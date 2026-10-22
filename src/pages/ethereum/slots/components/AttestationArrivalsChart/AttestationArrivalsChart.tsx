@@ -3,12 +3,18 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { AttestationArrivalsChartProps } from './AttestationArrivalsChart.types';
 import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { ATTESTATION_DEADLINE_MS, formatSlot } from '@/utils';
+
+/** Width of the attestation arrival buckets in fct_attestation_first_seen_chunked_50ms */
+const CHUNK_MS = 50;
 
 /**
  * AttestationArrivalsChart - Visualizes attestation arrival rate by block root voted for
  *
- * Shows attestations grouped by the block root they voted for over the slot timeline.
- * Each line represents attestations voting for a different block, showing when they arrived.
+ * Attestations arriving per 50ms across the slot, one series per block they voted for. Votes for
+ * this block are the filled area; votes for an older block (a missed head) are drawn in warning and
+ * danger so they stand out against it.
  *
  * @example
  * ```tsx
@@ -28,6 +34,7 @@ export function AttestationArrivalsChart({
   title = 'Attestation Arrivals by Block Vote',
   anchorId = 'attestation-arrivals',
 }: AttestationArrivalsChartProps): JSX.Element {
+  const themeColors = useThemeColors();
   // Create a map of block_root -> slot for quick lookup
   const blockSlotMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -39,88 +46,54 @@ export function AttestationArrivalsChart({
     return map;
   }, [votedForBlocks]);
 
-  // Group attestations by block_root and time chunk
-  const { series, labels, totalReceived } = useMemo(() => {
-    // Create array of all possible time points (0-12000ms in 50ms increments = 241 points)
-    const timePoints = Array.from({ length: 241 }, (_, i) => i * 50);
-
-    // Group by block_root, then by time
+  // One series per block voted for, as [seconds into the slot, attestations in that 50ms chunk]
+  const { series, totalReceived } = useMemo(() => {
     const blockGroups = new Map<string, Map<number, number>>();
-
     let total = 0;
 
     attestationData.forEach(point => {
-      const blockRoot = point.block_root;
-      if (!blockRoot) return;
-
-      const time = point.chunk_slot_start_diff ?? 0;
+      if (!point.block_root) return;
       const count = point.attestation_count ?? 0;
       total += count;
-
-      // Get or create the time map for this block root
-      let timeMap = blockGroups.get(blockRoot);
-      if (!timeMap) {
-        timeMap = new Map<number, number>();
-        blockGroups.set(blockRoot, timeMap);
-      }
-
-      // Set the count for this time point
-      timeMap.set(time, count);
+      let timeMap = blockGroups.get(point.block_root);
+      if (!timeMap) blockGroups.set(point.block_root, (timeMap = new Map()));
+      const time = point.chunk_slot_start_diff ?? 0;
+      timeMap.set(time, (timeMap.get(time) ?? 0) + count);
     });
 
-    // Create labels for time axis, but only show every second (every 20th point)
-    // Empty string for points we don't want to show labels for
-    const timeLabels = timePoints.map((time, index) => {
-      // Show label every 1000ms (20 points * 50ms = 1000ms)
-      if (index % 20 === 0) {
-        return (time / 1000).toFixed(0);
-      }
-      return '';
-    });
-
-    // Create series for each block root
-    const chartSeries: SeriesData[] = [];
-
-    blockGroups.forEach((timeMap, blockRoot) => {
-      // Get the slot for this block
+    const votes = [...blockGroups.entries()].map(([blockRoot, timeMap]) => {
       const blockSlot = blockSlotMap.get(blockRoot) ?? currentSlot;
+      const times = [...timeMap.keys()].sort((x, y) => x - y);
       const distance = currentSlot - blockSlot;
-
-      // Create data array aligned with timePoints, fill with 0 for missing data
-      const data = timePoints.map(time => timeMap.get(time) ?? 0);
-
-      // Create a label for this series
-      const label = distance === 0 ? 'Current Block (HEAD)' : `Slot ${blockSlot} (-${distance})`;
-
-      chartSeries.push({
-        name: label,
-        data,
-        showArea: true,
-        smooth: false,
-      });
+      // Votes for this block are a continuous curve over their arrival window. Votes for older blocks
+      // are a handful of scattered chunks: plot only the chunks that had any, so they read as marks
+      // rather than a flat line along the baseline
+      const data: Array<[number, number | null]> = [];
+      for (let t = times[0]; t <= times[times.length - 1]; t += CHUNK_MS) {
+        const count = timeMap.get(t) ?? 0;
+        data.push([t / 1000, count || distance === 0 ? count : null]);
+      }
+      return { blockSlot, distance, data };
     });
+    votes.sort((x, y) => x.distance - y.distance);
 
-    // Sort series so current block is first, then by distance (ascending)
-    chartSeries.sort((a, b) => {
-      const aIsCurrent = a.name.includes('Current');
-      const bIsCurrent = b.name.includes('Current');
-      if (aIsCurrent && !bIsCurrent) return -1;
-      if (!aIsCurrent && bIsCurrent) return 1;
+    const chartSeries: SeriesData[] = votes.map(({ blockSlot, distance, data }) =>
+      distance === 0
+        ? // Votes for this block are the normal case: neutral ink, so the exceptions carry the colour
+          { name: 'This block', data, color: themeColors.foreground, showArea: true, areaOpacity: 0.1, lineWidth: 1.25 }
+        : {
+            // Votes for an older block missed this one
+            name: `Slot ${formatSlot(blockSlot)}`,
+            data,
+            color: distance === 1 ? themeColors.warning : themeColors.danger,
+            lineWidth: 1.5,
+            showSymbol: true,
+            symbolSize: 3,
+          }
+    );
 
-      // Extract distance from name for sorting
-      const getDistance = (name: string): number => {
-        const match = name.match(/-(\d+)\)/);
-        return match ? parseInt(match[1], 10) : 0;
-      };
-      return getDistance(a.name) - getDistance(b.name);
-    });
-
-    return {
-      series: chartSeries,
-      labels: timeLabels,
-      totalReceived: total,
-    };
-  }, [attestationData, currentSlot, blockSlotMap]);
+    return { series: chartSeries, totalReceived: total };
+  }, [attestationData, currentSlot, blockSlotMap, themeColors]);
 
   // Format participation message
   const participationMessage = useMemo(() => {
@@ -153,21 +126,24 @@ export function AttestationArrivalsChart({
   return (
     <PopoutCard title={title} anchorId={anchorId} subtitle={participationMessage} modalSize="fullscreen">
       {({ inModal }) => (
-        <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-80'}>
+        <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-88'}>
           <MultiLineChart
             series={series}
-            xAxis={{
-              type: 'category',
-              labels,
-              name: 'Slot Time (s)',
-            }}
-            yAxis={{
-              name: 'Attestation Count',
-            }}
+            xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: 12 }}
+            yAxis={{ name: 'Per 50 ms', minInterval: 1 }}
+            markLines={[{ xValue: ATTESTATION_DEADLINE_MS / 1000, color: themeColors.muted }]}
+            markAreas={[
+              {
+                xStart: ATTESTATION_DEADLINE_MS / 1000,
+                xEnd: 12,
+                color: themeColors.muted,
+                opacity: 0.04,
+                label: 'After the attestation deadline',
+              },
+            ]}
             height="100%"
             animationDuration={150}
             showLegend
-            useNativeLegend
             syncGroup="slot-time"
           />
         </div>

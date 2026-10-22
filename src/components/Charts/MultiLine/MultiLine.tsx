@@ -1373,8 +1373,10 @@ export function MultiLineChart({
   }
 
   // Return unwrapped chart
+  // At height 100% the legend and the chart share the container: a flex column lets the chart take
+  // what the legend leaves, instead of the full height plus the legend (which clipped the x axis)
   return (
-    <div ref={measureRef} className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div ref={measureRef} className={_height === '100%' ? 'flex h-full w-full flex-col' : 'w-full'}>
       {chartContent}
     </div>
   );
