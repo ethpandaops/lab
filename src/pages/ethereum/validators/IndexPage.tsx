@@ -1,374 +1,685 @@
-import type { JSX } from 'react';
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useNavigate, useSearch } from '@tanstack/react-router';
-import clsx from 'clsx';
-import { MagnifyingGlassIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { type JSX, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Card } from '@/components/Layout/Card';
+import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { Stats } from '@/components/DataDisplay/Stats';
+import { StackedBar } from '@/components/Charts/StackedBar';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
+import type { MarkLineConfig, SeriesData } from '@/components/Charts/MultiLine';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { Toggle } from '@/components/Forms/Toggle';
+import { DataTable } from '@/components/DataTable';
+import type { DataTableColumn } from '@/components/DataTable';
+import { Entity } from '@/components/Ethereum/Entity';
+import { useForks } from '@/hooks/useForks';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useValidatorsData, useValidatorResolver, useValidatorStatus } from './hooks';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { epochToTimestamp, getDataVizColors } from '@/utils';
 import {
-  ValidatorInput,
-  parseValidatorIndices,
-  DateRangeSelector,
-  PerformanceSummary,
-  ValidatorTable,
-  ValidatorsSkeleton,
-  ThresholdConfig,
-  DEFAULT_THRESHOLDS,
-  ValidatorHeatmap,
-} from './components';
-import type { ThresholdValues, HeatmapMetric, ValidatorSelection } from './components';
-import { generateValidatorReport } from './utils';
+  fctAttestationParticipationRateDailyServiceListOptions,
+  fctHeadVoteCorrectnessRateDailyServiceListOptions,
+  fctMissedSlotRateDailyServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
+import { MockBadge, TableCard, TableSearch } from './components';
+import { buildOverviewDays, CREDENTIAL_TYPES, fixture, formatDayLabel } from './mocks/overview';
+import type { CredentialType, OverviewDay, OverviewFixture } from './mocks/overview';
+import {
+  bucketDays,
+  formatCompact,
+  lowestSince,
+  OVERVIEW_WINDOW_OPTIONS,
+  sliceWindow,
+  sum,
+  type OverviewWindow,
+} from './utils/overview';
 
-/** Search params for validators page */
-interface ValidatorsSearch {
-  indices?: string;
-  from?: number;
-  to?: number;
-}
+const CREDENTIAL_LABELS: Record<CredentialType, string> = {
+  '0x00': '0x00 BLS',
+  '0x01': '0x01 Execution',
+  '0x02': '0x02 Compounding',
+};
+
+/** ETH that can enter or leave the active set per day (256 ETH per epoch) */
+const CHURN_ETH_PER_DAY = 256 * 225;
+
+const EB_BUCKETS: { label: string; min: number; max: number }[] = [
+  { label: '<32', min: 0, max: 31 },
+  { label: '32', min: 32, max: 32 },
+  { label: '33–63', min: 33, max: 63 },
+  { label: '64–127', min: 64, max: 127 },
+  { label: '128–255', min: 128, max: 255 },
+  { label: '256–511', min: 256, max: 511 },
+  { label: '512–1023', min: 512, max: 1023 },
+  { label: '1024–2047', min: 1024, max: 2047 },
+  { label: '2048', min: 2048, max: 2048 },
+];
+
+const area = (stack: string): Partial<SeriesData> => ({
+  stack,
+  showArea: true,
+  areaOpacity: 0.85,
+  lineWidth: 0,
+  showSymbol: false,
+});
+
+const bar = (stack: string): Partial<SeriesData> => ({ stack, seriesType: 'bar' });
+
+const formatEth = (v: number): string => `${formatCompact(v)} ETH`;
 
 /**
- * Get default time range (last 7 days including today)
- */
-function getDefaultTimeRange(): { from: number; to: number } {
-  const now = new Date();
-  now.setUTCHours(0, 0, 0, 0);
-  const todayStart = Math.floor(now.getTime() / 1000);
-  const from = todayStart - 7 * 86400;
-  return { from, to: todayStart };
-}
-
-/**
- * Parse comma-separated URL string into a tag array
- */
-function tagsFromUrl(indices?: string): string[] {
-  return (indices ?? '').split(',').filter(Boolean);
-}
-
-/**
- * Validators performance analysis page
- *
- * Allows users to:
- * - Enter multiple validator indices
- * - Select a time range
- * - Configure pass/fail thresholds
- * - View aggregate and per-validator performance metrics
+ * Network-wide validator overview: validator set size, stake by withdrawal credential type, queues,
+ * operations, rewards and duty performance.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate();
-  const search = useSearch({ from: '/ethereum/validators/' }) as ValidatorsSearch;
+  const search = useSearch({ from: '/ethereum/validators/' });
+  const window: OverviewWindow = search.t ?? 'all';
+  const [showForks, setShowForks] = useState(true);
+  const [ebMode, setEbMode] = useState<'stake' | 'validators'>('stake');
+  const [mixMode, setMixMode] = useState<'stake' | 'validators'>('stake');
+  const [entitySearch, setEntitySearch] = useState('');
+
+  const themeColors = useThemeColors();
+  const { CHART_CATEGORICAL_COLORS: palette } = getDataVizColors();
+  const credentialColors: Record<CredentialType, string> = {
+    '0x00': themeColors.muted,
+    '0x01': palette[0],
+    '0x02': palette[1],
+  };
+
+  const allDays = useMemo(() => buildOverviewDays(), []);
+  const days = sliceWindow(allDays, window);
+  const weekly = days.length > 400;
+  const buckets = bucketDays(days, weekly);
+  const labels = days.map(d => formatDayLabel(d.day));
+  const bucketLabels = buckets.map(b => b.label);
+
+  // --- Fork marks: nearest label on or after each fork ---
+  const { allForks } = useForks();
   const { currentNetwork } = useNetwork();
-
-  // Initialize state from URL params or defaults
-  const defaultRange = getDefaultTimeRange();
-  const [tags, setTags] = useState<string[]>(() => tagsFromUrl(search.indices));
-  const [timeRange, setTimeRange] = useState({
-    from: search.from ?? defaultRange.from,
-    to: search.to ?? defaultRange.to,
-  });
-  const [thresholds, setThresholds] = useState<ThresholdValues>(DEFAULT_THRESHOLDS);
-  const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('inclusion');
-  const [hasAnalyzed, setHasAnalyzed] = useState(false);
-  const [selection, setSelection] = useState<ValidatorSelection>({
-    validatorIndex: null,
-    dayTimestamp: null,
-    hourTimestamp: null,
-  });
-
-  // Parse validator indices and pubkeys from tags
-  const { valid: parsedIndices, pubkeys: parsedPubkeys } = parseValidatorIndices(tags);
-
-  // Resolve mixed inputs (indices + pubkeys) into unified set
-  const {
-    resolvedIndices,
-    validatorMap,
-    isResolving,
-    isResolved,
-    error: resolverError,
-    unresolvedPubkeys,
-  } = useValidatorResolver(parsedIndices, parsedPubkeys, hasAnalyzed);
-
-  // Fetch data when analyze is triggered and resolution is complete
-  const {
-    validators,
-    summary,
-    attestationDaily,
-    balanceDaily,
-    syncCommitteeDaily,
-    blockProposals,
-    isLoading,
-    error,
-    hasData,
-  } = useValidatorsData(
-    hasAnalyzed && isResolved ? resolvedIndices : [],
-    hasAnalyzed && isResolved ? timeRange.from : 0,
-    hasAnalyzed && isResolved ? timeRange.to : 0
-  );
-
-  // Fetch validator status transitions
-  const {
-    getStatusAtTimestamp,
-    statusSummary,
-    unknownValidators,
-    isLoading: isStatusLoading,
-  } = useValidatorStatus(hasAnalyzed && isResolved ? resolvedIndices : []);
-
-  // Update URL when search params change
-  const updateUrl = useCallback(
-    (tagList: string[], from: number, to: number) => {
-      const indices = tagList.join(',');
-      void navigate({
-        to: '/ethereum/validators',
-        search: {
-          indices: indices || undefined,
-          from: from || undefined,
-          to: to || undefined,
-        } as ValidatorsSearch,
-        replace: true,
+  const forkMarks = (dayList: string[], labelList: string[]): MarkLineConfig[] => {
+    if (!showForks || !currentNetwork) return [];
+    return allForks
+      .filter(f => f.name !== 'phase0')
+      .flatMap(f => {
+        const day = new Date(epochToTimestamp(f.epoch, currentNetwork.genesis_time) * 1000).toISOString().slice(0, 10);
+        const idx = dayList.findIndex(d => d >= day);
+        if (idx <= 0) return [];
+        return [
+          {
+            xValue: labelList[idx],
+            label: f.displayName,
+            labelPosition: 'end' as const,
+            color: '#8b5cf6',
+            lineStyle: 'dashed' as const,
+            lineWidth: 1,
+          },
+        ];
       });
-    },
-    [navigate]
+  };
+  const dailyForkMarks = forkMarks(
+    days.map(d => d.day),
+    labels
+  );
+  const bucketForkMarks = forkMarks(
+    buckets.map(b => b.days[0].day),
+    bucketLabels
   );
 
-  const hasValidInput = parsedIndices.length > 0 || parsedPubkeys.length > 0;
+  // --- Snapshot (real, from a beacon state) ---
+  const { snapshot } = fixture;
+  const active = snapshot.byCredentialStatus.filter(r => r.status.startsWith('active_'));
+  const activeByType = Object.fromEntries(
+    CREDENTIAL_TYPES.map(ct => {
+      const rows = active.filter(r => r.credentialType === ct);
+      return [
+        ct,
+        {
+          count: rows.reduce((a, r) => a + r.count, 0),
+          stake: rows.reduce((a, r) => a + r.effectiveBalanceEth, 0),
+        },
+      ];
+    })
+  ) as Record<CredentialType, { count: number; stake: number }>;
+  const activeCount = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].count, 0);
+  const activeStake = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].stake, 0);
+  const lowDay = lowestSince(allDays, d => d.status.active + d.status.exiting);
+  const { queues } = snapshot;
+  const entryEth = queues.activationQueue.effectiveBalanceEth + (queues.pendingDeposits?.amountEth ?? 0);
+  const exitWaitDays = Math.max(0, ((queues.exitQueue.maxExitEpoch - snapshot.epoch) * 384) / 86_400);
 
-  // Handle analyze button click
-  const handleAnalyze = useCallback(() => {
-    if (!hasValidInput) return;
-    setHasAnalyzed(true);
-    updateUrl(tags, timeRange.from, timeRange.to);
-  }, [hasValidInput, tags, timeRange, updateUrl]);
+  // --- Real duty performance from existing daily tables ---
+  const dailyQuery = { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 10_000 };
+  const participation = useQuery(fctAttestationParticipationRateDailyServiceListOptions({ query: dailyQuery }));
+  const headVote = useQuery(fctHeadVoteCorrectnessRateDailyServiceListOptions({ query: dailyQuery }));
+  const missed = useQuery(fctMissedSlotRateDailyServiceListOptions({ query: dailyQuery }));
+  const dutyDays = days.map(d => d.day);
+  const byDay = <T extends { day_start_date?: string }>(
+    rows: T[] | undefined,
+    pick: (r: T) => number | undefined
+  ): (number | null)[] => {
+    const m = new Map(rows?.map(r => [r.day_start_date ?? '', pick(r)]));
+    return dutyDays.map(d => m.get(d) ?? null);
+  };
+  const participationSeries = byDay(
+    participation.data?.fct_attestation_participation_rate_daily,
+    r => r.avg_participation_rate
+  );
+  const headVoteSeries = byDay(headVote.data?.fct_head_vote_correctness_rate_daily, r => r.avg_head_vote_rate);
+  const missedSeries = byDay(missed.data?.fct_missed_slot_rate_daily, r => r.missed_rate);
 
-  // Handle tags change
-  const handleTagsChange = useCallback(
-    (newTags: string[]) => {
-      setTags(newTags);
-      setHasAnalyzed(false);
-      if (newTags.length === 0) {
-        updateUrl([], timeRange.from, timeRange.to);
-      }
-    },
-    [timeRange, updateUrl]
+  // Memoised: DataTable returns to page 1 whenever its data array changes
+  const entities = useMemo(
+    () => snapshot.topEntities.filter(e => e.entity.toLowerCase().includes(entitySearch.trim().toLowerCase())),
+    [snapshot.topEntities, entitySearch]
   );
 
-  // Handle time range change
-  const handleTimeRangeChange = useCallback((from: number, to: number) => {
-    setTimeRange({ from, to });
-    setHasAnalyzed(false);
-  }, []);
-
-  // Track if we've done the initial mount check
-  const hasInitialized = useRef(false);
-
-  // Auto-analyze if URL has params on mount (only once)
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-
-    if (search.indices) {
-      const parsed = tagsFromUrl(search.indices);
-      const { valid, pubkeys } = parseValidatorIndices(parsed);
-      if (valid.length > 0 || pubkeys.length > 0) {
-        setHasAnalyzed(true);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Handle download report
-  const handleDownloadReport = useCallback(() => {
-    if (!summary || !currentNetwork) return;
-
-    const markdown = generateValidatorReport({
-      validators,
-      summary,
-      thresholds,
-      timeRange,
-      network: currentNetwork.name,
-      url: window.location.href,
-      blockProposals,
-      validatorMap,
-    });
-
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `validator-report-${new Date().toISOString().split('T')[0]}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [validators, summary, thresholds, timeRange, currentNetwork, blockProposals, validatorMap]);
+  const entityColumns: DataTableColumn<OverviewFixture['snapshot']['topEntities'][number]>[] = [
+    {
+      id: 'entity',
+      header: 'Entity',
+      accessorKey: 'entity',
+      cell: ({ row }) => <Entity entity={row.original.entity} />,
+      meta: { cellClassName: 'text-foreground' },
+    },
+    {
+      id: 'validators',
+      header: 'Validators',
+      accessorKey: 'count',
+      cell: ({ row }) => row.original.count.toLocaleString(),
+      meta: { cellClassName: 'text-foreground tabular-nums' },
+    },
+    {
+      id: 'stake',
+      header: 'Stake',
+      accessorKey: 'effectiveBalanceEth',
+      cell: ({ row }) => formatEth(row.original.effectiveBalanceEth),
+      meta: { cellClassName: 'text-foreground tabular-nums' },
+    },
+    {
+      id: 'share',
+      header: 'Share',
+      accessorFn: e => e.effectiveBalanceEth / activeStake,
+      cell: ({ getValue }) => `${((getValue() as number) * 100).toFixed(2)}%`,
+      meta: { cellClassName: 'tabular-nums' },
+    },
+    {
+      id: 'avg',
+      header: 'Avg balance',
+      accessorFn: e => e.effectiveBalanceEth / e.count,
+      cell: ({ getValue }) => `${(getValue() as number).toFixed(1)} ETH`,
+      meta: { cellClassName: 'tabular-nums' },
+    },
+    {
+      id: 'mix',
+      header: 'Credential mix (stake)',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex h-2 w-48 overflow-hidden rounded-full bg-border">
+          {CREDENTIAL_TYPES.map(ct => (
+            <div
+              key={ct}
+              title={`${CREDENTIAL_LABELS[ct]}: ${formatEth(row.original.byCredential[ct].effectiveBalanceEth)}`}
+              style={{
+                width: `${(row.original.byCredential[ct].effectiveBalanceEth / row.original.effectiveBalanceEth) * 100}%`,
+                backgroundColor: credentialColors[ct],
+              }}
+            />
+          ))}
+        </div>
+      ),
+    },
+  ];
 
   return (
     <Container>
-      <Header
-        title="Validators"
-        description="Attestation correctness, sync committee participation and balance history"
-      />
+      <Header title="Validators" description="Validator set, stake, queues and rewards across the network" />
 
-      <div className="mt-6 space-y-6">
-        {/* Input section */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <ValidatorInput
-            tags={tags}
-            onTagsChange={handleTagsChange}
-            onSubmit={handleAnalyze}
-            disabled={isResolving || isLoading}
-          />
-          <DateRangeSelector
-            from={timeRange.from}
-            to={timeRange.to}
-            onChange={handleTimeRangeChange}
-            disabled={isResolving || isLoading}
-          />
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={handleAnalyze}
-            disabled={!hasValidInput || isResolving || isLoading || isStatusLoading}
-            className={clsx(
-              'flex items-center gap-2 rounded-xs border border-primary bg-primary/10 px-4 py-2 text-sm/6 font-medium text-primary',
-              'transition-colors hover:bg-primary/20',
-              'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-primary/10'
-            )}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <SegmentedControl
+          options={OVERVIEW_WINDOW_OPTIONS}
+          value={window}
+          onChange={value => navigate({ to: '/ethereum/validators', search: { t: value }, replace: true })}
+          ariaLabel="Time window"
+        />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted">Forks</span>
+            <Toggle checked={showForks} onChange={setShowForks} size="small" />
+          </div>
+          <Link
+            to="/ethereum/validators/inspect"
+            className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
           >
-            <MagnifyingGlassIcon className="size-4" />
-            {isResolving ? 'Resolving validators...' : isLoading ? 'Analyzing...' : 'Analyze'}
-          </button>
+            Inspect validators
+          </Link>
+        </div>
+      </div>
 
-          {hasAnalyzed && hasData && !isLoading && !isResolving && (
-            <button
-              type="button"
-              onClick={handleDownloadReport}
-              className={clsx(
-                'flex items-center gap-2 rounded-xs border border-border bg-surface px-4 py-2 text-sm/6 font-medium text-foreground',
-                'transition-colors hover:bg-muted/10'
-              )}
-            >
-              <ArrowDownTrayIcon className="size-4" />
-              Download Report
-            </button>
+      <div className="flex flex-col gap-4">
+        <Stats
+          gridClassName="grid grid-cols-2 gap-px md:grid-cols-3 xl:grid-cols-6"
+          stats={[
+            {
+              id: 'active',
+              name: 'Active validators',
+              value: activeCount.toLocaleString(),
+              subtitle: lowDay
+                ? `Lowest since ${new Date(`${lowDay}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`
+                : undefined,
+            },
+            {
+              id: 'stake',
+              name: 'Staked',
+              value: formatEth(activeStake),
+              subtitle: 'Effective balance',
+            },
+            {
+              id: 'compounding',
+              name: 'Compounding (0x02)',
+              value: activeByType['0x02'].count.toLocaleString(),
+              subtitle: `${((activeByType['0x02'].stake / activeStake) * 100).toFixed(1)}% of stake`,
+            },
+            {
+              id: 'avg-eb',
+              name: 'Avg effective balance',
+              value: `${(activeStake / activeCount).toFixed(1)} ETH`,
+            },
+            {
+              id: 'entry',
+              name: 'Entry queue',
+              value: formatEth(entryEth),
+              subtitle: `~${Math.ceil(entryEth / CHURN_ETH_PER_DAY)} days`,
+            },
+            {
+              id: 'exit',
+              name: 'Exit queue',
+              value: formatEth(queues.exitQueue.effectiveBalanceEth),
+              subtitle:
+                exitWaitDays < 1 ? `~${Math.ceil(exitWaitDays * 24)} hours` : `~${Math.ceil(exitWaitDays)} days`,
+            },
+          ]}
+        />
+
+        <Card
+          title="Credential mix"
+          actions={
+            <SegmentedControl
+              options={[
+                { value: 'stake', label: 'Stake' },
+                { value: 'validators', label: 'Validators' },
+              ]}
+              value={mixMode}
+              onChange={setMixMode}
+              ariaLabel="Credential mix measure"
+            />
+          }
+        >
+          <StackedBar
+            segments={CREDENTIAL_TYPES.map(ct => ({
+              name: CREDENTIAL_LABELS[ct],
+              value: mixMode === 'stake' ? activeByType[ct].stake : activeByType[ct].count,
+              color: credentialColors[ct],
+            }))}
+            showPercentages
+            showLegend
+            valueFormatter={v => (mixMode === 'stake' ? formatEth(v) : formatCompact(v))}
+          />
+        </Card>
+
+        <PopoutCard
+          title="Stake by credential type"
+          anchorId="stake-by-credential"
+          modalSize="full"
+          headerActions={fixture.weeklyCredential.some(w => w.modelled) ? <MockBadge /> : undefined}
+        >
+          {({ inModal }) => (
+            <MultiLineChart
+              series={[
+                ...CREDENTIAL_TYPES.map(ct => ({
+                  name: CREDENTIAL_LABELS[ct],
+                  data: days.map(d => Math.round(d.credential[ct].effectiveBalanceEth)),
+                  color: credentialColors[ct],
+                  ...area('stake'),
+                })),
+                {
+                  name: 'Active validators',
+                  data: days.map(d => Math.round(d.status.active + d.status.exiting)),
+                  color: themeColors.foreground,
+                  yAxisIndex: 1,
+                  showSymbol: false,
+                },
+              ]}
+              xAxis={{ type: 'category', labels }}
+              yAxis={{ name: 'Staked ETH', min: 0 }}
+              secondaryYAxis={{ name: 'Active validators', min: 0 }}
+              height={inModal ? 600 : 380}
+              showLegend
+              legendPosition="top"
+              enableDataZoom
+              markLines={dailyForkMarks}
+              syncGroup={inModal ? undefined : 'validators-overview'}
+            />
           )}
+        </PopoutCard>
+
+        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+          <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
+            {({ inModal }) => (
+              <MultiLineChart
+                series={[
+                  {
+                    name: 'Active',
+                    data: days.map(d => Math.round(d.status.active)),
+                    color: themeColors.success,
+                    ...area('status'),
+                  },
+                  {
+                    name: 'Exiting',
+                    data: days.map(d => Math.round(d.status.exiting)),
+                    color: themeColors.warning,
+                    ...area('status'),
+                  },
+                  {
+                    name: 'Pending',
+                    data: days.map(d => Math.round(d.status.pending)),
+                    color: palette[0],
+                    ...area('status'),
+                  },
+                  {
+                    name: 'Exited',
+                    initiallyVisible: false,
+                    data: days.map(d => Math.round(d.status.exited + d.status.withdrawn)),
+                    color: themeColors.muted,
+                    showSymbol: false,
+                    lineStyle: 'dashed',
+                  },
+                ]}
+                xAxis={{ type: 'category', labels }}
+                yAxis={{ name: 'Validators', min: 0 }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                markLines={dailyForkMarks}
+                syncGroup={inModal ? undefined : 'validators-overview'}
+              />
+            )}
+          </PopoutCard>
+
+          <PopoutCard
+            title="Effective balance distribution"
+            anchorId="effective-balance-distribution"
+            modalSize="full"
+            headerActions={
+              <SegmentedControl
+                options={[
+                  { value: 'stake', label: 'Stake' },
+                  { value: 'validators', label: 'Validators' },
+                ]}
+                value={ebMode}
+                onChange={setEbMode}
+                ariaLabel="Distribution measure"
+              />
+            }
+          >
+            {({ inModal }) => (
+              <MultiLineChart
+                series={CREDENTIAL_TYPES.map(ct => ({
+                  name: CREDENTIAL_LABELS[ct],
+                  data: EB_BUCKETS.map(b =>
+                    snapshot.effectiveBalanceHistogram
+                      .filter(
+                        h => h.credentialType === ct && h.effectiveBalanceEth >= b.min && h.effectiveBalanceEth <= b.max
+                      )
+                      .reduce((a, h) => a + (ebMode === 'stake' ? h.count * h.effectiveBalanceEth : h.count), 0)
+                  ),
+                  color: credentialColors[ct],
+                  ...bar('eb'),
+                }))}
+                xAxis={{ type: 'category', labels: EB_BUCKETS.map(b => b.label), name: 'Effective balance (ETH)' }}
+                yAxis={{ name: ebMode === 'stake' ? 'ETH' : 'Validators', min: 0 }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+              />
+            )}
+          </PopoutCard>
         </div>
 
-        {/* Resolver error */}
-        {resolverError && (
-          <div className="rounded-xs border border-danger/20 bg-danger/10 p-4 text-danger">
-            Error resolving validators: {resolverError.message}
-          </div>
-        )}
+        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+          <PopoutCard title="Entry and exit queues" anchorId="queues" modalSize="full" headerActions={<MockBadge />}>
+            {({ inModal }) => (
+              <MultiLineChart
+                series={[
+                  {
+                    name: 'Entry',
+                    data: days.map(d => Math.round(d.activationQueueEth)),
+                    color: themeColors.success,
+                    showArea: true,
+                    areaOpacity: 0.3,
+                    showSymbol: false,
+                  },
+                  {
+                    name: 'Exit',
+                    data: days.map(d => -Math.round(d.exitQueueEth)),
+                    color: themeColors.danger,
+                    showArea: true,
+                    areaOpacity: 0.3,
+                    showSymbol: false,
+                  },
+                ]}
+                xAxis={{ type: 'category', labels }}
+                yAxis={{ name: 'Queued ETH', formatter: v => formatCompact(Math.abs(v)) }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                markLines={dailyForkMarks}
+                syncGroup={inModal ? undefined : 'validators-overview'}
+              />
+            )}
+          </PopoutCard>
 
-        {/* Unresolved pubkeys warning */}
-        {unresolvedPubkeys.length > 0 && (
-          <div className="rounded-xs border border-warning/20 bg-warning/10 p-4 text-warning">
-            <p className="font-medium">
-              Could not resolve {unresolvedPubkeys.length} pubkey{unresolvedPubkeys.length !== 1 ? 's' : ''}:
-            </p>
-            <ul className="mt-1 list-inside list-disc text-sm">
-              {unresolvedPubkeys.map(pk => (
-                <li key={pk} className="font-mono">
-                  {pk.slice(0, 10)}...{pk.slice(-8)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          <PopoutCard
+            title={weekly ? 'Validator operations per week' : 'Validator operations per day'}
+            anchorId="operations"
+            modalSize="full"
+            headerActions={<MockBadge />}
+          >
+            {({ inModal }) => (
+              <MultiLineChart
+                series={(
+                  [
+                    ['New deposits', d => d.ops.deposits, palette[0]],
+                    ['Top-ups', d => d.ops.topUps, palette[4]],
+                    ['Consolidations', d => d.ops.consolidations, palette[1]],
+                    ['Switch to 0x02', d => d.ops.switchToCompounding, palette[10]],
+                    ['Partial withdrawal requests', d => d.ops.partialWithdrawalRequests, palette[2]],
+                    ['Exit requests (EL)', d => d.ops.fullExitRequests, palette[6]],
+                    ['Voluntary exits', d => d.ops.voluntaryExits, palette[3]],
+                  ] as [string, (d: OverviewDay) => number, string][]
+                ).map(([name, pick, color]) => ({
+                  name,
+                  data: buckets.map(b => sum(b.days, pick)),
+                  color,
+                  ...bar('ops'),
+                }))}
+                xAxis={{ type: 'category', labels: bucketLabels }}
+                yAxis={{ name: 'Operations', min: 0 }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                markLines={bucketForkMarks}
+              />
+            )}
+          </PopoutCard>
+        </div>
 
-        {/* Unknown validators warning */}
-        {unknownValidators.length > 0 && (
-          <div className="rounded-xs border border-warning/20 bg-warning/10 p-4 text-warning">
-            <p className="font-medium">
-              {unknownValidators.length} validator{unknownValidators.length !== 1 ? 's' : ''} not found:
-            </p>
-            <ul className="mt-1 list-inside list-disc text-sm">
-              {unknownValidators.map(idx => (
-                <li key={idx} className="font-mono">
-                  {idx}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+          <PopoutCard
+            title={weekly ? 'ETH in and out per week' : 'ETH in and out per day'}
+            anchorId="flows"
+            modalSize="full"
+            headerActions={<MockBadge />}
+          >
+            {({ inModal }) => (
+              <MultiLineChart
+                series={[
+                  {
+                    name: 'Deposited',
+                    data: buckets.map(b => Math.round(sum(b.days, d => d.flows.depositedEth))),
+                    color: themeColors.success,
+                    ...bar('flows'),
+                  },
+                  {
+                    name: 'Reward skims',
+                    data: buckets.map(b => -Math.round(sum(b.days, d => d.flows.skimmedEth))),
+                    color: palette[2],
+                    ...bar('flows'),
+                  },
+                  {
+                    name: 'Full withdrawals',
+                    data: buckets.map(b => -Math.round(sum(b.days, d => d.flows.fullWithdrawnEth))),
+                    color: themeColors.danger,
+                    ...bar('flows'),
+                  },
+                  {
+                    name: 'Net',
+                    data: buckets.map(b =>
+                      Math.round(sum(b.days, d => d.flows.depositedEth - d.flows.skimmedEth - d.flows.fullWithdrawnEth))
+                    ),
+                    color: themeColors.foreground,
+                    showSymbol: false,
+                  },
+                ]}
+                xAxis={{ type: 'category', labels: bucketLabels }}
+                yAxis={{ name: 'ETH' }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                markLines={bucketForkMarks}
+              />
+            )}
+          </PopoutCard>
 
-        {/* Data error state */}
-        {error && (
-          <div className="rounded-xs border border-danger/20 bg-danger/10 p-4 text-danger">
-            Error loading data: {error.message}
-          </div>
-        )}
+          <PopoutCard
+            title={weekly ? 'Consensus rewards per week' : 'Consensus rewards per day'}
+            anchorId="rewards"
+            modalSize="full"
+            headerActions={<MockBadge />}
+          >
+            {({ inModal }) => (
+              <MultiLineChart
+                series={[
+                  {
+                    name: 'Attestations',
+                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.attestationEth))),
+                    color: palette[0],
+                    ...bar('rewards'),
+                  },
+                  {
+                    name: 'Proposals',
+                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.proposerEth))),
+                    color: palette[7],
+                    ...bar('rewards'),
+                  },
+                  {
+                    name: 'Sync committee',
+                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.syncEth))),
+                    color: palette[4],
+                    ...bar('rewards'),
+                  },
+                  {
+                    name: 'Penalties',
+                    data: buckets.map(b => -Math.round(sum(b.days, d => d.rewards.penaltiesEth))),
+                    color: themeColors.danger,
+                    ...bar('rewards'),
+                  },
+                  {
+                    name: 'APR',
+                    data: buckets.map(b => {
+                      const stake = CREDENTIAL_TYPES.reduce(
+                        (a, ct) => a + b.last.credential[ct].effectiveBalanceEth,
+                        0
+                      );
+                      const r = sum(
+                        b.days,
+                        d =>
+                          d.rewards.attestationEth + d.rewards.proposerEth + d.rewards.syncEth - d.rewards.penaltiesEth
+                      );
+                      return Number(((((r / b.days.length) * 365) / stake) * 100).toFixed(2));
+                    }),
+                    color: themeColors.foreground,
+                    yAxisIndex: 1,
+                    showSymbol: false,
+                  },
+                ]}
+                xAxis={{ type: 'category', labels: bucketLabels }}
+                yAxis={{ name: 'ETH' }}
+                secondaryYAxis={{ name: 'APR', formatter: v => `${v}%` }}
+                height={inModal ? 600 : 300}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                markLines={bucketForkMarks}
+              />
+            )}
+          </PopoutCard>
+        </div>
 
-        {/* Results section - only show if analyzed */}
-        {hasAnalyzed && !error && !resolverError && (
-          <>
-            {/* Threshold configuration */}
-            <ThresholdConfig values={thresholds} onChange={setThresholds} disabled={isResolving || isLoading} />
-
-            {/* Performance summary */}
-            <PerformanceSummary
-              summary={summary}
-              statusSummary={statusSummary}
-              isStatusLoading={isStatusLoading}
-              thresholds={thresholds}
-              isLoading={isResolving || isLoading}
+        <PopoutCard title="Duty performance" anchorId="duty-performance" modalSize="full">
+          {({ inModal }) => (
+            <MultiLineChart
+              series={[
+                {
+                  name: 'Attestation participation',
+                  data: participationSeries,
+                  color: palette[0],
+                  showSymbol: false,
+                },
+                { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
+                {
+                  name: 'Missed slots',
+                  data: missedSeries,
+                  color: themeColors.danger,
+                  showSymbol: false,
+                  yAxisIndex: 1,
+                },
+              ]}
+              xAxis={{ type: 'category', labels }}
+              yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
+              secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
+              height={inModal ? 600 : 280}
+              showLegend
+              legendPosition="top"
+              enableDataZoom
+              connectNulls
+              markLines={dailyForkMarks}
+              syncGroup={inModal ? undefined : 'validators-overview'}
             />
+          )}
+        </PopoutCard>
 
-            {/* Heatmap visualization */}
-            {(hasData || statusSummary !== null) && (
-              <ValidatorHeatmap
-                data={attestationDaily}
-                blockProposals={blockProposals}
-                metric={heatmapMetric}
-                onMetricChange={setHeatmapMetric}
-                from={timeRange.from}
-                to={timeRange.to}
-                isLoading={isResolving || isLoading}
-                validatorIndices={resolvedIndices}
-                selection={selection}
-                onCellSelect={setSelection}
-                getStatusAtTimestamp={getStatusAtTimestamp}
-              />
-            )}
-
-            {/* Validator table */}
-            {isResolving || isLoading ? (
-              <ValidatorsSkeleton />
-            ) : hasData ? (
-              <ValidatorTable
-                validators={validators}
-                attestationDaily={attestationDaily}
-                balanceDaily={balanceDaily}
-                syncCommitteeDaily={syncCommitteeDaily}
-                blockProposals={blockProposals}
-                validatorMap={validatorMap}
-                from={timeRange.from}
-                to={timeRange.to}
-                getStatusAtTimestamp={getStatusAtTimestamp}
-                selection={selection}
-                onValidatorSelect={setSelection}
-              />
-            ) : (
-              <div className="rounded-xs border border-border bg-surface p-8 text-center text-muted">
-                No data available for the selected validators and time range.
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Initial state - show instructions */}
-        {!hasAnalyzed && !isLoading && !isResolving && (
-          <div className="rounded-xs border border-border bg-surface p-8 text-center">
-            <p className="text-muted">
-              Enter one or more validator indices or pubkeys and select a time range to analyze their performance.
-            </p>
-            <p className="mt-2 text-sm text-muted/70">
-              Supports comma-separated, space-separated, or newline-separated validator indices and pubkeys.
-            </p>
-          </div>
-        )}
+        <TableCard
+          title="Entities by stake"
+          filters={<TableSearch value={entitySearch} onChange={setEntitySearch} placeholder="Search entities" />}
+        >
+          <DataTable
+            data={entities}
+            columns={entityColumns}
+            pageSize={10}
+            hideGlobalFilter
+            hideColumnVisibility
+            getRowId={e => e.entity}
+            emptyMessage="No entities match this search"
+          />
+        </TableCard>
       </div>
     </Container>
   );

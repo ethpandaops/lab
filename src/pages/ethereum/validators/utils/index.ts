@@ -1,1 +1,0 @@
-export { generateValidatorReport } from './generateReport';

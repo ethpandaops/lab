@@ -8,3 +8,5 @@ export { useValidatorResolver } from './useValidatorResolver';
 export type { ValidatorInfo } from './useValidatorResolver';
 export { useValidatorStatus, formatStatusLabel, getStatusIconConfig } from './useValidatorStatus';
 export type { StatusSummary, StatusCategory, StatusIconConfig } from './useValidatorStatus';
+export { useValidatorIdentity } from './useValidatorIdentity';
+export type { ValidatorIdentity } from './useValidatorIdentity';

@@ -43,6 +43,7 @@ import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epoch
 import { Route as EthereumEntitiesIndexRouteImport } from './routes/ethereum/entities/index'
 import { Route as EthereumContractsIndexRouteImport } from './routes/ethereum/contracts/index'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
+import { Route as EthereumValidatorsInspectRouteImport } from './routes/ethereum/validators/inspect'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/execution/timings'
@@ -245,6 +246,12 @@ const XatuContributorsIdRoute = XatuContributorsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => XatuContributorsRoute,
 } as any)
+const EthereumValidatorsInspectRoute =
+  EthereumValidatorsInspectRouteImport.update({
+    id: '/inspect',
+    path: '/inspect',
+    getParentRoute: () => EthereumValidatorsRoute,
+  } as any)
 const EthereumSlotsSlotRoute = EthereumSlotsSlotRouteImport.update({
   id: '/$slot',
   path: '/$slot',
@@ -441,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
+  '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
@@ -490,6 +498,7 @@ export interface FileRoutesByTo {
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
+  '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/contracts': typeof EthereumContractsIndexRoute
   '/ethereum/entities': typeof EthereumEntitiesIndexRoute
@@ -553,6 +562,7 @@ export interface FileRoutesById {
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
+  '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
@@ -617,6 +627,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
+    | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/ethereum/contracts/'
     | '/ethereum/entities/'
@@ -666,6 +677,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
+    | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/ethereum/contracts'
     | '/ethereum/entities'
@@ -728,6 +740,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
     | '/ethereum/slots/$slot'
+    | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/ethereum/contracts/'
     | '/ethereum/entities/'
@@ -999,6 +1012,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/xatu/contributors/$id'
       preLoaderRoute: typeof XatuContributorsIdRouteImport
       parentRoute: typeof XatuContributorsRoute
+    }
+    '/ethereum/validators/inspect': {
+      id: '/ethereum/validators/inspect'
+      path: '/inspect'
+      fullPath: '/ethereum/validators/inspect'
+      preLoaderRoute: typeof EthereumValidatorsInspectRouteImport
+      parentRoute: typeof EthereumValidatorsRoute
     }
     '/ethereum/slots/$slot': {
       id: '/ethereum/slots/$slot'
@@ -1393,10 +1413,12 @@ const EthereumSlotsRouteWithChildren = EthereumSlotsRoute._addFileChildren(
 )
 
 interface EthereumValidatorsRouteChildren {
+  EthereumValidatorsInspectRoute: typeof EthereumValidatorsInspectRoute
   EthereumValidatorsIndexRoute: typeof EthereumValidatorsIndexRoute
 }
 
 const EthereumValidatorsRouteChildren: EthereumValidatorsRouteChildren = {
+  EthereumValidatorsInspectRoute: EthereumValidatorsInspectRoute,
   EthereumValidatorsIndexRoute: EthereumValidatorsIndexRoute,
 }
 

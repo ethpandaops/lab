@@ -1,9 +1,7 @@
 import type { JSX } from 'react';
-import clsx from 'clsx';
 import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats';
 import type { AggregateSummary } from '../../hooks/useValidatorsData.types';
-import type { StatusSummary } from '../../hooks/useValidatorStatus';
 
 interface ThresholdConfig {
   inclusionRate: number;
@@ -15,10 +13,6 @@ interface ThresholdConfig {
 interface PerformanceSummaryProps {
   /** Aggregate summary data */
   summary: AggregateSummary | null;
-  /** Validator status summary */
-  statusSummary?: StatusSummary | null;
-  /** Whether status data is still loading */
-  isStatusLoading?: boolean;
   /** Threshold configuration */
   thresholds: ThresholdConfig;
   /** Whether data is loading */
@@ -42,22 +36,6 @@ function ValueWithThreshold({ value, threshold }: { value: string; threshold?: n
   );
 }
 
-interface StatusBadgeConfig {
-  key: keyof Omit<StatusSummary, 'total'>;
-  label: string;
-  dotClass: string;
-  badgeClass: string;
-}
-
-const STATUS_BADGES: StatusBadgeConfig[] = [
-  { key: 'active', label: 'Active', dotClass: 'bg-foreground', badgeClass: 'bg-foreground/10 text-foreground' },
-  { key: 'pending', label: 'Pending', dotClass: 'bg-accent', badgeClass: 'bg-accent/10 text-accent' },
-  { key: 'exited', label: 'Exited', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },
-  { key: 'withdrawal', label: 'Withdrawal', dotClass: 'bg-muted', badgeClass: 'bg-muted/10 text-muted' },
-  { key: 'slashed', label: 'Slashed', dotClass: 'bg-danger', badgeClass: 'bg-danger/10 text-danger' },
-  { key: 'unknown', label: 'Unknown', dotClass: 'bg-warning', badgeClass: 'bg-warning/10 text-warning' },
-];
-
 /**
  * Format percentage with specified decimals
  */
@@ -70,7 +48,7 @@ function formatPercent(value: number, decimals = 2): string {
  */
 function formatEth(value: number | null): string {
   if (value === null) return '-';
-  return `${value.toFixed(4)} ETH`;
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ETH`;
 }
 
 /**
@@ -78,8 +56,6 @@ function formatEth(value: number | null): string {
  */
 export function PerformanceSummary({
   summary,
-  statusSummary,
-  isStatusLoading = false,
   thresholds,
   isLoading = false,
   className,
@@ -97,39 +73,14 @@ export function PerformanceSummary({
 
   const inclusionPassed = attestationInclusionRate >= thresholds.inclusionRate;
   const correctnessPassed = avgCorrectnessRate >= thresholds.correctnessRate;
-  const syncPassed = summary?.syncCommittee.totalSlots === 0 || summary?.syncCommittee.missedCount === 0;
+  const syncPassed = summary?.syncCommittee.totalSlots === 0 || syncParticipationRate >= thresholds.syncParticipation;
   const hasProposals = (blockProposal?.totalProposals ?? 0) > 0;
   const proposalsPassed = !hasProposals || blockProposal?.canonicalCount === blockProposal?.totalProposals;
   const balancePassed = minBalance === null || minBalance >= thresholds.minBalance;
 
-  const visibleBadges = statusSummary ? STATUS_BADGES.filter(b => statusSummary[b.key] > 0) : [];
-
-  const verdictClass = (passed: boolean): string => (passed ? 'text-foreground' : 'text-danger');
+  const verdictClass = (passed: boolean): string => (passed ? 'text-success' : 'text-danger');
 
   const stats: Stat[] = [
-    {
-      id: 'validators',
-      name: 'Validators',
-      value: isStatusLoading ? <ValueSkeleton /> : (statusSummary?.total ?? 0),
-      subtitle: isStatusLoading ? (
-        <span className="block h-4 w-32 animate-pulse rounded-xs bg-muted/20" />
-      ) : visibleBadges.length > 0 ? (
-        <span className="flex flex-wrap items-center gap-1.5">
-          {visibleBadges.map(badge => (
-            <span
-              key={badge.key}
-              className={clsx(
-                'inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 text-xs font-medium',
-                badge.badgeClass
-              )}
-            >
-              <span className={clsx('size-1.5 rounded-full', badge.dotClass)} />
-              {statusSummary![badge.key]}
-            </span>
-          ))}
-        </span>
-      ) : undefined,
-    },
     {
       id: 'attestation-inclusion',
       name: 'Attestation Inclusion',
@@ -151,22 +102,19 @@ export function PerformanceSummary({
       ),
       valueClassName: isLoading ? undefined : verdictClass(correctnessPassed),
       subtitle: (
-        <span className="flex flex-wrap gap-x-2 whitespace-normal">
-          <span>
-            <span className="font-bold lg:hidden">H: </span>
-            <span className="hidden font-bold lg:inline">Head: </span>
-            {formatPercent(summary?.attestation.headCorrectRate ?? 0, 1)}
-          </span>
-          <span>
-            <span className="font-bold lg:hidden">T: </span>
-            <span className="hidden font-bold lg:inline">Target: </span>
-            {formatPercent(summary?.attestation.targetCorrectRate ?? 0, 1)}
-          </span>
-          <span>
-            <span className="font-bold lg:hidden">S: </span>
-            <span className="hidden font-bold lg:inline">Source: </span>
-            {formatPercent(summary?.attestation.sourceCorrectRate ?? 0, 1)}
-          </span>
+        <span className="mt-1 grid grid-cols-3 gap-2 whitespace-normal">
+          {(
+            [
+              ['Head', summary?.attestation.headCorrectRate],
+              ['Target', summary?.attestation.targetCorrectRate],
+              ['Source', summary?.attestation.sourceCorrectRate],
+            ] as const
+          ).map(([label, rate]) => (
+            <span key={label}>
+              <span className="block">{label}</span>
+              <span className="block text-foreground tabular-nums">{formatPercent(rate ?? 0, 1)}</span>
+            </span>
+          ))}
         </span>
       ),
     },
@@ -181,7 +129,7 @@ export function PerformanceSummary({
           threshold={summary?.syncCommittee.totalSlots === 0 ? undefined : thresholds.syncParticipation}
         />
       ),
-      valueClassName: isLoading ? undefined : verdictClass(syncPassed),
+      valueClassName: isLoading || summary?.syncCommittee.totalSlots === 0 ? undefined : verdictClass(syncPassed),
       subtitle:
         summary?.syncCommittee.totalSlots === 0
           ? 'No duties in period'
@@ -197,7 +145,7 @@ export function PerformanceSummary({
       ) : (
         'N/A'
       ),
-      valueClassName: isLoading ? undefined : verdictClass(proposalsPassed),
+      valueClassName: isLoading || !hasProposals ? undefined : verdictClass(proposalsPassed),
       subtitle: hasProposals
         ? [
             blockProposal!.missedCount > 0 && `${blockProposal!.missedCount} missed`,
@@ -211,10 +159,10 @@ export function PerformanceSummary({
       id: 'min-balance',
       name: 'Min Balance',
       value: isLoading ? <ValueSkeleton /> : formatEth(minBalance),
-      valueClassName: isLoading ? undefined : verdictClass(balancePassed),
-      subtitle: `Across ${summary?.totalValidators ?? 0} validators`,
+      valueClassName: isLoading || minBalance === null ? undefined : verdictClass(balancePassed),
+      subtitle: (summary?.totalValidators ?? 0) > 1 ? 'Lowest of any validator' : undefined,
     },
   ];
 
-  return <Stats stats={stats} className={className} gridClassName="grid grid-cols-2 lg:grid-cols-3" />;
+  return <Stats stats={stats} className={className} gridClassName="grid grid-cols-2 lg:grid-cols-5" />;
 }
