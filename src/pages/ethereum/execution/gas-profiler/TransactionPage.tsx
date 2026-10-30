@@ -54,6 +54,9 @@ import {
 } from './utils';
 import type { CallTreeNode, OpcodeStats } from './IndexPage.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Format gas value with comma separators
@@ -614,15 +617,15 @@ export function TransactionPage(): JSX.Element {
       itemStyle: {
         color: [
           colors.primary,
-          '#22c55e',
-          '#f59e0b',
-          '#8b5cf6',
-          '#ec4899',
-          '#06b6d4',
-          '#84cc16',
-          '#f97316',
-          '#6366f1',
-          '#14b8a6',
+          DATA_COLORS.green,
+          DATA_COLORS.amber,
+          DATA_COLORS.violet,
+          DATA_COLORS.pink,
+          DATA_COLORS.cyan,
+          DATA_COLORS.lime,
+          DATA_COLORS.orange,
+          DATA_COLORS.indigo,
+          DATA_COLORS.teal,
         ][i % 10],
       },
     }));
@@ -835,7 +838,7 @@ export function TransactionPage(): JSX.Element {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <DocumentTextIcon className="size-5 text-warning" />
+            <DocumentTextIcon className="size-5 text-muted" />
             <div>
               <div className="text-xl font-semibold text-foreground">{contractCounts.total}</div>
               <div className="text-xs text-muted">Contracts</div>
@@ -913,7 +916,7 @@ export function TransactionPage(): JSX.Element {
               <div className="mt-4 border-t border-border pt-3 text-center">
                 <div className="inline-flex items-center gap-2">
                   {isSuccess ? (
-                    <CheckCircleIcon className="size-4 text-muted" />
+                    <CheckCircleIcon className="size-4 text-success" />
                   ) : (
                     <XCircleIcon className="size-4 text-danger" />
                   )}

@@ -3,24 +3,26 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors, type ThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 import type { ValidatorStatusChartProps } from './ValidatorStatusChart.types';
 
 const HIDDEN_STATUSES = new Set(['withdrawal_done']);
 
-const STATUS_COLORS: Record<string, string> = {
-  active_ongoing: '#22c55e',
-  active_exiting: '#eab308',
-  active_slashed: '#ef4444',
-  pending_initialized: '#60a5fa',
-  pending_queued: '#3b82f6',
-  exited_unslashed: '#6b7280',
-  exited_slashed: '#dc2626',
-  withdrawal_possible: '#9ca3af',
-};
-
-function getStatusColor(status: string): string {
-  return STATUS_COLORS[status] ?? '#8b5cf6';
+function getStatusColor(status: string, themeColors: ThemeColors): string {
+  const { DATA_COLORS } = getDataVizColors();
+  const statusColors: Record<string, string> = {
+    active_ongoing: themeColors.success,
+    active_exiting: themeColors.warning,
+    active_slashed: themeColors.danger,
+    pending_initialized: DATA_COLORS.sky,
+    pending_queued: DATA_COLORS.blue,
+    exited_unslashed: themeColors.muted,
+    exited_slashed: themeColors.danger,
+    withdrawal_possible: DATA_COLORS.slate,
+  };
+  return statusColors[status] ?? DATA_COLORS.violet;
 }
 
 const SUBTITLE_MAP: Record<string, string> = {
@@ -32,6 +34,7 @@ const SUBTITLE_MAP: Record<string, string> = {
 };
 
 export function ValidatorStatusChart({ data, timePeriod }: ValidatorStatusChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
   const series = useMemo(() => {
     if (!data) return [];
 
@@ -44,7 +47,7 @@ export function ValidatorStatusChart({ data, timePeriod }: ValidatorStatusChartP
         return {
           name: status.replace(/_/g, ' '),
           data: chartData,
-          color: getStatusColor(status),
+          color: getStatusColor(status, themeColors),
           stack: 'validator-status',
           showArea: true,
           areaOpacity: 0.85,
@@ -52,7 +55,7 @@ export function ValidatorStatusChart({ data, timePeriod }: ValidatorStatusChartP
           showSymbol: false,
         };
       });
-  }, [data]);
+  }, [data, themeColors]);
 
   const subtitle = SUBTITLE_MAP[timePeriod] ?? 'Last 30 days';
 

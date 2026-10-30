@@ -89,13 +89,13 @@ export interface FlameGraphProps {
 
   /**
    * Default color for nodes without a category match
-   * @default { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' }
+   * @default { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' }
    */
   defaultColor?: { bg: string; hover: string };
 
   /**
    * Color for error nodes (hasError: true)
-   * @default { bg: 'bg-red-500', hover: 'hover:bg-red-400' }
+   * @default { bg: 'bg-danger', hover: 'hover:bg-danger/80' }
    */
   errorColor?: { bg: string; hover: string };
 
@@ -184,12 +184,12 @@ export interface FlattenedNode {
  * EVM call type colors (for Ethereum transaction call trees)
  */
 export const EVM_CALL_TYPE_COLORS: FlameGraphColorMap = {
-  CALL: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-  DELEGATECALL: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
-  STATICCALL: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
-  CALLCODE: { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-400' },
-  CREATE: { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
-  CREATE2: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+  CALL: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
+  DELEGATECALL: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple/80' },
+  STATICCALL: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan/80' },
+  CALLCODE: { bg: 'bg-data-indigo', hover: 'hover:bg-data-indigo/80' },
+  CREATE: { bg: 'bg-data-orange', hover: 'hover:bg-data-orange/80' },
+  CREATE2: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber/80' },
 };
 
 /**
@@ -197,23 +197,23 @@ export const EVM_CALL_TYPE_COLORS: FlameGraphColorMap = {
  */
 export const EVM_OPCODE_CATEGORY_COLORS: FlameGraphColorMap = {
   // Opcode categories
-  Math: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
-  Comparisons: { bg: 'bg-violet-500', hover: 'hover:bg-violet-400' },
-  Logic: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
-  'Bit Ops': { bg: 'bg-teal-500', hover: 'hover:bg-teal-400' },
-  Misc: { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
-  'Ethereum State': { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-  Pop: { bg: 'bg-fuchsia-500', hover: 'hover:bg-fuchsia-400' },
-  Memory: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
-  Storage: { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
-  Jump: { bg: 'bg-pink-500', hover: 'hover:bg-pink-400' },
-  'Transient Storage': { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
-  Push: { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' },
-  Dup: { bg: 'bg-stone-500', hover: 'hover:bg-stone-400' },
-  Swap: { bg: 'bg-lime-500', hover: 'hover:bg-lime-400' },
-  Log: { bg: 'bg-yellow-500', hover: 'hover:bg-yellow-400' },
-  Contract: { bg: 'bg-sky-500', hover: 'hover:bg-sky-400' },
-  Other: { bg: 'bg-gray-400', hover: 'hover:bg-gray-300' },
+  Math: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber/80' },
+  Comparisons: { bg: 'bg-data-violet', hover: 'hover:bg-data-violet/80' },
+  Logic: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan/80' },
+  'Bit Ops': { bg: 'bg-data-teal', hover: 'hover:bg-data-teal/80' },
+  Misc: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
+  'Ethereum State': { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
+  Pop: { bg: 'bg-data-fuchsia', hover: 'hover:bg-data-fuchsia/80' },
+  Memory: { bg: 'bg-data-green', hover: 'hover:bg-data-green/80' },
+  Storage: { bg: 'bg-data-red', hover: 'hover:bg-data-red/80' },
+  Jump: { bg: 'bg-data-pink', hover: 'hover:bg-data-pink/80' },
+  'Transient Storage': { bg: 'bg-data-orange', hover: 'hover:bg-data-orange/80' },
+  Push: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
+  Dup: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
+  Swap: { bg: 'bg-data-lime', hover: 'hover:bg-data-lime/80' },
+  Log: { bg: 'bg-data-yellow', hover: 'hover:bg-data-yellow/80' },
+  Contract: { bg: 'bg-data-sky', hover: 'hover:bg-data-sky/80' },
+  Other: { bg: 'bg-data-slate/60', hover: 'hover:bg-data-slate/40' },
 };
 
 /**
@@ -228,20 +228,20 @@ export const EVM_COMBINED_COLORS: FlameGraphColorMap = {
  * File type colors (for file system visualization)
  */
 export const FILE_TYPE_COLORS: FlameGraphColorMap = {
-  folder: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
-  file: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-  image: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
-  video: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
-  document: { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
+  folder: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber/80' },
+  file: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
+  image: { bg: 'bg-data-green', hover: 'hover:bg-data-green/80' },
+  video: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple/80' },
+  document: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan/80' },
 };
 
 /**
  * Process type colors (for profiling visualization)
  */
 export const PROCESS_TYPE_COLORS: FlameGraphColorMap = {
-  cpu: { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
-  memory: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-  io: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
-  network: { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
-  wait: { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+  cpu: { bg: 'bg-data-red', hover: 'hover:bg-data-red/80' },
+  memory: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
+  io: { bg: 'bg-data-green', hover: 'hover:bg-data-green/80' },
+  network: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple/80' },
+  wait: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
 };

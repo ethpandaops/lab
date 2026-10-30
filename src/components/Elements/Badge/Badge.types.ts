@@ -1,6 +1,16 @@
 import type { ReactNode } from 'react';
 
-export type BadgeColor = 'gray' | 'red' | 'yellow' | 'green' | 'blue' | 'indigo' | 'purple' | 'pink';
+export type BadgeColor =
+  | 'gray'
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'teal'
+  | 'blue'
+  | 'indigo'
+  | 'purple'
+  | 'pink';
 
 export type BadgeVariant = 'border' | 'flat';
 

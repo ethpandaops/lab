@@ -2,6 +2,7 @@ import type { MarkLineConfig, SeriesData } from './MultiLine.types';
 import type { ForkInfo } from '@/utils/forks';
 import type { ExecutionForks, BlobScheduleItem } from '@/hooks/useConfig';
 import { epochToTimestamp } from '@/utils/beacon';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 export interface BandConfig {
   /** Band fill color (hex) */
@@ -28,7 +29,7 @@ export interface BandConfig {
  * @example
  * const series = [
  *   ...createBandSeries('Min/Max', 'minmax', minValues, maxValues, {
- *     color: '#64748b',
+ *     color: DATA_COLORS.slate,
  *     opacity: 0.06,
  *     group: 'Bands',
  *   }),
@@ -96,12 +97,12 @@ export interface StatisticConfig {
  * @example
  * const series = [
  *   createStatisticSeries('Mean', meanValues, {
- *     color: '#3b82f6',
+ *     color: DATA_COLORS.blue,
  *     lineWidth: 2,
  *     group: 'Statistics',
  *   }),
  *   createStatisticSeries('Median', medianValues, {
- *     color: '#8b5cf6',
+ *     color: DATA_COLORS.violet,
  *     lineStyle: 'dashed',
  *     group: 'Statistics',
  *   }),
@@ -186,7 +187,7 @@ export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConf
         xValue: forkLabel,
         label: fork.combinedName ? titleCase(fork.combinedName) : fork.displayName,
         labelPosition: 'end',
-        color: '#8b5cf6', // Purple for consensus forks
+        color: getDataVizColors().DATA_COLORS.violet, // Violet for consensus forks
         lineStyle: 'dashed',
         lineWidth: 1,
       });
@@ -241,7 +242,7 @@ export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOpti
         xValue: forkLabel,
         label: displayName,
         labelPosition: 'end',
-        color: '#f59e0b', // Amber for execution forks
+        color: getDataVizColors().DATA_COLORS.amber, // Amber for execution forks
         lineStyle: 'dashed',
         lineWidth: 1,
       });
@@ -296,7 +297,7 @@ export function createBlobScheduleMarkLines(options: BlobScheduleMarkLinesOption
         xValue: blobLabel,
         label: `BPO${index + 1}`,
         labelPosition: 'end',
-        color: '#10b981', // Green for blob schedule
+        color: getDataVizColors().DATA_COLORS.emerald, // Emerald for blob schedule
         lineStyle: 'dashed',
         lineWidth: 1,
       });

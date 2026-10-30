@@ -124,9 +124,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     { value: statusTotals.valid, color: themeColors.success },
     { value: statusTotals.invalid, color: themeColors.danger },
     { value: statusTotals.syncing, color: themeColors.warning },
-    { value: statusTotals.accepted, color: themeColors.accent },
+    { value: statusTotals.accepted, color: themeColors.muted },
     { value: statusTotals.invalidBlockHash, color: themeColors.danger },
-    { value: statusTotals.error, color: themeColors.muted },
+    { value: statusTotals.error, color: themeColors.danger },
   ];
 
   // === Block Complexity vs Duration by Client ===
@@ -1156,7 +1156,7 @@ function WinrateSection({
                     className={clsx(
                       'relative overflow-hidden',
                       isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
-                      isLeader ? 'border-warning/30' : '',
+                      isLeader ? 'border-border' : '',
                       !isLeader && isTopThree && medal ? medal.bg : '',
                       !isTopThree ? 'bg-surface/20' : ''
                     )}
@@ -1247,9 +1247,9 @@ function WinrateSection({
   );
 }
 
-/** Rank styling for the podium positions (gold / silver / bronze accents) */
+/** Rank styling for the podium positions (neutral: a rank is not a status) */
 const MEDAL_CONFIG: Record<number, { bg: string; text: string }> = {
-  1: { bg: 'bg-warning/10', text: 'text-warning' },
+  1: { bg: 'bg-muted/10', text: 'text-foreground' },
   2: { bg: 'bg-muted/10', text: 'text-foreground' },
-  3: { bg: 'bg-warning/5', text: 'text-warning/70' },
+  3: { bg: 'bg-muted/5', text: 'text-foreground' },
 };

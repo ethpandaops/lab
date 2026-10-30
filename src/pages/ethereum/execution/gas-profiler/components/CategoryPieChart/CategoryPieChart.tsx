@@ -3,6 +3,9 @@ import ReactECharts from 'echarts-for-react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Data item for the pie chart
@@ -113,7 +116,7 @@ export function CategoryPieChart({
           data: processedData.map(d => ({
             name: d.name,
             value: d.value,
-            itemStyle: { color: d.name === 'Other' ? '#6b7280' : (colorMap[d.name] ?? colors.muted) },
+            itemStyle: { color: d.name === 'Other' ? DATA_COLORS.slate : (colorMap[d.name] ?? colors.muted) },
           })),
           label: {
             show: true,

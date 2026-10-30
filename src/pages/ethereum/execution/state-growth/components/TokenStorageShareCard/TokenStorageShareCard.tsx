@@ -3,6 +3,9 @@ import { Card } from '@/components/Layout/Card';
 import { StackedBar, type StackedBarSegment } from '@/components/Charts/StackedBar';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTokenStorageShare, type NormalizedDataPoint } from '../../hooks';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 interface TokenStorageShareCardProps {
   /** Daily state-size series from the page, reused as the storage-slot denominator (no re-query). */
@@ -62,7 +65,7 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
       {
         name: 'ERC721',
         value: snapshot.erc721,
-        color: '#3b82f6',
+        color: DATA_COLORS.blue,
       },
       {
         name: 'Others',

@@ -104,7 +104,7 @@ export function NetworksTable({ group, now }: NetworksTableProps): JSX.Element {
         return (
           <span className="inline-flex items-baseline gap-2">
             <span className="text-foreground">{timestampToSlot(row.indexedAt, row.network.genesis_time)}</span>
-            <span className={clsx('w-16 text-xs', lag > STALE_AFTER_SECONDS ? 'text-warning' : 'text-muted')}>
+            <span className={clsx('w-16 text-xs', lag > STALE_AFTER_SECONDS ? 'text-warning' : 'text-success')}>
               {formatAge(lag)} behind
             </span>
           </span>

@@ -45,14 +45,14 @@ interface BlockOpcodeHeatmapProps {
  */
 function getColorIntensity(gas: number, maxGas: number): string {
   const ratio = maxGas > 0 ? gas / maxGas : 0;
-  if (ratio === 0) return 'bg-indigo-50/50 dark:bg-indigo-950/30';
-  if (ratio < 0.1) return 'bg-indigo-100 dark:bg-indigo-900/40';
-  if (ratio < 0.25) return 'bg-indigo-200 dark:bg-indigo-800/50';
-  if (ratio < 0.4) return 'bg-indigo-300 dark:bg-indigo-700/60';
-  if (ratio < 0.55) return 'bg-indigo-400 dark:bg-indigo-600/70';
-  if (ratio < 0.7) return 'bg-indigo-500 dark:bg-indigo-500';
-  if (ratio < 0.85) return 'bg-indigo-600 dark:bg-indigo-400';
-  return 'bg-indigo-700 dark:bg-indigo-300';
+  if (ratio === 0) return 'bg-data-indigo/5';
+  if (ratio < 0.1) return 'bg-data-indigo/15';
+  if (ratio < 0.25) return 'bg-data-indigo/25';
+  if (ratio < 0.4) return 'bg-data-indigo/40';
+  if (ratio < 0.55) return 'bg-data-indigo/55';
+  if (ratio < 0.7) return 'bg-data-indigo/70';
+  if (ratio < 0.85) return 'bg-data-indigo/85';
+  return 'bg-data-indigo';
 }
 
 /**
@@ -64,13 +64,13 @@ function Legend({ opcodeCount }: { opcodeCount: number }): JSX.Element {
       <div className="flex items-center gap-2 text-xs text-muted">
         <span>Low</span>
         <div className="flex gap-px">
-          <div className="size-3 bg-indigo-100 dark:bg-indigo-900/40" />
-          <div className="size-3 bg-indigo-200 dark:bg-indigo-800/50" />
-          <div className="size-3 bg-indigo-300 dark:bg-indigo-700/60" />
-          <div className="size-3 bg-indigo-400 dark:bg-indigo-600/70" />
-          <div className="size-3 bg-indigo-500 dark:bg-indigo-500" />
-          <div className="size-3 bg-indigo-600 dark:bg-indigo-400" />
-          <div className="size-3 bg-indigo-700 dark:bg-indigo-300" />
+          <div className="size-3 bg-data-indigo/15" />
+          <div className="size-3 bg-data-indigo/25" />
+          <div className="size-3 bg-data-indigo/40" />
+          <div className="size-3 bg-data-indigo/55" />
+          <div className="size-3 bg-data-indigo/70" />
+          <div className="size-3 bg-data-indigo/85" />
+          <div className="size-3 bg-data-indigo" />
         </div>
         <span>High</span>
       </div>
@@ -167,7 +167,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
                     {/* Cell */}
                     <div
                       ref={el => setCellRef(opcode, el)}
-                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-indigo-400/60' : ''}`}
+                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
                       onMouseEnter={() => setHoveredOpcode(opcode)}
                       onMouseLeave={() => setHoveredOpcode(null)}
                     />
@@ -444,7 +444,7 @@ function TransactionsViewHeatmap({
                             <div
                               key={opcode}
                               ref={el => setCellRef(cellKey, el)}
-                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-indigo-400/60' : ''}`}
+                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
                               onMouseEnter={() => gas > 0 && setHoveredCell({ txHash, opcode })}
                               onMouseLeave={() => setHoveredCell(null)}
                             />

@@ -56,6 +56,9 @@ import type { GasProfilerBlockSearch } from './IndexPage.types';
 import type { IntTransactionReceiptSize } from '@/api/types.gen';
 import { formatBytes } from '@/utils';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Available call types for filtering
@@ -345,18 +348,18 @@ export function BlockPage(): JSX.Element {
       hasErrors: tx.hasErrors,
       itemStyle: {
         color: tx.hasErrors
-          ? '#ef4444'
+          ? colors.danger
           : [
               colors.primary,
-              '#22c55e',
-              '#f59e0b',
-              '#8b5cf6',
-              '#ec4899',
-              '#06b6d4',
-              '#84cc16',
-              '#f97316',
-              '#6366f1',
-              '#14b8a6',
+              DATA_COLORS.green,
+              DATA_COLORS.amber,
+              DATA_COLORS.violet,
+              DATA_COLORS.pink,
+              DATA_COLORS.cyan,
+              DATA_COLORS.lime,
+              DATA_COLORS.orange,
+              DATA_COLORS.indigo,
+              DATA_COLORS.teal,
             ][i % 10],
       },
     }));
@@ -463,13 +466,13 @@ export function BlockPage(): JSX.Element {
 
           // Call type badge colors
           const callTypeBg: Record<string, string> = {
-            CALL: '#3b82f6',
-            CREATE: '#f97316',
-            CREATE2: '#f59e0b',
-            DELEGATECALL: '#a855f7',
-            STATICCALL: '#06b6d4',
+            CALL: DATA_COLORS.blue,
+            CREATE: DATA_COLORS.orange,
+            CREATE2: DATA_COLORS.amber,
+            DELEGATECALL: DATA_COLORS.purple,
+            STATICCALL: DATA_COLORS.cyan,
           };
-          const badgeColor = callTypeBg[d.rootCallType] ?? '#6b7280';
+          const badgeColor = callTypeBg[d.rootCallType] ?? DATA_COLORS.slate;
 
           // Truncate hash for display
           const shortHash = d.txHash ? `${d.txHash.slice(0, 10)}...${d.txHash.slice(-8)}` : '';
@@ -526,9 +529,9 @@ export function BlockPage(): JSX.Element {
                 ${
                   d.hasErrors
                     ? `<!-- Error Indicator -->
-                <div style="margin-top: 12px; padding: 6px 8px; border-radius: 4px; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; gap: 6px;">
-                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444;"></span>
-                  <span style="color: #ef4444; font-size: 11px;">Transaction failed</span>
+                <div style="margin-top: 12px; padding: 6px 8px; border-radius: 4px; background: ${colors.danger}1a; display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: ${colors.danger};"></span>
+                  <span style="color: ${colors.danger}; font-size: 11px;">Transaction failed</span>
                 </div>`
                     : ''
                 }
@@ -607,15 +610,15 @@ export function BlockPage(): JSX.Element {
       itemStyle: {
         color: [
           colors.primary,
-          '#22c55e',
-          '#f59e0b',
-          '#8b5cf6',
-          '#ec4899',
-          '#06b6d4',
-          '#84cc16',
-          '#f97316',
-          '#6366f1',
-          '#14b8a6',
+          DATA_COLORS.green,
+          DATA_COLORS.amber,
+          DATA_COLORS.violet,
+          DATA_COLORS.pink,
+          DATA_COLORS.cyan,
+          DATA_COLORS.lime,
+          DATA_COLORS.orange,
+          DATA_COLORS.indigo,
+          DATA_COLORS.teal,
         ][i % 10],
       },
     }));
@@ -732,7 +735,7 @@ export function BlockPage(): JSX.Element {
       const label = name
         ? `${name.slice(0, 25)}${name.length > 25 ? '...' : ''}`
         : `${addr.slice(0, 8)}...${addr.slice(-6)}`;
-      nodes.push({ name: label, txHash: contractFirstTx.get(addr), itemStyle: { color: '#22c55e' } });
+      nodes.push({ name: label, txHash: contractFirstTx.get(addr), itemStyle: { color: DATA_COLORS.green } });
       contractNodeMap.set(addr, nodeIdx++);
     }
 
@@ -810,7 +813,7 @@ export function BlockPage(): JSX.Element {
             {
               depth: 1,
               itemStyle: {
-                color: '#10b981',
+                color: DATA_COLORS.emerald,
                 shadowBlur: 4,
                 shadowColor: 'rgba(0,0,0,0.1)',
               },
@@ -843,7 +846,7 @@ export function BlockPage(): JSX.Element {
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
                 <span style="color: ${colors.primary}; font-weight: 600;">${d.sourceName}</span>
                 <span style="color: ${colors.muted};">→</span>
-                <span style="color: #10b981; font-weight: 600;">${d.targetName}</span>
+                <span style="color: ${DATA_COLORS.emerald}; font-weight: 600;">${d.targetName}</span>
               </div>
               <div style="display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 12px;">
                 <span style="color: ${colors.muted};">Gas</span>
@@ -855,7 +858,7 @@ export function BlockPage(): JSX.Element {
           }
           // Node tooltip
           const isContract = params.name?.startsWith('0x') || params.data.name?.startsWith('0x');
-          const nodeColor = isContract ? '#10b981' : colors.primary;
+          const nodeColor = isContract ? DATA_COLORS.emerald : colors.primary;
           return `<div style="font-weight: 600; color: ${nodeColor};">${params.data.name ?? params.name}</div>`;
         },
       },

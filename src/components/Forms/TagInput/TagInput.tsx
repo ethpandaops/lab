@@ -138,13 +138,13 @@ export function TagInput({
         )}
       >
         {tags.map((tag, index) => {
-          const validation = validate ? validate(tag) : { valid: true };
+          const validation = validate?.(tag);
           return (
             <Badge
               key={`${tag}-${index}`}
               size="small"
               pill
-              color={validation.color ?? 'gray'}
+              color={validation ? (validation.color ?? (validation.valid ? 'green' : 'red')) : 'gray'}
               onRemove={disabled ? undefined : () => removeTag(index)}
             >
               <span className="max-w-48 truncate">{tag}</span>

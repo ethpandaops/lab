@@ -19,7 +19,7 @@ export function getClassificationBadgeClasses(classification: string): string {
     case 'corporate':
       return 'bg-purple-500/10 text-purple-600 inset-ring-purple-500/20 dark:bg-purple-500/10 dark:text-purple-400 dark:inset-ring-purple-500/10';
     case 'internal':
-      return 'bg-success/10 text-success inset-ring-success/20 dark:bg-success/10 dark:text-success dark:inset-ring-success/10';
+      return 'bg-blue-500/10 text-blue-600 inset-ring-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:inset-ring-blue-500/10';
     default:
       return 'bg-muted/10 text-muted inset-ring-muted/20 dark:bg-muted/10 dark:text-muted dark:inset-ring-muted/10';
   }

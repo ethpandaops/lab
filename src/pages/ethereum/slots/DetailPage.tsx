@@ -556,7 +556,9 @@ export function DetailPage(): JSX.Element {
                         value={formatFirstSeen(firstBlockSeen)}
                         percentage={Math.min((firstBlockSeen / ATTESTATION_DEADLINE_MS) * 100, 100)}
                         showGauge
-                        color="var(--color-success)"
+                        color={
+                          firstBlockSeen > ATTESTATION_DEADLINE_MS ? 'var(--color-danger)' : 'var(--color-success)'
+                        }
                       />
                     )}
 
@@ -583,7 +585,7 @@ export function DetailPage(): JSX.Element {
                               100 >
                             90
                               ? 'var(--color-danger)'
-                              : 'var(--color-primary)'
+                              : 'var(--color-success)'
                           }
                         />
                       )}
@@ -1240,7 +1242,7 @@ export function DetailPage(): JSX.Element {
                                   100 >
                                 90
                                   ? 'var(--color-danger)'
-                                  : 'var(--color-primary)'
+                                  : 'var(--color-success)'
                               }
                             />
                           )}

@@ -20,7 +20,7 @@ export function ContractStateExpirySkeleton(): JSX.Element {
         </Card>
 
         {/* After Expiry - blue border (matches slot expiry color) */}
-        <div className="border-l-2 border-l-blue-500">
+        <div className="border-l-2 border-l-data-blue">
           <Card className="h-full border-l-0 p-2 md:p-3">
             <LoadingContainer className="h-3 w-20 rounded-xs" />
             <LoadingContainer className="mt-1.5 h-6 w-24 rounded-xs" />
@@ -29,7 +29,7 @@ export function ContractStateExpirySkeleton(): JSX.Element {
         </div>
 
         {/* Difference - emerald border */}
-        <Card className="border-l-2 border-l-emerald-500 p-2 md:p-3">
+        <Card className="border-l-2 border-l-data-emerald p-2 md:p-3">
           <LoadingContainer className="h-3 w-20 rounded-xs" />
           <LoadingContainer className="mt-1.5 h-6 w-36 rounded-xs" />
           <LoadingContainer className="mt-1 h-3.5 w-32 rounded-xs" />

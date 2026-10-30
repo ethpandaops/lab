@@ -2,6 +2,9 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CALL_TYPE_COLORS } from '../../utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Format large numbers with K/M suffix
@@ -107,8 +110,8 @@ export function TopItemsByGasTable({
             <span
               className="inline-block rounded-xs px-1.5 py-0.5 text-xs font-medium"
               style={{
-                backgroundColor: `${CALL_TYPE_COLORS[item.callType] ?? '#6b7280'}20`,
-                color: CALL_TYPE_COLORS[item.callType] ?? '#6b7280',
+                backgroundColor: `${CALL_TYPE_COLORS[item.callType] ?? DATA_COLORS.slate}20`,
+                color: CALL_TYPE_COLORS[item.callType] ?? DATA_COLORS.slate,
               }}
             >
               {item.callType}

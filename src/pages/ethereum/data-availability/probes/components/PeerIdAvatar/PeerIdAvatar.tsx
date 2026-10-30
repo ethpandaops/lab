@@ -1,4 +1,5 @@
 import { type JSX, useMemo } from 'react';
+import { getDataVizColors } from '@/utils/dataVizColors';
 
 /**
  * Props for the PeerIdAvatar component
@@ -15,17 +16,18 @@ interface PeerIdAvatarProps {
 /**
  * Color palette for the avatar - using semantic colors that work in both themes
  */
+const { DATA_COLORS } = getDataVizColors();
 const COLORS = [
-  '#f97316', // orange
-  '#eab308', // yellow
-  '#22c55e', // green
-  '#06b6d4', // cyan
-  '#3b82f6', // blue
-  '#8b5cf6', // violet
-  '#ec4899', // pink
-  '#ef4444', // red
-  '#14b8a6', // teal
-  '#a855f7', // purple
+  DATA_COLORS.orange,
+  DATA_COLORS.yellow,
+  DATA_COLORS.green,
+  DATA_COLORS.cyan,
+  DATA_COLORS.blue,
+  DATA_COLORS.violet,
+  DATA_COLORS.pink,
+  DATA_COLORS.red,
+  DATA_COLORS.teal,
+  DATA_COLORS.purple,
 ];
 
 /**

@@ -12,6 +12,7 @@ interface ColorClasses {
   };
 }
 
+/** green, orange and red are status colours and use the theme's status tokens; the rest are categories */
 const colorStyles: Record<BadgeColor, ColorClasses> = {
   gray: {
     border:
@@ -24,13 +25,21 @@ const colorStyles: Record<BadgeColor, ColorClasses> = {
     },
   },
   red: {
-    border:
-      'bg-red-50 text-red-700 inset-ring inset-ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:inset-ring-red-400/20',
-    flat: 'bg-red-100 text-red-700 dark:bg-red-400/10 dark:text-red-400',
-    dotFill: 'fill-red-500 dark:fill-red-400',
+    border: 'bg-danger/10 text-danger inset-ring inset-ring-danger/20',
+    flat: 'bg-danger/15 text-danger',
+    dotFill: 'fill-danger',
     removeButton: {
-      hover: 'hover:bg-red-600/20 dark:hover:bg-red-500/30',
-      stroke: 'stroke-red-600/50 group-hover:stroke-red-600/75 dark:stroke-red-400 dark:group-hover:stroke-red-300',
+      hover: 'hover:bg-danger/20',
+      stroke: 'stroke-danger/50 group-hover:stroke-danger/75',
+    },
+  },
+  orange: {
+    border: 'bg-warning/10 text-warning inset-ring inset-ring-warning/20',
+    flat: 'bg-warning/15 text-warning',
+    dotFill: 'fill-warning',
+    removeButton: {
+      hover: 'hover:bg-warning/20',
+      stroke: 'stroke-warning/50 group-hover:stroke-warning/75',
     },
   },
   yellow: {
@@ -45,14 +54,22 @@ const colorStyles: Record<BadgeColor, ColorClasses> = {
     },
   },
   green: {
-    border:
-      'bg-green-50 text-green-700 inset-ring inset-ring-green-600/20 dark:bg-green-400/10 dark:text-green-400 dark:inset-ring-green-500/20',
-    flat: 'bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-400',
-    dotFill: 'fill-green-500 dark:fill-green-400',
+    border: 'bg-success/10 text-success inset-ring inset-ring-success/20',
+    flat: 'bg-success/15 text-success',
+    dotFill: 'fill-success',
     removeButton: {
-      hover: 'hover:bg-green-600/20 dark:hover:bg-green-500/30',
-      stroke:
-        'stroke-green-700/50 group-hover:stroke-green-700/75 dark:stroke-green-400 dark:group-hover:stroke-green-300',
+      hover: 'hover:bg-success/20',
+      stroke: 'stroke-success/50 group-hover:stroke-success/75',
+    },
+  },
+  teal: {
+    border:
+      'bg-teal-50 text-teal-700 inset-ring inset-ring-teal-700/10 dark:bg-teal-400/10 dark:text-teal-400 dark:inset-ring-teal-400/30',
+    flat: 'bg-teal-100 text-teal-700 dark:bg-teal-400/10 dark:text-teal-400',
+    dotFill: 'fill-teal-500 dark:fill-teal-400',
+    removeButton: {
+      hover: 'hover:bg-teal-600/20 dark:hover:bg-teal-500/30',
+      stroke: 'stroke-teal-700/50 group-hover:stroke-teal-700/75 dark:stroke-teal-400 dark:group-hover:stroke-teal-300',
     },
   },
   blue: {

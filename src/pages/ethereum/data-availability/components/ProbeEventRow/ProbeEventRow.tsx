@@ -11,12 +11,12 @@ import type { ProbeEventRowProps } from './ProbeEventRow.types';
 /**
  * Result icon based on probe result
  * - success (green): peer responded with valid data
- * - failure (yellow): transient/one-off failure, probe didn't complete (less severe)
+ * - failure (orange): transient/one-off failure, probe didn't complete (less severe)
  * - missing (red): peer responded but didn't have the data (serious - they should have it)
  */
 function ResultIcon({ result }: { result?: string }): JSX.Element {
   if (result === 'success') {
-    return <CheckCircleIcon className="size-4 text-muted" />;
+    return <CheckCircleIcon className="size-4 text-success" />;
   }
   if (result === 'failure') {
     return <XCircleIcon className="size-4 text-warning" />;

@@ -24,18 +24,18 @@ function truncateAddress(address: string | null): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-orange-500/10', text: 'text-orange-500' };
+      return { bg: 'bg-data-orange/10', text: 'text-data-orange' };
     case 'CREATE2':
       return { bg: 'bg-warning/10', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-purple-500/10', text: 'text-purple-400' };
+      return { bg: 'bg-data-purple/10', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-cyan-500/10', text: 'text-cyan-400' };
+      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan' };
     case 'CALLCODE':
-      return { bg: 'bg-pink-500/10', text: 'text-pink-400' };
+      return { bg: 'bg-data-pink/10', text: 'text-data-pink' };
     case 'CALL':
     default:
-      return { bg: 'bg-blue-500/10', text: 'text-blue-400' };
+      return { bg: 'bg-data-blue/10', text: 'text-data-blue' };
   }
 }
 

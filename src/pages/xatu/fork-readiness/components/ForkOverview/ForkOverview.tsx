@@ -27,6 +27,7 @@ export function ForkOverview({
             id: 'overall-readiness',
             name: 'Overall Readiness',
             value: `${overallReadyPercentage}%`,
+            valueClassName: totalNodes > 0 && actionNeededCount === 0 ? 'text-success' : 'text-warning',
             delta: {
               value: `${readyNodes}/${totalNodes} nodes`,
               type: 'neutral',
@@ -41,9 +42,10 @@ export function ForkOverview({
             id: 'action-needed',
             name: 'Action Needed',
             value: actionNeededCount.toString(),
+            valueClassName: actionNeededCount === 0 ? 'text-success' : 'text-danger',
             delta: {
               value: 'nodes to update',
-              type: actionNeededCount > 0 ? 'decrease' : 'neutral',
+              type: 'neutral',
             },
           },
           {

@@ -82,7 +82,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
 
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   // or from the isOrphaned/isMissedSlot flags
-  const getSlotStatus = (): { label: string; color: 'gray' | 'red' | 'yellow' } => {
+  const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'orange' } => {
     // Check isMissedSlot prop first (no block data at all)
     if (isMissedSlot) {
       return { label: 'Missed', color: 'red' };
@@ -90,22 +90,22 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
 
     // Check isOrphaned flag (set when we have block data but no canonical blockHead)
     if (data.isOrphaned) {
-      return { label: 'Orphaned', color: 'yellow' };
+      return { label: 'Orphaned', color: 'orange' };
     }
 
     const statusValue = blockProposer?.status?.toLowerCase();
 
     if (statusValue === 'canonical') {
-      return { label: 'Canonical', color: 'gray' };
+      return { label: 'Canonical', color: 'green' };
     }
     if (statusValue === 'orphaned') {
-      return { label: 'Orphaned', color: 'yellow' };
+      return { label: 'Orphaned', color: 'orange' };
     }
     if (statusValue === 'missed' || !blockHead) {
       return { label: 'Missed', color: 'red' };
     }
     // Default to canonical if we have block data but no status
-    return { label: 'Canonical', color: 'gray' };
+    return { label: 'Canonical', color: 'green' };
   };
 
   const status = getSlotStatus();
@@ -214,7 +214,7 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
           <div className="flex-1 space-y-6">
             {/* Status Section */}
             <div className="flex flex-wrap items-center gap-2">
-              <Badge color={wasBlockSeen ? 'gray' : 'red'} variant="border">
+              <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
                 {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
               </Badge>
               <Badge color={status.color} variant="border">

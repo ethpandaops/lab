@@ -70,7 +70,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
               className={clsx(
                 'flex items-center justify-center border-b border-border/30 p-1.5 transition-colors sm:p-2 lg:p-2.5',
                 !isLastCol && 'border-r',
-                isHovered && 'bg-success/10'
+                isHovered && 'bg-muted/10'
               )}
               onMouseEnter={() => setHoveredPolicy(policy)}
               onMouseLeave={() => setHoveredPolicy(null)}

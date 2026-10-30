@@ -64,7 +64,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                     className={clsx(
                       'flex shrink-0 items-center text-xs font-medium tabular-nums',
                       item.delta.type === 'increase'
-                        ? 'text-foreground'
+                        ? 'text-success'
                         : item.delta.type === 'decrease'
                           ? 'text-danger'
                           : 'text-muted'

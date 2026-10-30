@@ -9,7 +9,7 @@ interface ForkStatusBadgeProps {
 
 /**
  * Current / Active / Upcoming pill for a fork or BPO.
- * Current and active share one neutral-strong treatment; upcoming is muted.
+ * Current and active are live (green); upcoming is muted.
  */
 export function ForkStatusBadge({ isActive, isCurrent, label }: ForkStatusBadgeProps): React.JSX.Element {
   const isLive = isCurrent || isActive;
@@ -19,7 +19,7 @@ export function ForkStatusBadge({ isActive, isCurrent, label }: ForkStatusBadgeP
     <span
       className={clsx(
         'inline-flex items-center rounded-xs px-2 py-1 text-xs font-medium',
-        isLive ? 'bg-foreground/10 text-foreground' : 'bg-muted/10 text-muted'
+        isLive ? 'bg-success/10 text-success' : 'bg-muted/10 text-muted'
       )}
     >
       {text}

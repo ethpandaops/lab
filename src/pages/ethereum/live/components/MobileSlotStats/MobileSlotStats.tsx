@@ -25,7 +25,7 @@ function formatEth(wei: string | null | undefined): string | null {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  canonical: { label: 'Proposed', cls: 'border-border bg-muted/10 text-muted' },
+  canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
   orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
   missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
 };

@@ -14,6 +14,9 @@ import type {
   IntTransactionResourceGas,
   IntTransactionCallFrameOpcodeResourceGas,
 } from '@/api/types.gen';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Canonical resource category names */
 export const RESOURCE_CATEGORIES = [
@@ -30,14 +33,14 @@ export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
 
 /** Color scheme deliberately distinct from opcode CATEGORY_COLORS */
 export const RESOURCE_COLORS: Record<string, string> = {
-  Compute: '#3b82f6', // blue
-  Memory: '#8b5cf6', // violet
-  'Address Access': '#f59e0b', // amber
-  'State Growth': '#ef4444', // red
-  History: '#06b6d4', // cyan
-  'Bloom Topics': '#ec4899', // pink
-  'Block Size': '#64748b', // slate
-  Refund: '#22c55e', // green
+  Compute: DATA_COLORS.blue,
+  Memory: DATA_COLORS.violet,
+  'Address Access': DATA_COLORS.amber,
+  'State Growth': DATA_COLORS.red,
+  History: DATA_COLORS.cyan,
+  'Bloom Topics': DATA_COLORS.pink,
+  'Block Size': DATA_COLORS.slate,
+  Refund: DATA_COLORS.green,
 };
 
 /** A single resource breakdown entry for display */
@@ -76,7 +79,7 @@ export function toResourceEntries(
       category,
       gas,
       percentage: (gas / total) * 100,
-      color: RESOURCE_COLORS[category] ?? '#9ca3af',
+      color: RESOURCE_COLORS[category] ?? DATA_COLORS.slate,
     }))
     .sort((a, b) => b.gas - a.gas);
 }
@@ -107,7 +110,7 @@ export function aggregateOpcodeResourceGas(records: IntTransactionCallFrameOpcod
       category,
       gas,
       percentage: (gas / total) * 100,
-      color: RESOURCE_COLORS[category] ?? '#9ca3af',
+      color: RESOURCE_COLORS[category] ?? DATA_COLORS.slate,
     }))
     .sort((a, b) => b.gas - a.gas);
 }

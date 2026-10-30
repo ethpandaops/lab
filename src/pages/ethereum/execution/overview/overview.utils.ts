@@ -12,6 +12,10 @@ import type {
   FctExecutionTransactionsDaily,
 } from '@/api/types.gen';
 import { GAS_BANDS, type ChartConfig } from './constants';
+import { hexToRgba } from '@/utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 // ============================================================================
 // Time Formatting Utilities
@@ -303,34 +307,34 @@ export function buildTpsChartConfig(
     labels,
     series: [
       createStatisticSeries('Average', avgValues, {
-        color: '#10b981',
+        color: DATA_COLORS.emerald,
         lineWidth: 2.5,
         group: 'Statistics',
       }),
       createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: '#06b6d4',
+        color: DATA_COLORS.cyan,
         lineWidth: 2,
         group: 'Statistics',
       }),
       createStatisticSeries('Median', medianValues, {
-        color: '#a855f7',
+        color: DATA_COLORS.purple,
         lineWidth: 1.5,
         lineStyle: 'dotted',
         group: 'Statistics',
       }),
       ...createBandSeries('Bollinger', 'bollinger', lowerBandValues, upperBandValues, {
-        color: '#f59e0b',
+        color: DATA_COLORS.amber,
         opacity: 0.15,
         group: 'Bands',
         initiallyVisible: false,
       }),
       ...createBandSeries('P5/P95', 'percentile', p5Values, p95Values, {
-        color: '#6366f1',
+        color: DATA_COLORS.indigo,
         opacity: 0.1,
         group: 'Bands',
       }),
       ...createBandSeries('Min/Max', 'minmax', minValues, maxValues, {
-        color: '#64748b',
+        color: DATA_COLORS.slate,
         opacity: 0.06,
         group: 'Bands',
         initiallyVisible: false,
@@ -410,17 +414,17 @@ export function buildGasChartConfig(
 
   const series: ChartConfig['series'] = [
     createStatisticSeries('Average', avgValues, {
-      color: '#10b981',
+      color: DATA_COLORS.emerald,
       lineWidth: 2.5,
       group: 'Statistics',
     }),
     createStatisticSeries('Moving Avg', movingAvgValues, {
-      color: '#06b6d4',
+      color: DATA_COLORS.cyan,
       lineWidth: 2,
       group: 'Statistics',
     }),
     createStatisticSeries('Median', medianValues, {
-      color: '#a855f7',
+      color: DATA_COLORS.purple,
       lineWidth: 1.5,
       lineStyle: 'dotted',
       group: 'Statistics',
@@ -428,7 +432,7 @@ export function buildGasChartConfig(
     {
       name: 'Cumulative',
       data: cumulativeValues,
-      color: 'rgba(156, 163, 175, 0.6)',
+      color: hexToRgba(DATA_COLORS.slate, 0.6),
       lineWidth: 1.5,
       yAxisIndex: 1,
       group: 'Statistics',
@@ -438,7 +442,7 @@ export function buildGasChartConfig(
   if (gasLimitRecords?.length) {
     series.push(
       createStatisticSeries('Gas Limit', gasLimitValues as number[], {
-        color: '#ef4444',
+        color: DATA_COLORS.red,
         lineWidth: 2,
         lineStyle: 'dashed',
         group: 'Statistics',
@@ -448,18 +452,18 @@ export function buildGasChartConfig(
 
   series.push(
     ...createBandSeries('Bollinger', 'gas-bollinger', lowerBandValues, upperBandValues, {
-      color: '#f59e0b',
+      color: DATA_COLORS.amber,
       opacity: 0.15,
       group: 'Bands',
       initiallyVisible: false,
     }),
     ...createBandSeries('P5/P95', 'gas-percentile', p5Values, p95Values, {
-      color: '#6366f1',
+      color: DATA_COLORS.indigo,
       opacity: 0.1,
       group: 'Bands',
     }),
     ...createBandSeries('Min/Max', 'gas-minmax', minValues, maxValues, {
-      color: '#64748b',
+      color: DATA_COLORS.slate,
       opacity: 0.06,
       group: 'Bands',
       initiallyVisible: false,
@@ -530,7 +534,7 @@ export function buildSignallingChartConfig(
     showArea: true,
     areaOpacity: 0.08,
     lineWidth: 1.5,
-    color: '#a855f7',
+    color: DATA_COLORS.purple,
     group: 'Total',
   };
 
@@ -598,17 +602,17 @@ export function buildTransactionsChartConfig(
     labels,
     series: [
       createStatisticSeries('Average', avgValues, {
-        color: '#10b981',
+        color: DATA_COLORS.emerald,
         lineWidth: 2.5,
         group: 'Statistics',
       }),
       createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: '#06b6d4',
+        color: DATA_COLORS.cyan,
         lineWidth: 2,
         group: 'Statistics',
       }),
       createStatisticSeries('Median', medianValues, {
-        color: '#a855f7',
+        color: DATA_COLORS.purple,
         lineWidth: 1.5,
         lineStyle: 'dotted',
         group: 'Statistics',
@@ -616,24 +620,24 @@ export function buildTransactionsChartConfig(
       {
         name: 'Cumulative',
         data: cumulativeValues,
-        color: 'rgba(156, 163, 175, 0.6)',
+        color: hexToRgba(DATA_COLORS.slate, 0.6),
         lineWidth: 1.5,
         yAxisIndex: 1,
         group: 'Statistics',
       },
       ...createBandSeries('Bollinger', 'txn-bollinger', lowerBandValues, upperBandValues, {
-        color: '#f59e0b',
+        color: DATA_COLORS.amber,
         opacity: 0.15,
         group: 'Bands',
         initiallyVisible: false,
       }),
       ...createBandSeries('P5/P95', 'txn-percentile', p5Values, p95Values, {
-        color: '#6366f1',
+        color: DATA_COLORS.indigo,
         opacity: 0.1,
         group: 'Bands',
       }),
       ...createBandSeries('Min/Max', 'txn-minmax', minValues, maxValues, {
-        color: '#64748b',
+        color: DATA_COLORS.slate,
         opacity: 0.06,
         group: 'Bands',
         initiallyVisible: false,

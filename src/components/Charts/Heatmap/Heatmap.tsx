@@ -10,7 +10,6 @@ import {
   MarkAreaComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import colors from 'tailwindcss/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from '@/utils/color';
 import type { HeatmapChartProps } from './Heatmap.types';
@@ -55,7 +54,11 @@ export function HeatmapChart({
   height = 400,
   min,
   max,
-  colorGradient = [colors.indigo[50], colors.indigo[400], colors.indigo[700]],
+  colorGradient = [
+    'color-mix(in oklab, var(--color-data-indigo) 15%, white)',
+    'var(--color-data-indigo)',
+    'color-mix(in oklab, var(--color-data-indigo) 70%, black)',
+  ],
   showLabel = false,
   showVisualMap = true,
   animationDuration = 300,

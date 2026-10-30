@@ -40,9 +40,9 @@ echarts.use([GaugeChart, TitleComponent, CanvasRenderer]);
  * // Multiple gauges with custom colors
  * <Gauge
  *   data={[
- *     { name: 'Participation', value: 450, max: 512, color: '#22c55e' },
- *     { name: 'Head Correct', value: 440, max: 512, color: '#3b82f6' },
- *     { name: 'Source Correct', value: 435, max: 512, color: '#8b5cf6' },
+ *     { name: 'Participation', value: 450, max: 512, color: DATA_COLORS.green },
+ *     { name: 'Head Correct', value: 440, max: 512, color: DATA_COLORS.blue },
+ *     { name: 'Source Correct', value: 435, max: 512, color: DATA_COLORS.violet },
  *   ]}
  * />
  * ```

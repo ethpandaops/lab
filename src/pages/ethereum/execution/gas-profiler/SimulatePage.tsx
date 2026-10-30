@@ -43,6 +43,9 @@ import { useGasSchedule } from './hooks/useGasSchedule';
 import type { GasSchedule, BlockSimulationResult, CallError } from './SimulatePage.types';
 import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 // Register ECharts components
 echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
@@ -101,7 +104,7 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < -5) return 'text-foreground';
+  if (percent < -5) return 'text-success';
   if (percent > 5) return 'text-danger';
   return 'text-muted';
 }
@@ -451,8 +454,8 @@ export function SimulatePage(): JSX.Element {
             color: (params: { dataIndex: number; data: [number, number] }) => {
               const delta = params.data[1];
               if (params.dataIndex === selectedBlockIndex) return themeColors.primary;
-              if (delta < -5) return '#22c55e';
-              if (delta > 5) return '#ef4444';
+              if (delta < -5) return themeColors.success;
+              if (delta > 5) return themeColors.danger;
               return themeColors.muted;
             },
           },
@@ -1008,9 +1011,13 @@ export function SimulatePage(): JSX.Element {
             gridClassName="grid grid-cols-2 gap-3 lg:grid-cols-4"
             stats={(() => {
               const gasColor =
-                aggregateStats.deltaPercent > 0 ? '#ef4444' : aggregateStats.deltaPercent < 0 ? '#22c55e' : '#6b7280';
-              const divergedColor = aggregateStats.totalDiverged > 0 ? '#f59e0b' : '#22c55e';
-              const statusColor = aggregateStats.totalStatusChanges > 0 ? '#ef4444' : '#22c55e';
+                aggregateStats.deltaPercent > 0
+                  ? themeColors.danger
+                  : aggregateStats.deltaPercent < 0
+                    ? themeColors.success
+                    : themeColors.muted;
+              const divergedColor = aggregateStats.totalDiverged > 0 ? themeColors.warning : themeColors.success;
+              const statusColor = aggregateStats.totalStatusChanges > 0 ? themeColors.danger : themeColors.success;
 
               return [
                 {
@@ -1027,9 +1034,9 @@ export function SimulatePage(): JSX.Element {
                   name: 'Transactions',
                   value: formatGas(aggregateStats.totalTransactions),
                   icon: BoltIcon,
-                  iconColor: '#3b82f6',
+                  iconColor: DATA_COLORS.blue,
                   subtitle: `across ${simState.results.length} block${simState.results.length !== 1 ? 's' : ''}`,
-                  accentColor: '#3b82f633',
+                  accentColor: `${DATA_COLORS.blue}33`,
                 },
                 {
                   id: 'diverged',

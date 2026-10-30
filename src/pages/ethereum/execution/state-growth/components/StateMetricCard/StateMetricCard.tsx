@@ -2,6 +2,9 @@ import { type JSX, useMemo } from 'react';
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 interface StateMetricCardProps {
   label: string;
@@ -79,24 +82,24 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }): JSX.
 
 const colorMap = {
   cyan: {
-    sparkline: 'rgb(34, 211, 238)',
-    bg: 'bg-cyan-500/10',
-    text: 'text-cyan-400',
+    sparkline: DATA_COLORS.cyan,
+    bg: 'bg-data-cyan/10',
+    text: 'text-data-cyan',
   },
   purple: {
-    sparkline: 'rgb(168, 85, 247)',
-    bg: 'bg-purple-500/10',
-    text: 'text-purple-400',
+    sparkline: DATA_COLORS.purple,
+    bg: 'bg-data-purple/10',
+    text: 'text-data-purple',
   },
   amber: {
-    sparkline: 'rgb(251, 191, 36)',
+    sparkline: DATA_COLORS.amber,
     bg: 'bg-warning/10',
     text: 'text-warning',
   },
   default: {
-    sparkline: 'rgb(96, 165, 250)',
-    bg: 'bg-blue-500/10',
-    text: 'text-blue-400',
+    sparkline: DATA_COLORS.blue,
+    bg: 'bg-data-blue/10',
+    text: 'text-data-blue',
   },
 };
 
@@ -129,7 +132,7 @@ export function StateMetricCard({
             <p className="mt-0.5 text-sm text-muted tabular-nums">
               {count.toLocaleString()}
               {countDelta !== undefined && (
-                <span className={clsx('ml-1 text-xs', isPositive ? 'text-warning' : 'text-muted')}>
+                <span className={clsx('ml-1 text-xs', isPositive ? 'text-warning' : 'text-success')}>
                   ({countDelta >= 0 ? '+' : ''}
                   {countDelta.toLocaleString()})
                 </span>
@@ -141,13 +144,13 @@ export function StateMetricCard({
             <div
               className={clsx(
                 'flex items-center gap-1 rounded-sm px-1.5 py-0.5',
-                isPositive ? 'bg-warning/10 text-warning' : 'bg-surface text-muted'
+                isPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
               )}
             >
               <Icon className="size-3" />
               <span className="text-xs font-medium tabular-nums">{formatDeltaBytes(deltaBytes)}</span>
             </div>
-            <span className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-warning' : 'text-muted')}>
+            <span className={clsx('text-xs font-medium tabular-nums', isPositive ? 'text-warning' : 'text-success')}>
               {deltaPercent >= 0 ? '+' : ''}
               {deltaPercent.toFixed(3)}%
             </span>

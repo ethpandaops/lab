@@ -83,7 +83,7 @@ export function IndexPage(): JSX.Element {
   const [entitySearch, setEntitySearch] = useState('');
 
   const themeColors = useThemeColors();
-  const { CHART_CATEGORICAL_COLORS: palette } = getDataVizColors();
+  const { CHART_CATEGORICAL_COLORS: palette, DATA_COLORS } = getDataVizColors();
   const credentialColors: Record<CredentialType, string> = {
     '0x00': themeColors.muted,
     '0x01': palette[0],
@@ -113,7 +113,7 @@ export function IndexPage(): JSX.Element {
             xValue: labelList[idx],
             label: f.displayName,
             labelPosition: 'end' as const,
-            color: '#8b5cf6',
+            color: DATA_COLORS.violet,
             lineStyle: 'dashed' as const,
             lineWidth: 1,
           },

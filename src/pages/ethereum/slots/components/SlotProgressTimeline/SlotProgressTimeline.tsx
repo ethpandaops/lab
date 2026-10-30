@@ -280,7 +280,7 @@ export function SlotProgressTimeline({
                         />
                       )}
                       <span
-                        className={clsx('truncate', span.isLate ? 'text-danger' : 'text-foreground')}
+                        className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')}
                         title={span.label}
                       >
                         {span.label}
@@ -293,7 +293,7 @@ export function SlotProgressTimeline({
                       <div
                         className={clsx(
                           'absolute top-1 rounded-xs transition-all',
-                          span.isLate ? 'bg-danger/80' : colors.bg,
+                          span.isLate ? 'bg-warning/80' : colors.bg,
                           isHovered && 'ring-1 ring-white/20 brightness-110',
                           span.collapsible && 'cursor-pointer'
                         )}
@@ -312,7 +312,7 @@ export function SlotProgressTimeline({
                     <div
                       className={clsx(
                         'shrink-0 px-2 text-right font-mono text-xs',
-                        span.isLate ? 'text-danger' : colors.text
+                        span.isLate ? 'text-warning' : colors.text
                       )}
                       style={{ width: 80 }}
                     >

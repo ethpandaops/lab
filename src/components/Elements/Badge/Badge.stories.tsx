@@ -18,7 +18,7 @@ const meta = {
   argTypes: {
     color: {
       control: 'select',
-      options: ['gray', 'red', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink'],
+      options: ['gray', 'red', 'orange', 'yellow', 'green', 'teal', 'blue', 'indigo', 'purple', 'pink'],
     },
     variant: {
       control: 'radio',
@@ -62,6 +62,9 @@ export const WithBorder: Story = {
       <Badge color="red" variant="border">
         Badge
       </Badge>
+      <Badge color="orange" variant="border">
+        Badge
+      </Badge>
       <Badge color="yellow" variant="border">
         Badge
       </Badge>
@@ -92,6 +95,9 @@ export const WithBorderAndDot: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="border" dot>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="border" dot>
         Badge
       </Badge>
       <Badge color="yellow" variant="border" dot>
@@ -126,6 +132,9 @@ export const PillWithBorder: Story = {
       <Badge color="red" variant="border" pill>
         Badge
       </Badge>
+      <Badge color="orange" variant="border" pill>
+        Badge
+      </Badge>
       <Badge color="yellow" variant="border" pill>
         Badge
       </Badge>
@@ -156,6 +165,9 @@ export const PillWithBorderAndDot: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="border" pill dot>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="border" pill dot>
         Badge
       </Badge>
       <Badge color="yellow" variant="border" pill dot>
@@ -222,6 +234,9 @@ export const Flat: Story = {
       <Badge color="red" variant="flat">
         Badge
       </Badge>
+      <Badge color="orange" variant="flat">
+        Badge
+      </Badge>
       <Badge color="yellow" variant="flat">
         Badge
       </Badge>
@@ -252,6 +267,9 @@ export const FlatPill: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="flat" pill>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="flat" pill>
         Badge
       </Badge>
       <Badge color="yellow" variant="flat" pill>
@@ -286,6 +304,9 @@ export const FlatWithDot: Story = {
       <Badge color="red" variant="flat" dot>
         Badge
       </Badge>
+      <Badge color="orange" variant="flat" dot>
+        Badge
+      </Badge>
       <Badge color="yellow" variant="flat" dot>
         Badge
       </Badge>
@@ -316,6 +337,9 @@ export const FlatPillWithDot: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="flat" pill dot>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="flat" pill dot>
         Badge
       </Badge>
       <Badge color="yellow" variant="flat" pill dot>
@@ -382,6 +406,9 @@ export const SmallWithBorder: Story = {
       <Badge color="red" variant="border" size="small">
         Badge
       </Badge>
+      <Badge color="orange" variant="border" size="small">
+        Badge
+      </Badge>
       <Badge color="yellow" variant="border" size="small">
         Badge
       </Badge>
@@ -412,6 +439,9 @@ export const SmallFlat: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="flat" size="small">
+        Badge
+      </Badge>
+      <Badge color="orange" variant="flat" size="small">
         Badge
       </Badge>
       <Badge color="yellow" variant="flat" size="small">
@@ -446,6 +476,9 @@ export const SmallPillWithBorder: Story = {
       <Badge color="red" variant="border" size="small" pill>
         Badge
       </Badge>
+      <Badge color="orange" variant="border" size="small" pill>
+        Badge
+      </Badge>
       <Badge color="yellow" variant="border" size="small" pill>
         Badge
       </Badge>
@@ -476,6 +509,9 @@ export const SmallFlatPill: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="flat" size="small" pill>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="flat" size="small" pill>
         Badge
       </Badge>
       <Badge color="yellow" variant="flat" size="small" pill>
@@ -510,6 +546,9 @@ export const SmallFlatWithDot: Story = {
       <Badge color="red" variant="flat" size="small" dot>
         Badge
       </Badge>
+      <Badge color="orange" variant="flat" size="small" dot>
+        Badge
+      </Badge>
       <Badge color="yellow" variant="flat" size="small" dot>
         Badge
       </Badge>
@@ -540,6 +579,9 @@ export const SmallFlatPillWithDot: Story = {
         Badge
       </Badge>
       <Badge color="red" variant="flat" size="small" pill dot>
+        Badge
+      </Badge>
+      <Badge color="orange" variant="flat" size="small" pill dot>
         Badge
       </Badge>
       <Badge color="yellow" variant="flat" size="small" pill dot>

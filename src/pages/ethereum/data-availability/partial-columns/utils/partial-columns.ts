@@ -1,4 +1,6 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import type { ThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type {
   FctDataColumnCompletionByPathDaily,
   FctDataColumnCompletionByPathHourly,
@@ -21,6 +23,8 @@ import {
 import type { CompletionPath, PartialRecord, PathRecord, PeerRecord } from '../IndexPage.types';
 
 export { formatClientName };
+
+const { DATA_COLORS } = getDataVizColors();
 
 type PathRow = FctDataColumnCompletionByPathHourly | FctDataColumnCompletionByPathDaily;
 type PartialRow = FctDataColumnPartialMessageHourly | FctDataColumnPartialMessageDaily;
@@ -323,7 +327,7 @@ export function buildUsefulCellSeries(records: PartialRecord[], keys: string[]):
     {
       name: 'Cells received',
       data: sums.map(s => (s.receivedCells > 0 ? s.receivedCells : null)),
-      color: '#94a3b8',
+      color: DATA_COLORS.slate,
       seriesType: 'bar',
       yAxisIndex: 1,
     },
@@ -337,15 +341,15 @@ export function buildUsefulCellSeries(records: PartialRecord[], keys: string[]):
 }
 
 /** Stacked verdict counts per bucket for the cell and header checks */
-export function buildVerdictSeries(records: PartialRecord[], keys: string[]): SeriesData[] {
+export function buildVerdictSeries(records: PartialRecord[], keys: string[], themeColors: ThemeColors): SeriesData[] {
   const grouped = byKey(records);
   const fields: Array<{ name: string; group: string; color: string; pick: (r: PartialRecord) => number }> = [
-    { name: 'Cells accepted', group: 'Cells', color: VERDICT_COLORS.accept, pick: r => r.cellsAccept },
-    { name: 'Cells ignored', group: 'Cells', color: VERDICT_COLORS.ignore, pick: r => r.cellsIgnore },
-    { name: 'Cells rejected', group: 'Cells', color: VERDICT_COLORS.reject, pick: r => r.cellsReject },
-    { name: 'Header accepted', group: 'Header', color: '#14b8a6', pick: r => r.headerAccept },
-    { name: 'Header ignored', group: 'Header', color: '#64748b', pick: r => r.headerIgnore },
-    { name: 'Header rejected', group: 'Header', color: '#f97316', pick: r => r.headerReject },
+    { name: 'Cells accepted', group: 'Cells', color: themeColors[VERDICT_COLORS.accept], pick: r => r.cellsAccept },
+    { name: 'Cells ignored', group: 'Cells', color: themeColors[VERDICT_COLORS.ignore], pick: r => r.cellsIgnore },
+    { name: 'Cells rejected', group: 'Cells', color: themeColors[VERDICT_COLORS.reject], pick: r => r.cellsReject },
+    { name: 'Header accepted', group: 'Header', color: DATA_COLORS.teal, pick: r => r.headerAccept },
+    { name: 'Header ignored', group: 'Header', color: DATA_COLORS.slate, pick: r => r.headerIgnore },
+    { name: 'Header rejected', group: 'Header', color: DATA_COLORS.orange, pick: r => r.headerReject },
   ];
   return fields
     .map(field => ({
@@ -368,11 +372,11 @@ export function buildHeaderSeries(records: PartialRecord[], keys: string[]): Ser
   const p50 = new Map(withHeaders.map(r => [r.key, r.p50HeaderSeen]));
   const p90 = new Map(withHeaders.map(r => [r.key, r.p90HeaderSeen]));
   return [
-    { name: 'p50', data: keys.map(key => p50.get(key) ?? null), color: '#0ea5e9', showSymbol: keys.length <= 2 },
+    { name: 'p50', data: keys.map(key => p50.get(key) ?? null), color: DATA_COLORS.sky, showSymbol: keys.length <= 2 },
     {
       name: 'p90',
       data: keys.map(key => p90.get(key) ?? null),
-      color: '#0ea5e9',
+      color: DATA_COLORS.sky,
       lineStyle: 'dashed',
       showSymbol: keys.length <= 2,
     },
@@ -418,7 +422,7 @@ export function buildAdoptionSeries(records: PeerRecord[], keys: string[]): Seri
     {
       name: 'All peers',
       data: keys.map(key => shareIn(key)),
-      color: '#9ca3af',
+      color: DATA_COLORS.slate,
       lineStyle: 'dashed' as const,
       showSymbol: keys.length <= 2,
     },

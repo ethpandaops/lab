@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import type { ThemeColors } from '@/hooks/useThemeColors';
 import type { PartialRecord, PathRecord, PeerRecord } from '../IndexPage.types';
 import {
   buildAdoptionSeries,
@@ -216,8 +217,10 @@ describe('partial message series', () => {
   });
 
   it('should stack only the verdicts that occur', () => {
-    const series = buildVerdictSeries(partials, [H1, H2]);
+    const themeColors = { success: '#success', muted: '#muted', danger: '#danger' } as ThemeColors;
+    const series = buildVerdictSeries(partials, [H1, H2], themeColors);
     expect(series.map(s => s.name)).toEqual(['Cells accepted', 'Cells ignored', 'Header ignored']);
+    expect(series.slice(0, 2).map(s => s.color)).toEqual(['#success', '#muted']);
     expect(series[2].data).toEqual([0, 4]);
   });
 });

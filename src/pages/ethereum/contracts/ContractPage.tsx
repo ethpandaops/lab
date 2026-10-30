@@ -11,6 +11,7 @@ import { MultiLineChart, type MarkLineConfig } from '@/components/Charts/MultiLi
 import { PolicySelector, type PolicySelectorConfig } from '@/pages/ethereum/execution/state-expiry/components';
 import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { useContractStorageData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
 import { ContractInfoCard, ContractInfoCardSkeleton, ContractStateExpirySkeleton } from './components';
 
@@ -26,10 +27,12 @@ const TYPE_LABELS: Record<ExpiryType, string> = {
   contract: 'Contract',
 };
 
+const { DATA_COLORS } = getDataVizColors();
+
 /** Colors for expiry types */
 const TYPE_COLORS: Record<ExpiryType, string> = {
-  slot: '#3b82f6', // blue
-  contract: '#8b5cf6', // violet
+  slot: DATA_COLORS.blue,
+  contract: DATA_COLORS.violet,
 };
 
 /** Configuration for the PolicySelector component */
@@ -40,24 +43,24 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     slot: {
       label: 'Slot',
       icon: CubeIcon,
-      textColor: 'text-blue-600 dark:text-blue-400',
-      selectedBg: 'bg-blue-500/25',
-      selectedRing: 'ring-blue-500 dark:ring-blue-400',
-      hoverBg: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/25',
-      rowHoverBg: 'bg-blue-500/10 dark:bg-blue-500/15',
-      cellBg: 'bg-blue-500/10 dark:bg-blue-500/10',
-      fillColor: 'bg-blue-500/30 dark:bg-blue-500/25',
+      textColor: 'text-data-blue',
+      selectedBg: 'bg-data-blue/25',
+      selectedRing: 'ring-data-blue',
+      hoverBg: 'hover:bg-data-blue/20 dark:hover:bg-data-blue/25',
+      rowHoverBg: 'bg-data-blue/10 dark:bg-data-blue/15',
+      cellBg: 'bg-data-blue/10',
+      fillColor: 'bg-data-blue/30 dark:bg-data-blue/25',
     },
     contract: {
       label: 'Contract',
       icon: DocumentTextIcon,
-      textColor: 'text-violet-600 dark:text-violet-400',
-      selectedBg: 'bg-violet-500/25',
-      selectedRing: 'ring-violet-500 dark:ring-violet-400',
-      hoverBg: 'hover:bg-violet-500/20 dark:hover:bg-violet-500/25',
-      rowHoverBg: 'bg-violet-500/10 dark:bg-violet-500/15',
-      cellBg: 'bg-violet-500/10 dark:bg-violet-500/10',
-      fillColor: 'bg-violet-500/30 dark:bg-violet-500/25',
+      textColor: 'text-data-violet',
+      selectedBg: 'bg-data-violet/25',
+      selectedRing: 'ring-data-violet',
+      hoverBg: 'hover:bg-data-violet/20 dark:hover:bg-data-violet/25',
+      rowHoverBg: 'bg-data-violet/10 dark:bg-data-violet/15',
+      cellBg: 'bg-data-violet/10',
+      fillColor: 'bg-data-violet/30 dark:bg-data-violet/25',
     },
   },
   policyConfig: {
@@ -321,7 +324,7 @@ export function ContractPage(): JSX.Element {
           xValue: data[i].dateLabel,
           label: 'Resurrected',
           labelPosition: 'end',
-          color: '#10b981', // emerald-500
+          color: DATA_COLORS.emerald,
           lineStyle: 'dashed',
           lineWidth: 1,
         });

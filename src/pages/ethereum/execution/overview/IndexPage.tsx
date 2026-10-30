@@ -58,6 +58,10 @@ import {
   type TooltipItem,
   type TooltipSection,
 } from './overview.utils';
+import { hexToRgba } from '@/utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * IndexPage - Execution Overview page showing TPS, Gas Used, and Gas Limit charts
@@ -404,22 +408,32 @@ export function IndexPage(): JSX.Element {
         {
           title: 'STATISTICS',
           items: [
-            { color: '#10b981', label: 'Average', value: (record.avg_tps ?? 0).toFixed(4) },
-            { color: '#06b6d4', label: 'Moving Avg', value: (record.moving_avg_tps ?? 0).toFixed(4) },
-            { color: '#a855f7', label: 'Median', value: (record.p50_tps ?? 0).toFixed(4), style: 'dotted' },
+            { color: DATA_COLORS.emerald, label: 'Average', value: (record.avg_tps ?? 0).toFixed(4) },
+            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: (record.moving_avg_tps ?? 0).toFixed(4) },
+            { color: DATA_COLORS.purple, label: 'Median', value: (record.p50_tps ?? 0).toFixed(4), style: 'dotted' },
           ],
         },
         {
           title: 'BANDS',
           items: [
             {
-              color: '#f59e0b',
+              color: DATA_COLORS.amber,
               label: 'Bollinger',
               value: formatTpsBand(record.lower_band_tps, record.upper_band_tps),
               style: 'area',
             },
-            { color: '#6366f1', label: 'P5/P95', value: formatTpsBand(record.p05_tps, record.p95_tps), style: 'area' },
-            { color: '#64748b', label: 'Min/Max', value: formatTpsBand(record.min_tps, record.max_tps), style: 'area' },
+            {
+              color: DATA_COLORS.indigo,
+              label: 'P5/P95',
+              value: formatTpsBand(record.p05_tps, record.p95_tps),
+              style: 'area',
+            },
+            {
+              color: DATA_COLORS.slate,
+              label: 'Min/Max',
+              value: formatTpsBand(record.min_tps, record.max_tps),
+              style: 'area',
+            },
           ],
         },
       ];
@@ -460,11 +474,11 @@ export function IndexPage(): JSX.Element {
       const dateStr = formatTooltipDate(dateValue, isDaily);
 
       const statsItems: TooltipItem[] = [
-        { color: '#10b981', label: 'Average', value: formatGas(record.avg_gas_used ?? 0) },
-        { color: '#06b6d4', label: 'Moving Avg', value: formatGas(record.moving_avg_gas_used ?? 0) },
-        { color: '#a855f7', label: 'Median', value: formatGas(record.p50_gas_used ?? 0), style: 'dotted' },
+        { color: DATA_COLORS.emerald, label: 'Average', value: formatGas(record.avg_gas_used ?? 0) },
+        { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatGas(record.moving_avg_gas_used ?? 0) },
+        { color: DATA_COLORS.purple, label: 'Median', value: formatGas(record.p50_gas_used ?? 0), style: 'dotted' },
         {
-          color: 'rgba(156, 163, 175, 0.6)',
+          color: hexToRgba(DATA_COLORS.slate, 0.6),
           label: 'Cumulative',
           value: formatCumulativeGas(record.cumulative_gas_used ?? 0),
         },
@@ -483,7 +497,7 @@ export function IndexPage(): JSX.Element {
         });
         if (gasLimitRecord) {
           statsItems.push({
-            color: '#ef4444',
+            color: DATA_COLORS.red,
             label: 'Gas Limit',
             value: formatGas(gasLimitRecord.max_gas_limit ?? 0),
             style: 'dashed',
@@ -497,19 +511,19 @@ export function IndexPage(): JSX.Element {
           title: 'BANDS',
           items: [
             {
-              color: '#f59e0b',
+              color: DATA_COLORS.amber,
               label: 'Bollinger',
               value: formatGasBand(record.lower_band_gas_used, record.upper_band_gas_used),
               style: 'area',
             },
             {
-              color: '#6366f1',
+              color: DATA_COLORS.indigo,
               label: 'P5/P95',
               value: formatGasBand(record.p05_gas_used, record.p95_gas_used),
               style: 'area',
             },
             {
-              color: '#64748b',
+              color: DATA_COLORS.slate,
               label: 'Min/Max',
               value: formatGasBand(record.min_gas_used, record.max_gas_used),
               style: 'area',
@@ -574,7 +588,13 @@ export function IndexPage(): JSX.Element {
       if (mevData) {
         sections.push({
           title: 'Total',
-          items: [{ color: '#a855f7', label: 'Relay Registered Validators', value: formatCompact(mevData.value ?? 0) }],
+          items: [
+            {
+              color: DATA_COLORS.purple,
+              label: 'Relay Registered Validators',
+              value: formatCompact(mevData.value ?? 0),
+            },
+          ],
         });
       }
 
@@ -621,16 +641,16 @@ export function IndexPage(): JSX.Element {
         {
           title: 'STATISTICS',
           items: [
-            { color: '#10b981', label: 'Average', value: formatNum(record.avg_txn_per_block) },
-            { color: '#06b6d4', label: 'Moving Avg', value: formatNum(record.moving_avg_txn_per_block) },
-            { color: '#a855f7', label: 'Median', value: formatNum(record.p50_txn_per_block), style: 'dotted' },
+            { color: DATA_COLORS.emerald, label: 'Average', value: formatNum(record.avg_txn_per_block) },
+            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatNum(record.moving_avg_txn_per_block) },
+            { color: DATA_COLORS.purple, label: 'Median', value: formatNum(record.p50_txn_per_block), style: 'dotted' },
             {
-              color: 'rgba(156, 163, 175, 0.6)',
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
               label: 'Cumulative',
               value: formatBigNum(record.cumulative_transactions),
             },
             {
-              color: 'rgba(156, 163, 175, 0.6)',
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
               label: 'Period Total',
               value: formatBigNum(record.total_transactions),
             },
@@ -640,19 +660,19 @@ export function IndexPage(): JSX.Element {
           title: 'BANDS',
           items: [
             {
-              color: '#f59e0b',
+              color: DATA_COLORS.amber,
               label: 'Bollinger',
               value: formatBand(record.lower_band_txn_per_block, record.upper_band_txn_per_block),
               style: 'area',
             },
             {
-              color: '#6366f1',
+              color: DATA_COLORS.indigo,
               label: 'P5/P95',
               value: formatBand(record.p05_txn_per_block, record.p95_txn_per_block),
               style: 'area',
             },
             {
-              color: '#64748b',
+              color: DATA_COLORS.slate,
               label: 'Min/Max',
               value: formatBand(record.min_txn_per_block, record.max_txn_per_block),
               style: 'area',

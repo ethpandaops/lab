@@ -4,6 +4,7 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getClassificationLabel, CLASSIFICATION_DESCRIPTIONS } from '@/utils/classification';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlockClassificationCDFChartProps } from './BlockClassificationCDFChart.types';
 
 /**
@@ -47,7 +48,7 @@ export function BlockClassificationCDFChart({ blockPropagationData }: BlockClass
     // Define classification colors to match the badge colors in classification.ts
     const classificationColors: Record<string, string> = {
       individual: themeColors.primary,
-      corporate: '#a855f7', // purple-500
+      corporate: getDataVizColors().DATA_COLORS.purple,
       internal: themeColors.success,
       unclassified: themeColors.muted,
     };

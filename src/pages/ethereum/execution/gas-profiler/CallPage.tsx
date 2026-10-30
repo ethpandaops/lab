@@ -66,16 +66,16 @@ async function copyToClipboard(text: string): Promise<boolean> {
 function getCallTypeStyles(callType: string): { bg: string; text: string; border: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-orange-500/10', text: 'text-orange-500', border: 'border-orange-500/30' };
+      return { bg: 'bg-data-orange/10', text: 'text-data-orange', border: 'border-data-orange/30' };
     case 'CREATE2':
-      return { bg: 'bg-amber-500/10', text: 'text-amber-500', border: 'border-amber-500/30' };
+      return { bg: 'bg-data-amber/10', text: 'text-data-amber', border: 'border-data-amber/30' };
     case 'DELEGATECALL':
-      return { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' };
+      return { bg: 'bg-data-purple/10', text: 'text-data-purple', border: 'border-data-purple/30' };
     case 'STATICCALL':
-      return { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30' };
+      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan', border: 'border-data-cyan/30' };
     case 'CALL':
     default:
-      return { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' };
+      return { bg: 'bg-data-blue/10', text: 'text-data-blue', border: 'border-data-blue/30' };
   }
 }
 
@@ -585,7 +585,7 @@ export function CallPage(): JSX.Element {
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <BoltIcon className="size-5 text-warning" />
+            <BoltIcon className="size-5 text-muted" />
             <div>
               <div className="text-xl font-semibold text-foreground">{formatGas(selfGas)}</div>
               <div className="text-xs text-muted">Gas</div>

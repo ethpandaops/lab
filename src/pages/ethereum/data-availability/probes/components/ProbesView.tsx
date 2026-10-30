@@ -276,10 +276,10 @@ export function ProbesView({
           const isSuccess = result === 'success';
           const isFailure = result === 'failure';
 
-          // failure = yellow (transient/one-off failure - less severe)
+          // failure = orange (transient/one-off failure - less severe)
           // missing = red (peer responded but didn't have the data - serious)
           const icon = isSuccess ? (
-            <CheckCircleIcon className="size-3.5 text-muted" />
+            <CheckCircleIcon className="size-3.5 text-success" />
           ) : isFailure ? (
             <XCircleIcon className="size-3.5 text-warning" />
           ) : (
@@ -291,7 +291,7 @@ export function ProbesView({
               <div
                 className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
-                    ? 'bg-muted/10 text-muted'
+                    ? 'bg-success/10 text-success'
                     : isFailure
                       ? 'bg-warning/10 text-warning'
                       : 'bg-danger/10 text-danger'
@@ -468,7 +468,7 @@ export function ProbesView({
         cell: info => {
           const ms = info.getValue();
           if (!ms) return <span className="text-muted">-</span>;
-          let color = 'text-foreground';
+          let color = 'text-success';
           if (ms > 4000) color = 'text-warning';
           if (ms > 8000) color = 'text-danger';
           return <span className={`font-mono text-xs ${color}`}>{ms}ms</span>;
@@ -716,11 +716,11 @@ export function ProbesView({
 
       {/* Live mode indicator bar */}
       {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-primary/30 bg-primary/10 px-4 py-2">
+        <div className="mb-4 flex items-center rounded-sm border border-success/30 bg-success/10 px-4 py-2">
           <div className="flex items-center gap-3">
-            <SignalIcon className="size-5 text-primary" />
+            <SignalIcon className="size-5 text-success" />
             <div>
-              <span className="text-sm font-medium text-primary">Live Mode Active</span>
+              <span className="text-sm font-medium text-success">Live Mode Active</span>
               <span className="ml-2 text-xs text-muted">Showing a sample of recent probes</span>
             </div>
           </div>
@@ -744,7 +744,7 @@ export function ProbesView({
             </p>
             <ul className="mt-2 space-y-1 text-sm">
               <li>
-                <span className="font-medium text-foreground">Success</span> - Peer provided valid data matching KZG
+                <span className="font-medium text-success">Success</span> - Peer provided valid data matching KZG
                 commitments
               </li>
               <li>
