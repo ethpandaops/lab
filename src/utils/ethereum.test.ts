@@ -217,9 +217,10 @@ describe('getClientLayer', () => {
     expect(getClientLayer('unknown-client')).toBeNull();
   });
 
-  it('should classify caplin and silver as CL and the newer execution clients as EL', () => {
+  it('should classify caplin, silver and ethlambda as CL and the newer execution clients as EL', () => {
     expect(getClientLayer('caplin')).toBe('CL');
     expect(getClientLayer('Silver')).toBe('CL');
+    expect(getClientLayer('ethlambda')).toBe('CL');
     expect(getClientLayer('nimbusel')).toBe('EL');
     expect(getClientLayer('ethereumjs')).toBe('EL');
     expect(getClientLayer('trin-execution')).toBe('EL');
