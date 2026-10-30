@@ -109,6 +109,7 @@ export const CONSENSUS_CLIENTS = [
   'grandine',
   'caplin',
   'silver',
+  'ethlambda',
 ] as const;
 export const CONSENSUS_CLIENTS_SET = new Set<string>(CONSENSUS_CLIENTS);
 
@@ -169,6 +170,7 @@ export const CONSENSUS_CLIENT_COLORS: Record<string, string> = {
   grandine: '#14b8a6',
   caplin: '#a16207',
   silver: '#475569',
+  ethlambda: '#16a34a',
 };
 
 /**
