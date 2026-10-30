@@ -177,10 +177,19 @@ export function DataTable<TData>({
   const hasFilterableColumns = columns.some(col => col.meta?.filterType);
 
   return (
-    <div className="w-full">
+    <div
+      className={clsx(
+        'group/datatable w-full [--table-inset:--spacing(3)] [--toolbar-inset:--spacing(4)] sm:[--toolbar-inset:--spacing(6)]',
+        // Inside a Card body: flush to the card edges, with edge columns on the card's inset so they
+        // line up with the card title
+        'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:w-auto',
+        'in-data-[slot=card-body]:[--table-inset:var(--card-inset)] in-data-[slot=card-body]:[--toolbar-inset:var(--card-inset)]',
+        'in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)'
+      )}
+    >
       {/* Header section */}
       {(title || description) && (
-        <div className="mb-4 px-4 sm:px-6">
+        <div className="mb-4 px-(--toolbar-inset)">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:flex-auto">
               {title && <h2 className="text-sm/6 font-semibold text-foreground">{title}</h2>}
@@ -192,7 +201,7 @@ export function DataTable<TData>({
 
       {/* Global search (if enabled) */}
       {!hideGlobalFilter && (
-        <div className="mb-4 px-4 sm:px-6">
+        <div className="mb-4 px-(--toolbar-inset)">
           <div className="sm:max-w-xs">
             <Input size="sm">
               <Input.Leading>
@@ -210,7 +219,13 @@ export function DataTable<TData>({
       )}
 
       {/* Table container with unified toolbar */}
-      <div className="overflow-hidden border-y border-border">
+      <div
+        className={clsx(
+          'overflow-hidden border-y border-border',
+          // The card's own edge and header rule replace these borders
+          'in-data-[slot=card-body]:border-b-0 in-data-[slot=card-body]:group-first/datatable:border-t-0'
+        )}
+      >
         {/* Unified toolbar (top) - columns + pagination */}
         {!isLoading &&
           table.getRowModel().rows.length > 0 &&
@@ -239,7 +254,11 @@ export function DataTable<TData>({
                         style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                         className={clsx(
                           'py-1.5 text-left text-xs font-semibold text-foreground',
-                          headerIndex === 0 ? 'pr-2 pl-3' : 'px-2'
+                          headerIndex === 0
+                            ? 'pr-2 pl-(--table-inset)'
+                            : headerIndex === headerGroup.headers.length - 1
+                              ? 'pr-(--table-inset) pl-2'
+                              : 'px-2'
                         )}
                       >
                         <div className="flex flex-col gap-2">
@@ -324,7 +343,11 @@ export function DataTable<TData>({
                         style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
                         className={clsx(
                           'py-1.5 text-xs whitespace-nowrap',
-                          cellIndex === 0 ? 'pr-2 pl-3' : 'px-2',
+                          cellIndex === 0
+                            ? 'pr-2 pl-(--table-inset)'
+                            : cellIndex === row.getVisibleCells().length - 1
+                              ? 'pr-(--table-inset) pl-2'
+                              : 'px-2',
                           (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName || 'text-muted'
                         )}
                       >

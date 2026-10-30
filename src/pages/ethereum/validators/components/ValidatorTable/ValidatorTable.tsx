@@ -11,6 +11,7 @@ import type {
   BlockProposalDataPoint,
 } from '../../hooks/useValidatorsData.types';
 import { DailyBreakdownTable } from '../DailyBreakdownTable';
+import { BeaconchainLink } from '../ValidatorIdentity/ValidatorIdentity';
 import type { ValidatorSelection } from '../ValidatorHeatmap';
 
 interface ValidatorTableProps {
@@ -82,15 +83,15 @@ function formatStatus(status: string, slashed: boolean): ReactNode {
   }
 
   const statusColors: Record<string, string> = {
-    active_ongoing: 'bg-muted/10 text-muted',
+    active_ongoing: 'bg-success/10 text-success',
     active_exiting: 'bg-warning/10 text-warning',
     active_slashed: 'bg-danger/10 text-danger',
     exited_unslashed: 'bg-muted/10 text-muted',
     exited_slashed: 'bg-danger/10 text-danger',
-    withdrawal_possible: 'bg-accent/10 text-accent',
+    withdrawal_possible: 'bg-muted/10 text-muted',
     withdrawal_done: 'bg-muted/10 text-muted',
-    pending_initialized: 'bg-accent/10 text-accent',
-    pending_queued: 'bg-accent/10 text-accent',
+    pending_initialized: 'bg-muted/10 text-muted',
+    pending_queued: 'bg-muted/10 text-muted',
   };
 
   const colorClass = statusColors[status] ?? 'bg-muted/10 text-muted';
@@ -223,7 +224,7 @@ export function ValidatorTable({
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-border bg-surface text-xs text-muted">
-              <th className="w-px px-2 py-3" />
+              <th className="w-px py-3 pr-2 pl-(--card-inset)" />
               <th className="px-2 py-3 text-left font-medium">Validator</th>
               <th className="w-px px-2 py-3 text-right font-medium">Inclusion</th>
               <th className="w-px px-2 py-3 text-center font-medium">Incl. Trend</th>
@@ -231,15 +232,15 @@ export function ValidatorTable({
               <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Head Trend</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Target</th>
               <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Target Trend</th>
-              <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Source</th>
-              <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Source Trend</th>
-              <th className="hidden w-px px-2 py-3 text-right font-medium xl:table-cell">Avg Delay</th>
-              <th className="hidden w-px px-2 py-3 text-center font-medium xl:table-cell">Delay Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium 2xl:table-cell">Source</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium 2xl:table-cell">Source Trend</th>
+              <th className="hidden w-px px-2 py-3 text-right font-medium 2xl:table-cell">Avg Delay</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium 2xl:table-cell">Delay Trend</th>
               <th className="w-px px-2 py-3 text-right font-medium">Sync %</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Proposals</th>
               <th className="w-px px-2 py-3 text-right font-medium">Min Bal (ETH)</th>
               <th className="w-px px-2 py-3 text-center font-medium">Bal. Trend</th>
-              <th className="w-px px-2 py-3 text-left font-medium">Status</th>
+              <th className="w-px py-3 pr-(--card-inset) pl-2 text-left font-medium">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -385,7 +386,7 @@ function ValidatorRow({
         onClick={onClick}
       >
         {/* Chevron */}
-        <td className="px-2 py-2">
+        <td className="py-2 pr-2 pl-(--card-inset)">
           {isExpanded ? (
             <ChevronDownIcon className="size-4 text-primary" />
           ) : (
@@ -395,7 +396,7 @@ function ValidatorRow({
 
         {/* Validator index + pubkey */}
         <td className="px-2 py-2 font-mono">
-          <span className="flex items-baseline gap-1.5">
+          <span className="flex items-center gap-1.5">
             <span className="font-medium text-foreground">{row.validatorIndex}</span>
             {pubkey && (
               <span className="text-xs text-muted" title={pubkey}>
@@ -403,6 +404,9 @@ function ValidatorRow({
                 <span className="hidden 2xl:inline">{pubkey}</span>
               </span>
             )}
+            <span onClick={e => e.stopPropagation()}>
+              <BeaconchainLink index={row.validatorIndex} />
+            </span>
           </span>
         </td>
 
@@ -453,12 +457,12 @@ function ValidatorRow({
         </td>
 
         {/* Source */}
-        <td className="hidden px-2 py-2 text-right xl:table-cell">
+        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
           {formatPercent(row.attestation.sourceCorrectRate, 98)}
         </td>
 
         {/* Source sparkline */}
-        <td className="hidden px-2 py-2 text-center xl:table-cell">
+        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
           {sourceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={sourceSparkline} width={80} />
@@ -469,7 +473,7 @@ function ValidatorRow({
         </td>
 
         {/* Avg Delay */}
-        <td className="hidden px-2 py-2 text-right xl:table-cell">
+        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
           {row.attestation.avgInclusionDistance !== null ? (
             <span className="tabular-nums">{row.attestation.avgInclusionDistance.toFixed(2)}</span>
           ) : (
@@ -478,7 +482,7 @@ function ValidatorRow({
         </td>
 
         {/* Delay sparkline */}
-        <td className="hidden px-2 py-2 text-center xl:table-cell">
+        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
           {delaySparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={delaySparkline} width={80} />
@@ -526,7 +530,7 @@ function ValidatorRow({
         <td className="px-2 py-2 text-center">
           {balanceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
-              <Sparkline data={balanceSparkline} width={80} showArea color="#22c55e" />
+              <Sparkline data={balanceSparkline} width={80} showArea />
             </div>
           ) : (
             <span className="text-muted">-</span>
@@ -534,13 +538,13 @@ function ValidatorRow({
         </td>
 
         {/* Status */}
-        <td className="px-2 py-2">{formatStatus(row.balance.status, row.balance.slashed)}</td>
+        <td className="py-2 pr-(--card-inset) pl-2">{formatStatus(row.balance.status, row.balance.slashed)}</td>
       </tr>
 
       {/* Expanded daily breakdown */}
       {isExpanded && (
         <tr className="bg-background">
-          <td colSpan={COLUMN_COUNT} className="px-4 py-3">
+          <td colSpan={COLUMN_COUNT} className="px-(--card-inset) py-3">
             <DailyBreakdownTable
               attestationData={attestationDaily}
               balanceData={balanceDaily}

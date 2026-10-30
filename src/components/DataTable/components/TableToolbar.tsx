@@ -50,7 +50,7 @@ export function TableToolbar<TData>({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-4 bg-surface/50 px-4 py-2 sm:px-6',
+        'flex items-center justify-between gap-4 bg-surface/50 px-(--toolbar-inset) py-2',
         position === 'top' ? 'border-b border-border' : 'border-t border-border'
       )}
     >

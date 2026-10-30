@@ -191,6 +191,10 @@ Detailed standards for specific topics are in `.claude/rules/`:
 - [Theming](.claude/rules/theming.md) — Two-tier color architecture, semantic tokens
 - [Storybook](.claude/rules/storybook.md) — Decorator pattern, story title convention
 
+## Layout
+
+Give every value its own place. Don't run separate values together in one line of text (`5 · 7,638 ETH`, `Head 99% · Target 98%`, a root and a percentage in one cell). Each value gets a label and a slot: a table column, a `<dl>` term and definition, a stat, its own line. If you're reaching for a `·`, `|` or `/` separator, the layout probably needs structure instead.
+
 ## Copy
 
 Every user-facing string (titles, descriptions, hints, tooltips, empty states, toasts, button text) must pass the clean-copy skill:

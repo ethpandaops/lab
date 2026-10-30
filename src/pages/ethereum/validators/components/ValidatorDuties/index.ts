@@ -1,0 +1,1 @@
+export { ValidatorDuties } from './ValidatorDuties';

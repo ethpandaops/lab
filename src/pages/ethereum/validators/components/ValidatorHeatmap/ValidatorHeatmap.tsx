@@ -1,13 +1,11 @@
 import type { JSX } from 'react';
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import clsx from 'clsx';
 import colors from 'tailwindcss/colors';
 import { ArrowLeftIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { HeatmapChart } from '@/components/Charts/Heatmap';
-import { ButtonGroup } from '@/components/Elements/ButtonGroup';
-import { Button } from '@/components/Elements/Button';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { formatSlot } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { AttestationDailyDataPoint, BlockProposalDataPoint } from '../../hooks/useValidatorsData.types';
@@ -51,8 +49,26 @@ interface ValidatorHeatmapProps {
   onCellSelect?: (selection: ValidatorSelection) => void;
   /** Look up validator status at a given timestamp for NO_DATA tooltip */
   getStatusAtTimestamp?: (validatorIndex: number, timestamp: number) => string | null;
+  /** Days per column: 1 for daily rows, 7 for weekly rows (each starting Monday UTC) */
+  stepDays?: 1 | 7;
+  /** Called with a week's Monday when a weekly cell is clicked */
+  onWeekSelect?: (weekStart: number) => void;
   /** Additional class names */
   className?: string;
+}
+
+/** Column start times from `from` to `to`, one per `stepDays`, aligned to Monday for weeks */
+function columnTimestamps(from: number, to: number, stepDays: number): number[] {
+  const start = new Date(from * 1000);
+  start.setUTCHours(0, 0, 0, 0);
+  if (stepDays === 7) start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+  const end = new Date(to * 1000);
+  end.setUTCHours(0, 0, 0, 0);
+  const out: number[] = [];
+  for (const d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + stepDays)) {
+    out.push(Math.floor(d.getTime() / 1000));
+  }
+  return out;
 }
 
 /** Shape shared by both daily and hourly attestation data points */
@@ -250,11 +266,22 @@ export function ValidatorHeatmap({
   selection,
   onCellSelect,
   getStatusAtTimestamp,
+  stepDays = 1,
+  onWeekSelect,
   className,
 }: ValidatorHeatmapProps): JSX.Element {
-  const config = METRIC_CONFIGS[metric];
-  const slotConfig = SLOT_METRIC_GETTERS[metric];
   const themeColors = useThemeColors();
+  // Proposal cells are statuses (missed, orphaned, canonical), so they take the status tokens; the rate
+  // metrics keep their performance gradient
+  const { danger, warning, success } = themeColors;
+  const config = useMemo(
+    () =>
+      metric === 'proposals'
+        ? { ...METRIC_CONFIGS.proposals, colorGradient: [danger, warning, success] }
+        : METRIC_CONFIGS[metric],
+    [metric, danger, warning, success]
+  );
+  const slotConfig = SLOT_METRIC_GETTERS[metric];
   const emptyColor = themeColors.border;
   const [internalDay, setInternalDay] = useState<number | null>(null);
   const [internalHour, setInternalHour] = useState<number | null>(null);
@@ -302,16 +329,7 @@ export function ValidatorHeatmap({
 
   // Transform daily data into heatmap format
   const { heatmapData, xLabels, yLabels, timestamps, validatorIndices } = useMemo(() => {
-    const allTimestamps: number[] = [];
-    const startDate = new Date(from * 1000);
-    startDate.setUTCHours(0, 0, 0, 0);
-    const endDate = new Date(to * 1000);
-    endDate.setUTCHours(0, 0, 0, 0);
-    const current = new Date(startDate);
-    while (current <= endDate) {
-      allTimestamps.push(Math.floor(current.getTime() / 1000));
-      current.setUTCDate(current.getUTCDate() + 1);
-    }
+    const allTimestamps = columnTimestamps(from, to, stepDays);
 
     // Include all validators from both data and the input prop
     const uniqueValidators = [...new Set([...data.map(d => d.validatorIndex), ...validatorIndicesProp])].sort(
@@ -339,7 +357,7 @@ export function ValidatorHeatmap({
       timestamps: allTimestamps,
       validatorIndices: uniqueValidators,
     };
-  }, [data, config, from, to, validatorIndicesProp]);
+  }, [data, config, from, to, stepDays, validatorIndicesProp]);
 
   // Transform hourly data into heatmap format
   const hourlyHeatmap = useMemo(() => {
@@ -428,17 +446,8 @@ export function ValidatorHeatmap({
       };
     }
 
-    // Build day labels spanning from→to
-    const allTimestamps: number[] = [];
-    const startDate = new Date(from * 1000);
-    startDate.setUTCHours(0, 0, 0, 0);
-    const endDate = new Date(to * 1000);
-    endDate.setUTCHours(0, 0, 0, 0);
-    const current = new Date(startDate);
-    while (current <= endDate) {
-      allTimestamps.push(Math.floor(current.getTime() / 1000));
-      current.setUTCDate(current.getUTCDate() + 1);
-    }
+    // Columns spanning from→to
+    const allTimestamps = columnTimestamps(from, to, stepDays);
 
     // Only include validators the user queried — the API may return extra validators from the same service
     const inputSet = new Set(validatorIndicesProp);
@@ -455,7 +464,7 @@ export function ValidatorHeatmap({
     const cellMap = new Map<string, number>();
     for (const p of blockProposals) {
       const dayTs = Math.floor(new Date(p.slotTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000);
-      const dayIdx = timestampToIndex.get(dayTs);
+      const dayIdx = timestampToIndex.get(stepDays === 7 ? columnTimestamps(dayTs, dayTs, 7)[0] : dayTs);
       const valIdx = validatorToIndex.get(p.validatorIndex);
       if (dayIdx === undefined || valIdx === undefined) continue;
 
@@ -480,7 +489,7 @@ export function ValidatorHeatmap({
       timestamps: allTimestamps,
       validatorIndices: allValidators,
     };
-  }, [metric, blockProposals, from, to, data, validatorIndicesProp]);
+  }, [metric, blockProposals, from, to, stepDays, data, validatorIndicesProp]);
 
   // Build proposal hourly heatmap data — filter blockProposals by selected day, group by hour
   const proposalHourlyHeatmap = useMemo(() => {
@@ -637,13 +646,17 @@ export function ValidatorHeatmap({
       const dayTs = activeDailyTimestamps[value[0]];
       const valIdx = activeDailyValidators[value[1]];
       if (dayTs === undefined) return;
+      if (stepDays === 7) {
+        onWeekSelect?.(dayTs);
+        return;
+      }
       if (onCellSelect) {
         onCellSelect({ validatorIndex: valIdx ?? null, dayTimestamp: dayTs, hourTimestamp: null });
       } else {
         setDrillDownDay(dayTs);
       }
     },
-    [activeDailyTimestamps, activeDailyValidators, onCellSelect, setDrillDownDay]
+    [activeDailyTimestamps, activeDailyValidators, onCellSelect, setDrillDownDay, stepDays, onWeekSelect]
   );
 
   // Click handler for hourly heatmap cells
@@ -777,12 +790,13 @@ export function ValidatorHeatmap({
     const timestamp = activeDailyTimestamps[dayIdx];
     const validatorIndex = activeDailyValidators[validatorIdx];
     const date = new Date(timestamp * 1000);
-    const fullDate = date.toLocaleDateString('en-US', {
+    const dayText = date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     });
+    const fullDate = stepDays === 7 ? `Week of ${dayText}` : dayText;
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       let statusLine = '';
@@ -828,24 +842,35 @@ export function ValidatorHeatmap({
     return `<strong>Validator ${formatSlot(validatorIndex)}</strong><br/>Slot ${formatSlot(slot)}<br/>${config.label}: ${valueText}`;
   };
 
-  /** Metric toggle buttons shared across all views */
-  const metricToggle = (
-    <div className="mb-4 flex flex-wrap items-center gap-4">
-      <span className="text-sm font-medium text-muted">Metric:</span>
-      <ButtonGroup rounded>
-        {(Object.keys(METRIC_CONFIGS) as HeatmapMetric[]).map(m => (
-          <Button key={m} variant={metric === m ? 'primary' : 'secondary'} size="xs" onClick={() => onMetricChange(m)}>
-            {METRIC_CONFIGS[m].label}
-          </Button>
-        ))}
-      </ButtonGroup>
-    </div>
+  /** Metric selector shared across all views */
+  const metricControl = (
+    <SegmentedControl
+      options={(Object.keys(METRIC_CONFIGS) as HeatmapMetric[]).map(m => ({
+        value: m,
+        label: METRIC_CONFIGS[m].label,
+      }))}
+      value={metric}
+      onChange={onMetricChange}
+      ariaLabel="Heatmap metric"
+    />
   );
+
+  const backLink = (label: string, onClick: () => void): JSX.Element => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80"
+    >
+      <ArrowLeftIcon className="size-3" />
+      {label}
+    </button>
+  );
+
+  const dailyTitle = stepDays === 7 ? 'Weekly performance' : 'Daily performance';
 
   if (isLoading) {
     return (
-      <Card className={clsx('p-4', className)}>
-        <div className="mb-4 h-8 w-48 animate-pulse rounded-xs bg-muted/20" />
+      <Card title={dailyTitle} className={className}>
         <div className="h-64 animate-pulse rounded-xs bg-muted/10" />
       </Card>
     );
@@ -853,10 +878,10 @@ export function ValidatorHeatmap({
 
   if (data.length === 0 && blockProposals.length === 0 && validatorIndicesProp.length === 0) {
     return (
-      <Card className={clsx('p-4', className)}>
+      <Card title={dailyTitle} className={className}>
         <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
           <ChartBarIcon className="size-8 text-muted/40" />
-          <p className="text-sm text-muted">No daily data available for heatmap visualization.</p>
+          <p className="text-sm text-muted">No attestation data in this range.</p>
         </div>
       </Card>
     );
@@ -865,24 +890,13 @@ export function ValidatorHeatmap({
   // Slot-level drill-down view
   if (drillDownHour !== null) {
     return (
-      <Card className={clsx('p-4', className)}>
+      <Card
+        title={`${formatFullDate(drillDownDay!)}, ${formatHourLabel(drillDownHour)}`}
+        subtitle={backLink('Hourly view', handleBackToHourly)}
+        actions={metricControl}
+        className={className}
+      >
         <div ref={containerRef}>
-          <div className="mb-4 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleBackToHourly}
-              className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-            >
-              <ArrowLeftIcon className="size-4" />
-              Back to hourly view
-            </button>
-            <span className="text-sm text-muted">
-              {formatFullDate(drillDownDay!)} / {formatHourLabel(drillDownHour)}
-            </span>
-          </div>
-
-          {metricToggle}
-
           {(() => {
             const activeSlotData = isProposalsMetric ? proposalSlotHeatmap : slotHeatmap;
             const isSlotEmpty = activeSlotData.data.length === 0;
@@ -934,22 +948,13 @@ export function ValidatorHeatmap({
   // Hourly drill-down view
   if (drillDownDay !== null) {
     return (
-      <Card className={clsx('p-4', className)}>
+      <Card
+        title={formatFullDate(drillDownDay)}
+        subtitle={backLink('Daily view', handleBackToDaily)}
+        actions={metricControl}
+        className={className}
+      >
         <div ref={containerRef}>
-          <div className="mb-4 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleBackToDaily}
-              className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-            >
-              <ArrowLeftIcon className="size-4" />
-              Back to daily view
-            </button>
-            <span className="text-sm text-muted">{formatFullDate(drillDownDay)}</span>
-          </div>
-
-          {metricToggle}
-
           {(() => {
             const activeHourlyData = isProposalsMetric ? proposalHourlyHeatmap : hourlyHeatmap;
             const isHourlyEmpty = activeHourlyData.data.length === 0;
@@ -1001,17 +1006,18 @@ export function ValidatorHeatmap({
 
   // Daily view (default)
   return (
-    <Card className={clsx('p-4', className)}>
+    <Card
+      title={dailyTitle}
+      subtitle={stepDays === 7 ? 'Select a week to see its days' : 'Select a day to see its hours'}
+      actions={metricControl}
+      className={className}
+    >
       <div ref={containerRef}>
-        {metricToggle}
-
         {activeDailyData.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
             <ChartBarIcon className="size-8 text-muted/40" />
             <p className="text-sm text-muted">
-              {isProposalsMetric
-                ? 'No block proposals in this period.'
-                : 'No daily data available for heatmap visualization.'}
+              {isProposalsMetric ? 'No block proposals in this range.' : 'No attestation data in this range.'}
             </p>
           </div>
         ) : (

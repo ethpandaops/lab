@@ -1,8 +1,7 @@
 import type { JSX } from 'react';
-import { useState } from 'react';
 import clsx from 'clsx';
-import { Card } from '@/components/Layout/Card';
-import { ChevronDownIcon, ChevronUpIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+import { Popover, PopoverButton, PopoverPanel } from '@/components/Overlays/Popover';
 
 export interface ThresholdValues {
   inclusionRate: number;
@@ -50,7 +49,7 @@ interface ThresholdInputProps {
 function ThresholdInput({ label, value, onChange, min, max, step, unit, disabled }: ThresholdInputProps): JSX.Element {
   return (
     <div className="flex items-center gap-4">
-      <label className="w-40 text-sm text-muted">{label}</label>
+      <label className="w-36 shrink-0 text-sm text-muted">{label}</label>
       <input
         type="range"
         min={min}
@@ -83,127 +82,61 @@ function ThresholdInput({ label, value, onChange, min, max, step, unit, disabled
 }
 
 /**
- * Collapsible threshold configuration panel
+ * "Thresholds" button opening the pass/fail settings used by the performance scorecard.
  */
 export function ThresholdConfig({ values, onChange, disabled = false, className }: ThresholdConfigProps): JSX.Element {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const handleReset = (): void => {
-    onChange(DEFAULT_THRESHOLDS);
-  };
-
-  const isCustom =
-    values.inclusionRate !== DEFAULT_THRESHOLDS.inclusionRate ||
-    values.correctnessRate !== DEFAULT_THRESHOLDS.correctnessRate ||
-    values.syncParticipation !== DEFAULT_THRESHOLDS.syncParticipation ||
-    values.minBalance !== DEFAULT_THRESHOLDS.minBalance ||
-    values.inclusionDelay !== DEFAULT_THRESHOLDS.inclusionDelay ||
-    values.blockProductionRate !== DEFAULT_THRESHOLDS.blockProductionRate;
+  const isCustom = (Object.keys(DEFAULT_THRESHOLDS) as (keyof ThresholdValues)[]).some(
+    key => values[key] !== DEFAULT_THRESHOLDS[key]
+  );
+  const field = (key: keyof ThresholdValues): Pick<ThresholdInputProps, 'value' | 'onChange' | 'disabled'> => ({
+    value: values[key],
+    onChange: v => onChange({ ...values, [key]: v }),
+    disabled,
+  });
 
   return (
-    <Card
-      className={clsx('[&>[data-slot=card-body]:empty]:hidden', className)}
-      title={
-        <button
-          type="button"
-          aria-expanded={isExpanded}
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex w-full cursor-pointer items-center justify-between gap-2 text-left"
-        >
-          <span className="inline-flex items-center gap-2">
-            <AdjustmentsHorizontalIcon className="size-4 text-muted" />
-            Pass/Fail Thresholds
-            {isCustom && (
-              <span className="rounded-xs bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">Custom</span>
-            )}
-          </span>
-          {isExpanded ? (
-            <ChevronUpIcon aria-hidden="true" className="size-4 text-muted" />
-          ) : (
-            <ChevronDownIcon aria-hidden="true" className="size-4 text-muted" />
-          )}
-        </button>
-      }
-    >
-      {isExpanded && (
-        <div className="space-y-4">
-          <ThresholdInput
-            label="Attestation Inclusion"
-            value={values.inclusionRate}
-            onChange={v => onChange({ ...values, inclusionRate: v })}
-            min={0}
-            max={100}
-            step={0.5}
-            unit="%"
-            disabled={disabled}
-          />
-          <ThresholdInput
-            label="Vote Correctness"
-            value={values.correctnessRate}
-            onChange={v => onChange({ ...values, correctnessRate: v })}
-            min={0}
-            max={100}
-            step={0.5}
-            unit="%"
-            disabled={disabled}
-          />
-          <ThresholdInput
-            label="Sync Participation"
-            value={values.syncParticipation}
-            onChange={v => onChange({ ...values, syncParticipation: v })}
-            min={0}
-            max={100}
-            step={0.5}
-            unit="%"
-            disabled={disabled}
-          />
-          <ThresholdInput
-            label="Minimum Balance"
-            value={values.minBalance}
-            onChange={v => onChange({ ...values, minBalance: v })}
-            min={0}
-            max={32}
-            step={0.01}
-            unit="ETH"
-            disabled={disabled}
-          />
-          <ThresholdInput
-            label="Block Production"
-            value={values.blockProductionRate}
-            onChange={v => onChange({ ...values, blockProductionRate: v })}
-            min={0}
-            max={100}
-            step={0.5}
-            unit="%"
-            disabled={disabled}
-          />
-          <ThresholdInput
-            label="Inclusion Delay"
-            value={values.inclusionDelay}
-            onChange={v => onChange({ ...values, inclusionDelay: v })}
-            min={1}
-            max={4}
-            step={0.1}
-            unit="slots"
-            disabled={disabled}
-          />
-
-          <div className="flex justify-end border-t border-border pt-3">
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={disabled || !isCustom}
-              className={clsx(
-                'text-sm text-muted transition-colors hover:text-foreground',
-                (disabled || !isCustom) && 'cursor-not-allowed opacity-50'
-              )}
-            >
-              Reset to defaults
-            </button>
-          </div>
+    <Popover className={clsx('relative', className)}>
+      <PopoverButton
+        variant="secondary"
+        size="sm"
+        leadingIcon={<AdjustmentsHorizontalIcon className="size-4" />}
+        trailingIcon={
+          isCustom ? <span className="size-1.5 rounded-full bg-primary" aria-label="Customised" /> : undefined
+        }
+      >
+        Thresholds
+      </PopoverButton>
+      <PopoverPanel anchor="bottom end" className="z-20 mt-2 w-md space-y-4 p-4">
+        <ThresholdInput
+          label="Attestation inclusion"
+          min={0}
+          max={100}
+          step={0.5}
+          unit="%"
+          {...field('inclusionRate')}
+        />
+        <ThresholdInput label="Vote correctness" min={0} max={100} step={0.5} unit="%" {...field('correctnessRate')} />
+        <ThresholdInput
+          label="Sync participation"
+          min={0}
+          max={100}
+          step={0.5}
+          unit="%"
+          {...field('syncParticipation')}
+        />
+        <ThresholdInput label="Minimum balance" min={0} max={32} step={0.01} unit="ETH" {...field('minBalance')} />
+        <div className="flex justify-end border-t border-border pt-3">
+          <button
+            type="button"
+            onClick={() => onChange(DEFAULT_THRESHOLDS)}
+            disabled={disabled || !isCustom}
+            className="text-sm text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Reset to defaults
+          </button>
         </div>
-      )}
-    </Card>
+      </PopoverPanel>
+    </Popover>
   );
 }
 

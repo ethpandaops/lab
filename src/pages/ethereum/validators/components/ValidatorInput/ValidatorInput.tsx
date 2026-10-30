@@ -30,46 +30,20 @@ function validateTag(value: string): TagValidationResult {
   }
   // Valid BLS pubkey
   if (PUBKEY_REGEX.test(value)) {
-    return { valid: true, color: 'indigo' };
+    return { valid: true, color: 'green' };
   }
   // Invalid
   return { valid: false, color: 'red' };
 }
 
-/**
- * Build helper text ReactNode showing tag counts and a clear button
- */
-function buildHelperText(tags: string[], onTagsChange: (tags: string[]) => void): ReactNode {
-  const { valid, pubkeys, invalid } = parseValidatorIndices(tags);
-
-  if (tags.length === 0) return undefined;
-
+/** Lists entries that are neither an index nor a pubkey */
+function invalidHelperText(tags: string[]): ReactNode {
+  const { invalid } = parseValidatorIndices(tags);
+  if (invalid.length === 0) return undefined;
   return (
-    <span className="flex items-center justify-between">
-      <span className="flex items-center gap-3">
-        {(valid.length > 0 || pubkeys.length > 0) && (
-          <span className="text-foreground">
-            {valid.length > 0 && pubkeys.length > 0
-              ? `${valid.length} ${valid.length === 1 ? 'index' : 'indices'} + ${pubkeys.length} ${pubkeys.length === 1 ? 'pubkey' : 'pubkeys'} entered`
-              : pubkeys.length > 0
-                ? `${pubkeys.length} ${pubkeys.length === 1 ? 'pubkey' : 'pubkeys'} entered`
-                : `${valid.length} ${valid.length === 1 ? 'validator' : 'validators'} entered`}
-          </span>
-        )}
-        {invalid.length > 0 && (
-          <span className="text-warning">
-            {invalid.length} invalid: {invalid.slice(0, 3).join(', ')}
-            {invalid.length > 3 && '...'}
-          </span>
-        )}
-      </span>
-      <button
-        type="button"
-        onClick={() => onTagsChange([])}
-        className="text-xs text-muted transition-colors hover:text-foreground"
-      >
-        Clear all
-      </button>
+    <span className="text-warning">
+      Not a validator index or pubkey: {invalid.slice(0, 3).join(', ')}
+      {invalid.length > 3 && ` and ${invalid.length - 3} more`}
     </span>
   );
 }
@@ -78,7 +52,7 @@ function buildHelperText(tags: string[], onTagsChange: (tags: string[]) => void)
  * Validator-specific tag input component
  *
  * Wraps the core TagInput with validator index/pubkey validation and status display.
- * Tags are colored green for valid indices, indigo for valid pubkeys, and red for invalid entries.
+ * Valid indices and pubkeys render green; anything else is red.
  */
 export function ValidatorInput({
   tags,
@@ -93,9 +67,8 @@ export function ValidatorInput({
       onTagsChange={onTagsChange}
       validate={validateTag}
       onSubmit={onSubmit}
-      label="Validators"
-      placeholder="Enter validator indices or pubkeys (e.g., 123, 0xab12...)"
-      helperText={buildHelperText(tags, onTagsChange)}
+      placeholder="Validator indices or pubkeys, e.g. 1257, 0xab12…"
+      helperText={invalidHelperText(tags)}
       disabled={disabled}
       className={className}
     />

@@ -120,14 +120,14 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
           // Non-mainnet network: add/update the param
           navigate({
             to: '.',
-            search: { network: initialNetwork.name },
+            search: prev => ({ ...prev, network: initialNetwork.name }),
             replace: true,
           });
         } else if (!shouldHaveParam && hasParam) {
           // Mainnet: remove the param by setting to undefined
           navigate({
             to: '.',
-            search: { network: undefined },
+            search: prev => ({ ...prev, network: undefined }),
             replace: true,
           });
         }
@@ -163,7 +163,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
           // Use undefined to explicitly remove the param
           navigate({
             to: '.',
-            search: { network: undefined },
+            search: prev => ({ ...prev, network: undefined }),
           });
         } else {
           // Add/update network param for non-mainnet networks
