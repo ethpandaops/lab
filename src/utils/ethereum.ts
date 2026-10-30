@@ -100,7 +100,16 @@ export function truncateAddress(pubkey?: string, startChars = 6, endChars = 4): 
 /**
  * Known consensus client names (caplin is the consensus client embedded in erigon)
  */
-export const CONSENSUS_CLIENTS = ['lighthouse', 'lodestar', 'nimbus', 'prysm', 'teku', 'grandine', 'caplin'] as const;
+export const CONSENSUS_CLIENTS = [
+  'lighthouse',
+  'lodestar',
+  'nimbus',
+  'prysm',
+  'teku',
+  'grandine',
+  'caplin',
+  'silver',
+] as const;
 export const CONSENSUS_CLIENTS_SET = new Set<string>(CONSENSUS_CLIENTS);
 
 /**
@@ -159,6 +168,7 @@ export const CONSENSUS_CLIENT_COLORS: Record<string, string> = {
   lodestar: '#8b5cf6',
   grandine: '#14b8a6',
   caplin: '#a16207',
+  silver: '#475569',
 };
 
 /**
