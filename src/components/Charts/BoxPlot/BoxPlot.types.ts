@@ -138,4 +138,9 @@ export interface BoxPlotProps {
    * @default '60%'
    */
   boxWidth?: string | number;
+  /**
+   * Interval between category axis labels (0 shows every label)
+   * @default 'auto'
+   */
+  categoryLabelInterval?: number | 'auto';
 }

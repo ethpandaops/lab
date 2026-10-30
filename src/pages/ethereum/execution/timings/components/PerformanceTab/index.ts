@@ -1,0 +1,1 @@
+export { PerformanceTab } from './PerformanceTab';

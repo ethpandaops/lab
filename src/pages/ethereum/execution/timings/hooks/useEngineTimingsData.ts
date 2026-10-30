@@ -95,7 +95,7 @@ function getTimeRangeTimestamps(range: TimeRange): {
  * The daily winrate table keys on a string date column whose generated filters
  * have no gte/lt variants, so ranges are expressed via day_start_date_in_values.
  */
-function generateDateRange(startTs: number, endTs: number): string {
+export function generateDateRange(startTs: number, endTs: number): string {
   const dates: string[] = [];
   const current = new Date(startTs * 1000);
   current.setUTCHours(0, 0, 0, 0);
