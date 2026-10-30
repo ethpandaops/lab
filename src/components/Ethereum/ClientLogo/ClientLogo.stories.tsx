@@ -142,6 +142,15 @@ export const Grandine: Story = {
 };
 
 /**
+ * Silver consensus client logo
+ */
+export const Silver: Story = {
+  args: {
+    client: 'silver',
+  },
+};
+
+/**
  * Larger logo (32px)
  */
 export const Large: Story = {
@@ -255,6 +264,10 @@ export const AllConsensusClients: Story = {
         <div className="flex flex-col items-center gap-1">
           <ClientLogo client="caplin" />
           <span className="text-xs text-muted">caplin</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <ClientLogo client="silver" />
+          <span className="text-xs text-muted">silver</span>
         </div>
       </div>
     </div>
