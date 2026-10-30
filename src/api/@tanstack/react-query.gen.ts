@@ -64,6 +64,8 @@ import {
   fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
   fctAttestationVoteCorrectnessByValidatorServiceGet,
   fctAttestationVoteCorrectnessByValidatorServiceList,
+  fctAttestationVoteCorrectnessByValidatorWeeklyServiceGet,
+  fctAttestationVoteCorrectnessByValidatorWeeklyServiceList,
   fctBlobCountDailyServiceGet,
   fctBlobCountDailyServiceList,
   fctBlobCountHourlyServiceGet,
@@ -316,6 +318,8 @@ import {
   fctSyncCommitteeParticipationByValidatorHourlyServiceList,
   fctSyncCommitteeParticipationByValidatorServiceGet,
   fctSyncCommitteeParticipationByValidatorServiceList,
+  fctSyncCommitteeParticipationByValidatorWeeklyServiceGet,
+  fctSyncCommitteeParticipationByValidatorWeeklyServiceList,
   fctTokenContractStorageStateByBlockDailyServiceGet,
   fctTokenContractStorageStateByBlockDailyServiceList,
   fctValidatorBalanceDailyServiceGet,
@@ -324,6 +328,8 @@ import {
   fctValidatorBalanceHourlyServiceList,
   fctValidatorBalanceServiceGet,
   fctValidatorBalanceServiceList,
+  fctValidatorBalanceWeeklyServiceGet,
+  fctValidatorBalanceWeeklyServiceList,
   fctValidatorCountByEntityByStatusDailyServiceGet,
   fctValidatorCountByEntityByStatusDailyServiceList,
   intAttestationAttestedCanonicalServiceGet,
@@ -659,6 +665,12 @@ import type {
   FctAttestationVoteCorrectnessByValidatorServiceListData,
   FctAttestationVoteCorrectnessByValidatorServiceListError,
   FctAttestationVoteCorrectnessByValidatorServiceListResponse,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetError,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponse,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListError,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponse,
   FctBlobCountDailyServiceGetData,
   FctBlobCountDailyServiceGetError,
   FctBlobCountDailyServiceGetResponse,
@@ -1415,6 +1427,12 @@ import type {
   FctSyncCommitteeParticipationByValidatorServiceListData,
   FctSyncCommitteeParticipationByValidatorServiceListError,
   FctSyncCommitteeParticipationByValidatorServiceListResponse,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetError,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListData,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListError,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListResponse,
   FctTokenContractStorageStateByBlockDailyServiceGetData,
   FctTokenContractStorageStateByBlockDailyServiceGetError,
   FctTokenContractStorageStateByBlockDailyServiceGetResponse,
@@ -1439,6 +1457,12 @@ import type {
   FctValidatorBalanceServiceListData,
   FctValidatorBalanceServiceListError,
   FctValidatorBalanceServiceListResponse,
+  FctValidatorBalanceWeeklyServiceGetData,
+  FctValidatorBalanceWeeklyServiceGetError,
+  FctValidatorBalanceWeeklyServiceGetResponse,
+  FctValidatorBalanceWeeklyServiceListData,
+  FctValidatorBalanceWeeklyServiceListError,
+  FctValidatorBalanceWeeklyServiceListResponse,
   FctValidatorCountByEntityByStatusDailyServiceGetData,
   FctValidatorCountByEntityByStatusDailyServiceGetError,
   FctValidatorCountByEntityByStatusDailyServiceGetResponse,
@@ -3672,6 +3696,66 @@ export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctAttestationVoteCorrectnessByValidatorHourlyServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponse,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceListError,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorWeeklyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByValidatorWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponse,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetError,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByValidatorWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByValidatorWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByValidatorWeeklyServiceGetQueryKey(options),
   });
 
 export const fctBlobCountDailyServiceListQueryKey = (options?: Options<FctBlobCountDailyServiceListData>) =>
@@ -11011,6 +11095,66 @@ export const fctSyncCommitteeParticipationByValidatorHourlyServiceGetOptions = (
     queryKey: fctSyncCommitteeParticipationByValidatorHourlyServiceGetQueryKey(options),
   });
 
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceListQueryKey = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceListData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions = (
+  options?: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceListResponse,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceListError,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceListResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorWeeklyServiceListQueryKey(options),
+  });
+
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceGetQueryKey = (
+  options: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceGetData>
+) => createQueryKey('fctSyncCommitteeParticipationByValidatorWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceGetOptions = (
+  options: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceGetError,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse,
+    ReturnType<typeof fctSyncCommitteeParticipationByValidatorWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSyncCommitteeParticipationByValidatorWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSyncCommitteeParticipationByValidatorWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctTokenContractStorageStateByBlockDailyServiceListQueryKey = (
   options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData>
 ) => createQueryKey('fctTokenContractStorageStateByBlockDailyServiceList', options);
@@ -11238,6 +11382,64 @@ export const fctValidatorBalanceHourlyServiceGetOptions = (options: Options<FctV
       return data;
     },
     queryKey: fctValidatorBalanceHourlyServiceGetQueryKey(options),
+  });
+
+export const fctValidatorBalanceWeeklyServiceListQueryKey = (
+  options?: Options<FctValidatorBalanceWeeklyServiceListData>
+) => createQueryKey('fctValidatorBalanceWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceWeeklyServiceListOptions = (
+  options?: Options<FctValidatorBalanceWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctValidatorBalanceWeeklyServiceListResponse,
+    FctValidatorBalanceWeeklyServiceListError,
+    FctValidatorBalanceWeeklyServiceListResponse,
+    ReturnType<typeof fctValidatorBalanceWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceWeeklyServiceListQueryKey(options),
+  });
+
+export const fctValidatorBalanceWeeklyServiceGetQueryKey = (
+  options: Options<FctValidatorBalanceWeeklyServiceGetData>
+) => createQueryKey('fctValidatorBalanceWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceWeeklyServiceGetOptions = (options: Options<FctValidatorBalanceWeeklyServiceGetData>) =>
+  queryOptions<
+    FctValidatorBalanceWeeklyServiceGetResponse,
+    FctValidatorBalanceWeeklyServiceGetError,
+    FctValidatorBalanceWeeklyServiceGetResponse,
+    ReturnType<typeof fctValidatorBalanceWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorBalanceWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorBalanceWeeklyServiceGetQueryKey(options),
   });
 
 export const fctValidatorCountByEntityByStatusDailyServiceListQueryKey = (

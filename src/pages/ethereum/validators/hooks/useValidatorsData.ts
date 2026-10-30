@@ -5,9 +5,12 @@ import {
   fctBlockProposerByValidatorServiceListOptions,
   fctSyncCommitteeParticipationByValidatorDailyServiceListOptions,
   fctValidatorBalanceDailyServiceListOptions,
+  fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions,
+  fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions,
+  fctValidatorBalanceWeeklyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { weeklyAttestation, weeklyBalance, weeklySync } from '../utils/weekly';
+import { weekStartOf } from '../utils/week';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
@@ -457,16 +460,21 @@ export function useValidatorsData(
   const indicesString = validatorIndices.join(',');
   const enabled = validatorIndices.length > 0 && startTime > 0 && endTime > 0 && !!currentNetwork;
 
-  const dateRangeString = useMemo(
-    () => (enabled && !allHistory ? generateDateRange(startTime, endTime) : ''),
-    [enabled, allHistory, startTime, endTime]
-  );
+  const weekly = resolution === 'week';
+  const dateRangeString = useMemo(() => {
+    if (!enabled || allHistory) return '';
+    const days = generateDateRange(startTime, endTime);
+    return weekly ? [...new Set(days.split(',').map(weekStartOf))].join(',') : days;
+  }, [enabled, allHistory, weekly, startTime, endTime]);
   // Listing every day of a multi-year range would not fit in a URL
   const dayFilter = allHistory ? { day_start_date_like: '20%' } : { day_start_date_in_values: dateRangeString };
+  const weekFilter = allHistory ? { week_start_date_like: '20%' } : { week_start_date_in_values: dateRangeString };
 
-  // Split validators into chunks so each chunk x days < API_MAX_PAGE_SIZE
-  const dayCount = countDaysInRange(startTime, endTime);
-  const maxValidatorsPerChunk = Math.max(1, Math.floor(API_MAX_PAGE_SIZE / dayCount));
+  // Split validators into chunks so each chunk x rows per validator < API_MAX_PAGE_SIZE
+  const rowsPerValidator = weekly
+    ? Math.ceil(countDaysInRange(startTime, endTime) / 7) + 1
+    : countDaysInRange(startTime, endTime);
+  const maxValidatorsPerChunk = Math.max(1, Math.floor(API_MAX_PAGE_SIZE / rowsPerValidator));
   const validatorChunks = useMemo(
     () => (enabled ? chunkArray(validatorIndices, maxValidatorsPerChunk) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -478,45 +486,33 @@ export function useValidatorsData(
   // Layout: [attestation_chunk0..N, sync_chunk0..N, balance_chunk0..N, blockProposer_chunk0..N]
   const results = useQueries({
     queries: validatorChunks.flatMap(chunk => {
-      const chunkIndicesString = chunk.join(',');
+      const validator_index_in_values = chunk.join(',');
+      const dailyQuery = {
+        validator_index_in_values,
+        ...dayFilter,
+        page_size: API_MAX_PAGE_SIZE,
+        order_by: 'day_start_date',
+      };
+      const weeklyQuery = {
+        validator_index_in_values,
+        ...weekFilter,
+        page_size: API_MAX_PAGE_SIZE,
+        order_by: 'week_start_date',
+      };
       return [
-        {
-          ...fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions({
-            query: {
-              validator_index_in_values: chunkIndicesString,
-              ...dayFilter,
-              page_size: API_MAX_PAGE_SIZE,
-              order_by: 'day_start_date',
-            },
-          }),
-          enabled,
-        },
-        {
-          ...fctSyncCommitteeParticipationByValidatorDailyServiceListOptions({
-            query: {
-              validator_index_in_values: chunkIndicesString,
-              ...dayFilter,
-              page_size: API_MAX_PAGE_SIZE,
-              order_by: 'day_start_date',
-            },
-          }),
-          enabled,
-        },
-        {
-          ...fctValidatorBalanceDailyServiceListOptions({
-            query: {
-              validator_index_in_values: chunkIndicesString,
-              ...dayFilter,
-              page_size: API_MAX_PAGE_SIZE,
-              order_by: 'day_start_date',
-            },
-          }),
-          enabled,
-        },
+        weekly
+          ? { ...fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
+          : { ...fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions({ query: dailyQuery }), enabled },
+        weekly
+          ? { ...fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
+          : { ...fctSyncCommitteeParticipationByValidatorDailyServiceListOptions({ query: dailyQuery }), enabled },
+        weekly
+          ? { ...fctValidatorBalanceWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
+          : { ...fctValidatorBalanceDailyServiceListOptions({ query: dailyQuery }), enabled },
         {
           ...fctBlockProposerByValidatorServiceListOptions({
             query: {
-              validator_index_in_values: chunkIndicesString,
+              validator_index_in_values,
               slot_start_date_time_gte: startTime,
               slot_start_date_time_lte: endTime + 86400,
               page_size: API_MAX_PAGE_SIZE,
@@ -533,13 +529,22 @@ export function useValidatorsData(
   const error = results.find(r => r.error)?.error ?? null;
 
   // Type assertions for response data extraction
+  // Weekly rows keep the daily shape, keyed by their week's Monday, so every consumer reads both
+  type WeekRow<T> = Omit<T, 'day_start_date'> & { week_start_date?: string };
   type AttestationResponse = {
     fct_attestation_vote_correctness_by_validator_daily?: FctAttestationVoteCorrectnessByValidatorDaily[];
+    fct_attestation_vote_correctness_by_validator_weekly?: WeekRow<FctAttestationVoteCorrectnessByValidatorDaily>[];
   };
   type SyncCommitteeResponse = {
     fct_sync_committee_participation_by_validator_daily?: FctSyncCommitteeParticipationByValidatorDaily[];
+    fct_sync_committee_participation_by_validator_weekly?: WeekRow<FctSyncCommitteeParticipationByValidatorDaily>[];
   };
-  type BalanceResponse = { fct_validator_balance_daily?: FctValidatorBalanceDaily[] };
+  type BalanceResponse = {
+    fct_validator_balance_daily?: FctValidatorBalanceDaily[];
+    fct_validator_balance_weekly?: WeekRow<FctValidatorBalanceDaily>[];
+  };
+  const asDaily = <T>(rows: WeekRow<T>[] | undefined): T[] =>
+    (rows ?? []).map(({ week_start_date, ...rest }) => ({ ...rest, day_start_date: week_start_date }) as T);
   type BlockProposalResponse = { fct_block_proposer_by_validator?: FctBlockProposerByValidator[] };
 
   // Merge chunked results: each chunk produced 4 queries (attestation, sync, balance, blockProposer)
@@ -563,34 +568,42 @@ export function useValidatorsData(
 
   const attestationData = useMemo(() => {
     if (chunkCount === 0) return [];
-    const rows = results
+    return results
       .filter((_, i) => i % 4 === 0)
-      .flatMap(
-        r => (r.data as AttestationResponse | undefined)?.fct_attestation_vote_correctness_by_validator_daily ?? []
-      );
-    return resolution === 'week' ? weeklyAttestation(rows) : rows;
+      .flatMap(r => {
+        const data = r.data as AttestationResponse | undefined;
+        return (
+          data?.fct_attestation_vote_correctness_by_validator_daily ??
+          asDaily(data?.fct_attestation_vote_correctness_by_validator_weekly)
+        );
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, attestationUpdatedAt, resolution]);
+  }, [chunkCount, attestationUpdatedAt]);
 
   const syncCommitteeData = useMemo(() => {
     if (chunkCount === 0) return [];
-    const rows = results
+    return results
       .filter((_, i) => i % 4 === 1)
-      .flatMap(
-        r => (r.data as SyncCommitteeResponse | undefined)?.fct_sync_committee_participation_by_validator_daily ?? []
-      );
-    return resolution === 'week' ? weeklySync(rows) : rows;
+      .flatMap(r => {
+        const data = r.data as SyncCommitteeResponse | undefined;
+        return (
+          data?.fct_sync_committee_participation_by_validator_daily ??
+          asDaily(data?.fct_sync_committee_participation_by_validator_weekly)
+        );
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, syncUpdatedAt, resolution]);
+  }, [chunkCount, syncUpdatedAt]);
 
   const balanceData = useMemo(() => {
     if (chunkCount === 0) return [];
-    const rows = results
+    return results
       .filter((_, i) => i % 4 === 2)
-      .flatMap(r => (r.data as BalanceResponse | undefined)?.fct_validator_balance_daily ?? []);
-    return resolution === 'week' ? weeklyBalance(rows) : rows;
+      .flatMap(r => {
+        const data = r.data as BalanceResponse | undefined;
+        return data?.fct_validator_balance_daily ?? asDaily(data?.fct_validator_balance_weekly);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, balanceUpdatedAt, resolution]);
+  }, [chunkCount, balanceUpdatedAt]);
 
   const blockProposalData = useMemo(() => {
     if (chunkCount === 0) return [];

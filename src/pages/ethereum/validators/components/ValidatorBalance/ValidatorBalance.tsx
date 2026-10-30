@@ -11,7 +11,7 @@ import type {
 } from '@/api/types.gen';
 import { formatDayLabel } from '../../mocks/overview';
 import { estimateRewards } from '../../utils/rewards';
-import { weekStartOf } from '../../utils/weekly';
+import { weekStartOf } from '../../utils/week';
 import { MockBadge } from '../MockBadge';
 
 interface ValidatorBalanceProps {
