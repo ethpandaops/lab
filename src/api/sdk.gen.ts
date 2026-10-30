@@ -183,6 +183,12 @@ import type {
   FctAttestationVoteCorrectnessByValidatorServiceListData,
   FctAttestationVoteCorrectnessByValidatorServiceListErrors,
   FctAttestationVoteCorrectnessByValidatorServiceListResponses,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetErrors,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponses,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListErrors,
+  FctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponses,
   FctBlobCountDailyServiceGetData,
   FctBlobCountDailyServiceGetErrors,
   FctBlobCountDailyServiceGetResponses,
@@ -939,6 +945,12 @@ import type {
   FctSyncCommitteeParticipationByValidatorServiceListData,
   FctSyncCommitteeParticipationByValidatorServiceListErrors,
   FctSyncCommitteeParticipationByValidatorServiceListResponses,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetData,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetErrors,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponses,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListData,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListErrors,
+  FctSyncCommitteeParticipationByValidatorWeeklyServiceListResponses,
   FctTokenContractStorageStateByBlockDailyServiceGetData,
   FctTokenContractStorageStateByBlockDailyServiceGetErrors,
   FctTokenContractStorageStateByBlockDailyServiceGetResponses,
@@ -963,6 +975,12 @@ import type {
   FctValidatorBalanceServiceListData,
   FctValidatorBalanceServiceListErrors,
   FctValidatorBalanceServiceListResponses,
+  FctValidatorBalanceWeeklyServiceGetData,
+  FctValidatorBalanceWeeklyServiceGetErrors,
+  FctValidatorBalanceWeeklyServiceGetResponses,
+  FctValidatorBalanceWeeklyServiceListData,
+  FctValidatorBalanceWeeklyServiceListErrors,
+  FctValidatorBalanceWeeklyServiceListResponses,
   FctValidatorCountByEntityByStatusDailyServiceGetData,
   FctValidatorCountByEntityByStatusDailyServiceGetErrors,
   FctValidatorCountByEntityByStatusDailyServiceGetResponses,
@@ -1541,6 +1559,10 @@ import {
   zFctAttestationVoteCorrectnessByValidatorServiceGetResponse,
   zFctAttestationVoteCorrectnessByValidatorServiceListData,
   zFctAttestationVoteCorrectnessByValidatorServiceListResponse,
+  zFctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData,
+  zFctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByValidatorWeeklyServiceListData,
+  zFctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponse,
   zFctBlobCountDailyServiceGetData,
   zFctBlobCountDailyServiceGetResponse,
   zFctBlobCountDailyServiceListData,
@@ -2045,6 +2067,10 @@ import {
   zFctSyncCommitteeParticipationByValidatorServiceGetResponse,
   zFctSyncCommitteeParticipationByValidatorServiceListData,
   zFctSyncCommitteeParticipationByValidatorServiceListResponse,
+  zFctSyncCommitteeParticipationByValidatorWeeklyServiceGetData,
+  zFctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse,
+  zFctSyncCommitteeParticipationByValidatorWeeklyServiceListData,
+  zFctSyncCommitteeParticipationByValidatorWeeklyServiceListResponse,
   zFctTokenContractStorageStateByBlockDailyServiceGetData,
   zFctTokenContractStorageStateByBlockDailyServiceGetResponse,
   zFctTokenContractStorageStateByBlockDailyServiceListData,
@@ -2061,6 +2087,10 @@ import {
   zFctValidatorBalanceServiceGetResponse,
   zFctValidatorBalanceServiceListData,
   zFctValidatorBalanceServiceListResponse,
+  zFctValidatorBalanceWeeklyServiceGetData,
+  zFctValidatorBalanceWeeklyServiceGetResponse,
+  zFctValidatorBalanceWeeklyServiceListData,
+  zFctValidatorBalanceWeeklyServiceListResponse,
   zFctValidatorCountByEntityByStatusDailyServiceGetData,
   zFctValidatorCountByEntityByStatusDailyServiceGetResponse,
   zFctValidatorCountByEntityByStatusDailyServiceListData,
@@ -3511,6 +3541,48 @@ export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGet = <ThrowOn
     responseValidator: async data =>
       await zFctAttestationVoteCorrectnessByValidatorHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_validator_hourly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponses,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponses,
+    FctAttestationVoteCorrectnessByValidatorWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByValidatorWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_validator_weekly/{validator_index}',
     ...options,
   });
 
@@ -8280,6 +8352,48 @@ export const fctSyncCommitteeParticipationByValidatorHourlyServiceGet = <ThrowOn
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceListResponses,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctSyncCommitteeParticipationByValidatorWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponses,
+    FctSyncCommitteeParticipationByValidatorWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_sync_committee_participation_by_validator_weekly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctTokenContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData, ThrowOnError>
 ) =>
@@ -8425,6 +8539,44 @@ export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean
     requestValidator: async data => await zFctValidatorBalanceHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctValidatorBalanceHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_balance_hourly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctValidatorBalanceWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorBalanceWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorBalanceWeeklyServiceListResponses,
+    FctValidatorBalanceWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by validator_index
+ */
+export const fctValidatorBalanceWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorBalanceWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorBalanceWeeklyServiceGetResponses,
+    FctValidatorBalanceWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorBalanceWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorBalanceWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_balance_weekly/{validator_index}',
     ...options,
   });
 
