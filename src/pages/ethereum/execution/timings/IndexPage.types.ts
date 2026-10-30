@@ -34,7 +34,7 @@ export const HOURLY_CHART_RANGES: TimeRange[] = ['1hour', '6hours', '24hours', '
 /**
  * Tab identifiers for the timings page
  */
-export type TimingsTab = 'overview' | 'newPayload' | 'getBlobs' | 'clients';
+export type TimingsTab = 'overview' | 'newPayload' | 'getBlobs' | 'clients' | 'performance';
 
 /**
  * Zod schema for timings page search parameters
@@ -42,7 +42,7 @@ export type TimingsTab = 'overview' | 'newPayload' | 'getBlobs' | 'clients';
  */
 export const timingsSearchSchema = z.object({
   // Active tab selection
-  tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients']).optional(),
+  tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients', 'performance']).optional(),
 
   // Time range for data queries
   range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days']).optional(),
