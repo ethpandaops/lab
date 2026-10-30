@@ -5,6 +5,9 @@ import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Opcode stats type
@@ -63,7 +66,7 @@ function OpcodeByGasChart({
     const reversed = [...sortedStats].reverse();
     return reversed.map(stat => ({
       value: stat.totalGas,
-      color: CATEGORY_COLORS[getOpcodeCategory(stat.opcode)] ?? CATEGORY_COLORS.Other ?? '#9ca3af',
+      color: CATEGORY_COLORS[getOpcodeCategory(stat.opcode)] ?? CATEGORY_COLORS.Other ?? DATA_COLORS.slate,
     }));
   }, [sortedStats]);
 
@@ -123,7 +126,7 @@ function OpcodeByCountChart({
     const reversed = [...sortedStats].reverse();
     return reversed.map(stat => ({
       value: stat.count,
-      color: CATEGORY_COLORS[getOpcodeCategory(stat.opcode)] ?? CATEGORY_COLORS.Other ?? '#9ca3af',
+      color: CATEGORY_COLORS[getOpcodeCategory(stat.opcode)] ?? CATEGORY_COLORS.Other ?? DATA_COLORS.slate,
     }));
   }, [sortedStats]);
 
@@ -228,14 +231,14 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
   const getColorIntensity = (gas: number): string => {
     const ratio = maxGas > 0 ? gas / maxGas : 0;
     // Indigo gradient: light to dark
-    if (ratio === 0) return 'bg-indigo-50 dark:bg-indigo-950/30';
-    if (ratio < 0.1) return 'bg-indigo-100 dark:bg-indigo-900/40';
-    if (ratio < 0.25) return 'bg-indigo-200 dark:bg-indigo-800/50';
-    if (ratio < 0.4) return 'bg-indigo-300 dark:bg-indigo-700/60';
-    if (ratio < 0.55) return 'bg-indigo-400 dark:bg-indigo-600/70';
-    if (ratio < 0.7) return 'bg-indigo-500 dark:bg-indigo-500';
-    if (ratio < 0.85) return 'bg-indigo-600 dark:bg-indigo-400';
-    return 'bg-indigo-700 dark:bg-indigo-300';
+    if (ratio === 0) return 'bg-data-indigo/5';
+    if (ratio < 0.1) return 'bg-data-indigo/15';
+    if (ratio < 0.25) return 'bg-data-indigo/25';
+    if (ratio < 0.4) return 'bg-data-indigo/40';
+    if (ratio < 0.55) return 'bg-data-indigo/55';
+    if (ratio < 0.7) return 'bg-data-indigo/70';
+    if (ratio < 0.85) return 'bg-data-indigo/85';
+    return 'bg-data-indigo';
   };
 
   return (
@@ -245,13 +248,13 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
         <div className="flex items-center gap-2 text-xs text-muted">
           <span>Low</span>
           <div className="flex gap-px">
-            <div className="size-3 bg-indigo-100 dark:bg-indigo-900/40" />
-            <div className="size-3 bg-indigo-200 dark:bg-indigo-800/50" />
-            <div className="size-3 bg-indigo-300 dark:bg-indigo-700/60" />
-            <div className="size-3 bg-indigo-400 dark:bg-indigo-600/70" />
-            <div className="size-3 bg-indigo-500 dark:bg-indigo-500" />
-            <div className="size-3 bg-indigo-600 dark:bg-indigo-400" />
-            <div className="size-3 bg-indigo-700 dark:bg-indigo-300" />
+            <div className="size-3 bg-data-indigo/15" />
+            <div className="size-3 bg-data-indigo/25" />
+            <div className="size-3 bg-data-indigo/40" />
+            <div className="size-3 bg-data-indigo/55" />
+            <div className="size-3 bg-data-indigo/70" />
+            <div className="size-3 bg-data-indigo/85" />
+            <div className="size-3 bg-data-indigo" />
           </div>
           <span>High</span>
         </div>
@@ -434,8 +437,8 @@ function OpcodeTable({ opcodeStats, searchTerm }: { opcodeStats: OpcodeStats[]; 
                 <span
                   className="rounded-xs px-1.5 py-0.5 text-xs"
                   style={{
-                    backgroundColor: `${CATEGORY_COLORS[op.category] ?? '#6b7280'}20`,
-                    color: CATEGORY_COLORS[op.category] ?? '#6b7280',
+                    backgroundColor: `${CATEGORY_COLORS[op.category] ?? DATA_COLORS.slate}20`,
+                    color: CATEGORY_COLORS[op.category] ?? DATA_COLORS.slate,
                   }}
                 >
                   {op.category}

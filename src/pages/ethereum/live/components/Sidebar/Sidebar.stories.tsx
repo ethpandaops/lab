@@ -104,7 +104,7 @@ const ethereumEvents: TimelineItem[] = [
     timestamp: 4800,
     content: (
       <div className="flex items-center gap-2">
-        <Badge color="green" variant="border" size="small">
+        <Badge color="blue" variant="border" size="small">
           Block
         </Badge>
         <span>proposed by</span>

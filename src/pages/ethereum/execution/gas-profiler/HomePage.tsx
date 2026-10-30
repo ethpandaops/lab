@@ -48,6 +48,9 @@ import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS } from './constants';
 import { getOpcodeCategory, CATEGORY_COLORS } from './utils';
 import type { GasProfilerHomeSearch } from './IndexPage.types';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 // ============================================================================
 // TOOLTIP UTILITIES (matching execution/overview pattern)
@@ -460,7 +463,7 @@ export function HomePage(): JSX.Element {
       labels: reversed.map(([name]) => name),
       data: reversed.map(([name, value]) => ({
         value,
-        color: name === 'Other' ? '#6b7280' : (CATEGORY_COLORS[name] ?? '#6b7280'),
+        color: name === 'Other' ? DATA_COLORS.slate : (CATEGORY_COLORS[name] ?? DATA_COLORS.slate),
       })),
       total,
     };
@@ -636,34 +639,34 @@ export function HomePage(): JSX.Element {
       labels,
       series: [
         createStatisticSeries('Average', avgValues, {
-          color: '#10b981',
+          color: DATA_COLORS.emerald,
           lineWidth: 2.5,
           group: 'Statistics',
         }),
         createStatisticSeries('Moving Avg', movingAvgValues, {
-          color: '#06b6d4',
+          color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
         }),
         createStatisticSeries('Median', medianValues, {
-          color: '#a855f7',
+          color: DATA_COLORS.purple,
           lineWidth: 1.5,
           lineStyle: 'dotted',
           group: 'Statistics',
         }),
         ...createBandSeries('Bollinger', 'ops-bollinger', lowerBandValues, upperBandValues, {
-          color: '#f59e0b',
+          color: DATA_COLORS.amber,
           opacity: 0.15,
           group: 'Bands',
           initiallyVisible: false,
         }),
         ...createBandSeries('P5/P95', 'ops-percentile', p5Values, p95Values, {
-          color: '#6366f1',
+          color: DATA_COLORS.indigo,
           opacity: 0.1,
           group: 'Bands',
         }),
         ...createBandSeries('Min/Max', 'ops-minmax', minValues, maxValues, {
-          color: '#64748b',
+          color: DATA_COLORS.slate,
           opacity: 0.06,
           group: 'Bands',
         }),
@@ -760,22 +763,32 @@ export function HomePage(): JSX.Element {
         {
           title: 'STATISTICS',
           items: [
-            { color: '#10b981', label: 'Average', value: formatCompact(record.avg_ops ?? 0) },
-            { color: '#06b6d4', label: 'Moving Avg', value: formatCompact(record.moving_avg_ops ?? 0) },
-            { color: '#a855f7', label: 'Median', value: formatCompact(record.p50_ops ?? 0), style: 'dotted' },
+            { color: DATA_COLORS.emerald, label: 'Average', value: formatCompact(record.avg_ops ?? 0) },
+            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatCompact(record.moving_avg_ops ?? 0) },
+            { color: DATA_COLORS.purple, label: 'Median', value: formatCompact(record.p50_ops ?? 0), style: 'dotted' },
           ],
         },
         {
           title: 'BANDS',
           items: [
             {
-              color: '#f59e0b',
+              color: DATA_COLORS.amber,
               label: 'Bollinger',
               value: formatOpsBand(record.lower_band_ops, record.upper_band_ops),
               style: 'area',
             },
-            { color: '#6366f1', label: 'P5/P95', value: formatOpsBand(record.p05_ops, record.p95_ops), style: 'area' },
-            { color: '#64748b', label: 'Min/Max', value: formatOpsBand(record.min_ops, record.max_ops), style: 'area' },
+            {
+              color: DATA_COLORS.indigo,
+              label: 'P5/P95',
+              value: formatOpsBand(record.p05_ops, record.p95_ops),
+              style: 'area',
+            },
+            {
+              color: DATA_COLORS.slate,
+              label: 'Min/Max',
+              value: formatOpsBand(record.min_ops, record.max_ops),
+              style: 'area',
+            },
           ],
         },
       ];
@@ -845,34 +858,34 @@ export function HomePage(): JSX.Element {
       labels,
       series: [
         createStatisticSeries('Average', avgValues, {
-          color: '#10b981',
+          color: DATA_COLORS.emerald,
           lineWidth: 2.5,
           group: 'Statistics',
         }),
         createStatisticSeries('Moving Avg', movingAvgValues, {
-          color: '#06b6d4',
+          color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
         }),
         createStatisticSeries('Median', medianValues, {
-          color: '#a855f7',
+          color: DATA_COLORS.purple,
           lineWidth: 1.5,
           lineStyle: 'dotted',
           group: 'Statistics',
         }),
         ...createBandSeries('Bollinger', 'receipt-bollinger', lowerBandValues, upperBandValues, {
-          color: '#f59e0b',
+          color: DATA_COLORS.amber,
           opacity: 0.15,
           group: 'Bands',
           initiallyVisible: false,
         }),
         ...createBandSeries('P5/P95', 'receipt-percentile', p5Values, p95Values, {
-          color: '#6366f1',
+          color: DATA_COLORS.indigo,
           opacity: 0.1,
           group: 'Bands',
         }),
         ...createBandSeries('Min/Max', 'receipt-minmax', minValues, maxValues, {
-          color: '#64748b',
+          color: DATA_COLORS.slate,
           opacity: 0.06,
           group: 'Bands',
         }),
@@ -938,14 +951,18 @@ export function HomePage(): JSX.Element {
         {
           title: 'STATISTICS',
           items: [
-            { color: '#10b981', label: 'Average', value: formatBytes(record.avg_receipt_bytes_per_block ?? 0) },
             {
-              color: '#06b6d4',
+              color: DATA_COLORS.emerald,
+              label: 'Average',
+              value: formatBytes(record.avg_receipt_bytes_per_block ?? 0),
+            },
+            {
+              color: DATA_COLORS.cyan,
               label: 'Moving Avg',
               value: formatBytes(record.moving_avg_receipt_bytes_per_block ?? 0),
             },
             {
-              color: '#a855f7',
+              color: DATA_COLORS.purple,
               label: 'Median',
               value: formatBytes(record.p50_receipt_bytes_per_block ?? 0),
               style: 'dotted',
@@ -956,7 +973,7 @@ export function HomePage(): JSX.Element {
           title: 'BANDS',
           items: [
             {
-              color: '#f59e0b',
+              color: DATA_COLORS.amber,
               label: 'Bollinger',
               value: formatBytesBand(
                 record.lower_band_receipt_bytes_per_block,
@@ -965,13 +982,13 @@ export function HomePage(): JSX.Element {
               style: 'area',
             },
             {
-              color: '#6366f1',
+              color: DATA_COLORS.indigo,
               label: 'P5/P95',
               value: formatBytesBand(record.p05_receipt_bytes_per_block, record.p95_receipt_bytes_per_block),
               style: 'area',
             },
             {
-              color: '#64748b',
+              color: DATA_COLORS.slate,
               label: 'Min/Max',
               value: formatBytesBand(record.min_receipt_bytes_per_block, record.max_receipt_bytes_per_block),
               style: 'area',

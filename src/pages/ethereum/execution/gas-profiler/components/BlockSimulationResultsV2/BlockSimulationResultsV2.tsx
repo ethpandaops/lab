@@ -21,9 +21,13 @@ import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
 import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
 import type { BlockSimulationResult, TxSummary, OpcodeSummary, CallError } from '../../SimulatePage.types';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 // ============================================================================
 // TYPES
@@ -79,7 +83,7 @@ function formatDelta(percent: number): string {
 }
 
 function getDeltaColor(percent: number): string {
-  if (percent < 0) return 'text-foreground';
+  if (percent < 0) return 'text-success';
   if (percent > 0) return 'text-danger';
   return 'text-muted';
 }
@@ -173,7 +177,7 @@ function ErrorCard({
         <div
           className={clsx(
             'size-1.5 shrink-0 rounded-full',
-            hasErrors ? (isSimulated ? 'bg-danger' : 'bg-warning') : 'bg-muted'
+            hasErrors ? (isSimulated ? 'bg-danger' : 'bg-warning') : 'bg-success'
           )}
         />
         <span className="text-xs font-semibold text-foreground">{label}</span>
@@ -204,7 +208,7 @@ function ErrorCard({
             ))}
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-xs text-muted">
+          <div className="flex items-center gap-1.5 text-xs text-success">
             <CheckCircleIcon className="size-3.5" />
             <span>No internal call errors</span>
           </div>
@@ -231,7 +235,7 @@ function GasComparisonSection({
   const isIncrease = result.simulated.gasUsed > result.original.gasUsed;
   const absDelta = Math.abs(result.simulated.gasUsed - result.original.gasUsed);
 
-  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : 'bg-primary/25';
+  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : overallDelta < -5 ? 'bg-success/25' : 'bg-primary/25';
 
   return (
     <div className="space-y-2">
@@ -314,8 +318,8 @@ function GasComparisonSection({
             </>
           ) : (
             <>
-              <CheckCircleIcon className="size-3 text-muted" />
-              <span className="text-xs text-muted">Within limit</span>
+              <CheckCircleIcon className="size-3 text-success" />
+              <span className="text-xs text-success">Within limit</span>
             </>
           )}
           <span className="text-xs text-muted">{formatCompactGas(gasLimit)}</span>
@@ -342,6 +346,7 @@ function ExecutionHealthSection({
   };
   totalTransactions: number;
 }): JSX.Element {
+  const themeColors = useThemeColors();
   const hasDivergence =
     divergenceSummary.divergedCount > 0 ||
     divergenceSummary.statusChanges > 0 ||
@@ -351,14 +356,14 @@ function ExecutionHealthSection({
     return <Alert variant="success" description="No execution divergence — all transaction paths unchanged" />;
   }
 
-  const divergedColor = divergenceSummary.divergedCount > 0 ? '#f59e0b' : '#22c55e';
-  const statusColor = divergenceSummary.statusChanges > 0 ? '#ef4444' : '#22c55e';
+  const divergedColor = divergenceSummary.divergedCount > 0 ? themeColors.warning : themeColors.success;
+  const statusColor = divergenceSummary.statusChanges > 0 ? themeColors.danger : themeColors.success;
   const revertsColor =
     divergenceSummary.additionalReverts > 0
-      ? '#ef4444'
+      ? themeColors.danger
       : divergenceSummary.additionalReverts < 0
-        ? '#22c55e'
-        : '#6b7280';
+        ? themeColors.success
+        : themeColors.muted;
 
   const stats: Stat[] = [
     {
@@ -390,7 +395,12 @@ function ExecutionHealthSection({
       value: `${divergenceSummary.additionalReverts > 0 ? '+' : ''}${divergenceSummary.additionalReverts}`,
       icon: XMarkIcon,
       iconColor: revertsColor,
-      valueClassName: divergenceSummary.additionalReverts > 0 ? 'text-danger' : 'text-foreground',
+      valueClassName:
+        divergenceSummary.additionalReverts > 0
+          ? 'text-danger'
+          : divergenceSummary.additionalReverts < 0
+            ? 'text-success'
+            : 'text-foreground',
       subtitle:
         divergenceSummary.totalOriginalReverts > 0 || divergenceSummary.totalSimulatedReverts > 0
           ? `${divergenceSummary.totalOriginalReverts} \u2192 ${divergenceSummary.totalSimulatedReverts} total`
@@ -766,7 +776,7 @@ function TransactionImpactView({
 
                 {/* Simulated status icon */}
                 {tx.simulatedStatus === 'success' ? (
-                  <CheckCircleIcon className="size-4 shrink-0 text-muted" />
+                  <CheckCircleIcon className="size-4 shrink-0 text-success" />
                 ) : (
                   <XCircleIcon className="size-4 shrink-0 text-danger" />
                 )}
@@ -805,7 +815,7 @@ function TransactionImpactView({
                             {tx.simulatedStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         ) : (
-                          <span className={tx.originalStatus === 'success' ? 'text-foreground' : 'text-danger'}>
+                          <span className={tx.originalStatus === 'success' ? 'text-success' : 'text-danger'}>
                             {tx.originalStatus === 'success' ? 'Success' : 'Failed'}
                           </span>
                         )}
@@ -999,7 +1009,7 @@ export function BlockSimulationResultsV2({
         return {
           opcode,
           category,
-          categoryColor: CATEGORY_COLORS[category] || '#9ca3af',
+          categoryColor: CATEGORY_COLORS[category] || DATA_COLORS.slate,
           originalCount: summary.originalCount,
           simulatedCount: summary.simulatedCount,
           originalGas: summary.originalGas,

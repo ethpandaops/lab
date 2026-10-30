@@ -216,7 +216,7 @@ describe('getDataVizColors', () => {
     it('should only compute colors once when cached', () => {
       const spy = vi.spyOn(window, 'getComputedStyle');
 
-      // First call computes all 33 colors (6 blob + 7 continent + 5 performance + 15 chart)
+      // First call computes all 51 colors (6 blob + 7 continent + 5 performance + 15 chart + 18 data hues)
       getDataVizColors();
       const firstCallCount = spy.mock.calls.length;
 
@@ -230,8 +230,8 @@ describe('getDataVizColors', () => {
       // Should not call getComputedStyle again due to caching
       expect(spy).toHaveBeenCalledTimes(0);
 
-      // Verify first call computed all colors (33 calls to getComputedStyle)
-      expect(firstCallCount).toBe(33);
+      // Verify first call computed all colors (51 calls to getComputedStyle)
+      expect(firstCallCount).toBe(51);
     });
 
     it('should invalidate cache when theme changes', () => {

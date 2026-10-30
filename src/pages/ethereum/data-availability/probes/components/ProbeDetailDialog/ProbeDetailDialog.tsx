@@ -217,7 +217,7 @@ export function ProbeDetailDialog({
                 className={clsx(
                   'text-sm font-medium',
                   probe.result === 'success'
-                    ? 'text-foreground'
+                    ? 'text-success'
                     : probe.result === 'failure'
                       ? 'text-warning dark:text-warning'
                       : 'text-danger dark:text-danger'
@@ -255,7 +255,7 @@ export function ProbeDetailDialog({
                     className={clsx(
                       'relative flex items-center gap-2 rounded-sm border px-3 py-2',
                       probe.result === 'success'
-                        ? 'border-border bg-muted/5'
+                        ? 'border-success/30 bg-success/5'
                         : probe.result === 'failure'
                           ? 'border-warning/30 bg-warning/5'
                           : 'border-danger/30 bg-danger/5'
@@ -268,7 +268,7 @@ export function ProbeDetailDialog({
                         className={clsx(
                           'absolute -right-1 -bottom-1 size-4 rounded-full bg-background',
                           probe.result === 'success'
-                            ? 'text-muted'
+                            ? 'text-success'
                             : probe.result === 'failure'
                               ? 'text-warning'
                               : 'text-danger'

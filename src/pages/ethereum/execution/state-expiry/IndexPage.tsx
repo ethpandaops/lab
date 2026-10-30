@@ -9,6 +9,9 @@ import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useStateExpiryData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
 import { PolicySelector, type PolicySelectorConfig, StateExpirySkeleton, ContractTop100List } from './components';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Short labels for chart series */
 const POLICY_LABELS_SHORT: Record<ExpiryPolicy, string> = {
@@ -24,8 +27,8 @@ const TYPE_LABELS: Record<ExpiryType, string> = {
 
 /** Colors for expiry types */
 const TYPE_COLORS: Record<ExpiryType, string> = {
-  slot: '#3b82f6', // blue
-  contract: '#8b5cf6', // violet
+  slot: DATA_COLORS.blue,
+  contract: DATA_COLORS.violet,
 };
 
 /** Configuration for the PolicySelector component */
@@ -36,24 +39,24 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     slot: {
       label: 'Slot',
       icon: CubeIcon,
-      textColor: 'text-blue-600 dark:text-blue-400',
-      selectedBg: 'bg-blue-500/25',
-      selectedRing: 'ring-blue-500 dark:ring-blue-400',
-      hoverBg: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/25',
-      rowHoverBg: 'bg-blue-500/10 dark:bg-blue-500/15',
-      cellBg: 'bg-blue-500/10 dark:bg-blue-500/10',
-      fillColor: 'bg-blue-500/30 dark:bg-blue-500/25',
+      textColor: 'text-data-blue',
+      selectedBg: 'bg-data-blue/25',
+      selectedRing: 'ring-data-blue',
+      hoverBg: 'hover:bg-data-blue/20 dark:hover:bg-data-blue/25',
+      rowHoverBg: 'bg-data-blue/10 dark:bg-data-blue/15',
+      cellBg: 'bg-data-blue/10',
+      fillColor: 'bg-data-blue/30 dark:bg-data-blue/25',
     },
     contract: {
       label: 'Contract',
       icon: DocumentTextIcon,
-      textColor: 'text-violet-600 dark:text-violet-400',
-      selectedBg: 'bg-violet-500/25',
-      selectedRing: 'ring-violet-500 dark:ring-violet-400',
-      hoverBg: 'hover:bg-violet-500/20 dark:hover:bg-violet-500/25',
-      rowHoverBg: 'bg-violet-500/10 dark:bg-violet-500/15',
-      cellBg: 'bg-violet-500/10 dark:bg-violet-500/10',
-      fillColor: 'bg-violet-500/30 dark:bg-violet-500/25',
+      textColor: 'text-data-violet',
+      selectedBg: 'bg-data-violet/25',
+      selectedRing: 'ring-data-violet',
+      hoverBg: 'hover:bg-data-violet/20 dark:hover:bg-data-violet/25',
+      rowHoverBg: 'bg-data-violet/10 dark:bg-data-violet/15',
+      cellBg: 'bg-data-violet/10',
+      fillColor: 'bg-data-violet/30 dark:bg-data-violet/25',
     },
   },
   policyConfig: {
@@ -388,7 +391,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-blue-600 hover:bg-blue-500/20 dark:border-blue-400/30 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20"
+              className="inline-flex items-center gap-1.5 border border-data-blue/30 bg-data-blue/10 px-2.5 py-1 text-data-blue hover:bg-data-blue/20"
             >
               <CubeIcon className="size-3.5" />
               <span className="font-medium">Slot</span>
@@ -403,7 +406,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-violet-600 hover:bg-violet-500/20 dark:border-violet-400/30 dark:bg-violet-400/10 dark:text-violet-400 dark:hover:bg-violet-400/20"
+              className="inline-flex items-center gap-1.5 border border-data-violet/30 bg-data-violet/10 px-2.5 py-1 text-data-violet hover:bg-data-violet/20"
             >
               <DocumentTextIcon className="size-3.5" />
               <span className="font-medium">Contract</span>

@@ -66,7 +66,7 @@ export function TimelineRow({
           span.depth > 0 && <span className="text-muted">{'└'}</span>
         )}
         {span.clientName && <ClientLogo client={span.clientName} size={14} className="shrink-0" />}
-        <span className={clsx('truncate', span.isLate ? 'text-danger' : 'text-foreground')} title={span.label}>
+        <span className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')} title={span.label}>
           {span.label}
           {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
         </span>
@@ -77,7 +77,7 @@ export function TimelineRow({
         <div
           className={clsx(
             'absolute top-1 rounded-xs transition-all',
-            span.isLate ? 'bg-danger/80' : colors.bg,
+            span.isLate ? 'bg-warning/80' : colors.bg,
             isHovered && 'ring-1 ring-white/20 brightness-110',
             span.collapsible && 'cursor-pointer'
           )}
@@ -94,7 +94,7 @@ export function TimelineRow({
 
       {/* Duration column */}
       <div
-        className={clsx('shrink-0 px-2 text-right font-mono text-xs', span.isLate ? 'text-danger' : colors.text)}
+        className={clsx('shrink-0 px-2 text-right font-mono text-xs', span.isLate ? 'text-warning' : colors.text)}
         style={{ width: 80 }}
       >
         {span.category === 'column' ? formatMs(span.startMs) : formatMs(duration)}

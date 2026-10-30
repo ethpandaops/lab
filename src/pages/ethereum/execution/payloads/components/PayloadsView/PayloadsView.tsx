@@ -45,7 +45,7 @@ function truncateHash(hash?: string, length = 10): string {
  */
 function getDurationColorClass(durationMs?: number): string {
   if (durationMs === undefined) return 'text-muted';
-  if (durationMs < 500) return 'text-foreground';
+  if (durationMs < 500) return 'text-success';
   if (durationMs < 1000) return 'text-warning';
   if (durationMs < 2000) return 'text-danger/70';
   return 'text-danger';
@@ -109,7 +109,7 @@ function StatusBadge({
   const isSyncing = status === 'SYNCING';
 
   const icon = isSuccess ? (
-    <CheckCircleIcon className="size-4 text-muted" />
+    <CheckCircleIcon className="size-4 text-success" />
   ) : isError ? (
     <XCircleIcon className="size-4 text-danger" />
   ) : isSyncing ? (

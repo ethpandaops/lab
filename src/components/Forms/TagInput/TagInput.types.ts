@@ -4,7 +4,7 @@ import type { BadgeColor } from '@/components/Elements/Badge';
 export interface TagValidationResult {
   /** Whether the tag value is valid */
   valid: boolean;
-  /** Badge color to use for this tag */
+  /** Badge color to use for this tag. Defaults to green when valid, red when invalid */
   color?: BadgeColor;
 }
 

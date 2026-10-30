@@ -47,7 +47,7 @@ export function BlockArrivalTimesChart({
   relativeSlots,
   syncGroup,
 }: BlockArrivalTimesChartProps): React.JSX.Element {
-  const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
+  const { CHART_CATEGORICAL_COLORS, DATA_COLORS } = getDataVizColors();
 
   // Calculate attestation deadline from slot phases (end of Block phase)
   const attestationDeadlineSeconds = DEFAULT_BEACON_SLOT_PHASES[0].duration / 1000;
@@ -124,7 +124,7 @@ export function BlockArrivalTimesChart({
       {
         name: 'Attestation deadline',
         data: data.map(d => [d.x, attestationDeadlineSeconds] as [number, number]),
-        color: '#ef4444', // red
+        color: DATA_COLORS.red,
         smooth: false,
         showSymbol: false,
         lineWidth: 2,
@@ -142,7 +142,7 @@ export function BlockArrivalTimesChart({
     const maxY = dataMaxY > 12 ? Math.ceil((dataMaxY * 1.1) / 2) * 2 : 12;
 
     return { series, minX, maxY };
-  }, [data, CHART_CATEGORICAL_COLORS, attestationDeadlineSeconds]);
+  }, [data, CHART_CATEGORICAL_COLORS, DATA_COLORS, attestationDeadlineSeconds]);
 
   const chartHeight = height ?? (inModal ? 600 : 300);
 

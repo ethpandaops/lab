@@ -87,7 +87,7 @@ const EXTRA_PRESETS: QuickFilterPreset[] = [
   {
     id: 'high-gas',
     label: '50M+ Gas',
-    icon: <FireIcon className="size-4 text-warning" />,
+    icon: <FireIcon className="size-4 text-muted" />,
     filters: { gasUsedMin: 50_000_000 },
   },
   {

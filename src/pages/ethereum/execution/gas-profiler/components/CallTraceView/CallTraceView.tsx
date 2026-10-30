@@ -9,6 +9,9 @@ import { useCallFrameOpcodes, type OpcodeBreakdown } from '../../hooks/useCallFr
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 import { isPrecompileAddress } from '../../utils/precompileNames';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Format gas value compactly
@@ -25,18 +28,18 @@ function formatGasCompact(value: number): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-orange-500/20', text: 'text-orange-400' };
+      return { bg: 'bg-data-orange/20', text: 'text-data-orange' };
     case 'CREATE2':
       return { bg: 'bg-warning/20', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-purple-500/20', text: 'text-purple-400' };
+      return { bg: 'bg-data-purple/20', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-cyan-500/20', text: 'text-cyan-400' };
+      return { bg: 'bg-data-cyan/20', text: 'text-data-cyan' };
     case 'CALLCODE':
-      return { bg: 'bg-pink-500/20', text: 'text-pink-400' };
+      return { bg: 'bg-data-pink/20', text: 'text-data-pink' };
     case 'CALL':
     default:
-      return { bg: 'bg-blue-500/20', text: 'text-blue-400' };
+      return { bg: 'bg-data-blue/20', text: 'text-data-blue' };
   }
 }
 
@@ -105,7 +108,7 @@ function buildCallTree(
  */
 function getOpcodeColorHex(opcode: string): string {
   const category = getOpcodeCategory(opcode);
-  return CATEGORY_COLORS[category] ?? CATEGORY_COLORS.Other ?? '#9ca3af';
+  return CATEGORY_COLORS[category] ?? CATEGORY_COLORS.Other ?? DATA_COLORS.slate;
 }
 
 /**
@@ -407,7 +410,7 @@ function TraceRow({
           <span
             className={clsx(
               'shrink-0 rounded-xs px-1.5 py-0.5 text-xs font-medium',
-              isContractCreation ? 'bg-orange-500/20 text-orange-400' : callTypeStyles.bg,
+              isContractCreation ? 'bg-data-orange/20 text-data-orange' : callTypeStyles.bg,
               isContractCreation ? '' : callTypeStyles.text
             )}
           >
@@ -417,7 +420,7 @@ function TraceRow({
 
         {/* Precompile badge */}
         {isPrecompile && (
-          <span className="shrink-0 rounded-xs bg-rose-500/20 px-1.5 py-0.5 text-xs font-medium text-rose-400">
+          <span className="shrink-0 rounded-xs bg-data-rose/20 px-1.5 py-0.5 text-xs font-medium text-data-rose">
             precompile
           </span>
         )}
@@ -442,8 +445,7 @@ function TraceRow({
           <span
             className={clsx(
               'cursor-pointer font-medium transition-colors',
-              isFunctionHighlighted &&
-                'rounded-xs bg-emerald-200 px-0.5 text-emerald-800 dark:bg-lime-500/30 dark:text-lime-300'
+              isFunctionHighlighted && 'rounded-xs bg-data-emerald/30 px-0.5 text-foreground dark:bg-data-lime/30'
             )}
             onMouseEnter={node.functionName ? handleFunctionMouseEnter : undefined}
             onMouseLeave={node.functionName ? handleMouseLeave : undefined}
@@ -475,7 +477,7 @@ function TraceRow({
         {/* Opcode badges - storage reads (SLOAD) */}
         {opcodeStats && opcodeStats.sloadCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-sky-500/20 px-1.5 py-0.5 text-xs text-sky-400 transition-colors hover:bg-sky-500/30">
+            <span className="cursor-pointer rounded-xs bg-data-sky/20 px-1.5 py-0.5 text-xs text-data-sky transition-colors hover:bg-data-sky/30">
               {opcodeStats.sloadCount} read{opcodeStats.sloadCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -488,7 +490,7 @@ function TraceRow({
         {/* Opcode badges - events/logs (LOG0-LOG4) */}
         {opcodeStats && opcodeStats.logCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-violet-500/20 px-1.5 py-0.5 text-xs text-violet-400 transition-colors hover:bg-violet-500/30">
+            <span className="cursor-pointer rounded-xs bg-data-violet/20 px-1.5 py-0.5 text-xs text-data-violet transition-colors hover:bg-data-violet/30">
               {opcodeStats.logCount} event{opcodeStats.logCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -501,7 +503,7 @@ function TraceRow({
         {/* Opcode badges - contract creation (CREATE/CREATE2) */}
         {opcodeStats && opcodeStats.createCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-orange-500/20 px-1.5 py-0.5 text-xs text-orange-400 transition-colors hover:bg-orange-500/30">
+            <span className="cursor-pointer rounded-xs bg-data-orange/20 px-1.5 py-0.5 text-xs text-data-orange transition-colors hover:bg-data-orange/30">
               {opcodeStats.createCount} deploy{opcodeStats.createCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">

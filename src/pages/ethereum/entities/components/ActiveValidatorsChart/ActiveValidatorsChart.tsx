@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 import type { EntityValidatorStatusData } from '../../hooks/useEntityValidatorStatusData';
 import type { TimePeriod } from '../../constants';
@@ -23,6 +24,7 @@ interface ActiveValidatorsChartProps {
 }
 
 export function ActiveValidatorsChart({ data, timePeriod }: ActiveValidatorsChartProps): React.JSX.Element {
+  const themeColors = useThemeColors();
   const { series, yMin } = useMemo(() => {
     if (!data) return { series: [], yMin: 0 };
 
@@ -45,7 +47,7 @@ export function ActiveValidatorsChart({ data, timePeriod }: ActiveValidatorsChar
         {
           name: 'Active Validators',
           data: chartData,
-          color: '#22c55e',
+          color: themeColors.success,
           showArea: true,
           areaOpacity: 0.15,
           lineWidth: 2,
@@ -54,7 +56,7 @@ export function ActiveValidatorsChart({ data, timePeriod }: ActiveValidatorsChar
       ],
       yMin: roundedMin,
     };
-  }, [data]);
+  }, [data, themeColors.success]);
 
   const subtitle = SUBTITLE_MAP[timePeriod] ?? 'Last 30 days';
 

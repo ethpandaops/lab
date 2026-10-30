@@ -47,9 +47,9 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
     description:
       'Base transaction cost charged before execution. Includes: 21,000 base + calldata cost (4 gas per zero byte, 16 per non-zero) + access list cost. For failed transactions, this may be unavailable.',
     color: {
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-600 dark:text-amber-400',
-      border: 'border-amber-500/20',
+      bg: 'bg-data-amber/10',
+      text: 'text-amber-700 dark:text-data-amber',
+      border: 'border-data-amber/20',
     },
   },
   evm: {

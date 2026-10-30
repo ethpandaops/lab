@@ -33,7 +33,7 @@ export function ClientReadinessCard({ data }: ClientReadinessCardProps): JSX.Ele
       <div className="mb-4">
         <ProgressBar
           progress={readyPercentage}
-          fillColor={readyPercentage === 100 ? 'bg-primary' : 'bg-warning'}
+          fillColor={readyPercentage === 100 ? 'bg-success' : 'bg-warning'}
           backgroundColor="bg-border"
           ariaLabel={`${clientName} readiness`}
         />

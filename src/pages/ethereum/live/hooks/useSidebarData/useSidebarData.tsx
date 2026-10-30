@@ -72,7 +72,7 @@ export function useSidebarData({
         timestamp: data.timestamp,
         content: (
           <div className="flex items-center gap-1.5">
-            <Badge color="green" variant="border" size="small">
+            <Badge color="blue" variant="border" size="small">
               Block
             </Badge>
             <span>{location}</span>

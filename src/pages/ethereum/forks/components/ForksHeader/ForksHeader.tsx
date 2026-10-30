@@ -126,7 +126,7 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
         {/* "LIVE NOW" display instead of countdown */}
         <div className="mb-6 flex items-center justify-center gap-4 rounded-sm border border-border py-6">
           <div className="text-center">
-            <div className="text-4xl font-bold text-accent">LIVE NOW</div>
+            <div className="text-4xl font-bold text-success">LIVE NOW</div>
           </div>
         </div>
 

@@ -4,6 +4,9 @@ import clsx from 'clsx';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 import type { AttestationArrivalsProps } from './AttestationArrivals.types';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * AttestationArrivals - attestation arrival counts over the slot as a line
@@ -41,7 +44,7 @@ function AttestationArrivalsComponent({
       result.push({
         name: 'PTC payload',
         data: toPoints(payloadAttestationChartValues),
-        color: '#a855f7',
+        color: DATA_COLORS.purple,
         showArea: true,
       });
     }

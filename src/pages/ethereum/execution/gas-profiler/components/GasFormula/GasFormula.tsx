@@ -48,17 +48,17 @@ export interface GasFormulaProps {
 function getColorClasses(color: GasFormulaColor): { border: string; bg: string; text: string } {
   switch (color) {
     case 'blue':
-      return { border: 'border-blue-500/30', bg: 'bg-blue-500/5', text: 'text-blue-400' };
+      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
     case 'purple':
-      return { border: 'border-purple-500/30', bg: 'bg-purple-500/5', text: 'text-purple-400' };
+      return { border: 'border-data-purple/30', bg: 'bg-data-purple/5', text: 'text-data-purple' };
     case 'green':
       return { border: 'border-success/30', bg: 'bg-success/5', text: 'text-success' };
     case 'amber':
       return { border: 'border-warning/30', bg: 'bg-warning/5', text: 'text-warning' };
     case 'cyan':
-      return { border: 'border-cyan-500/30', bg: 'bg-cyan-500/5', text: 'text-cyan-400' };
+      return { border: 'border-data-cyan/30', bg: 'bg-data-cyan/5', text: 'text-data-cyan' };
     default:
-      return { border: 'border-blue-500/30', bg: 'bg-blue-500/5', text: 'text-blue-400' };
+      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
   }
 }
 
@@ -68,17 +68,17 @@ function getColorClasses(color: GasFormulaColor): { border: string; bg: string; 
 function getValueColor(color: GasFormulaColor): string {
   switch (color) {
     case 'blue':
-      return 'text-blue-500';
+      return 'text-data-blue';
     case 'purple':
-      return 'text-purple-500';
+      return 'text-data-purple';
     case 'green':
       return 'text-success';
     case 'amber':
       return 'text-warning';
     case 'cyan':
-      return 'text-cyan-500';
+      return 'text-data-cyan';
     default:
-      return 'text-blue-500';
+      return 'text-data-blue';
   }
 }
 

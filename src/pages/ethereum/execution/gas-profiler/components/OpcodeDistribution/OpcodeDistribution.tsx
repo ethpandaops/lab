@@ -2,6 +2,7 @@ import { type JSX, useMemo, useState } from 'react';
 import { BarChart } from '@/components/Charts/Bar';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Card } from '@/components/Layout/Card';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { OpcodeStats } from '../../IndexPage.types';
 
@@ -32,6 +33,7 @@ const SORT_OPTIONS = [
  * Horizontal bar chart showing opcode gas distribution
  */
 export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistributionProps): JSX.Element {
+  const themeColors = useThemeColors();
   const [sortMode, setSortMode] = useState<SortMode>('gas');
 
   const sortedStats = useMemo(() => {
@@ -106,7 +108,7 @@ export function OpcodeDistribution({ opcodeStats, maxOpcodes = 15 }: OpcodeDistr
             <div>
               <span>Count: </span><strong>${stat.count.toLocaleString()}</strong>
             </div>
-            ${stat.errorCount > 0 ? `<div style="color: #ef4444;">Errors: ${stat.errorCount}</div>` : ''}
+            ${stat.errorCount > 0 ? `<div style="color: ${themeColors.danger};">Errors: ${stat.errorCount}</div>` : ''}
           `;
         }}
       />

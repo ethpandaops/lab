@@ -126,11 +126,13 @@ export function IndexPage(): React.JSX.Element {
               accessor: row => (
                 <span
                   className={
-                    row.participationValue < 0.95
-                      ? 'text-warning'
-                      : row.participationValue >= 0.99
-                        ? 'text-foreground'
-                        : 'text-muted'
+                    row.participationValue < 2 / 3
+                      ? 'text-danger'
+                      : row.participationValue < 0.95
+                        ? 'text-warning'
+                        : row.participationValue >= 0.99
+                          ? 'text-success'
+                          : 'text-muted'
                   }
                 >
                   {row.participation}

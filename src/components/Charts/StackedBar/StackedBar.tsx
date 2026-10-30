@@ -42,8 +42,8 @@ function defaultValueFormatter(value: number): string {
  * // Gas breakdown example
  * <StackedBar
  *   segments={[
- *     { name: 'Intrinsic', value: 21608, color: '#6366f1' },
- *     { name: 'EVM Execution', value: 1969778, color: '#3b82f6' },
+ *     { name: 'Intrinsic', value: 21608, color: DATA_COLORS.indigo },
+ *     { name: 'EVM Execution', value: 1969778, color: DATA_COLORS.blue },
  *   ]}
  *   title="Gas Breakdown"
  *   subtitle="Receipt: 1.59M"

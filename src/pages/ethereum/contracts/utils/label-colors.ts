@@ -6,9 +6,9 @@ import type { BadgeColor } from '@/components/Elements/Badge';
  */
 const SEMANTIC_COLORS: Record<string, BadgeColor> = {
   // Financial / Money
-  stablecoin: 'green',
-  lending: 'green',
-  payments: 'green',
+  stablecoin: 'teal',
+  lending: 'teal',
+  payments: 'teal',
 
   // Trading / Exchange
   dex: 'blue',

@@ -1,3 +1,7 @@
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
+
 /**
  * Opcode category mapping based on EVM opcode semantics
  */
@@ -121,40 +125,40 @@ export const OPCODE_CATEGORIES: Record<string, string> = {
  * Category colors for charts
  */
 export const CATEGORY_COLORS: Record<string, string> = {
-  Math: '#f59e0b', // amber
-  Comparisons: '#8b5cf6', // purple
-  Logic: '#06b6d4', // cyan
-  'Bit Ops': '#14b8a6', // teal
-  Hashing: '#6366f1', // indigo
-  Misc: '#6b7280', // gray
-  'Ethereum State': '#3b82f6', // blue
-  Pop: '#a855f7', // violet
-  Memory: '#22c55e', // green
-  Storage: '#ef4444', // red
-  Jump: '#ec4899', // pink
-  'Transient Storage': '#f97316', // orange
-  Push: '#64748b', // slate
+  Math: DATA_COLORS.amber,
+  Comparisons: DATA_COLORS.violet,
+  Logic: DATA_COLORS.cyan,
+  'Bit Ops': DATA_COLORS.teal,
+  Hashing: DATA_COLORS.indigo,
+  Misc: DATA_COLORS.slate,
+  'Ethereum State': DATA_COLORS.blue,
+  Pop: DATA_COLORS.purple,
+  Memory: DATA_COLORS.green,
+  Storage: DATA_COLORS.red,
+  Jump: DATA_COLORS.pink,
+  'Transient Storage': DATA_COLORS.orange,
+  Push: DATA_COLORS.slate,
   Dup: '#78716c', // stone
-  Swap: '#84cc16', // lime
-  Log: '#eab308', // yellow
-  Contract: '#0ea5e9', // sky
-  'Precompiles (Fixed)': '#10b981', // emerald
-  'Precompiles (Variable)': '#059669', // emerald-600
-  Precompiles: '#10b981', // emerald - used for opcode breakdown chart
-  'Intrinsic Gas': '#d946ef', // fuchsia
-  Other: '#9ca3af', // gray-400
+  Swap: DATA_COLORS.lime,
+  Log: DATA_COLORS.yellow,
+  Contract: DATA_COLORS.sky,
+  'Precompiles (Fixed)': DATA_COLORS.emerald,
+  'Precompiles (Variable)': DATA_COLORS.emerald,
+  Precompiles: DATA_COLORS.emerald,
+  'Intrinsic Gas': DATA_COLORS.fuchsia,
+  Other: DATA_COLORS.slate,
 };
 
 /**
  * Call type colors for charts
  */
 export const CALL_TYPE_COLORS: Record<string, string> = {
-  CALL: '#3b82f6',
-  STATICCALL: '#06b6d4',
-  DELEGATECALL: '#8b5cf6',
-  CREATE: '#f59e0b',
-  CREATE2: '#f97316',
-  CALLCODE: '#ec4899',
+  CALL: DATA_COLORS.blue,
+  STATICCALL: DATA_COLORS.cyan,
+  DELEGATECALL: DATA_COLORS.violet,
+  CREATE: DATA_COLORS.amber,
+  CREATE2: DATA_COLORS.orange,
+  CALLCODE: DATA_COLORS.pink,
 };
 
 /**
@@ -266,27 +270,24 @@ export function getOpcodeCategory(opcode: string): string {
  * Hex to Tailwind class mapping for FlameGraph compatibility
  */
 const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
-  '#f59e0b': { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
-  '#6366f1': { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-400' },
-  '#8b5cf6': { bg: 'bg-violet-500', hover: 'hover:bg-violet-400' },
-  '#06b6d4': { bg: 'bg-cyan-500', hover: 'hover:bg-cyan-400' },
-  '#14b8a6': { bg: 'bg-teal-500', hover: 'hover:bg-teal-400' },
-  '#6b7280': { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
-  '#3b82f6': { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-  '#a855f7': { bg: 'bg-purple-500', hover: 'hover:bg-purple-400' },
-  '#22c55e': { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
-  '#ef4444': { bg: 'bg-red-500', hover: 'hover:bg-red-400' },
-  '#ec4899': { bg: 'bg-pink-500', hover: 'hover:bg-pink-400' },
-  '#f97316': { bg: 'bg-orange-500', hover: 'hover:bg-orange-400' },
-  '#64748b': { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' },
+  [DATA_COLORS.amber]: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber/80' },
+  [DATA_COLORS.indigo]: { bg: 'bg-data-indigo', hover: 'hover:bg-data-indigo/80' },
+  [DATA_COLORS.violet]: { bg: 'bg-data-violet', hover: 'hover:bg-data-violet/80' },
+  [DATA_COLORS.cyan]: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan/80' },
+  [DATA_COLORS.teal]: { bg: 'bg-data-teal', hover: 'hover:bg-data-teal/80' },
+  [DATA_COLORS.blue]: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
+  [DATA_COLORS.purple]: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple/80' },
+  [DATA_COLORS.green]: { bg: 'bg-data-green', hover: 'hover:bg-data-green/80' },
+  [DATA_COLORS.red]: { bg: 'bg-data-red', hover: 'hover:bg-data-red/80' },
+  [DATA_COLORS.pink]: { bg: 'bg-data-pink', hover: 'hover:bg-data-pink/80' },
+  [DATA_COLORS.orange]: { bg: 'bg-data-orange', hover: 'hover:bg-data-orange/80' },
+  [DATA_COLORS.slate]: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
   '#78716c': { bg: 'bg-stone-500', hover: 'hover:bg-stone-400' },
-  '#84cc16': { bg: 'bg-lime-500', hover: 'hover:bg-lime-400' },
-  '#eab308': { bg: 'bg-yellow-500', hover: 'hover:bg-yellow-400' },
-  '#0ea5e9': { bg: 'bg-sky-500', hover: 'hover:bg-sky-400' },
-  '#10b981': { bg: 'bg-emerald-500', hover: 'hover:bg-emerald-400' },
-  '#059669': { bg: 'bg-emerald-600', hover: 'hover:bg-emerald-500' },
-  '#d946ef': { bg: 'bg-fuchsia-500', hover: 'hover:bg-fuchsia-400' },
-  '#9ca3af': { bg: 'bg-gray-400', hover: 'hover:bg-gray-300' },
+  [DATA_COLORS.lime]: { bg: 'bg-data-lime', hover: 'hover:bg-data-lime/80' },
+  [DATA_COLORS.yellow]: { bg: 'bg-data-yellow', hover: 'hover:bg-data-yellow/80' },
+  [DATA_COLORS.sky]: { bg: 'bg-data-sky', hover: 'hover:bg-data-sky/80' },
+  [DATA_COLORS.emerald]: { bg: 'bg-data-emerald', hover: 'hover:bg-data-emerald/80' },
+  [DATA_COLORS.fuchsia]: { bg: 'bg-data-fuchsia', hover: 'hover:bg-data-fuchsia/80' },
 };
 
 /**
@@ -295,7 +296,7 @@ const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
 export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
   Object.entries(CALL_TYPE_COLORS).map(([key, hex]) => [
     key,
-    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
   ])
 );
 
@@ -305,7 +306,7 @@ export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: s
 export const FLAME_GRAPH_CATEGORY_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
   Object.entries(CATEGORY_COLORS).map(([key, hex]) => [
     key,
-    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-gray-500', hover: 'hover:bg-gray-400' },
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
   ])
 );
 

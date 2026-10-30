@@ -36,14 +36,14 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
         {span.clientName && <ClientLogo client={span.clientName} size={20} />}
         <span className="text-sm font-semibold text-foreground">{span.label}</span>
         {span.isLate && (
-          <span className="rounded bg-danger/20 px-1.5 py-0.5 text-xs font-medium text-danger">LATE</span>
+          <span className="rounded bg-warning/20 px-1.5 py-0.5 text-xs font-medium text-warning">LATE</span>
         )}
       </div>
 
       {/* Timing row - point-in-time events show just timestamp, not range/delta */}
       <div className="mt-2 flex items-center gap-4 rounded bg-surface/50 px-2 py-1.5 font-mono text-sm">
         {span.isPointInTime ? (
-          <span className={clsx('font-semibold', span.isLate ? 'text-danger' : 'text-foreground')}>
+          <span className={clsx('font-semibold', span.isLate ? 'text-warning' : 'text-foreground')}>
             @ {formatMs(span.startMs)}
           </span>
         ) : (
@@ -51,7 +51,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
             <span className="text-muted">
               {formatMs(span.startMs)} → {formatMs(span.endMs)}
             </span>
-            <span className={clsx('font-semibold', span.isLate ? 'text-danger' : 'text-foreground')}>
+            <span className={clsx('font-semibold', span.isLate ? 'text-warning' : 'text-foreground')}>
               Δ {formatMs(span.endMs - span.startMs)}
             </span>
           </>

@@ -1,6 +1,9 @@
 import { type JSX, useState } from 'react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@/components/Overlays/Dialog';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Help modal explaining how resource gas decomposition works.
@@ -30,44 +33,44 @@ export function ResourceGasHelp(): JSX.Element {
           <div>
             <h3 className="mb-3 text-base font-semibold text-foreground">Resources</h3>
             <dl className="space-y-4">
-              <ResourceDef color="#3b82f6" term="Compute">
+              <ResourceDef color={DATA_COLORS.blue} term="Compute">
                 Pure EVM execution. The cost of running instructions: arithmetic, logic, control flow, stack
                 manipulation, and precompile execution (ecrecover, bn256Pairing, etc.). For opcodes that touch storage
                 or accounts, only the base &ldquo;warm access&rdquo; cost is counted here &mdash; the cold penalty goes
                 to Address Access.
               </ResourceDef>
 
-              <ResourceDef color="#8b5cf6" term="Memory">
+              <ResourceDef color={DATA_COLORS.violet} term="Memory">
                 The cost of expanding EVM memory. The EVM charges a quadratic fee as memory grows, meaning large memory
                 usage gets disproportionately expensive. Applies to any opcode that reads, writes, or returns memory.
               </ResourceDef>
 
-              <ResourceDef color="#f59e0b" term="Address Access">
+              <ResourceDef color={DATA_COLORS.amber} term="Address Access">
                 The first-touch penalty for accounts and storage slots (EIP-2929). The first time a transaction accesses
                 an address or storage slot, it pays a cold access surcharge. Repeat accesses within the same transaction
                 are warm and much cheaper. This incentivizes access locality.
               </ResourceDef>
 
-              <ResourceDef color="#ef4444" term="State Growth">
+              <ResourceDef color={DATA_COLORS.red} term="State Growth">
                 The cost of writing to Ethereum&rsquo;s persistent state. This is the bulk of what SSTORE charges
                 (beyond the base and cold costs), the code deposit cost when deploying contracts, and SELFDESTRUCT fund
                 transfers. Net state cost can be computed as State Growth &minus; Gas Refund, since clearing storage
                 slots generates refunds.
               </ResourceDef>
 
-              <ResourceDef color="#06b6d4" term="History">
+              <ResourceDef color={DATA_COLORS.cyan} term="History">
                 The cost of data that nodes must store but the EVM doesn&rsquo;t re-read. This includes LOG event data,
                 contract deployment code storage overhead, and a portion of intrinsic transaction costs. A share of
                 per-byte calldata cost is also attributed here.
               </ResourceDef>
 
-              <ResourceDef color="#ec4899" term="Bloom Topics">
+              <ResourceDef color={DATA_COLORS.pink} term="Bloom Topics">
                 The cost of indexing LOG event topics in the block&rsquo;s bloom filter. Each topic on a LOG opcode has
                 a portion of its per-topic charge attributed to bloom filter maintenance, with the remainder going to
                 History.
               </ResourceDef>
 
-              <ResourceDef color="#64748b" term="Block Size">
+              <ResourceDef color={DATA_COLORS.slate} term="Block Size">
                 The cost of including transaction calldata in the block. This only appears at the transaction level
                 (always zero for individual opcodes) and scales with the number and type of calldata bytes, plus a fixed
                 overhead from the intrinsic base cost.

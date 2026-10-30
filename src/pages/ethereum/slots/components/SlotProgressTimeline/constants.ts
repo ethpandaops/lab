@@ -14,18 +14,18 @@ export const MAX_REASONABLE_SEEN_TIME_MS = 60_000;
  * Color configuration for span categories.
  */
 export const SPAN_COLORS: Record<TraceSpan['category'], { bg: string; border: string; text: string }> = {
-  slot: { bg: 'bg-slate-600', border: 'border-slate-700', text: 'text-slate-400' },
-  propagation: { bg: 'bg-blue-500', border: 'border-blue-600', text: 'text-blue-500' },
-  country: { bg: 'bg-blue-300', border: 'border-blue-400', text: 'text-blue-300' },
+  slot: { bg: 'bg-data-slate', border: 'border-data-slate', text: 'text-muted' },
+  propagation: { bg: 'bg-data-blue', border: 'border-data-blue', text: 'text-data-blue' },
+  country: { bg: 'bg-data-blue/60', border: 'border-data-blue/80', text: 'text-data-blue' },
   // Classification colors for block propagation nodes
-  internal: { bg: 'bg-teal-400', border: 'border-teal-500', text: 'text-teal-400' },
-  individual: { bg: 'bg-violet-400', border: 'border-violet-500', text: 'text-violet-400' },
-  mev: { bg: 'bg-pink-500', border: 'border-pink-600', text: 'text-pink-500' },
-  'mev-builder': { bg: 'bg-pink-400', border: 'border-pink-500', text: 'text-pink-400' },
-  execution: { bg: 'bg-amber-500', border: 'border-amber-600', text: 'text-amber-500' },
-  'execution-client': { bg: 'bg-amber-400', border: 'border-amber-500', text: 'text-amber-400' },
-  'execution-node': { bg: 'bg-amber-300', border: 'border-amber-400', text: 'text-amber-300' },
-  'data-availability': { bg: 'bg-purple-500', border: 'border-purple-600', text: 'text-purple-500' },
-  column: { bg: 'bg-purple-400', border: 'border-purple-500', text: 'text-purple-400' },
-  attestation: { bg: 'bg-emerald-500', border: 'border-emerald-600', text: 'text-emerald-500' },
+  internal: { bg: 'bg-data-teal', border: 'border-data-teal', text: 'text-data-teal' },
+  individual: { bg: 'bg-data-violet', border: 'border-data-violet', text: 'text-data-violet' },
+  mev: { bg: 'bg-data-pink', border: 'border-data-pink', text: 'text-data-pink' },
+  'mev-builder': { bg: 'bg-data-pink/80', border: 'border-data-pink', text: 'text-data-pink' },
+  execution: { bg: 'bg-data-indigo', border: 'border-data-indigo', text: 'text-data-indigo' },
+  'execution-client': { bg: 'bg-data-indigo/80', border: 'border-data-indigo', text: 'text-data-indigo' },
+  'execution-node': { bg: 'bg-data-indigo/60', border: 'border-data-indigo/80', text: 'text-data-indigo' },
+  'data-availability': { bg: 'bg-data-purple', border: 'border-data-purple', text: 'text-data-purple' },
+  column: { bg: 'bg-data-purple/80', border: 'border-data-purple', text: 'text-data-purple' },
+  attestation: { bg: 'bg-data-emerald', border: 'border-data-emerald', text: 'text-data-emerald' },
 };

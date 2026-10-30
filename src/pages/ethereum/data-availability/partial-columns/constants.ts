@@ -1,4 +1,8 @@
+import type { ThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type { CompletionPath, TimePeriod } from './IndexPage.types';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Configuration for each time period: hourly data for short windows, daily for long ones */
 export const TIME_RANGE_CONFIG = {
@@ -53,26 +57,26 @@ export const PATH_LABELS: Record<CompletionPath, string> = {
 
 /** Series color per completion path */
 export const PATH_COLORS: Record<CompletionPath, string> = {
-  FULL_GOSSIP: '#0ea5e9',
-  PARTIAL_GOSSIP: '#8b5cf6',
-  EL: '#22c55e',
-  RECONSTRUCTION: '#f59e0b',
-  UNKNOWN: '#9ca3af',
+  FULL_GOSSIP: DATA_COLORS.sky,
+  PARTIAL_GOSSIP: DATA_COLORS.violet,
+  EL: DATA_COLORS.green,
+  RECONSTRUCTION: DATA_COLORS.amber,
+  UNKNOWN: DATA_COLORS.slate,
 };
 
 /** Series colors for cells by source */
 export const CELL_SOURCE_COLORS = {
-  gossip: '#0ea5e9',
-  el: '#22c55e',
-  recovered: '#f59e0b',
-} as const;
+  gossip: DATA_COLORS.sky,
+  el: DATA_COLORS.green,
+  recovered: DATA_COLORS.amber,
+};
 
-/** Series colors for validation verdicts */
+/** Theme color per validation verdict */
 export const VERDICT_COLORS = {
-  accept: '#22c55e',
-  ignore: '#9ca3af',
-  reject: '#ef4444',
-} as const;
+  accept: 'success',
+  ignore: 'muted',
+  reject: 'danger',
+} as const satisfies Record<string, keyof ThemeColors>;
 
 /** Preferred sentry client when the URL names none, the one that reports every completion path */
 export const DEFAULT_SENTRY_CLIENT = 'lighthouse';

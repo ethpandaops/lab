@@ -1,3 +1,5 @@
+import { getDataVizColors } from '@/utils/dataVizColors';
+
 export type CpuMetric = 'mean' | 'min' | 'max';
 
 export type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
@@ -16,12 +18,14 @@ export interface AnnotationEvent {
   nodeName?: string;
 }
 
+const { DATA_COLORS } = getDataVizColors();
+
 export const ANNOTATION_COLORS: Record<AnnotationType, string> = {
-  block: '#f59e0b',
-  head: '#8b5cf6',
-  execution: '#ef4444',
-  data_columns: '#10b981',
-  slot_phases: '#6b7280',
+  block: DATA_COLORS.amber,
+  head: DATA_COLORS.violet,
+  execution: DATA_COLORS.red,
+  data_columns: DATA_COLORS.emerald,
+  slot_phases: DATA_COLORS.slate,
 };
 
 export interface HighlightRange {

@@ -234,7 +234,7 @@ export function GlamsterdamPresetModal({
                   </span>
                   <h3 className="text-sm font-semibold text-foreground">{section.name}</h3>
                   {section.placeholder && (
-                    <Badge color="yellow" variant="flat" size="small">
+                    <Badge color="orange" variant="flat" size="small">
                       Values TBD
                     </Badge>
                   )}

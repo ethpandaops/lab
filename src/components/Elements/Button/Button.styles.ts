@@ -31,7 +31,7 @@ const variantStyles = {
     'dark:hover:bg-muted/20'
   ),
   danger: clsx(
-    'bg-danger text-white',
+    'bg-danger text-white dark:text-background',
     'hover:bg-danger/90 disabled:hover:bg-danger',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger',
     'dark:hover:bg-danger/80'

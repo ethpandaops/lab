@@ -10,6 +10,8 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import {
   buildTooltipHtml,
   formatCompact,
@@ -62,7 +64,7 @@ function seriesItems(
     if (typeof value !== 'number') return [];
     return [
       {
-        color: entry.color ?? '#9ca3af',
+        color: entry.color ?? getDataVizColors().DATA_COLORS.slate,
         label: entry.name,
         value: format(value, entry),
         style: entry.lineStyle === 'dashed' ? ('dashed' as const) : undefined,
@@ -77,6 +79,7 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/data-availability/partial-columns' });
   const timePeriod: TimePeriod = search.t ?? DEFAULT_TIME_PERIOD;
   const config = TIME_RANGE_CONFIG[timePeriod];
+  const themeColors = useThemeColors();
 
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(COMPLETION_HOURLY_TABLE);
   const hasData = !!tableBounds;
@@ -110,10 +113,10 @@ export function IndexPage(): JSX.Element {
       pathLatency: buildPathLatencySeries(sentryPaths, keys),
       cellSource: buildCellSourceSeries(sentryPaths, keys),
       usefulCells: buildUsefulCellSeries(sentryPartials, keys),
-      verdicts: buildVerdictSeries(sentryPartials, keys),
+      verdicts: buildVerdictSeries(sentryPartials, keys, themeColors),
       header: buildHeaderSeries(sentryPartials, keys),
     }),
-    [peerRecords, peerKeys, sentryPaths, sentryPartials, keys]
+    [peerRecords, peerKeys, sentryPaths, sentryPartials, keys, themeColors]
   );
 
   const setSearch = useCallback(

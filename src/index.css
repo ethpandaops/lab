@@ -20,7 +20,8 @@
 @plugin '@tailwindcss/forms';
 
 /* Enable class-based dark mode and star mode */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Star is a dark theme, so dark: styles apply to it too; star: overrides them where needed */
+@custom-variant dark (&:where(.dark, .dark *, .star, .star *));
 @custom-variant star (&:where(.star, .star *));
 
 /* Two-Tier Token Architecture
@@ -181,55 +182,75 @@
   --color-border: var(--border-value);
 
   /* State colors */
-  --color-success: var(--color-green-500);
-  --color-warning: var(--color-amber-500);
-  --color-danger: var(--color-red-500);
+  --color-success: var(--success-value);
+  --color-warning: var(--warning-value);
+  --color-danger: var(--danger-value);
 
   /* ===== Data Visualization Colors ===== */
+  /* Data hues: Tailwind's 500 hues at about 60% chroma, so charts sit with the earthy UI.
+   * Every data colour below (chart, blob, continent, performance) maps to one of these. */
+  --color-data-red: oklch(63.7% 0.147 25.3);
+  --color-data-orange: oklch(70.5% 0.132 47.6);
+  --color-data-amber: oklch(74.0% 0.117 70.1);
+  --color-data-yellow: oklch(74.0% 0.114 86.0);
+  --color-data-lime: oklch(74.0% 0.144 130.8);
+  --color-data-green: oklch(72.3% 0.136 149.6);
+  --color-data-emerald: oklch(69.6% 0.105 162.5);
+  --color-data-teal: oklch(70.4% 0.1 182.5);
+  --color-data-cyan: oklch(71.5% 0.1 215.2);
+  --color-data-sky: oklch(68.5% 0.105 237.3);
+  --color-data-blue: oklch(62.3% 0.133 259.8);
+  --color-data-indigo: oklch(62.0% 0.144 277.1);
+  --color-data-violet: oklch(62.0% 0.15 292.7);
+  --color-data-purple: oklch(62.7% 0.15 303.9);
+  --color-data-fuchsia: oklch(66.7% 0.15 322.1);
+  --color-data-pink: oklch(65.6% 0.149 354.3);
+  --color-data-rose: oklch(64.5% 0.15 16.4);
+  --color-data-slate: oklch(62.0% 0.03 257.4);
+
   /* These colors represent data categories, not UI elements.
-   * They remain constant across themes (light/dark/star).
-   * Use Tailwind's color palette for consistency. */
+   * They remain constant across themes (light/dark/star). */
 
   /* Blob index colors (0-5) for data availability visualization */
-  --color-blob-0: var(--color-cyan-500);
-  --color-blob-1: var(--color-pink-500);
-  --color-blob-2: var(--color-amber-500);
-  --color-blob-3: var(--color-green-500);
-  --color-blob-4: var(--color-violet-500);
-  --color-blob-5: var(--color-red-500);
+  --color-blob-0: var(--color-data-cyan);
+  --color-blob-1: var(--color-data-pink);
+  --color-blob-2: var(--color-data-amber);
+  --color-blob-3: var(--color-data-green);
+  --color-blob-4: var(--color-data-violet);
+  --color-blob-5: var(--color-data-red);
 
   /* Continent/Region color mappings for geographical visualizations */
-  --color-continent-af: var(--color-red-500); /* Africa */
-  --color-continent-as: var(--color-amber-500); /* Asia */
-  --color-continent-eu: var(--color-emerald-500); /* Europe */
-  --color-continent-na: var(--color-blue-500); /* North America */
-  --color-continent-oc: var(--color-cyan-500); /* Oceania */
-  --color-continent-sa: var(--color-violet-500); /* South America */
-  --color-continent-an: var(--color-slate-500); /* Antarctica */
+  --color-continent-af: var(--color-data-red); /* Africa */
+  --color-continent-as: var(--color-data-amber); /* Asia */
+  --color-continent-eu: var(--color-data-emerald); /* Europe */
+  --color-continent-na: var(--color-data-blue); /* North America */
+  --color-continent-oc: var(--color-data-cyan); /* Oceania */
+  --color-continent-sa: var(--color-data-violet); /* South America */
+  --color-continent-an: var(--color-data-slate); /* Antarctica */
 
   /* Performance time-based color gradient (fast → slow) */
-  --color-performance-excellent: var(--color-green-500); /* 0-1s - very fast */
-  --color-performance-good: var(--color-lime-500); /* 1-2s - fast */
-  --color-performance-fair: var(--color-yellow-500); /* 2-3s - moderate */
-  --color-performance-slow: var(--color-orange-500); /* 3-4s - slow */
-  --color-performance-poor: var(--color-red-500); /* 4+s - very slow */
+  --color-performance-excellent: var(--color-data-green); /* 0-1s - very fast */
+  --color-performance-good: var(--color-data-lime); /* 1-2s - fast */
+  --color-performance-fair: var(--color-data-yellow); /* 2-3s - moderate */
+  --color-performance-slow: var(--color-data-orange); /* 3-4s - slow */
+  --color-performance-poor: var(--color-data-red); /* 4+s - very slow */
 
   /* Categorical color palette for multi-series charts (0-14) */
-  --color-chart-0: var(--color-blue-500);
-  --color-chart-1: var(--color-emerald-500);
-  --color-chart-2: var(--color-amber-500);
-  --color-chart-3: var(--color-red-500);
-  --color-chart-4: var(--color-cyan-500);
-  --color-chart-5: var(--color-lime-500);
-  --color-chart-6: var(--color-orange-500);
-  --color-chart-7: var(--color-purple-500);
-  --color-chart-8: var(--color-pink-500);
-  --color-chart-9: var(--color-violet-500);
-  --color-chart-10: var(--color-teal-500);
-  --color-chart-11: var(--color-indigo-500);
-  --color-chart-12: var(--color-rose-500);
-  --color-chart-13: var(--color-fuchsia-500);
-  --color-chart-14: var(--color-sky-500);
+  --color-chart-0: var(--color-data-blue);
+  --color-chart-1: var(--color-data-emerald);
+  --color-chart-2: var(--color-data-amber);
+  --color-chart-3: var(--color-data-red);
+  --color-chart-4: var(--color-data-cyan);
+  --color-chart-5: var(--color-data-lime);
+  --color-chart-6: var(--color-data-orange);
+  --color-chart-7: var(--color-data-purple);
+  --color-chart-8: var(--color-data-pink);
+  --color-chart-9: var(--color-data-violet);
+  --color-chart-10: var(--color-data-teal);
+  --color-chart-11: var(--color-data-indigo);
+  --color-chart-12: var(--color-data-rose);
+  --color-chart-13: var(--color-data-fuchsia);
+  --color-chart-14: var(--color-data-sky);
 
   /* Custom animations */
   --animate-shimmer: shimmer 2s linear infinite;
@@ -299,6 +320,10 @@
     --foreground-value: var(--color-sand-950);
     --muted-value: var(--color-sand-700);
     --border-value: #dcd7c5;
+    /* Status: earthy, about half Tailwind's chroma, AA on the light surface */
+    --success-value: #337344;
+    --warning-value: #a56217;
+    --danger-value: #af3d36;
 
     /* Set html background for overscroll */
     background-color: var(--color-sand-100);
@@ -315,6 +340,9 @@
     --foreground-value: #f5f5f4;
     --muted-value: #a19f9a;
     --border-value: #2c2b29;
+    --success-value: #76be86;
+    --warning-value: #e8a95c;
+    --danger-value: #e2726b;
 
     /* Set html background for overscroll */
     background-color: #0f0f0e;
@@ -330,6 +358,10 @@
     --foreground-value: var(--color-aurora-cyan-50);
     --muted-value: var(--color-aurora-cyan-700);
     --border-value: #1a2847;
+    /* Warmer than dark so good stays apart from the cyan muted text */
+    --success-value: #96c979;
+    --warning-value: #e8a95c;
+    --danger-value: #e2726b;
 
     /* Set html background for overscroll */
     background-color: var(--color-aurora-blue-950);

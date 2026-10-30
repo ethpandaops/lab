@@ -1,5 +1,7 @@
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import type { ThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import type {
   FctBlobCountHourly,
   FctBlobCountDaily,
@@ -20,6 +22,8 @@ import type {
 } from '@/api/types.gen';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import type { ChartConfig } from './constants';
+
+const { DATA_COLORS } = getDataVizColors();
 
 // Re-export shared utilities from execution overview
 export {
@@ -122,34 +126,34 @@ export function buildBlobCountChartConfig(
 
   const series: SeriesData[] = [
     createStatisticSeries('Average', avgValues, {
-      color: '#10b981',
+      color: DATA_COLORS.emerald,
       lineWidth: 2.5,
       group: 'Statistics',
     }),
     createStatisticSeries('Moving Avg', movingAvgValues, {
-      color: '#06b6d4',
+      color: DATA_COLORS.cyan,
       lineWidth: 2,
       group: 'Statistics',
     }),
     createStatisticSeries('Median', medianValues, {
-      color: '#a855f7',
+      color: DATA_COLORS.purple,
       lineWidth: 1.5,
       lineStyle: 'dotted',
       group: 'Statistics',
     }),
     ...createBandSeries('Bollinger', 'blob-bollinger', lowerBandValues, upperBandValues, {
-      color: '#f59e0b',
+      color: DATA_COLORS.amber,
       opacity: 0.15,
       group: 'Bands',
       initiallyVisible: false,
     }),
     ...createBandSeries('P5/P95', 'blob-percentile', p5Values, p95Values, {
-      color: '#6366f1',
+      color: DATA_COLORS.indigo,
       opacity: 0.1,
       group: 'Bands',
     }),
     ...createBandSeries('Min/Max', 'blob-minmax', minValues, maxValues, {
-      color: '#64748b',
+      color: DATA_COLORS.slate,
       opacity: 0.06,
       group: 'Bands',
       initiallyVisible: false,
@@ -159,7 +163,7 @@ export function buildBlobCountChartConfig(
   if (maxBlobValues?.length) {
     series.push(
       createStatisticSeries('Max Blobs', maxBlobValues, {
-        color: '#ef4444',
+        color: DATA_COLORS.red,
         lineWidth: 2,
         lineStyle: 'dashed',
         group: 'Statistics',
@@ -208,34 +212,34 @@ export function buildAttestationParticipationChartConfig(
     labels,
     series: [
       createStatisticSeries('Average', avgValues, {
-        color: '#10b981',
+        color: DATA_COLORS.emerald,
         lineWidth: 2.5,
         group: 'Statistics',
       }),
       createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: '#06b6d4',
+        color: DATA_COLORS.cyan,
         lineWidth: 2,
         group: 'Statistics',
       }),
       createStatisticSeries('Median', medianValues, {
-        color: '#a855f7',
+        color: DATA_COLORS.purple,
         lineWidth: 1.5,
         lineStyle: 'dotted',
         group: 'Statistics',
       }),
       ...createBandSeries('Bollinger', 'attn-bollinger', lowerBandValues, upperBandValues, {
-        color: '#f59e0b',
+        color: DATA_COLORS.amber,
         opacity: 0.15,
         group: 'Bands',
         initiallyVisible: false,
       }),
       ...createBandSeries('P5/P95', 'attn-percentile', p5Values, p95Values, {
-        color: '#6366f1',
+        color: DATA_COLORS.indigo,
         opacity: 0.1,
         group: 'Bands',
       }),
       ...createBandSeries('Min/Max', 'attn-minmax', minValues, maxValues, {
-        color: '#64748b',
+        color: DATA_COLORS.slate,
         opacity: 0.06,
         group: 'Bands',
         initiallyVisible: false,
@@ -272,7 +276,7 @@ export function buildHeadVoteCorrectnessChartConfig(
         'Average',
         unifiedKeys.map(k => getValue(k, 'avg_head_vote_rate')),
         {
-          color: '#10b981',
+          color: DATA_COLORS.emerald,
           lineWidth: 2.5,
           group: 'Statistics',
         }
@@ -281,7 +285,7 @@ export function buildHeadVoteCorrectnessChartConfig(
         'Moving Avg',
         unifiedKeys.map(k => getValue(k, 'moving_avg_head_vote_rate')),
         {
-          color: '#06b6d4',
+          color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
         }
@@ -290,7 +294,7 @@ export function buildHeadVoteCorrectnessChartConfig(
         'Median',
         unifiedKeys.map(k => getValue(k, 'p50_head_vote_rate')),
         {
-          color: '#a855f7',
+          color: DATA_COLORS.purple,
           lineWidth: 1.5,
           lineStyle: 'dotted',
           group: 'Statistics',
@@ -301,27 +305,35 @@ export function buildHeadVoteCorrectnessChartConfig(
         'hv-bollinger',
         unifiedKeys.map(k => getValue(k, 'lower_band_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'upper_band_head_vote_rate')),
-        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.amber, opacity: 0.15, group: 'Bands', initiallyVisible: false }
       ),
       ...createBandSeries(
         'P5/P95',
         'hv-percentile',
         unifiedKeys.map(k => getValue(k, 'p05_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'p95_head_vote_rate')),
-        { color: '#6366f1', opacity: 0.1, group: 'Bands' }
+        { color: DATA_COLORS.indigo, opacity: 0.1, group: 'Bands' }
       ),
       ...createBandSeries(
         'Min/Max',
         'hv-minmax',
         unifiedKeys.map(k => getValue(k, 'min_head_vote_rate')),
         unifiedKeys.map(k => getValue(k, 'max_head_vote_rate')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.slate, opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };
 }
 
-export const DEPTH_COLORS = ['#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#8b5cf6', '#ec4899'];
+export const DEPTH_COLORS = [
+  DATA_COLORS.rose,
+  DATA_COLORS.orange,
+  DATA_COLORS.yellow,
+  DATA_COLORS.green,
+  DATA_COLORS.cyan,
+  DATA_COLORS.violet,
+  DATA_COLORS.pink,
+];
 
 /** Builds stacked area chart config from reorg records grouped by depth */
 export function buildReorgChartConfig(
@@ -390,12 +402,12 @@ export function buildMissedSlotRateChartConfig(
     labels,
     series: [
       createStatisticSeries('Missed Rate', rateValues, {
-        color: '#f43f5e',
+        color: DATA_COLORS.rose,
         lineWidth: 2.5,
         group: 'Statistics',
       }),
       createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: '#06b6d4',
+        color: DATA_COLORS.cyan,
         lineWidth: 2,
         group: 'Statistics',
       }),
@@ -403,19 +415,21 @@ export function buildMissedSlotRateChartConfig(
   };
 }
 
-export const STATUS_COLORS: Record<string, string> = {
-  delivered: '#22c55e',
-  absent: '#ef4444',
-  canonical: '#22c55e',
-  orphaned: '#f59e0b',
-  missed: '#f43f5e',
+/** Theme color per block proposal / payload status */
+export const STATUS_COLORS: Record<string, 'success' | 'warning' | 'danger'> = {
+  delivered: 'success',
+  absent: 'danger',
+  canonical: 'success',
+  orphaned: 'warning',
+  missed: 'danger',
 };
 
 /** Builds line chart config from block proposal status records as rates (% of total) */
 export function buildBlockProposalStatusChartConfig(
   records: (FctBlockProposalStatusHourly | FctBlockProposalStatusDaily)[],
   unifiedKeys: string[],
-  isDaily: boolean
+  isDaily: boolean,
+  themeColors: ThemeColors
 ): ChartConfig {
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
@@ -454,7 +468,7 @@ export function buildBlockProposalStatusChartConfig(
       const total = totalsByKey.get(k) ?? 0;
       return total > 0 ? Number(((count / total) * 100).toFixed(2)) : null;
     }),
-    color: STATUS_COLORS[status] ?? '#94a3b8',
+    color: STATUS_COLORS[status] ? themeColors[STATUS_COLORS[status]] : themeColors.muted,
     group: 'Status',
   }));
 
@@ -489,7 +503,7 @@ export function buildAttestationInclusionDelayChartConfig(
         'Average',
         unifiedKeys.map(k => getValue(k, 'avg_inclusion_delay')),
         {
-          color: '#10b981',
+          color: DATA_COLORS.emerald,
           lineWidth: 2.5,
           group: 'Statistics',
         }
@@ -498,7 +512,7 @@ export function buildAttestationInclusionDelayChartConfig(
         'Moving Avg',
         unifiedKeys.map(k => getValue(k, 'moving_avg_inclusion_delay')),
         {
-          color: '#06b6d4',
+          color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
         }
@@ -507,7 +521,7 @@ export function buildAttestationInclusionDelayChartConfig(
         'Median',
         unifiedKeys.map(k => getValue(k, 'p50_inclusion_delay')),
         {
-          color: '#a855f7',
+          color: DATA_COLORS.purple,
           lineWidth: 1.5,
           lineStyle: 'dotted',
           group: 'Statistics',
@@ -518,21 +532,21 @@ export function buildAttestationInclusionDelayChartConfig(
         'id-bollinger',
         unifiedKeys.map(k => getValue(k, 'lower_band_inclusion_delay')),
         unifiedKeys.map(k => getValue(k, 'upper_band_inclusion_delay')),
-        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.amber, opacity: 0.15, group: 'Bands', initiallyVisible: false }
       ),
       ...createBandSeries(
         'P5/P95',
         'id-percentile',
         unifiedKeys.map(k => getValue(k, 'p05_inclusion_delay')),
         unifiedKeys.map(k => getValue(k, 'p95_inclusion_delay')),
-        { color: '#6366f1', opacity: 0.1, group: 'Bands' }
+        { color: DATA_COLORS.indigo, opacity: 0.1, group: 'Bands' }
       ),
       ...createBandSeries(
         'Min/Max',
         'id-minmax',
         unifiedKeys.map(k => getValue(k, 'min_inclusion_delay')),
         unifiedKeys.map(k => getValue(k, 'max_inclusion_delay')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.slate, opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };
@@ -566,7 +580,7 @@ export function buildProposerRewardChartConfig(
         'Average',
         unifiedKeys.map(k => getValue(k, 'avg_reward_eth')),
         {
-          color: '#10b981',
+          color: DATA_COLORS.emerald,
           lineWidth: 2.5,
           group: 'Statistics',
         }
@@ -575,7 +589,7 @@ export function buildProposerRewardChartConfig(
         'Moving Avg',
         unifiedKeys.map(k => getValue(k, 'moving_avg_reward_eth')),
         {
-          color: '#06b6d4',
+          color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
         }
@@ -584,7 +598,7 @@ export function buildProposerRewardChartConfig(
         'Median',
         unifiedKeys.map(k => getValue(k, 'p50_reward_eth')),
         {
-          color: '#a855f7',
+          color: DATA_COLORS.purple,
           lineWidth: 1.5,
           lineStyle: 'dotted',
           group: 'Statistics',
@@ -595,21 +609,21 @@ export function buildProposerRewardChartConfig(
         'pr-bollinger',
         unifiedKeys.map(k => getValue(k, 'lower_band_reward_eth')),
         unifiedKeys.map(k => getValue(k, 'upper_band_reward_eth')),
-        { color: '#f59e0b', opacity: 0.15, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.amber, opacity: 0.15, group: 'Bands', initiallyVisible: false }
       ),
       ...createBandSeries(
         'P5/P95',
         'pr-percentile',
         unifiedKeys.map(k => getValue(k, 'p05_reward_eth')),
         unifiedKeys.map(k => getValue(k, 'p95_reward_eth')),
-        { color: '#6366f1', opacity: 0.1, group: 'Bands' }
+        { color: DATA_COLORS.indigo, opacity: 0.1, group: 'Bands' }
       ),
       ...createBandSeries(
         'Min/Max',
         'pr-minmax',
         unifiedKeys.map(k => getValue(k, 'min_reward_eth')),
         unifiedKeys.map(k => getValue(k, 'max_reward_eth')),
-        { color: '#64748b', opacity: 0.06, group: 'Bands', initiallyVisible: false }
+        { color: DATA_COLORS.slate, opacity: 0.06, group: 'Bands', initiallyVisible: false }
       ),
     ],
   };

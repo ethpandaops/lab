@@ -8,7 +8,7 @@ import type {
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 // Module-level constants - static, cached
-const { BLOB_COLORS, CONTINENT_COLORS } = getDataVizColors();
+const { BLOB_COLORS, CONTINENT_COLORS, DATA_COLORS } = getDataVizColors();
 
 export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]): {
   firstSeenData: BlobDataPoint[];
@@ -68,7 +68,7 @@ export function useBlobAvailabilityData(blobNodes: FctBlockBlobFirstSeenByNode[]
 
       return {
         continent,
-        color: CONTINENT_COLORS[continent as keyof typeof CONTINENT_COLORS] ?? '#9ca3af',
+        color: CONTINENT_COLORS[continent as keyof typeof CONTINENT_COLORS] ?? DATA_COLORS.slate,
         data,
       };
     });

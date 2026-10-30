@@ -17,7 +17,7 @@ const hashFraction = (n: number, salt: number): number =>
 const mockProposerRewardEth = (slot: number): number =>
   0.032 + hashFraction(slot, 9) * 0.012 + hashFraction(slot, 10) ** 3 * 0.25;
 
-const STATUS_COLORS: Record<string, 'green' | 'red' | 'yellow'> = { canonical: 'green', missed: 'red' };
+const STATUS_COLORS: Record<string, 'green' | 'red' | 'orange'> = { canonical: 'green', missed: 'red' };
 
 interface ProposalDutiesProps {
   indices: number[];
@@ -77,7 +77,7 @@ export function ProposalDuties({ indices, validator, onValidatorChange, proposal
       header: 'Status',
       enableSorting: false,
       cell: ({ row }) => (
-        <Badge color={STATUS_COLORS[row.original.status ?? ''] ?? 'yellow'} size="small">
+        <Badge color={STATUS_COLORS[row.original.status ?? ''] ?? 'orange'} size="small">
           {row.original.status}
         </Badge>
       ),

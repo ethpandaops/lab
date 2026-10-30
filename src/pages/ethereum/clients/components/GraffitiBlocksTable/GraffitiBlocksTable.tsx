@@ -23,8 +23,8 @@ export interface GraffitiBlocksTableProps {
 }
 
 /** Badge color per graffiti format: client codes and version strings parsed, the rest did not */
-function formatColor(format: string | undefined): 'green' | 'blue' | 'gray' {
-  if (format?.startsWith('codes')) return 'green';
+function formatColor(format: string | undefined): 'indigo' | 'blue' | 'gray' {
+  if (format?.startsWith('codes')) return 'indigo';
   if (format === 'version_string') return 'blue';
   return 'gray';
 }

@@ -4,6 +4,9 @@ import { Card } from '@/components/Layout/Card';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import type { TransactionMetadata } from '../../IndexPage.types';
 import { getEffectiveGasRefund } from '../../utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 export interface GasBreakdownCardProps {
   /** Transaction metadata with gas values */
@@ -31,7 +34,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
       result.push({
         name: 'Intrinsic',
         value: metadata.intrinsicGas,
-        color: '#6366f1', // indigo-500
+        color: DATA_COLORS.indigo,
         description: 'Base transaction cost (21000 + calldata)',
       });
     }
@@ -41,7 +44,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
       result.push({
         name: 'EVM Execution',
         value: metadata.evmGasUsed,
-        color: '#3b82f6', // blue-500
+        color: DATA_COLORS.blue,
         description: 'Gas consumed by opcode execution',
       });
     }
@@ -93,7 +96,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
           showLabels
           showPercentages
           footerRight={refundText}
-          footerRightClassName={metadata.gasRefund > 0 ? 'text-foreground' : undefined}
+          footerRightClassName={metadata.gasRefund > 0 ? 'text-success' : undefined}
           valueFormatter={formatGas}
         />
       )}
@@ -110,7 +113,7 @@ export function GasBreakdownCard({ metadata, network }: GasBreakdownCardProps): 
         </div>
         <div>
           <span className="text-muted">Status</span>
-          <p className={metadata.status === 'success' ? 'font-medium text-foreground' : 'font-medium text-danger'}>
+          <p className={metadata.status === 'success' ? 'font-medium text-success' : 'font-medium text-danger'}>
             {metadata.status === 'success' ? 'Success' : 'Failed'}
           </p>
         </div>

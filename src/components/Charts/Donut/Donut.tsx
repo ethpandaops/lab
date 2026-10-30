@@ -43,8 +43,8 @@ echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, Canvas
  * // Custom colors and styling
  * <Donut
  *   data={[
- *     { name: 'Passed', value: 450, color: '#22c55e' },
- *     { name: 'Failed', value: 62, color: '#ef4444' },
+ *     { name: 'Passed', value: 450, color: themeColors.success },
+ *     { name: 'Failed', value: 62, color: themeColors.danger },
  *   ]}
  *   innerRadius={50}
  *   outerRadius={80}

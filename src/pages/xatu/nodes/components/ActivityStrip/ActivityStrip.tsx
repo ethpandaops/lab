@@ -31,7 +31,7 @@ function barClass(bar: Bar): string {
   if (bar.current) return 'bg-muted/45 group-hover:bg-muted';
   if (bar.seen === 0) return 'bg-danger';
   if (bar.seen / bar.total < GAP_THRESHOLD) return 'bg-warning';
-  return 'bg-muted/45 group-hover:bg-muted';
+  return 'bg-success/70 group-hover:bg-success';
 }
 
 /**

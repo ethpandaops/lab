@@ -1,5 +1,8 @@
 import { z } from 'zod';
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Available time period options for chart display */
 export type TimePeriod = '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
@@ -33,12 +36,12 @@ export interface ChartConfig {
  * Colors go from cool (blue) to hot (red)
  */
 export const GAS_BANDS = [
-  { max: 30_000_000, label: '0-30M', color: '#3b82f6' }, // Blue
-  { max: 36_000_000, label: '30-36M', color: '#06b6d4' }, // Cyan
-  { max: 45_000_000, label: '36-45M', color: '#22c55e' }, // Green
-  { max: 60_000_000, label: '45-60M', color: '#f97316' }, // Orange
-  { max: 75_000_000, label: '60-75M', color: '#ef4444' }, // Red
-  { max: Infinity, label: '75M+', color: '#dc2626' }, // Deep Red
+  { max: 30_000_000, label: '0-30M', color: DATA_COLORS.blue },
+  { max: 36_000_000, label: '30-36M', color: DATA_COLORS.cyan },
+  { max: 45_000_000, label: '36-45M', color: DATA_COLORS.green },
+  { max: 60_000_000, label: '45-60M', color: DATA_COLORS.orange },
+  { max: 75_000_000, label: '60-75M', color: DATA_COLORS.red },
+  { max: Infinity, label: '75M+', color: DATA_COLORS.rose },
 ] as const;
 
 /** Time period selector options for UI rendering */

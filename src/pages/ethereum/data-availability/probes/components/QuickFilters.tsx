@@ -93,7 +93,7 @@ const PRESETS: QuickFilterPreset[] = [
   {
     id: 'successes',
     label: 'Successes Only',
-    icon: <CheckCircleIcon className="size-4 text-muted" />,
+    icon: <CheckCircleIcon className="size-4 text-success" />,
     filters: {
       result: 'success',
     },

@@ -94,7 +94,7 @@ export function AttestationVotesBreakdownTable({
               header: 'Slot',
               accessor: group => {
                 if (group.blockRoot === 'offline') {
-                  return <span className="text-muted italic">Offline</span>;
+                  return <span className="text-danger italic">Offline</span>;
                 }
                 const slot = group.blockData?.slot ?? group.slot;
                 return slot !== undefined ? <Slot slot={slot} /> : <span className="text-muted">Unknown</span>;
@@ -111,7 +111,11 @@ export function AttestationVotesBreakdownTable({
                 if (slot === undefined) return <span className="text-muted">-</span>;
                 const distance = currentSlot - slot;
                 return (
-                  <span className={distance === 0 ? 'font-semibold text-foreground' : 'text-muted'}>
+                  <span
+                    className={
+                      distance === 0 ? 'font-semibold text-success' : distance === 1 ? 'text-warning' : 'text-danger'
+                    }
+                  >
                     {distance === 0 ? 'Current' : `${distance}`}
                   </span>
                 );

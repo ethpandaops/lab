@@ -459,7 +459,7 @@ function ActivationStatus({
   return (
     <div className="mb-6 flex items-center justify-center gap-4 rounded-sm border border-border py-6">
       <div className="text-center">
-        <div className="text-4xl font-bold text-accent">{isCurrent ? 'LIVE NOW' : 'ACTIVATED'}</div>
+        <div className="text-4xl font-bold text-success">{isCurrent ? 'LIVE NOW' : 'ACTIVATED'}</div>
         {genesisTime && (
           <div className="mt-2 text-sm text-muted">
             <Timestamp timestamp={epochToTimestamp(epoch, genesisTime)} format="long" />

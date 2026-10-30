@@ -30,7 +30,7 @@ export interface HeatmapChartProps {
   max?: number;
   /**
    * Custom color gradient for the heatmap
-   * @default ['#eef2ff', '#818cf8', '#4338ca']
+   * @default light, mid and dark steps of `--color-data-indigo`
    */
   colorGradient?: string[];
   /**
@@ -81,9 +81,9 @@ export interface HeatmapChartProps {
   /**
    * Piecewise color ranges for visualMap (only used when visualMapType is 'piecewise')
    * @example [
-   *   { min: 0, max: 1000, color: '#22c55e' },
-   *   { min: 1000, max: 2000, color: '#84cc16' },
-   *   { min: 4000, color: '#ef4444' }
+   *   { min: 0, max: 1000, color: DATA_COLORS.green },
+   *   { min: 1000, max: 2000, color: DATA_COLORS.lime },
+   *   { min: 4000, color: DATA_COLORS.red }
    * ]
    */
   piecewisePieces?: Array<{

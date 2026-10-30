@@ -42,7 +42,7 @@ export function EngineSection({ newPayload, getBlobs, rangeLabel }: EngineSectio
             id: 'np-invalid',
             name: 'newPayload not VALID',
             value: notValid.toLocaleString(),
-            valueClassName: notValid > 0 ? 'text-warning' : undefined,
+            valueClassName: notValid > 0 ? 'text-warning' : 'text-success',
             subtitle: `of ${calls.toLocaleString()} calls`,
           },
           { id: 'gb-p50', name: 'getBlobs p50', value: formatMs(getBlobs ? rangeValue(getBlobs.rows, 'p50') : null) },
@@ -50,7 +50,7 @@ export function EngineSection({ newPayload, getBlobs, rangeLabel }: EngineSectio
             id: 'gb-hit',
             name: 'getBlobs hit rate',
             value: hitRate === null ? '–' : `${(hitRate * 100).toFixed(1)}%`,
-            valueClassName: hitRate !== null && hitRate < 0.9 ? 'text-warning' : undefined,
+            valueClassName: hitRate === null ? undefined : hitRate < 0.9 ? 'text-warning' : 'text-success',
           },
         ]}
       />

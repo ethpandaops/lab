@@ -15,7 +15,7 @@ const CREDENTIAL_LABELS = { '0x00': '0x00 BLS', '0x01': '0x01 Execution', '0x02'
 function statusColor(status: string): BadgeColor {
   if (status.includes('slashed')) return 'red';
   if (status === 'active_ongoing') return 'green';
-  if (status === 'active_exiting') return 'yellow';
+  if (status === 'active_exiting') return 'orange';
   return 'gray';
 }
 

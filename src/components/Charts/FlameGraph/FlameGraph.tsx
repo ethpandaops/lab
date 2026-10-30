@@ -22,8 +22,8 @@ const TOOLTIP_OFFSET = 12;
 const VIEWPORT_PADDING = 16;
 
 // Default colors
-const DEFAULT_COLOR = { bg: 'bg-slate-500', hover: 'hover:bg-slate-400' };
-const ERROR_COLOR = { bg: 'bg-red-500', hover: 'hover:bg-red-400' };
+const DEFAULT_COLOR = { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' };
+const ERROR_COLOR = { bg: 'bg-danger', hover: 'hover:bg-danger/80' };
 
 /**
  * Default formatter for values (K/M suffix)
@@ -601,7 +601,7 @@ export function FlameGraph({
                     <span
                       className={clsx(
                         'mt-1.5 inline-block rounded-xs px-1.5 py-0.5 text-xs font-medium text-white',
-                        colorMap?.[hoveredNode.category]?.bg ?? 'bg-slate-500'
+                        colorMap?.[hoveredNode.category]?.bg ?? 'bg-data-slate'
                       )}
                     >
                       {hoveredNode.category}
@@ -617,7 +617,7 @@ export function FlameGraph({
                       {hoveredNode.selfValue !== undefined && (
                         <div className="flex items-center justify-between text-xs">
                           <span className="flex items-center gap-2 text-muted">
-                            <span className="size-0.5 rounded-full bg-green-500" />
+                            <span className="size-0.5 rounded-full bg-data-green" />
                             Gas
                           </span>
                           <span className="font-mono text-foreground">
@@ -628,7 +628,7 @@ export function FlameGraph({
                       )}
                       <div className="flex items-center justify-between text-xs">
                         <span className="flex items-center gap-2 text-muted">
-                          <span className="size-0.5 rounded-full bg-blue-500" />
+                          <span className="size-0.5 rounded-full bg-data-blue" />
                           Cumulative
                         </span>
                         <span className="font-mono text-foreground">

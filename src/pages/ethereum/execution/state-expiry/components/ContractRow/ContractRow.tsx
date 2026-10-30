@@ -113,14 +113,14 @@ export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
 
       {/* 1y Savings */}
       <td className="px-2 py-1.5 text-right text-xs font-semibold whitespace-nowrap tabular-nums">
-        <span className={savings1y !== null ? 'text-foreground' : 'text-muted'}>
+        <span className={savings1y !== null ? 'text-success' : 'text-muted'}>
           {savings1y !== null ? `-${savings1y.toFixed(0)}%` : '—'}
         </span>
       </td>
 
       {/* 2y Savings */}
       <td className="px-2 py-1.5 text-right text-xs font-semibold whitespace-nowrap tabular-nums">
-        <span className={savings2y !== null ? 'text-foreground' : 'text-muted'}>
+        <span className={savings2y !== null ? 'text-success' : 'text-muted'}>
           {savings2y !== null ? `-${savings2y.toFixed(0)}%` : '—'}
         </span>
       </td>
@@ -186,13 +186,13 @@ export function ContractCard({ item, index }: ContractRowProps): JSX.Element {
             </div>
             <div>
               <span className="text-muted">1y: </span>
-              <span className={savings1y !== null ? 'font-semibold text-foreground tabular-nums' : 'text-muted'}>
+              <span className={savings1y !== null ? 'font-semibold text-success tabular-nums' : 'text-muted'}>
                 {savings1y !== null ? `-${savings1y.toFixed(0)}%` : '—'}
               </span>
             </div>
             <div>
               <span className="text-muted">2y: </span>
-              <span className={savings2y !== null ? 'font-semibold text-foreground tabular-nums' : 'text-muted'}>
+              <span className={savings2y !== null ? 'font-semibold text-success tabular-nums' : 'text-muted'}>
                 {savings2y !== null ? `-${savings2y.toFixed(0)}%` : '—'}
               </span>
             </div>

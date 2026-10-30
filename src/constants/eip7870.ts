@@ -103,9 +103,9 @@ export const CLUSTER_SPECS: ClusterSpec[] = [
  * Cluster color mapping for visual differentiation
  */
 export const CLUSTER_COLORS: Record<string, string> = {
-  utility: 'text-blue-500',
-  sigma: 'text-emerald-500',
-  berlin: 'text-amber-500',
+  utility: 'text-data-blue',
+  sigma: 'text-data-emerald',
+  berlin: 'text-data-amber',
 };
 
 /**

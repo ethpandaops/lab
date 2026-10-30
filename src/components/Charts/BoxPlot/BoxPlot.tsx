@@ -48,8 +48,8 @@ echarts.use([BoxplotChart, GridComponent, TooltipComponent, TitleComponent, Lege
  * // Multiple series with colors
  * <BoxPlot
  *   series={[
- *     { name: "Blob 0", data: [[10, 20, 30, 40, 50]], color: "#3b82f6" },
- *     { name: "Blob 1", data: [[15, 25, 35, 45, 55]], color: "#10b981" },
+ *     { name: "Blob 0", data: [[10, 20, 30, 40, 50]], color: DATA_COLORS.blue },
+ *     { name: "Blob 1", data: [[15, 25, 35, 45, 55]], color: DATA_COLORS.emerald },
  *   ]}
  *   yAxisTitle="Latency (ms)"
  *   showLegend={true}

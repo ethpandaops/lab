@@ -61,7 +61,8 @@ export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.E
         header: 'Attestation Rate',
         accessor: row => {
           const rate = row.rate * 100;
-          const colorClass = rate >= 99 ? 'text-foreground' : rate < 95 ? 'text-warning' : 'text-muted';
+          const colorClass =
+            rate >= 99 ? 'text-success' : rate < 200 / 3 ? 'text-danger' : rate < 95 ? 'text-warning' : 'text-muted';
 
           return <span className={colorClass}>{rate.toFixed(2)}%</span>;
         },

@@ -160,7 +160,7 @@ export function ContractActionPopover({
           params={{ address }}
           className="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-sm text-foreground transition-colors hover:bg-surface"
         >
-          <CircleStackIcon className="size-4 text-cyan-500" />
+          <CircleStackIcon className="size-4 text-data-cyan" />
           <span>View Contract Storage</span>
         </Link>
       </div>

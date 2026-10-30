@@ -1,6 +1,29 @@
 import type { ThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from './color';
 
+/** Named data hues (`--color-data-*` in src/index.css) for series that need a specific hue */
+const DATA_HUES = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+  'slate',
+] as const;
+export type DataHue = (typeof DATA_HUES)[number];
+
 // Cache object to avoid re-reading DOM on every call
 const cache: { colors: ReturnType<typeof computeDataVizColors> | null } = { colors: null };
 
@@ -57,6 +80,7 @@ function computeDataVizColors(): {
     poor: string;
   };
   CHART_CATEGORICAL_COLORS: readonly string[];
+  DATA_COLORS: Record<DataHue, string>;
 } {
   // Helper to resolve CSS variable to hex using shared utility
   const resolveVar = (varName: string): string => {
@@ -108,11 +132,17 @@ function computeDataVizColors(): {
     resolveVar('--color-chart-14'),
   ] as const;
 
+  const DATA_COLORS = Object.fromEntries(DATA_HUES.map(hue => [hue, resolveVar(`--color-data-${hue}`)])) as Record<
+    DataHue,
+    string
+  >;
+
   return {
     BLOB_COLORS,
     CONTINENT_COLORS,
     PERFORMANCE_TIME_COLORS,
     CHART_CATEGORICAL_COLORS,
+    DATA_COLORS,
   };
 }
 

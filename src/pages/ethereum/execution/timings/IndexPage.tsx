@@ -79,7 +79,7 @@ export function IndexPage(): JSX.Element {
       ) : error ? (
         <Alert variant="error" title="Error loading timing data" description={error.message} />
       ) : !data ? (
-        <Alert variant="warning" title="No data available" description="No engine timing data has been recorded yet." />
+        <Alert variant="info" title="No data available" description="No engine timing data has been recorded yet." />
       ) : (
         /* Tabbed Content */
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>

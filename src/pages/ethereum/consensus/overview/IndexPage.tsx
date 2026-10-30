@@ -13,6 +13,8 @@ import {
 } from '@/components/Charts/MultiLine';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { Toggle } from '@/components/Forms/Toggle';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { epochToTimestamp } from '@/utils/beacon';
@@ -75,6 +77,8 @@ import {
   type TooltipSection,
 } from './overview.utils';
 
+const { DATA_COLORS } = getDataVizColors();
+
 /**
  * IndexPage - Consensus Overview page
  */
@@ -87,6 +91,7 @@ export function IndexPage(): JSX.Element {
   const isDaily = config.dataType === 'daily';
 
   const { currentNetwork } = useNetwork();
+  const themeColors = useThemeColors();
   const { allForks } = useForks();
 
   const startTimestamp = useMemo(() => {
@@ -493,8 +498,8 @@ export function IndexPage(): JSX.Element {
 
   const proposalStatusChartConfig = useMemo(() => {
     if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildBlockProposalStatusChartConfig(proposalStatusRecords, unifiedTimeKeys, isDaily);
-  }, [proposalStatusRecords, unifiedTimeKeys, isDaily]);
+    return buildBlockProposalStatusChartConfig(proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors);
+  }, [proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors]);
 
   const payloadStatusChartConfig = useMemo(() => {
     const records = payloadStatusHourlyQuery.data?.fct_block_payload_status_hourly ?? [];
@@ -503,9 +508,10 @@ export function IndexPage(): JSX.Element {
     return buildBlockProposalStatusChartConfig(
       records as unknown as FctBlockProposalStatusHourly[],
       unifiedTimeKeys,
-      isDaily
+      isDaily,
+      themeColors
     );
-  }, [payloadStatusHourlyQuery.data, unifiedTimeKeys, isDaily]);
+  }, [payloadStatusHourlyQuery.data, unifiedTimeKeys, isDaily, themeColors]);
 
   const inclusionDelayChartConfig = useMemo(() => {
     if (!inclusionDelayRecords?.length || !unifiedTimeKeys.length) return null;
@@ -603,28 +609,28 @@ export function IndexPage(): JSX.Element {
           {
             title: 'STATISTICS',
             items: [
-              { color: '#10b981', label: 'Average', value: fmt(record[fields.avg]) },
-              { color: '#06b6d4', label: 'Moving Avg', value: fmt(record[fields.movingAvg]) },
-              { color: '#a855f7', label: 'Median', value: fmt(record[fields.median]), style: 'dotted' },
+              { color: DATA_COLORS.emerald, label: 'Average', value: fmt(record[fields.avg]) },
+              { color: DATA_COLORS.cyan, label: 'Moving Avg', value: fmt(record[fields.movingAvg]) },
+              { color: DATA_COLORS.purple, label: 'Median', value: fmt(record[fields.median]), style: 'dotted' },
             ],
           },
           {
             title: 'BANDS',
             items: [
               {
-                color: '#f59e0b',
+                color: DATA_COLORS.amber,
                 label: 'Bollinger',
                 value: `${formatBand(record[fields.lowerBand] as number, record[fields.upperBand] as number)}${unit}`,
                 style: 'area',
               },
               {
-                color: '#6366f1',
+                color: DATA_COLORS.indigo,
                 label: 'P5/P95',
                 value: `${formatBand(record[fields.p05] as number, record[fields.p95] as number)}${unit}`,
                 style: 'area',
               },
               {
-                color: '#64748b',
+                color: DATA_COLORS.slate,
                 label: 'Min/Max',
                 value: `${formatBand(record[fields.min] as number, record[fields.max] as number)}${unit}`,
                 style: 'area',
@@ -771,8 +777,12 @@ export function IndexPage(): JSX.Element {
         {
           title: `MISSED SLOTS (${record.missed_count ?? 0} / ${record.slot_count ?? 0})`,
           items: [
-            { color: '#f43f5e', label: 'Missed Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
-            { color: '#06b6d4', label: 'Moving Avg', value: `${(record.moving_avg_missed_rate ?? 0).toFixed(2)}%` },
+            { color: DATA_COLORS.rose, label: 'Missed Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
+            {
+              color: DATA_COLORS.cyan,
+              label: 'Moving Avg',
+              value: `${(record.moving_avg_missed_rate ?? 0).toFixed(2)}%`,
+            },
           ],
         },
       ];
@@ -815,7 +825,7 @@ export function IndexPage(): JSX.Element {
           items: sortedStatuses.map(([status, count]) => {
             const rate = total > 0 ? ((count / total) * 100).toFixed(2) : '0.00';
             return {
-              color: STATUS_COLORS[status] ?? '#94a3b8',
+              color: STATUS_COLORS[status] ? themeColors[STATUS_COLORS[status]] : themeColors.muted,
               label: status.charAt(0).toUpperCase() + status.slice(1),
               value: `${rate}% (${count})`,
             };
@@ -825,7 +835,7 @@ export function IndexPage(): JSX.Element {
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [proposalStatusRecords, unifiedTimeKeys, isDaily]
+    [proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors]
   );
 
   const inclusionDelayTooltipFormatter = useMemo(

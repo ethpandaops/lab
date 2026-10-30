@@ -26,16 +26,16 @@ function truncateAddress(address: string | null): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-orange-500/10', text: 'text-orange-500' };
+      return { bg: 'bg-data-orange/10', text: 'text-data-orange' };
     case 'CREATE2':
       return { bg: 'bg-warning/10', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-purple-500/10', text: 'text-purple-400' };
+      return { bg: 'bg-data-purple/10', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-cyan-500/10', text: 'text-cyan-400' };
+      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan' };
     case 'CALL':
     default:
-      return { bg: 'bg-blue-500/10', text: 'text-blue-400' };
+      return { bg: 'bg-data-blue/10', text: 'text-data-blue' };
   }
 }
 
@@ -78,7 +78,7 @@ export function TransactionSummaryCard({
             {transaction.transactionHash.slice(0, 6)}...{transaction.transactionHash.slice(-4)}
           </span>
           {isSimpleTransfer ? (
-            <span className="shrink-0 rounded-xs bg-cyan-500/10 px-1.5 py-0.5 text-xs font-medium text-cyan-400">
+            <span className="shrink-0 rounded-xs bg-data-cyan/10 px-1.5 py-0.5 text-xs font-medium text-data-cyan">
               Transfer
             </span>
           ) : (

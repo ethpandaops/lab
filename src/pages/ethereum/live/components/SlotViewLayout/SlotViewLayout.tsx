@@ -13,6 +13,7 @@ import {
 import { useSlotPlayerState, useSlotPlayerActions, useSlotPlayerProgress } from '@/hooks/useSlotPlayer';
 import { useForks } from '@/hooks/useForks';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import { Sidebar } from '../Sidebar';
 import type { SidebarProps } from '../Sidebar/Sidebar.types';
@@ -395,7 +396,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
     const payloadWave = slotData.payloadMapPoints.map(point => ({
       ...point,
       name: `${point.name} / payload`,
-      color: 'var(--color-purple-500, #a855f7)',
+      color: getDataVizColors().DATA_COLORS.purple,
     }));
 
     return [...slotData.mapPoints, ...payloadWave].sort((a, b) => a.earliestSeenTime - b.earliestSeenTime);

@@ -36,7 +36,8 @@ interface DiskIoChartProps {
   onHighlight: (range: HighlightRange | null) => void;
 }
 
-const PHASE_BOUNDARY_COLORS = ['#22d3ee', '#22c55e', '#f59e0b'];
+const { DATA_COLORS } = getDataVizColors();
+const PHASE_BOUNDARY_COLORS = [DATA_COLORS.cyan, DATA_COLORS.green, DATA_COLORS.amber];
 
 interface EChartsTooltipParam {
   marker: string;
@@ -213,7 +214,7 @@ export function DiskIoChart({
     for (let i = 0; i < DEFAULT_BEACON_SLOT_PHASES.length - 1; i++) {
       cumulativeSec += DEFAULT_BEACON_SLOT_PHASES[i].duration / 1000;
       const nextPhase = DEFAULT_BEACON_SLOT_PHASES[i + 1];
-      const color = PHASE_BOUNDARY_COLORS[i + 1] ?? '#6b7280';
+      const color = PHASE_BOUNDARY_COLORS[i + 1] ?? DATA_COLORS.slate;
 
       lines.push({
         xValue: cumulativeSec,

@@ -43,6 +43,12 @@ Two-tier system defined in `src/index.css`:
 | foreground | sand-950 | neutral-50 | aurora-cyan-50 |
 | muted | sand-600 | neutral-400 | aurora-cyan-700 |
 | border | sand-300 | neutral-800 | #1a2847 |
+| success | #337344 | #76be86 | #96c979 |
+| warning | #a56217 | #e8a95c | #e8a95c |
+| danger | #af3d36 | #e2726b | #e2726b |
+
+Star is a dark theme: the `dark:` variant matches `.star` too, and `star:` overrides it where star needs
+something different.
 
 **Programmatic access:**
 ```tsx
@@ -52,7 +58,10 @@ const colors = useThemeColors();
 
 ### Data Visualization Colors
 
-Constant across all themes:
+Constant across all themes. Every data colour maps to a **data hue** (`--color-data-{red…slate}`,
+`bg-data-emerald`, `getDataVizColors().DATA_COLORS.emerald`): Tailwind's 500 hues at about 60%
+chroma, so charts sit with the earthy UI. Don't hard-code Tailwind hex in charts; series that
+encode a judgement (canonical, missed, accept, failed) use the status tokens instead.
 - **Chart categorical** (0–14): `--color-chart-{n}` — blue, emerald, amber, red, cyan, lime, orange, purple, pink, violet, teal, indigo, rose, fuchsia, sky
 - **Blob indices** (0–5): `--color-blob-{n}` — cyan, pink, amber, green, violet, red
 - **Continents**: `--color-continent-{code}` — af(red), as(amber), eu(emerald), na(blue), oc(cyan), sa(violet), an(slate)
@@ -60,15 +69,34 @@ Constant across all themes:
 
 ---
 
-## Colour Only Exceptions
+## Status Colour
 
-Data values render in `text-foreground` (or `text-muted` when secondary). Colour marks what needs
-attention: `warning` and `danger` for thresholds, failures, missed/orphaned/late states and lag.
-Good and normal values (participation, Ready, Canonical, Delivered, pass marks) are not green;
-the normal state of a multi-state badge is neutral. `success` remains for live/running
-indicators and transient feedback ("Copied"). Categorical data colours (chart series, call
-types, heatmaps) are data, not judgement. Each Ethereum client has one colour everywhere:
-`getClientColor` in `src/utils/ethereum.ts`.
+Status colour is a judgement, and each colour has one meaning everywhere: badges, status pills,
+pass/fail values, tags, table cells, icons and dots.
+
+| Meaning | Text / fill | Badge | Examples |
+|---|---|---|---|
+| Good | `success` | `green` | canonical, included, signed, valid input, ready, delivered, passing a threshold, live, "Copied" |
+| Bad | `danger` | `red` | missed, failed, slashed, invalid input, failing a threshold, errors |
+| Warning | `warning` | `orange` | late, orphaned, degraded, lagging, near a threshold, transient failures |
+| Neutral | `foreground` / `muted` | `gray` | plain values and counts, identifiers, states that are neither good nor bad (pending, unknown) |
+
+Solid status fills take `text-white` in light mode and `text-background` in dark and star.
+
+Status tokens are earthy and set per theme (see Theme mappings): about half Tailwind's chroma so
+they sit with terracotta, and at least 4.5:1 as text on each theme's surface. Badge `green`,
+`orange` and `red` render from these tokens, so a status has one colour whether it's text, a
+badge or a dot.
+
+A threshold colours every side it has: pass green, near orange, fail red. Participation and online
+rates share one scale (`getHealthColor`): ≥99% green, 95–99% neutral, 2/3–95% orange, below 2/3
+(no finality) red. A value with no
+judgement stays neutral; don't colour a number just because it can be. Teal, blue, indigo,
+purple, pink and yellow badges are categories, never status, and `primary` is brand, never status.
+
+Categorical data colours (chart series, call types, contract labels, heatmap gradients) are
+data, not judgement, and don't follow this rule. Each Ethereum client has one colour
+everywhere: `getClientColor` in `src/utils/ethereum.ts`.
 
 ## Depth Strategy
 

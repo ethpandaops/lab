@@ -1,5 +1,6 @@
 import type { ForwardRefExoticComponent, ReactNode, SVGProps } from 'react';
 
+/** 'increase' reads as good (green), 'decrease' as bad (red), 'neutral' as neither */
 export type DeltaType = 'increase' | 'decrease' | 'neutral';
 
 export interface Stat {
