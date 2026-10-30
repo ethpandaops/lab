@@ -1,0 +1,1 @@
+export { ArrivalHistogram } from './ArrivalHistogram';

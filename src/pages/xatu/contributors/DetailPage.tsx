@@ -1,5 +1,5 @@
 import { type JSX, useState, useEffect } from 'react';
-import { Link, useParams } from '@tanstack/react-router';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
@@ -7,7 +7,8 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Button } from '@/components/Elements/Button';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table';
@@ -15,16 +16,40 @@ import { UserDetailsSkeleton } from './components/UserDetailsSkeleton';
 import type { UserClassification } from './components/UserCard/UserCard.types';
 import { getClassificationLabel, getClassificationBadgeClasses, getCountryFlag, getRelativeTime } from '@/utils';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { useSlotPlayerMeta } from '@/hooks/useSlotPlayer';
-import { SlotPlayerControls } from './components/SlotPlayerControls';
-import { BlockLatencyChart } from './components/BlockLatencyChart';
-import { DataColumnLatencyChart } from './components/DataColumnLatencyChart';
-import { AttestationLatencyChart } from './components/AttestationLatencyChart';
-import { HeadLatencyChart } from './components/HeadLatencyChart';
-import { MetricsSkeleton } from './components/MetricsSkeleton';
+import { Route } from '@/routes/xatu/contributors/$id';
+import { PerNodeHistoryChart } from '@/pages/xatu/nodes/components';
+import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
+import { useNodeHistory, type HistoryMetric } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+
+const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: string; anchorId: string }> = [
+  { metric: 'block', title: 'Block arrival', subtitle: 'Median per node', anchorId: 'block-latency' },
+  { metric: 'head', title: 'Head events', subtitle: 'Median per node', anchorId: 'head-latency' },
+  { metric: 'attestation', title: 'Attestations', subtitle: 'Median per node', anchorId: 'attestation-latency' },
+  {
+    metric: 'dataColumn',
+    title: 'Data columns',
+    subtitle: 'Median per node of when the last custody column arrived',
+    anchorId: 'data-column-latency',
+  },
+];
 
 // Node table columns (constant, defined once outside component)
 const nodeColumns: Column<FctNodeActiveLast24h>[] = [
+  {
+    header: 'Node',
+    accessor: (node: FctNodeActiveLast24h) =>
+      node.node_id ? (
+        <Link
+          to="/xatu/nodes/$nodeId"
+          params={{ nodeId: node.node_id }}
+          className="font-mono text-primary hover:underline"
+        >
+          {node.node_id}
+        </Link>
+      ) : (
+        '-'
+      ),
+  },
   {
     header: 'Location',
     accessor: (node: FctNodeActiveLast24h) => {
@@ -111,8 +136,16 @@ export function DetailPage(): JSX.Element {
     return () => clearInterval(interval);
   }, []);
 
-  // Get slot player meta state
-  const { isLoading: slotPlayerLoading, error: slotPlayerError } = useSlotPlayerMeta();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: '/xatu/contributors/$id' });
+  const range = search.range ?? DEFAULT_NODE_RANGE;
+  const rangeLabel = NODE_RANGE_CONFIG[range].label;
+  const histories = {
+    block: useNodeHistory('block', range, { username: id }),
+    head: useNodeHistory('head', range, { username: id }),
+    attestation: useNodeHistory('attestation', range, { username: id }),
+    dataColumn: useNodeHistory('dataColumn', range, { username: id }),
+  };
 
   // Query all three categories since we don't know which one the username belongs to
   const {
@@ -172,28 +205,21 @@ export function DetailPage(): JSX.Element {
 
   const data = allNodes.length > 0 ? { fct_node_active_last_24h: allNodes } : null;
 
-  if (isLoading || slotPlayerLoading) {
+  if (isLoading) {
     return (
       <Container>
         <Header title="Contributor Details" />
         <UserDetailsSkeleton />
-        {!isLoading && slotPlayerLoading && (
-          <div className="mt-8">
-            <h2 className="mb-4 text-lg/7 font-semibold text-foreground">Live Metrics</h2>
-            <MetricsSkeleton />
-          </div>
-        )}
       </Container>
     );
   }
 
-  if (error || slotPlayerError) {
+  if (error) {
     return (
       <Container>
         <Header title="Contributor Details" />
         <div className="rounded-sm border border-danger bg-danger/10 p-4 text-danger">
-          {error && `Error loading contributor: ${error.message}`}
-          {slotPlayerError && `Error initializing slot player: ${slotPlayerError.message}`}
+          Error loading contributor: {error.message}
         </div>
         <Link to="/xatu/contributors" className="mt-4 inline-block text-primary hover:underline">
           ← Back to all contributors
@@ -294,50 +320,34 @@ export function DetailPage(): JSX.Element {
         </div>
       )}
 
-      {/* Live Metrics Section */}
       <div className="mt-12">
-        <h2 className="mb-6 text-lg/7 font-semibold text-foreground">Propagation Latency Metrics</h2>
-
-        <div className="mb-6">
-          <SlotPlayerControls />
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg/7 font-semibold text-foreground">Propagation latency</h2>
+          <SegmentedControl
+            options={NODE_RANGE_OPTIONS}
+            value={range}
+            onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
+            ariaLabel="Time range"
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <PopoutCard
-            title="Block Propagation"
-            subtitle="Time from slot start to first seen"
-            modalSize="full"
-            anchorId="block-latency"
-          >
-            <BlockLatencyChart username={username} />
-          </PopoutCard>
-
-          <PopoutCard
-            title="Data Column Propagation"
-            subtitle="Time from slot start to first seen"
-            modalSize="full"
-            anchorId="data-column-latency"
-          >
-            <DataColumnLatencyChart username={username} nodes={nodes} />
-          </PopoutCard>
-
-          <PopoutCard
-            title="Head Events"
-            subtitle="Time from slot start to first seen"
-            modalSize="full"
-            anchorId="head-latency"
-          >
-            <HeadLatencyChart username={username} />
-          </PopoutCard>
-
-          <PopoutCard
-            title="Attestations"
-            subtitle="Median attestation propagation latency"
-            modalSize="full"
-            anchorId="attestation-latency"
-          >
-            <AttestationLatencyChart username={username} />
-          </PopoutCard>
+          {HISTORY_CHARTS.map(chart => {
+            const history = histories[chart.metric as keyof typeof histories].data;
+            return history ? (
+              <PerNodeHistoryChart
+                key={chart.metric}
+                title={chart.title}
+                subtitle={`${chart.subtitle}, ${rangeLabel.toLowerCase()}`}
+                anchorId={chart.anchorId}
+                history={history}
+                nodeIds={nodes.flatMap(node => (node.node_id ? [node.node_id] : []))}
+                clientOf={nodeId => nodes.find(node => node.node_id === nodeId)?.meta_consensus_implementation}
+              />
+            ) : (
+              <LoadingContainer key={chart.metric} className="h-96 rounded-sm" />
+            );
+          })}
         </div>
       </div>
     </Container>

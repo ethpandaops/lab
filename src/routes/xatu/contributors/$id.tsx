@@ -1,42 +1,34 @@
-import { type JSX } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { DetailPage } from '@/pages/xatu/contributors/';
-import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
-
-/**
- * Wrapper component to provide SlotPlayer context for contributor detail page.
- * Fetches slot bounds from all three username-enabled tables used by the live metrics charts.
- */
-function DetailPageWithSlotPlayer(): JSX.Element {
-  return (
-    <SlotPlayerProvider
-      tables={['fct_block_first_seen_by_node', 'fct_block_blob_first_seen_by_node', 'int_attestation_first_seen']}
-      initialMode="continuous"
-      initialPlaying={true}
-      playbackSpeed={1}
-    >
-      <DetailPage />
-    </SlotPlayerProvider>
-  );
-}
+import { nodesSearchSchema } from '@/pages/xatu/nodes/constants';
 
 export const Route = createFileRoute('/xatu/contributors/$id')({
-  component: DetailPageWithSlotPlayer,
+  component: DetailPage,
+  validateSearch: nodesSearchSchema,
   beforeLoad: ({ params }) => ({
     getBreadcrumb: () => ({ label: params.id }),
   }),
   head: ctx => ({
     meta: [
       { title: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
-      { name: 'description', content: 'Detailed contribution metrics and live network performance data' },
+      {
+        name: 'description',
+        content: 'Block, head, attestation and data column arrival over time for each of a contributor’s nodes',
+      },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/contributors/${ctx.params.id}` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
-      { property: 'og:description', content: 'Detailed contribution metrics and live network performance data' },
+      {
+        property: 'og:description',
+        content: 'Block, head, attestation and data column arrival over time for each of a contributor’s nodes',
+      },
       { property: 'og:image', content: `${import.meta.env.VITE_BASE_URL}/images/xatu/contributors.png` },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/contributors/${ctx.params.id}` },
       { name: 'twitter:title', content: `${ctx.params.id} | ${import.meta.env.VITE_BASE_TITLE}` },
-      { name: 'twitter:description', content: 'Detailed contribution metrics and live network performance data' },
+      {
+        name: 'twitter:description',
+        content: 'Block, head, attestation and data column arrival over time for each of a contributor’s nodes',
+      },
       { name: 'twitter:image', content: `${import.meta.env.VITE_BASE_URL}/images/xatu/contributors.png` },
     ],
   }),

@@ -1,0 +1,1 @@
+export { ColumnArrivalChart } from './ColumnArrivalChart';

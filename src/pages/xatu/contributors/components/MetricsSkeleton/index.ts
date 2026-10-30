@@ -1,1 +1,0 @@
-export { MetricsSkeleton } from './MetricsSkeleton';

@@ -135,6 +135,18 @@ import type {
   FctAttestationLivenessByEntityServiceListData,
   FctAttestationLivenessByEntityServiceListErrors,
   FctAttestationLivenessByEntityServiceListResponses,
+  FctAttestationObservationByNodeDailyServiceGetData,
+  FctAttestationObservationByNodeDailyServiceGetErrors,
+  FctAttestationObservationByNodeDailyServiceGetResponses,
+  FctAttestationObservationByNodeDailyServiceListData,
+  FctAttestationObservationByNodeDailyServiceListErrors,
+  FctAttestationObservationByNodeDailyServiceListResponses,
+  FctAttestationObservationByNodeHourlyServiceGetData,
+  FctAttestationObservationByNodeHourlyServiceGetErrors,
+  FctAttestationObservationByNodeHourlyServiceGetResponses,
+  FctAttestationObservationByNodeHourlyServiceListData,
+  FctAttestationObservationByNodeHourlyServiceListErrors,
+  FctAttestationObservationByNodeHourlyServiceListResponses,
   FctAttestationObservationByNodeServiceGetData,
   FctAttestationObservationByNodeServiceGetErrors,
   FctAttestationObservationByNodeServiceGetResponses,
@@ -213,6 +225,18 @@ import type {
   FctBlockDataColumnCompletionServiceListData,
   FctBlockDataColumnCompletionServiceListErrors,
   FctBlockDataColumnCompletionServiceListResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListResponses,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetErrors,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponses,
@@ -225,6 +249,18 @@ import type {
   FctBlockDataColumnSidecarFirstSeenServiceListData,
   FctBlockDataColumnSidecarFirstSeenServiceListErrors,
   FctBlockDataColumnSidecarFirstSeenServiceListResponses,
+  FctBlockFirstSeenByNodeDailyServiceGetData,
+  FctBlockFirstSeenByNodeDailyServiceGetErrors,
+  FctBlockFirstSeenByNodeDailyServiceGetResponses,
+  FctBlockFirstSeenByNodeDailyServiceListData,
+  FctBlockFirstSeenByNodeDailyServiceListErrors,
+  FctBlockFirstSeenByNodeDailyServiceListResponses,
+  FctBlockFirstSeenByNodeHourlyServiceGetData,
+  FctBlockFirstSeenByNodeHourlyServiceGetErrors,
+  FctBlockFirstSeenByNodeHourlyServiceGetResponses,
+  FctBlockFirstSeenByNodeHourlyServiceListData,
+  FctBlockFirstSeenByNodeHourlyServiceListErrors,
+  FctBlockFirstSeenByNodeHourlyServiceListResponses,
   FctBlockFirstSeenByNodeServiceGetData,
   FctBlockFirstSeenByNodeServiceGetErrors,
   FctBlockFirstSeenByNodeServiceGetResponses,
@@ -489,6 +525,18 @@ import type {
   FctEngineGetBlobsByElClientServiceListData,
   FctEngineGetBlobsByElClientServiceListErrors,
   FctEngineGetBlobsByElClientServiceListResponses,
+  FctEngineGetBlobsByNodeDailyServiceGetData,
+  FctEngineGetBlobsByNodeDailyServiceGetErrors,
+  FctEngineGetBlobsByNodeDailyServiceGetResponses,
+  FctEngineGetBlobsByNodeDailyServiceListData,
+  FctEngineGetBlobsByNodeDailyServiceListErrors,
+  FctEngineGetBlobsByNodeDailyServiceListResponses,
+  FctEngineGetBlobsByNodeHourlyServiceGetData,
+  FctEngineGetBlobsByNodeHourlyServiceGetErrors,
+  FctEngineGetBlobsByNodeHourlyServiceGetResponses,
+  FctEngineGetBlobsByNodeHourlyServiceListData,
+  FctEngineGetBlobsByNodeHourlyServiceListErrors,
+  FctEngineGetBlobsByNodeHourlyServiceListResponses,
   FctEngineGetBlobsBySlotServiceGetData,
   FctEngineGetBlobsBySlotServiceGetErrors,
   FctEngineGetBlobsBySlotServiceGetResponses,
@@ -513,6 +561,18 @@ import type {
   FctEngineNewPayloadByElClientServiceListData,
   FctEngineNewPayloadByElClientServiceListErrors,
   FctEngineNewPayloadByElClientServiceListResponses,
+  FctEngineNewPayloadByNodeDailyServiceGetData,
+  FctEngineNewPayloadByNodeDailyServiceGetErrors,
+  FctEngineNewPayloadByNodeDailyServiceGetResponses,
+  FctEngineNewPayloadByNodeDailyServiceListData,
+  FctEngineNewPayloadByNodeDailyServiceListErrors,
+  FctEngineNewPayloadByNodeDailyServiceListResponses,
+  FctEngineNewPayloadByNodeHourlyServiceGetData,
+  FctEngineNewPayloadByNodeHourlyServiceGetErrors,
+  FctEngineNewPayloadByNodeHourlyServiceGetResponses,
+  FctEngineNewPayloadByNodeHourlyServiceListData,
+  FctEngineNewPayloadByNodeHourlyServiceListErrors,
+  FctEngineNewPayloadByNodeHourlyServiceListResponses,
   FctEngineNewPayloadBySlotServiceGetData,
   FctEngineNewPayloadBySlotServiceGetErrors,
   FctEngineNewPayloadBySlotServiceGetResponses,
@@ -621,6 +681,18 @@ import type {
   FctExecutionTransactionsHourlyServiceListData,
   FctExecutionTransactionsHourlyServiceListErrors,
   FctExecutionTransactionsHourlyServiceListResponses,
+  FctHeadFirstSeenByNodeDailyServiceGetData,
+  FctHeadFirstSeenByNodeDailyServiceGetErrors,
+  FctHeadFirstSeenByNodeDailyServiceGetResponses,
+  FctHeadFirstSeenByNodeDailyServiceListData,
+  FctHeadFirstSeenByNodeDailyServiceListErrors,
+  FctHeadFirstSeenByNodeDailyServiceListResponses,
+  FctHeadFirstSeenByNodeHourlyServiceGetData,
+  FctHeadFirstSeenByNodeHourlyServiceGetErrors,
+  FctHeadFirstSeenByNodeHourlyServiceGetResponses,
+  FctHeadFirstSeenByNodeHourlyServiceListData,
+  FctHeadFirstSeenByNodeHourlyServiceListErrors,
+  FctHeadFirstSeenByNodeHourlyServiceListResponses,
   FctHeadFirstSeenByNodeServiceGetData,
   FctHeadFirstSeenByNodeServiceGetErrors,
   FctHeadFirstSeenByNodeServiceGetResponses,
@@ -1437,6 +1509,14 @@ import {
   zFctAttestationLivenessByEntityServiceGetResponse,
   zFctAttestationLivenessByEntityServiceListData,
   zFctAttestationLivenessByEntityServiceListResponse,
+  zFctAttestationObservationByNodeDailyServiceGetData,
+  zFctAttestationObservationByNodeDailyServiceGetResponse,
+  zFctAttestationObservationByNodeDailyServiceListData,
+  zFctAttestationObservationByNodeDailyServiceListResponse,
+  zFctAttestationObservationByNodeHourlyServiceGetData,
+  zFctAttestationObservationByNodeHourlyServiceGetResponse,
+  zFctAttestationObservationByNodeHourlyServiceListData,
+  zFctAttestationObservationByNodeHourlyServiceListResponse,
   zFctAttestationObservationByNodeServiceGetData,
   zFctAttestationObservationByNodeServiceGetResponse,
   zFctAttestationObservationByNodeServiceListData,
@@ -1489,6 +1569,14 @@ import {
   zFctBlockDataColumnCompletionServiceGetResponse,
   zFctBlockDataColumnCompletionServiceListData,
   zFctBlockDataColumnCompletionServiceListResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetData,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
@@ -1497,6 +1585,14 @@ import {
   zFctBlockDataColumnSidecarFirstSeenServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenServiceListData,
   zFctBlockDataColumnSidecarFirstSeenServiceListResponse,
+  zFctBlockFirstSeenByNodeDailyServiceGetData,
+  zFctBlockFirstSeenByNodeDailyServiceGetResponse,
+  zFctBlockFirstSeenByNodeDailyServiceListData,
+  zFctBlockFirstSeenByNodeDailyServiceListResponse,
+  zFctBlockFirstSeenByNodeHourlyServiceGetData,
+  zFctBlockFirstSeenByNodeHourlyServiceGetResponse,
+  zFctBlockFirstSeenByNodeHourlyServiceListData,
+  zFctBlockFirstSeenByNodeHourlyServiceListResponse,
   zFctBlockFirstSeenByNodeServiceGetData,
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
@@ -1673,6 +1769,14 @@ import {
   zFctEngineGetBlobsByElClientServiceGetResponse,
   zFctEngineGetBlobsByElClientServiceListData,
   zFctEngineGetBlobsByElClientServiceListResponse,
+  zFctEngineGetBlobsByNodeDailyServiceGetData,
+  zFctEngineGetBlobsByNodeDailyServiceGetResponse,
+  zFctEngineGetBlobsByNodeDailyServiceListData,
+  zFctEngineGetBlobsByNodeDailyServiceListResponse,
+  zFctEngineGetBlobsByNodeHourlyServiceGetData,
+  zFctEngineGetBlobsByNodeHourlyServiceGetResponse,
+  zFctEngineGetBlobsByNodeHourlyServiceListData,
+  zFctEngineGetBlobsByNodeHourlyServiceListResponse,
   zFctEngineGetBlobsBySlotServiceGetData,
   zFctEngineGetBlobsBySlotServiceGetResponse,
   zFctEngineGetBlobsBySlotServiceListData,
@@ -1689,6 +1793,14 @@ import {
   zFctEngineNewPayloadByElClientServiceGetResponse,
   zFctEngineNewPayloadByElClientServiceListData,
   zFctEngineNewPayloadByElClientServiceListResponse,
+  zFctEngineNewPayloadByNodeDailyServiceGetData,
+  zFctEngineNewPayloadByNodeDailyServiceGetResponse,
+  zFctEngineNewPayloadByNodeDailyServiceListData,
+  zFctEngineNewPayloadByNodeDailyServiceListResponse,
+  zFctEngineNewPayloadByNodeHourlyServiceGetData,
+  zFctEngineNewPayloadByNodeHourlyServiceGetResponse,
+  zFctEngineNewPayloadByNodeHourlyServiceListData,
+  zFctEngineNewPayloadByNodeHourlyServiceListResponse,
   zFctEngineNewPayloadBySlotServiceGetData,
   zFctEngineNewPayloadBySlotServiceGetResponse,
   zFctEngineNewPayloadBySlotServiceListData,
@@ -1761,6 +1873,14 @@ import {
   zFctExecutionTransactionsHourlyServiceGetResponse,
   zFctExecutionTransactionsHourlyServiceListData,
   zFctExecutionTransactionsHourlyServiceListResponse,
+  zFctHeadFirstSeenByNodeDailyServiceGetData,
+  zFctHeadFirstSeenByNodeDailyServiceGetResponse,
+  zFctHeadFirstSeenByNodeDailyServiceListData,
+  zFctHeadFirstSeenByNodeDailyServiceListResponse,
+  zFctHeadFirstSeenByNodeHourlyServiceGetData,
+  zFctHeadFirstSeenByNodeHourlyServiceGetResponse,
+  zFctHeadFirstSeenByNodeHourlyServiceListData,
+  zFctHeadFirstSeenByNodeHourlyServiceListResponse,
   zFctHeadFirstSeenByNodeServiceGetData,
   zFctHeadFirstSeenByNodeServiceGetResponse,
   zFctHeadFirstSeenByNodeServiceListData,
@@ -3125,6 +3245,82 @@ export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends b
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctAttestationObservationByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationObservationByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationObservationByNodeDailyServiceListResponses,
+    FctAttestationObservationByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationObservationByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationObservationByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationObservationByNodeDailyServiceGetResponses,
+    FctAttestationObservationByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctAttestationObservationByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationObservationByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationObservationByNodeHourlyServiceListResponses,
+    FctAttestationObservationByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctAttestationObservationByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationObservationByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationObservationByNodeHourlyServiceGetResponses,
+    FctAttestationObservationByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctAttestationParticipationRateDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationParticipationRateDailyServiceListData, ThrowOnError>
 ) =>
@@ -3688,6 +3884,89 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockFirstSeenByNodeServiceListData, ThrowOnError>
 ) =>
@@ -3718,6 +3997,82 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
     requestValidator: async data => await zFctBlockFirstSeenByNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNodeDailyServiceListResponses,
+    FctBlockFirstSeenByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockFirstSeenByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNodeDailyServiceGetResponses,
+    FctBlockFirstSeenByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNodeHourlyServiceListResponses,
+    FctBlockFirstSeenByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNodeHourlyServiceGetResponses,
+    FctBlockFirstSeenByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -5298,6 +5653,82 @@ export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctEngineGetBlobsByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineGetBlobsByNodeDailyServiceListResponses,
+    FctEngineGetBlobsByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineGetBlobsByNodeDailyServiceGetResponses,
+    FctEngineGetBlobsByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineGetBlobsByNodeHourlyServiceListResponses,
+    FctEngineGetBlobsByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineGetBlobsByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineGetBlobsByNodeHourlyServiceGetResponses,
+    FctEngineGetBlobsByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_node_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>
 ) =>
@@ -5442,6 +5873,82 @@ export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError exten
     requestValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctEngineNewPayloadByElClientHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadByNodeDailyServiceListResponses,
+    FctEngineNewPayloadByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadByNodeDailyServiceGetResponses,
+    FctEngineNewPayloadByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadByNodeHourlyServiceListResponses,
+    FctEngineNewPayloadByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadByNodeHourlyServiceGetResponses,
+    FctEngineNewPayloadByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_node_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -6164,6 +6671,82 @@ export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = 
     requestValidator: async data => await zFctHeadFirstSeenByNodeServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctHeadFirstSeenByNodeServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctHeadFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctHeadFirstSeenByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctHeadFirstSeenByNodeDailyServiceListResponses,
+    FctHeadFirstSeenByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctHeadFirstSeenByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctHeadFirstSeenByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctHeadFirstSeenByNodeDailyServiceGetResponses,
+    FctHeadFirstSeenByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctHeadFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctHeadFirstSeenByNodeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctHeadFirstSeenByNodeHourlyServiceListResponses,
+    FctHeadFirstSeenByNodeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctHeadFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctHeadFirstSeenByNodeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctHeadFirstSeenByNodeHourlyServiceGetResponses,
+    FctHeadFirstSeenByNodeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_hourly/{hour_start_date_time}',
     ...options,
   });
 
