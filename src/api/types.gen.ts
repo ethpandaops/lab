@@ -7372,6 +7372,184 @@ export type FctNodeNetworkIoByProcess = {
   window_start?: number;
 };
 
+export type FctOpcodeCostByElClientDaily = {
+  /**
+   * Block observations in the fit
+   */
+  block_count?: number;
+  /**
+   * Client average execution time per unit of gas, in nanoseconds
+   */
+  client_ns_per_gas?: number;
+  /**
+   * Start of the day period, by block timestamp
+   */
+  day_start_date?: string;
+  /**
+   * Average gas charged per execution of this opcode group
+   */
+  gas_per_op?: number;
+  /**
+   * Share of all opcode and non-opcode gas spent on this opcode group
+   */
+  gas_share?: number;
+  /**
+   * Hours with data in the fit
+   */
+  hour_count?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Client versions that ran during the day, most blocks first
+   */
+  meta_execution_versions?: Array<string>;
+  /**
+   * Node classification the timings come from (e.g., eip7870-block-builder)
+   */
+  node_class?: string;
+  /**
+   * Fitted execution time per unit of gas for this opcode group, in nanoseconds
+   */
+  ns_per_gas?: number;
+  /**
+   * Fitted execution time per execution of this opcode group, in nanoseconds
+   */
+  ns_per_op?: number;
+  /**
+   * 5th percentile of ns_per_op over an hourly bootstrap
+   */
+  ns_per_op_lower?: number;
+  /**
+   * 95th percentile of ns_per_op over an hourly bootstrap
+   */
+  ns_per_op_upper?: number;
+  /**
+   * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK)
+   */
+  opcode_group?: string;
+  /**
+   * Fitted fixed cost per block, in milliseconds
+   */
+  overhead_ms?: number;
+  /**
+   * Fitted cost per transaction, in microseconds
+   */
+  per_tx_us?: number;
+  /**
+   * ns_per_gas divided by the client average ns per gas, where 1 means gas prices this opcode group in line with the rest of execution
+   */
+  price_ratio?: number;
+  /**
+   * 5th percentile of price_ratio over an hourly bootstrap
+   */
+  price_ratio_lower?: number;
+  /**
+   * 95th percentile of price_ratio over an hourly bootstrap
+   */
+  price_ratio_upper?: number;
+  /**
+   * Share of block duration variance the fit explains
+   */
+  r_squared?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctOpcodeCostByElClientVersion = {
+  /**
+   * Block observations in the fit
+   */
+  block_count?: number;
+  /**
+   * Client average execution time per unit of gas, in nanoseconds
+   */
+  client_ns_per_gas?: number;
+  /**
+   * Start of the first hour the version has data
+   */
+  first_seen_date_time?: number;
+  /**
+   * Average gas charged per execution of this opcode group
+   */
+  gas_per_op?: number;
+  /**
+   * Share of all opcode and non-opcode gas spent on this opcode group
+   */
+  gas_share?: number;
+  /**
+   * Hours with data in the fit
+   */
+  hour_count?: number;
+  /**
+   * Start of the last hour the version has data
+   */
+  last_seen_date_time?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification the timings come from (e.g., eip7870-block-builder)
+   */
+  node_class?: string;
+  /**
+   * Fitted execution time per unit of gas for this opcode group, in nanoseconds
+   */
+  ns_per_gas?: number;
+  /**
+   * Fitted execution time per execution of this opcode group, in nanoseconds
+   */
+  ns_per_op?: number;
+  /**
+   * 5th percentile of ns_per_op over a 6-hour block bootstrap
+   */
+  ns_per_op_lower?: number;
+  /**
+   * 95th percentile of ns_per_op over a 6-hour block bootstrap
+   */
+  ns_per_op_upper?: number;
+  /**
+   * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK)
+   */
+  opcode_group?: string;
+  /**
+   * Fitted fixed cost per block, in milliseconds
+   */
+  overhead_ms?: number;
+  /**
+   * Fitted cost per transaction, in microseconds
+   */
+  per_tx_us?: number;
+  /**
+   * ns_per_gas divided by the client average ns per gas, where 1 means gas prices this opcode group in line with the rest of execution
+   */
+  price_ratio?: number;
+  /**
+   * 5th percentile of price_ratio over a 6-hour block bootstrap
+   */
+  price_ratio_lower?: number;
+  /**
+   * 95th percentile of price_ratio over a 6-hour block bootstrap
+   */
+  price_ratio_upper?: number;
+  /**
+   * Share of block duration variance the fit explains
+   */
+  r_squared?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctOpcodeGasByOpcodeDaily = {
   /**
    * Average executions per block
@@ -9597,6 +9775,20 @@ export type GetFctNodeNetworkIoByProcessResponse = {
 };
 
 /**
+ * Response for getting a single fct_opcode_cost_by_el_client_daily record
+ */
+export type GetFctOpcodeCostByElClientDailyResponse = {
+  item?: FctOpcodeCostByElClientDaily;
+};
+
+/**
+ * Response for getting a single fct_opcode_cost_by_el_client_version record
+ */
+export type GetFctOpcodeCostByElClientVersionResponse = {
+  item?: FctOpcodeCostByElClientVersion;
+};
+
+/**
  * Response for getting a single fct_opcode_gas_by_opcode_daily record
  */
 export type GetFctOpcodeGasByOpcodeDailyResponse = {
@@ -10105,6 +10297,13 @@ export type GetIntEngineGetBlobsResponse = {
  */
 export type GetIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
   item?: IntEngineNewPayloadFastestExecutionByNodeClass;
+};
+
+/**
+ * Response for getting a single int_engine_new_payload_opcode_gram_hourly record
+ */
+export type GetIntEngineNewPayloadOpcodeGramHourlyResponse = {
+  item?: IntEngineNewPayloadOpcodeGramHourly;
 };
 
 /**
@@ -12440,6 +12639,65 @@ export type IntEngineNewPayloadFastestExecutionByNodeClass = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type IntEngineNewPayloadOpcodeGramHourly = {
+  /**
+   * Blocks in the regression after trimming outliers
+   */
+  block_count?: number;
+  /**
+   * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas
+   */
+  feature_names?: Array<string>;
+  /**
+   * Start of the hour, by block timestamp
+   */
+  hour_start_date_time?: number;
+  /**
+   * Highest execution block number in the hour
+   */
+  max_block_number?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Lowest execution block number in the hour
+   */
+  min_block_number?: number;
+  /**
+   * Node classification the timings come from (e.g., eip7870-block-builder)
+   */
+  node_class?: string;
+  /**
+   * Executions per opcode group, aligned with feature_names after the first three features
+   */
+  opcode_count?: Array<number>;
+  /**
+   * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas)
+   */
+  trimmed_block_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Upper triangle (row-major, including the diagonal) of X^T X, where X is blocks by feature_names
+   */
+  xtx?: Array<number>;
+  /**
+   * X^T y, where y is the median engine_newPayload duration in milliseconds across the node class
+   */
+  xty?: Array<number>;
+  /**
+   * y^T y, the sum of squared durations in ms^2
+   */
+  yty?: number;
 };
 
 export type IntExecutionBlockByDate = {
@@ -15521,6 +15779,34 @@ export type ListFctNodeNetworkIoByProcessResponse = {
 };
 
 /**
+ * Response for listing fct_opcode_cost_by_el_client_daily records
+ */
+export type ListFctOpcodeCostByElClientDailyResponse = {
+  /**
+   * The list of fct_opcode_cost_by_el_client_daily.
+   */
+  fct_opcode_cost_by_el_client_daily?: Array<FctOpcodeCostByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_opcode_cost_by_el_client_version records
+ */
+export type ListFctOpcodeCostByElClientVersionResponse = {
+  /**
+   * The list of fct_opcode_cost_by_el_client_version.
+   */
+  fct_opcode_cost_by_el_client_version?: Array<FctOpcodeCostByElClientVersion>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_opcode_gas_by_opcode_daily records
  */
 export type ListFctOpcodeGasByOpcodeDailyResponse = {
@@ -16536,6 +16822,20 @@ export type ListIntEngineNewPayloadFastestExecutionByNodeClassResponse = {
    * The list of int_engine_new_payload_fastest_execution_by_node_class.
    */
   int_engine_new_payload_fastest_execution_by_node_class?: Array<IntEngineNewPayloadFastestExecutionByNodeClass>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_engine_new_payload_opcode_gram_hourly records
+ */
+export type ListIntEngineNewPayloadOpcodeGramHourlyResponse = {
+  /**
+   * The list of int_engine_new_payload_opcode_gram_hourly.
+   */
+  int_engine_new_payload_opcode_gram_hourly?: Array<IntEngineNewPayloadOpcodeGramHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -87942,6 +88242,894 @@ export type FctNodeNetworkIoByProcessServiceGetResponses = {
 export type FctNodeNetworkIoByProcessServiceGetResponse =
   FctNodeNetworkIoByProcessServiceGetResponses[keyof FctNodeNetworkIoByProcessServiceGetResponses];
 
+export type FctOpcodeCostByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by block timestamp (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by block timestamp (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: eq)
+     */
+    opcode_group_eq?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ne)
+     */
+    opcode_group_ne?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: contains)
+     */
+    opcode_group_contains?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: starts_with)
+     */
+    opcode_group_starts_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ends_with)
+     */
+    opcode_group_ends_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: like)
+     */
+    opcode_group_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_like)
+     */
+    opcode_group_not_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: in_values) (comma-separated list)
+     */
+    opcode_group_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_group_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: has)
+     */
+    meta_execution_versions_has?: string;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: has_all_values)
+     */
+    meta_execution_versions_has_all_values?: Array<string>;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: has_any_values)
+     */
+    meta_execution_versions_has_any_values?: Array<string>;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: length_eq)
+     */
+    meta_execution_versions_length_eq?: number;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: length_gt)
+     */
+    meta_execution_versions_length_gt?: number;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: length_gte)
+     */
+    meta_execution_versions_length_gte?: number;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: length_lt)
+     */
+    meta_execution_versions_length_lt?: number;
+    /**
+     * Client versions that ran during the day, most blocks first (filter: length_lte)
+     */
+    meta_execution_versions_length_lte?: number;
+    /**
+     * Block observations in the fit (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Block observations in the fit (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Block observations in the fit (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Block observations in the fit (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Block observations in the fit (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Block observations in the fit (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Block observations in the fit (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Block observations in the fit (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Block observations in the fit (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Block observations in the fit (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: eq)
+     */
+    hour_count_eq?: number;
+    /**
+     * Hours with data in the fit (filter: ne)
+     */
+    hour_count_ne?: number;
+    /**
+     * Hours with data in the fit (filter: lt)
+     */
+    hour_count_lt?: number;
+    /**
+     * Hours with data in the fit (filter: lte)
+     */
+    hour_count_lte?: number;
+    /**
+     * Hours with data in the fit (filter: gt)
+     */
+    hour_count_gt?: number;
+    /**
+     * Hours with data in the fit (filter: gte)
+     */
+    hour_count_gte?: number;
+    /**
+     * Hours with data in the fit (filter: between_min)
+     */
+    hour_count_between_min?: number;
+    /**
+     * Hours with data in the fit (filter: between_max_value)
+     */
+    hour_count_between_max_value?: number;
+    /**
+     * Hours with data in the fit (filter: in_values) (comma-separated list)
+     */
+    hour_count_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: not_in_values) (comma-separated list)
+     */
+    hour_count_not_in_values?: string;
+    /**
+     * Filter gas_share using value
+     */
+    gas_share_value?: number;
+    /**
+     * Filter gas_per_op using value
+     */
+    gas_per_op_value?: number;
+    /**
+     * Filter ns_per_gas using value
+     */
+    ns_per_gas_value?: number;
+    /**
+     * Filter ns_per_op using value
+     */
+    ns_per_op_value?: number;
+    /**
+     * Filter ns_per_op_lower using value
+     */
+    ns_per_op_lower_value?: number;
+    /**
+     * Filter ns_per_op_upper using value
+     */
+    ns_per_op_upper_value?: number;
+    /**
+     * Filter price_ratio using value
+     */
+    price_ratio_value?: number;
+    /**
+     * Filter price_ratio_lower using value
+     */
+    price_ratio_lower_value?: number;
+    /**
+     * Filter price_ratio_upper using value
+     */
+    price_ratio_upper_value?: number;
+    /**
+     * Filter client_ns_per_gas using value
+     */
+    client_ns_per_gas_value?: number;
+    /**
+     * Filter overhead_ms using value
+     */
+    overhead_ms_value?: number;
+    /**
+     * Filter per_tx_us using value
+     */
+    per_tx_us_value?: number;
+    /**
+     * Filter r_squared using value
+     */
+    r_squared_value?: number;
+    /**
+     * The maximum number of fct_opcode_cost_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeCostByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_cost_by_el_client_daily';
+};
+
+export type FctOpcodeCostByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientDailyServiceListError =
+  FctOpcodeCostByElClientDailyServiceListErrors[keyof FctOpcodeCostByElClientDailyServiceListErrors];
+
+export type FctOpcodeCostByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeCostByElClientDailyResponse;
+};
+
+export type FctOpcodeCostByElClientDailyServiceListResponse =
+  FctOpcodeCostByElClientDailyServiceListResponses[keyof FctOpcodeCostByElClientDailyServiceListResponses];
+
+export type FctOpcodeCostByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by block timestamp
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_cost_by_el_client_daily/{day_start_date}';
+};
+
+export type FctOpcodeCostByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientDailyServiceGetError =
+  FctOpcodeCostByElClientDailyServiceGetErrors[keyof FctOpcodeCostByElClientDailyServiceGetErrors];
+
+export type FctOpcodeCostByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeCostByElClientDailyResponse;
+};
+
+export type FctOpcodeCostByElClientDailyServiceGetResponse =
+  FctOpcodeCostByElClientDailyServiceGetResponses[keyof FctOpcodeCostByElClientDailyServiceGetResponses];
+
+export type FctOpcodeCostByElClientVersionServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: eq)
+     */
+    opcode_group_eq?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ne)
+     */
+    opcode_group_ne?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: contains)
+     */
+    opcode_group_contains?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: starts_with)
+     */
+    opcode_group_starts_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ends_with)
+     */
+    opcode_group_ends_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: like)
+     */
+    opcode_group_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_like)
+     */
+    opcode_group_not_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: in_values) (comma-separated list)
+     */
+    opcode_group_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_group_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the first hour the version has data (filter: eq)
+     */
+    first_seen_date_time_eq?: number;
+    /**
+     * Start of the first hour the version has data (filter: ne)
+     */
+    first_seen_date_time_ne?: number;
+    /**
+     * Start of the first hour the version has data (filter: lt)
+     */
+    first_seen_date_time_lt?: number;
+    /**
+     * Start of the first hour the version has data (filter: lte)
+     */
+    first_seen_date_time_lte?: number;
+    /**
+     * Start of the first hour the version has data (filter: gt)
+     */
+    first_seen_date_time_gt?: number;
+    /**
+     * Start of the first hour the version has data (filter: gte)
+     */
+    first_seen_date_time_gte?: number;
+    /**
+     * Start of the first hour the version has data (filter: between_min)
+     */
+    first_seen_date_time_between_min?: number;
+    /**
+     * Start of the first hour the version has data (filter: between_max_value)
+     */
+    first_seen_date_time_between_max_value?: number;
+    /**
+     * Start of the first hour the version has data (filter: in_values) (comma-separated list)
+     */
+    first_seen_date_time_in_values?: string;
+    /**
+     * Start of the first hour the version has data (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_date_time_not_in_values?: string;
+    /**
+     * Start of the last hour the version has data (filter: eq)
+     */
+    last_seen_date_time_eq?: number;
+    /**
+     * Start of the last hour the version has data (filter: ne)
+     */
+    last_seen_date_time_ne?: number;
+    /**
+     * Start of the last hour the version has data (filter: lt)
+     */
+    last_seen_date_time_lt?: number;
+    /**
+     * Start of the last hour the version has data (filter: lte)
+     */
+    last_seen_date_time_lte?: number;
+    /**
+     * Start of the last hour the version has data (filter: gt)
+     */
+    last_seen_date_time_gt?: number;
+    /**
+     * Start of the last hour the version has data (filter: gte)
+     */
+    last_seen_date_time_gte?: number;
+    /**
+     * Start of the last hour the version has data (filter: between_min)
+     */
+    last_seen_date_time_between_min?: number;
+    /**
+     * Start of the last hour the version has data (filter: between_max_value)
+     */
+    last_seen_date_time_between_max_value?: number;
+    /**
+     * Start of the last hour the version has data (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_time_in_values?: string;
+    /**
+     * Start of the last hour the version has data (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_time_not_in_values?: string;
+    /**
+     * Block observations in the fit (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Block observations in the fit (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Block observations in the fit (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Block observations in the fit (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Block observations in the fit (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Block observations in the fit (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Block observations in the fit (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Block observations in the fit (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Block observations in the fit (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Block observations in the fit (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: eq)
+     */
+    hour_count_eq?: number;
+    /**
+     * Hours with data in the fit (filter: ne)
+     */
+    hour_count_ne?: number;
+    /**
+     * Hours with data in the fit (filter: lt)
+     */
+    hour_count_lt?: number;
+    /**
+     * Hours with data in the fit (filter: lte)
+     */
+    hour_count_lte?: number;
+    /**
+     * Hours with data in the fit (filter: gt)
+     */
+    hour_count_gt?: number;
+    /**
+     * Hours with data in the fit (filter: gte)
+     */
+    hour_count_gte?: number;
+    /**
+     * Hours with data in the fit (filter: between_min)
+     */
+    hour_count_between_min?: number;
+    /**
+     * Hours with data in the fit (filter: between_max_value)
+     */
+    hour_count_between_max_value?: number;
+    /**
+     * Hours with data in the fit (filter: in_values) (comma-separated list)
+     */
+    hour_count_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: not_in_values) (comma-separated list)
+     */
+    hour_count_not_in_values?: string;
+    /**
+     * Filter gas_share using value
+     */
+    gas_share_value?: number;
+    /**
+     * Filter gas_per_op using value
+     */
+    gas_per_op_value?: number;
+    /**
+     * Filter ns_per_gas using value
+     */
+    ns_per_gas_value?: number;
+    /**
+     * Filter ns_per_op using value
+     */
+    ns_per_op_value?: number;
+    /**
+     * Filter ns_per_op_lower using value
+     */
+    ns_per_op_lower_value?: number;
+    /**
+     * Filter ns_per_op_upper using value
+     */
+    ns_per_op_upper_value?: number;
+    /**
+     * Filter price_ratio using value
+     */
+    price_ratio_value?: number;
+    /**
+     * Filter price_ratio_lower using value
+     */
+    price_ratio_lower_value?: number;
+    /**
+     * Filter price_ratio_upper using value
+     */
+    price_ratio_upper_value?: number;
+    /**
+     * Filter client_ns_per_gas using value
+     */
+    client_ns_per_gas_value?: number;
+    /**
+     * Filter overhead_ms using value
+     */
+    overhead_ms_value?: number;
+    /**
+     * Filter per_tx_us using value
+     */
+    per_tx_us_value?: number;
+    /**
+     * Filter r_squared using value
+     */
+    r_squared_value?: number;
+    /**
+     * The maximum number of fct_opcode_cost_by_el_client_version to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeCostByElClientVersion` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_cost_by_el_client_version';
+};
+
+export type FctOpcodeCostByElClientVersionServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientVersionServiceListError =
+  FctOpcodeCostByElClientVersionServiceListErrors[keyof FctOpcodeCostByElClientVersionServiceListErrors];
+
+export type FctOpcodeCostByElClientVersionServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeCostByElClientVersionResponse;
+};
+
+export type FctOpcodeCostByElClientVersionServiceListResponse =
+  FctOpcodeCostByElClientVersionServiceListResponses[keyof FctOpcodeCostByElClientVersionServiceListResponses];
+
+export type FctOpcodeCostByElClientVersionServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder)
+     */
+    node_class: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_cost_by_el_client_version/{node_class}';
+};
+
+export type FctOpcodeCostByElClientVersionServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientVersionServiceGetError =
+  FctOpcodeCostByElClientVersionServiceGetErrors[keyof FctOpcodeCostByElClientVersionServiceGetErrors];
+
+export type FctOpcodeCostByElClientVersionServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeCostByElClientVersionResponse;
+};
+
+export type FctOpcodeCostByElClientVersionServiceGetResponse =
+  FctOpcodeCostByElClientVersionServiceGetResponses[keyof FctOpcodeCostByElClientVersionServiceGetResponses];
+
 export type FctOpcodeGasByOpcodeDailyServiceListData = {
   body?: never;
   path?: never;
@@ -121165,6 +122353,502 @@ export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses = 
 
 export type IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse =
   IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses[keyof IntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponses];
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour, by block timestamp (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour, by block timestamp (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour, by block timestamp (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Blocks in the regression after trimming outliers (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Blocks in the regression after trimming outliers (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Blocks in the regression after trimming outliers (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: eq)
+     */
+    trimmed_block_count_eq?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: ne)
+     */
+    trimmed_block_count_ne?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: lt)
+     */
+    trimmed_block_count_lt?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: lte)
+     */
+    trimmed_block_count_lte?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: gt)
+     */
+    trimmed_block_count_gt?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: gte)
+     */
+    trimmed_block_count_gte?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: between_min)
+     */
+    trimmed_block_count_between_min?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: between_max_value)
+     */
+    trimmed_block_count_between_max_value?: number;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: in_values) (comma-separated list)
+     */
+    trimmed_block_count_in_values?: string;
+    /**
+     * Blocks dropped as outliers (above the hourly P99 duration, or above 3x the hourly median ms per Mgas) (filter: not_in_values) (comma-separated list)
+     */
+    trimmed_block_count_not_in_values?: string;
+    /**
+     * Lowest execution block number in the hour (filter: eq)
+     */
+    min_block_number_eq?: number;
+    /**
+     * Lowest execution block number in the hour (filter: ne)
+     */
+    min_block_number_ne?: number;
+    /**
+     * Lowest execution block number in the hour (filter: lt)
+     */
+    min_block_number_lt?: number;
+    /**
+     * Lowest execution block number in the hour (filter: lte)
+     */
+    min_block_number_lte?: number;
+    /**
+     * Lowest execution block number in the hour (filter: gt)
+     */
+    min_block_number_gt?: number;
+    /**
+     * Lowest execution block number in the hour (filter: gte)
+     */
+    min_block_number_gte?: number;
+    /**
+     * Lowest execution block number in the hour (filter: between_min)
+     */
+    min_block_number_between_min?: number;
+    /**
+     * Lowest execution block number in the hour (filter: between_max_value)
+     */
+    min_block_number_between_max_value?: number;
+    /**
+     * Lowest execution block number in the hour (filter: in_values) (comma-separated list)
+     */
+    min_block_number_in_values?: string;
+    /**
+     * Lowest execution block number in the hour (filter: not_in_values) (comma-separated list)
+     */
+    min_block_number_not_in_values?: string;
+    /**
+     * Highest execution block number in the hour (filter: eq)
+     */
+    max_block_number_eq?: number;
+    /**
+     * Highest execution block number in the hour (filter: ne)
+     */
+    max_block_number_ne?: number;
+    /**
+     * Highest execution block number in the hour (filter: lt)
+     */
+    max_block_number_lt?: number;
+    /**
+     * Highest execution block number in the hour (filter: lte)
+     */
+    max_block_number_lte?: number;
+    /**
+     * Highest execution block number in the hour (filter: gt)
+     */
+    max_block_number_gt?: number;
+    /**
+     * Highest execution block number in the hour (filter: gte)
+     */
+    max_block_number_gte?: number;
+    /**
+     * Highest execution block number in the hour (filter: between_min)
+     */
+    max_block_number_between_min?: number;
+    /**
+     * Highest execution block number in the hour (filter: between_max_value)
+     */
+    max_block_number_between_max_value?: number;
+    /**
+     * Highest execution block number in the hour (filter: in_values) (comma-separated list)
+     */
+    max_block_number_in_values?: string;
+    /**
+     * Highest execution block number in the hour (filter: not_in_values) (comma-separated list)
+     */
+    max_block_number_not_in_values?: string;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: has)
+     */
+    feature_names_has?: string;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: has_all_values)
+     */
+    feature_names_has_all_values?: Array<string>;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: has_any_values)
+     */
+    feature_names_has_any_values?: Array<string>;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: length_eq)
+     */
+    feature_names_length_eq?: number;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: length_gt)
+     */
+    feature_names_length_gt?: number;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: length_gte)
+     */
+    feature_names_length_gte?: number;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: length_lt)
+     */
+    feature_names_length_lt?: number;
+    /**
+     * Regression features, in order: INTERCEPT (1 per block), TX_COUNT (transactions / 100), NON_OPCODE_GAS (gas used minus opcode gas, in Mgas), then gas per opcode group in Mgas (filter: length_lte)
+     */
+    feature_names_length_lte?: number;
+    /**
+     * Filter by xtx - Upper triangle (row-major, including the diagonal) of X^T X, where X is blocks by feature_names (optional)
+     */
+    xtx?: Array<number>;
+    /**
+     * Filter by xty - X^T y, where y is the median engine_newPayload duration in milliseconds across the node class (optional)
+     */
+    xty?: Array<number>;
+    /**
+     * Filter yty using value
+     */
+    yty_value?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: has)
+     */
+    opcode_count_has?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: has_all_values)
+     */
+    opcode_count_has_all_values?: Array<number>;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: has_any_values)
+     */
+    opcode_count_has_any_values?: Array<number>;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: length_eq)
+     */
+    opcode_count_length_eq?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: length_gt)
+     */
+    opcode_count_length_gt?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: length_gte)
+     */
+    opcode_count_length_gte?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: length_lt)
+     */
+    opcode_count_length_lt?: number;
+    /**
+     * Executions per opcode group, aligned with feature_names after the first three features (filter: length_lte)
+     */
+    opcode_count_length_lte?: number;
+    /**
+     * The maximum number of int_engine_new_payload_opcode_gram_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntEngineNewPayloadOpcodeGramHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_engine_new_payload_opcode_gram_hourly';
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceListError =
+  IntEngineNewPayloadOpcodeGramHourlyServiceListErrors[keyof IntEngineNewPayloadOpcodeGramHourlyServiceListErrors];
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntEngineNewPayloadOpcodeGramHourlyResponse;
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceListResponse =
+  IntEngineNewPayloadOpcodeGramHourlyServiceListResponses[keyof IntEngineNewPayloadOpcodeGramHourlyServiceListResponses];
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour, by block timestamp
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_engine_new_payload_opcode_gram_hourly/{hour_start_date_time}';
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceGetError =
+  IntEngineNewPayloadOpcodeGramHourlyServiceGetErrors[keyof IntEngineNewPayloadOpcodeGramHourlyServiceGetErrors];
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntEngineNewPayloadOpcodeGramHourlyResponse;
+};
+
+export type IntEngineNewPayloadOpcodeGramHourlyServiceGetResponse =
+  IntEngineNewPayloadOpcodeGramHourlyServiceGetResponses[keyof IntEngineNewPayloadOpcodeGramHourlyServiceGetResponses];
 
 export type IntExecutionBlockByDateServiceListData = {
   body?: never;

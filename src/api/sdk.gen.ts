@@ -777,6 +777,18 @@ import type {
   FctNodeNetworkIoByProcessServiceListData,
   FctNodeNetworkIoByProcessServiceListErrors,
   FctNodeNetworkIoByProcessServiceListResponses,
+  FctOpcodeCostByElClientDailyServiceGetData,
+  FctOpcodeCostByElClientDailyServiceGetErrors,
+  FctOpcodeCostByElClientDailyServiceGetResponses,
+  FctOpcodeCostByElClientDailyServiceListData,
+  FctOpcodeCostByElClientDailyServiceListErrors,
+  FctOpcodeCostByElClientDailyServiceListResponses,
+  FctOpcodeCostByElClientVersionServiceGetData,
+  FctOpcodeCostByElClientVersionServiceGetErrors,
+  FctOpcodeCostByElClientVersionServiceGetResponses,
+  FctOpcodeCostByElClientVersionServiceListData,
+  FctOpcodeCostByElClientVersionServiceListErrors,
+  FctOpcodeCostByElClientVersionServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -1215,6 +1227,12 @@ import type {
   IntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
   IntEngineNewPayloadFastestExecutionByNodeClassServiceListErrors,
   IntEngineNewPayloadFastestExecutionByNodeClassServiceListResponses,
+  IntEngineNewPayloadOpcodeGramHourlyServiceGetData,
+  IntEngineNewPayloadOpcodeGramHourlyServiceGetErrors,
+  IntEngineNewPayloadOpcodeGramHourlyServiceGetResponses,
+  IntEngineNewPayloadOpcodeGramHourlyServiceListData,
+  IntEngineNewPayloadOpcodeGramHourlyServiceListErrors,
+  IntEngineNewPayloadOpcodeGramHourlyServiceListResponses,
   IntEngineNewPayloadServiceGetData,
   IntEngineNewPayloadServiceGetErrors,
   IntEngineNewPayloadServiceGetResponses,
@@ -1955,6 +1973,14 @@ import {
   zFctNodeNetworkIoByProcessServiceGetResponse,
   zFctNodeNetworkIoByProcessServiceListData,
   zFctNodeNetworkIoByProcessServiceListResponse,
+  zFctOpcodeCostByElClientDailyServiceGetData,
+  zFctOpcodeCostByElClientDailyServiceGetResponse,
+  zFctOpcodeCostByElClientDailyServiceListData,
+  zFctOpcodeCostByElClientDailyServiceListResponse,
+  zFctOpcodeCostByElClientVersionServiceGetData,
+  zFctOpcodeCostByElClientVersionServiceGetResponse,
+  zFctOpcodeCostByElClientVersionServiceListData,
+  zFctOpcodeCostByElClientVersionServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -2247,6 +2273,10 @@ import {
   zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse,
   zIntEngineNewPayloadFastestExecutionByNodeClassServiceListData,
   zIntEngineNewPayloadFastestExecutionByNodeClassServiceListResponse,
+  zIntEngineNewPayloadOpcodeGramHourlyServiceGetData,
+  zIntEngineNewPayloadOpcodeGramHourlyServiceGetResponse,
+  zIntEngineNewPayloadOpcodeGramHourlyServiceListData,
+  zIntEngineNewPayloadOpcodeGramHourlyServiceListResponse,
   zIntEngineNewPayloadServiceGetData,
   zIntEngineNewPayloadServiceGetResponse,
   zIntEngineNewPayloadServiceListData,
@@ -7285,6 +7315,82 @@ export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctOpcodeCostByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeCostByElClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeCostByElClientDailyServiceListResponses,
+    FctOpcodeCostByElClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctOpcodeCostByElClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeCostByElClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeCostByElClientDailyServiceGetResponses,
+    FctOpcodeCostByElClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctOpcodeCostByElClientVersionServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeCostByElClientVersionServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeCostByElClientVersionServiceListResponses,
+    FctOpcodeCostByElClientVersionServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientVersionServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientVersionServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_version',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by node_class
+ */
+export const fctOpcodeCostByElClientVersionServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeCostByElClientVersionServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeCostByElClientVersionServiceGetResponses,
+    FctOpcodeCostByElClientVersionServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientVersionServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientVersionServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_version/{node_class}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
 ) =>
@@ -10090,6 +10196,44 @@ export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOn
     responseValidator: async data =>
       await zIntEngineNewPayloadFastestExecutionByNodeClassServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_engine_new_payload_fastest_execution_by_node_class/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intEngineNewPayloadOpcodeGramHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntEngineNewPayloadOpcodeGramHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntEngineNewPayloadOpcodeGramHourlyServiceListResponses,
+    IntEngineNewPayloadOpcodeGramHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadOpcodeGramHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadOpcodeGramHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_opcode_gram_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const intEngineNewPayloadOpcodeGramHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntEngineNewPayloadOpcodeGramHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntEngineNewPayloadOpcodeGramHourlyServiceGetResponses,
+    IntEngineNewPayloadOpcodeGramHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntEngineNewPayloadOpcodeGramHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntEngineNewPayloadOpcodeGramHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_engine_new_payload_opcode_gram_hourly/{hour_start_date_time}',
     ...options,
   });
 
