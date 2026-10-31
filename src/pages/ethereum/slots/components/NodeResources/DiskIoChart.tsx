@@ -121,6 +121,7 @@ export function DiskIoChart({
 
       chartSeries.push({
         name: `${clLabel} Read`,
+        client: resolvedClClient || undefined,
         data: toPoints(bucketData(clRead)),
         color: resolvedClClient ? getClientColor(resolvedClClient, 0) : CHART_CATEGORICAL_COLORS[0],
         lineWidth: 2,
@@ -130,6 +131,7 @@ export function DiskIoChart({
       });
       chartSeries.push({
         name: `${clLabel} Write`,
+        client: resolvedClClient || undefined,
         data: toPoints(bucketData(clWrite)),
         color: resolvedClClient ? getClientColor(resolvedClClient, 0) : CHART_CATEGORICAL_COLORS[0],
         lineWidth: 1.5,
@@ -139,6 +141,7 @@ export function DiskIoChart({
       });
       chartSeries.push({
         name: `${elLabel} Read`,
+        client: resolvedElClient || undefined,
         data: toPoints(bucketData(elRead)),
         color: resolvedElClient ? getClientColor(resolvedElClient, 1) : CHART_CATEGORICAL_COLORS[1],
         lineWidth: 2,
@@ -148,6 +151,7 @@ export function DiskIoChart({
       });
       chartSeries.push({
         name: `${elLabel} Write`,
+        client: resolvedElClient || undefined,
         data: toPoints(bucketData(elWrite)),
         color: resolvedElClient ? getClientColor(resolvedElClient, 1) : CHART_CATEGORICAL_COLORS[1],
         lineWidth: 1.5,

@@ -65,6 +65,7 @@ function seriesItems(
     return [
       {
         color: entry.color ?? getDataVizColors().DATA_COLORS.slate,
+        client: entry.client ?? entry.name,
         label: entry.name,
         value: format(value, entry),
         style: entry.lineStyle === 'dashed' ? ('dashed' as const) : undefined,

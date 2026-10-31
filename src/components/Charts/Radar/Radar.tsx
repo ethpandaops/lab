@@ -9,6 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { RadarChartProps } from './Radar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { legendItem, legendItemSize } from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -156,15 +157,20 @@ export function RadarChart({
               color: themeColors.foreground,
               fontSize: 12,
             },
-            itemWidth: 14,
-            itemHeight: 10,
+            ...legendItemSize(
+              series.map(s => s.name),
+              14,
+              10
+            ),
             itemGap: 16,
-            data: series.map((s, index) => ({
-              name: s.name,
-              itemStyle: {
-                color: s.color ? resolveCssColorToHex(s.color) : extendedPalette[index % extendedPalette.length],
-              },
-            })),
+            data: series.map((s, index) =>
+              legendItem({
+                name: s.name,
+                itemStyle: {
+                  color: s.color ? resolveCssColorToHex(s.color) : extendedPalette[index % extendedPalette.length],
+                },
+              })
+            ),
           }
         : undefined,
       tooltip: {

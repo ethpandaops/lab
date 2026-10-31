@@ -13,6 +13,8 @@ import {
   CONSENSUS_CLIENT_COLORS,
   EXECUTION_CLIENT_COLORS,
   UNKNOWN_CLIENT_COLOR,
+  isKnownClient,
+  normalizeClientName,
 } from './ethereum';
 
 describe('weiToEth', () => {
@@ -251,5 +253,29 @@ describe('client colors', () => {
   it('should keep consensus colors distinct', () => {
     const colors = Object.values(CONSENSUS_CLIENT_COLORS);
     expect(new Set(colors).size).toBe(colors.length);
+  });
+});
+
+describe('normalizeClientName', () => {
+  it('should lowercase, trim and resolve aliases', () => {
+    expect(normalizeClientName(' Lighthouse ')).toBe('lighthouse');
+    expect(normalizeClientName('go-ethereum')).toBe('geth');
+    expect(normalizeClientName('Nimbus EL')).toBe('nimbusel');
+    expect(normalizeClientName('Trin Execution')).toBe('trin-execution');
+  });
+});
+
+describe('isKnownClient', () => {
+  it('should recognise clients of both layers by name or alias', () => {
+    expect(isKnownClient('Prysm')).toBe(true);
+    expect(isKnownClient('reth')).toBe(true);
+    expect(isKnownClient('go-ethereum')).toBe(true);
+    expect(isKnownClient('EthereumJS')).toBe(true);
+  });
+
+  it('should reject names that carry more than the client', () => {
+    expect(isKnownClient('Reth P50')).toBe(false);
+    expect(isKnownClient('unknown')).toBe(false);
+    expect(isKnownClient('All peers')).toBe(false);
   });
 });

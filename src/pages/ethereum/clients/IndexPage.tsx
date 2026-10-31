@@ -129,6 +129,7 @@ export function IndexPage(): JSX.Element {
             title: `${layer === 'consensus' ? 'CONSENSUS' : 'EXECUTION'} CLIENTS (${total} blocks)`,
             items: items.map((item, i) => ({
               color: getClientColor(item.client, i),
+              client: item.client,
               label: formatClientName(item.client),
               value: `${item.share.toFixed(1)}% (${item.blocks})`,
             })),

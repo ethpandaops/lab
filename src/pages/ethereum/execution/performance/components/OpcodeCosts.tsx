@@ -5,6 +5,7 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -239,7 +240,7 @@ function dailyTooltip(params: unknown, label: (seriesName: string, ns: number) =
     .sort((a, b) => (b.value![1] ?? 0) - (a.value![1] ?? 0))
     .map(
       p =>
-        `<div style="display:flex;gap:8px;align-items:center;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span><span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${label(p.seriesName ?? '', p.value![1])}</span></div>`
+        `<div style="display:flex;gap:8px;align-items:center;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span>${clientLogoHtml(p.seriesName ?? '')}<span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${label(p.seriesName ?? '', p.value![1])}</span></div>`
     )
     .join('');
   return `<div style="font-weight:600;margin-bottom:4px">${fmtDate(first.value[0] / 1000)}</div>${rows}`;
@@ -297,6 +298,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
           <SelectMenu
             value={opIndex}
             onChange={setOpIndex}
+            expandToFit
             options={versionOpcodes.map(({ op: o, i }) => ({ value: i, label: o.name }))}
           />
         </div>

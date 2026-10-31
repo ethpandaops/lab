@@ -58,13 +58,20 @@ export function PerNodeHistoryChart({
       height={300}
       yMax={axisCeiling(lines.flatMap(line => line.values))}
       empty={history.rows.length === 0 ? 'No data in this range' : undefined}
-      series={lines.map(line => ({ name: nameOf(line), data: line.values, color: line.color, lineWidth: 1.5 }))}
+      series={lines.map(line => ({
+        name: nameOf(line),
+        client: line.client,
+        data: line.values,
+        color: line.color,
+        lineWidth: 1.5,
+      }))}
       tooltipRows={index =>
         lines
           .filter(line => line.raw[index] !== null)
           .sort((a, b) => a.raw[index]! - b.raw[index]!)
           .map(line => ({
             color: line.color,
+            client: line.client,
             label: line.behind[index] ? `${nameOf(line)}, catching up` : nameOf(line),
             value: formatMs(line.raw[index]),
           }))

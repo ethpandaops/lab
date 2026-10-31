@@ -22,8 +22,10 @@ import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 import { dateCategoryTicks } from './MultiLine.utils';
-import { formatAxisNumber } from '../chartChrome';
+import { clientLogoHtml, formatAxisNumber } from '../chartChrome';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { isKnownClient } from '@/utils/ethereum';
 
 /** Maximum number of plain lines that get an end-of-line label */
 const MAX_END_LABELS = 8;
@@ -997,6 +999,7 @@ export function MultiLineChart({
                 const formattedValue = formatSmartDecimal(p.yValue!, effectiveValueDecimals);
                 html += `<div style="display: flex; align-items: center; gap: 8px;">`;
                 html += p.marker;
+                html += clientLogoHtml(p.seriesName ?? '');
                 html += `<span>${p.seriesName}:</span>`;
                 html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
                 html += `</div>`;
@@ -1028,6 +1031,7 @@ export function MultiLineChart({
                     const formattedValue = formatSmartDecimal(yValue, effectiveValueDecimals);
                     html += `<div style="display: flex; align-items: center; gap: 8px;">`;
                     html += p.marker;
+                    html += clientLogoHtml(p.seriesName);
                     html += `<span>${p.seriesName}:</span>`;
                     html += `<span style="font-weight: 600; margin-left: auto;">${formattedValue}</span>`;
                     html += `</div>`;
@@ -1215,6 +1219,13 @@ export function MultiLineChart({
                   }`}
                 >
                   <LegendSwatch series={s} color={seriesColor} active={isVisible} />
+                  {isKnownClient(s.client ?? s.name) && (
+                    <ClientLogo
+                      client={s.client ?? s.name}
+                      size={14}
+                      className={isVisible ? undefined : 'opacity-50'}
+                    />
+                  )}
                   <span>{s.name}</span>
                 </button>
               );

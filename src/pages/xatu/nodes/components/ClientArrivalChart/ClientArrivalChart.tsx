@@ -39,6 +39,7 @@ export function ClientArrivalChart({ history, rangeLabel }: ClientArrivalChartPr
           .sort((a, b) => a.value! - b.value!)
           .map(({ client, clientIndex, value }) => ({
             color: colors[clientIndex],
+            client: client.client,
             label: formatClientName(client.client),
             value: formatMs(value),
           }))

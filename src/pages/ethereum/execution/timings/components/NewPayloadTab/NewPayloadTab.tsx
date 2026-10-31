@@ -8,6 +8,7 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
@@ -558,6 +559,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                                 border: `2px solid ${s.color}`,
                               }}
                             />
+                            <ClientLogo client={s.name} size={14} className={clsx(!isVisible && 'opacity-50')} />
                             <span className="font-medium">{s.name}</span>
                           </button>
                         );
@@ -573,7 +575,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                     showLegend={false}
                     tooltipFormatter={(params: unknown) => {
                       const p = params as { seriesName: string; data: [number, number] };
-                      return `<strong>${p.seriesName}</strong><br/>Gas: ${p.data[0].toFixed(1)}M<br/>Duration: ${p.data[1].toFixed(0)}ms`;
+                      return `<div style="display: flex; align-items: center; gap: 6px;">${clientLogoHtml(p.seriesName)}<strong>${p.seriesName}</strong></div>Gas: ${p.data[0].toFixed(1)}M<br/>Duration: ${p.data[1].toFixed(0)}ms`;
                     }}
                   />
                 </>
@@ -645,6 +647,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                       if (value !== undefined && value !== null) {
                         html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
                         html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += clientLogoHtml(p.seriesName ?? '');
                         html += `<span>${p.seriesName}:</span>`;
                         html += `<span style="font-weight: 600; margin-left: auto;">${Math.round(value)} ms</span>`;
                         html += `</div>`;
@@ -709,6 +712,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                       if (value !== undefined && value !== null) {
                         html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
                         html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += clientLogoHtml(p.seriesName ?? '');
                         html += `<span>${p.seriesName}:</span>`;
                         html += `<span style="font-weight: 600; margin-left: auto;">${value.toFixed(1)}%</span>`;
                         html += `</div>`;
@@ -1099,6 +1103,7 @@ function WinrateSection({
       for (const p of sortedPoints) {
         html += `<div style="display: flex; align-items: center; gap: 8px;">`;
         html += p.marker;
+        html += clientLogoHtml(p.seriesName ?? '');
         html += `<span>${p.seriesName}:</span>`;
         html += `<span style="font-weight: 600; margin-left: auto;">${Number(p.yValue).toFixed(1)}%</span>`;
         html += `</div>`;

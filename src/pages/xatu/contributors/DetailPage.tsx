@@ -94,7 +94,15 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   },
   {
     header: 'Consensus',
-    accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_implementation || '-',
+    accessor: (node: FctNodeActiveLast24h) =>
+      node.meta_consensus_implementation ? (
+        <span className="flex items-center gap-1.5">
+          <ClientLogo client={node.meta_consensus_implementation} size={16} />
+          {node.meta_consensus_implementation}
+        </span>
+      ) : (
+        '-'
+      ),
     cellClassName: 'text-muted',
   },
   {

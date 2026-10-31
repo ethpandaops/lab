@@ -16,7 +16,12 @@ import {
   getChartTooltipChrome,
   getChartValueAxisName,
   getChartValueSplitLine,
+  legendItem,
+  legendItemSize,
+  clientAxisLabel,
+  formatClientAxisLabel,
 } from '../chartChrome';
+import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -105,12 +110,20 @@ export function BoxPlot({
     // Calculate number of data points for x-axis
     const maxDataLength = Math.max(...series.map(s => s.data.length), 1);
     const xAxisData = categories || Array.from({ length: maxDataLength }, (_, i) => String(i + 1));
+    const hasClientCategories = xAxisData.some(isKnownClient);
+    const categoryLabel = hasClientCategories ? formatClientAxisLabel : (value: string) => value;
 
     // Legend configuration - simplified with automatic positioning
     const legendConfig =
       showLegend && series.length > 1
         ? {
-            data: series.map(s => s.name),
+            data: series.map(s => legendItem({ name: s.name })),
+            // ECharts' default legend item box is 25 × 14
+            ...legendItemSize(
+              series.map(s => s.name),
+              25,
+              14
+            ),
             textStyle: {
               color: themeColors.foreground,
               fontSize: 12,
@@ -152,7 +165,12 @@ export function BoxPlot({
         nameTextStyle: getChartAxisNameStyle(themeColors),
         axisLine: getChartAxisLine(themeColors),
         axisTick: { show: false },
-        axisLabel: { ...getChartAxisLabelStyle(themeColors), hideOverlap: true, interval: categoryLabelInterval },
+        axisLabel: {
+          ...getChartAxisLabelStyle(themeColors),
+          hideOverlap: true,
+          interval: categoryLabelInterval,
+          ...(hasClientCategories ? clientAxisLabel() : {}),
+        },
         splitLine: {
           show: false,
         },
@@ -199,14 +217,15 @@ export function BoxPlot({
     return {
       baseOption,
       media: [
-        { option: { xAxis: { axisLabel: { hideOverlap: true, formatter: (value: string) => value } } } },
+        { option: { xAxis: { axisLabel: { hideOverlap: true, formatter: categoryLabel } } } },
         {
           query: { maxWidth: 480 },
           option: {
             xAxis: {
               axisLabel: {
                 hideOverlap: false,
-                formatter: (value: string, index: number) => (index % 2 ? `\n${value}` : value),
+                formatter: (value: string, index: number) =>
+                  index % 2 ? `\n${categoryLabel(value)}` : categoryLabel(value),
               },
             },
           },

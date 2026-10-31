@@ -201,6 +201,7 @@ export function CpuUtilizationChart({
 
       chartSeries.push({
         name: `${clLabel} peak core`,
+        client: resolvedClClient || undefined,
         data: toPoints(clBuckets, b => b.coreVals),
         color: clColor,
         lineWidth: 1.5,
@@ -211,6 +212,7 @@ export function CpuUtilizationChart({
       });
       chartSeries.push({
         name: `${elLabel} peak core`,
+        client: resolvedElClient || undefined,
         data: toPoints(elBuckets, b => b.coreVals),
         color: elColor,
         lineWidth: 1.5,
