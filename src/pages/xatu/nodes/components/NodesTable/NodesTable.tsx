@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { ExclamationTriangleIcon } from '@heroicons/react/16/solid';
 import { DataTable } from '@/components/DataTable';
+import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getCountryFlag, getRelativeTime } from '@/utils';
@@ -89,7 +90,7 @@ const columns: DataTableColumn<NodeRow>[] = [
   },
   {
     id: 'block',
-    header: 'Block p50',
+    header: () => <span className="whitespace-nowrap">Block p50</span>,
     accessorFn: row => row.observation?.blockP50 ?? undefined,
     sortUndefined: 'last',
     cell: ({ getValue }) => formatMs(getValue() as number | undefined),
@@ -97,7 +98,7 @@ const columns: DataTableColumn<NodeRow>[] = [
   },
   {
     id: 'attestation',
-    header: 'Attestation p50',
+    header: () => <span className="whitespace-nowrap">Attestation p50</span>,
     accessorFn: row => row.observation?.attestationP50 ?? undefined,
     sortUndefined: 'last',
     cell: ({ getValue }) => formatMs(getValue() as number | undefined),
@@ -105,7 +106,7 @@ const columns: DataTableColumn<NodeRow>[] = [
   },
   {
     id: 'lastSeen',
-    header: 'Last seen',
+    header: () => <span className="whitespace-nowrap">Last seen</span>,
     accessorFn: row => row.node.last_seen_date_time ?? 0,
     cell: ({ getValue }) => getRelativeTime(getValue() as number),
     enableGlobalFilter: false,
@@ -119,7 +120,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
   const navigate = useNavigate();
 
   return (
-    <div className="overflow-hidden rounded-sm bg-surface pt-4 outline -outline-offset-1 outline-border">
+    <Card title="All nodes">
       <DataTable
         data={rows}
         columns={columns}
@@ -129,6 +130,6 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
         hideColumnVisibility
         emptyMessage="No nodes match"
       />
-    </div>
+    </Card>
   );
 }

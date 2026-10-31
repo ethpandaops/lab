@@ -57,7 +57,7 @@ const columns: DataTableColumn<SlotRow>[] = [
   ),
   {
     id: 'delta',
-    header: 'vs network median',
+    header: () => <span className="whitespace-nowrap">vs network median</span>,
     accessorFn: row => row.delta,
     sortUndefined: 'last',
     cell: ({ getValue }) => {
@@ -101,16 +101,14 @@ export function NodeSlotsTable({
 
   return (
     <Card title="Recent slots" subtitle="Last 64 slots">
-      <div className="-m-4 sm:-m-5">
-        <DataTable
-          data={rows}
-          columns={columns}
-          pageSize={25}
-          getRowId={row => String(row.slot)}
-          hideGlobalFilter
-          hideColumnVisibility
-        />
-      </div>
+      <DataTable
+        data={rows}
+        columns={columns}
+        pageSize={25}
+        getRowId={row => String(row.slot)}
+        hideGlobalFilter
+        hideColumnVisibility
+      />
     </Card>
   );
 }
