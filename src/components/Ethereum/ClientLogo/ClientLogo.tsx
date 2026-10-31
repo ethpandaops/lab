@@ -1,25 +1,8 @@
 import { type JSX, useState } from 'react';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
+import { LIGHT_GLYPH_CLIENTS, getClientLogoUrl, normalizeClientName } from '@/utils/ethereum';
 import type { ClientLogoProps } from './ClientLogo.types';
-
-/** Map client name aliases to canonical names */
-const CLIENT_ALIASES: Record<string, string> = {
-  'go-ethereum': 'geth',
-  'nimbus-el': 'nimbusel',
-};
-
-function normalizeClientName(clientName: string): string {
-  const lower = clientName.toLowerCase();
-  return CLIENT_ALIASES[lower] ?? lower;
-}
-
-/** Logos drawn in white on transparent, inverted on light themes so they stay visible */
-const LIGHT_GLYPH_LOGOS = new Set(['lighthouse']);
-
-function getClientLogoUrl(clientName: string): string {
-  return `/images/external/clients/${normalizeClientName(clientName)}.png`;
-}
 
 export function ClientLogo({ client, size = 20, className = '' }: ClientLogoProps): JSX.Element {
   const [hasError, setHasError] = useState(false);
@@ -42,7 +25,7 @@ export function ClientLogo({ client, size = 20, className = '' }: ClientLogoProp
       alt={client}
       className={clsx(
         'rounded-sm',
-        LIGHT_GLYPH_LOGOS.has(normalizeClientName(client)) && 'invert dark:invert-0 star:invert-0',
+        LIGHT_GLYPH_CLIENTS.has(normalizeClientName(client)) && 'invert dark:invert-0 star:invert-0',
         className
       )}
       style={{ width: `${size}px`, height: `${size}px` }}

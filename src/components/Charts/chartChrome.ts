@@ -1,3 +1,12 @@
+import {
+  CONSENSUS_CLIENTS,
+  EXECUTION_CLIENTS,
+  LIGHT_GLYPH_CLIENTS,
+  getClientLogoUrl,
+  isKnownClient,
+  normalizeClientName,
+} from '@/utils/ethereum';
+
 /**
  * Shared ECharts chrome (axes, tooltip, title) so every chart matches MultiLine.
  */
@@ -86,4 +95,74 @@ export function formatAxisNumber(value: number): string {
     return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
   }
   return value.toLocaleString('en-US', { maximumFractionDigits: 6 });
+}
+
+/**
+ * Native ECharts legend entry for a series: a known client's series shows the client's logo in
+ * place of the colour swatch, so clients read the same in every legend
+ */
+export function legendItem<T extends { name: string }>(entry: T): T | (T & { icon: string }) {
+  return isKnownClient(entry.name) ? { ...entry, icon: `image://${chartClientLogoUrl(entry.name)}` } : entry;
+}
+
+/**
+ * Legend item box for a native legend: square when any entry is a client, so `legendItem` logos
+ * aren't stretched (ECharts keeps an image icon's aspect only on its first load, not from cache)
+ */
+export function legendItemSize(
+  names: string[],
+  width: number,
+  height: number
+): { itemWidth: number; itemHeight: number } {
+  const size = Math.min(width, height);
+  return names.some(isKnownClient) ? { itemWidth: size, itemHeight: size } : { itemWidth: width, itemHeight: height };
+}
+
+/**
+ * Client logo as an `<img>` for ECharts HTML tooltips, or an empty string for names that aren't
+ * a known client
+ */
+export function clientLogoHtml(name: string, size = 14): string {
+  if (!isKnownClient(name)) return '';
+  return `<img src="${chartClientLogoUrl(name)}" width="${size}" height="${size}" alt="" style="flex-shrink:0;border-radius:2px">`;
+}
+
+/** Rich text style name for a client's logo in axis labels (rich names allow word characters only) */
+function clientRichKey(name: string): string {
+  return `client_${normalizeClientName(name).replace(/\W/g, '_')}`;
+}
+
+/** Category axis label that puts a known client's logo before its name */
+export function formatClientAxisLabel(value: string): string {
+  return isKnownClient(value) ? `{${clientRichKey(value)}|} ${value}` : value;
+}
+
+/**
+ * Category axis label options for axes that list clients: `formatClientAxisLabel` as the formatter,
+ * plus the rich text styles that draw each client's logo
+ */
+export function clientAxisLabel(): {
+  formatter: (value: string) => string;
+  rich: Record<string, { width: number; height: number; backgroundColor: { image: string } }>;
+} {
+  const rich = Object.fromEntries(
+    [...CONSENSUS_CLIENTS, ...EXECUTION_CLIENTS].map(client => [
+      clientRichKey(client),
+      { width: 14, height: 14, backgroundColor: { image: chartClientLogoUrl(client) } },
+    ])
+  );
+  return { formatter: formatClientAxisLabel, rich };
+}
+
+/**
+ * Logo URL for canvas legends and tooltip HTML, which can't take ClientLogo's CSS inversion:
+ * on light themes, logos drawn in white use their inverted copy
+ */
+function chartClientLogoUrl(name: string): string {
+  const normalized = normalizeClientName(name);
+  const classList = typeof document === 'undefined' ? undefined : document.documentElement.classList;
+  const isLightTheme = classList ? !classList.contains('dark') && !classList.contains('star') : false;
+  return isLightTheme && LIGHT_GLYPH_CLIENTS.has(normalized)
+    ? `/images/external/clients/${normalized}-inverted.png`
+    : getClientLogoUrl(normalized);
 }

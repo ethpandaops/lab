@@ -10,6 +10,8 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 import type { StackedBarProps } from './StackedBar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getChartTooltipChrome } from '../chartChrome';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -355,6 +357,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
                   className={clsx('size-3 rounded-xs', isSelected && 'ring-2 ring-primary ring-offset-1')}
                   style={{ backgroundColor: color }}
                 />
+                {isKnownClient(seg.name) && <ClientLogo client={seg.name} size={14} />}
                 <span className="text-foreground">{seg.name}</span>
               </button>
             );

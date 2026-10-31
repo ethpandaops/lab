@@ -16,7 +16,9 @@ import {
   getChartTooltipChrome,
   getChartValueAxisName,
   getChartValueSplitLine,
+  clientAxisLabel,
 } from '../chartChrome';
+import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -131,6 +133,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
         ...getChartAxisLabelStyle(themeColors),
         hideOverlap: true,
         interval: categoryLabelInterval,
+        ...(labels.some(isKnownClient) ? clientAxisLabel() : {}),
       },
       splitLine: {
         show: false,

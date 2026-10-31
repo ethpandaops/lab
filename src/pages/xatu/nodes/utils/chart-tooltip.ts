@@ -1,6 +1,10 @@
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
+
 /** One line of a chart tooltip */
 export interface TooltipRow {
   color?: string;
+  /** Client the row stands for, shown with its logo */
+  client?: string;
   label: string;
   value: string;
 }
@@ -15,6 +19,7 @@ export function renderTooltip(heading: string, rows: TooltipRow[]): string {
       (row.color
         ? `<span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background:${row.color};"></span>`
         : '') +
+      (row.client ? clientLogoHtml(row.client) : '') +
       `<span>${row.label}</span>` +
       `<span style="margin-left:auto;padding-left:12px;font-weight:600;font-variant-numeric:tabular-nums;">${row.value}</span>` +
       `</div>`

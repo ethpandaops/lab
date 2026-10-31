@@ -11,6 +11,7 @@ const EMPTY_ROUTES: RouteData[] = [];
 const EMPTY_POINTS: PointData[] = [];
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 
 /**
  * Map2DChart - A high-performance 2D map visualization component using ECharts
@@ -426,7 +427,16 @@ function Map2DChartComponent({
                         {node.nodeId}
                       </td>
                       <td className="py-0.5 pr-4">{node.username || <span className="text-muted">—</span>}</td>
-                      <td className="py-0.5 pr-4 capitalize">{node.client || <span className="text-muted">—</span>}</td>
+                      <td className="py-0.5 pr-4 capitalize">
+                        {node.client ? (
+                          <span className="flex items-center gap-1.5">
+                            <ClientLogo client={node.client} size={14} />
+                            {node.client}
+                          </span>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
                       <td className="py-0.5 text-right font-mono whitespace-nowrap opacity-80">
                         {formatTiming(node.timing)}
                       </td>

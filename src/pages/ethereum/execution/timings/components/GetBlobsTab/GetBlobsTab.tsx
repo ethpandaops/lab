@@ -7,6 +7,7 @@ import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
@@ -631,6 +632,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                       if (value !== undefined && value !== null) {
                         html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
                         html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += clientLogoHtml(p.seriesName ?? '');
                         html += `<span>${p.seriesName}:</span>`;
                         html += `<span style="font-weight: 600; margin-left: auto;">${Math.round(value)} ms</span>`;
                         html += `</div>`;
@@ -701,6 +703,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                       if (value !== undefined && value !== null) {
                         html += `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">`;
                         html += `<span style="display: inline-block; width: 10px; height: 10px; background: ${p.color}; border-radius: 50%;"></span>`;
+                        html += clientLogoHtml(p.seriesName ?? '');
                         html += `<span>${p.seriesName}:</span>`;
                         html += `<span style="font-weight: 600; margin-left: auto;">${value.toFixed(1)}%</span>`;
                         html += `</div>`;

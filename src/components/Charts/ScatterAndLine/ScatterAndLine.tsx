@@ -18,6 +18,8 @@ import {
   getChartTooltipChrome,
   getChartValueAxisName,
   getChartValueSplitLine,
+  legendItem,
+  legendItemSize,
 } from '../chartChrome';
 
 // Get data visualization colors once at module level
@@ -193,6 +195,12 @@ export function ScatterAndLineChart({
               color: themeColors.foreground,
               fontSize: legendType === 'scroll' ? 11 : 12,
             },
+            // ECharts' default legend item box is 25 × 14
+            ...legendItemSize(
+              [...scatterSeries, ...lineSeries].map(s => s.name),
+              25,
+              14
+            ),
             pageTextStyle:
               legendType === 'scroll'
                 ? {
@@ -201,7 +209,7 @@ export function ScatterAndLineChart({
                 : undefined,
             data: [...scatterSeries, ...lineSeries].map(s => {
               const icon = 'legendIcon' in s && s.legendIcon ? s.legendIcon : undefined;
-              return icon ? { name: s.name, icon } : s.name;
+              return icon ? { name: s.name, icon } : legendItem({ name: s.name });
             }),
           }
         : undefined,

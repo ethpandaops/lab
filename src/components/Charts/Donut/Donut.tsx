@@ -8,7 +8,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { DonutProps } from './Donut.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { getChartTooltipChrome } from '../chartChrome';
+import { getChartTooltipChrome, legendItem } from '../chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -96,6 +96,7 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
       },
       itemWidth: 12,
       itemHeight: 12,
+      data: data.map(d => legendItem({ name: d.name })),
     };
 
     // Set legend positioning based on legendPosition

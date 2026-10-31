@@ -129,6 +129,40 @@ export const EXECUTION_CLIENTS = [
 ] as const;
 export const EXECUTION_CLIENTS_SET = new Set<string>(EXECUTION_CLIENTS);
 
+/** Client name aliases, mapped to the canonical names used for logos and colours */
+const CLIENT_ALIASES: Record<string, string> = {
+  'go-ethereum': 'geth',
+  'nimbus-el': 'nimbusel',
+  'nimbus el': 'nimbusel',
+  'trin execution': 'trin-execution',
+};
+
+/**
+ * Lowercase a client name and resolve aliases (go-ethereum → geth)
+ */
+export function normalizeClientName(clientName: string): string {
+  const lower = clientName.toLowerCase().trim();
+  return CLIENT_ALIASES[lower] ?? lower;
+}
+
+/**
+ * Whether a name is a known consensus or execution client, so it can be shown with its logo
+ */
+export function isKnownClient(clientName: string): boolean {
+  const normalized = normalizeClientName(clientName);
+  return CONSENSUS_CLIENTS_SET.has(normalized) || EXECUTION_CLIENTS_SET.has(normalized);
+}
+
+/**
+ * URL of a client's logo
+ */
+export function getClientLogoUrl(clientName: string): string {
+  return `/images/external/clients/${normalizeClientName(clientName)}.png`;
+}
+
+/** Clients whose logo is drawn in white on transparent, so light themes need it inverted */
+export const LIGHT_GLYPH_CLIENTS = new Set(['lighthouse']);
+
 /**
  * Determine whether a client type string is a CL or EL client
  */
@@ -203,7 +237,7 @@ const FALLBACK_COLORS = [
  * ```
  */
 export function getExecutionClientColor(clientName: string, fallbackIndex = 0): string {
-  const normalized = clientName.toLowerCase().trim();
+  const normalized = normalizeClientName(clientName);
   return EXECUTION_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
 }
 
@@ -221,7 +255,7 @@ export function getExecutionClientColor(clientName: string, fallbackIndex = 0): 
  * ```
  */
 export function getConsensusClientColor(clientName: string, fallbackIndex = 0): string {
-  const normalized = clientName.toLowerCase().trim();
+  const normalized = normalizeClientName(clientName);
   if (normalized === 'unknown') return UNKNOWN_CLIENT_COLOR;
   return CONSENSUS_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
 }
@@ -234,7 +268,7 @@ export function getConsensusClientColor(clientName: string, fallbackIndex = 0): 
  * @returns Hex color string
  */
 export function getClientColor(clientName: string, fallbackIndex = 0): string {
-  const normalized = clientName.toLowerCase().trim();
+  const normalized = normalizeClientName(clientName);
   if (normalized === 'unknown') return UNKNOWN_CLIENT_COLOR;
   if (CONSENSUS_CLIENTS_SET.has(normalized)) return getConsensusClientColor(normalized, fallbackIndex);
   return getExecutionClientColor(normalized, fallbackIndex);

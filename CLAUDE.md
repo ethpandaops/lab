@@ -195,6 +195,12 @@ Detailed standards for specific topics are in `.claude/rules/`:
 
 Give every value its own place. Don't run separate values together in one line of text (`5 · 7,638 ETH`, `Head 99% · Target 98%`, a root and a percentage in one cell). Each value gets a label and a slot: a table column, a `<dl>` term and definition, a stat, its own line. If you're reaching for a `·`, `|` or `/` separator, the layout probably needs structure instead.
 
+## Clients
+
+Every client looks the same everywhere. Wherever a client appears — table cell, stat, badge, tooltip, chart legend, dropdown — render its logo (`ClientLogo`) beside the name, and draw any mark that stands for it (series, bar, dot, swatch) in its colour from `getClientColor` (`getExecutionClientColor` / `getConsensusClientColor` when the layer is known). Never colour a client from a chart palette or by index.
+
+Chart legends already do this for any series named after a known client (`isKnownClient`): `MultiLineChart` and `StackedBar` render the logo, and native ECharts legends get it through `legendItem` in `chartChrome.ts`. Name client series by the client (`reth`, not `Reth P50`) so they're recognised, and pass `color: getClientColor(name)`.
+
 ## Copy
 
 Every user-facing string (titles, descriptions, hints, tooltips, empty states, toasts, button text) must pass the clean-copy skill:

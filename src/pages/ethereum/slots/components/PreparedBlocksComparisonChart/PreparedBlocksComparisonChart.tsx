@@ -2,8 +2,9 @@ import { type JSX, useMemo } from 'react';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { BarChart } from '@/components/Charts/Bar';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { weiToEth, extractExecutionClient } from '@/utils';
+import { weiToEth, extractExecutionClient, getExecutionClientColor } from '@/utils';
 import type {
   PreparedBlocksComparisonChartProps,
   ProcessedBlock,
@@ -155,7 +156,7 @@ export function PreparedBlocksComparisonChart({
     const labels = processedBlocks.map(b => b.clientName);
     const data = processedBlocks.map(b => ({
       value: b.rewardEth,
-      color: b.isProposed ? themeColors.accent : themeColors.success,
+      color: b.isProposed ? themeColors.accent : getExecutionClientColor(b.clientName),
     }));
 
     const formatter = (params: unknown): string => {
@@ -166,7 +167,7 @@ export function PreparedBlocksComparisonChart({
       // Handle both direct value and data.value formats
       const value = typeof param.value === 'number' ? param.value : (param.data?.value ?? 0);
 
-      let tooltip = `<strong>${param.name}</strong><br/>`;
+      let tooltip = `<div style="display: flex; align-items: center; gap: 6px;">${clientLogoHtml(param.name)}<strong>${param.name}</strong></div>`;
       tooltip += `Reward: ${value.toFixed(5)} ETH<br/>`;
 
       if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
@@ -178,7 +179,7 @@ export function PreparedBlocksComparisonChart({
     };
 
     return { chartData: data, chartLabels: labels, tooltipFormatter: formatter };
-  }, [processedBlocks, themeColors.accent, themeColors.success]);
+  }, [processedBlocks, themeColors.accent]);
 
   // Handle empty data
   if (preparedBlocks.length === 0) {

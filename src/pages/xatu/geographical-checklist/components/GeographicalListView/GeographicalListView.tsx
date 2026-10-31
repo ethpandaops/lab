@@ -7,6 +7,7 @@ import type { Column } from '@/components/Lists/Table/Table.types';
 import type { ProcessedNode } from '../../hooks/useGeographicalData/useGeographicalData.types';
 import { getClassificationBadgeClasses } from '@/utils';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 
 export function GeographicalListView({ continents, isLoading }: GeographicalListViewProps): JSX.Element {
   if (isLoading) {
@@ -60,7 +61,15 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
     },
     {
       header: 'Client',
-      accessor: node => node.meta_consensus_implementation || 'Unknown',
+      accessor: node =>
+        node.meta_consensus_implementation ? (
+          <span className="flex items-center gap-1.5">
+            <ClientLogo client={node.meta_consensus_implementation} size={16} />
+            {node.meta_consensus_implementation}
+          </span>
+        ) : (
+          'Unknown'
+        ),
       cellClassName: 'text-muted',
     },
     {

@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { getConsensusClientColor } from '@/utils/ethereum';
 import type { InsightsDialogProps } from './InsightsDialog.types';
 
 export function InsightsDialog({
@@ -37,18 +39,24 @@ export function InsightsDialog({
             <p className="text-sm text-muted">No client data available</p>
           ) : (
             <div className="grid gap-x-6 gap-y-2 md:grid-cols-2">
-              {clientData.map(client => (
+              {clientData.map((client, index) => (
                 <div key={client.name} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-foreground">{client.name}</span>
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      <ClientLogo client={client.name} size={16} />
+                      {client.name}
+                    </span>
                     <span className="text-muted">
                       {client.count} ({client.percentage.toFixed(1)}%)
                     </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-surface">
                     <div
-                      className="h-full rounded-full bg-primary transition-all duration-300"
-                      style={{ width: `${client.percentage}%` }}
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${client.percentage}%`,
+                        backgroundColor: getConsensusClientColor(client.name, index),
+                      }}
                     />
                   </div>
                 </div>

@@ -10,6 +10,7 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { BoxPlot } from '@/components/Charts/BoxPlot';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { Sparkline } from '@/components/Charts/Sparkline';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
@@ -236,7 +237,12 @@ function PerformanceSections({
             id: 'ceiling',
             name: `Gas limit ceiling · ${BUDGET_OPTIONS.find(b => b.value === budget)?.label}`,
             value: fmtGasM(networkCeiling.mgas),
-            subtitle: `${(networkCeiling.mgas / gasLimitM).toFixed(1)}× today, set by ${networkCeiling.client.client}`,
+            subtitle: (
+              <span className="flex flex-wrap items-center gap-x-1">
+                {(networkCeiling.mgas / gasLimitM).toFixed(1)}× today, set by
+                <ClientInline client={networkCeiling.client.client} />
+              </span>
+            ),
           },
         ]}
       />
@@ -438,7 +444,7 @@ function throughputTooltip(params: unknown): string {
     .sort((a, b) => (b.value?.[1] ?? 0) - (a.value?.[1] ?? 0))
     .map(
       p =>
-        `<div style="display:flex;gap:8px;align-items:center;margin:3px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span><span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${fmtMgas(p.value![1])} Mgas/s</span></div>`
+        `<div style="display:flex;gap:8px;align-items:center;margin:3px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span>${clientLogoHtml(p.seriesName ?? '')}<span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${fmtMgas(p.value![1])} Mgas/s</span></div>`
     )
     .join('');
   return `<div style="font-weight:600;margin-bottom:6px">${time}</div>${rows}`;

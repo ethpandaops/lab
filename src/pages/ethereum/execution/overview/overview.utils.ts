@@ -14,6 +14,7 @@ import type {
 import { GAS_BANDS, type ChartConfig } from './constants';
 import { hexToRgba } from '@/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { clientLogoHtml } from '@/components/Charts/chartChrome';
 
 const { DATA_COLORS } = getDataVizColors();
 
@@ -123,6 +124,8 @@ export interface TooltipItem {
   value: string;
   /** Visual style indicator: 'line' (default), 'dashed', 'dotted', 'area' */
   style?: 'line' | 'dashed' | 'dotted' | 'area';
+  /** Client the row stands for, shown with its logo */
+  client?: string;
 }
 
 /** Section configuration for tooltip */
@@ -150,6 +153,7 @@ function buildTooltipRow(item: TooltipItem, fontSize: number = 12): string {
 
   return `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: ${fontSize}px;">
     ${indicator}
+    ${item.client ? clientLogoHtml(item.client) : ''}
     <span>${item.label}</span>
     <span style="margin-left: auto; font-weight: 600;">${item.value}</span>
   </div>`;

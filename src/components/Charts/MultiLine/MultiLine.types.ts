@@ -27,6 +27,11 @@ export interface SeriesData {
    */
   color?: string;
   /**
+   * Client the series stands for, when its name carries more than the client (e.g. a node ID);
+   * the legend shows that client's logo. Series named after a client get it without this
+   */
+  client?: string;
+  /**
    * Whether the series is visible in the legend
    * When false, series is hidden from legend but still renders (for stacking)
    * @default true
