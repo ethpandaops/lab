@@ -11,12 +11,14 @@ export interface VsNetworkChartProps {
   /** Block rollups of every node over the same range */
   network: NodeHistory;
   rangeLabel: string;
+  /** Bucket starts where the node was behind the network */
+  behind?: Set<number>;
 }
 
 /**
  * The node's median block arrival against the spread of every node's median, per hour or day.
  */
-export function VsNetworkChart({ nodeId, network, rangeLabel }: VsNetworkChartProps): JSX.Element {
+export function VsNetworkChart({ nodeId, network, rangeLabel, behind }: VsNetworkChartProps): JSX.Element {
   const colors = useThemeColors();
   const spread = spreadByBucket(network.rows, network.buckets);
   const own = rowsByBucket(network.rows, nodeId);
@@ -42,7 +44,11 @@ export function VsNetworkChart({ nodeId, network, rangeLabel }: VsNetworkChartPr
           spread.map(bucket => bucket.p50),
           { color: colors.muted, lineStyle: 'dashed' }
         ),
-        createStatisticSeries('This node', ownP50, { color: colors.primary, lineWidth: 2 }),
+        createStatisticSeries(
+          'This node',
+          ownP50.map((value, index) => (behind?.has(network.buckets[index]) ? null : value)),
+          { color: colors.primary, lineWidth: 2 }
+        ),
       ]}
       tooltipRows={index => {
         const bucket = spread[index];
@@ -59,6 +65,8 @@ export function VsNetworkChart({ nodeId, network, rangeLabel }: VsNetworkChartPr
           ...(delta === null ? [] : [{ label: 'vs median', value: `${delta > 0 ? '+' : ''}${formatMs(delta)}` }]),
         ];
       }}
+      behind={behind}
+      empty={own.size === 0 ? 'No data in this range' : undefined}
       syncGroup="node-history"
     />
   );

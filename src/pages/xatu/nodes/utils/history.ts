@@ -1,3 +1,4 @@
+import { BEHIND_MS } from '../constants';
 import type { HistoryRow } from '../hooks/useNodeHistory';
 import { median, quantile } from './node-stats';
 import { weightedMedian } from './time-buckets';
@@ -32,11 +33,42 @@ export function spreadByBucket(rows: HistoryRow[], buckets: number[]): BucketSpr
 }
 
 /**
+ * Median of every node's median per bucket start: the network's typical arrival in that hour or day.
+ */
+export function medianByStart(rows: HistoryRow[]): Map<number, number> {
+  const byStart = new Map<number, number[]>();
+  rows.forEach(row => {
+    if (!byStart.has(row.start)) byStart.set(row.start, []);
+    byStart.get(row.start)!.push(row.p50);
+  });
+  const medians = new Map<number, number>();
+  byStart.forEach((values, start) => medians.set(start, median(values)!));
+  return medians;
+}
+
+/**
+ * Whether a node's bucket trails the network median by more than a slot, i.e. the node was catching up.
+ */
+export function isBehind(row: HistoryRow, networkMedians: Map<number, number>): boolean {
+  const network = networkMedians.get(row.start);
+  return network !== undefined && row.p50 - network > BEHIND_MS;
+}
+
+/**
+ * Bucket starts where a node was behind the network.
+ */
+export function behindStarts(rows: HistoryRow[], networkMedians: Map<number, number>): Set<number> {
+  return new Set(rows.filter(row => isBehind(row, networkMedians)).map(row => row.start));
+}
+
+/**
  * Median of node medians per consensus client per bucket, largest client first.
+ * Nodes behind the network are left out, so one syncing node can't drag a client with few nodes.
  */
 export function medianByClient(
   rows: HistoryRow[],
-  buckets: number[]
+  buckets: number[],
+  networkMedians: Map<number, number> = new Map()
 ): Array<{ client: string; nodeCount: number; p50: (number | null)[] }> {
   const byClient = new Map<string, { nodes: Set<string>; byBucket: Map<number, number[]> }>();
   rows.forEach(row => {
@@ -44,6 +76,7 @@ export function medianByClient(
     if (!byClient.has(client)) byClient.set(client, { nodes: new Set(), byBucket: new Map() });
     const entry = byClient.get(client)!;
     entry.nodes.add(row.nodeId);
+    if (isBehind(row, networkMedians)) return;
     if (!entry.byBucket.has(row.start)) entry.byBucket.set(row.start, []);
     entry.byBucket.get(row.start)!.push(row.p50);
   });

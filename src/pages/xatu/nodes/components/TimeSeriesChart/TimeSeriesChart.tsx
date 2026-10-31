@@ -1,6 +1,7 @@
 import type { JSX, ReactNode } from 'react';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimezone } from '@/hooks/useTimezone';
 import type { Granularity } from '../../constants';
 import { hoveredIndex, renderTooltip, type TooltipRow } from '../../utils/chart-tooltip';
@@ -23,6 +24,20 @@ export interface TimeSeriesChartProps {
   headerActions?: ReactNode;
   /** Shown instead of the chart when there is nothing to plot */
   empty?: string;
+  /** Bucket starts where the node was behind the network; shaded, and the series should leave them out */
+  behind?: Set<number>;
+}
+
+/** Index ranges of consecutive buckets in `starts`, inclusive */
+function runs(buckets: number[], starts: Set<number>): Array<[number, number]> {
+  const result: Array<[number, number]> = [];
+  buckets.forEach((start, index) => {
+    if (!starts.has(start)) return;
+    const last = result[result.length - 1];
+    if (last && last[1] === index - 1) last[1] = index;
+    else result.push([index, index]);
+  });
+  return result;
 }
 
 /**
@@ -42,13 +57,29 @@ export function TimeSeriesChart({
   syncGroup,
   headerActions,
   empty,
+  behind,
 }: TimeSeriesChartProps): JSX.Element {
   const { timezone } = useTimezone();
+  const colors = useThemeColors();
+  const markAreas = behind
+    ? runs(buckets, behind).map(([first, last]) => ({
+        // Category axes take indexes and shade from band centre to band centre, so reach into the next bucket
+        xStart: first,
+        xEnd: Math.min(last + 1, buckets.length - 1),
+        color: colors.warning,
+        opacity: 0.12,
+      }))
+    : undefined;
 
   const tooltipFormatter = (params: unknown): string => {
     const index = hoveredIndex(params);
     if (index === null || index >= buckets.length) return '';
-    const rows = tooltipRows(index);
+    const rows = [
+      ...(behind?.has(buckets[index])
+        ? [{ color: colors.warning, label: 'Behind the network, catching up', value: '' }]
+        : []),
+      ...tooltipRows(index),
+    ];
     return renderTooltip(
       bucketHeading(buckets[index], granularity, timezone),
       rows.length > 0 ? rows : [{ label: 'No data', value: '' }]
@@ -76,6 +107,7 @@ export function TimeSeriesChart({
             connectNulls={false}
             tooltipFormatter={tooltipFormatter}
             syncGroup={inModal ? undefined : syncGroup}
+            markAreas={markAreas}
           />
         )
       }

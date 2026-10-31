@@ -1,6 +1,6 @@
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { compareVersions } from '@/utils/version';
-import { ONLINE_THRESHOLD_SECONDS } from '../constants';
+import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '../constants';
 
 /** Distribution summary of a set of millisecond timings */
 export interface Summary {
@@ -164,13 +164,14 @@ export function shortVersion(version: string | undefined): string {
 }
 
 /**
- * Y-axis maximum that keeps rare spikes from flattening a chart: 1.2× the 98th percentile, rounded up
+ * Y-axis maximum that keeps spikes from flattening a chart: the lower of 1.2× the 98th percentile and
+ * 2.5× the median (a node that restarts often has too many spikes for the percentile alone), rounded up
  * to a whole power-of-ten step. Undefined when nothing exceeds it, so the axis scales on its own.
  */
 export function axisCeiling(values: (number | null)[]): number | undefined {
   const sorted = values.filter((value): value is number => value !== null).sort((a, b) => a - b);
   if (sorted.length === 0) return undefined;
-  const target = quantile(sorted, 0.98) * 1.2;
+  const target = Math.min(quantile(sorted, 0.98) * 1.2, quantile(sorted, 0.5) * 2.5);
   if (target <= 0 || sorted[sorted.length - 1] <= target) return undefined;
   const step = 10 ** Math.floor(Math.log10(target));
   return Math.ceil(target / step) * step;
@@ -184,4 +185,32 @@ export function getIngestedEndSlot(slots: Array<{ slot: number; nodeCount: numbe
     if (slots[index].nodeCount > 0) return slots[index].slot + 1;
   }
   return fallback;
+}
+
+/** Whether a node is keeping up with the chain right now */
+export type SyncState = 'in-sync' | 'catching-up' | 'missing-blocks';
+
+/**
+ * Sync state from a node's latest slots: how far its block arrival trails the network median, and whether
+ * it sees recent blocks at all (a node still importing old blocks has none in the recent window).
+ *
+ * @param block - The node's block arrival (ms) by slot
+ * @param slots - Network median and node count per slot, oldest first
+ * @param recent - Latest slots with network data to judge by
+ * @returns null when the network has no recent slots to compare against
+ */
+export function getSyncState(
+  block: Map<number, number>,
+  slots: Array<{ slot: number; p50: number | null; nodeCount: number }>,
+  recent = 16
+): { state: SyncState; lagMs: number | null } | null {
+  const latest = slots.filter(slot => slot.nodeCount > 0 && slot.p50 !== null).slice(-recent);
+  if (latest.length === 0) return null;
+  const lags = latest.flatMap(slot => {
+    const seen = block.get(slot.slot);
+    return seen === undefined ? [] : [seen - slot.p50!];
+  });
+  if (lags.length < latest.length / 4) return { state: 'missing-blocks', lagMs: null };
+  const lagMs = median(lags)!;
+  return { state: lagMs > BEHIND_MS ? 'catching-up' : 'in-sync', lagMs };
 }

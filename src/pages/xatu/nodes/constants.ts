@@ -41,6 +41,12 @@ export const nodeDetailSearchSchema = z.object({ range: rangeSchema });
 
 export const nodesSearchSchema = z.object({ range: rangeSchema });
 
+/**
+ * How far a node's median arrival can trail the network's median before the node counts as behind: one slot.
+ * Measured against the network, not slot start, so a chain-wide delay never marks every node as behind.
+ */
+export const BEHIND_MS = 12_000;
+
 /** Slots in an hour and a day, for counting the slots a node missed */
 export const SLOTS_PER_BUCKET: Record<Granularity, number> = { hourly: 300, daily: 7200 };
 

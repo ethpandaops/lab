@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { HistoryRow } from '../hooks/useNodeHistory';
-import { spreadByBucket, summarizeByNode } from './history';
+import { behindStarts, medianByClient, medianByStart, spreadByBucket, summarizeByNode } from './history';
 import { expectedSlots, getBuckets, parseBucket, weightedMedian } from './time-buckets';
 
 const HOUR = 3600;
@@ -82,5 +82,42 @@ describe('summarizeByNode', () => {
     const summaries = summarizeByNode([row(0, 'a', 1600, 300), row(HOUR, 'a', 4000, 20), row(0, 'b', 2000, 300)]);
     expect(summaries.get('a')).toEqual({ p50: 1600, count: 320 });
     expect(summaries.get('b')).toEqual({ p50: 2000, count: 300 });
+  });
+});
+
+describe('behindStarts', () => {
+  it('flags hours a node trails the network median by more than a slot, not hours the whole network is late', () => {
+    // Hour 0: network ~1.7s, node catching up at 30s. Hour 1: the whole network is late (Holesky-style), node too.
+    const rows = [
+      row(0, 'a', 1600),
+      row(0, 'b', 1700),
+      row(0, 'c', 1800),
+      row(0, 'sync', 30000, 20),
+      row(HOUR, 'a', 40000),
+      row(HOUR, 'b', 42000),
+      row(HOUR, 'sync', 45000),
+    ];
+    const medians = medianByStart(rows);
+    expect(
+      behindStarts(
+        rows.filter(r => r.nodeId === 'sync'),
+        medians
+      )
+    ).toEqual(new Set([0]));
+  });
+
+  it('leaves a catching-up node out of its client median', () => {
+    const rows = [
+      row(0, 'a', 1600),
+      row(0, 'b', 1800),
+      { ...row(0, 'sync', 60000), client: 'grandine' },
+      {
+        ...row(0, 'g', 1900),
+        client: 'grandine',
+      },
+    ];
+    const grandine = medianByClient(rows, [0], medianByStart(rows)).find(c => c.client === 'grandine')!;
+    expect(grandine.p50).toEqual([1900]);
+    expect(grandine.nodeCount).toBe(2);
   });
 });

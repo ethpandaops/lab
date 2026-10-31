@@ -8,15 +8,18 @@ import { TimeSeriesChart } from '../TimeSeriesChart';
 export interface AttestationArrivalChartProps {
   history: NodeHistory;
   rangeLabel: string;
+  /** Bucket starts where the node was behind the network */
+  behind?: Set<number>;
 }
 
 /**
  * When the node saw each slot's attestations: the median per hour or day, inside its p10–p90.
  */
-export function AttestationArrivalChart({ history, rangeLabel }: AttestationArrivalChartProps): JSX.Element {
+export function AttestationArrivalChart({ history, rangeLabel, behind }: AttestationArrivalChartProps): JSX.Element {
   const colors = useThemeColors();
   const byBucket = rowsByBucket(history.rows);
   const aligned = history.buckets.map(start => byBucket.get(start) ?? null);
+  const plotted = aligned.map((row, index) => (behind?.has(history.buckets[index]) ? null : row));
 
   return (
     <TimeSeriesChart
@@ -25,18 +28,20 @@ export function AttestationArrivalChart({ history, rangeLabel }: AttestationArri
       anchorId="attestation-arrival"
       buckets={history.buckets}
       granularity={history.granularity}
-      yMax={axisCeiling(aligned.map(row => row?.p90 ?? null))}
+      yMax={axisCeiling(plotted.map(row => row?.p90 ?? null))}
+      behind={behind}
+      empty={history.rows.length === 0 ? 'No data in this range' : undefined}
       series={[
         ...createBandSeries(
           'P10–P90',
           'attestation-band',
-          aligned.map(row => row?.p10 ?? null),
-          aligned.map(row => row?.p90 ?? null),
+          plotted.map(row => row?.p10 ?? null),
+          plotted.map(row => row?.p90 ?? null),
           { color: colors.primary, opacity: 0.2 }
         ),
         createStatisticSeries(
           'Median',
-          aligned.map(row => row?.p50 ?? null),
+          plotted.map(row => row?.p50 ?? null),
           { color: colors.primary, lineWidth: 2 }
         ),
       ]}

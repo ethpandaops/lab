@@ -20,6 +20,7 @@ import { Route } from '@/routes/xatu/contributors/$id';
 import { PerNodeHistoryChart } from '@/pages/xatu/nodes/components';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
 import { useNodeHistory, type HistoryMetric } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { behindStarts, medianByStart } from '@/pages/xatu/nodes/utils/history';
 
 const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: string; anchorId: string }> = [
   { metric: 'block', title: 'Block arrival', subtitle: 'Median per node', anchorId: 'block-latency' },
@@ -146,6 +147,14 @@ export function DetailPage(): JSX.Element {
     attestation: useNodeHistory('attestation', range, { username: id }),
     dataColumn: useNodeHistory('dataColumn', range, { username: id }),
   };
+  // Every node's block arrival, to tell when one of these nodes was catching up rather than slow
+  const network = useNodeHistory('block', range, {});
+  const networkMedians = medianByStart(network.data?.rows ?? []);
+  const behindOf = (nodeId: string): Set<number> =>
+    behindStarts(
+      (histories.block.data?.rows ?? []).filter(row => row.nodeId === nodeId),
+      networkMedians
+    );
 
   // Query all three categories since we don't know which one the username belongs to
   const {
@@ -343,6 +352,7 @@ export function DetailPage(): JSX.Element {
                 history={history}
                 nodeIds={nodes.flatMap(node => (node.node_id ? [node.node_id] : []))}
                 clientOf={nodeId => nodes.find(node => node.node_id === nodeId)?.meta_consensus_implementation}
+                behindOf={behindOf}
               />
             ) : (
               <LoadingContainer key={chart.metric} className="h-96 rounded-sm" />

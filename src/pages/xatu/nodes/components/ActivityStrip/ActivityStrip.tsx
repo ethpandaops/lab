@@ -10,6 +10,8 @@ export interface ActivityStripProps {
   /** The node's block rollups */
   block: NodeHistory;
   rangeLabel: string;
+  /** Bucket starts where the node was behind the network */
+  behind?: Set<number>;
 }
 
 interface Bar {
@@ -18,6 +20,8 @@ interface Bar {
   before: boolean;
   /** Still in progress, so recent slots may not be ingested yet */
   current: boolean;
+  /** Trailing the network by more than a slot: the node was catching up */
+  behind: boolean;
   seen: number;
   total: number;
   p50: number | null;
@@ -30,14 +34,15 @@ function barClass(bar: Bar): string {
   if (bar.before) return 'bg-border/60';
   if (bar.current) return 'bg-muted/45 group-hover:bg-muted';
   if (bar.seen === 0) return 'bg-danger';
+  if (bar.behind) return 'bg-warning';
   if (bar.seen / bar.total < GAP_THRESHOLD) return 'bg-warning';
   return 'bg-success/70 group-hover:bg-success';
 }
 
 /**
- * Status-page bars, one per hour or day, flagged where the node saw few or no blocks.
+ * Status-page bars, one per hour or day, flagged where the node saw few or no blocks or was catching up.
  */
-export function ActivityStrip({ block, rangeLabel }: ActivityStripProps): JSX.Element {
+export function ActivityStrip({ block, rangeLabel, behind }: ActivityStripProps): JSX.Element {
   const { timezone } = useTimezone();
   const [hovered, setHovered] = useState<Bar | null>(null);
   const now = Date.now() / 1000;
@@ -48,6 +53,7 @@ export function ActivityStrip({ block, rangeLabel }: ActivityStripProps): JSX.El
       start,
       before: start < first,
       current: index === block.buckets.length - 1,
+      behind: behind?.has(start) ?? false,
       seen: byBucket.get(start)?.count ?? 0,
       total: expectedSlots(start, block.granularity, now),
       p50: byBucket.get(start)?.p50 ?? null,
@@ -76,6 +82,7 @@ export function ActivityStrip({ block, rangeLabel }: ActivityStripProps): JSX.El
                     {hovered.seen.toLocaleString()}/{hovered.total.toLocaleString()}
                   </span>{' '}
                   slots · p50 <span className="text-foreground">{formatMs(hovered.p50)}</span>
+                  {hovered.behind && <span className="text-warning"> · catching up</span>}
                 </>
               )}
             </>

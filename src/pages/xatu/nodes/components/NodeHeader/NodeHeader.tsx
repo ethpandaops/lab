@@ -8,14 +8,22 @@ import { Card } from '@/components/Layout/Card';
 import { getClassificationBadgeClasses, getClassificationLabel, getCountryFlag } from '@/utils';
 import { formatClientName } from '@/utils/graffiti';
 import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatNodeLocation, shortVersion } from '../../utils/node-stats';
+import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
 
 export interface NodeHeaderProps {
   row: NodeRow;
   /** Execution client seen in the node's engine API calls */
   execution: { implementation: string; version: string } | null;
+  /** Whether the node keeps up with the chain over its latest slots; null when unknown or offline */
+  sync?: { state: SyncState; lagMs: number | null } | null;
 }
+
+const SYNC_LABELS: Record<SyncState, string> = {
+  'in-sync': 'In sync',
+  'catching-up': 'Catching up',
+  'missing-blocks': 'Missing recent blocks',
+};
 
 function Detail({ label, children }: { label: string; children: ReactNode }): JSX.Element {
   return (
@@ -29,7 +37,7 @@ function Detail({ label, children }: { label: string; children: ReactNode }): JS
 /**
  * Node identity: client, ID, status and owner, then the node's software, location and network.
  */
-export function NodeHeader({ row, execution }: NodeHeaderProps): JSX.Element {
+export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Element {
   const { node, nodeId, online, newerVersion } = row;
   const client = node.meta_consensus_implementation;
   const classification = node.classification || 'unclassified';
@@ -45,6 +53,19 @@ export function NodeHeader({ row, execution }: NodeHeaderProps): JSX.Element {
             <h1 className="truncate font-mono text-lg/7 font-semibold text-foreground">{nodeId}</h1>
             <CopyToClipboard content={nodeId} />
             <NodeStatus online={online} showLabel />
+            {sync && (
+              <span
+                className={clsx(
+                  'inline-flex items-center rounded-xs px-1.5 py-0.5 text-xs font-medium inset-ring',
+                  sync.state === 'in-sync'
+                    ? 'bg-muted/10 text-muted inset-ring-border'
+                    : 'bg-warning/10 text-warning inset-ring-warning/20'
+                )}
+                title={sync.state === 'catching-up' ? `${formatMs(sync.lagMs)} behind the network median` : undefined}
+              >
+                {SYNC_LABELS[sync.state]}
+              </span>
+            )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-sm/6 text-muted">
             {node.username && (

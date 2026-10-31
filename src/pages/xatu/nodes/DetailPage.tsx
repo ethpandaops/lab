@@ -26,8 +26,8 @@ import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodePerformance } from './hooks/useNodePerformance';
 import { useNodeRows } from './hooks/useNodeRows';
-import { rangeValue } from './utils/history';
-import { formatMs, getIngestedEndSlot, shareSlowerThan } from './utils/node-stats';
+import { behindStarts, medianByStart, rangeValue } from './utils/history';
+import { formatMs, getIngestedEndSlot, getSyncState, shareSlowerThan } from './utils/node-stats';
 import { expectedSlots } from './utils/time-buckets';
 
 function Section({
@@ -140,6 +140,10 @@ export function DetailPage(): JSX.Element {
     : null;
   const hasEngine = !!newPayload.data && newPayload.data.rows.length > 0;
   const hasColumns = !!dataColumn.data && dataColumn.data.rows.length > 0;
+  // Hours the node trailed the network by more than a slot were spent catching up after downtime or a resync
+  const behind = behindStarts(blockRows, medianByStart(network.data?.rows ?? []));
+  const sync =
+    row.online && recent.data && recentNetwork.data ? getSyncState(recent.data.block, recentNetwork.data.slots) : null;
   const recentEndSlot = recent.data
     ? recentNetwork.data
       ? getIngestedEndSlot(recentNetwork.data.slots, recent.data.window.endSlot)
@@ -149,7 +153,7 @@ export function DetailPage(): JSX.Element {
   return (
     <Container>
       <div className="flex flex-col gap-10">
-        <NodeHeader row={row} execution={execution} />
+        <NodeHeader row={row} execution={execution} sync={sync} />
 
         <Section
           title="Performance"
@@ -214,13 +218,13 @@ export function DetailPage(): JSX.Element {
             </>
           ) : (
             <>
-              <ActivityStrip block={block.data} rangeLabel={rangeLabel} />
+              <ActivityStrip block={block.data} rangeLabel={rangeLabel} behind={behind} />
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} />
-                <VsNetworkChart nodeId={nodeId} network={network.data} rangeLabel={rangeLabel} />
+                <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} behind={behind} />
+                <VsNetworkChart nodeId={nodeId} network={network.data} rangeLabel={rangeLabel} behind={behind} />
                 {attestation.data && (
                   <div className="xl:col-span-2">
-                    <AttestationArrivalChart history={attestation.data} rangeLabel={rangeLabel} />
+                    <AttestationArrivalChart history={attestation.data} rangeLabel={rangeLabel} behind={behind} />
                   </div>
                 )}
               </div>
@@ -238,7 +242,7 @@ export function DetailPage(): JSX.Element {
               )}
               {hasColumns && (
                 <div className="xl:col-span-3">
-                  <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} />
+                  <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} behind={behind} />
                 </div>
               )}
             </div>
@@ -251,7 +255,7 @@ export function DetailPage(): JSX.Element {
           </Section>
         )}
 
-        {recent.data && (
+        {recent.data && recent.data.block.size > 0 && (
           <NodeSlotsTable
             performance={recent.data}
             network={recentNetwork.data}

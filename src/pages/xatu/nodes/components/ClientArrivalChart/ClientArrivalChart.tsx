@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import type { NodeHistory } from '../../hooks/useNodeHistory';
-import { medianByClient } from '../../utils/history';
+import { medianByClient, medianByStart } from '../../utils/history';
 import { formatMs } from '../../utils/node-stats';
 import { TimeSeriesChart } from '../TimeSeriesChart';
 
@@ -16,7 +16,7 @@ export interface ClientArrivalChartProps {
  * Median block arrival of each consensus client's nodes over time.
  */
 export function ClientArrivalChart({ history, rangeLabel }: ClientArrivalChartProps): JSX.Element {
-  const clients = medianByClient(history.rows, history.buckets);
+  const clients = medianByClient(history.rows, history.buckets, medianByStart(history.rows));
   const colors = clients.map((client, index) => getConsensusClientColor(client.client, index));
 
   return (

@@ -4,6 +4,7 @@ import {
   axisCeiling,
   getIngestedEndSlot,
   getLatestVersions,
+  getSyncState,
   getSlotWindow,
   histogram,
   isNodeOnline,
@@ -127,5 +128,30 @@ describe('getIngestedEndSlot', () => {
     ];
     expect(getIngestedEndSlot(slots, 15)).toBe(13);
     expect(getIngestedEndSlot([{ slot: 10, nodeCount: 0 }], 11)).toBe(11);
+  });
+});
+
+describe('getSyncState', () => {
+  const slots = Array.from({ length: 20 }, (_, i) => ({ slot: 100 + i, p50: 1500, nodeCount: 120 }));
+
+  it('is in sync when the node trails the network by less than a slot', () => {
+    const block = new Map(slots.map(s => [s.slot, 2500]));
+    expect(getSyncState(block, slots)).toEqual({ state: 'in-sync', lagMs: 1000 });
+  });
+
+  it('is catching up when recent blocks arrive more than a slot after the network saw them', () => {
+    const block = new Map(slots.map(s => [s.slot, 40000]));
+    expect(getSyncState(block, slots)?.state).toBe('catching-up');
+  });
+
+  it('is missing blocks when the node sees almost none of the recent slots', () => {
+    expect(getSyncState(new Map([[119, 1500]]), slots)?.state).toBe('missing-blocks');
+  });
+
+  it('ignores slots no node has reported yet', () => {
+    const pending = [...slots, { slot: 120, p50: null, nodeCount: 0 }];
+    const block = new Map(slots.map(s => [s.slot, 1600]));
+    expect(getSyncState(block, pending)?.state).toBe('in-sync');
+    expect(getSyncState(new Map(), [{ slot: 1, p50: null, nodeCount: 0 }])).toBeNull();
   });
 });

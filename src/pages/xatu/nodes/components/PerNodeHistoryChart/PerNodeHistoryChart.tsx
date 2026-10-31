@@ -14,6 +14,8 @@ export interface PerNodeHistoryChartProps {
   nodeIds: string[];
   /** Line label per node, e.g. its client */
   clientOf: (nodeId: string) => string | undefined;
+  /** Bucket starts where each node was behind the network; those points are left out of its line */
+  behindOf?: (nodeId: string) => Set<number>;
 }
 
 /**
@@ -26,15 +28,21 @@ export function PerNodeHistoryChart({
   history,
   nodeIds,
   clientOf,
+  behindOf,
 }: PerNodeHistoryChartProps): JSX.Element {
   const lines = nodeIds.map((nodeId, index) => {
     const byBucket = rowsByBucket(history.rows, nodeId);
     const client = clientOf(nodeId) ?? 'unknown';
+    const behind = behindOf?.(nodeId) ?? new Set<number>();
+    const raw = history.buckets.map(start => byBucket.get(start)?.p50 ?? null);
     return {
       nodeId,
       client,
       color: getConsensusClientColor(client, index),
-      values: history.buckets.map(start => byBucket.get(start)?.p50 ?? null),
+      raw,
+      behind: history.buckets.map(start => behind.has(start)),
+      // Hours a node spent catching up would flatten every other line
+      values: raw.map((value, bucket) => (behind.has(history.buckets[bucket]) ? null : value)),
     };
   });
   // Two nodes on one client would share a colour, so a node's ID is always in its name
@@ -53,9 +61,13 @@ export function PerNodeHistoryChart({
       series={lines.map(line => ({ name: nameOf(line), data: line.values, color: line.color, lineWidth: 1.5 }))}
       tooltipRows={index =>
         lines
-          .filter(line => line.values[index] !== null)
-          .sort((a, b) => a.values[index]! - b.values[index]!)
-          .map(line => ({ color: line.color, label: nameOf(line), value: formatMs(line.values[index]) }))
+          .filter(line => line.raw[index] !== null)
+          .sort((a, b) => a.raw[index]! - b.raw[index]!)
+          .map(line => ({
+            color: line.color,
+            label: line.behind[index] ? `${nameOf(line)}, catching up` : nameOf(line),
+            value: formatMs(line.raw[index]),
+          }))
       }
       syncGroup="contributor-history"
     />

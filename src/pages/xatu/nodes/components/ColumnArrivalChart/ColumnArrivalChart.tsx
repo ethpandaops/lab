@@ -8,15 +8,18 @@ import { TimeSeriesChart } from '../TimeSeriesChart';
 export interface ColumnArrivalChartProps {
   history: NodeHistory;
   rangeLabel: string;
+  /** Bucket starts where the node was behind the network */
+  behind?: Set<number>;
 }
 
 /**
  * When the node held all of a slot's custody columns (median inside p10–p90), and when the first arrived.
  */
-export function ColumnArrivalChart({ history, rangeLabel }: ColumnArrivalChartProps): JSX.Element {
+export function ColumnArrivalChart({ history, rangeLabel, behind }: ColumnArrivalChartProps): JSX.Element {
   const colors = useThemeColors();
   const byBucket = rowsByBucket(history.rows);
   const aligned = history.buckets.map(start => byBucket.get(start) ?? null);
+  const plotted = aligned.map((row, index) => (behind?.has(history.buckets[index]) ? null : row));
 
   return (
     <TimeSeriesChart
@@ -26,23 +29,25 @@ export function ColumnArrivalChart({ history, rangeLabel }: ColumnArrivalChartPr
       buckets={history.buckets}
       granularity={history.granularity}
       height={260}
-      yMax={axisCeiling(aligned.map(row => row?.p90 ?? null))}
+      yMax={axisCeiling(plotted.map(row => row?.p90 ?? null))}
+      behind={behind}
+      empty={history.rows.length === 0 ? 'No data in this range' : undefined}
       series={[
         ...createBandSeries(
           'Last column P10–P90',
           'column-band',
-          aligned.map(row => row?.p10 ?? null),
-          aligned.map(row => row?.p90 ?? null),
+          plotted.map(row => row?.p10 ?? null),
+          plotted.map(row => row?.p90 ?? null),
           { color: colors.primary, opacity: 0.2 }
         ),
         createStatisticSeries(
           'Last column median',
-          aligned.map(row => row?.p50 ?? null),
+          plotted.map(row => row?.p50 ?? null),
           { color: colors.primary, lineWidth: 2 }
         ),
         createStatisticSeries(
           'First column median',
-          aligned.map(row => row?.firstP50 ?? null),
+          plotted.map(row => row?.firstP50 ?? null),
           { color: colors.muted, lineStyle: 'dashed' }
         ),
       ]}
