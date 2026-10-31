@@ -254,64 +254,76 @@ export function PopoutCard({
               '[&>div:last-child]:p-0 [&>div:last-child]:[--card-inset-y:0px] [&>div:last-child]:[--card-inset:0px]',
             className
           )}
-          title={
-            anchorId ? (
-              <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">
-                {title}
-              </ScrollAnchor>
-            ) : (
-              title
-            )
-          }
-          subtitle={subtitle}
-          actions={
-            showLogo ? (
-              <img src="/images/ethpandaops.png" alt="ethPandaOps" className="h-8 w-auto" />
-            ) : (
-              <>
-                {headerActions}
-                {enableDownload && (
-                  <Dropdown
-                    trigger={
-                      <button
-                        type="button"
-                        disabled={isDownloading}
-                        className={iconButtonClassName}
-                        aria-label="Export options"
-                      >
-                        <EllipsisVerticalIcon className={iconClassName} />
-                      </button>
-                    }
-                    align="right"
-                  >
-                    <DropdownSection>
-                      <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
-                        Download
-                      </DropdownItem>
-                      <CopyToClipboard
-                        content={handleCopyToClipboard}
-                        successMessage="Copied to clipboard!"
-                        errorMessage="Failed to copy image"
-                      >
-                        {({ onClick }) => (
-                          <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
-                            Copy to clipboard
-                          </DropdownItem>
-                        )}
-                      </CopyToClipboard>
-                    </DropdownSection>
-                  </Dropdown>
+          header={
+            // Header actions sit beside the title when there is room and wrap below it when there
+            // isn't, so they never squeeze the title; export and expand stay top right
+            <div className="flex items-start gap-x-2">
+              <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-x-4 gap-y-3">
+                <div className="min-w-0 flex-[1_1_16rem]">
+                  <h3 className="truncate text-sm/6 font-semibold text-foreground">
+                    {anchorId ? (
+                      <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">
+                        {title}
+                      </ScrollAnchor>
+                    ) : (
+                      title
+                    )}
+                  </h3>
+                  {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
+                </div>
+                {headerActions && !showLogo && (
+                  <div className="-my-1 flex max-w-full items-center gap-0.5">{headerActions}</div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(true)}
-                  className={iconButtonClassName}
-                  aria-label={`Open ${title} in modal`}
-                >
-                  <ArrowsPointingOutIcon className={iconClassName} />
-                </button>
-              </>
-            )
+              </div>
+              <div className="-my-1 -mr-1.5 flex shrink-0 items-center gap-0.5">
+                {showLogo ? (
+                  <img src="/images/ethpandaops.png" alt="ethPandaOps" className="h-8 w-auto" />
+                ) : (
+                  <>
+                    {enableDownload && (
+                      <Dropdown
+                        trigger={
+                          <button
+                            type="button"
+                            disabled={isDownloading}
+                            className={iconButtonClassName}
+                            aria-label="Export options"
+                          >
+                            <EllipsisVerticalIcon className={iconClassName} />
+                          </button>
+                        }
+                        align="right"
+                      >
+                        <DropdownSection>
+                          <DropdownItem icon={<ArrowDownTrayIcon className="size-5" />} onClick={handleDownload}>
+                            Download
+                          </DropdownItem>
+                          <CopyToClipboard
+                            content={handleCopyToClipboard}
+                            successMessage="Copied to clipboard!"
+                            errorMessage="Failed to copy image"
+                          >
+                            {({ onClick }) => (
+                              <DropdownItem icon={<ClipboardDocumentIcon className="size-5" />} onClick={onClick}>
+                                Copy to clipboard
+                              </DropdownItem>
+                            )}
+                          </CopyToClipboard>
+                        </DropdownSection>
+                      </Dropdown>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(true)}
+                      className={iconButtonClassName}
+                      aria-label={`Open ${title} in modal`}
+                    >
+                      <ArrowsPointingOutIcon className={iconClassName} />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           }
           rounded
           allowContentOverflow={allowContentOverflow}
@@ -329,10 +341,14 @@ export function PopoutCard({
         hideCloseButton={showModalLogo}
         noPadding={noPadding}
         title={
-          <div className="flex w-full items-center justify-between gap-4">
-            <span className="truncate">{title}</span>
-            {/* Custom header actions */}
-            {headerActions && !showModalLogo && <div className="shrink-0">{headerActions}</div>}
+          <div className="flex w-full items-start justify-between gap-x-2">
+            {/* Header actions wrap below the title when there is no room beside it */}
+            <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <span className="min-w-0 flex-[1_1_12rem] truncate">{title}</span>
+              {headerActions && !showModalLogo && (
+                <div className="flex max-w-full items-center font-normal">{headerActions}</div>
+              )}
+            </div>
             {/* Show logo or dropdown in modal title */}
             {showModalLogo ? (
               <div className="shrink-0">
@@ -376,6 +392,9 @@ export function PopoutCard({
         }
         description={modalDescriptionText}
         size={modalSize}
+        // Fit the viewport whatever the header height (it grows when header actions wrap): the
+        // body takes the remaining height and scrolls
+        className="flex max-h-[calc(100dvh-2rem)] flex-col [&>div:last-child]:max-h-none [&>div:last-child]:min-h-0 [&>div:last-child]:flex-1"
       >
         {modalDescriptionPosition === 'above' && descriptionBox && <div className="mb-4">{descriptionBox}</div>}
         {modalContent}

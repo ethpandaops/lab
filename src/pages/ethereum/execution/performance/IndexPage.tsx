@@ -1,6 +1,10 @@
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX, Fragment, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { Link } from '@tanstack/react-router';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { Container } from '@/components/Layout/Container';
+import { Header } from '@/components/Layout/Header';
+import { Checkbox } from '@/components/Forms/Checkbox';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
@@ -10,9 +14,10 @@ import { Sparkline } from '@/components/Charts/Sparkline';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { usePerformanceData } from '../../hooks/usePerformanceData';
-import { HOURLY_CHART_RANGES, PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
+import { usePerformanceData } from './hooks/usePerformanceData';
+import { useOpcodeCostData } from './hooks/useOpcodeCostData';
+import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 import {
   GAS_BUCKET_MGAS,
   RESOURCES,
@@ -25,17 +30,9 @@ import {
   type ClientPerformance,
   type SlowBlock,
   type VersionRow,
-} from '../../utils/performance';
-import { RangeUnavailableNote } from '../RangeUnavailableNote';
-import { OpcodePricingCard, OpcodeVersionsCard } from './OpcodeCosts';
-import { MethodologyButton, MethodologyDialog, type MethodologySection } from './MethodologyDialog';
-import { useOpcodeCostData } from '../../hooks/useOpcodeCostData';
-
-export interface PerformanceTabProps {
-  data: EngineTimingsData;
-  timeRange: TimeRange;
-  referenceNodesOnly: boolean;
-}
+} from './utils/performance';
+import { OpcodePricingCard, OpcodeVersionsCard } from './components/OpcodeCosts';
+import { MethodologyButton, MethodologyDialog, type MethodologySection } from './components/MethodologyDialog';
 
 const PERCENTILE_OPTIONS = [
   { value: 'avg', label: 'Avg' },
@@ -85,10 +82,69 @@ function divergingStyle(value: number | undefined, limit: number): React.CSSProp
 }
 
 /**
- * Performance tab: turns engine_newPayload timings plus block gas into execution throughput
- * (Mgas/s), per-client cost models, gas limit headroom and workload sensitivity.
+ * Execution performance page: the time range, reference node filter and page header around
+ * the performance sections.
  */
-export function PerformanceTab({ data, timeRange, referenceNodesOnly }: PerformanceTabProps): JSX.Element {
+export function IndexPage(): JSX.Element {
+  const navigate = useNavigate({ from: '/ethereum/execution/performance' });
+  const { range, refNodes } = useSearch({ from: '/ethereum/execution/performance' });
+  const timeRange: TimeRange = range ?? DEFAULT_TIME_RANGE;
+  const referenceNodesOnly = refNodes ?? true;
+  const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
+
+  return (
+    <Container>
+      <Header title="Execution Performance" description="Execution throughput, cost and opcode pricing per client" />
+
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <SegmentedControl
+          options={(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => ({
+            value: r,
+            label: TIME_RANGE_CONFIG[r].label,
+          }))}
+          value={timeRange}
+          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+          ariaLabel="Time window"
+        />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              navigate({ search: prev => ({ ...prev, refNodes: !referenceNodesOnly || undefined }), replace: true })
+            }
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <Checkbox checked={referenceNodesOnly} onChange={() => undefined} />
+            <span className="text-sm text-foreground">Reference nodes only</span>
+          </button>
+          <button
+            onClick={() => setShowRefNodeInfo(true)}
+            className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
+            aria-label="Learn more about reference nodes"
+          >
+            <InformationCircleIcon className="size-4" />
+          </button>
+        </div>
+      </div>
+
+      <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
+
+      <PerformanceSections timeRange={timeRange} referenceNodesOnly={referenceNodesOnly} />
+    </Container>
+  );
+}
+
+/**
+ * Turns engine_newPayload timings plus block gas into execution throughput (Mgas/s), per-client
+ * cost models, gas limit headroom, workload sensitivity and opcode pricing.
+ */
+function PerformanceSections({
+  timeRange,
+  referenceNodesOnly,
+}: {
+  timeRange: TimeRange;
+  referenceNodesOnly: boolean;
+}): JSX.Element {
   const [percentile, setPercentile] = useState<'avg' | 'p95'>('avg');
   const [budget, setBudget] = useState<(typeof BUDGET_OPTIONS)[number]['value']>('1000');
   const [ceilingBasis, setCeilingBasis] = useState<'p50' | 'p95'>('p95');
@@ -101,7 +157,6 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
   const opcodeCosts = useOpcodeCostData(timeRange);
 
   const { data: perf } = usePerformanceData({ timeRange, referenceNodesOnly, enabled: true });
-  const showHourly = HOURLY_CHART_RANGES.includes(timeRange);
   const usePerSlotTrend = PER_SLOT_CHART_RANGES.includes(timeRange);
 
   const model = useMemo(
@@ -118,10 +173,10 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
     if (usePerSlotTrend) {
       return perf ? bucketedThroughputSeries(perf.perClientBlocks, timeRange === '1hour' ? 60 : 300, percentile) : [];
     }
-    return hourlyThroughputSeries(data.newPayloadByElClientHourly, percentile);
-  }, [usePerSlotTrend, perf, timeRange, percentile, data.newPayloadByElClientHourly]);
+    return perf ? hourlyThroughputSeries(perf.perClientHourly, percentile) : [];
+  }, [usePerSlotTrend, perf, timeRange, percentile]);
 
-  const versions = useMemo(() => versionRows(data.newPayloadByElClientHourly), [data.newPayloadByElClientHourly]);
+  const versions = useMemo(() => (perf ? versionRows(perf.perClientHourly) : []), [perf]);
 
   if (!perf || !model) {
     return (
@@ -151,7 +206,7 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
       />
 
       <Stats
-        gridClassName="grid grid-cols-2 lg:grid-cols-5"
+        gridClassName="grid grid-cols-1 sm:grid-cols-2 sm:*:last:col-span-2 lg:grid-cols-3 xl:grid-cols-5 xl:*:last:col-span-1"
         stats={[
           {
             id: 'fastest',
@@ -193,7 +248,7 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
         anchorId="throughput"
         modalSize="full"
         headerActions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <MethodologyButton onClick={() => openMethodology('throughput')} />
             <SegmentedControl
               ariaLabel="Percentile"
@@ -204,31 +259,27 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
           </div>
         }
       >
-        {({ inModal }) =>
-          !showHourly && !usePerSlotTrend ? (
-            <RangeUnavailableNote />
-          ) : (
-            <MultiLineChart
-              series={trend.map((s, i) => ({
-                name: s.client,
-                data: s.points,
-                color: getExecutionClientColor(s.client, i),
-              }))}
-              xAxis={{
-                type: 'value',
-                name: 'Time',
-                min: 'dataMin',
-                max: 'dataMax',
-                formatter: timeFormatter(timeRange),
-              }}
-              yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
-              height={inModal ? 600 : 340}
-              showLegend
-              enableDataZoom
-              tooltipFormatter={params => throughputTooltip(params)}
-            />
-          )
-        }
+        {({ inModal }) => (
+          <MultiLineChart
+            series={trend.map((s, i) => ({
+              name: s.client,
+              data: s.points,
+              color: getExecutionClientColor(s.client, i),
+            }))}
+            xAxis={{
+              type: 'value',
+              name: 'Time',
+              min: 'dataMin',
+              max: 'dataMax',
+              formatter: timeFormatter(timeRange),
+            }}
+            yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
+            height={inModal ? 600 : 340}
+            showLegend
+            enableDataZoom
+            tooltipFormatter={params => throughputTooltip(params)}
+          />
+        )}
       </PopoutCard>
 
       {/* Gas limit ceiling */}
@@ -238,7 +289,7 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
         anchorId="gas-ceiling"
         modalSize="full"
         headerActions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <MethodologyButton onClick={() => openMethodology('cost-model')} />
             <SegmentedControl
               ariaLabel="Execution budget"
@@ -353,7 +404,7 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
         modalSize="full"
         noPadding
       >
-        {showHourly ? <VersionTracker rows={versions} /> : <RangeUnavailableNote />}
+        <VersionTracker rows={versions} />
       </PopoutCard>
     </div>
   );
@@ -407,6 +458,8 @@ function GasCeiling({
   const step = max > 4000 ? 1000 : max > 2000 ? 500 : max > 800 ? 200 : 100;
   const axisMax = Math.ceil(max / step) * step;
   const ticks = Array.from({ length: axisMax / step + 1 }, (_, i) => i * step);
+  // Phones label at most four ticks so the labels don't run together
+  const phoneTickEvery = Math.ceil((ticks.length - 1) / 3);
   const network = ceilings[ceilings.length - 1];
 
   return (
@@ -425,60 +478,71 @@ function GasCeiling({
         </div>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="relative">
-          {ceilings.map(({ client, mgas }) => {
-            const fit = basis === 'p50' ? client.fitP50 : client.fitP95;
-            return (
-              <div key={client.client} className="flex items-center gap-3 py-1.5">
-                <div className="flex w-28 shrink-0 items-center gap-2 text-sm font-medium text-foreground">
-                  <ClientLogo client={client.client} size={18} />
-                  {client.client}
-                </div>
-                <div className="relative h-7 flex-1">
-                  <div
-                    className="absolute inset-y-0 left-0 flex items-center justify-end rounded-xs pr-2 text-xs font-semibold text-white tabular-nums transition-[width] duration-500"
-                    style={{ width: `${(mgas / axisMax) * 100}%`, backgroundColor: client.color }}
-                  >
-                    {mgas / axisMax > 0.12 && fmtGasM(mgas)}
-                  </div>
-                  {mgas / axisMax <= 0.12 && (
-                    <span
-                      className="absolute top-1/2 -translate-y-1/2 pl-2 text-xs font-semibold text-foreground tabular-nums"
-                      style={{ left: `${(mgas / axisMax) * 100}%` }}
-                    >
-                      {fmtGasM(mgas)}
-                    </span>
-                  )}
-                </div>
-                <div className="hidden w-40 shrink-0 text-right font-mono text-xs text-muted sm:block">
-                  {Math.max(0, fit.intercept).toFixed(0)}ms + {fit.slope.toFixed(2)}ms/Mgas
-                </div>
+      {/* Bars, today's marker and ticks share the middle column; the bar track keeps room on its
+          right for the value label after the longest bar */}
+      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 pt-5 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+        {ceilings.map(({ client, mgas }, i) => {
+          const fit = basis === 'p50' ? client.fitP50 : client.fitP95;
+          return (
+            <Fragment key={client.client}>
+              <div
+                className="col-start-1 flex items-center gap-2 text-sm font-medium text-foreground"
+                style={{ gridRow: i + 1 }}
+              >
+                <ClientLogo client={client.client} size={18} />
+                {client.client}
               </div>
-            );
-          })}
-          {/* Today's gas limit marker */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 left-31 sm:right-43">
-            <div
-              className="absolute inset-y-0 border-l-2 border-dashed border-foreground/60"
-              style={{ left: `${(gasLimitM / axisMax) * 100}%` }}
-            >
-              <span className="absolute -top-5 -translate-x-1/2 text-[10px] font-semibold whitespace-nowrap text-foreground">
-                today {fmtGasM(gasLimitM)}
-              </span>
-            </div>
+              <div className="relative col-start-2 mr-12 h-7" style={{ gridRow: i + 1 }}>
+                <div
+                  className="absolute inset-y-0 left-0 rounded-xs transition-[width] duration-500"
+                  style={{ width: `${(mgas / axisMax) * 100}%`, backgroundColor: client.color }}
+                />
+                <span
+                  className="absolute top-1/2 -translate-y-1/2 pl-2 text-xs font-semibold whitespace-nowrap text-foreground tabular-nums"
+                  style={{ left: `${(mgas / axisMax) * 100}%` }}
+                >
+                  {fmtGasM(mgas)}
+                </span>
+              </div>
+              <div
+                className="col-start-3 hidden text-right font-mono text-xs whitespace-nowrap text-muted sm:block"
+                style={{ gridRow: i + 1 }}
+              >
+                {Math.max(0, fit.intercept).toFixed(0)}ms + {fit.slope.toFixed(2)}ms/Mgas
+              </div>
+            </Fragment>
+          );
+        })}
+        {/* Today's gas limit marker */}
+        <div
+          className="pointer-events-none relative col-start-2 mr-12 self-stretch"
+          style={{ gridRow: `1 / span ${ceilings.length}` }}
+        >
+          <div
+            className="absolute inset-y-0 border-l-2 border-dashed border-foreground/60"
+            style={{ left: `${(gasLimitM / axisMax) * 100}%` }}
+          >
+            <span className="absolute -top-5 -translate-x-1/2 text-xs font-semibold whitespace-nowrap text-foreground">
+              today {fmtGasM(gasLimitM)}
+            </span>
           </div>
         </div>
-        <div className="mt-1 flex items-center gap-3">
-          <div className="w-28 shrink-0" />
-          <div className="relative h-4 flex-1 text-[10px] text-muted tabular-nums">
-            {ticks.map(t => (
-              <span key={t} className="absolute -translate-x-1/2" style={{ left: `${(t / axisMax) * 100}%` }}>
-                {fmtGasM(t)}
-              </span>
-            ))}
-          </div>
-          <div className="hidden w-40 shrink-0 sm:block" />
+        <div
+          className="relative col-start-2 mr-12 h-4 text-xs text-muted tabular-nums"
+          style={{ gridRow: ceilings.length + 1 }}
+        >
+          {ticks.map((t, i) => (
+            <span
+              key={t}
+              className={clsx(
+                'absolute -translate-x-1/2 whitespace-nowrap',
+                i % phoneTickEvery !== 0 && 'hidden sm:inline'
+              )}
+              style={{ left: `${(t / axisMax) * 100}%` }}
+            >
+              {fmtGasM(t)}
+            </span>
+          ))}
         </div>
       </div>
     </div>
@@ -520,32 +584,34 @@ function CostModel({ clients, inModal }: { clients: ClientPerformance[]; inModal
         height={inModal ? 560 : 260}
         showLegend={false}
       />
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-xs text-muted">
-            <th className="py-1 text-left font-medium">Client</th>
-            <th className="py-1 text-right font-medium">Overhead</th>
-            <th className="py-1 text-right font-medium">Per Mgas</th>
-            <th className="py-1 text-right font-medium">Full block</th>
-            <th className="py-1 text-right font-medium">R²</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {clients.map(c => (
-            <tr key={c.client}>
-              <td className="py-1.5">
-                <ClientInline client={c.client} />
-              </td>
-              <td className="py-1.5 text-right tabular-nums">{Math.max(0, c.fitP50.intercept).toFixed(1)} ms</td>
-              <td className="py-1.5 text-right tabular-nums">{c.fitP50.slope.toFixed(2)} ms</td>
-              <td className="py-1.5 text-right tabular-nums">
-                {(Math.max(0, c.fitP50.intercept) + c.fitP50.slope * 60).toFixed(0)} ms
-              </td>
-              <td className="py-1.5 text-right text-muted tabular-nums">{c.fitP50.r2.toFixed(2)}</td>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
+          <thead>
+            <tr className="text-xs text-muted">
+              <th className="py-1 text-left font-medium">Client</th>
+              <th className="py-1 pl-2 text-right font-medium">Overhead</th>
+              <th className="py-1 pl-2 text-right font-medium">Per Mgas</th>
+              <th className="py-1 pl-2 text-right font-medium">Full block</th>
+              <th className="py-1 pl-2 text-right font-medium">R²</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {clients.map(c => (
+              <tr key={c.client}>
+                <td className="py-1.5">
+                  <ClientInline client={c.client} />
+                </td>
+                <td className="py-1.5 pl-2 text-right tabular-nums">{Math.max(0, c.fitP50.intercept).toFixed(1)} ms</td>
+                <td className="py-1.5 pl-2 text-right tabular-nums">{c.fitP50.slope.toFixed(2)} ms</td>
+                <td className="py-1.5 pl-2 text-right tabular-nums">
+                  {(Math.max(0, c.fitP50.intercept) + c.fitP50.slope * 60).toFixed(0)} ms
+                </td>
+                <td className="py-1.5 pl-2 text-right text-muted tabular-nums">{c.fitP50.r2.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -595,7 +661,7 @@ function WorkloadSensitivity({
       <table className="w-full border-separate border-spacing-1 text-sm">
         <thead>
           <tr>
-            <th />
+            <th className="sticky left-0 z-10 bg-surface" />
             {resources.map(r => (
               <th key={r.key} className="px-1 pb-1 text-center align-bottom text-xs font-medium text-muted">
                 <div className="text-foreground">{r.label}</div>
@@ -607,8 +673,10 @@ function WorkloadSensitivity({
         <tbody>
           {clients.map(c => (
             <tr key={c.client}>
-              <td className="pr-2 whitespace-nowrap">
-                <ClientInline client={c.client} />
+              <td className="sticky left-0 z-10 bg-surface pr-2">
+                <div className="w-max">
+                  <ClientInline client={c.client} />
+                </div>
               </td>
               {resources.map(r => {
                 const v = c.sensitivity.get(r.key);
@@ -648,9 +716,9 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-border text-sm">
         <thead>
-          <tr className="text-left text-xs text-muted">
+          <tr className="text-left text-xs whitespace-nowrap text-muted">
             <th className="px-4 py-2.5 font-medium sm:px-5">Slot</th>
-            <th className="px-3 py-2.5 font-medium">Block</th>
+            <th className="hidden px-3 py-2.5 font-medium xl:table-cell">Block</th>
             <th className="px-3 py-2.5 text-right font-medium">Gas</th>
             <th className="px-3 py-2.5 text-right font-medium">Txs</th>
             <th className="px-3 py-2.5 font-medium">Heaviest resource</th>
@@ -659,62 +727,66 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {blocks.map(b => (
-            <tr key={b.slot}>
-              <td className="px-4 py-2.5 sm:px-5">
+          {blocks.map(b => {
+            const block =
+              b.blockNumber > 0 ? (
                 <Link
-                  to="/ethereum/slots/$slot"
-                  params={{ slot: String(b.slot) }}
-                  className="font-medium text-primary hover:underline"
+                  to="/ethereum/execution/gas-profiler/block/$blockNumber"
+                  params={{ blockNumber: String(b.blockNumber) }}
+                  className="text-foreground hover:text-primary hover:underline"
                 >
-                  {b.slot}
+                  {b.blockNumber}
                 </Link>
-              </td>
-              <td className="px-3 py-2.5">
-                {b.blockNumber > 0 ? (
+              ) : (
+                '–'
+              );
+            return (
+              <tr key={b.slot}>
+                <td className="px-4 py-2.5 sm:px-5">
                   <Link
-                    to="/ethereum/execution/gas-profiler/block/$blockNumber"
-                    params={{ blockNumber: String(b.blockNumber) }}
-                    className="text-foreground hover:text-primary hover:underline"
+                    to="/ethereum/slots/$slot"
+                    params={{ slot: String(b.slot) }}
+                    className="font-medium text-primary hover:underline"
                   >
-                    {b.blockNumber}
+                    {b.slot}
                   </Link>
-                ) : (
-                  '–'
-                )}
-              </td>
-              <td className="px-3 py-2.5 text-right tabular-nums">{(b.gasUsed / 1e6).toFixed(1)}M</td>
-              <td className="px-3 py-2.5 text-right tabular-nums">{b.txCount}</td>
-              <td className="px-3 py-2.5 whitespace-nowrap text-muted">
-                {b.topResource ? (
-                  <>
-                    <span className="text-foreground">{b.topResource.label}</span>{' '}
-                    {(b.topResource.share * 100).toFixed(0)}%
-                  </>
-                ) : (
-                  '–'
-                )}
-              </td>
-              <td className="w-[38%] min-w-64 px-3 py-2.5">
-                <div className="relative h-5 rounded-xs bg-background">
-                  {b.perClient.map(p => (
-                    <span
-                      key={p.client}
-                      title={`${p.client} · ${Math.round(p.ms)} ms`}
-                      className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
-                      style={{ left: `${(p.ms / maxMs) * 100}%`, backgroundColor: getExecutionClientColor(p.client) }}
-                    />
-                  ))}
-                </div>
-              </td>
-              <td className="px-4 py-2.5 text-right whitespace-nowrap sm:px-5">
-                <span className="inline-flex items-center gap-1.5">
-                  <ClientLogo client={b.slowestClient} size={14} />
-                  <span className="font-semibold tabular-nums">{Math.round(b.slowestMs)} ms</span>
-                </span>
-              </td>
-            </tr>
-          ))}
+                  {/* Narrower screens stack the block under its slot to keep the race and slowest time in view */}
+                  <div className="text-xs xl:hidden">{block}</div>
+                </td>
+                <td className="hidden px-3 py-2.5 xl:table-cell">{block}</td>
+                <td className="px-3 py-2.5 text-right tabular-nums">{(b.gasUsed / 1e6).toFixed(1)}M</td>
+                <td className="px-3 py-2.5 text-right tabular-nums">{b.txCount}</td>
+                <td className="px-3 py-2.5 whitespace-nowrap text-muted">
+                  {b.topResource ? (
+                    <>
+                      <span className="text-foreground">{b.topResource.label}</span>{' '}
+                      {(b.topResource.share * 100).toFixed(0)}%
+                    </>
+                  ) : (
+                    '–'
+                  )}
+                </td>
+                <td className="min-w-40 px-3 py-2.5 xl:w-[38%] xl:min-w-64">
+                  <div className="relative h-5 rounded-xs bg-background">
+                    {b.perClient.map(p => (
+                      <span
+                        key={p.client}
+                        title={`${p.client} · ${Math.round(p.ms)} ms`}
+                        className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
+                        style={{ left: `${(p.ms / maxMs) * 100}%`, backgroundColor: getExecutionClientColor(p.client) }}
+                      />
+                    ))}
+                  </div>
+                </td>
+                <td className="px-4 py-2.5 text-right whitespace-nowrap sm:px-5">
+                  <span className="inline-flex items-center gap-1.5">
+                    <ClientLogo client={b.slowestClient} size={14} />
+                    <span className="font-semibold tabular-nums">{Math.round(b.slowestMs)} ms</span>
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -733,11 +805,11 @@ function VersionTracker({ rows }: { rows: VersionRow[] }): JSX.Element {
         <thead>
           <tr className="text-left text-xs text-muted">
             <th className="px-4 py-2.5 font-medium sm:px-5">Client</th>
-            <th className="px-3 py-2.5 font-medium">Version</th>
-            <th className="px-3 py-2.5 font-medium">Seen</th>
-            <th className="px-3 py-2.5 font-medium">Hourly Mgas/s</th>
-            <th className="px-3 py-2.5 text-right font-medium">Mgas/s</th>
-            <th className="px-4 py-2.5 text-right font-medium sm:px-5">vs previous</th>
+            <th className="hidden px-3 py-2.5 font-medium xl:table-cell">Version</th>
+            <th className="hidden px-3 py-2.5 font-medium xl:table-cell">Seen</th>
+            <th className="hidden px-3 py-2.5 font-medium sm:table-cell">Hourly Mgas/s</th>
+            <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Mgas/s</th>
+            <th className="px-4 py-2.5 text-right font-medium whitespace-nowrap sm:px-5">vs previous</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -745,12 +817,19 @@ function VersionTracker({ rows }: { rows: VersionRow[] }): JSX.Element {
             <tr key={`${r.client}|${r.version}`}>
               <td className="px-4 py-2 sm:px-5">
                 <ClientInline client={r.client} />
+                {/* Narrower screens stack version and dates under the client so the numbers stay in view */}
+                <div className="mt-0.5 font-mono text-xs wrap-break-word text-foreground xl:hidden">{r.version}</div>
+                <div className="text-xs whitespace-nowrap text-muted xl:hidden">
+                  {fmtDate(r.firstSeen)} – {fmtDate(r.lastSeen)}
+                </div>
               </td>
-              <td className="max-w-56 truncate px-3 py-2 font-mono text-xs text-foreground">{r.version}</td>
-              <td className="px-3 py-2 whitespace-nowrap text-muted">
+              <td className="hidden max-w-56 truncate px-3 py-2 font-mono text-xs text-foreground xl:table-cell">
+                {r.version}
+              </td>
+              <td className="hidden px-3 py-2 whitespace-nowrap text-muted xl:table-cell">
                 {fmtDate(r.firstSeen)} – {fmtDate(r.lastSeen)}
               </td>
-              <td className="px-3 py-2">
+              <td className="hidden px-3 py-2 sm:table-cell">
                 <Sparkline data={r.sparkline} width={180} height={24} color={getExecutionClientColor(r.client)} />
               </td>
               <td className="px-3 py-2 text-right font-medium tabular-nums">{fmtMgas(r.throughput)}</td>

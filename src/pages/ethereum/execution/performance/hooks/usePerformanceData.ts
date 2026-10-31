@@ -5,16 +5,18 @@ import {
   fctEngineNewPayloadBySlotServiceList,
   intBlockResourceGasServiceList,
   fctExecutionGasUsedHourlyServiceList,
+  fctEngineNewPayloadByElClientHourlyServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
   FctEngineNewPayloadBySlot,
   IntBlockResourceGas,
   FctExecutionGasUsedHourly,
+  FctEngineNewPayloadByElClientHourly,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { TIME_RANGE_CONFIG, HOURLY_CHART_RANGES, type TimeRange } from '../IndexPage.types';
+import { TIME_RANGE_CONFIG, type TimeRange } from '../IndexPage.types';
 
 /** Block-level analysis covers at most this many seconds, so it stays fast at any range */
 export const BLOCK_WINDOW_MAX_SECONDS = 6 * 3600;
@@ -26,6 +28,8 @@ export interface PerformanceData {
   blocks: FctEngineNewPayloadBySlot[];
   /** Gas split by resource for each block in the block window */
   resourceGas: IntBlockResourceGas[];
+  /** Per-client, per-version newPayload timings per hour over the selected range */
+  perClientHourly: FctEngineNewPayloadByElClientHourly[];
   /** Chain-wide gas used per hour over the selected range */
   gasUsedHourly: FctExecutionGasUsedHourly[];
   /** Length of the block window in seconds */
@@ -33,8 +37,8 @@ export interface PerformanceData {
 }
 
 /**
- * Fetches the extra data behind the Performance tab: per-block client timings joined with
- * per-block resource gas, plus chain-wide gas used for the demand side.
+ * Fetches everything behind the performance page: hourly per-client timings over the range,
+ * per-block client timings joined with per-block resource gas, and chain-wide gas used.
  */
 export function usePerformanceData({
   timeRange,
@@ -134,11 +138,32 @@ export function usePerformanceData({
         'fct_execution_gas_used_hourly',
         signal
       ),
-    enabled: on && HOURLY_CHART_RANGES.includes(timeRange),
+    enabled: on,
     placeholderData: keepPreviousData,
   });
 
-  const isLoading = !perClientBlocks.data || !blocks.data;
+  const perClientHourly = useQuery({
+    queryKey: ['engine-perf', 'by-el-client-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctEngineNewPayloadByElClientHourly>(
+        fctEngineNewPayloadByElClientHourlyServiceList,
+        {
+          query: {
+            hour_start_date_time_gte: hourlyStart,
+            hour_start_date_time_lt: hourlyEnd,
+            order_by: 'hour_start_date_time DESC',
+            page_size: 10000,
+            ...refNodeFilter,
+          },
+        },
+        'fct_engine_new_payload_by_el_client_hourly',
+        signal
+      ),
+    enabled: on,
+    placeholderData: keepPreviousData,
+  });
+
+  const isLoading = !perClientBlocks.data || !blocks.data || !perClientHourly.data;
 
   return {
     data: isLoading
@@ -148,6 +173,7 @@ export function usePerformanceData({
           blocks: blocks.data ?? [],
           resourceGas: resourceGas.data ?? [],
           gasUsedHourly: gasUsedHourly.data ?? [],
+          perClientHourly: perClientHourly.data ?? [],
           blockWindowSeconds: hourlyEnd - blockStart,
         },
     isLoading,

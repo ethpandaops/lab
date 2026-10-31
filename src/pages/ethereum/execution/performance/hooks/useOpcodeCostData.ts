@@ -6,7 +6,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { TIME_RANGE_CONFIG, type TimeRange } from '../IndexPage.types';
 import { buildOpcodeCostModel, MIN_VERSION_HOURS, type OpcodeCostModel } from '../utils/opcode-costs';
-import { generateDateRange } from './useEngineTimingsData';
+import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
 
 /** The opcode model is fitted only on reference nodes, which share hardware */
 const NODE_CLASS = 'eip7870-block-builder';

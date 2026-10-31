@@ -15,7 +15,6 @@ import { TimingsSkeleton } from './components/TimingsSkeleton';
 import { NewPayloadTab } from './components/NewPayloadTab';
 import { GetBlobsTab } from './components/GetBlobsTab';
 import { ReferenceNodesInfoDialog } from './components/ReferenceNodesInfoDialog';
-import { PerformanceTab } from './components/PerformanceTab';
 import { DEFAULT_TIME_RANGE, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 
 /**
@@ -38,14 +37,10 @@ export function IndexPage(): JSX.Element {
   const { selectedIndex, onChange } = useTabState([
     { id: 'newPayload', anchors: ['duration-histogram', 'slot-duration', 'client-matrix'] },
     { id: 'getBlobs', anchors: ['blob-duration'] },
-    {
-      id: 'performance',
-      anchors: ['throughput', 'gas-ceiling', 'cost-model', 'opcode-pricing', 'opcode-versions', 'slowest-blocks'],
-    },
   ]);
 
   // Map tab index to tab name
-  const activeTab = selectedIndex === 1 ? 'getBlobs' : 'newPayload';
+  const activeTab = selectedIndex === 0 ? 'newPayload' : 'getBlobs';
 
   // Fetch engine timing data (getBlobs queries only run when that tab is visited)
   const { data, isLoading, isLoadingBlobs, error } = useEngineTimingsData({
@@ -92,7 +87,6 @@ export function IndexPage(): JSX.Element {
             <ScrollableTabs>
               <Tab>newPayload</Tab>
               <Tab>getBlobs</Tab>
-              <Tab>Performance</Tab>
             </ScrollableTabs>
 
             {/* Reference Nodes Filter - below tabs on mobile, absolute right on sm+ */}
@@ -124,11 +118,6 @@ export function IndexPage(): JSX.Element {
             {/* getBlobs Tab */}
             <TabPanel>
               <GetBlobsTab data={data} timeRange={timeRange} isLoading={isLoadingBlobs} />
-            </TabPanel>
-
-            {/* Performance Tab */}
-            <TabPanel>
-              <PerformanceTab data={data} timeRange={timeRange} referenceNodesOnly={referenceNodesOnly} />
             </TabPanel>
           </TabPanels>
         </TabGroup>

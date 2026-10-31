@@ -119,7 +119,7 @@ export function BoxPlot({
           }
         : undefined;
 
-    return {
+    const baseOption = {
       animation: true,
       animationDuration,
       animationEasing: 'cubicOut',
@@ -190,6 +190,28 @@ export function BoxPlot({
           `;
         },
       },
+    };
+
+    if (categoryLabelInterval === 'auto') return baseOption;
+
+    // Every label must show: on narrow charts, drop every other label to a second line so long
+    // names don't collide and get hidden
+    return {
+      baseOption,
+      media: [
+        { option: { xAxis: { axisLabel: { hideOverlap: true, formatter: (value: string) => value } } } },
+        {
+          query: { maxWidth: 480 },
+          option: {
+            xAxis: {
+              axisLabel: {
+                hideOverlap: false,
+                formatter: (value: string, index: number) => (index % 2 ? `\n${value}` : value),
+              },
+            },
+          },
+        },
+      ],
     };
   }, [
     series,
