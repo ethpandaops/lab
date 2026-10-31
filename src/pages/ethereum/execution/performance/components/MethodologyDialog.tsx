@@ -10,7 +10,7 @@ export function MethodologyButton({ onClick }: { onClick: () => void }): JSX.Ele
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1 rounded-xs px-1.5 py-1 text-xs text-muted transition-colors hover:text-foreground"
+      className="-ml-1.5 flex items-center gap-1 rounded-xs px-1.5 py-1 text-xs text-muted transition-colors hover:text-foreground"
     >
       <InformationCircleIcon className="size-3.5" />
       Methodology

@@ -88,7 +88,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
       modalSize="full"
       noPadding
       headerActions={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <MethodologyButton onClick={onMethodology} />
           <SegmentedControl ariaLabel="Metric" options={METRIC_OPTIONS} value={metric} onChange={setMetric} />
         </div>
@@ -97,26 +97,32 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
       <div className="border-b border-border p-4 sm:p-5">
         <div className="mb-3 text-xs font-medium text-muted">Repricing candidates</div>
         <Stats
-          gridClassName="grid grid-cols-2 lg:grid-cols-4"
+          gridClassName="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
           stats={candidates.map(c => ({
             id: c.opcode.name,
             name: c.opcode.name,
             value: fmtRatio(c.cost.ratio),
             subtitle: (
-              <span className="flex items-center gap-1.5">
-                <ClientLogo client={c.client} size={14} />
-                {c.client} · {fmtNs(c.cost.nsPerOp)} for {fmtGasPerOp(c.opcode.gasPerOp)} gas
-              </span>
+              <>
+                <span className="flex items-center gap-1.5">
+                  <ClientLogo client={c.client} size={14} />
+                  {c.client}
+                </span>
+                <span className="block truncate">
+                  {fmtNs(c.cost.nsPerOp)} for {fmtGasPerOp(c.opcode.gasPerOp)} gas
+                </span>
+              </>
             ),
           }))}
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-x-1 border-spacing-y-0.5 px-3 py-3 text-sm sm:px-4">
+      {/* Inset scroll area: cells scrolling under the sticky opcode column stay inside the card's hairline */}
+      <div className="mx-3 overflow-x-auto sm:mx-4">
+        <table className="min-w-full border-separate border-spacing-x-1 border-spacing-y-0.5 py-3 text-sm">
           <thead>
             <tr className="text-xs text-muted">
-              <th className="px-1 pb-2 text-left font-medium">Opcode</th>
+              <th className="sticky left-0 z-10 bg-surface px-1 pb-2 text-left font-medium">Opcode</th>
               <th className="px-1 pb-2 text-right font-medium">Gas share</th>
               <th className="px-1 pb-2 text-right font-medium">Gas / op</th>
               {model.clients.map(c => (
@@ -134,15 +140,20 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
               <Fragment key={section.key}>
                 <tr>
                   <td colSpan={3 + model.clients.length} className="px-1 pt-4 pb-1.5">
-                    <span className="text-xs font-semibold text-foreground">{section.title}</span>
-                    {section.note && <span className="ml-2 text-xs text-muted">{section.note}</span>}
+                    {/* Stays in view and wraps inside it while the matrix scrolls sideways */}
+                    <div className="sticky left-1 flex max-w-[calc(100vw-5rem)] flex-wrap gap-x-2 text-xs">
+                      <span className="font-semibold text-foreground">{section.title}</span>
+                      {section.note && <span className="text-muted">{section.note}</span>}
+                    </div>
                   </td>
                 </tr>
                 {section.rows.map(i => {
                   const op = model.opcodes[i];
                   return (
                     <tr key={op.name}>
-                      <td className="px-1 py-0.5 font-mono text-xs whitespace-nowrap text-foreground">{op.name}</td>
+                      <td className="sticky left-0 z-10 bg-surface px-1 py-0.5 font-mono text-xs text-foreground sm:whitespace-nowrap">
+                        <div className="max-w-36 sm:max-w-none">{op.name}</div>
+                      </td>
                       <td className="px-1 py-0.5 text-right text-muted tabular-nums">
                         {(op.gasShare * 100).toFixed(op.gasShare >= 0.01 ? 0 : 1)}%
                       </td>
@@ -174,10 +185,10 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted sm:px-5">
         <span>Uncoloured cells are within 10% of 1× or within noise.</span>
-        <span className="flex items-center gap-2">
+        <span className="flex w-full items-center gap-2 whitespace-nowrap sm:w-auto">
           Faster than priced
           <span
-            className="h-2 w-32 rounded-full"
+            className="h-2 min-w-8 flex-1 rounded-full sm:w-32 sm:flex-none"
             style={{
               background:
                 'linear-gradient(to right, color-mix(in oklab, var(--color-chart-0) 70%, transparent), transparent, color-mix(in oklab, var(--color-chart-3) 70%, transparent))',
@@ -387,13 +398,19 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                       </tr>
                       {g.rows.map(r => (
                         <tr key={r.version.version}>
-                          <td className="max-w-48 truncate px-4 py-1 font-mono text-xs text-foreground sm:px-5">
-                            {r.version.version}
+                          <td className="py-1 pr-3 pl-4 sm:pl-5">
+                            {/* Wraps rather than truncates on phones: the build hash at the end tells releases apart */}
+                            <div className="w-40 font-mono text-xs wrap-break-word text-foreground sm:w-auto sm:whitespace-nowrap">
+                              {r.version.version}
+                            </div>
+                            <div className="text-xs whitespace-nowrap text-muted sm:hidden">
+                              {fmtDate(r.version.firstSeen)} – {fmtDate(r.version.lastSeen)}
+                            </div>
                           </td>
-                          <td className="px-3 py-1 whitespace-nowrap text-muted">
+                          <td className="hidden px-3 py-1 whitespace-nowrap text-muted sm:table-cell">
                             {fmtDate(r.version.firstSeen)} – {fmtDate(r.version.lastSeen)}
                           </td>
-                          <td className="w-[40%] min-w-40 px-3 py-1">
+                          <td className="w-[40%] min-w-12 px-3 py-1 sm:min-w-40">
                             <div className="relative h-5">
                               <div
                                 className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full opacity-40"
