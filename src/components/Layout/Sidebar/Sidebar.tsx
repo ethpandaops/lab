@@ -16,6 +16,7 @@ import {
   Square3Stack3DIcon,
   UserGroupIcon,
   ShieldCheckIcon,
+  BoltIcon,
   ClockIcon,
   CpuChipIcon,
   MapIcon,
@@ -181,6 +182,7 @@ const ethereumDataAvailabilityPages: NavItem[] = [
 const ethereumExecutionPages: NavItem[] = [
   { name: 'Overview', to: '/ethereum/execution/overview', icon: PresentationChartLineIcon },
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
+  { name: 'Performance', to: '/ethereum/execution/performance', icon: BoltIcon },
   { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
   { name: 'Gas Profiler', to: '/ethereum/execution/gas-profiler', icon: FireIcon },
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },

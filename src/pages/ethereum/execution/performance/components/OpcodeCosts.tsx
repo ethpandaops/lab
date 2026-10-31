@@ -15,7 +15,7 @@ import {
   type OpcodeCost,
   type OpcodeCostModel,
   type OpcodeMeta,
-} from '../../utils/opcode-costs';
+} from '../utils/opcode-costs';
 import { MethodologyButton } from './MethodologyDialog';
 
 export interface OpcodeCardProps {
@@ -209,9 +209,34 @@ const MAX_RELEASES_PER_CLIENT = 4;
 const fmtDate = (t: number): string =>
   new Date(t * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
+const VIEW_OPTIONS = [
+  { value: 'combined', label: 'Combined' },
+  { value: 'per-client', label: 'Per client' },
+] as const;
+
+/** Tooltip for daily points: date, then each series' value */
+function dailyTooltip(params: unknown, label: (seriesName: string, ns: number) => string): string {
+  const points = (Array.isArray(params) ? params : [params]) as {
+    seriesName?: string;
+    value?: [number, number];
+    color?: string;
+  }[];
+  const first = points.find(p => p.value);
+  if (!first?.value) return '';
+  const rows = points
+    .filter(p => p.value && p.seriesName !== 'Median')
+    .sort((a, b) => (b.value![1] ?? 0) - (a.value![1] ?? 0))
+    .map(
+      p =>
+        `<div style="display:flex;gap:8px;align-items:center;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span><span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${label(p.seriesName ?? '', p.value![1])}</span></div>`
+    )
+    .join('');
+  return `<div style="font-weight:600;margin-bottom:4px">${fmtDate(first.value[0] / 1000)}</div>${rows}`;
+}
+
 /**
- * One opcode's cost over time per client: daily estimates with deploys marked, and an estimate
- * with interval for each release that ran long enough to measure.
+ * One opcode's cost over time: all clients on one chart, or a chart per client scaled to that
+ * client's own range with deploys marked. Below, an estimate with interval for recent releases.
  */
 export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): JSX.Element {
   const themeColors = useThemeColors();
@@ -220,37 +245,44 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
     .filter(({ op }) => op.gasShare >= 0.005)
     .sort((a, b) => b.op.gasShare - a.op.gasShare);
   const [opIndex, setOpIndex] = useState(model.opcodes.findIndex(o => o.key === 'SLOAD'));
+  const [view, setView] = useState<(typeof VIEW_OPTIONS)[number]['value']>('combined');
   const op = model.opcodes[opIndex];
   const dayMin = Math.min(...model.clients.flatMap(c => c.daily.map(d => d.day)));
   const dayMax = Math.max(...model.clients.flatMap(c => c.daily.map(d => d.day)));
-  const yMax = niceMax(Math.max(...model.clients.flatMap(c => c.daily.map(d => d.nsPerOp[opIndex]))));
+  const xAxis = {
+    type: 'value' as const,
+    min: dayMin * 1000,
+    max: dayMax * 1000,
+    formatter: (v: number | string) => fmtDate(Number(v) / 1000),
+  };
 
-  const measured = model.clients.flatMap((c, ci) =>
-    // The most recent releases per client; long ranges otherwise list dozens of dev builds
-    c.versions.slice(-MAX_RELEASES_PER_CLIENT).map(v => {
-      const cost = v.ratios[opIndex];
-      return {
-        client: c.client,
-        color: getExecutionClientColor(c.client, ci),
+  const releaseGroups = model.clients
+    .map((c, ci) => {
+      const color = getExecutionClientColor(c.client, ci);
+      // The most recent releases per client; long ranges otherwise list dozens of dev builds
+      const rows = c.versions.slice(-MAX_RELEASES_PER_CLIENT).map(v => ({
         version: v,
-        ns: cost.nsPerOp,
-        lo: cost.nsLo,
-        hi: cost.nsHi,
-      };
+        ns: v.ratios[opIndex].nsPerOp,
+        lo: v.ratios[opIndex].nsLo,
+        hi: v.ratios[opIndex].nsHi,
+      }));
+      // Each client on its own scale: what matters is how its releases compare with each other
+      const max = Math.max(...rows.map(r => r.hi), 1e-9) * 1.05;
+      return { client: c.client, color, rows, max };
     })
-  );
-  const forestMax = Math.max(...measured.map(m => m.hi)) * 1.05;
+    .filter(g => g.rows.length > 0);
 
   return (
     <PopoutCard
       title="Opcode Cost Over Time"
-      subtitle={`Nanoseconds per ${op.name}, fitted per day. Dashed lines mark deploys.`}
+      subtitle={`Nanoseconds per ${op.name}, fitted per day`}
       anchorId="opcode-versions"
       modalSize="full"
       noPadding
       headerActions={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <MethodologyButton onClick={onMethodology} />
+          <SegmentedControl ariaLabel="Chart layout" options={VIEW_OPTIONS} value={view} onChange={setView} />
           <SelectMenu
             value={opIndex}
             onChange={setOpIndex}
@@ -261,109 +293,134 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
     >
       {({ inModal }) => (
         <>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-2 p-4 sm:p-5 md:grid-cols-2 xl:grid-cols-3">
-            {model.clients.map((c, ci) => {
-              const color = getExecutionClientColor(c.client, ci);
-              // A deploy is the first day a new version leads the day's blocks
-              const deploys = c.daily
-                .filter((d, i) => i > 0 && d.versions[0] !== c.daily[i - 1].versions[0])
-                .map(d => ({ xValue: d.day * 1000, color }));
-              return (
-                <div key={c.client}>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1.5 font-medium text-foreground">
-                      <ClientLogo client={c.client} size={16} />
-                      {c.client}
-                    </span>
-                    <span className="text-xs text-muted tabular-nums">{fmtNs(c.ratios[opIndex].nsPerOp)} median</span>
+          {view === 'combined' ? (
+            <div className="p-4 sm:p-5">
+              <MultiLineChart
+                series={model.clients.map((c, ci) => ({
+                  name: c.client,
+                  data: c.daily.map(d => [d.day * 1000, d.nsPerOp[opIndex]] as [number, number]),
+                  color: getExecutionClientColor(c.client, ci),
+                  showSymbol: true,
+                  symbolSize: 5,
+                }))}
+                xAxis={xAxis}
+                yAxis={{ min: 0, formatter: v => fmtNs(v) }}
+                height={inModal ? 600 : 360}
+                showLegend
+                tooltipFormatter={params => dailyTooltip(params, (_, ns) => fmtNs(ns))}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-x-6 gap-y-2 p-4 sm:p-5 md:grid-cols-2 xl:grid-cols-3">
+              {model.clients.map((c, ci) => {
+                const color = getExecutionClientColor(c.client, ci);
+                // A deploy is the first day a new version leads the day's blocks
+                const deploys = c.daily
+                  .filter((d, i) => i > 0 && d.versions[0] !== c.daily[i - 1].versions[0])
+                  .map(d => ({ xValue: d.day * 1000, color }));
+                const yMax = niceMax(Math.max(...c.daily.map(d => d.nsPerOp[opIndex]), 1e-9));
+                return (
+                  <div key={c.client}>
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <span className="flex items-center gap-1.5 font-medium text-foreground">
+                        <ClientLogo client={c.client} size={16} />
+                        {c.client}
+                      </span>
+                      <span className="text-xs text-muted tabular-nums">{fmtNs(c.ratios[opIndex].nsPerOp)} median</span>
+                    </div>
+                    <MultiLineChart
+                      series={[
+                        {
+                          name: c.client,
+                          data: c.daily.map(d => [d.day * 1000, d.nsPerOp[opIndex]] as [number, number]),
+                          color,
+                          showSymbol: true,
+                          symbolSize: 5,
+                        },
+                        {
+                          name: 'Median',
+                          data: [
+                            [dayMin * 1000, c.ratios[opIndex].nsPerOp],
+                            [dayMax * 1000, c.ratios[opIndex].nsPerOp],
+                          ],
+                          color: themeColors.muted,
+                          lineStyle: 'dotted',
+                          lineWidth: 1,
+                        },
+                      ]}
+                      xAxis={xAxis}
+                      yAxis={{ min: 0, max: yMax, formatter: v => fmtNs(v) }}
+                      markLines={deploys}
+                      height={inModal ? 300 : 190}
+                      showLegend={false}
+                      grid={{ top: 24, right: 12, bottom: 28, left: 56 }}
+                      tooltipFormatter={params => {
+                        const p = (Array.isArray(params) ? params : [params]) as { value?: [number, number] }[];
+                        const day = c.daily.find(d => d.day * 1000 === p[0]?.value?.[0]);
+                        if (!day) return '';
+                        return `<div style="font-weight:600">${fmtDate(day.day)}</div><div>${fmtNs(day.nsPerOp[opIndex])}, ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
+                      }}
+                    />
                   </div>
-                  <MultiLineChart
-                    series={[
-                      {
-                        name: c.client,
-                        data: c.daily.map(d => [d.day * 1000, d.nsPerOp[opIndex]] as [number, number]),
-                        color,
-                        showSymbol: true,
-                        symbolSize: 5,
-                      },
-                      {
-                        name: 'Median',
-                        data: [
-                          [dayMin * 1000, c.ratios[opIndex].nsPerOp],
-                          [dayMax * 1000, c.ratios[opIndex].nsPerOp],
-                        ],
-                        color: themeColors.muted,
-                        lineStyle: 'dotted',
-                        lineWidth: 1,
-                      },
-                    ]}
-                    xAxis={{
-                      type: 'value',
-                      min: dayMin * 1000,
-                      max: dayMax * 1000,
-                      formatter: v => fmtDate(Number(v) / 1000),
-                    }}
-                    yAxis={{ min: 0, max: yMax, formatter: v => fmtNs(v) }}
-                    markLines={deploys}
-                    height={inModal ? 300 : 190}
-                    showLegend={false}
-                    grid={{ top: 24, right: 12, bottom: 28, left: 56 }}
-                    tooltipFormatter={params => {
-                      const p = (Array.isArray(params) ? params : [params]) as { value?: [number, number] }[];
-                      const day = c.daily.find(d => d.day * 1000 === p[0]?.value?.[0]);
-                      if (!day) return '';
-                      return `<div style="font-weight:600">${fmtDate(day.day)}</div><div>${fmtNs(day.nsPerOp[opIndex])} · ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+              <p className="text-xs text-muted md:col-span-2 xl:col-span-3">
+                Each chart has its own scale. Dashed lines mark deploys.
+              </p>
+            </div>
+          )}
 
-          {measured.length > 0 && (
-            <div className="border-t border-border">
-              <div className="px-4 pt-3 text-xs font-semibold text-foreground sm:px-5">
-                Releases that ran a day or more
-              </div>
-              <table className="min-w-full text-sm">
-                <tbody>
-                  {measured.map(m => (
-                    <tr key={`${m.client}|${m.version.version}`}>
-                      <td className="px-4 py-1.5 whitespace-nowrap sm:px-5">
-                        <span className="flex items-center gap-1.5">
-                          <ClientLogo client={m.client} size={14} />
-                          <span className="font-mono text-xs text-foreground">{m.version.version}</span>
-                        </span>
-                      </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-muted">
-                        {fmtDate(m.version.firstSeen)} – {fmtDate(m.version.lastSeen)}
-                      </td>
-                      <td className="w-[45%] min-w-72 px-3 py-1.5">
-                        <div className="relative h-5">
-                          <div
-                            className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full opacity-40"
-                            style={{
-                              left: `${(m.lo / forestMax) * 100}%`,
-                              width: `${Math.max(0.5, ((m.hi - m.lo) / forestMax) * 100)}%`,
-                              backgroundColor: m.color,
-                            }}
-                          />
-                          <div
-                            className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
-                            style={{ left: `${(m.ns / forestMax) * 100}%`, backgroundColor: m.color }}
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-1.5 text-right whitespace-nowrap tabular-nums sm:px-5">
-                        <span className="font-medium">{fmtNs(m.ns)}</span>{' '}
-                        <span className="text-xs text-muted">
-                          {fmtNs(m.lo)}–{fmtNs(m.hi)}
-                        </span>
-                      </td>
-                    </tr>
+          {releaseGroups.length > 0 && (
+            <div className="border-t border-border pb-2">
+              <div className="px-4 pt-3 text-xs font-semibold text-foreground sm:px-5">Recent releases</div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  {releaseGroups.map(g => (
+                    <tbody key={g.client}>
+                      <tr>
+                        <td colSpan={4} className="px-4 pt-3 pb-1 sm:px-5">
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                            <ClientLogo client={g.client} size={14} />
+                            {g.client}
+                          </span>
+                        </td>
+                      </tr>
+                      {g.rows.map(r => (
+                        <tr key={r.version.version}>
+                          <td className="max-w-48 truncate px-4 py-1 font-mono text-xs text-foreground sm:px-5">
+                            {r.version.version}
+                          </td>
+                          <td className="px-3 py-1 whitespace-nowrap text-muted">
+                            {fmtDate(r.version.firstSeen)} – {fmtDate(r.version.lastSeen)}
+                          </td>
+                          <td className="w-[40%] min-w-40 px-3 py-1">
+                            <div className="relative h-5">
+                              <div
+                                className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full opacity-40"
+                                style={{
+                                  left: `${(r.lo / g.max) * 100}%`,
+                                  width: `${Math.max(0.5, ((r.hi - r.lo) / g.max) * 100)}%`,
+                                  backgroundColor: g.color,
+                                }}
+                              />
+                              <div
+                                className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
+                                style={{ left: `${(r.ns / g.max) * 100}%`, backgroundColor: g.color }}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-1 text-right whitespace-nowrap tabular-nums sm:px-5">
+                            <div className="font-medium">{fmtNs(r.ns)}</div>
+                            <div className="text-xs text-muted">
+                              {fmtNs(r.lo)}–{fmtNs(r.hi)}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   ))}
-                </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           )}
         </>

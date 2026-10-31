@@ -1,13 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/execution/timings';
 import { timingsSearchSchema } from '@/pages/ethereum/execution/timings/IndexPage.types';
 
 export const Route = createFileRoute('/ethereum/execution/timings/')({
   component: IndexPage,
   validateSearch: timingsSearchSchema,
-  beforeLoad: () => ({
-    getBreadcrumb: () => ({ show: false }),
-  }),
+  beforeLoad: ({ search }) => {
+    // The Performance tab moved to its own page
+    if (search.tab === 'performance') {
+      throw redirect({
+        to: '/ethereum/execution/performance',
+        search: {
+          range:
+            search.range === '90days' || search.range === '180days' || search.range === '365days'
+              ? undefined
+              : search.range,
+        },
+      });
+    }
+    return {
+      getBreadcrumb: () => ({ show: false }),
+    };
+  },
   head: () => ({
     meta: [
       { title: `Engine API Timings | ${import.meta.env.VITE_BASE_TITLE}` },

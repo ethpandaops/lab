@@ -52,6 +52,7 @@ import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$
 import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/execution/timings'
 import { Route as EthereumExecutionStateGrowthRouteImport } from './routes/ethereum/execution/state-growth'
 import { Route as EthereumExecutionStateExpiryRouteImport } from './routes/ethereum/execution/state-expiry'
+import { Route as EthereumExecutionPerformanceRouteImport } from './routes/ethereum/execution/performance'
 import { Route as EthereumExecutionPayloadsRouteImport } from './routes/ethereum/execution/payloads'
 import { Route as EthereumExecutionOverviewRouteImport } from './routes/ethereum/execution/overview'
 import { Route as EthereumExecutionGasProfilerRouteImport } from './routes/ethereum/execution/gas-profiler'
@@ -298,6 +299,12 @@ const EthereumExecutionStateExpiryRoute =
     path: '/state-expiry',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
+const EthereumExecutionPerformanceRoute =
+  EthereumExecutionPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
 const EthereumExecutionPayloadsRoute =
   EthereumExecutionPayloadsRouteImport.update({
     id: '/payloads',
@@ -462,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerRouteWithChildren
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
+  '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
@@ -515,6 +523,7 @@ export interface FileRoutesByTo {
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
+  '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
@@ -581,6 +590,7 @@ export interface FileRoutesById {
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerRouteWithChildren
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
+  '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
@@ -649,6 +659,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/gas-profiler'
     | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
+    | '/ethereum/execution/performance'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
@@ -702,6 +713,7 @@ export interface FileRouteTypes {
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/overview'
+    | '/ethereum/execution/performance'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/forks/$fork'
@@ -767,6 +779,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/gas-profiler'
     | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
+    | '/ethereum/execution/performance'
     | '/ethereum/execution/state-expiry'
     | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
@@ -1110,6 +1123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionStateExpiryRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
+    '/ethereum/execution/performance': {
+      id: '/ethereum/execution/performance'
+      path: '/performance'
+      fullPath: '/ethereum/execution/performance'
+      preLoaderRoute: typeof EthereumExecutionPerformanceRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
     '/ethereum/execution/payloads': {
       id: '/ethereum/execution/payloads'
       path: '/payloads'
@@ -1421,6 +1441,7 @@ interface EthereumExecutionRouteChildren {
   EthereumExecutionGasProfilerRoute: typeof EthereumExecutionGasProfilerRouteWithChildren
   EthereumExecutionOverviewRoute: typeof EthereumExecutionOverviewRoute
   EthereumExecutionPayloadsRoute: typeof EthereumExecutionPayloadsRouteWithChildren
+  EthereumExecutionPerformanceRoute: typeof EthereumExecutionPerformanceRoute
   EthereumExecutionStateExpiryRoute: typeof EthereumExecutionStateExpiryRoute
   EthereumExecutionStateGrowthRoute: typeof EthereumExecutionStateGrowthRoute
   EthereumExecutionTimingsRoute: typeof EthereumExecutionTimingsRouteWithChildren
@@ -1431,6 +1452,7 @@ const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
     EthereumExecutionGasProfilerRouteWithChildren,
   EthereumExecutionOverviewRoute: EthereumExecutionOverviewRoute,
   EthereumExecutionPayloadsRoute: EthereumExecutionPayloadsRouteWithChildren,
+  EthereumExecutionPerformanceRoute: EthereumExecutionPerformanceRoute,
   EthereumExecutionStateExpiryRoute: EthereumExecutionStateExpiryRoute,
   EthereumExecutionStateGrowthRoute: EthereumExecutionStateGrowthRoute,
   EthereumExecutionTimingsRoute: EthereumExecutionTimingsRouteWithChildren,

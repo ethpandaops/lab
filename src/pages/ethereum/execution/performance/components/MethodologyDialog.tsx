@@ -35,7 +35,7 @@ function Formula({ children }: { children: ReactNode }): JSX.Element {
   );
 }
 
-/** How every number on the Performance tab is derived */
+/** How every number on the performance page is derived */
 export function MethodologyDialog({
   open,
   section,

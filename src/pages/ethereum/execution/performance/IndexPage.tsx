@@ -1,6 +1,10 @@
 import { type JSX, useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { Link } from '@tanstack/react-router';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { Container } from '@/components/Layout/Container';
+import { Header } from '@/components/Layout/Header';
+import { Checkbox } from '@/components/Forms/Checkbox';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
@@ -10,9 +14,10 @@ import { Sparkline } from '@/components/Charts/Sparkline';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { usePerformanceData } from '../../hooks/usePerformanceData';
-import { HOURLY_CHART_RANGES, PER_SLOT_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
+import { usePerformanceData } from './hooks/usePerformanceData';
+import { useOpcodeCostData } from './hooks/useOpcodeCostData';
+import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 import {
   GAS_BUCKET_MGAS,
   RESOURCES,
@@ -25,17 +30,9 @@ import {
   type ClientPerformance,
   type SlowBlock,
   type VersionRow,
-} from '../../utils/performance';
-import { RangeUnavailableNote } from '../RangeUnavailableNote';
-import { OpcodePricingCard, OpcodeVersionsCard } from './OpcodeCosts';
-import { MethodologyButton, MethodologyDialog, type MethodologySection } from './MethodologyDialog';
-import { useOpcodeCostData } from '../../hooks/useOpcodeCostData';
-
-export interface PerformanceTabProps {
-  data: EngineTimingsData;
-  timeRange: TimeRange;
-  referenceNodesOnly: boolean;
-}
+} from './utils/performance';
+import { OpcodePricingCard, OpcodeVersionsCard } from './components/OpcodeCosts';
+import { MethodologyButton, MethodologyDialog, type MethodologySection } from './components/MethodologyDialog';
 
 const PERCENTILE_OPTIONS = [
   { value: 'avg', label: 'Avg' },
@@ -85,10 +82,69 @@ function divergingStyle(value: number | undefined, limit: number): React.CSSProp
 }
 
 /**
- * Performance tab: turns engine_newPayload timings plus block gas into execution throughput
- * (Mgas/s), per-client cost models, gas limit headroom and workload sensitivity.
+ * Execution performance page: the time range, reference node filter and page header around
+ * the performance sections.
  */
-export function PerformanceTab({ data, timeRange, referenceNodesOnly }: PerformanceTabProps): JSX.Element {
+export function IndexPage(): JSX.Element {
+  const navigate = useNavigate({ from: '/ethereum/execution/performance' });
+  const { range, refNodes } = useSearch({ from: '/ethereum/execution/performance' });
+  const timeRange: TimeRange = range ?? DEFAULT_TIME_RANGE;
+  const referenceNodesOnly = refNodes ?? true;
+  const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
+
+  return (
+    <Container>
+      <Header title="Execution Performance" description="Execution throughput, cost and opcode pricing per client" />
+
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <SegmentedControl
+          options={(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => ({
+            value: r,
+            label: TIME_RANGE_CONFIG[r].label,
+          }))}
+          value={timeRange}
+          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+          ariaLabel="Time window"
+        />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              navigate({ search: prev => ({ ...prev, refNodes: !referenceNodesOnly || undefined }), replace: true })
+            }
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <Checkbox checked={referenceNodesOnly} onChange={() => undefined} />
+            <span className="text-sm text-foreground">Reference nodes only</span>
+          </button>
+          <button
+            onClick={() => setShowRefNodeInfo(true)}
+            className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
+            aria-label="Learn more about reference nodes"
+          >
+            <InformationCircleIcon className="size-4" />
+          </button>
+        </div>
+      </div>
+
+      <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
+
+      <PerformanceSections timeRange={timeRange} referenceNodesOnly={referenceNodesOnly} />
+    </Container>
+  );
+}
+
+/**
+ * Turns engine_newPayload timings plus block gas into execution throughput (Mgas/s), per-client
+ * cost models, gas limit headroom, workload sensitivity and opcode pricing.
+ */
+function PerformanceSections({
+  timeRange,
+  referenceNodesOnly,
+}: {
+  timeRange: TimeRange;
+  referenceNodesOnly: boolean;
+}): JSX.Element {
   const [percentile, setPercentile] = useState<'avg' | 'p95'>('avg');
   const [budget, setBudget] = useState<(typeof BUDGET_OPTIONS)[number]['value']>('1000');
   const [ceilingBasis, setCeilingBasis] = useState<'p50' | 'p95'>('p95');
@@ -101,7 +157,6 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
   const opcodeCosts = useOpcodeCostData(timeRange);
 
   const { data: perf } = usePerformanceData({ timeRange, referenceNodesOnly, enabled: true });
-  const showHourly = HOURLY_CHART_RANGES.includes(timeRange);
   const usePerSlotTrend = PER_SLOT_CHART_RANGES.includes(timeRange);
 
   const model = useMemo(
@@ -118,10 +173,10 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
     if (usePerSlotTrend) {
       return perf ? bucketedThroughputSeries(perf.perClientBlocks, timeRange === '1hour' ? 60 : 300, percentile) : [];
     }
-    return hourlyThroughputSeries(data.newPayloadByElClientHourly, percentile);
-  }, [usePerSlotTrend, perf, timeRange, percentile, data.newPayloadByElClientHourly]);
+    return perf ? hourlyThroughputSeries(perf.perClientHourly, percentile) : [];
+  }, [usePerSlotTrend, perf, timeRange, percentile]);
 
-  const versions = useMemo(() => versionRows(data.newPayloadByElClientHourly), [data.newPayloadByElClientHourly]);
+  const versions = useMemo(() => (perf ? versionRows(perf.perClientHourly) : []), [perf]);
 
   if (!perf || !model) {
     return (
@@ -204,31 +259,27 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
           </div>
         }
       >
-        {({ inModal }) =>
-          !showHourly && !usePerSlotTrend ? (
-            <RangeUnavailableNote />
-          ) : (
-            <MultiLineChart
-              series={trend.map((s, i) => ({
-                name: s.client,
-                data: s.points,
-                color: getExecutionClientColor(s.client, i),
-              }))}
-              xAxis={{
-                type: 'value',
-                name: 'Time',
-                min: 'dataMin',
-                max: 'dataMax',
-                formatter: timeFormatter(timeRange),
-              }}
-              yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
-              height={inModal ? 600 : 340}
-              showLegend
-              enableDataZoom
-              tooltipFormatter={params => throughputTooltip(params)}
-            />
-          )
-        }
+        {({ inModal }) => (
+          <MultiLineChart
+            series={trend.map((s, i) => ({
+              name: s.client,
+              data: s.points,
+              color: getExecutionClientColor(s.client, i),
+            }))}
+            xAxis={{
+              type: 'value',
+              name: 'Time',
+              min: 'dataMin',
+              max: 'dataMax',
+              formatter: timeFormatter(timeRange),
+            }}
+            yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
+            height={inModal ? 600 : 340}
+            showLegend
+            enableDataZoom
+            tooltipFormatter={params => throughputTooltip(params)}
+          />
+        )}
       </PopoutCard>
 
       {/* Gas limit ceiling */}
@@ -353,7 +404,7 @@ export function PerformanceTab({ data, timeRange, referenceNodesOnly }: Performa
         modalSize="full"
         noPadding
       >
-        {showHourly ? <VersionTracker rows={versions} /> : <RangeUnavailableNote />}
+        <VersionTracker rows={versions} />
       </PopoutCard>
     </div>
   );
