@@ -1,6 +1,7 @@
-import { type JSX, type ReactNode, useMemo } from 'react';
+import { Fragment, type JSX, type ReactNode, useMemo, useState } from 'react';
+import clsx from 'clsx';
 import { Link } from '@tanstack/react-router';
-import { ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
@@ -53,11 +54,20 @@ function usePartners(
 }
 
 /** A share as a bar and a percentage, or a dash */
-function Share({ share, color }: { share: number | null; color: string }): JSX.Element {
+function Share({
+  share,
+  color,
+  barClassName = 'hidden min-w-16 flex-1 sm:block',
+}: {
+  share: number | null;
+  color: string;
+  /** Where the bar shows; the percentage always does */
+  barClassName?: string;
+}): JSX.Element {
   if (share === null) return <span className="block text-right text-sm/6 text-muted">-</span>;
   return (
     <div className="flex items-center gap-3">
-      <div className="hidden min-w-16 flex-1 sm:block">
+      <div className={barClassName}>
         <ShareBar share={share} color={color} showThresholds={false} />
       </div>
       <span className="w-12 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
@@ -68,11 +78,19 @@ function Share({ share, color }: { share: number | null; color: string }): JSX.E
 }
 
 /** Table header cell */
-function Th({ children, right = false }: { children: ReactNode; right?: boolean }): JSX.Element {
+function Th({
+  children,
+  right = false,
+  compact = false,
+}: {
+  children: ReactNode;
+  right?: boolean;
+  compact?: boolean;
+}): JSX.Element {
   return (
     <th
       scope="col"
-      className={`px-3 py-2 align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground first:pl-0 last:pr-0 ${right ? 'text-right' : 'text-left'}`}
+      className={`${compact ? 'px-2.5' : 'px-3'} py-2 align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground first:pl-0 last:pr-0 ${right ? 'text-right' : 'text-left'}`}
     >
       {children}
     </th>
@@ -197,8 +215,8 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
   const article = otherArticle(layer);
   const partnerKey = layer === 'consensus' ? 'execution_client' : 'consensus_client';
 
-  const columns = useMemo(() => {
-    if (!pairMetrics.available) return [];
+  const { headline: columns, detail } = useMemo(() => {
+    if (!pairMetrics.available) return { headline: [], detail: [] };
     const proposalsBy = (partner: string): ProposalPairRow[] =>
       pairMetrics.proposals.filter(row => row[partnerKey] === partner);
     const attestationsBy = (partner: string): AttestationPairRow[] =>
@@ -211,17 +229,29 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
       metric: ATTESTATION_METRICS.find(m => m.id === id)! as unknown as ClientMetric<AttestationPairRow>,
       rows: attestationsBy,
     });
-    return [
-      ...(pairMetrics.proposals.length > 0
-        ? [proposal('mev-share'), proposal('missed'), proposal('orphaned'), proposal('seen-p50')]
-        : []),
-      ...(pairMetrics.attestations.length > 0
-        ? [attestation('attested'), attestation('head'), attestation('target'), attestation('inclusion')]
-        : []),
-    ] as Array<PartnerMetric<ProposalPairRow> | PartnerMetric<AttestationPairRow>>;
+    const hasProposals = pairMetrics.proposals.length > 0;
+    const hasAttestations = pairMetrics.attestations.length > 0;
+    type Column = PartnerMetric<ProposalPairRow> | PartnerMetric<AttestationPairRow>;
+    return {
+      headline: [
+        ...(hasProposals
+          ? [proposal('mev-share'), proposal('missed'), proposal('orphaned'), proposal('seen-p50')]
+          : []),
+        ...(hasAttestations ? [attestation('attested'), attestation('head')] : []),
+      ] as Column[],
+      // Shown when a row is expanded, so the table fits its card
+      detail: [
+        ...(hasProposals ? [proposal('seen-p90'), proposal('mev-value'), proposal('blobs')] : []),
+        ...(hasAttestations ? [attestation('target'), attestation('source'), attestation('inclusion')] : []),
+      ] as Column[],
+    };
   }, [pairMetrics, partnerKey]);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
-  const value = (column: (typeof columns)[number], partner: string): string => {
+  const value = (
+    column: PartnerMetric<ProposalPairRow> | PartnerMetric<AttestationPairRow>,
+    partner: string
+  ): string => {
     const result = ratio(column.rows(partner) as never[], column.metric as ClientMetric<never>);
     return result === null ? '-' : column.metric.format(result);
   };
@@ -250,48 +280,98 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
           No block in this window named {article} {other} client alongside it.
         </p>
       ) : (
-        <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full border-collapse" style={{ minWidth: columns.length > 0 ? '64rem' : undefined }}>
+        <div className="-mx-[calc(var(--card-inset)-1px)] overflow-x-auto">
+          <table className="w-full border-collapse">
             <thead className="border-b border-border">
               <tr>
-                <Th>Client</Th>
-                <Th>Share of blocks</Th>
-                <Th right>Blocks</Th>
+                <th
+                  scope="col"
+                  className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-(--card-inset) text-left align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground"
+                >
+                  Client
+                </th>
+                <Th compact>Share of blocks</Th>
+                <Th compact right>
+                  Blocks
+                </Th>
                 {columns.map(column => (
-                  <Th key={column.metric.id} right>
+                  <Th key={column.metric.id} compact right>
                     {column.metric.label}
                   </Th>
                 ))}
+                {detail.length > 0 && (
+                  <th scope="col" className="w-8 pr-(--card-inset)">
+                    <span className="sr-only">More</span>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
-              {rows.map(row => (
-                <tr key={row.client} id={`partner-${row.client}`} className="scroll-mt-24 target:bg-primary/10">
-                  <td className="py-2 pr-3">
-                    {row.client === UNKNOWN_CLIENT ? (
-                      <span className="text-sm/6 whitespace-nowrap text-muted">
-                        With an unknown {layer === 'consensus' ? 'EL' : 'CL'}
-                      </span>
-                    ) : (
-                      <ClientLabel client={row.client} />
+              {rows.map(row => {
+                const open = expanded === row.client;
+                return (
+                  <Fragment key={row.client}>
+                    <tr id={`partner-${row.client}`} className="scroll-mt-24 target:bg-primary/10">
+                      <td className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-(--card-inset)">
+                        {row.client === UNKNOWN_CLIENT ? (
+                          <span className="text-sm/6 whitespace-nowrap text-muted">
+                            With an unknown {layer === 'consensus' ? 'EL' : 'CL'}
+                          </span>
+                        ) : (
+                          <ClientLabel client={row.client} />
+                        )}
+                      </td>
+                      <td className="px-2.5 py-2">
+                        <Share
+                          share={row.blockShare}
+                          color={getClientColor(row.client)}
+                          barClassName="hidden w-12 shrink-0 xl:block"
+                        />
+                      </td>
+                      <td className="px-2.5 py-2 text-right text-sm/6 text-muted tabular-nums">
+                        {row.blocks.toLocaleString()}
+                      </td>
+                      {columns.map(column => (
+                        <td
+                          key={column.metric.id}
+                          className="px-2.5 py-2 text-right text-sm/6 whitespace-nowrap text-foreground tabular-nums"
+                        >
+                          {value(column, row.client)}
+                        </td>
+                      ))}
+                      {detail.length > 0 && (
+                        <td className="py-2 pr-(--card-inset) pl-1 text-right">
+                          <button
+                            type="button"
+                            onClick={() => setExpanded(open ? null : row.client)}
+                            aria-expanded={open}
+                            aria-label={`${open ? 'Hide' : 'Show'} more metrics`}
+                            className="rounded-xs p-1 text-muted hover:bg-primary/10 hover:text-foreground"
+                          >
+                            <ChevronDownIcon className={clsx('size-4 transition-transform', open && 'rotate-180')} />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                    {open && (
+                      <tr className="bg-background/50">
+                        <td colSpan={columns.length + 4} className="py-3">
+                          <dl className="sticky left-0 flex max-w-[calc(100vw-3rem)] flex-wrap gap-x-8 gap-y-2 px-(--card-inset) lg:max-w-none">
+                            {detail.map(column => (
+                              <div key={column.metric.id}>
+                                <dt className="text-xs/5 text-muted">{column.metric.label}</dt>
+                                <dd className="text-sm/6 font-medium text-foreground tabular-nums">
+                                  {value(column, row.client)}
+                                </dd>
+                              </div>
+                            ))}
+                          </dl>
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                  <td className="w-[30%] px-3 py-2">
-                    <Share share={row.blockShare} color={getClientColor(row.client)} />
-                  </td>
-                  <td className="px-3 py-2 text-right text-sm/6 text-muted tabular-nums last:pr-0">
-                    {row.blocks.toLocaleString()}
-                  </td>
-                  {columns.map(column => (
-                    <td
-                      key={column.metric.id}
-                      className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums last:pr-0"
-                    >
-                      {value(column, row.client)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
