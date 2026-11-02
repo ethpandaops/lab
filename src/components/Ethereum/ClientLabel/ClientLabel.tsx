@@ -25,7 +25,7 @@ export function ClientLabel({ client, detail, version, noLink = false }: ClientL
   const name = (
     <>
       <ClientLogo client={client} size={16} noLink decorative />
-      <span className={clsx('text-sm/6', isUnknown ? 'text-muted' : 'font-medium text-foreground')}>
+      <span className={clsx('shrink-0 text-sm/6', isUnknown ? 'text-muted' : 'font-medium text-foreground')}>
         {formatClientName(client)}
       </span>
     </>
@@ -37,7 +37,7 @@ export function ClientLabel({ client, detail, version, noLink = false }: ClientL
         <Link
           to="/ethereum/clients/$client"
           params={{ client: normalizeClientName(client) }}
-          className="inline-flex items-center gap-2 hover:underline"
+          className="inline-flex shrink-0 items-center gap-2 hover:underline"
           onClick={event => event.stopPropagation()}
         >
           {name}
@@ -50,7 +50,7 @@ export function ClientLabel({ client, detail, version, noLink = false }: ClientL
           <Link
             to="/ethereum/clients/$client/$version"
             params={{ client: normalizeClientName(client), version }}
-            className="font-mono text-xs/6 text-muted hover:text-foreground hover:underline"
+            className="shrink-0 font-mono text-xs/6 text-muted hover:text-foreground hover:underline"
             onClick={event => event.stopPropagation()}
           >
             {version}
