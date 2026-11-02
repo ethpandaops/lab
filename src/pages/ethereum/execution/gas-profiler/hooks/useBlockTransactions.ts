@@ -139,7 +139,11 @@ function createTransactionSummaries(
       frameCount: txFrames.length,
       maxDepth,
       hasErrors,
-      rootCallType: rootFrame?.call_type ?? 'CALL',
+      // Root frames carry an empty call type; a root with no target is a contract creation
+      rootCallType:
+        rootFrame?.call_type === 'CREATE' || (!targetAddress && !rootFrame?.call_type)
+          ? 'CREATE'
+          : rootFrame?.call_type || 'CALL',
       targetAddress,
       targetName,
     });

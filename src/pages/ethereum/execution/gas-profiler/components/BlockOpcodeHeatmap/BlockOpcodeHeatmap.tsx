@@ -1,12 +1,9 @@
 import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { intTransactionOpcodeGasServiceList } from '@/api/sdk.gen';
-import type { IntTransactionOpcodeGas } from '@/api/types.gen';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { fetchAllPages } from '@/utils/api-pagination';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
+import { useBlockTransactionOpcodes } from '../../hooks/useBlockTransactionOpcodes';
 
 /**
  * Format gas value with suffixes (K, M, B)
@@ -509,26 +506,11 @@ export function BlockOpcodeHeatmap({
   const [viewMode, setViewMode] = useState<ViewMode>(defaultViewMode);
 
   // Only fetch per-transaction data when in transactions view
-  // Uses fetchAllPages to handle pagination for large blocks
-  const { data: opcodeData, isLoading } = useQuery({
-    queryKey: ['int-transaction-opcode-gas-all', blockNumber],
-    queryFn: async ({ signal }) => {
-      const allData = await fetchAllPages<IntTransactionOpcodeGas>(
-        intTransactionOpcodeGasServiceList,
-        {
-          query: {
-            block_number_eq: blockNumber,
-            page_size: 10000,
-          },
-        },
-        'int_transaction_opcode_gas',
-        signal
-      );
-      // Wrap in expected shape for TransactionsViewHeatmap
-      return { int_transaction_opcode_gas: allData };
-    },
-    enabled: viewMode === 'transactions' && !isNaN(blockNumber),
+  const { rows: opcodeRows, isLoading } = useBlockTransactionOpcodes({
+    blockNumber,
+    enabled: viewMode === 'transactions',
   });
+  const opcodeData = useMemo(() => (opcodeRows ? { int_transaction_opcode_gas: opcodeRows } : undefined), [opcodeRows]);
 
   if (opcodeStats.length === 0) {
     return (

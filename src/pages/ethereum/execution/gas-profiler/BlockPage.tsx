@@ -1,14 +1,12 @@
 import { ExplorerLinks } from './components/ExplorerLinks';
-import { Button } from '@/components/Elements/Button';
 import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams, useSearch, useNavigate, Link } from '@tanstack/react-router';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
   BeakerIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  FunnelIcon,
   QueueListIcon,
   FireIcon,
   ArrowsPointingOutIcon,
@@ -28,10 +26,10 @@ import { Alert } from '@/components/Feedback/Alert';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { intBlockOpcodeGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import { useBlockTransactions, type TransactionSummary } from './hooks/useBlockTransactions';
+import { useBlockTransactions } from './hooks/useBlockTransactions';
 import {
   GasProfilerSkeleton,
-  TransactionSummaryCard,
+  BlockTransactionsView,
   OpcodeAnalysis,
   CategoryPieChart,
   GasFormula,
@@ -52,8 +50,6 @@ import { useBlockReceiptSizes } from './hooks/useBlockReceiptSizes';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
 import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
-import type { GasProfilerBlockSearch } from './IndexPage.types';
-import type { IntTransactionReceiptSize } from '@/api/types.gen';
 import { formatBytes } from '@/utils';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -61,59 +57,10 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 const { DATA_COLORS } = getDataVizColors();
 
 /**
- * Available call types for filtering
- */
-const CALL_TYPES = ['CALL', 'CREATE', 'CREATE2', 'DELEGATECALL', 'STATICCALL'] as const;
-
-/**
  * Format gas value with comma separators
  */
 function formatGas(value: number): string {
   return value.toLocaleString();
-}
-
-/**
- * Sort field type for transactions table
- */
-type TransactionSortField = 'index' | 'gas' | 'calls' | 'depth' | 'receipt';
-
-/**
- * Filter and sort transactions based on current settings
- */
-function filterAndSortTransactions(
-  transactions: TransactionSummary[],
-  sort: TransactionSortField,
-  sortDir: 'asc' | 'desc',
-  callTypeFilter?: string,
-  receiptsByTxHash?: Map<string, IntTransactionReceiptSize>
-): TransactionSummary[] {
-  // Filter by call type if specified
-  let filtered = transactions;
-  if (callTypeFilter) {
-    filtered = transactions.filter(tx => tx.rootCallType === callTypeFilter);
-  }
-
-  // Sort
-  const sorted = [...filtered].sort((a, b) => {
-    switch (sort) {
-      case 'gas':
-        return a.totalGasUsed - b.totalGasUsed;
-      case 'calls':
-        return a.frameCount - b.frameCount;
-      case 'depth':
-        return a.maxDepth - b.maxDepth;
-      case 'receipt': {
-        const aBytes = receiptsByTxHash?.get(a.transactionHash)?.receipt_bytes ?? 0;
-        const bBytes = receiptsByTxHash?.get(b.transactionHash)?.receipt_bytes ?? 0;
-        return aBytes - bBytes;
-      }
-      case 'index':
-      default:
-        return a.transactionIndex - b.transactionIndex;
-    }
-  });
-
-  return sortDir === 'desc' ? sorted.reverse() : sorted;
 }
 
 // Tab hash values for URL-based navigation
@@ -126,20 +73,11 @@ export function BlockPage(): JSX.Element {
   const { blockNumber: blockNumberParam } = useParams({
     from: '/ethereum/execution/gas-profiler/block/$blockNumber',
   });
-  const search = useSearch({ from: '/ethereum/execution/gas-profiler/block/$blockNumber' }) as GasProfilerBlockSearch;
   const navigate = useNavigate({ from: '/ethereum/execution/gas-profiler/block/$blockNumber' });
   const colors = useThemeColors();
   const { currentNetwork } = useNetwork();
 
   const blockNumber = parseInt(blockNumberParam, 10);
-
-  // Load more state for transaction list
-  const INITIAL_VISIBLE_COUNT = 10;
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-
-  // Local state for table sorting (avoids scroll reset from URL param changes)
-  const [sortField, setSortField] = useState<TransactionSortField>('gas');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   // State for contract action popover
   const [contractPopover, setContractPopover] = useState<{
@@ -204,35 +142,13 @@ export function BlockPage(): JSX.Element {
   const { receiptsByTxHash, totalReceiptBytes } = useBlockReceiptSizes({
     blockNumber: isNaN(blockNumber) ? null : blockNumber,
   });
-
-  // Handle sort change (uses local state to avoid scroll reset)
-  const handleSortChange = useCallback(
-    (newSort: TransactionSortField) => {
-      if (sortField === newSort) {
-        // Toggle direction
-        setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
-      } else {
-        // Default to desc for gas/calls/depth/receipt (show highest first), asc for index
-        const defaultDir = newSort === 'index' ? 'asc' : 'desc';
-        setSortField(newSort);
-        setSortDir(defaultDir);
-      }
-    },
-    [sortField]
-  );
-
-  // Handle call type filter change
-  const handleFilterChange = useCallback(
-    (callType: string | undefined) => {
-      navigate({
-        search: prev => ({
-          ...prev,
-          callType,
-        }),
-      });
-    },
-    [navigate]
-  );
+  const receiptBytesByTxHash = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const [hash, receipt] of receiptsByTxHash) {
+      if (receipt.receipt_bytes != null) map.set(hash, receipt.receipt_bytes);
+    }
+    return map;
+  }, [receiptsByTxHash]);
 
   // Handle treemap click - navigate to transaction page
   const handleTreemapClick = useCallback(
@@ -250,12 +166,6 @@ export function BlockPage(): JSX.Element {
     [navigate, blockNumber]
   );
 
-  // Filter and sort transactions (default to gas desc if not specified)
-  const filteredTransactions = useMemo(() => {
-    if (!data?.transactions) return [];
-    return filterAndSortTransactions(data.transactions, sortField, sortDir, search.callType, receiptsByTxHash);
-  }, [data?.transactions, sortField, sortDir, search.callType, receiptsByTxHash]);
-
   // Calculate total gas for percentage (from all transactions, not filtered)
   const totalBlockGas = useMemo(() => {
     return (data?.transactions ?? []).reduce((sum, tx) => sum + tx.totalGasUsed, 0);
@@ -265,13 +175,6 @@ export function BlockPage(): JSX.Element {
   const maxBlockDepth = useMemo(() => {
     if (!data?.transactions?.length) return 0;
     return Math.max(...data.transactions.map(tx => tx.maxDepth));
-  }, [data?.transactions]);
-
-  // Get unique call types in this block
-  const availableCallTypes = useMemo(() => {
-    if (!data?.transactions) return [];
-    const types = new Set(data.transactions.map(tx => tx.rootCallType));
-    return CALL_TYPES.filter(t => types.has(t));
   }, [data?.transactions]);
 
   // Block opcode data (from API) - transformed for OpcodeAnalysis component
@@ -1162,7 +1065,7 @@ export function BlockPage(): JSX.Element {
                   count: data.transactions.length,
                   label: 'Transactions',
                   onClick: () => {
-                    setSelectedTabIndex(2);
+                    setSelectedTabIndex(BLOCK_TAB_HASHES.indexOf('transactions'));
                     window.history.pushState(null, '', '#transactions');
                   },
                 }}
@@ -1239,180 +1142,15 @@ export function BlockPage(): JSX.Element {
 
           {/* Transactions Tab */}
           <HeadlessTab.Panel>
-            {/* Filter bar */}
-            {availableCallTypes.length > 1 && (
-              <div className="mb-4 flex items-center gap-2">
-                <FunnelIcon className="size-4 text-muted" />
-                <span className="text-xs text-muted">Filter:</span>
-                <button
-                  onClick={() => handleFilterChange(undefined)}
-                  className={clsx(
-                    'rounded-xs px-2 py-1 text-xs transition-colors',
-                    !search.callType ? 'bg-primary text-white' : 'bg-surface text-muted hover:text-foreground'
-                  )}
-                >
-                  All ({data.transactionCount})
-                </button>
-                {availableCallTypes.map(callType => {
-                  const count = data.transactions.filter(tx => tx.rootCallType === callType).length;
-                  return (
-                    <button
-                      key={callType}
-                      onClick={() => handleFilterChange(callType)}
-                      className={clsx(
-                        'rounded-xs px-2 py-1 text-xs transition-colors',
-                        search.callType === callType
-                          ? 'bg-primary text-white'
-                          : 'bg-surface text-muted hover:text-foreground'
-                      )}
-                    >
-                      {callType} ({count})
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Transactions Header */}
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-foreground">Transactions</h3>
-              <span className="text-xs text-muted">{filteredTransactions.length} transactions</span>
-            </div>
-
-            {filteredTransactions.length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-muted">
-                  {search.callType
-                    ? `No ${search.callType} transactions in this block`
-                    : 'No transactions in this block'}
-                </p>
-              </Card>
-            ) : (
-              <div className="overflow-hidden rounded-sm border border-border">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-border">
-                    <thead className="sticky top-0 bg-surface">
-                      <tr>
-                        <th
-                          scope="col"
-                          onClick={() => handleSortChange('index')}
-                          className={clsx(
-                            'cursor-pointer px-3 py-3.5 text-left text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-                            sortField === 'index' ? 'text-primary' : 'text-foreground'
-                          )}
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            #
-                            {sortField === 'index' && (
-                              <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                            )}
-                          </span>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold whitespace-nowrap text-foreground"
-                        >
-                          Transaction
-                        </th>
-                        <th
-                          scope="col"
-                          onClick={() => handleSortChange('gas')}
-                          className={clsx(
-                            'cursor-pointer px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-                            sortField === 'gas' ? 'text-primary' : 'text-foreground'
-                          )}
-                        >
-                          <span className="inline-flex items-center justify-end gap-1">
-                            Gas
-                            {sortField === 'gas' && (
-                              <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                            )}
-                          </span>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap text-foreground"
-                        >
-                          %
-                        </th>
-                        {hasReceiptData && (
-                          <th
-                            scope="col"
-                            onClick={() => handleSortChange('receipt')}
-                            className={clsx(
-                              'cursor-pointer px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-                              sortField === 'receipt' ? 'text-primary' : 'text-foreground'
-                            )}
-                          >
-                            <span className="inline-flex items-center justify-end gap-1">
-                              Receipt
-                              {sortField === 'receipt' && (
-                                <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                              )}
-                            </span>
-                          </th>
-                        )}
-                        <th
-                          scope="col"
-                          onClick={() => handleSortChange('calls')}
-                          className={clsx(
-                            'cursor-pointer px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-                            sortField === 'calls' ? 'text-primary' : 'text-foreground'
-                          )}
-                        >
-                          <span className="inline-flex items-center justify-end gap-1">
-                            Calls
-                            {sortField === 'calls' && (
-                              <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                            )}
-                          </span>
-                        </th>
-                        <th
-                          scope="col"
-                          onClick={() => handleSortChange('depth')}
-                          className={clsx(
-                            'cursor-pointer px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-                            sortField === 'depth' ? 'text-primary' : 'text-foreground'
-                          )}
-                        >
-                          <span className="inline-flex items-center justify-end gap-1">
-                            Max Depth
-                            {sortField === 'depth' && (
-                              <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                            )}
-                          </span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border bg-surface">
-                      {filteredTransactions.slice(0, visibleCount).map(tx => {
-                        const gasPercentage = totalBlockGas > 0 ? (tx.totalGasUsed / totalBlockGas) * 100 : 0;
-                        const receiptData = receiptsByTxHash.get(tx.transactionHash);
-                        return (
-                          <TransactionSummaryCard
-                            key={tx.transactionHash}
-                            transaction={tx}
-                            blockNumber={blockNumber}
-                            gasPercentage={gasPercentage}
-                            receiptBytes={receiptData?.receipt_bytes}
-                            showReceiptColumn={hasReceiptData}
-                          />
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Show More Button */}
-                {filteredTransactions.length > visibleCount && (
-                  <div className="flex justify-center border-t border-border py-4">
-                    <Button variant="secondary" size="sm" onClick={() => setVisibleCount(filteredTransactions.length)}>
-                      Show All ({filteredTransactions.length - visibleCount} more)
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+            <BlockTransactionsView
+              blockNumber={blockNumber}
+              transactions={data.transactions}
+              txContractFlows={data.txContractFlows}
+              opcodeStats={opcodeStats}
+              receiptBytes={receiptBytesByTxHash}
+              showReceiptColumn={hasReceiptData}
+              totalBlockGas={totalBlockGas}
+            />
           </HeadlessTab.Panel>
 
           {/* Calls Tab - consolidated calls and contracts analysis */}
