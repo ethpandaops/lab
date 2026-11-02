@@ -259,10 +259,14 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
   const op = model.opcodes[opIndex];
   const dayMin = Math.min(...model.clients.flatMap(c => c.daily.map(d => d.day)));
   const dayMax = Math.max(...model.clients.flatMap(c => c.daily.map(d => d.day)));
+  // A single day would give the axis no span, and ECharts then invents one; pad it to the days around it
+  const pad = dayMin === dayMax ? 86_400 : 0;
   const xAxis = {
     type: 'value' as const,
-    min: dayMin * 1000,
-    max: dayMax * 1000,
+    min: (dayMin - pad) * 1000,
+    max: (dayMax + pad) * 1000,
+    // Whole days between ticks, at most about eight; otherwise ticks fall between days and repeat their date
+    interval: Math.max(1, Math.ceil((dayMax - dayMin + 2 * pad) / 86_400 / 8)) * 86_400_000,
     formatter: (v: number | string) => fmtDate(Number(v) / 1000),
   };
 

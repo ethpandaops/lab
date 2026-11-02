@@ -169,6 +169,11 @@ export interface XAxisConfig {
    */
   max?: number | 'dataMax';
   /**
+   * Fixed step between ticks, counted from `min` (only for type 'value' or 'time')
+   * @example 86_400_000 // One tick per day on a millisecond axis that starts at midnight
+   */
+  interval?: number;
+  /**
    * Value formatter function
    */
   formatter?: (value: number | string) => string;
