@@ -11,7 +11,7 @@ import {
   UNKNOWN_CLIENT,
   findReleaseByVersion,
   githubCommitUrl,
-  githubReleaseUrl,
+  releaseUrl,
   resolveClientRelease,
 } from '@/utils/graffiti';
 
@@ -21,6 +21,8 @@ export interface ProposerClientField {
   /** Release version, from the graffiti's version string or resolved from its commit prefix */
   version?: string;
   versionUrl?: string;
+  /** Whether the version is a published release, with its own version page */
+  isRelease?: boolean;
   /** Commit prefix from the graffiti */
   commit?: string;
   commitUrl?: string;
@@ -87,7 +89,8 @@ function buildField(
   return {
     client,
     version,
-    versionUrl: release ? githubReleaseUrl(release.repository ?? repository, release.tag) : undefined,
+    isRelease: !!release,
+    versionUrl: release ? releaseUrl({ ...release, repository: release.repository ?? repository }) : undefined,
     commit: commit || undefined,
     commitUrl: githubCommitUrl(repository, commit),
     commitNote,

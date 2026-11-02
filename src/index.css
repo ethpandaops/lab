@@ -191,22 +191,22 @@
    * Every data colour below (chart, blob, continent, performance) maps to one of these. */
   --color-data-red: oklch(63.7% 0.147 25.3);
   --color-data-orange: oklch(70.5% 0.132 47.6);
-  --color-data-amber: oklch(74.0% 0.117 70.1);
-  --color-data-yellow: oklch(74.0% 0.114 86.0);
-  --color-data-lime: oklch(74.0% 0.144 130.8);
+  --color-data-amber: oklch(74% 0.117 70.1);
+  --color-data-yellow: oklch(74% 0.114 86);
+  --color-data-lime: oklch(74% 0.144 130.8);
   --color-data-green: oklch(72.3% 0.136 149.6);
   --color-data-emerald: oklch(69.6% 0.105 162.5);
   --color-data-teal: oklch(70.4% 0.1 182.5);
   --color-data-cyan: oklch(71.5% 0.1 215.2);
   --color-data-sky: oklch(68.5% 0.105 237.3);
   --color-data-blue: oklch(62.3% 0.133 259.8);
-  --color-data-indigo: oklch(62.0% 0.144 277.1);
-  --color-data-violet: oklch(62.0% 0.15 292.7);
+  --color-data-indigo: oklch(62% 0.144 277.1);
+  --color-data-violet: oklch(62% 0.15 292.7);
   --color-data-purple: oklch(62.7% 0.15 303.9);
   --color-data-fuchsia: oklch(66.7% 0.15 322.1);
   --color-data-pink: oklch(65.6% 0.149 354.3);
   --color-data-rose: oklch(64.5% 0.15 16.4);
-  --color-data-slate: oklch(62.0% 0.03 257.4);
+  --color-data-slate: oklch(62% 0.03 257.4);
 
   /* These colors represent data categories, not UI elements.
    * They remain constant across themes (light/dark/star). */
@@ -409,7 +409,6 @@
 /* Digit flip animations for scoreboard display.
  * Placed outside @theme inline so they're always emitted
  * (keyframes inside @theme are only output when referenced by a token). */
-
 
 /* CardChain slide animations for conveyor belt effect.
  * Placed outside @theme inline so they're always emitted

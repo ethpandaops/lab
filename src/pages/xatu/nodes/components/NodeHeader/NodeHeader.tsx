@@ -6,10 +6,10 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Card } from '@/components/Layout/Card';
 import { getClassificationBadgeClasses, getClassificationLabel, getCountryFlag } from '@/utils';
-import { formatClientName } from '@/utils/graffiti';
 import type { NodeRow } from '../../hooks/useNodeRows';
 import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
+import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 export interface NodeHeaderProps {
   row: NodeRow;
@@ -94,25 +94,11 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
 
       <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-border pt-4 md:grid-cols-3 xl:grid-cols-6">
         <Detail label="Consensus client">
-          {client ? (
-            <>
-              <ClientLogo client={client} size={16} />
-              <span>{formatClientName(client)}</span>
-              <span className="text-muted" title={node.meta_consensus_version}>
-                {shortVersion(node.meta_consensus_version)}
-              </span>
-            </>
-          ) : (
-            '–'
-          )}
+          {client ? <NodeClientVersion client={client} version={node.meta_consensus_version} showNewer /> : '–'}
         </Detail>
         {execution && (
           <Detail label="Execution client">
-            <ClientLogo client={execution.implementation} size={16} />
-            <span>{formatClientName(executionName)}</span>
-            <span className="text-muted" title={execution.version}>
-              {shortVersion(execution.version)}
-            </span>
+            <NodeClientVersion client={executionName} version={execution.version} />
           </Detail>
         )}
         <Detail label="Collector">

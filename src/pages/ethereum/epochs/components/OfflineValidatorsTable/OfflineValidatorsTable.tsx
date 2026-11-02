@@ -1,6 +1,7 @@
 import { type JSX, useMemo, useState } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
+import { Entity } from '@/components/Ethereum/Entity';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import type { MissedAttestationByEntity } from '../../hooks/useEpochsData.types';
 
@@ -50,7 +51,11 @@ export function OfflineValidatorsTable({ data, epochs }: OfflineValidatorsTableP
   const visible = expanded || needle ? filtered : filtered.slice(0, COLLAPSED_ROWS);
 
   const columns: Column<Row>[] = [
-    { header: 'Entity', accessor: row => row.entity, cellClassName: 'text-foreground font-medium' },
+    {
+      header: 'Entity',
+      accessor: row => (row.entity === 'unknown' ? row.entity : <Entity entity={row.entity} />),
+      cellClassName: 'text-foreground font-medium',
+    },
     {
       header: 'Total',
       accessor: row => row.total.toLocaleString(),

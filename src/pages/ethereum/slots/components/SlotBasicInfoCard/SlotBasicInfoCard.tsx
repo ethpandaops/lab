@@ -1,11 +1,14 @@
 import { type JSX } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Link } from '@tanstack/react-router';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/16/solid';
 import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Entity } from '@/components/Ethereum/Entity';
+import { Validator } from '@/components/Ethereum/Validator';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { BeaconchainIcon } from '@/components/Ethereum/BeaconchainIcon';
@@ -19,20 +22,44 @@ import { useSlotProposerClient, type ProposerClientField } from '../../hooks/use
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
-/** Client logo and name with its version linked to the GitHub release, or the commit prefix when no version resolved */
+/** Client logo and name linked to the client page, its version to the version page and GitHub release, or the commit prefix when no version resolved */
 function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Element {
   return (
     <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-      <ClientLogo client={field.client} size={16} />
-      <span>{formatClientName(field.client)}</span>
-      {field.version &&
-        (field.versionUrl ? (
-          <a href={field.versionUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-            {field.version}
-          </a>
-        ) : (
-          <span>{field.version}</span>
-        ))}
+      <Link
+        to="/ethereum/clients/$client"
+        params={{ client: field.client }}
+        className="inline-flex items-center gap-2 hover:underline"
+      >
+        <ClientLogo client={field.client} size={16} noLink />
+        <span>{formatClientName(field.client)}</span>
+      </Link>
+      {field.version && (
+        <span className="inline-flex items-center gap-1">
+          {field.isRelease ? (
+            <Link
+              to="/ethereum/clients/$client/$version"
+              params={{ client: field.client, version: field.version }}
+              className="hover:underline"
+            >
+              {field.version}
+            </Link>
+          ) : (
+            <span>{field.version}</span>
+          )}
+          {field.versionUrl && (
+            <a
+              href={field.versionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted hover:text-foreground"
+              aria-label={`${field.version} release on GitHub`}
+            >
+              <ArrowTopRightOnSquareIcon className="size-3" />
+            </a>
+          )}
+        </span>
+      )}
       {!field.version &&
         field.commit &&
         (field.commitUrl ? (
@@ -324,7 +351,9 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
                     <Entity entity={proposerEntity?.entity} />
                     {blockProposer?.proposer_validator_index !== undefined &&
                       blockProposer.proposer_validator_index !== null && (
-                        <span className="ml-2 text-muted">(Validator {blockProposer.proposer_validator_index})</span>
+                        <span className="ml-2 text-muted">
+                          (Validator <Validator index={blockProposer.proposer_validator_index} />)
+                        </span>
                       )}
                   </dd>
                 </div>

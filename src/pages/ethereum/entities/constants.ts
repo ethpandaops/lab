@@ -3,7 +3,7 @@ import { z } from 'zod';
 export type TimePeriod = '7d' | '30d' | '90d' | '180d' | 'all';
 
 export const entityDetailSearchSchema = z.object({
-  tab: z.enum(['validators', 'recent', 'attestations', 'blocks']).default('validators'),
+  tab: z.enum(['validators', 'recent', 'attestations', 'blocks', 'clients']).default('validators'),
   t: z.enum(['7d', '30d', '90d', '180d', 'all']).optional(),
   /** Top slot of the Blocks tab page; absent means the latest proposals */
   blocksFrom: z.coerce.number().int().nonnegative().optional(),

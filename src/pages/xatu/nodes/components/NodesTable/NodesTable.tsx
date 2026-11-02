@@ -5,12 +5,11 @@ import { DataTable } from '@/components/DataTable';
 import { Input } from '@/components/Forms/Input';
 import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
-import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getCountryFlag, getRelativeTime } from '@/utils';
-import { formatClientName } from '@/utils/graffiti';
 import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatMs, formatNodeLocation, shortVersion } from '../../utils/node-stats';
+import { formatMs, formatNodeLocation } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
+import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 export interface NodesTableProps {
   rows: NodeRow[];
@@ -44,15 +43,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row }) => {
       const client = row.original.node.meta_consensus_implementation;
       if (!client) return '–';
-      return (
-        <span className="flex items-center gap-2">
-          <ClientLogo client={client} size={16} />
-          <span>{formatClientName(client)}</span>
-          <span className="text-muted" title={row.original.node.meta_consensus_version}>
-            {shortVersion(row.original.node.meta_consensus_version)}
-          </span>
-        </span>
-      );
+      return <NodeClientVersion client={client} version={row.original.node.meta_consensus_version} />;
     },
     meta: { cellClassName: 'text-foreground' },
   },

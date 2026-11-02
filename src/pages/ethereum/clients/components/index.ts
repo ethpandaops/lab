@@ -9,6 +9,7 @@ export { EntityFilter } from './EntityFilter';
 export { EntityTable } from './EntityTable';
 export { ForkReadinessCard } from './ForkReadinessCard';
 export { GraffitiBlocksTable } from './GraffitiBlocksTable';
+export { NodeClientVersion } from './NodeClientVersion';
 export { NodeTable } from './NodeTable';
 export { PeerSupport } from './PeerSupport';
 export { PendingSource } from './PendingSource';

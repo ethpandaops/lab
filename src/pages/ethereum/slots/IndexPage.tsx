@@ -6,6 +6,8 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Slot } from '@/components/Ethereum/Slot';
+import { Entity } from '@/components/Ethereum/Entity';
+import { Validator } from '@/components/Ethereum/Validator';
 import { useSlotsPage, type SlotData } from './hooks';
 import { RangePager } from '@/components/Lists/RangePager';
 import { Alert } from '@/components/Feedback/Alert';
@@ -156,12 +158,12 @@ export function IndexPage(): JSX.Element {
       },
       {
         header: 'Proposer Index',
-        accessor: row => (row.proposerIndex !== null ? row.proposerIndex : '-'),
+        accessor: row => (row.proposerIndex !== null ? <Validator index={row.proposerIndex} /> : '-'),
         cellClassName: 'text-muted',
       },
       {
         header: 'Proposer Entity',
-        accessor: row => (row.proposerEntity ? row.proposerEntity : '-'),
+        accessor: row => (row.proposerEntity ? <Entity entity={row.proposerEntity} /> : '-'),
         cellClassName: 'text-muted',
       },
       {

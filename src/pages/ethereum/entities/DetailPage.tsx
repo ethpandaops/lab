@@ -23,6 +23,7 @@ import {
 } from './components';
 import { useEntityDetailData, useEntityValidatorStatusData } from './hooks';
 import { EntityProposals } from './components/EntityProposals';
+import { EntityClients } from './components/EntityClients';
 import { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
 
 export function DetailPage(): React.JSX.Element {
@@ -52,6 +53,7 @@ export function DetailPage(): React.JSX.Element {
     { id: 'recent', anchors: ['recent-activity'] },
     { id: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
     { id: 'blocks', anchors: ['block-proposals'] },
+    { id: 'clients' },
   ]);
 
   if (entityName === null) {
@@ -109,6 +111,7 @@ export function DetailPage(): React.JSX.Element {
             <Tab>Recent</Tab>
             <Tab>Attestations</Tab>
             <Tab>Blocks</Tab>
+            <Tab>Clients</Tab>
           </ScrollableTabs>
 
           <TabPanels className="mt-6">
@@ -149,6 +152,11 @@ export function DetailPage(): React.JSX.Element {
             {/* Blocks Tab */}
             <TabPanel>
               <EntityProposals entity={entityName} />
+            </TabPanel>
+
+            {/* Clients Tab */}
+            <TabPanel>
+              <EntityClients entity={entityName} />
             </TabPanel>
           </TabPanels>
         </TabGroup>
