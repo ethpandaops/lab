@@ -7,6 +7,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
+import { useTableBounds } from '@/hooks/useBounds';
 import type { FctBlockProposerByValidator } from '@/api/types.gen';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
 
@@ -17,12 +18,20 @@ interface ProposalDutiesProps {
   validator: number | null;
   onValidatorChange: (validator: number | null) => void;
   proposals: FctBlockProposerByValidator[];
+  /** Range start (unix seconds) */
+  from: number;
 }
 
 /**
  * Block proposal duties in the range.
  */
-export function ProposalDuties({ indices, validator, onValidatorChange, proposals }: ProposalDutiesProps): JSX.Element {
+export function ProposalDuties({
+  indices,
+  validator,
+  onValidatorChange,
+  proposals,
+  from,
+}: ProposalDutiesProps): JSX.Element {
   const [status, setStatus] = useState('all');
   const [slotQuery, setSlotQuery] = useState('');
   // Consensus-layer reward for each canonical block, as computed by the beacon node
@@ -41,6 +50,17 @@ export function ProposalDuties({ indices, validator, onValidatorChange, proposal
   const rewardBySlot = new Map(
     (rewards.data?.fct_block_proposer_reward ?? []).map(r => [r.slot ?? -1, Number(r.total ?? 0)])
   );
+  // The proposer table starts after the earliest balances; an empty result before its start means no data
+  const bounds = useTableBounds('fct_block_proposer_by_validator');
+  const coverageStart =
+    bounds.data && bounds.data.min > from
+      ? new Date(bounds.data.min * 1000).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      : null;
   const statuses = [...new Set(proposals.map(p => p.status ?? ''))].filter(Boolean).sort();
 
   // Memoised: DataTable returns to page 1 whenever its data array changes
@@ -128,7 +148,13 @@ export function ProposalDuties({ indices, validator, onValidatorChange, proposal
         hideGlobalFilter
         hideColumnVisibility
         getRowId={r => String(r.slot)}
-        emptyMessage={proposals.length === 0 ? 'No proposals in this range' : 'No proposals match these filters'}
+        emptyMessage={
+          proposals.length > 0
+            ? 'No proposals match these filters'
+            : coverageStart
+              ? `Proposal data starts ${coverageStart}. No proposals since then.`
+              : 'No proposals in this range'
+        }
       />
     </TableCard>
   );

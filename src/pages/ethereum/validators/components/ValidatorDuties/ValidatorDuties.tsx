@@ -43,7 +43,7 @@ export function ValidatorDuties({ indices, from, to, proposals }: ValidatorDutie
       {tab === 'events' ? (
         <ValidatorEvents {...shared} from={from} to={to} />
       ) : tab === 'proposals' ? (
-        <ProposalDuties {...shared} proposals={proposals} />
+        <ProposalDuties {...shared} proposals={proposals} from={from} />
       ) : tab === 'sync' ? (
         <SyncDuties {...shared} from={from} to={to} />
       ) : (

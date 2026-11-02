@@ -112,6 +112,19 @@ export function IndexPage(): JSX.Element {
   const weekly = period === 'week';
   const labels = days.map(d => formatDayLabel(d.day));
   const perPeriod = weekly ? 'per week' : 'per day';
+  // Some tables start inside long windows; say where, rather than leave the early periods blank
+  const dataStart = (has: (d: OverviewPeriod) => boolean): string | undefined => {
+    const first = days.find(has)?.day;
+    if (!first || first === days[0].day) return undefined;
+    const date = new Date(`${first}T00:00:00Z`).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+    return `Data starts ${date}`;
+  };
+  const opsStart = dataStart(hasOps);
 
   // --- Fork marks: nearest label on or after each fork ---
   const { allForks } = useForks();
@@ -526,7 +539,12 @@ export function IndexPage(): JSX.Element {
               )}
             </PopoutCard>
 
-            <PopoutCard title={`Validator operations ${perPeriod}`} anchorId="operations" modalSize="full">
+            <PopoutCard
+              title={`Validator operations ${perPeriod}`}
+              subtitle={opsStart}
+              anchorId="operations"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={(
@@ -558,7 +576,7 @@ export function IndexPage(): JSX.Element {
           </div>
 
           <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-            <PopoutCard title={`ETH in and out ${perPeriod}`} anchorId="flows" modalSize="full">
+            <PopoutCard title={`ETH in and out ${perPeriod}`} subtitle={opsStart} anchorId="flows" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={[
@@ -598,7 +616,12 @@ export function IndexPage(): JSX.Element {
               )}
             </PopoutCard>
 
-            <PopoutCard title={`Consensus rewards ${perPeriod}`} anchorId="rewards" modalSize="full">
+            <PopoutCard
+              title={`Consensus rewards ${perPeriod}`}
+              subtitle={dataStart(d => d.rewards !== null)}
+              anchorId="rewards"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={[

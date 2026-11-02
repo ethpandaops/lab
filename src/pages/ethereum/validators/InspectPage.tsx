@@ -25,7 +25,7 @@ import {
   ValidatorDuties,
   InspectSection,
 } from './components';
-import type { ThresholdValues, HeatmapMetric, ValidatorSelection } from './components';
+import type { ThresholdValues, HeatmapMetric, ValidatorSelection, ValidatorState } from './components';
 
 /** Search params for the inspect page; no `from` means all history */
 interface InspectSearch {
@@ -41,6 +41,8 @@ const MAX_DAILY_RANGE_DAYS = 120;
 const DEFAULT_RANGE_DAYS = 30;
 
 const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
+/** Monday (UTC) of the week containing the day */
+const mondayOf = (ts: number): number => ts - ((new Date(ts * 1000).getUTCDay() + 6) % 7) * DAY;
 // Links can carry the list JSON-quoted (indices="1,2"), so quotes are dropped
 const tagsFromUrl = (indices?: string): string[] => (indices ?? '').replace(/"/g, '').split(',').filter(Boolean);
 const formatDate = (ts: number): string =>
@@ -56,8 +58,12 @@ export function InspectPage(): JSX.Element {
 
   const balanceBounds = useTableBounds('fct_validator_balance_daily');
   const attestationBounds = useTableBounds('fct_attestation_vote_correctness_by_validator_daily');
+  const proposalBounds = useTableBounds('fct_block_proposer_by_validator');
   const earliest = balanceBounds.data ? startOfDay(balanceBounds.data.min) : undefined;
-  const attestationFloor = attestationBounds.data ? startOfDay(attestationBounds.data.min) : undefined;
+  const performanceFloor =
+    attestationBounds.data && proposalBounds.data
+      ? startOfDay(Math.max(attestationBounds.data.min, proposalBounds.data.min))
+      : undefined;
 
   const [tags, setTags] = useState<string[]>(() => tagsFromUrl(search.indices));
   const [range, setRange] = useState<{ from?: number; to?: number }>({ from: search.from, to: search.to });
@@ -70,10 +76,15 @@ export function InspectPage(): JSX.Element {
     hourTimestamp: null,
   });
 
-  const to = range.to ?? startOfDay(Date.now() / 1000);
+  const today = startOfDay(Date.now() / 1000);
+  const to = range.to ?? today;
   const from = range.from ?? to - DEFAULT_RANGE_DAYS * DAY;
-  const allHistory = earliest !== undefined && from <= earliest;
+  // Only a range that also ends today can skip listing its periods; an earlier end must cut rows off
+  const allHistory = earliest !== undefined && from <= earliest && to >= today;
   const resolution = (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
+  // Weekly rows cover Monday to Sunday, so the data spans every week the range touches
+  const dataFrom = resolution === 'week' ? mondayOf(from) : from;
+  const dataTo = resolution === 'week' ? Math.min(today, mondayOf(to) + 6 * DAY) : to;
 
   const { valid: parsedIndices, pubkeys: parsedPubkeys } = useMemo(() => parseValidatorIndices(tags), [tags]);
   const {
@@ -97,7 +108,10 @@ export function InspectPage(): JSX.Element {
     error,
     hasData,
     raw,
-  } = useValidatorsData(ready ? resolvedIndices : [], ready ? from : 0, ready ? to : 0, { resolution, allHistory });
+  } = useValidatorsData(ready ? resolvedIndices : [], ready ? dataFrom : 0, ready ? dataTo : 0, {
+    resolution,
+    allHistory,
+  });
 
   const { getStatusAtTimestamp, unknownValidators } = useValidatorStatus(ready ? resolvedIndices : []);
   const { identities } = useValidatorIdentity(ready ? resolvedIndices : []);
@@ -105,6 +119,26 @@ export function InspectPage(): JSX.Element {
     () => resolvedIndices.flatMap(i => identities.get(i) ?? []),
     [resolvedIndices, identities]
   );
+  // dim_validator holds today's state; a range that ends earlier shows each validator as it was on its last day
+  const endsEarlier = dataTo < today;
+  const balanceAtEnd = new Map(validators.map(v => [v.validatorIndex, v.balance]));
+  const endStates =
+    endsEarlier && !isLoading
+      ? new Map<number, ValidatorState>(
+          resolvedIndices.map(i => {
+            const b = balanceAtEnd.get(i);
+            return [
+              i,
+              {
+                status: b?.status ?? getStatusAtTimestamp(i, dataTo + DAY - 1) ?? 'unknown',
+                slashed: b?.slashed ?? false,
+                balanceEth: b?.endBalance ?? 0,
+                effectiveBalanceEth: b?.effectiveBalance ?? 0,
+              },
+            ];
+          })
+        )
+      : undefined;
 
   const updateUrl = useCallback(
     (tagList: string[], next: { from?: number; to?: number }) => {
@@ -160,17 +194,17 @@ export function InspectPage(): JSX.Element {
   }, []);
 
   const busy = isResolving || isLoading;
-  // Attestation tables start later than balances; the heatmap and table begin where they do
-  const performanceFrom = attestationFloor !== undefined ? Math.max(from, attestationFloor) : from;
+  // Attestation and proposal tables start later than balances; the heatmap and table begin where they do
+  const performanceFrom = performanceFloor !== undefined ? Math.max(dataFrom, performanceFloor) : dataFrom;
   const rangeMeta = (
     <span className="flex items-center gap-2">
-      {formatDate(from)} – {formatDate(to)}
+      {formatDate(dataFrom)} – {formatDate(dataTo)}
       {resolution === 'week' && <Badge color="gray">Weekly</Badge>}
     </span>
   );
   const performanceNote =
-    attestationFloor !== undefined && from < attestationFloor
-      ? `Attestation data starts ${formatDate(attestationFloor)}.`
+    performanceFloor !== undefined && dataFrom < performanceFloor
+      ? `Attestation and proposal data start ${formatDate(performanceFloor)}.`
       : undefined;
 
   return (
@@ -229,14 +263,18 @@ export function InspectPage(): JSX.Element {
         {hasAnalyzed && !error && !resolverError && (
           <>
             <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-              {identityList.length === 1 && <ValidatorIdentityCard identity={identityList[0]} />}
-              {identityList.length > 1 && <ValidatorSetCard identities={identityList} />}
+              {identityList.length === 1 && (!endsEarlier || endStates) && (
+                <ValidatorIdentityCard identity={identityList[0]} endState={endStates?.get(identityList[0].index)} />
+              )}
+              {identityList.length > 1 && (!endsEarlier || endStates) && (
+                <ValidatorSetCard identities={identityList} endStates={endStates} />
+              )}
               {hasData && !isLoading && (
                 <ValidatorBalance
                   balances={raw.balance}
                   validatorIndices={resolvedIndices}
-                  from={from}
-                  to={to}
+                  from={dataFrom}
+                  to={dataTo}
                   allHistory={allHistory}
                   daysPerRow={resolution === 'week' ? 7 : 1}
                 />
@@ -256,7 +294,7 @@ export function InspectPage(): JSX.Element {
                 metric={heatmapMetric}
                 onMetricChange={setHeatmapMetric}
                 from={performanceFrom}
-                to={to}
+                to={dataTo}
                 stepDays={resolution === 'week' ? 7 : 1}
                 onWeekSelect={weekStart => applyRange({ from: weekStart, to: weekStart + 6 * DAY })}
                 isLoading={busy}
@@ -276,7 +314,7 @@ export function InspectPage(): JSX.Element {
                   blockProposals={blockProposals}
                   validatorMap={validatorMap}
                   from={performanceFrom}
-                  to={to}
+                  to={dataTo}
                   getStatusAtTimestamp={getStatusAtTimestamp}
                   selection={selection}
                   onValidatorSelect={setSelection}
@@ -289,7 +327,7 @@ export function InspectPage(): JSX.Element {
             </InspectSection>
 
             {hasData && !isLoading && (
-              <ValidatorDuties indices={resolvedIndices} from={from} to={to} proposals={raw.blockProposal} />
+              <ValidatorDuties indices={resolvedIndices} from={dataFrom} to={dataTo} proposals={raw.blockProposal} />
             )}
           </>
         )}
