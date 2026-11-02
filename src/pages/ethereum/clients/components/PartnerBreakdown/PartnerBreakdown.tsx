@@ -226,7 +226,7 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
     return result === null ? '-' : column.metric.format(result);
   };
   const rows: PartnerRow[] = [
-    ...partners.rows.filter(row => row.blocks > 0 || columns.length > 0),
+    ...partners.rows.filter(row => row.blocks > 0),
     // The pair tables keep blocks and validators whose graffiti names no partner
     ...(columns.length > 0
       ? [{ client: UNKNOWN_CLIENT, blocks: partners.unnamedBlocks, blockShare: null, addresses: 0, addressShare: null }]
