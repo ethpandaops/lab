@@ -99,7 +99,7 @@ export function FilterBar({
   return (
     <div className="mb-4 space-y-3">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <Input size="sm" className="w-full sm:w-72">
+        <Input size="sm" wrapperClassName="w-full sm:w-72">
           <Input.Leading>
             <MagnifyingGlassIcon />
           </Input.Leading>
