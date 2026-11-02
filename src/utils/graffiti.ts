@@ -96,3 +96,33 @@ export function githubCommitUrl(repository: string | undefined, commit: string |
   if (!repository || !commit || !/^[0-9a-f]{7,40}$/i.test(commit)) return undefined;
   return `https://github.com/${repository}/commit/${commit.toLowerCase()}`;
 }
+
+/** dim_client_release with the GitHub release columns; optional until every backend serves them */
+export type ClientRelease = DimClientRelease & {
+  /** GitHub release title, empty when the tag has no release */
+  name?: string;
+  /** GitHub release page, empty when the tag has no release */
+  html_url?: string;
+  /** The release GitHub marks as latest, one per client */
+  is_latest?: boolean;
+};
+
+/**
+ * GitHub release page of a release; tags without a release have none. Falls back to a URL built from the tag
+ * where the backend does not serve html_url yet.
+ */
+export function releaseUrl(release: DimClientRelease | undefined): string | undefined {
+  if (!release) return undefined;
+  const htmlUrl = (release as ClientRelease).html_url;
+  if (htmlUrl !== undefined) return htmlUrl || undefined;
+  return githubReleaseUrl(release.repository, release.tag);
+}
+
+/**
+ * GitHub release title, when it says more than the version.
+ */
+export function releaseName(release: DimClientRelease | undefined): string | undefined {
+  const name = (release as ClientRelease | undefined)?.name?.trim();
+  if (!name || normaliseVersion(name) === normaliseVersion(release?.version ?? '')) return undefined;
+  return name;
+}

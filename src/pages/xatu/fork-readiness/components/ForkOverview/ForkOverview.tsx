@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { Link } from '@tanstack/react-router';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { formatEpoch } from '@/utils';
 import type { ForkOverviewProps } from './ForkOverview.types';
@@ -17,7 +18,11 @@ export function ForkOverview({
   return (
     <div className="space-y-4">
       <div className="flex items-baseline gap-2">
-        <h2 className="text-2xl font-bold text-foreground capitalize">{forkName}</h2>
+        <h2 className="text-2xl font-bold text-foreground capitalize">
+          <Link to="/ethereum/forks/$fork" params={{ fork: forkName }} className="hover:underline">
+            {forkName}
+          </Link>
+        </h2>
         <span className="text-sm/6 text-muted">Epoch {formatEpoch(forkEpoch)}</span>
       </div>
 

@@ -6,6 +6,8 @@ import { fctBlockHeadServiceList, fctBlockMevHeadServiceList, fctBlockProposerEn
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
+import { Entity } from '@/components/Ethereum/Entity';
+import { Validator } from '@/components/Ethereum/Validator';
 import { useNetwork } from '@/hooks/useNetwork';
 import { SECONDS_PER_SLOT } from '@/utils/beacon';
 import { getNetworkShortLabel } from '@/utils/networks';
@@ -136,17 +138,30 @@ export function LatestBlocks({ now }: LatestBlocksProps): JSX.Element {
               const blobs = block.blobGasUsed !== undefined ? Math.round(block.blobGasUsed / GAS_PER_BLOB) : null;
               return (
                 <li key={block.slot}>
-                  <button
-                    type="button"
+                  <div
+                    role="link"
+                    tabIndex={0}
                     onClick={() => navigate({ to: '/ethereum/slots/$slot', params: { slot: String(block.slot) } })}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter')
+                        navigate({ to: '/ethereum/slots/$slot', params: { slot: String(block.slot) } });
+                    }}
                     className={clsx(
-                      'grid w-full grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-(--card-inset) py-2.5 text-left text-sm transition-colors hover:bg-foreground/[0.03] sm:grid-cols-[5.5rem_minmax(0,1.2fr)_minmax(0,1fr)_7rem_3.5rem_3rem_7rem_3rem]',
+                      'grid w-full cursor-pointer grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-(--card-inset) py-2.5 text-left text-sm transition-colors hover:bg-foreground/[0.03] sm:grid-cols-[5.5rem_minmax(0,1.2fr)_minmax(0,1fr)_7rem_3.5rem_3rem_7rem_3rem]',
                       block.slot === newest && 'bg-primary/[0.04]'
                     )}
                   >
                     <span className="font-medium text-foreground tabular-nums">{block.slot}</span>
                     <span className="truncate text-foreground">
-                      {block.entity ?? (block.proposerIndex !== undefined ? `Validator ${block.proposerIndex}` : '–')}
+                      {block.entity ? (
+                        <Entity entity={block.entity} />
+                      ) : block.proposerIndex !== undefined ? (
+                        <>
+                          Validator <Validator index={block.proposerIndex} />
+                        </>
+                      ) : (
+                        '–'
+                      )}
                     </span>
                     <span className="hidden truncate text-muted sm:inline" title={block.relays?.join(', ')}>
                       {block.relays === undefined ? '–' : block.relays.length === 0 ? 'Local' : block.relays.join(', ')}
@@ -184,7 +199,7 @@ export function LatestBlocks({ now }: LatestBlocksProps): JSX.Element {
                       {blobs !== null && <span>{blobs === 1 ? '1 blob' : `${blobs} blobs`}</span>}
                       {gasShare !== null && <span>{Math.round(gasShare * 100)}% gas</span>}
                     </span>
-                  </button>
+                  </div>
                 </li>
               );
             })}

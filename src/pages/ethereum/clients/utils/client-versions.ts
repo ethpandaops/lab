@@ -6,7 +6,15 @@ import type {
 } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
-import { UNKNOWN_CLIENT, findReleaseByVersion, normaliseVersion, resolveClientRelease } from '@/utils/graffiti';
+import {
+  UNKNOWN_CLIENT,
+  findReleaseByVersion,
+  normaliseVersion,
+  resolveClientRelease,
+  type ClientRelease,
+} from '@/utils/graffiti';
+
+export { releaseName, releaseUrl, type ClientRelease } from '@/utils/graffiti';
 import type { ClientLayer } from './client-share';
 
 /** The `version` route param that resolves to a client's newest full release */
@@ -41,10 +49,13 @@ export function sortReleases(releases: DimClientRelease[]): DimClientRelease[] {
 }
 
 /**
- * Newest full release (not a prerelease) by release date.
+ * The client's latest release: the one GitHub marks latest, else the newest full release by release date.
  */
 export function latestRelease(releases: DimClientRelease[]): DimClientRelease | undefined {
-  return sortReleases(releases).find(release => !release.prerelease && release.release_date != null);
+  return (
+    releases.find(release => (release as ClientRelease).is_latest) ??
+    sortReleases(releases).find(release => !release.prerelease && release.release_date != null)
+  );
 }
 
 /**

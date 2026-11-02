@@ -17,7 +17,7 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getClientColor, normalizeClientName } from '@/utils/ethereum';
-import { formatClientName, githubReleaseUrl } from '@/utils/graffiti';
+import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { VERSION_WINDOW_DAYS, VERSION_WINDOW_OPTIONS, type VersionWindow } from './constants';
 import { ClientHeader, ForkReadinessCard, NodeTable, PendingSource, ReferenceEngine } from './components';
@@ -33,6 +33,8 @@ import {
   formatLag,
   nextRelease,
   previousRelease,
+  releaseName,
+  releaseUrl as releasePageUrl,
   summariseBuildLines,
   timeToAdoption,
   type AdoptionLag,
@@ -175,7 +177,8 @@ export function VersionPage(): JSX.Element {
 
   const name = formatClientName(client);
   const lastPoint = [...adoption].reverse().find(point => point.exact !== null);
-  const releaseUrl = githubReleaseUrl(release?.repository, release?.tag);
+  const releaseUrl = releasePageUrl(release);
+  const title = releaseName(release);
   const releaseDay = release?.release_date ? new Date(release.release_date * 1000).toISOString().slice(0, 10) : null;
   const lag50 = lagValue(facts.lag50);
   const lag90 = lagValue(facts.lag90);
@@ -230,6 +233,7 @@ export function VersionPage(): JSX.Element {
                 '-'
               ),
             },
+            ...(title ? [{ label: 'Name', value: title }] : []),
             {
               label: 'Previous release',
               value: previous?.version ? <VersionLink client={client} version={previous.version} /> : '-',

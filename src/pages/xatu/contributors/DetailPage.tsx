@@ -21,6 +21,7 @@ import { PerNodeHistoryChart } from '@/pages/xatu/nodes/components';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
 import { useNodeHistory, type HistoryMetric } from '@/pages/xatu/nodes/hooks/useNodeHistory';
 import { behindStarts, medianByStart } from '@/pages/xatu/nodes/utils/history';
+import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: string; anchorId: string }> = [
   { metric: 'block', title: 'Block arrival', subtitle: 'Median per node', anchorId: 'block-latency' },
@@ -96,18 +97,10 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
     header: 'Consensus',
     accessor: (node: FctNodeActiveLast24h) =>
       node.meta_consensus_implementation ? (
-        <span className="flex items-center gap-1.5">
-          <ClientLogo client={node.meta_consensus_implementation} size={16} />
-          {node.meta_consensus_implementation}
-        </span>
+        <NodeClientVersion client={node.meta_consensus_implementation} version={node.meta_consensus_version} />
       ) : (
         '-'
       ),
-    cellClassName: 'text-muted',
-  },
-  {
-    header: 'Consensus Version',
-    accessor: (node: FctNodeActiveLast24h) => node.meta_consensus_version || '-',
     cellClassName: 'text-muted',
   },
   {

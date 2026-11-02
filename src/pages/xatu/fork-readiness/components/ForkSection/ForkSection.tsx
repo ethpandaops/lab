@@ -24,7 +24,7 @@ export function ForkSection({ fork }: ForkSectionProps): JSX.Element {
         {fork.clientReadiness
           .filter(clientData => clientData.totalNodes > 0)
           .map(clientData => (
-            <ClientReadinessCard key={clientData.clientName} data={clientData} />
+            <ClientReadinessCard key={clientData.clientName} data={clientData} forkName={fork.forkName} />
           ))}
       </div>
     </div>

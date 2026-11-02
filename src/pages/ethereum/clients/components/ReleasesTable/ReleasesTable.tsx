@@ -6,8 +6,8 @@ import type { Column } from '@/components/Lists/Table/Table.types';
 import { Badge } from '@/components/Elements/Badge';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { DimClientRelease } from '@/api/types.gen';
-import { githubReleaseUrl } from '@/utils/graffiti';
 import { meetsMinVersion } from '@/utils/version';
+import { releaseName, releaseUrl } from '../../utils/client-versions';
 
 export interface ReleasesTableProps {
   client: string;
@@ -85,7 +85,8 @@ export function ReleasesTable({
     {
       header: 'Release',
       accessor: row => {
-        const url = githubReleaseUrl(row.repository, row.tag);
+        const url = releaseUrl(row);
+        const name = releaseName(row);
         return url ? (
           <a
             href={url}
@@ -93,11 +94,11 @@ export function ReleasesTable({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 font-mono text-xs/6 text-muted hover:text-foreground"
           >
-            {row.tag}
+            {name ?? row.tag}
             <ArrowTopRightOnSquareIcon className="size-3" />
           </a>
         ) : (
-          '-'
+          <span className="font-mono text-xs/6 text-muted">{row.tag ?? '-'}</span>
         );
       },
     },

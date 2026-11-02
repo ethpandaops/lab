@@ -28,7 +28,12 @@ export function Entity({ entity, noLink = false, className }: EntityProps): Reac
   }
 
   return (
-    <Link to="/ethereum/entities/$entity" params={{ entity }} className={clsx('hover:underline', className)}>
+    <Link
+      to="/ethereum/entities/$entity"
+      params={{ entity }}
+      className={clsx('hover:underline', className)}
+      onClick={event => event.stopPropagation()}
+    >
       {entity}
     </Link>
   );

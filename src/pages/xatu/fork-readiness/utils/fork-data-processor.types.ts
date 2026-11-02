@@ -11,6 +11,7 @@ export interface ClientReadinessData {
 
 export interface NodeReadinessStatus {
   nodeName: string; // meta_client_name
+  nodeId?: string; // node_id, for linking to the node page
   username?: string; // username for linking to contributor detail page
   version: string; // meta_client_version
   isReady: boolean;

@@ -43,7 +43,12 @@ const LATEST_LOOKBACK_SECONDS = 400 * 24 * 3600;
 /**
  * Newest full release of every known client, keyed by client.
  */
-export function useLatestReleases(): { latest: Map<string, DimClientRelease>; isLoading: boolean } {
+export function useLatestReleases(): {
+  latest: Map<string, DimClientRelease>;
+  /** Full releases from the last year per client */
+  releases: Map<string, DimClientRelease[]>;
+  isLoading: boolean;
+} {
   const query = useQuery({
     queryKey: ['client-pages', 'latest-releases'],
     queryFn: ({ signal }) =>
@@ -63,19 +68,19 @@ export function useLatestReleases(): { latest: Map<string, DimClientRelease>; is
     staleTime: 30 * 60 * 1000,
   });
 
-  const latest = useMemo(() => {
+  const { latest, releases } = useMemo(() => {
     const byClient = new Map<string, DimClientRelease[]>();
     for (const release of query.data ?? []) {
       if (!release.client) continue;
       byClient.set(release.client, [...(byClient.get(release.client) ?? []), release]);
     }
-    const result = new Map<string, DimClientRelease>();
-    for (const [client, releases] of byClient) {
-      const newest = latestRelease(releases);
-      if (newest) result.set(client, newest);
+    const newestByClient = new Map<string, DimClientRelease>();
+    for (const [client, clientReleases] of byClient) {
+      const newest = latestRelease(clientReleases);
+      if (newest) newestByClient.set(client, newest);
     }
-    return result;
+    return { latest: newestByClient, releases: byClient };
   }, [query.data]);
 
-  return { latest, isLoading: query.isLoading };
+  return { latest, releases, isLoading: query.isLoading };
 }

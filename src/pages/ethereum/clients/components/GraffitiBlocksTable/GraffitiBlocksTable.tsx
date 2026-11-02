@@ -7,6 +7,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Badge } from '@/components/Elements/Badge';
 import { Button } from '@/components/Elements/Button';
 import { Entity } from '@/components/Ethereum/Entity';
+import { Validator } from '@/components/Ethereum/Validator';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import type { FctBlockGraffiti } from '@/api/types.gen';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
@@ -46,7 +47,7 @@ const columns: Column<FctBlockGraffiti>[] = [
   },
   {
     header: 'Proposer',
-    accessor: row => row.proposer_index ?? '-',
+    accessor: row => (row.proposer_index !== undefined ? <Validator index={row.proposer_index} /> : '-'),
     cellClassName: 'tabular-nums text-muted',
   },
   {

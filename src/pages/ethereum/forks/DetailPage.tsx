@@ -35,6 +35,7 @@ import {
   secondsToCountdown,
   type CountdownTime,
 } from './components/ForkShared';
+import { ForkReadiness } from './components/ForkReadiness';
 import { Route } from '@/routes/ethereum/forks/$fork';
 
 /**
@@ -309,6 +310,8 @@ function ForkDetailContent({
             genesisTime={currentNetwork?.genesis_time}
           />
         )}
+
+        <ForkReadiness fork={fork.name} />
 
         <ForkLinksCard fork={fork} />
       </div>

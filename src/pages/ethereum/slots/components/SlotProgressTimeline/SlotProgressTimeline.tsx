@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import clsx from 'clsx';
+import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -280,13 +281,26 @@ export function SlotProgressTimeline({
                           className="shrink-0"
                         />
                       )}
-                      <span
-                        className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')}
-                        title={span.label}
-                      >
-                        {span.label}
-                        {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
-                      </span>
+                      {span.nodeId && span.label === span.username ? (
+                        <Link
+                          to="/xatu/nodes/$nodeId"
+                          params={{ nodeId: span.nodeId }}
+                          onClick={event => event.stopPropagation()}
+                          className={clsx('truncate hover:underline', span.isLate ? 'text-warning' : 'text-foreground')}
+                          title={span.label}
+                        >
+                          {span.label}
+                          {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
+                        </Link>
+                      ) : (
+                        <span
+                          className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')}
+                          title={span.label}
+                        >
+                          {span.label}
+                          {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
+                        </span>
+                      )}
                     </div>
 
                     {/* Timeline column */}

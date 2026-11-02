@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
+import { Entity } from '@/components/Ethereum/Entity';
+import { Validator } from '@/components/Ethereum/Validator';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -113,11 +115,21 @@ export function EpochSlotsTable({
       },
       {
         header: 'Proposer Index',
-        accessor: row => <span className="text-muted">{row.proposerIndex !== null ? row.proposerIndex : '-'}</span>,
+        accessor: row =>
+          row.proposerIndex !== null ? (
+            <Validator index={row.proposerIndex} className="text-muted" />
+          ) : (
+            <span className="text-muted">-</span>
+          ),
       },
       {
         header: 'Proposer Entity',
-        accessor: row => <span className="text-muted">{row.proposerEntity || '-'}</span>,
+        accessor: row =>
+          row.proposerEntity ? (
+            <Entity entity={row.proposerEntity} className="text-muted" />
+          ) : (
+            <span className="text-muted">-</span>
+          ),
       },
       {
         header: 'Status',
