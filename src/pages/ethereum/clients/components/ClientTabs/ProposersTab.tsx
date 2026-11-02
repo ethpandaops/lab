@@ -1,10 +1,11 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { compareVersions } from '@/utils/version';
 import { CLIENT_WINDOW_OPTIONS } from '../../constants';
-import { useGraffitiBlocks } from '../../hooks';
+import { BLOCK_FILTER_KEYS, type BlockSearch } from '../../utils/block-filters';
 import { EntityVersionBars } from '../EntityVersionBars';
 import { GraffitiBlocksTable } from '../GraffitiBlocksTable';
 import type { ClientTabProps } from './ClientTabs.types';
@@ -23,14 +24,18 @@ export function ProposersTab({
   blocks,
   blocksLoading,
   latest,
-  since,
   window,
   onWindowChange,
 }: ClientTabProps): JSX.Element {
-  const recent = useGraffitiBlocks({
-    since,
-    ...(layer === 'consensus' ? { consensusClient: client } : { executionClient: client }),
-  });
+  const search = useSearch({ from: '/ethereum/clients/$client/' });
+  const navigate = useNavigate({ from: '/ethereum/clients/$client/' });
+  const onBlockSearchChange = useCallback(
+    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }), resetScroll: false }),
+    [navigate]
+  );
+  // The page's own client is fixed; its layer's filter is not offered
+  const ownKey = layer === 'consensus' ? 'cl' : 'el';
+  const blockFields = BLOCK_FILTER_KEYS.filter(key => key !== ownKey);
 
   const concentration = useMemo(() => {
     const byEntity = new Map<string, { blocks: number; resolved: number; onLatest: number }>();
@@ -94,12 +99,9 @@ export function ProposersTab({
         </>
       )}
       <GraffitiBlocksTable
-        blocks={recent.blocks}
-        isLoading={recent.isLoading}
-        error={recent.error}
-        hasNextPage={recent.hasNextPage}
-        isFetchingNextPage={recent.isFetchingNextPage}
-        onLoadMore={recent.fetchNextPage}
+        search={{ ...search, [ownKey]: client }}
+        fields={blockFields}
+        onSearchChange={onBlockSearchChange}
       />
     </div>
   );

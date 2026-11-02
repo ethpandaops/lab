@@ -1,19 +1,16 @@
 export { UNKNOWN_CLIENT, GRAFFITI_FORMAT_LABELS } from '@/utils/graffiti';
 import { z } from 'zod';
+import { blockSearchShape } from './utils/block-filters';
 
 /** Available time period options for the client share charts */
 export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 
 /** Zod schema for the proposer clients page search params */
 export const clientsSearchSchema = z.object({
+  /** Blocks table filters, sort and page; cl, el and entity also filter the rest of the page */
+  ...blockSearchShape,
   /** Time period */
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
-  /** Consensus client filter */
-  cl: z.string().optional(),
-  /** Execution client filter */
-  el: z.string().optional(),
-  /** Proposer entity filter */
-  entity: z.string().optional(),
   /** Show shares of identified blocks only */
   identified: z.boolean().optional(),
 });
@@ -44,9 +41,6 @@ export const DEFAULT_TIME_PERIOD: TimePeriod = '7d';
 
 /** Page size for the aggregate queries */
 export const PAGE_SIZE = 10_000;
-
-/** Page size for the blocks table */
-export const BLOCKS_PAGE_SIZE = 25;
 
 /** Validator status whose per-entity counts list the entities to filter by */
 export const ENTITY_OPTIONS_STATUS = 'active_ongoing';
@@ -120,6 +114,8 @@ export const clientSearchSchema = z.object({
   t: z.enum(['30d', '90d', '1y', 'all']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
+  /** Proposers tab blocks table filters, sort and page */
+  ...blockSearchShape,
 });
 export type ClientSearch = z.infer<typeof clientSearchSchema>;
 

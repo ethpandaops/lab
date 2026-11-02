@@ -1,6 +1,7 @@
 import { type JSX, useMemo, useState } from 'react';
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { ChevronUpDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
+import clsx from 'clsx';
 import { entityLabel, type EntityOption } from '../../utils/client-share';
 
 export interface EntityFilterProps {
@@ -10,6 +11,8 @@ export interface EntityFilterProps {
   /** Entities to pick from, largest first */
   options: EntityOption[];
   disabled?: boolean;
+  /** Width classes; defaults to a fixed width beside the other filters */
+  className?: string;
 }
 
 /** Matches beyond this are left for the search box to narrow down */
@@ -18,7 +21,13 @@ const MAX_VISIBLE = 100;
 /**
  * Searchable entity selector for the filter bar, with each entity's active validator count.
  */
-export function EntityFilter({ value, onChange, options, disabled = false }: EntityFilterProps): JSX.Element {
+export function EntityFilter({
+  value,
+  onChange,
+  options,
+  disabled = false,
+  className = 'w-full sm:w-60',
+}: EntityFilterProps): JSX.Element {
   const [search, setSearch] = useState('');
 
   const matches = useMemo(() => {
@@ -35,7 +44,7 @@ export function EntityFilter({ value, onChange, options, disabled = false }: Ent
       disabled={disabled}
       immediate
     >
-      <div className="relative w-full sm:w-60">
+      <div className={clsx('relative', className)}>
         <ComboboxInput
           aria-label="Entity"
           placeholder="All entities"
