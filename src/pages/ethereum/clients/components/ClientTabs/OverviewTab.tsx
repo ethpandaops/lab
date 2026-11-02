@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { type JSX, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
@@ -125,7 +126,7 @@ export function OverviewTab({
         />
       </div>
       <Stats
-        gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
+        gridClassName={clsx('grid grid-cols-2 gap-4', layer === 'consensus' ? 'lg:grid-cols-4' : 'lg:grid-cols-3')}
         stats={[
           {
             id: 'blocks',
@@ -146,19 +147,16 @@ export function OverviewTab({
             subtitle: `Blocks on ${latest?.version ?? 'it'} or newer, 24h`,
             value: percent(onLatest, recentTotal),
           },
-          layer === 'consensus'
-            ? {
-                id: 'nodes',
-                name: 'Xatu nodes',
-                value: nodes.length.toLocaleString(),
-                subtitle: nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest` : undefined,
-              }
-            : {
-                id: 'nodes',
-                name: 'Xatu nodes',
-                value: '-',
-                subtitle: 'Xatu nodes do not report their execution client',
-              },
+          ...(layer === 'consensus'
+            ? [
+                {
+                  id: 'nodes',
+                  name: 'Xatu nodes',
+                  value: nodes.length.toLocaleString(),
+                  subtitle: nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest` : undefined,
+                },
+              ]
+            : []),
         ]}
       />
 

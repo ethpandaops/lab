@@ -403,8 +403,8 @@ export function recentTopVersions(days: VersionDay[], limit: number, recentDays 
  *
  * Releases are drawn as they are when the `limit` largest cover `coverage` of the blocks. Otherwise they are grouped
  * into minor lines, but only when that still leaves at least three lines that cover `coverage`; a single-major client
- * with a long tail would otherwise become one band. Failing both, the releases with the most recent blocks are drawn
- * and the tail stacks as Other.
+ * with a long tail would otherwise become one band. Failing both, the releases with the most recent blocks are drawn,
+ * with the main release of each stretch of a long window, and the rest stacks as Other.
  */
 export function groupVersionLines(
   days: VersionDay[],
@@ -434,7 +434,22 @@ export function groupVersionLines(
     });
     return { days: grouped, top: recentTopVersions(grouped, limit, grouped.length), level: 'minor' };
   }
-  return { days, top: recentTopVersions(days, limit), level: 'patch' };
+  // Half the lines go to the current releases; the rest to the main release of each stretch of the window
+  const top = recentTopVersions(days, Math.ceil(limit / 2));
+  const segments = limit - top.length;
+  for (let i = 0; i < segments; i++) {
+    const counts = new Map<string, number>();
+    for (const day of days.slice(
+      Math.floor((i * days.length) / segments),
+      Math.floor(((i + 1) * days.length) / segments)
+    )) {
+      for (const [version, count] of day.counts)
+        if (!top.includes(version)) counts.set(version, (counts.get(version) ?? 0) + count);
+    }
+    const leader = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    if (leader && leader[1] > 0) top.push(leader[0]);
+  }
+  return { days, top, level: 'patch' };
 }
 
 /** Resolved blocks per version for one UTC day */

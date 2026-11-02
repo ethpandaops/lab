@@ -382,8 +382,8 @@ export function VersionPage(): JSX.Element {
             <>
               <Stats
                 gridClassName={clsx(
-                  'grid grid-cols-2 gap-4 lg:grid-cols-3',
-                  isLatest ? '2xl:grid-cols-5' : '2xl:grid-cols-6'
+                  'grid grid-cols-2 gap-4',
+                  isLatest ? 'lg:grid-cols-5' : 'lg:grid-cols-3 2xl:grid-cols-6'
                 )}
                 stats={[
                   {

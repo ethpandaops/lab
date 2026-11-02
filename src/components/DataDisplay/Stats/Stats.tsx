@@ -50,7 +50,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                 <span className="truncate">{item.name}</span>
               </dt>
 
-              <dd className="mt-1 flex min-w-0 items-baseline gap-2">
+              <dd className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2">
                 <span
                   className={clsx(
                     'truncate text-2xl/8 font-semibold tracking-tight tabular-nums',

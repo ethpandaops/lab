@@ -413,6 +413,17 @@ describe('groupVersionLines', () => {
     expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 60 });
   });
 
+  it('gives each stretch of a long window its main release', () => {
+    const noise = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`v1.${40 + i}.0`, 3]));
+    const era = (i: number): string => (i < 20 ? 'v1.10.0' : i < 40 ? 'v1.20.0' : 'v1.30.0');
+    const days = Array.from({ length: 60 }, (_, i) =>
+      day(`d${String(i).padStart(2, '0')}`, { ...noise, [era(i)]: 40 })
+    );
+    const { top } = groupVersionLines(days, 4);
+    expect(top[0]).toBe('v1.30.0');
+    expect(top).toEqual(expect.arrayContaining(['v1.10.0', 'v1.20.0']));
+  });
+
   it('keeps the current releases of a long single-major tail apart instead of one band', () => {
     // Lodestar-like: twenty 1.x minors, each small, with peers lingering on old ones
     const old = Object.fromEntries(Array.from({ length: 18 }, (_, i) => [`v1.${10 + i}.0`, 10]));

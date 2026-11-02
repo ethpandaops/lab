@@ -172,9 +172,9 @@ export function PerformanceHeadline({
       },
       {
         id: 'coverage',
-        name: 'Duties with a known client',
+        name: 'Coverage',
         value: allDuties > 0 ? percent((knownDuties / allDuties) * 100) : '-',
-        subtitle: 'Across the layer',
+        subtitle: 'Duties with a known client',
       },
     ];
   }, [proposals.rows, attestations.rows, client]);
