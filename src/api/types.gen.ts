@@ -247,6 +247,73 @@ export type DimTokenContract = {
   updated_date_time?: number;
 };
 
+export type DimValidator = {
+  /**
+   * Epoch the validator became eligible for activation. NULL if not yet set
+   */
+  activation_eligibility_epoch?: number | null;
+  /**
+   * Epoch the validator activates or activated. NULL if not yet set
+   */
+  activation_epoch?: number | null;
+  /**
+   * Balance in Gwei
+   */
+  balance?: number | null;
+  /**
+   * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding)
+   */
+  credential_type?: string;
+  /**
+   * Effective balance in Gwei
+   */
+  effective_balance?: number | null;
+  /**
+   * Epoch of the state this row was taken from
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Epoch the validator exits or exited. NULL if no exit has been initiated
+   */
+  exit_epoch?: number | null;
+  /**
+   * The public key of the validator
+   */
+  pubkey?: string;
+  /**
+   * Whether the validator has been slashed
+   */
+  slashed?: boolean;
+  /**
+   * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+  /**
+   * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated
+   */
+  withdrawable_epoch?: number | null;
+  /**
+   * Execution address from 0x01 or 0x02 credentials. NULL for 0x00
+   */
+  withdrawal_address?: string | null;
+  /**
+   * Current withdrawal credentials
+   */
+  withdrawal_credentials?: string;
+};
+
 export type DimValidatorPubkey = {
   /**
    * The public key of the validator
@@ -1202,6 +1269,147 @@ export type FctAttestationParticipationRateHourly = {
    * Upper Bollinger band (avg + 2*stddev)
    */
   upper_band_participation_rate?: number;
+};
+
+export type FctAttestationRewardByValidator = {
+  /**
+   * The epoch number
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Head vote reward in Gwei
+   */
+  head?: number;
+  /**
+   * Inactivity penalty in Gwei
+   */
+  inactivity?: number;
+  /**
+   * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair)
+   */
+  inclusion_delay?: number;
+  /**
+   * Source vote reward in Gwei (negative when penalised)
+   */
+  source?: number;
+  /**
+   * Target vote reward in Gwei (negative when penalised)
+   */
+  target?: number;
+  /**
+   * head + target + source + inclusion_delay + inactivity in Gwei
+   */
+  total?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+};
+
+export type FctAttestationRewardByValidatorDaily = {
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Epochs of the day the validator was active (had an attestation reward)
+   */
+  epoch_count?: number;
+  /**
+   * Head vote reward in Gwei
+   */
+  head?: number;
+  /**
+   * Inactivity penalty in Gwei
+   */
+  inactivity?: number;
+  /**
+   * Inclusion delay reward in Gwei (phase0 only, 0 from Altair)
+   */
+  inclusion_delay?: number;
+  /**
+   * Epochs with any negative component
+   */
+  penalized_epoch_count?: number;
+  /**
+   * Sum of the negative components in Gwei
+   */
+  penalty?: number;
+  /**
+   * Source vote reward in Gwei (negative when penalised)
+   */
+  source?: number;
+  /**
+   * Target vote reward in Gwei (negative when penalised)
+   */
+  target?: number;
+  /**
+   * head + target + source + inclusion_delay + inactivity in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+};
+
+export type FctAttestationRewardByValidatorWeekly = {
+  /**
+   * Epochs of the week the validator was active (had an attestation reward)
+   */
+  epoch_count?: number;
+  /**
+   * Head vote reward in Gwei
+   */
+  head?: number;
+  /**
+   * Inactivity penalty in Gwei
+   */
+  inactivity?: number;
+  /**
+   * Inclusion delay reward in Gwei (phase0 only, 0 from Altair)
+   */
+  inclusion_delay?: number;
+  /**
+   * Epochs with any negative component
+   */
+  penalized_epoch_count?: number;
+  /**
+   * Sum of the negative components in Gwei
+   */
+  penalty?: number;
+  /**
+   * Source vote reward in Gwei (negative when penalised)
+   */
+  source?: number;
+  /**
+   * Target vote reward in Gwei (negative when penalised)
+   */
+  target?: number;
+  /**
+   * head + target + source + inclusion_delay + inactivity in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
 };
 
 export type FctAttestationVoteCorrectnessByValidator = {
@@ -3659,6 +3867,135 @@ export type FctBlockProposerHead = {
   updated_date_time?: number;
 };
 
+export type FctBlockProposerReward = {
+  /**
+   * Reward for included attestations in Gwei
+   */
+  attestations?: number;
+  /**
+   * Reward for included attester slashings in Gwei
+   */
+  attester_slashings?: number;
+  /**
+   * The canonical block root
+   */
+  block_root?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The validator index of the proposer
+   */
+  proposer_index?: number;
+  /**
+   * Reward for included proposer slashings in Gwei
+   */
+  proposer_slashings?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Reward for the included sync aggregate in Gwei
+   */
+  sync_aggregate?: number;
+  /**
+   * Total consensus layer proposer reward in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockProposerRewardByValidatorDaily = {
+  /**
+   * Reward for included attestations in Gwei
+   */
+  attestations?: number;
+  /**
+   * Reward for included attester slashings in Gwei
+   */
+  attester_slashings?: number;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * The validator index of the proposer
+   */
+  proposer_index?: number;
+  /**
+   * Reward for included proposer slashings in Gwei
+   */
+  proposer_slashings?: number;
+  /**
+   * Reward for included sync aggregates in Gwei
+   */
+  sync_aggregate?: number;
+  /**
+   * Total consensus layer proposer reward in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctBlockProposerRewardByValidatorWeekly = {
+  /**
+   * Reward for included attestations in Gwei
+   */
+  attestations?: number;
+  /**
+   * Reward for included attester slashings in Gwei
+   */
+  attester_slashings?: number;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * The validator index of the proposer
+   */
+  proposer_index?: number;
+  /**
+   * Reward for included proposer slashings in Gwei
+   */
+  proposer_slashings?: number;
+  /**
+   * Reward for included sync aggregates in Gwei
+   */
+  sync_aggregate?: number;
+  /**
+   * Total consensus layer proposer reward in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
 export type FctContractStorageStateByAddressDaily = {
   /**
    * Cumulative count of active storage slots at end of day
@@ -4864,6 +5201,85 @@ export type FctEngineGetBlobsByElClient = {
   updated_date_time?: number;
 };
 
+export type FctEngineGetBlobsByElClientDaily = {
+  /**
+   * Average duration of SUCCESS engine_getBlobs calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average number of blobs returned (SUCCESS status only)
+   */
+  avg_returned_count?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of observations with EMPTY status
+   */
+  empty_count?: number;
+  /**
+   * Number of observations with ERROR status
+   */
+  error_count?: number;
+  /**
+   * Maximum duration of SUCCESS calls in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration of SUCCESS calls in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this day
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration of SUCCESS calls over the day in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of observations with PARTIAL status
+   */
+  partial_count?: number;
+  /**
+   * Number of unique slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SUCCESS status
+   */
+  success_count?: number;
+  /**
+   * Number of unique nodes reporting for this client in this day
+   */
+  unique_node_count?: number;
+  /**
+   * Number of observations with UNSUPPORTED status
+   */
+  unsupported_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctEngineGetBlobsByElClientHourly = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -5320,6 +5736,93 @@ export type FctEngineNewPayloadByElClient = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctEngineNewPayloadByElClientDaily = {
+  /**
+   * Number of observations with ACCEPTED status
+   */
+  accepted_count?: number;
+  /**
+   * Average blob count per block (VALID status only)
+   */
+  avg_blob_count?: number;
+  /**
+   * Average duration of VALID engine_newPayload calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average gas limit per block (VALID status only)
+   */
+  avg_gas_limit?: number;
+  /**
+   * Average gas used per block (VALID status only)
+   */
+  avg_gas_used?: number;
+  /**
+   * Average transaction count per block (VALID status only)
+   */
+  avg_tx_count?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of observations with INVALID status
+   */
+  invalid_count?: number;
+  /**
+   * Maximum duration of VALID calls in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration of VALID calls in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this day
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration of VALID calls over the day in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration of VALID calls over the day in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of unique slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SYNCING status
+   */
+  syncing_count?: number;
+  /**
+   * Number of unique nodes reporting for this client in this day
+   */
+  unique_node_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of observations with VALID status
+   */
+  valid_count?: number;
 };
 
 export type FctEngineNewPayloadByElClientHourly = {
@@ -8641,6 +9144,103 @@ export type FctSyncCommitteeParticipationByValidatorWeekly = {
   week_start_date?: string;
 };
 
+export type FctSyncCommitteeRewardByValidator = {
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * Sync committee reward in Gwei (negative for a missed vote)
+   */
+  reward?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+};
+
+export type FctSyncCommitteeRewardByValidatorDaily = {
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Blocks with a negative reward
+   */
+  penalized_slot_count?: number;
+  /**
+   * Sum of negative rewards (missed votes) in Gwei
+   */
+  penalty?: number;
+  /**
+   * Sum of positive rewards in Gwei
+   */
+  reward?: number;
+  /**
+   * Blocks of the day with a sync committee reward for the validator
+   */
+  slot_count?: number;
+  /**
+   * Net sync committee reward in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+};
+
+export type FctSyncCommitteeRewardByValidatorWeekly = {
+  /**
+   * Blocks with a negative reward
+   */
+  penalized_slot_count?: number;
+  /**
+   * Sum of negative rewards (missed votes) in Gwei
+   */
+  penalty?: number;
+  /**
+   * Sum of positive rewards in Gwei
+   */
+  reward?: number;
+  /**
+   * Blocks of the week with a sync committee reward for the validator
+   */
+  slot_count?: number;
+  /**
+   * Net sync committee reward in Gwei
+   */
+  total?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The index of the validator
+   */
+  validator_index?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
 export type FctTokenContractStorageStateByBlockDaily = {
   /**
    * Cumulative active storage slots owned by contracts of this standard at end of day
@@ -8848,6 +9448,108 @@ export type FctValidatorBalanceWeekly = {
   week_start_date?: string;
 };
 
+export type FctValidatorCountByCredentialTypeDaily = {
+  /**
+   * Sum of active validators' balance in Gwei
+   */
+  active_balance?: number;
+  /**
+   * Sum of active validators' effective balance in Gwei (active stake)
+   */
+  active_effective_balance?: number;
+  /**
+   * Active validators (active_ongoing, active_exiting, active_slashed)
+   */
+  active_validator_count?: number;
+  /**
+   * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
+   */
+  credential_type?: string;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done)
+   */
+  exited_validator_count?: number;
+  /**
+   * Active validators with an exit started (active_exiting, active_slashed)
+   */
+  exiting_validator_count?: number;
+  /**
+   * Validators waiting for activation (pending_initialized, pending_queued)
+   */
+  pending_validator_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Validators in the beacon state with this credential type, in any status
+   */
+  validator_count?: number;
+};
+
+export type FctValidatorCountByCredentialTypeWeekly = {
+  /**
+   * Sum of active validators' balance in Gwei
+   */
+  active_balance?: number;
+  /**
+   * Sum of active validators' effective balance in Gwei (active stake)
+   */
+  active_effective_balance?: number;
+  /**
+   * Active validators (active_ongoing, active_exiting, active_slashed)
+   */
+  active_validator_count?: number;
+  /**
+   * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
+   */
+  credential_type?: string;
+  /**
+   * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done)
+   */
+  exited_validator_count?: number;
+  /**
+   * Active validators with an exit started (active_exiting, active_slashed)
+   */
+  exiting_validator_count?: number;
+  /**
+   * Validators waiting for activation (pending_initialized, pending_queued)
+   */
+  pending_validator_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Validators in the beacon state with this credential type, in any status
+   */
+  validator_count?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
 export type FctValidatorCountByEntityByStatusDaily = {
   /**
    * Start of the day period
@@ -8869,6 +9571,461 @@ export type FctValidatorCountByEntityByStatusDaily = {
    * Number of validators with this status for this entity on this day
    */
   validator_count?: number;
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDaily = {
+  /**
+   * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
+   */
+  credential_type?: string;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Effective balance in whole ETH (effective balance moves in 1 ETH steps)
+   */
+  effective_balance_eth?: number;
+  /**
+   * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Active validators with this credential type and effective balance
+   */
+  validator_count?: number;
+};
+
+export type FctValidatorEvent = {
+  /**
+   * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request
+   */
+  address?: string | null;
+  /**
+   * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types
+   */
+  amount?: number | null;
+  /**
+   * Root of the block that included the operation
+   */
+  block_root?: string;
+  /**
+   * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing
+   */
+  counterparty_validator_index?: number | null;
+  /**
+   * Epoch of the block that included the operation
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0
+   */
+  event_position?: number;
+  /**
+   * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed
+   */
+  event_type?: string;
+  /**
+   * Slot of the block that included the operation
+   */
+  slot?: number;
+  /**
+   * Wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Index of the validator the event belongs to
+   */
+  validator_index?: number;
+  /**
+   * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins
+   */
+  version?: number;
+};
+
+export type FctValidatorOperationDaily = {
+  /**
+   * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount
+   */
+  amount?: number | null;
+  /**
+   * The day (UTC) of the blocks that included the operations
+   */
+  day_start_date?: string;
+  /**
+   * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing
+   */
+  operation?: string;
+  /**
+   * Number of operations that took effect
+   */
+  operation_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Distinct validators (pubkeys for deposits and top-ups)
+   */
+  validator_count?: number;
+};
+
+export type FctValidatorOperationWeekly = {
+  /**
+   * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount
+   */
+  amount?: number | null;
+  /**
+   * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing
+   */
+  operation?: string;
+  /**
+   * Number of operations that took effect
+   */
+  operation_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Distinct validators in the week (pubkeys for deposits and top-ups)
+   */
+  validator_count?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
+export type FctValidatorQueueDaily = {
+  /**
+   * Validators with status pending_queued (eligible, waiting for activation)
+   */
+  activation_queue_count?: number;
+  /**
+   * Effective balance of pending_queued validators in Gwei
+   */
+  activation_queue_effective_balance?: number;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Validators with an exit started but not yet exited (active_exiting, active_slashed)
+   */
+  exit_queue_count?: number;
+  /**
+   * Effective balance of validators in the exit queue in Gwei
+   */
+  exit_queue_effective_balance?: number;
+  /**
+   * Entries in the pending consolidation queue (Electra). 0 before Electra
+   */
+  pending_consolidation_count?: number;
+  /**
+   * Effective balance of the queued consolidations' source validators in Gwei
+   */
+  pending_consolidation_source_effective_balance?: number;
+  /**
+   * Amount in the pending deposit queue in Gwei
+   */
+  pending_deposit_amount?: number;
+  /**
+   * Entries in the pending deposit queue (Electra). 0 before Electra
+   */
+  pending_deposit_count?: number;
+  /**
+   * Balance of pending_initialized validators in Gwei
+   */
+  pending_initialized_balance?: number;
+  /**
+   * Validators with status pending_initialized (deposited, not yet eligible for activation)
+   */
+  pending_initialized_count?: number;
+  /**
+   * Amount in the pending partial withdrawal queue in Gwei
+   */
+  pending_partial_withdrawal_amount?: number;
+  /**
+   * Entries in the pending partial withdrawal queue (Electra). 0 before Electra
+   */
+  pending_partial_withdrawal_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctValidatorQueueWeekly = {
+  /**
+   * Validators with status pending_queued (eligible, waiting for activation)
+   */
+  activation_queue_count?: number;
+  /**
+   * Effective balance of pending_queued validators in Gwei
+   */
+  activation_queue_effective_balance?: number;
+  /**
+   * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Validators with an exit started but not yet exited (active_exiting, active_slashed)
+   */
+  exit_queue_count?: number;
+  /**
+   * Effective balance of validators in the exit queue in Gwei
+   */
+  exit_queue_effective_balance?: number;
+  /**
+   * Entries in the pending consolidation queue (Electra). 0 before Electra
+   */
+  pending_consolidation_count?: number;
+  /**
+   * Effective balance of the queued consolidations' source validators in Gwei
+   */
+  pending_consolidation_source_effective_balance?: number;
+  /**
+   * Amount in the pending deposit queue in Gwei
+   */
+  pending_deposit_amount?: number;
+  /**
+   * Entries in the pending deposit queue (Electra). 0 before Electra
+   */
+  pending_deposit_count?: number;
+  /**
+   * Balance of pending_initialized validators in Gwei
+   */
+  pending_initialized_balance?: number;
+  /**
+   * Validators with status pending_initialized (deposited, not yet eligible for activation)
+   */
+  pending_initialized_count?: number;
+  /**
+   * Amount in the pending partial withdrawal queue in Gwei
+   */
+  pending_partial_withdrawal_amount?: number;
+  /**
+   * Entries in the pending partial withdrawal queue (Electra). 0 before Electra
+   */
+  pending_partial_withdrawal_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
+export type FctValidatorRewardTotalDaily = {
+  /**
+   * Head vote rewards in Gwei
+   */
+  attestation_head?: number;
+  /**
+   * Inactivity penalties in Gwei
+   */
+  attestation_inactivity?: number;
+  /**
+   * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair)
+   */
+  attestation_inclusion_delay?: number;
+  /**
+   * Negative attestation components in Gwei
+   */
+  attestation_penalty?: number;
+  /**
+   * Source vote rewards in Gwei
+   */
+  attestation_source?: number;
+  /**
+   * Target vote rewards in Gwei
+   */
+  attestation_target?: number;
+  /**
+   * Net attestation rewards in Gwei
+   */
+  attestation_total?: number;
+  /**
+   * Validators with an attestation reward on the day
+   */
+  attesting_validator_count?: number;
+  /**
+   * Canonical blocks on the day
+   */
+  block_count?: number;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Proposer rewards for attestations in Gwei
+   */
+  proposer_attestations?: number;
+  /**
+   * Proposer rewards for slashings in Gwei
+   */
+  proposer_slashings?: number;
+  /**
+   * Proposer rewards for sync aggregates in Gwei
+   */
+  proposer_sync_aggregate?: number;
+  /**
+   * Consensus layer proposer rewards in Gwei
+   */
+  proposer_total?: number;
+  /**
+   * Sync committee penalties in Gwei
+   */
+  sync_committee_penalty?: number;
+  /**
+   * Positive sync committee rewards in Gwei
+   */
+  sync_committee_reward?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctValidatorRewardTotalWeekly = {
+  /**
+   * Head vote rewards in Gwei
+   */
+  attestation_head?: number;
+  /**
+   * Inactivity penalties in Gwei
+   */
+  attestation_inactivity?: number;
+  /**
+   * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair)
+   */
+  attestation_inclusion_delay?: number;
+  /**
+   * Negative attestation components in Gwei
+   */
+  attestation_penalty?: number;
+  /**
+   * Source vote rewards in Gwei
+   */
+  attestation_source?: number;
+  /**
+   * Target vote rewards in Gwei
+   */
+  attestation_target?: number;
+  /**
+   * Net attestation rewards in Gwei
+   */
+  attestation_total?: number;
+  /**
+   * Distinct validators with an attestation reward in the week
+   */
+  attesting_validator_count?: number;
+  /**
+   * Canonical blocks in the week
+   */
+  block_count?: number;
+  /**
+   * Proposer rewards for attestations in Gwei
+   */
+  proposer_attestations?: number;
+  /**
+   * Proposer rewards for slashings in Gwei
+   */
+  proposer_slashings?: number;
+  /**
+   * Proposer rewards for sync aggregates in Gwei
+   */
+  proposer_sync_aggregate?: number;
+  /**
+   * Consensus layer proposer rewards in Gwei
+   */
+  proposer_total?: number;
+  /**
+   * Sync committee penalties in Gwei
+   */
+  sync_committee_penalty?: number;
+  /**
+   * Positive sync committee rewards in Gwei
+   */
+  sync_committee_reward?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The start of the week (Monday, UTC)
+   */
+  week_start_date?: string;
+};
+
+export type FctValidatorStakeByEntityDaily = {
+  /**
+   * Sum of active validators' balance in Gwei
+   */
+  active_balance?: number;
+  /**
+   * Sum of active validators' effective balance in Gwei (active stake)
+   */
+  active_effective_balance?: number;
+  /**
+   * Active validators (active_ongoing, active_exiting, active_slashed)
+   */
+  active_validator_count?: number;
+  /**
+   * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
+   */
+  credential_type?: string;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Entity label from dim_node as it is today, or unknown
+   */
+  entity?: string;
+  /**
+   * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today
+   */
+  epoch?: number;
+  /**
+   * Wall clock time when the snapshot epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 /**
@@ -8932,6 +10089,13 @@ export type GetDimTokenContractResponse = {
  */
 export type GetDimValidatorPubkeyResponse = {
   item?: DimValidatorPubkey;
+};
+
+/**
+ * Response for getting a single dim_validator record
+ */
+export type GetDimValidatorResponse = {
+  item?: DimValidator;
 };
 
 /**
@@ -9058,6 +10222,27 @@ export type GetFctAttestationParticipationRateDailyResponse = {
  */
 export type GetFctAttestationParticipationRateHourlyResponse = {
   item?: FctAttestationParticipationRateHourly;
+};
+
+/**
+ * Response for getting a single fct_attestation_reward_by_validator_daily record
+ */
+export type GetFctAttestationRewardByValidatorDailyResponse = {
+  item?: FctAttestationRewardByValidatorDaily;
+};
+
+/**
+ * Response for getting a single fct_attestation_reward_by_validator record
+ */
+export type GetFctAttestationRewardByValidatorResponse = {
+  item?: FctAttestationRewardByValidator;
+};
+
+/**
+ * Response for getting a single fct_attestation_reward_by_validator_weekly record
+ */
+export type GetFctAttestationRewardByValidatorWeeklyResponse = {
+  item?: FctAttestationRewardByValidatorWeekly;
 };
 
 /**
@@ -9341,6 +10526,27 @@ export type GetFctBlockProposerResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_proposer_reward_by_validator_daily record
+ */
+export type GetFctBlockProposerRewardByValidatorDailyResponse = {
+  item?: FctBlockProposerRewardByValidatorDaily;
+};
+
+/**
+ * Response for getting a single fct_block_proposer_reward_by_validator_weekly record
+ */
+export type GetFctBlockProposerRewardByValidatorWeeklyResponse = {
+  item?: FctBlockProposerRewardByValidatorWeekly;
+};
+
+/**
+ * Response for getting a single fct_block_proposer_reward record
+ */
+export type GetFctBlockProposerRewardResponse = {
+  item?: FctBlockProposerReward;
+};
+
+/**
  * Response for getting a single fct_block record
  */
 export type GetFctBlockResponse = {
@@ -9474,6 +10680,13 @@ export type GetFctDataColumnPartialMessageHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_get_blobs_by_el_client_daily record
+ */
+export type GetFctEngineGetBlobsByElClientDailyResponse = {
+  item?: FctEngineGetBlobsByElClientDaily;
+};
+
+/**
  * Response for getting a single fct_engine_get_blobs_by_el_client_hourly record
  */
 export type GetFctEngineGetBlobsByElClientHourlyResponse = {
@@ -9513,6 +10726,13 @@ export type GetFctEngineGetBlobsBySlotResponse = {
  */
 export type GetFctEngineGetBlobsDurationChunked50MsResponse = {
   item?: FctEngineGetBlobsDurationChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_by_el_client_daily record
+ */
+export type GetFctEngineNewPayloadByElClientDailyResponse = {
+  item?: FctEngineNewPayloadByElClientDaily;
 };
 
 /**
@@ -9992,6 +11212,27 @@ export type GetFctSyncCommitteeParticipationByValidatorWeeklyResponse = {
 };
 
 /**
+ * Response for getting a single fct_sync_committee_reward_by_validator_daily record
+ */
+export type GetFctSyncCommitteeRewardByValidatorDailyResponse = {
+  item?: FctSyncCommitteeRewardByValidatorDaily;
+};
+
+/**
+ * Response for getting a single fct_sync_committee_reward_by_validator record
+ */
+export type GetFctSyncCommitteeRewardByValidatorResponse = {
+  item?: FctSyncCommitteeRewardByValidator;
+};
+
+/**
+ * Response for getting a single fct_sync_committee_reward_by_validator_weekly record
+ */
+export type GetFctSyncCommitteeRewardByValidatorWeeklyResponse = {
+  item?: FctSyncCommitteeRewardByValidatorWeekly;
+};
+
+/**
  * Response for getting a single fct_token_contract_storage_state_by_block_daily record
  */
 export type GetFctTokenContractStorageStateByBlockDailyResponse = {
@@ -10027,10 +11268,87 @@ export type GetFctValidatorBalanceWeeklyResponse = {
 };
 
 /**
+ * Response for getting a single fct_validator_count_by_credential_type_daily record
+ */
+export type GetFctValidatorCountByCredentialTypeDailyResponse = {
+  item?: FctValidatorCountByCredentialTypeDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_count_by_credential_type_weekly record
+ */
+export type GetFctValidatorCountByCredentialTypeWeeklyResponse = {
+  item?: FctValidatorCountByCredentialTypeWeekly;
+};
+
+/**
  * Response for getting a single fct_validator_count_by_entity_by_status_daily record
  */
 export type GetFctValidatorCountByEntityByStatusDailyResponse = {
   item?: FctValidatorCountByEntityByStatusDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_effective_balance_by_credential_type_daily record
+ */
+export type GetFctValidatorEffectiveBalanceByCredentialTypeDailyResponse = {
+  item?: FctValidatorEffectiveBalanceByCredentialTypeDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_event record
+ */
+export type GetFctValidatorEventResponse = {
+  item?: FctValidatorEvent;
+};
+
+/**
+ * Response for getting a single fct_validator_operation_daily record
+ */
+export type GetFctValidatorOperationDailyResponse = {
+  item?: FctValidatorOperationDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_operation_weekly record
+ */
+export type GetFctValidatorOperationWeeklyResponse = {
+  item?: FctValidatorOperationWeekly;
+};
+
+/**
+ * Response for getting a single fct_validator_queue_daily record
+ */
+export type GetFctValidatorQueueDailyResponse = {
+  item?: FctValidatorQueueDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_queue_weekly record
+ */
+export type GetFctValidatorQueueWeeklyResponse = {
+  item?: FctValidatorQueueWeekly;
+};
+
+/**
+ * Response for getting a single fct_validator_reward_total_daily record
+ */
+export type GetFctValidatorRewardTotalDailyResponse = {
+  item?: FctValidatorRewardTotalDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_reward_total_weekly record
+ */
+export type GetFctValidatorRewardTotalWeeklyResponse = {
+  item?: FctValidatorRewardTotalWeekly;
+};
+
+/**
+ * Response for getting a single fct_validator_stake_by_entity_daily record
+ */
+export type GetFctValidatorStakeByEntityDailyResponse = {
+  item?: FctValidatorStakeByEntityDaily;
 };
 
 /**
@@ -14099,6 +15417,20 @@ export type ListDimValidatorPubkeyResponse = {
 };
 
 /**
+ * Response for listing dim_validator records
+ */
+export type ListDimValidatorResponse = {
+  /**
+   * The list of dim_validator.
+   */
+  dim_validator?: Array<DimValidator>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing dim_validator_status records
  */
 export type ListDimValidatorStatusResponse = {
@@ -14344,6 +15676,48 @@ export type ListFctAttestationParticipationRateHourlyResponse = {
    * The list of fct_attestation_participation_rate_hourly.
    */
   fct_attestation_participation_rate_hourly?: Array<FctAttestationParticipationRateHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_reward_by_validator_daily records
+ */
+export type ListFctAttestationRewardByValidatorDailyResponse = {
+  /**
+   * The list of fct_attestation_reward_by_validator_daily.
+   */
+  fct_attestation_reward_by_validator_daily?: Array<FctAttestationRewardByValidatorDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_reward_by_validator records
+ */
+export type ListFctAttestationRewardByValidatorResponse = {
+  /**
+   * The list of fct_attestation_reward_by_validator.
+   */
+  fct_attestation_reward_by_validator?: Array<FctAttestationRewardByValidator>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_reward_by_validator_weekly records
+ */
+export type ListFctAttestationRewardByValidatorWeeklyResponse = {
+  /**
+   * The list of fct_attestation_reward_by_validator_weekly.
+   */
+  fct_attestation_reward_by_validator_weekly?: Array<FctAttestationRewardByValidatorWeekly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -14911,6 +16285,48 @@ export type ListFctBlockProposerResponse = {
 };
 
 /**
+ * Response for listing fct_block_proposer_reward_by_validator_daily records
+ */
+export type ListFctBlockProposerRewardByValidatorDailyResponse = {
+  /**
+   * The list of fct_block_proposer_reward_by_validator_daily.
+   */
+  fct_block_proposer_reward_by_validator_daily?: Array<FctBlockProposerRewardByValidatorDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposer_reward_by_validator_weekly records
+ */
+export type ListFctBlockProposerRewardByValidatorWeeklyResponse = {
+  /**
+   * The list of fct_block_proposer_reward_by_validator_weekly.
+   */
+  fct_block_proposer_reward_by_validator_weekly?: Array<FctBlockProposerRewardByValidatorWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposer_reward records
+ */
+export type ListFctBlockProposerRewardResponse = {
+  /**
+   * The list of fct_block_proposer_reward.
+   */
+  fct_block_proposer_reward?: Array<FctBlockProposerReward>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block records
  */
 export type ListFctBlockResponse = {
@@ -15177,6 +16593,20 @@ export type ListFctDataColumnPartialMessageHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_engine_get_blobs_by_el_client_daily records
+ */
+export type ListFctEngineGetBlobsByElClientDailyResponse = {
+  /**
+   * The list of fct_engine_get_blobs_by_el_client_daily.
+   */
+  fct_engine_get_blobs_by_el_client_daily?: Array<FctEngineGetBlobsByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_get_blobs_by_el_client_hourly records
  */
 export type ListFctEngineGetBlobsByElClientHourlyResponse = {
@@ -15254,6 +16684,20 @@ export type ListFctEngineGetBlobsDurationChunked50MsResponse = {
    * The list of fct_engine_get_blobs_duration_chunked_50ms.
    */
   fct_engine_get_blobs_duration_chunked_50ms?: Array<FctEngineGetBlobsDurationChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_by_el_client_daily records
+ */
+export type ListFctEngineNewPayloadByElClientDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_by_el_client_daily.
+   */
+  fct_engine_new_payload_by_el_client_daily?: Array<FctEngineNewPayloadByElClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -16213,6 +17657,48 @@ export type ListFctSyncCommitteeParticipationByValidatorWeeklyResponse = {
 };
 
 /**
+ * Response for listing fct_sync_committee_reward_by_validator_daily records
+ */
+export type ListFctSyncCommitteeRewardByValidatorDailyResponse = {
+  /**
+   * The list of fct_sync_committee_reward_by_validator_daily.
+   */
+  fct_sync_committee_reward_by_validator_daily?: Array<FctSyncCommitteeRewardByValidatorDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_sync_committee_reward_by_validator records
+ */
+export type ListFctSyncCommitteeRewardByValidatorResponse = {
+  /**
+   * The list of fct_sync_committee_reward_by_validator.
+   */
+  fct_sync_committee_reward_by_validator?: Array<FctSyncCommitteeRewardByValidator>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_sync_committee_reward_by_validator_weekly records
+ */
+export type ListFctSyncCommitteeRewardByValidatorWeeklyResponse = {
+  /**
+   * The list of fct_sync_committee_reward_by_validator_weekly.
+   */
+  fct_sync_committee_reward_by_validator_weekly?: Array<FctSyncCommitteeRewardByValidatorWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_token_contract_storage_state_by_block_daily records
  */
 export type ListFctTokenContractStorageStateByBlockDailyResponse = {
@@ -16283,6 +17769,34 @@ export type ListFctValidatorBalanceWeeklyResponse = {
 };
 
 /**
+ * Response for listing fct_validator_count_by_credential_type_daily records
+ */
+export type ListFctValidatorCountByCredentialTypeDailyResponse = {
+  /**
+   * The list of fct_validator_count_by_credential_type_daily.
+   */
+  fct_validator_count_by_credential_type_daily?: Array<FctValidatorCountByCredentialTypeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_count_by_credential_type_weekly records
+ */
+export type ListFctValidatorCountByCredentialTypeWeeklyResponse = {
+  /**
+   * The list of fct_validator_count_by_credential_type_weekly.
+   */
+  fct_validator_count_by_credential_type_weekly?: Array<FctValidatorCountByCredentialTypeWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_validator_count_by_entity_by_status_daily records
  */
 export type ListFctValidatorCountByEntityByStatusDailyResponse = {
@@ -16290,6 +17804,132 @@ export type ListFctValidatorCountByEntityByStatusDailyResponse = {
    * The list of fct_validator_count_by_entity_by_status_daily.
    */
   fct_validator_count_by_entity_by_status_daily?: Array<FctValidatorCountByEntityByStatusDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_effective_balance_by_credential_type_daily records
+ */
+export type ListFctValidatorEffectiveBalanceByCredentialTypeDailyResponse = {
+  /**
+   * The list of fct_validator_effective_balance_by_credential_type_daily.
+   */
+  fct_validator_effective_balance_by_credential_type_daily?: Array<FctValidatorEffectiveBalanceByCredentialTypeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_event records
+ */
+export type ListFctValidatorEventResponse = {
+  /**
+   * The list of fct_validator_event.
+   */
+  fct_validator_event?: Array<FctValidatorEvent>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_operation_daily records
+ */
+export type ListFctValidatorOperationDailyResponse = {
+  /**
+   * The list of fct_validator_operation_daily.
+   */
+  fct_validator_operation_daily?: Array<FctValidatorOperationDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_operation_weekly records
+ */
+export type ListFctValidatorOperationWeeklyResponse = {
+  /**
+   * The list of fct_validator_operation_weekly.
+   */
+  fct_validator_operation_weekly?: Array<FctValidatorOperationWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_queue_daily records
+ */
+export type ListFctValidatorQueueDailyResponse = {
+  /**
+   * The list of fct_validator_queue_daily.
+   */
+  fct_validator_queue_daily?: Array<FctValidatorQueueDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_queue_weekly records
+ */
+export type ListFctValidatorQueueWeeklyResponse = {
+  /**
+   * The list of fct_validator_queue_weekly.
+   */
+  fct_validator_queue_weekly?: Array<FctValidatorQueueWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_reward_total_daily records
+ */
+export type ListFctValidatorRewardTotalDailyResponse = {
+  /**
+   * The list of fct_validator_reward_total_daily.
+   */
+  fct_validator_reward_total_daily?: Array<FctValidatorRewardTotalDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_reward_total_weekly records
+ */
+export type ListFctValidatorRewardTotalWeeklyResponse = {
+  /**
+   * The list of fct_validator_reward_total_weekly.
+   */
+  fct_validator_reward_total_weekly?: Array<FctValidatorRewardTotalWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_stake_by_entity_daily records
+ */
+export type ListFctValidatorStakeByEntityDailyResponse = {
+  /**
+   * The list of fct_validator_stake_by_entity_daily.
+   */
+  fct_validator_stake_by_entity_daily?: Array<FctValidatorStakeByEntityDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -19926,6 +21566,662 @@ export type DimTokenContractServiceGetResponses = {
 
 export type DimTokenContractServiceGetResponse =
   DimTokenContractServiceGetResponses[keyof DimTokenContractServiceGetResponses];
+
+export type DimValidatorServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the state this row was taken from (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the state this row was taken from (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the state this row was taken from (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The public key of the validator (filter: eq)
+     */
+    pubkey_eq?: string;
+    /**
+     * The public key of the validator (filter: ne)
+     */
+    pubkey_ne?: string;
+    /**
+     * The public key of the validator (filter: contains)
+     */
+    pubkey_contains?: string;
+    /**
+     * The public key of the validator (filter: starts_with)
+     */
+    pubkey_starts_with?: string;
+    /**
+     * The public key of the validator (filter: ends_with)
+     */
+    pubkey_ends_with?: string;
+    /**
+     * The public key of the validator (filter: like)
+     */
+    pubkey_like?: string;
+    /**
+     * The public key of the validator (filter: not_like)
+     */
+    pubkey_not_like?: string;
+    /**
+     * The public key of the validator (filter: in_values) (comma-separated list)
+     */
+    pubkey_in_values?: string;
+    /**
+     * The public key of the validator (filter: not_in_values) (comma-separated list)
+     */
+    pubkey_not_in_values?: string;
+    /**
+     * Current withdrawal credentials (filter: eq)
+     */
+    withdrawal_credentials_eq?: string;
+    /**
+     * Current withdrawal credentials (filter: ne)
+     */
+    withdrawal_credentials_ne?: string;
+    /**
+     * Current withdrawal credentials (filter: contains)
+     */
+    withdrawal_credentials_contains?: string;
+    /**
+     * Current withdrawal credentials (filter: starts_with)
+     */
+    withdrawal_credentials_starts_with?: string;
+    /**
+     * Current withdrawal credentials (filter: ends_with)
+     */
+    withdrawal_credentials_ends_with?: string;
+    /**
+     * Current withdrawal credentials (filter: like)
+     */
+    withdrawal_credentials_like?: string;
+    /**
+     * Current withdrawal credentials (filter: not_like)
+     */
+    withdrawal_credentials_not_like?: string;
+    /**
+     * Current withdrawal credentials (filter: in_values) (comma-separated list)
+     */
+    withdrawal_credentials_in_values?: string;
+    /**
+     * Current withdrawal credentials (filter: not_in_values) (comma-separated list)
+     */
+    withdrawal_credentials_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix: 0x00 (BLS), 0x01 (execution address) or 0x02 (compounding) (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: eq)
+     */
+    withdrawal_address_eq?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: ne)
+     */
+    withdrawal_address_ne?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: contains)
+     */
+    withdrawal_address_contains?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: starts_with)
+     */
+    withdrawal_address_starts_with?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: ends_with)
+     */
+    withdrawal_address_ends_with?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: like)
+     */
+    withdrawal_address_like?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: not_like)
+     */
+    withdrawal_address_not_like?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: in_values) (comma-separated list)
+     */
+    withdrawal_address_in_values?: string;
+    /**
+     * Execution address from 0x01 or 0x02 credentials. NULL for 0x00 (filter: not_in_values) (comma-separated list)
+     */
+    withdrawal_address_not_in_values?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Beacon chain validator status (e.g. pending_queued, active_ongoing, withdrawal_done) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Balance in Gwei (filter: eq)
+     */
+    balance_eq?: number;
+    /**
+     * Balance in Gwei (filter: ne)
+     */
+    balance_ne?: number;
+    /**
+     * Balance in Gwei (filter: lt)
+     */
+    balance_lt?: number;
+    /**
+     * Balance in Gwei (filter: lte)
+     */
+    balance_lte?: number;
+    /**
+     * Balance in Gwei (filter: gt)
+     */
+    balance_gt?: number;
+    /**
+     * Balance in Gwei (filter: gte)
+     */
+    balance_gte?: number;
+    /**
+     * Balance in Gwei (filter: between_min)
+     */
+    balance_between_min?: number;
+    /**
+     * Balance in Gwei (filter: between_max_value)
+     */
+    balance_between_max_value?: number;
+    /**
+     * Balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    balance_in_values?: string;
+    /**
+     * Balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    balance_not_in_values?: string;
+    /**
+     * Effective balance in Gwei (filter: eq)
+     */
+    effective_balance_eq?: number;
+    /**
+     * Effective balance in Gwei (filter: ne)
+     */
+    effective_balance_ne?: number;
+    /**
+     * Effective balance in Gwei (filter: lt)
+     */
+    effective_balance_lt?: number;
+    /**
+     * Effective balance in Gwei (filter: lte)
+     */
+    effective_balance_lte?: number;
+    /**
+     * Effective balance in Gwei (filter: gt)
+     */
+    effective_balance_gt?: number;
+    /**
+     * Effective balance in Gwei (filter: gte)
+     */
+    effective_balance_gte?: number;
+    /**
+     * Effective balance in Gwei (filter: between_min)
+     */
+    effective_balance_between_min?: number;
+    /**
+     * Effective balance in Gwei (filter: between_max_value)
+     */
+    effective_balance_between_max_value?: number;
+    /**
+     * Effective balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    effective_balance_in_values?: string;
+    /**
+     * Effective balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    effective_balance_not_in_values?: string;
+    /**
+     * Whether the validator has been slashed (filter: eq)
+     */
+    slashed_eq?: boolean;
+    /**
+     * Whether the validator has been slashed (filter: ne)
+     */
+    slashed_ne?: boolean;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: eq)
+     */
+    activation_eligibility_epoch_eq?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: ne)
+     */
+    activation_eligibility_epoch_ne?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: lt)
+     */
+    activation_eligibility_epoch_lt?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: lte)
+     */
+    activation_eligibility_epoch_lte?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: gt)
+     */
+    activation_eligibility_epoch_gt?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: gte)
+     */
+    activation_eligibility_epoch_gte?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: between_min)
+     */
+    activation_eligibility_epoch_between_min?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: between_max_value)
+     */
+    activation_eligibility_epoch_between_max_value?: number;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: in_values) (comma-separated list)
+     */
+    activation_eligibility_epoch_in_values?: string;
+    /**
+     * Epoch the validator became eligible for activation. NULL if not yet set (filter: not_in_values) (comma-separated list)
+     */
+    activation_eligibility_epoch_not_in_values?: string;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: eq)
+     */
+    activation_epoch_eq?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: ne)
+     */
+    activation_epoch_ne?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: lt)
+     */
+    activation_epoch_lt?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: lte)
+     */
+    activation_epoch_lte?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: gt)
+     */
+    activation_epoch_gt?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: gte)
+     */
+    activation_epoch_gte?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: between_min)
+     */
+    activation_epoch_between_min?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: between_max_value)
+     */
+    activation_epoch_between_max_value?: number;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: in_values) (comma-separated list)
+     */
+    activation_epoch_in_values?: string;
+    /**
+     * Epoch the validator activates or activated. NULL if not yet set (filter: not_in_values) (comma-separated list)
+     */
+    activation_epoch_not_in_values?: string;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: eq)
+     */
+    exit_epoch_eq?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: ne)
+     */
+    exit_epoch_ne?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: lt)
+     */
+    exit_epoch_lt?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: lte)
+     */
+    exit_epoch_lte?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: gt)
+     */
+    exit_epoch_gt?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: gte)
+     */
+    exit_epoch_gte?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: between_min)
+     */
+    exit_epoch_between_min?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: between_max_value)
+     */
+    exit_epoch_between_max_value?: number;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: in_values) (comma-separated list)
+     */
+    exit_epoch_in_values?: string;
+    /**
+     * Epoch the validator exits or exited. NULL if no exit has been initiated (filter: not_in_values) (comma-separated list)
+     */
+    exit_epoch_not_in_values?: string;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: eq)
+     */
+    withdrawable_epoch_eq?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: ne)
+     */
+    withdrawable_epoch_ne?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: lt)
+     */
+    withdrawable_epoch_lt?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: lte)
+     */
+    withdrawable_epoch_lte?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: gt)
+     */
+    withdrawable_epoch_gt?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: gte)
+     */
+    withdrawable_epoch_gte?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: between_min)
+     */
+    withdrawable_epoch_between_min?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: between_max_value)
+     */
+    withdrawable_epoch_between_max_value?: number;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: in_values) (comma-separated list)
+     */
+    withdrawable_epoch_in_values?: string;
+    /**
+     * Epoch the validator becomes or became withdrawable. NULL if no exit has been initiated (filter: not_in_values) (comma-separated list)
+     */
+    withdrawable_epoch_not_in_values?: string;
+    /**
+     * The maximum number of dim_validator to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimValidator` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_validator';
+};
+
+export type DimValidatorServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimValidatorServiceListError = DimValidatorServiceListErrors[keyof DimValidatorServiceListErrors];
+
+export type DimValidatorServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimValidatorResponse;
+};
+
+export type DimValidatorServiceListResponse = DimValidatorServiceListResponses[keyof DimValidatorServiceListResponses];
+
+export type DimValidatorServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/dim_validator/{validator_index}';
+};
+
+export type DimValidatorServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimValidatorServiceGetError = DimValidatorServiceGetErrors[keyof DimValidatorServiceGetErrors];
+
+export type DimValidatorServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimValidatorResponse;
+};
+
+export type DimValidatorServiceGetResponse = DimValidatorServiceGetResponses[keyof DimValidatorServiceGetResponses];
 
 export type DimValidatorPubkeyServiceListData = {
   body?: never;
@@ -28538,6 +30834,1534 @@ export type FctAttestationParticipationRateHourlyServiceGetResponses = {
 
 export type FctAttestationParticipationRateHourlyServiceGetResponse =
   FctAttestationParticipationRateHourlyServiceGetResponses[keyof FctAttestationParticipationRateHourlyServiceGetResponses];
+
+export type FctAttestationRewardByValidatorServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The epoch number (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: eq)
+     */
+    head_eq?: number;
+    /**
+     * Head vote reward in Gwei (filter: ne)
+     */
+    head_ne?: number;
+    /**
+     * Head vote reward in Gwei (filter: lt)
+     */
+    head_lt?: number;
+    /**
+     * Head vote reward in Gwei (filter: lte)
+     */
+    head_lte?: number;
+    /**
+     * Head vote reward in Gwei (filter: gt)
+     */
+    head_gt?: number;
+    /**
+     * Head vote reward in Gwei (filter: gte)
+     */
+    head_gte?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_min)
+     */
+    head_between_min?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_max_value)
+     */
+    head_between_max_value?: number;
+    /**
+     * Head vote reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    head_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    head_not_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    target_eq?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    target_ne?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    target_lt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    target_lte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    target_gt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    target_gte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    target_between_min?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    target_between_max_value?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    target_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    target_not_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    source_eq?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    source_ne?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    source_lt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    source_lte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    source_gt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    source_gte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    source_between_min?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    source_between_max_value?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: eq)
+     */
+    inclusion_delay_eq?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: ne)
+     */
+    inclusion_delay_ne?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: lt)
+     */
+    inclusion_delay_lt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: lte)
+     */
+    inclusion_delay_lte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: gt)
+     */
+    inclusion_delay_gt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: gte)
+     */
+    inclusion_delay_gte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: between_min)
+     */
+    inclusion_delay_between_min?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: between_max_value)
+     */
+    inclusion_delay_between_max_value?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: in_values) (comma-separated list)
+     */
+    inclusion_delay_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, the attester's share, 0 from Altair) (filter: not_in_values) (comma-separated list)
+     */
+    inclusion_delay_not_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: eq)
+     */
+    inactivity_eq?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: ne)
+     */
+    inactivity_ne?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lt)
+     */
+    inactivity_lt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lte)
+     */
+    inactivity_lte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gt)
+     */
+    inactivity_gt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gte)
+     */
+    inactivity_gte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_min)
+     */
+    inactivity_between_min?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_max_value)
+     */
+    inactivity_between_max_value?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: in_values) (comma-separated list)
+     */
+    inactivity_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    inactivity_not_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_reward_by_validator to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationRewardByValidator` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_reward_by_validator';
+};
+
+export type FctAttestationRewardByValidatorServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorServiceListError =
+  FctAttestationRewardByValidatorServiceListErrors[keyof FctAttestationRewardByValidatorServiceListErrors];
+
+export type FctAttestationRewardByValidatorServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationRewardByValidatorResponse;
+};
+
+export type FctAttestationRewardByValidatorServiceListResponse =
+  FctAttestationRewardByValidatorServiceListResponses[keyof FctAttestationRewardByValidatorServiceListResponses];
+
+export type FctAttestationRewardByValidatorServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_reward_by_validator/{validator_index}';
+};
+
+export type FctAttestationRewardByValidatorServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorServiceGetError =
+  FctAttestationRewardByValidatorServiceGetErrors[keyof FctAttestationRewardByValidatorServiceGetErrors];
+
+export type FctAttestationRewardByValidatorServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationRewardByValidatorResponse;
+};
+
+export type FctAttestationRewardByValidatorServiceGetResponse =
+  FctAttestationRewardByValidatorServiceGetResponses[keyof FctAttestationRewardByValidatorServiceGetResponses];
+
+export type FctAttestationRewardByValidatorDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: eq)
+     */
+    epoch_count_eq?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: ne)
+     */
+    epoch_count_ne?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: lt)
+     */
+    epoch_count_lt?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: lte)
+     */
+    epoch_count_lte?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: gt)
+     */
+    epoch_count_gt?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: gte)
+     */
+    epoch_count_gte?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: between_min)
+     */
+    epoch_count_between_min?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: between_max_value)
+     */
+    epoch_count_between_max_value?: number;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: in_values) (comma-separated list)
+     */
+    epoch_count_in_values?: string;
+    /**
+     * Epochs of the day the validator was active (had an attestation reward) (filter: not_in_values) (comma-separated list)
+     */
+    epoch_count_not_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: eq)
+     */
+    head_eq?: number;
+    /**
+     * Head vote reward in Gwei (filter: ne)
+     */
+    head_ne?: number;
+    /**
+     * Head vote reward in Gwei (filter: lt)
+     */
+    head_lt?: number;
+    /**
+     * Head vote reward in Gwei (filter: lte)
+     */
+    head_lte?: number;
+    /**
+     * Head vote reward in Gwei (filter: gt)
+     */
+    head_gt?: number;
+    /**
+     * Head vote reward in Gwei (filter: gte)
+     */
+    head_gte?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_min)
+     */
+    head_between_min?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_max_value)
+     */
+    head_between_max_value?: number;
+    /**
+     * Head vote reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    head_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    head_not_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    target_eq?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    target_ne?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    target_lt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    target_lte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    target_gt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    target_gte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    target_between_min?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    target_between_max_value?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    target_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    target_not_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    source_eq?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    source_ne?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    source_lt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    source_lte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    source_gt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    source_gte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    source_between_min?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    source_between_max_value?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: eq)
+     */
+    inclusion_delay_eq?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: ne)
+     */
+    inclusion_delay_ne?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: lt)
+     */
+    inclusion_delay_lt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: lte)
+     */
+    inclusion_delay_lte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: gt)
+     */
+    inclusion_delay_gt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: gte)
+     */
+    inclusion_delay_gte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: between_min)
+     */
+    inclusion_delay_between_min?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: between_max_value)
+     */
+    inclusion_delay_between_max_value?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: in_values) (comma-separated list)
+     */
+    inclusion_delay_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: not_in_values) (comma-separated list)
+     */
+    inclusion_delay_not_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: eq)
+     */
+    inactivity_eq?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: ne)
+     */
+    inactivity_ne?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lt)
+     */
+    inactivity_lt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lte)
+     */
+    inactivity_lte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gt)
+     */
+    inactivity_gt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gte)
+     */
+    inactivity_gte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_min)
+     */
+    inactivity_between_min?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_max_value)
+     */
+    inactivity_between_max_value?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: in_values) (comma-separated list)
+     */
+    inactivity_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    inactivity_not_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Sum of the negative components in Gwei (filter: eq)
+     */
+    penalty_eq?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: ne)
+     */
+    penalty_ne?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: lt)
+     */
+    penalty_lt?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: lte)
+     */
+    penalty_lte?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: gt)
+     */
+    penalty_gt?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: gte)
+     */
+    penalty_gte?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: between_min)
+     */
+    penalty_between_min?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: between_max_value)
+     */
+    penalty_between_max_value?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: in_values) (comma-separated list)
+     */
+    penalty_in_values?: string;
+    /**
+     * Sum of the negative components in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    penalty_not_in_values?: string;
+    /**
+     * Epochs with any negative component (filter: eq)
+     */
+    penalized_epoch_count_eq?: number;
+    /**
+     * Epochs with any negative component (filter: ne)
+     */
+    penalized_epoch_count_ne?: number;
+    /**
+     * Epochs with any negative component (filter: lt)
+     */
+    penalized_epoch_count_lt?: number;
+    /**
+     * Epochs with any negative component (filter: lte)
+     */
+    penalized_epoch_count_lte?: number;
+    /**
+     * Epochs with any negative component (filter: gt)
+     */
+    penalized_epoch_count_gt?: number;
+    /**
+     * Epochs with any negative component (filter: gte)
+     */
+    penalized_epoch_count_gte?: number;
+    /**
+     * Epochs with any negative component (filter: between_min)
+     */
+    penalized_epoch_count_between_min?: number;
+    /**
+     * Epochs with any negative component (filter: between_max_value)
+     */
+    penalized_epoch_count_between_max_value?: number;
+    /**
+     * Epochs with any negative component (filter: in_values) (comma-separated list)
+     */
+    penalized_epoch_count_in_values?: string;
+    /**
+     * Epochs with any negative component (filter: not_in_values) (comma-separated list)
+     */
+    penalized_epoch_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_reward_by_validator_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationRewardByValidatorDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_reward_by_validator_daily';
+};
+
+export type FctAttestationRewardByValidatorDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorDailyServiceListError =
+  FctAttestationRewardByValidatorDailyServiceListErrors[keyof FctAttestationRewardByValidatorDailyServiceListErrors];
+
+export type FctAttestationRewardByValidatorDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationRewardByValidatorDailyResponse;
+};
+
+export type FctAttestationRewardByValidatorDailyServiceListResponse =
+  FctAttestationRewardByValidatorDailyServiceListResponses[keyof FctAttestationRewardByValidatorDailyServiceListResponses];
+
+export type FctAttestationRewardByValidatorDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_reward_by_validator_daily/{validator_index}';
+};
+
+export type FctAttestationRewardByValidatorDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorDailyServiceGetError =
+  FctAttestationRewardByValidatorDailyServiceGetErrors[keyof FctAttestationRewardByValidatorDailyServiceGetErrors];
+
+export type FctAttestationRewardByValidatorDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationRewardByValidatorDailyResponse;
+};
+
+export type FctAttestationRewardByValidatorDailyServiceGetResponse =
+  FctAttestationRewardByValidatorDailyServiceGetResponses[keyof FctAttestationRewardByValidatorDailyServiceGetResponses];
+
+export type FctAttestationRewardByValidatorWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: eq)
+     */
+    epoch_count_eq?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: ne)
+     */
+    epoch_count_ne?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: lt)
+     */
+    epoch_count_lt?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: lte)
+     */
+    epoch_count_lte?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: gt)
+     */
+    epoch_count_gt?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: gte)
+     */
+    epoch_count_gte?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: between_min)
+     */
+    epoch_count_between_min?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: between_max_value)
+     */
+    epoch_count_between_max_value?: number;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: in_values) (comma-separated list)
+     */
+    epoch_count_in_values?: string;
+    /**
+     * Epochs of the week the validator was active (had an attestation reward) (filter: not_in_values) (comma-separated list)
+     */
+    epoch_count_not_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: eq)
+     */
+    head_eq?: number;
+    /**
+     * Head vote reward in Gwei (filter: ne)
+     */
+    head_ne?: number;
+    /**
+     * Head vote reward in Gwei (filter: lt)
+     */
+    head_lt?: number;
+    /**
+     * Head vote reward in Gwei (filter: lte)
+     */
+    head_lte?: number;
+    /**
+     * Head vote reward in Gwei (filter: gt)
+     */
+    head_gt?: number;
+    /**
+     * Head vote reward in Gwei (filter: gte)
+     */
+    head_gte?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_min)
+     */
+    head_between_min?: number;
+    /**
+     * Head vote reward in Gwei (filter: between_max_value)
+     */
+    head_between_max_value?: number;
+    /**
+     * Head vote reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    head_in_values?: string;
+    /**
+     * Head vote reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    head_not_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    target_eq?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    target_ne?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    target_lt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    target_lte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    target_gt?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    target_gte?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    target_between_min?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    target_between_max_value?: number;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    target_in_values?: string;
+    /**
+     * Target vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    target_not_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: eq)
+     */
+    source_eq?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: ne)
+     */
+    source_ne?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lt)
+     */
+    source_lt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: lte)
+     */
+    source_lte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gt)
+     */
+    source_gt?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: gte)
+     */
+    source_gte?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_min)
+     */
+    source_between_min?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: between_max_value)
+     */
+    source_between_max_value?: number;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: in_values) (comma-separated list)
+     */
+    source_in_values?: string;
+    /**
+     * Source vote reward in Gwei (negative when penalised) (filter: not_in_values) (comma-separated list)
+     */
+    source_not_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: eq)
+     */
+    inclusion_delay_eq?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: ne)
+     */
+    inclusion_delay_ne?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: lt)
+     */
+    inclusion_delay_lt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: lte)
+     */
+    inclusion_delay_lte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: gt)
+     */
+    inclusion_delay_gt?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: gte)
+     */
+    inclusion_delay_gte?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: between_min)
+     */
+    inclusion_delay_between_min?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: between_max_value)
+     */
+    inclusion_delay_between_max_value?: number;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: in_values) (comma-separated list)
+     */
+    inclusion_delay_in_values?: string;
+    /**
+     * Inclusion delay reward in Gwei (phase0 only, 0 from Altair) (filter: not_in_values) (comma-separated list)
+     */
+    inclusion_delay_not_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: eq)
+     */
+    inactivity_eq?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: ne)
+     */
+    inactivity_ne?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lt)
+     */
+    inactivity_lt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: lte)
+     */
+    inactivity_lte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gt)
+     */
+    inactivity_gt?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: gte)
+     */
+    inactivity_gte?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_min)
+     */
+    inactivity_between_min?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: between_max_value)
+     */
+    inactivity_between_max_value?: number;
+    /**
+     * Inactivity penalty in Gwei (filter: in_values) (comma-separated list)
+     */
+    inactivity_in_values?: string;
+    /**
+     * Inactivity penalty in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    inactivity_not_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * head + target + source + inclusion_delay + inactivity in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Sum of the negative components in Gwei (filter: eq)
+     */
+    penalty_eq?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: ne)
+     */
+    penalty_ne?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: lt)
+     */
+    penalty_lt?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: lte)
+     */
+    penalty_lte?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: gt)
+     */
+    penalty_gt?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: gte)
+     */
+    penalty_gte?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: between_min)
+     */
+    penalty_between_min?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: between_max_value)
+     */
+    penalty_between_max_value?: number;
+    /**
+     * Sum of the negative components in Gwei (filter: in_values) (comma-separated list)
+     */
+    penalty_in_values?: string;
+    /**
+     * Sum of the negative components in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    penalty_not_in_values?: string;
+    /**
+     * Epochs with any negative component (filter: eq)
+     */
+    penalized_epoch_count_eq?: number;
+    /**
+     * Epochs with any negative component (filter: ne)
+     */
+    penalized_epoch_count_ne?: number;
+    /**
+     * Epochs with any negative component (filter: lt)
+     */
+    penalized_epoch_count_lt?: number;
+    /**
+     * Epochs with any negative component (filter: lte)
+     */
+    penalized_epoch_count_lte?: number;
+    /**
+     * Epochs with any negative component (filter: gt)
+     */
+    penalized_epoch_count_gt?: number;
+    /**
+     * Epochs with any negative component (filter: gte)
+     */
+    penalized_epoch_count_gte?: number;
+    /**
+     * Epochs with any negative component (filter: between_min)
+     */
+    penalized_epoch_count_between_min?: number;
+    /**
+     * Epochs with any negative component (filter: between_max_value)
+     */
+    penalized_epoch_count_between_max_value?: number;
+    /**
+     * Epochs with any negative component (filter: in_values) (comma-separated list)
+     */
+    penalized_epoch_count_in_values?: string;
+    /**
+     * Epochs with any negative component (filter: not_in_values) (comma-separated list)
+     */
+    penalized_epoch_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_reward_by_validator_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationRewardByValidatorWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_reward_by_validator_weekly';
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceListError =
+  FctAttestationRewardByValidatorWeeklyServiceListErrors[keyof FctAttestationRewardByValidatorWeeklyServiceListErrors];
+
+export type FctAttestationRewardByValidatorWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationRewardByValidatorWeeklyResponse;
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceListResponse =
+  FctAttestationRewardByValidatorWeeklyServiceListResponses[keyof FctAttestationRewardByValidatorWeeklyServiceListResponses];
+
+export type FctAttestationRewardByValidatorWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_reward_by_validator_weekly/{validator_index}';
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceGetError =
+  FctAttestationRewardByValidatorWeeklyServiceGetErrors[keyof FctAttestationRewardByValidatorWeeklyServiceGetErrors];
+
+export type FctAttestationRewardByValidatorWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationRewardByValidatorWeeklyResponse;
+};
+
+export type FctAttestationRewardByValidatorWeeklyServiceGetResponse =
+  FctAttestationRewardByValidatorWeeklyServiceGetResponses[keyof FctAttestationRewardByValidatorWeeklyServiceGetResponses];
 
 export type FctAttestationVoteCorrectnessByValidatorServiceListData = {
   body?: never;
@@ -52548,6 +56372,1410 @@ export type FctBlockProposerHeadServiceGetResponses = {
 export type FctBlockProposerHeadServiceGetResponse =
   FctBlockProposerHeadServiceGetResponses[keyof FctBlockProposerHeadServiceGetResponses];
 
+export type FctBlockProposerRewardServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The validator index of the proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The canonical block root (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The canonical block root (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The canonical block root (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The canonical block root (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The canonical block root (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The canonical block root (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The canonical block root (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The canonical block root (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The canonical block root (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: eq)
+     */
+    attestations_eq?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: ne)
+     */
+    attestations_ne?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lt)
+     */
+    attestations_lt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lte)
+     */
+    attestations_lte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gt)
+     */
+    attestations_gt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gte)
+     */
+    attestations_gte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_min)
+     */
+    attestations_between_min?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_max_value)
+     */
+    attestations_between_max_value?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestations_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestations_not_in_values?: string;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: eq)
+     */
+    sync_aggregate_eq?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: ne)
+     */
+    sync_aggregate_ne?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: lt)
+     */
+    sync_aggregate_lt?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: lte)
+     */
+    sync_aggregate_lte?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: gt)
+     */
+    sync_aggregate_gt?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: gte)
+     */
+    sync_aggregate_gte?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: between_min)
+     */
+    sync_aggregate_between_min?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: between_max_value)
+     */
+    sync_aggregate_between_max_value?: number;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_aggregate_in_values?: string;
+    /**
+     * Reward for the included sync aggregate in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_aggregate_not_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: eq)
+     */
+    proposer_slashings_eq?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: ne)
+     */
+    proposer_slashings_ne?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lt)
+     */
+    proposer_slashings_lt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lte)
+     */
+    proposer_slashings_lte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gt)
+     */
+    proposer_slashings_gt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gte)
+     */
+    proposer_slashings_gte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_min)
+     */
+    proposer_slashings_between_min?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_max_value)
+     */
+    proposer_slashings_between_max_value?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_slashings_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_slashings_not_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: eq)
+     */
+    attester_slashings_eq?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: ne)
+     */
+    attester_slashings_ne?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lt)
+     */
+    attester_slashings_lt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lte)
+     */
+    attester_slashings_lte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gt)
+     */
+    attester_slashings_gt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gte)
+     */
+    attester_slashings_gte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_min)
+     */
+    attester_slashings_between_min?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_max_value)
+     */
+    attester_slashings_between_max_value?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    attester_slashings_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attester_slashings_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposer_reward to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposerReward` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposer_reward';
+};
+
+export type FctBlockProposerRewardServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardServiceListError =
+  FctBlockProposerRewardServiceListErrors[keyof FctBlockProposerRewardServiceListErrors];
+
+export type FctBlockProposerRewardServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposerRewardResponse;
+};
+
+export type FctBlockProposerRewardServiceListResponse =
+  FctBlockProposerRewardServiceListResponses[keyof FctBlockProposerRewardServiceListResponses];
+
+export type FctBlockProposerRewardServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The validator index of the proposer
+     */
+    proposer_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposer_reward/{proposer_index}';
+};
+
+export type FctBlockProposerRewardServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardServiceGetError =
+  FctBlockProposerRewardServiceGetErrors[keyof FctBlockProposerRewardServiceGetErrors];
+
+export type FctBlockProposerRewardServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposerRewardResponse;
+};
+
+export type FctBlockProposerRewardServiceGetResponse =
+  FctBlockProposerRewardServiceGetResponses[keyof FctBlockProposerRewardServiceGetResponses];
+
+export type FctBlockProposerRewardByValidatorDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The validator index of the proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: eq)
+     */
+    attestations_eq?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: ne)
+     */
+    attestations_ne?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lt)
+     */
+    attestations_lt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lte)
+     */
+    attestations_lte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gt)
+     */
+    attestations_gt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gte)
+     */
+    attestations_gte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_min)
+     */
+    attestations_between_min?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_max_value)
+     */
+    attestations_between_max_value?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestations_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestations_not_in_values?: string;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: eq)
+     */
+    sync_aggregate_eq?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: ne)
+     */
+    sync_aggregate_ne?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: lt)
+     */
+    sync_aggregate_lt?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: lte)
+     */
+    sync_aggregate_lte?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: gt)
+     */
+    sync_aggregate_gt?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: gte)
+     */
+    sync_aggregate_gte?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: between_min)
+     */
+    sync_aggregate_between_min?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: between_max_value)
+     */
+    sync_aggregate_between_max_value?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_aggregate_in_values?: string;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_aggregate_not_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: eq)
+     */
+    proposer_slashings_eq?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: ne)
+     */
+    proposer_slashings_ne?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lt)
+     */
+    proposer_slashings_lt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lte)
+     */
+    proposer_slashings_lte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gt)
+     */
+    proposer_slashings_gt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gte)
+     */
+    proposer_slashings_gte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_min)
+     */
+    proposer_slashings_between_min?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_max_value)
+     */
+    proposer_slashings_between_max_value?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_slashings_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_slashings_not_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: eq)
+     */
+    attester_slashings_eq?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: ne)
+     */
+    attester_slashings_ne?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lt)
+     */
+    attester_slashings_lt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lte)
+     */
+    attester_slashings_lte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gt)
+     */
+    attester_slashings_gt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gte)
+     */
+    attester_slashings_gte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_min)
+     */
+    attester_slashings_between_min?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_max_value)
+     */
+    attester_slashings_between_max_value?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    attester_slashings_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attester_slashings_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposer_reward_by_validator_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposerRewardByValidatorDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposer_reward_by_validator_daily';
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceListError =
+  FctBlockProposerRewardByValidatorDailyServiceListErrors[keyof FctBlockProposerRewardByValidatorDailyServiceListErrors];
+
+export type FctBlockProposerRewardByValidatorDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposerRewardByValidatorDailyResponse;
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceListResponse =
+  FctBlockProposerRewardByValidatorDailyServiceListResponses[keyof FctBlockProposerRewardByValidatorDailyServiceListResponses];
+
+export type FctBlockProposerRewardByValidatorDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The validator index of the proposer
+     */
+    proposer_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposer_reward_by_validator_daily/{proposer_index}';
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceGetError =
+  FctBlockProposerRewardByValidatorDailyServiceGetErrors[keyof FctBlockProposerRewardByValidatorDailyServiceGetErrors];
+
+export type FctBlockProposerRewardByValidatorDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposerRewardByValidatorDailyResponse;
+};
+
+export type FctBlockProposerRewardByValidatorDailyServiceGetResponse =
+  FctBlockProposerRewardByValidatorDailyServiceGetResponses[keyof FctBlockProposerRewardByValidatorDailyServiceGetResponses];
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The validator index of the proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * Total consensus layer proposer reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: eq)
+     */
+    attestations_eq?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: ne)
+     */
+    attestations_ne?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lt)
+     */
+    attestations_lt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: lte)
+     */
+    attestations_lte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gt)
+     */
+    attestations_gt?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: gte)
+     */
+    attestations_gte?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_min)
+     */
+    attestations_between_min?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: between_max_value)
+     */
+    attestations_between_max_value?: number;
+    /**
+     * Reward for included attestations in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestations_in_values?: string;
+    /**
+     * Reward for included attestations in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestations_not_in_values?: string;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: eq)
+     */
+    sync_aggregate_eq?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: ne)
+     */
+    sync_aggregate_ne?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: lt)
+     */
+    sync_aggregate_lt?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: lte)
+     */
+    sync_aggregate_lte?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: gt)
+     */
+    sync_aggregate_gt?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: gte)
+     */
+    sync_aggregate_gte?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: between_min)
+     */
+    sync_aggregate_between_min?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: between_max_value)
+     */
+    sync_aggregate_between_max_value?: number;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_aggregate_in_values?: string;
+    /**
+     * Reward for included sync aggregates in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_aggregate_not_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: eq)
+     */
+    proposer_slashings_eq?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: ne)
+     */
+    proposer_slashings_ne?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lt)
+     */
+    proposer_slashings_lt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: lte)
+     */
+    proposer_slashings_lte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gt)
+     */
+    proposer_slashings_gt?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: gte)
+     */
+    proposer_slashings_gte?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_min)
+     */
+    proposer_slashings_between_min?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: between_max_value)
+     */
+    proposer_slashings_between_max_value?: number;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_slashings_in_values?: string;
+    /**
+     * Reward for included proposer slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_slashings_not_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: eq)
+     */
+    attester_slashings_eq?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: ne)
+     */
+    attester_slashings_ne?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lt)
+     */
+    attester_slashings_lt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: lte)
+     */
+    attester_slashings_lte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gt)
+     */
+    attester_slashings_gt?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: gte)
+     */
+    attester_slashings_gte?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_min)
+     */
+    attester_slashings_between_min?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: between_max_value)
+     */
+    attester_slashings_between_max_value?: number;
+    /**
+     * Reward for included attester slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    attester_slashings_in_values?: string;
+    /**
+     * Reward for included attester slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attester_slashings_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposer_reward_by_validator_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposerRewardByValidatorWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposer_reward_by_validator_weekly';
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceListError =
+  FctBlockProposerRewardByValidatorWeeklyServiceListErrors[keyof FctBlockProposerRewardByValidatorWeeklyServiceListErrors];
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposerRewardByValidatorWeeklyResponse;
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceListResponse =
+  FctBlockProposerRewardByValidatorWeeklyServiceListResponses[keyof FctBlockProposerRewardByValidatorWeeklyServiceListResponses];
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The validator index of the proposer
+     */
+    proposer_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposer_reward_by_validator_weekly/{proposer_index}';
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceGetError =
+  FctBlockProposerRewardByValidatorWeeklyServiceGetErrors[keyof FctBlockProposerRewardByValidatorWeeklyServiceGetErrors];
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposerRewardByValidatorWeeklyResponse;
+};
+
+export type FctBlockProposerRewardByValidatorWeeklyServiceGetResponse =
+  FctBlockProposerRewardByValidatorWeeklyServiceGetResponses[keyof FctBlockProposerRewardByValidatorWeeklyServiceGetResponses];
+
 export type FctContractStorageStateByAddressDailyServiceListData = {
   body?: never;
   path?: never;
@@ -64744,6 +69972,786 @@ export type FctEngineGetBlobsByElClientServiceGetResponses = {
 export type FctEngineGetBlobsByElClientServiceGetResponse =
   FctEngineGetBlobsByElClientServiceGetResponses[keyof FctEngineGetBlobsByElClientServiceGetResponses];
 
+export type FctEngineGetBlobsByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this day (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this day (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: eq)
+     */
+    partial_count_eq?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: ne)
+     */
+    partial_count_ne?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lt)
+     */
+    partial_count_lt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lte)
+     */
+    partial_count_lte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gt)
+     */
+    partial_count_gt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gte)
+     */
+    partial_count_gte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_min)
+     */
+    partial_count_between_min?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_max_value)
+     */
+    partial_count_between_max_value?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
+     */
+    partial_count_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
+     */
+    partial_count_not_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: eq)
+     */
+    empty_count_eq?: number;
+    /**
+     * Number of observations with EMPTY status (filter: ne)
+     */
+    empty_count_ne?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lt)
+     */
+    empty_count_lt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lte)
+     */
+    empty_count_lte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gt)
+     */
+    empty_count_gt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gte)
+     */
+    empty_count_gte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_min)
+     */
+    empty_count_between_min?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_max_value)
+     */
+    empty_count_between_max_value?: number;
+    /**
+     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
+     */
+    empty_count_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
+     */
+    empty_count_not_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: eq)
+     */
+    unsupported_count_eq?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: ne)
+     */
+    unsupported_count_ne?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lt)
+     */
+    unsupported_count_lt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lte)
+     */
+    unsupported_count_lte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gt)
+     */
+    unsupported_count_gt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gte)
+     */
+    unsupported_count_gte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_min)
+     */
+    unsupported_count_between_min?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_max_value)
+     */
+    unsupported_count_between_max_value?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
+     */
+    unsupported_count_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
+     */
+    unsupported_count_not_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of observations with ERROR status (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of observations with ERROR status (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of observations with ERROR status (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of observations with ERROR status (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of observations with ERROR status (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * Filter avg_returned_count using value
+     */
+    avg_returned_count_value?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_get_blobs_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineGetBlobsByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_daily';
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListError =
+  FctEngineGetBlobsByElClientDailyServiceListErrors[keyof FctEngineGetBlobsByElClientDailyServiceListErrors];
+
+export type FctEngineGetBlobsByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineGetBlobsByElClientDailyResponse;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListResponse =
+  FctEngineGetBlobsByElClientDailyServiceListResponses[keyof FctEngineGetBlobsByElClientDailyServiceListResponses];
+
+export type FctEngineGetBlobsByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_daily/{day_start_date}';
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetError =
+  FctEngineGetBlobsByElClientDailyServiceGetErrors[keyof FctEngineGetBlobsByElClientDailyServiceGetErrors];
+
+export type FctEngineGetBlobsByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineGetBlobsByElClientDailyResponse;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetResponse =
+  FctEngineGetBlobsByElClientDailyServiceGetResponses[keyof FctEngineGetBlobsByElClientDailyServiceGetResponses];
+
 export type FctEngineGetBlobsByElClientHourlyServiceListData = {
   body?: never;
   path?: never;
@@ -69343,6 +75351,830 @@ export type FctEngineNewPayloadByElClientServiceGetResponses = {
 
 export type FctEngineNewPayloadByElClientServiceGetResponse =
   FctEngineNewPayloadByElClientServiceGetResponses[keyof FctEngineNewPayloadByElClientServiceGetResponses];
+
+export type FctEngineNewPayloadByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this day (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this day (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: eq)
+     */
+    valid_count_eq?: number;
+    /**
+     * Number of observations with VALID status (filter: ne)
+     */
+    valid_count_ne?: number;
+    /**
+     * Number of observations with VALID status (filter: lt)
+     */
+    valid_count_lt?: number;
+    /**
+     * Number of observations with VALID status (filter: lte)
+     */
+    valid_count_lte?: number;
+    /**
+     * Number of observations with VALID status (filter: gt)
+     */
+    valid_count_gt?: number;
+    /**
+     * Number of observations with VALID status (filter: gte)
+     */
+    valid_count_gte?: number;
+    /**
+     * Number of observations with VALID status (filter: between_min)
+     */
+    valid_count_between_min?: number;
+    /**
+     * Number of observations with VALID status (filter: between_max_value)
+     */
+    valid_count_between_max_value?: number;
+    /**
+     * Number of observations with VALID status (filter: in_values) (comma-separated list)
+     */
+    valid_count_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
+     */
+    valid_count_not_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: eq)
+     */
+    invalid_count_eq?: number;
+    /**
+     * Number of observations with INVALID status (filter: ne)
+     */
+    invalid_count_ne?: number;
+    /**
+     * Number of observations with INVALID status (filter: lt)
+     */
+    invalid_count_lt?: number;
+    /**
+     * Number of observations with INVALID status (filter: lte)
+     */
+    invalid_count_lte?: number;
+    /**
+     * Number of observations with INVALID status (filter: gt)
+     */
+    invalid_count_gt?: number;
+    /**
+     * Number of observations with INVALID status (filter: gte)
+     */
+    invalid_count_gte?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_min)
+     */
+    invalid_count_between_min?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_max_value)
+     */
+    invalid_count_between_max_value?: number;
+    /**
+     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
+     */
+    invalid_count_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
+     */
+    invalid_count_not_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: eq)
+     */
+    syncing_count_eq?: number;
+    /**
+     * Number of observations with SYNCING status (filter: ne)
+     */
+    syncing_count_ne?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lt)
+     */
+    syncing_count_lt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lte)
+     */
+    syncing_count_lte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gt)
+     */
+    syncing_count_gt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gte)
+     */
+    syncing_count_gte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_min)
+     */
+    syncing_count_between_min?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_max_value)
+     */
+    syncing_count_between_max_value?: number;
+    /**
+     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
+     */
+    syncing_count_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
+     */
+    syncing_count_not_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: eq)
+     */
+    accepted_count_eq?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: ne)
+     */
+    accepted_count_ne?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lt)
+     */
+    accepted_count_lt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lte)
+     */
+    accepted_count_lte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gt)
+     */
+    accepted_count_gt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gte)
+     */
+    accepted_count_gte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_min)
+     */
+    accepted_count_between_min?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_max_value)
+     */
+    accepted_count_between_max_value?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
+     */
+    accepted_count_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
+     */
+    accepted_count_not_in_values?: string;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: eq)
+     */
+    avg_gas_used_eq?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: ne)
+     */
+    avg_gas_used_ne?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lt)
+     */
+    avg_gas_used_lt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lte)
+     */
+    avg_gas_used_lte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gt)
+     */
+    avg_gas_used_gt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gte)
+     */
+    avg_gas_used_gte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_used_between_min?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_used_between_max_value?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_used_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_used_not_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: eq)
+     */
+    avg_gas_limit_eq?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: ne)
+     */
+    avg_gas_limit_ne?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lt)
+     */
+    avg_gas_limit_lt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lte)
+     */
+    avg_gas_limit_lte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gt)
+     */
+    avg_gas_limit_gt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gte)
+     */
+    avg_gas_limit_gte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_limit_between_min?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_limit_between_max_value?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_limit_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_limit_not_in_values?: string;
+    /**
+     * Filter avg_tx_count using value
+     */
+    avg_tx_count_value?: number;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_by_el_client_daily';
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListError =
+  FctEngineNewPayloadByElClientDailyServiceListErrors[keyof FctEngineNewPayloadByElClientDailyServiceListErrors];
+
+export type FctEngineNewPayloadByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadByElClientDailyResponse;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListResponse =
+  FctEngineNewPayloadByElClientDailyServiceListResponses[keyof FctEngineNewPayloadByElClientDailyServiceListResponses];
+
+export type FctEngineNewPayloadByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_by_el_client_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetError =
+  FctEngineNewPayloadByElClientDailyServiceGetErrors[keyof FctEngineNewPayloadByElClientDailyServiceGetErrors];
+
+export type FctEngineNewPayloadByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadByElClientDailyResponse;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetResponse =
+  FctEngineNewPayloadByElClientDailyServiceGetResponses[keyof FctEngineNewPayloadByElClientDailyServiceGetResponses];
 
 export type FctEngineNewPayloadByElClientHourlyServiceListData = {
   body?: never;
@@ -99060,6 +105892,1094 @@ export type FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponses = 
 export type FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponse =
   FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponses[keyof FctSyncCommitteeParticipationByValidatorWeeklyServiceGetResponses];
 
+export type FctSyncCommitteeRewardByValidatorServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: eq)
+     */
+    reward_eq?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: ne)
+     */
+    reward_ne?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: lt)
+     */
+    reward_lt?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: lte)
+     */
+    reward_lte?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: gt)
+     */
+    reward_gt?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: gte)
+     */
+    reward_gte?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: between_min)
+     */
+    reward_between_min?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: between_max_value)
+     */
+    reward_between_max_value?: number;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: in_values) (comma-separated list)
+     */
+    reward_in_values?: string;
+    /**
+     * Sync committee reward in Gwei (negative for a missed vote) (filter: not_in_values) (comma-separated list)
+     */
+    reward_not_in_values?: string;
+    /**
+     * The maximum number of fct_sync_committee_reward_by_validator to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctSyncCommitteeRewardByValidator` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_sync_committee_reward_by_validator';
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceListError =
+  FctSyncCommitteeRewardByValidatorServiceListErrors[keyof FctSyncCommitteeRewardByValidatorServiceListErrors];
+
+export type FctSyncCommitteeRewardByValidatorServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctSyncCommitteeRewardByValidatorResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceListResponse =
+  FctSyncCommitteeRewardByValidatorServiceListResponses[keyof FctSyncCommitteeRewardByValidatorServiceListResponses];
+
+export type FctSyncCommitteeRewardByValidatorServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_sync_committee_reward_by_validator/{validator_index}';
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceGetError =
+  FctSyncCommitteeRewardByValidatorServiceGetErrors[keyof FctSyncCommitteeRewardByValidatorServiceGetErrors];
+
+export type FctSyncCommitteeRewardByValidatorServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctSyncCommitteeRewardByValidatorResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorServiceGetResponse =
+  FctSyncCommitteeRewardByValidatorServiceGetResponses[keyof FctSyncCommitteeRewardByValidatorServiceGetResponses];
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Blocks of the day with a sync committee reward for the validator (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Net sync committee reward in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * Net sync committee reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Sum of positive rewards in Gwei (filter: eq)
+     */
+    reward_eq?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: ne)
+     */
+    reward_ne?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: lt)
+     */
+    reward_lt?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: lte)
+     */
+    reward_lte?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: gt)
+     */
+    reward_gt?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: gte)
+     */
+    reward_gte?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: between_min)
+     */
+    reward_between_min?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: between_max_value)
+     */
+    reward_between_max_value?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    reward_in_values?: string;
+    /**
+     * Sum of positive rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    reward_not_in_values?: string;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: eq)
+     */
+    penalty_eq?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: ne)
+     */
+    penalty_ne?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: lt)
+     */
+    penalty_lt?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: lte)
+     */
+    penalty_lte?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: gt)
+     */
+    penalty_gt?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: gte)
+     */
+    penalty_gte?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: between_min)
+     */
+    penalty_between_min?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: between_max_value)
+     */
+    penalty_between_max_value?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: in_values) (comma-separated list)
+     */
+    penalty_in_values?: string;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    penalty_not_in_values?: string;
+    /**
+     * Blocks with a negative reward (filter: eq)
+     */
+    penalized_slot_count_eq?: number;
+    /**
+     * Blocks with a negative reward (filter: ne)
+     */
+    penalized_slot_count_ne?: number;
+    /**
+     * Blocks with a negative reward (filter: lt)
+     */
+    penalized_slot_count_lt?: number;
+    /**
+     * Blocks with a negative reward (filter: lte)
+     */
+    penalized_slot_count_lte?: number;
+    /**
+     * Blocks with a negative reward (filter: gt)
+     */
+    penalized_slot_count_gt?: number;
+    /**
+     * Blocks with a negative reward (filter: gte)
+     */
+    penalized_slot_count_gte?: number;
+    /**
+     * Blocks with a negative reward (filter: between_min)
+     */
+    penalized_slot_count_between_min?: number;
+    /**
+     * Blocks with a negative reward (filter: between_max_value)
+     */
+    penalized_slot_count_between_max_value?: number;
+    /**
+     * Blocks with a negative reward (filter: in_values) (comma-separated list)
+     */
+    penalized_slot_count_in_values?: string;
+    /**
+     * Blocks with a negative reward (filter: not_in_values) (comma-separated list)
+     */
+    penalized_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_sync_committee_reward_by_validator_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctSyncCommitteeRewardByValidatorDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_sync_committee_reward_by_validator_daily';
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceListError =
+  FctSyncCommitteeRewardByValidatorDailyServiceListErrors[keyof FctSyncCommitteeRewardByValidatorDailyServiceListErrors];
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctSyncCommitteeRewardByValidatorDailyResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceListResponse =
+  FctSyncCommitteeRewardByValidatorDailyServiceListResponses[keyof FctSyncCommitteeRewardByValidatorDailyServiceListResponses];
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_sync_committee_reward_by_validator_daily/{validator_index}';
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceGetError =
+  FctSyncCommitteeRewardByValidatorDailyServiceGetErrors[keyof FctSyncCommitteeRewardByValidatorDailyServiceGetErrors];
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctSyncCommitteeRewardByValidatorDailyResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorDailyServiceGetResponse =
+  FctSyncCommitteeRewardByValidatorDailyServiceGetResponses[keyof FctSyncCommitteeRewardByValidatorDailyServiceGetResponses];
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The index of the validator (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * The index of the validator (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * The index of the validator (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * The index of the validator (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * The index of the validator (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * The index of the validator (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * The index of the validator (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * The index of the validator (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * The index of the validator (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * The index of the validator (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Blocks of the week with a sync committee reward for the validator (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Net sync committee reward in Gwei (filter: eq)
+     */
+    total_eq?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: ne)
+     */
+    total_ne?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: lt)
+     */
+    total_lt?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: lte)
+     */
+    total_lte?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: gt)
+     */
+    total_gt?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: gte)
+     */
+    total_gte?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: between_min)
+     */
+    total_between_min?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: between_max_value)
+     */
+    total_between_max_value?: number;
+    /**
+     * Net sync committee reward in Gwei (filter: in_values) (comma-separated list)
+     */
+    total_in_values?: string;
+    /**
+     * Net sync committee reward in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    total_not_in_values?: string;
+    /**
+     * Sum of positive rewards in Gwei (filter: eq)
+     */
+    reward_eq?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: ne)
+     */
+    reward_ne?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: lt)
+     */
+    reward_lt?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: lte)
+     */
+    reward_lte?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: gt)
+     */
+    reward_gt?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: gte)
+     */
+    reward_gte?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: between_min)
+     */
+    reward_between_min?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: between_max_value)
+     */
+    reward_between_max_value?: number;
+    /**
+     * Sum of positive rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    reward_in_values?: string;
+    /**
+     * Sum of positive rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    reward_not_in_values?: string;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: eq)
+     */
+    penalty_eq?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: ne)
+     */
+    penalty_ne?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: lt)
+     */
+    penalty_lt?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: lte)
+     */
+    penalty_lte?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: gt)
+     */
+    penalty_gt?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: gte)
+     */
+    penalty_gte?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: between_min)
+     */
+    penalty_between_min?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: between_max_value)
+     */
+    penalty_between_max_value?: number;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: in_values) (comma-separated list)
+     */
+    penalty_in_values?: string;
+    /**
+     * Sum of negative rewards (missed votes) in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    penalty_not_in_values?: string;
+    /**
+     * Blocks with a negative reward (filter: eq)
+     */
+    penalized_slot_count_eq?: number;
+    /**
+     * Blocks with a negative reward (filter: ne)
+     */
+    penalized_slot_count_ne?: number;
+    /**
+     * Blocks with a negative reward (filter: lt)
+     */
+    penalized_slot_count_lt?: number;
+    /**
+     * Blocks with a negative reward (filter: lte)
+     */
+    penalized_slot_count_lte?: number;
+    /**
+     * Blocks with a negative reward (filter: gt)
+     */
+    penalized_slot_count_gt?: number;
+    /**
+     * Blocks with a negative reward (filter: gte)
+     */
+    penalized_slot_count_gte?: number;
+    /**
+     * Blocks with a negative reward (filter: between_min)
+     */
+    penalized_slot_count_between_min?: number;
+    /**
+     * Blocks with a negative reward (filter: between_max_value)
+     */
+    penalized_slot_count_between_max_value?: number;
+    /**
+     * Blocks with a negative reward (filter: in_values) (comma-separated list)
+     */
+    penalized_slot_count_in_values?: string;
+    /**
+     * Blocks with a negative reward (filter: not_in_values) (comma-separated list)
+     */
+    penalized_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_sync_committee_reward_by_validator_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctSyncCommitteeRewardByValidatorWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_sync_committee_reward_by_validator_weekly';
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceListError =
+  FctSyncCommitteeRewardByValidatorWeeklyServiceListErrors[keyof FctSyncCommitteeRewardByValidatorWeeklyServiceListErrors];
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctSyncCommitteeRewardByValidatorWeeklyResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceListResponse =
+  FctSyncCommitteeRewardByValidatorWeeklyServiceListResponses[keyof FctSyncCommitteeRewardByValidatorWeeklyServiceListResponses];
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The index of the validator
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_sync_committee_reward_by_validator_weekly/{validator_index}';
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceGetError =
+  FctSyncCommitteeRewardByValidatorWeeklyServiceGetErrors[keyof FctSyncCommitteeRewardByValidatorWeeklyServiceGetErrors];
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctSyncCommitteeRewardByValidatorWeeklyResponse;
+};
+
+export type FctSyncCommitteeRewardByValidatorWeeklyServiceGetResponse =
+  FctSyncCommitteeRewardByValidatorWeeklyServiceGetResponses[keyof FctSyncCommitteeRewardByValidatorWeeklyServiceGetResponses];
+
 export type FctTokenContractStorageStateByBlockDailyServiceListData = {
   body?: never;
   path?: never;
@@ -101180,6 +109100,1094 @@ export type FctValidatorBalanceWeeklyServiceGetResponses = {
 export type FctValidatorBalanceWeeklyServiceGetResponse =
   FctValidatorBalanceWeeklyServiceGetResponses[keyof FctValidatorBalanceWeeklyServiceGetResponses];
 
+export type FctValidatorCountByCredentialTypeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: eq)
+     */
+    active_validator_count_eq?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: ne)
+     */
+    active_validator_count_ne?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lt)
+     */
+    active_validator_count_lt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lte)
+     */
+    active_validator_count_lte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gt)
+     */
+    active_validator_count_gt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gte)
+     */
+    active_validator_count_gte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_min)
+     */
+    active_validator_count_between_min?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_max_value)
+     */
+    active_validator_count_between_max_value?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    active_validator_count_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    active_validator_count_not_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: eq)
+     */
+    active_effective_balance_eq?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: ne)
+     */
+    active_effective_balance_ne?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lt)
+     */
+    active_effective_balance_lt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lte)
+     */
+    active_effective_balance_lte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gt)
+     */
+    active_effective_balance_gt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gte)
+     */
+    active_effective_balance_gte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_min)
+     */
+    active_effective_balance_between_min?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_max_value)
+     */
+    active_effective_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: in_values) (comma-separated list)
+     */
+    active_effective_balance_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: not_in_values) (comma-separated list)
+     */
+    active_effective_balance_not_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: eq)
+     */
+    active_balance_eq?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: ne)
+     */
+    active_balance_ne?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lt)
+     */
+    active_balance_lt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lte)
+     */
+    active_balance_lte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gt)
+     */
+    active_balance_gt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gte)
+     */
+    active_balance_gte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_min)
+     */
+    active_balance_between_min?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_max_value)
+     */
+    active_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    active_balance_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    active_balance_not_in_values?: string;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: eq)
+     */
+    pending_validator_count_eq?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: ne)
+     */
+    pending_validator_count_ne?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: lt)
+     */
+    pending_validator_count_lt?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: lte)
+     */
+    pending_validator_count_lte?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: gt)
+     */
+    pending_validator_count_gt?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: gte)
+     */
+    pending_validator_count_gte?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: between_min)
+     */
+    pending_validator_count_between_min?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: between_max_value)
+     */
+    pending_validator_count_between_max_value?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: in_values) (comma-separated list)
+     */
+    pending_validator_count_in_values?: string;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: not_in_values) (comma-separated list)
+     */
+    pending_validator_count_not_in_values?: string;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: eq)
+     */
+    exiting_validator_count_eq?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: ne)
+     */
+    exiting_validator_count_ne?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: lt)
+     */
+    exiting_validator_count_lt?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: lte)
+     */
+    exiting_validator_count_lte?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: gt)
+     */
+    exiting_validator_count_gt?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: gte)
+     */
+    exiting_validator_count_gte?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: between_min)
+     */
+    exiting_validator_count_between_min?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: between_max_value)
+     */
+    exiting_validator_count_between_max_value?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    exiting_validator_count_in_values?: string;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    exiting_validator_count_not_in_values?: string;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: eq)
+     */
+    exited_validator_count_eq?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: ne)
+     */
+    exited_validator_count_ne?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: lt)
+     */
+    exited_validator_count_lt?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: lte)
+     */
+    exited_validator_count_lte?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: gt)
+     */
+    exited_validator_count_gt?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: gte)
+     */
+    exited_validator_count_gte?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: between_min)
+     */
+    exited_validator_count_between_min?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: between_max_value)
+     */
+    exited_validator_count_between_max_value?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: in_values) (comma-separated list)
+     */
+    exited_validator_count_in_values?: string;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: not_in_values) (comma-separated list)
+     */
+    exited_validator_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_count_by_credential_type_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorCountByCredentialTypeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_count_by_credential_type_daily';
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceListError =
+  FctValidatorCountByCredentialTypeDailyServiceListErrors[keyof FctValidatorCountByCredentialTypeDailyServiceListErrors];
+
+export type FctValidatorCountByCredentialTypeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorCountByCredentialTypeDailyResponse;
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceListResponse =
+  FctValidatorCountByCredentialTypeDailyServiceListResponses[keyof FctValidatorCountByCredentialTypeDailyServiceListResponses];
+
+export type FctValidatorCountByCredentialTypeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_count_by_credential_type_daily/{day_start_date}';
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceGetError =
+  FctValidatorCountByCredentialTypeDailyServiceGetErrors[keyof FctValidatorCountByCredentialTypeDailyServiceGetErrors];
+
+export type FctValidatorCountByCredentialTypeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorCountByCredentialTypeDailyResponse;
+};
+
+export type FctValidatorCountByCredentialTypeDailyServiceGetResponse =
+  FctValidatorCountByCredentialTypeDailyServiceGetResponses[keyof FctValidatorCountByCredentialTypeDailyServiceGetResponses];
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Validators in the beacon state with this credential type, in any status (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: eq)
+     */
+    active_validator_count_eq?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: ne)
+     */
+    active_validator_count_ne?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lt)
+     */
+    active_validator_count_lt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lte)
+     */
+    active_validator_count_lte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gt)
+     */
+    active_validator_count_gt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gte)
+     */
+    active_validator_count_gte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_min)
+     */
+    active_validator_count_between_min?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_max_value)
+     */
+    active_validator_count_between_max_value?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    active_validator_count_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    active_validator_count_not_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: eq)
+     */
+    active_effective_balance_eq?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: ne)
+     */
+    active_effective_balance_ne?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lt)
+     */
+    active_effective_balance_lt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lte)
+     */
+    active_effective_balance_lte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gt)
+     */
+    active_effective_balance_gt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gte)
+     */
+    active_effective_balance_gte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_min)
+     */
+    active_effective_balance_between_min?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_max_value)
+     */
+    active_effective_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: in_values) (comma-separated list)
+     */
+    active_effective_balance_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: not_in_values) (comma-separated list)
+     */
+    active_effective_balance_not_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: eq)
+     */
+    active_balance_eq?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: ne)
+     */
+    active_balance_ne?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lt)
+     */
+    active_balance_lt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lte)
+     */
+    active_balance_lte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gt)
+     */
+    active_balance_gt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gte)
+     */
+    active_balance_gte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_min)
+     */
+    active_balance_between_min?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_max_value)
+     */
+    active_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    active_balance_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    active_balance_not_in_values?: string;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: eq)
+     */
+    pending_validator_count_eq?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: ne)
+     */
+    pending_validator_count_ne?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: lt)
+     */
+    pending_validator_count_lt?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: lte)
+     */
+    pending_validator_count_lte?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: gt)
+     */
+    pending_validator_count_gt?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: gte)
+     */
+    pending_validator_count_gte?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: between_min)
+     */
+    pending_validator_count_between_min?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: between_max_value)
+     */
+    pending_validator_count_between_max_value?: number;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: in_values) (comma-separated list)
+     */
+    pending_validator_count_in_values?: string;
+    /**
+     * Validators waiting for activation (pending_initialized, pending_queued) (filter: not_in_values) (comma-separated list)
+     */
+    pending_validator_count_not_in_values?: string;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: eq)
+     */
+    exiting_validator_count_eq?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: ne)
+     */
+    exiting_validator_count_ne?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: lt)
+     */
+    exiting_validator_count_lt?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: lte)
+     */
+    exiting_validator_count_lte?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: gt)
+     */
+    exiting_validator_count_gt?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: gte)
+     */
+    exiting_validator_count_gte?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: between_min)
+     */
+    exiting_validator_count_between_min?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: between_max_value)
+     */
+    exiting_validator_count_between_max_value?: number;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    exiting_validator_count_in_values?: string;
+    /**
+     * Active validators with an exit started (active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    exiting_validator_count_not_in_values?: string;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: eq)
+     */
+    exited_validator_count_eq?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: ne)
+     */
+    exited_validator_count_ne?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: lt)
+     */
+    exited_validator_count_lt?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: lte)
+     */
+    exited_validator_count_lte?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: gt)
+     */
+    exited_validator_count_gt?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: gte)
+     */
+    exited_validator_count_gte?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: between_min)
+     */
+    exited_validator_count_between_min?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: between_max_value)
+     */
+    exited_validator_count_between_max_value?: number;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: in_values) (comma-separated list)
+     */
+    exited_validator_count_in_values?: string;
+    /**
+     * Exited validators (exited_unslashed, exited_slashed, withdrawal_possible, withdrawal_done) (filter: not_in_values) (comma-separated list)
+     */
+    exited_validator_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_count_by_credential_type_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorCountByCredentialTypeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_count_by_credential_type_weekly';
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceListError =
+  FctValidatorCountByCredentialTypeWeeklyServiceListErrors[keyof FctValidatorCountByCredentialTypeWeeklyServiceListErrors];
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorCountByCredentialTypeWeeklyResponse;
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceListResponse =
+  FctValidatorCountByCredentialTypeWeeklyServiceListResponses[keyof FctValidatorCountByCredentialTypeWeeklyServiceListResponses];
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start of the week (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_count_by_credential_type_weekly/{week_start_date}';
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceGetError =
+  FctValidatorCountByCredentialTypeWeeklyServiceGetErrors[keyof FctValidatorCountByCredentialTypeWeeklyServiceGetErrors];
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorCountByCredentialTypeWeeklyResponse;
+};
+
+export type FctValidatorCountByCredentialTypeWeeklyServiceGetResponse =
+  FctValidatorCountByCredentialTypeWeeklyServiceGetResponses[keyof FctValidatorCountByCredentialTypeWeeklyServiceGetResponses];
+
 export type FctValidatorCountByEntityByStatusDailyServiceListData = {
   body?: never;
   path?: never;
@@ -101439,6 +110447,4870 @@ export type FctValidatorCountByEntityByStatusDailyServiceGetResponses = {
 
 export type FctValidatorCountByEntityByStatusDailyServiceGetResponse =
   FctValidatorCountByEntityByStatusDailyServiceGetResponses[keyof FctValidatorCountByEntityByStatusDailyServiceGetResponses];
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: eq)
+     */
+    effective_balance_eth_eq?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: ne)
+     */
+    effective_balance_eth_ne?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: lt)
+     */
+    effective_balance_eth_lt?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: lte)
+     */
+    effective_balance_eth_lte?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: gt)
+     */
+    effective_balance_eth_gt?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: gte)
+     */
+    effective_balance_eth_gte?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: between_min)
+     */
+    effective_balance_eth_between_min?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: between_max_value)
+     */
+    effective_balance_eth_between_max_value?: number;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: in_values) (comma-separated list)
+     */
+    effective_balance_eth_in_values?: string;
+    /**
+     * Effective balance in whole ETH (effective balance moves in 1 ETH steps) (filter: not_in_values) (comma-separated list)
+     */
+    effective_balance_eth_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Active validators with this credential type and effective balance (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Active validators with this credential type and effective balance (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Active validators with this credential type and effective balance (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_effective_balance_by_credential_type_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorEffectiveBalanceByCredentialTypeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_effective_balance_by_credential_type_daily';
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListError =
+  FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListErrors[keyof FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListErrors];
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorEffectiveBalanceByCredentialTypeDailyResponse;
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListResponse =
+  FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListResponses[keyof FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListResponses];
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_effective_balance_by_credential_type_daily/{day_start_date}';
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetError =
+  FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetErrors[keyof FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetErrors];
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorEffectiveBalanceByCredentialTypeDailyResponse;
+};
+
+export type FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetResponse =
+  FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetResponses[keyof FctValidatorEffectiveBalanceByCredentialTypeDailyServiceGetResponses];
+
+export type FctValidatorEventServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Index of the validator the event belongs to (filter: eq)
+     */
+    validator_index_eq?: number;
+    /**
+     * Index of the validator the event belongs to (filter: ne)
+     */
+    validator_index_ne?: number;
+    /**
+     * Index of the validator the event belongs to (filter: lt)
+     */
+    validator_index_lt?: number;
+    /**
+     * Index of the validator the event belongs to (filter: lte)
+     */
+    validator_index_lte?: number;
+    /**
+     * Index of the validator the event belongs to (filter: gt)
+     */
+    validator_index_gt?: number;
+    /**
+     * Index of the validator the event belongs to (filter: gte)
+     */
+    validator_index_gte?: number;
+    /**
+     * Index of the validator the event belongs to (filter: between_min)
+     */
+    validator_index_between_min?: number;
+    /**
+     * Index of the validator the event belongs to (filter: between_max_value)
+     */
+    validator_index_between_max_value?: number;
+    /**
+     * Index of the validator the event belongs to (filter: in_values) (comma-separated list)
+     */
+    validator_index_in_values?: string;
+    /**
+     * Index of the validator the event belongs to (filter: not_in_values) (comma-separated list)
+     */
+    validator_index_not_in_values?: string;
+    /**
+     * Wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: eq)
+     */
+    event_type_eq?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: ne)
+     */
+    event_type_ne?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: contains)
+     */
+    event_type_contains?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: starts_with)
+     */
+    event_type_starts_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: ends_with)
+     */
+    event_type_ends_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: like)
+     */
+    event_type_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: not_like)
+     */
+    event_type_not_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: in_values) (comma-separated list)
+     */
+    event_type_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation_source, consolidation_target, withdrawal_request, exit_request, voluntary_exit, slashed (filter: not_in_values) (comma-separated list)
+     */
+    event_type_not_in_values?: string;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: eq)
+     */
+    event_position_eq?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: ne)
+     */
+    event_position_ne?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: lt)
+     */
+    event_position_lt?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: lte)
+     */
+    event_position_lte?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: gt)
+     */
+    event_position_gt?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: gte)
+     */
+    event_position_gte?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: between_min)
+     */
+    event_position_between_min?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: between_max_value)
+     */
+    event_position_between_max_value?: number;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: in_values) (comma-separated list)
+     */
+    event_position_in_values?: string;
+    /**
+     * Separates events of the same type for a validator in one block: withdrawal index for withdrawals, position in the block for execution requests, 2147483648 plus the order among the pubkey's deposits in the block for bridge deposits, otherwise 0 (filter: not_in_values) (comma-separated list)
+     */
+    event_position_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: eq)
+     */
+    version_eq?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: ne)
+     */
+    version_ne?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: lt)
+     */
+    version_lt?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: lte)
+     */
+    version_lte?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: gt)
+     */
+    version_gt?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: gte)
+     */
+    version_gte?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: between_min)
+     */
+    version_between_min?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: between_max_value)
+     */
+    version_between_max_value?: number;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * ReplacingMergeTree version: rows with a known amount win over rows without one, then the newest row wins (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Slot of the block that included the operation (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * Slot of the block that included the operation (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * Slot of the block that included the operation (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * Slot of the block that included the operation (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * Slot of the block that included the operation (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * Slot of the block that included the operation (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * Slot of the block that included the operation (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * Slot of the block that included the operation (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * Slot of the block that included the operation (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * Slot of the block that included the operation (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * Epoch of the block that included the operation (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the block that included the operation (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the block that included the operation (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the block that included the operation (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the block that included the operation (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the block that included the operation (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the block that included the operation (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the block that included the operation (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the block that included the operation (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the block that included the operation (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Root of the block that included the operation (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * Root of the block that included the operation (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * Root of the block that included the operation (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * Root of the block that included the operation (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * Root of the block that included the operation (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * Root of the block that included the operation (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * Root of the block that included the operation (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * Root of the block that included the operation (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * Root of the block that included the operation (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: eq)
+     */
+    amount_eq?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: ne)
+     */
+    amount_ne?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: lt)
+     */
+    amount_lt?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: lte)
+     */
+    amount_lte?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: gt)
+     */
+    amount_gt?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: gte)
+     */
+    amount_gte?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: between_min)
+     */
+    amount_between_min?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: between_max_value)
+     */
+    amount_between_max_value?: number;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: in_values) (comma-separated list)
+     */
+    amount_in_values?: string;
+    /**
+     * Amount in Gwei: deposit amount, withdrawal amount, partial withdrawal amount accepted into the queue, or balance moved by a consolidation once processed (NULL until then). NULL for other types (filter: not_in_values) (comma-separated list)
+     */
+    amount_not_in_values?: string;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: eq)
+     */
+    counterparty_validator_index_eq?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: ne)
+     */
+    counterparty_validator_index_ne?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: lt)
+     */
+    counterparty_validator_index_lt?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: lte)
+     */
+    counterparty_validator_index_lte?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: gt)
+     */
+    counterparty_validator_index_gt?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: gte)
+     */
+    counterparty_validator_index_gte?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: between_min)
+     */
+    counterparty_validator_index_between_min?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: between_max_value)
+     */
+    counterparty_validator_index_between_max_value?: number;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: in_values) (comma-separated list)
+     */
+    counterparty_validator_index_in_values?: string;
+    /**
+     * Other validator: consolidation target (for the source) or source (for the target), or the proposer that included a slashing (filter: not_in_values) (comma-separated list)
+     */
+    counterparty_validator_index_not_in_values?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: eq)
+     */
+    address_eq?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: ne)
+     */
+    address_ne?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: contains)
+     */
+    address_contains?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: starts_with)
+     */
+    address_starts_with?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: ends_with)
+     */
+    address_ends_with?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: like)
+     */
+    address_like?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: not_like)
+     */
+    address_not_like?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: in_values) (comma-separated list)
+     */
+    address_in_values?: string;
+    /**
+     * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request (filter: not_in_values) (comma-separated list)
+     */
+    address_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_event to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorEvent` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_event';
+};
+
+export type FctValidatorEventServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorEventServiceListError =
+  FctValidatorEventServiceListErrors[keyof FctValidatorEventServiceListErrors];
+
+export type FctValidatorEventServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorEventResponse;
+};
+
+export type FctValidatorEventServiceListResponse =
+  FctValidatorEventServiceListResponses[keyof FctValidatorEventServiceListResponses];
+
+export type FctValidatorEventServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Index of the validator the event belongs to
+     */
+    validator_index: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_event/{validator_index}';
+};
+
+export type FctValidatorEventServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorEventServiceGetError =
+  FctValidatorEventServiceGetErrors[keyof FctValidatorEventServiceGetErrors];
+
+export type FctValidatorEventServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorEventResponse;
+};
+
+export type FctValidatorEventServiceGetResponse =
+  FctValidatorEventServiceGetResponses[keyof FctValidatorEventServiceGetResponses];
+
+export type FctValidatorOperationDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) of the blocks that included the operations (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: eq)
+     */
+    operation_eq?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: ne)
+     */
+    operation_ne?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: contains)
+     */
+    operation_contains?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: starts_with)
+     */
+    operation_starts_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: ends_with)
+     */
+    operation_ends_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: like)
+     */
+    operation_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: not_like)
+     */
+    operation_not_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: in_values) (comma-separated list)
+     */
+    operation_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: not_in_values) (comma-separated list)
+     */
+    operation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of operations that took effect (filter: eq)
+     */
+    operation_count_eq?: number;
+    /**
+     * Number of operations that took effect (filter: ne)
+     */
+    operation_count_ne?: number;
+    /**
+     * Number of operations that took effect (filter: lt)
+     */
+    operation_count_lt?: number;
+    /**
+     * Number of operations that took effect (filter: lte)
+     */
+    operation_count_lte?: number;
+    /**
+     * Number of operations that took effect (filter: gt)
+     */
+    operation_count_gt?: number;
+    /**
+     * Number of operations that took effect (filter: gte)
+     */
+    operation_count_gte?: number;
+    /**
+     * Number of operations that took effect (filter: between_min)
+     */
+    operation_count_between_min?: number;
+    /**
+     * Number of operations that took effect (filter: between_max_value)
+     */
+    operation_count_between_max_value?: number;
+    /**
+     * Number of operations that took effect (filter: in_values) (comma-separated list)
+     */
+    operation_count_in_values?: string;
+    /**
+     * Number of operations that took effect (filter: not_in_values) (comma-separated list)
+     */
+    operation_count_not_in_values?: string;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Distinct validators (pubkeys for deposits and top-ups) (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: eq)
+     */
+    amount_eq?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: ne)
+     */
+    amount_ne?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: lt)
+     */
+    amount_lt?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: lte)
+     */
+    amount_lte?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: gt)
+     */
+    amount_gt?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: gte)
+     */
+    amount_gte?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: between_min)
+     */
+    amount_between_min?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: between_max_value)
+     */
+    amount_between_max_value?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: in_values) (comma-separated list)
+     */
+    amount_in_values?: string;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: not_in_values) (comma-separated list)
+     */
+    amount_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_operation_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorOperationDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_operation_daily';
+};
+
+export type FctValidatorOperationDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorOperationDailyServiceListError =
+  FctValidatorOperationDailyServiceListErrors[keyof FctValidatorOperationDailyServiceListErrors];
+
+export type FctValidatorOperationDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorOperationDailyResponse;
+};
+
+export type FctValidatorOperationDailyServiceListResponse =
+  FctValidatorOperationDailyServiceListResponses[keyof FctValidatorOperationDailyServiceListResponses];
+
+export type FctValidatorOperationDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC) of the blocks that included the operations
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_operation_daily/{day_start_date}';
+};
+
+export type FctValidatorOperationDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorOperationDailyServiceGetError =
+  FctValidatorOperationDailyServiceGetErrors[keyof FctValidatorOperationDailyServiceGetErrors];
+
+export type FctValidatorOperationDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorOperationDailyResponse;
+};
+
+export type FctValidatorOperationDailyServiceGetResponse =
+  FctValidatorOperationDailyServiceGetResponses[keyof FctValidatorOperationDailyServiceGetResponses];
+
+export type FctValidatorOperationWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: eq)
+     */
+    operation_eq?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: ne)
+     */
+    operation_ne?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: contains)
+     */
+    operation_contains?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: starts_with)
+     */
+    operation_starts_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: ends_with)
+     */
+    operation_ends_with?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: like)
+     */
+    operation_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: not_like)
+     */
+    operation_not_like?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: in_values) (comma-separated list)
+     */
+    operation_in_values?: string;
+    /**
+     * One of deposit, top_up, withdrawal_partial, withdrawal_full, bls_to_execution_change, switch_to_compounding, consolidation, withdrawal_request, exit_request, voluntary_exit, slashing (filter: not_in_values) (comma-separated list)
+     */
+    operation_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of operations that took effect (filter: eq)
+     */
+    operation_count_eq?: number;
+    /**
+     * Number of operations that took effect (filter: ne)
+     */
+    operation_count_ne?: number;
+    /**
+     * Number of operations that took effect (filter: lt)
+     */
+    operation_count_lt?: number;
+    /**
+     * Number of operations that took effect (filter: lte)
+     */
+    operation_count_lte?: number;
+    /**
+     * Number of operations that took effect (filter: gt)
+     */
+    operation_count_gt?: number;
+    /**
+     * Number of operations that took effect (filter: gte)
+     */
+    operation_count_gte?: number;
+    /**
+     * Number of operations that took effect (filter: between_min)
+     */
+    operation_count_between_min?: number;
+    /**
+     * Number of operations that took effect (filter: between_max_value)
+     */
+    operation_count_between_max_value?: number;
+    /**
+     * Number of operations that took effect (filter: in_values) (comma-separated list)
+     */
+    operation_count_in_values?: string;
+    /**
+     * Number of operations that took effect (filter: not_in_values) (comma-separated list)
+     */
+    operation_count_not_in_values?: string;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Distinct validators in the week (pubkeys for deposits and top-ups) (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: eq)
+     */
+    amount_eq?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: ne)
+     */
+    amount_ne?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: lt)
+     */
+    amount_lt?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: lte)
+     */
+    amount_lte?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: gt)
+     */
+    amount_gt?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: gte)
+     */
+    amount_gte?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: between_min)
+     */
+    amount_between_min?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: between_max_value)
+     */
+    amount_between_max_value?: number;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: in_values) (comma-separated list)
+     */
+    amount_in_values?: string;
+    /**
+     * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount (filter: not_in_values) (comma-separated list)
+     */
+    amount_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_operation_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorOperationWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_operation_weekly';
+};
+
+export type FctValidatorOperationWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorOperationWeeklyServiceListError =
+  FctValidatorOperationWeeklyServiceListErrors[keyof FctValidatorOperationWeeklyServiceListErrors];
+
+export type FctValidatorOperationWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorOperationWeeklyResponse;
+};
+
+export type FctValidatorOperationWeeklyServiceListResponse =
+  FctValidatorOperationWeeklyServiceListResponses[keyof FctValidatorOperationWeeklyServiceListResponses];
+
+export type FctValidatorOperationWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start of the week (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_operation_weekly/{week_start_date}';
+};
+
+export type FctValidatorOperationWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorOperationWeeklyServiceGetError =
+  FctValidatorOperationWeeklyServiceGetErrors[keyof FctValidatorOperationWeeklyServiceGetErrors];
+
+export type FctValidatorOperationWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorOperationWeeklyResponse;
+};
+
+export type FctValidatorOperationWeeklyServiceGetResponse =
+  FctValidatorOperationWeeklyServiceGetResponses[keyof FctValidatorOperationWeeklyServiceGetResponses];
+
+export type FctValidatorQueueDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: eq)
+     */
+    pending_initialized_count_eq?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: ne)
+     */
+    pending_initialized_count_ne?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: lt)
+     */
+    pending_initialized_count_lt?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: lte)
+     */
+    pending_initialized_count_lte?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: gt)
+     */
+    pending_initialized_count_gt?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: gte)
+     */
+    pending_initialized_count_gte?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: between_min)
+     */
+    pending_initialized_count_between_min?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: between_max_value)
+     */
+    pending_initialized_count_between_max_value?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: in_values) (comma-separated list)
+     */
+    pending_initialized_count_in_values?: string;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: not_in_values) (comma-separated list)
+     */
+    pending_initialized_count_not_in_values?: string;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: eq)
+     */
+    pending_initialized_balance_eq?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: ne)
+     */
+    pending_initialized_balance_ne?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: lt)
+     */
+    pending_initialized_balance_lt?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: lte)
+     */
+    pending_initialized_balance_lte?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: gt)
+     */
+    pending_initialized_balance_gt?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: gte)
+     */
+    pending_initialized_balance_gte?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: between_min)
+     */
+    pending_initialized_balance_between_min?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: between_max_value)
+     */
+    pending_initialized_balance_between_max_value?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_initialized_balance_in_values?: string;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_initialized_balance_not_in_values?: string;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: eq)
+     */
+    activation_queue_count_eq?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: ne)
+     */
+    activation_queue_count_ne?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: lt)
+     */
+    activation_queue_count_lt?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: lte)
+     */
+    activation_queue_count_lte?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: gt)
+     */
+    activation_queue_count_gt?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: gte)
+     */
+    activation_queue_count_gte?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: between_min)
+     */
+    activation_queue_count_between_min?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: between_max_value)
+     */
+    activation_queue_count_between_max_value?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: in_values) (comma-separated list)
+     */
+    activation_queue_count_in_values?: string;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: not_in_values) (comma-separated list)
+     */
+    activation_queue_count_not_in_values?: string;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: eq)
+     */
+    activation_queue_effective_balance_eq?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: ne)
+     */
+    activation_queue_effective_balance_ne?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: lt)
+     */
+    activation_queue_effective_balance_lt?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: lte)
+     */
+    activation_queue_effective_balance_lte?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: gt)
+     */
+    activation_queue_effective_balance_gt?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: gte)
+     */
+    activation_queue_effective_balance_gte?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: between_min)
+     */
+    activation_queue_effective_balance_between_min?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: between_max_value)
+     */
+    activation_queue_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    activation_queue_effective_balance_in_values?: string;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    activation_queue_effective_balance_not_in_values?: string;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: eq)
+     */
+    exit_queue_count_eq?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: ne)
+     */
+    exit_queue_count_ne?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: lt)
+     */
+    exit_queue_count_lt?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: lte)
+     */
+    exit_queue_count_lte?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: gt)
+     */
+    exit_queue_count_gt?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: gte)
+     */
+    exit_queue_count_gte?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: between_min)
+     */
+    exit_queue_count_between_min?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: between_max_value)
+     */
+    exit_queue_count_between_max_value?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    exit_queue_count_in_values?: string;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    exit_queue_count_not_in_values?: string;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: eq)
+     */
+    exit_queue_effective_balance_eq?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: ne)
+     */
+    exit_queue_effective_balance_ne?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: lt)
+     */
+    exit_queue_effective_balance_lt?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: lte)
+     */
+    exit_queue_effective_balance_lte?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: gt)
+     */
+    exit_queue_effective_balance_gt?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: gte)
+     */
+    exit_queue_effective_balance_gte?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: between_min)
+     */
+    exit_queue_effective_balance_between_min?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: between_max_value)
+     */
+    exit_queue_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    exit_queue_effective_balance_in_values?: string;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    exit_queue_effective_balance_not_in_values?: string;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_deposit_count_eq?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_deposit_count_ne?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_deposit_count_lt?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_deposit_count_lte?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_deposit_count_gt?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_deposit_count_gte?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_deposit_count_between_min?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_deposit_count_between_max_value?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_deposit_count_in_values?: string;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_deposit_count_not_in_values?: string;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: eq)
+     */
+    pending_deposit_amount_eq?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: ne)
+     */
+    pending_deposit_amount_ne?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: lt)
+     */
+    pending_deposit_amount_lt?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: lte)
+     */
+    pending_deposit_amount_lte?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: gt)
+     */
+    pending_deposit_amount_gt?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: gte)
+     */
+    pending_deposit_amount_gte?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: between_min)
+     */
+    pending_deposit_amount_between_min?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: between_max_value)
+     */
+    pending_deposit_amount_between_max_value?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_deposit_amount_in_values?: string;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_deposit_amount_not_in_values?: string;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_consolidation_count_eq?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_consolidation_count_ne?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_consolidation_count_lt?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_consolidation_count_lte?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_consolidation_count_gt?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_consolidation_count_gte?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_consolidation_count_between_min?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_consolidation_count_between_max_value?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_consolidation_count_in_values?: string;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_consolidation_count_not_in_values?: string;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: eq)
+     */
+    pending_consolidation_source_effective_balance_eq?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: ne)
+     */
+    pending_consolidation_source_effective_balance_ne?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: lt)
+     */
+    pending_consolidation_source_effective_balance_lt?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: lte)
+     */
+    pending_consolidation_source_effective_balance_lte?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: gt)
+     */
+    pending_consolidation_source_effective_balance_gt?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: gte)
+     */
+    pending_consolidation_source_effective_balance_gte?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: between_min)
+     */
+    pending_consolidation_source_effective_balance_between_min?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: between_max_value)
+     */
+    pending_consolidation_source_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_consolidation_source_effective_balance_in_values?: string;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_consolidation_source_effective_balance_not_in_values?: string;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_partial_withdrawal_count_eq?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_partial_withdrawal_count_ne?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_partial_withdrawal_count_lt?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_partial_withdrawal_count_lte?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_partial_withdrawal_count_gt?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_partial_withdrawal_count_gte?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_partial_withdrawal_count_between_min?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_partial_withdrawal_count_between_max_value?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_count_in_values?: string;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_count_not_in_values?: string;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: eq)
+     */
+    pending_partial_withdrawal_amount_eq?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: ne)
+     */
+    pending_partial_withdrawal_amount_ne?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: lt)
+     */
+    pending_partial_withdrawal_amount_lt?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: lte)
+     */
+    pending_partial_withdrawal_amount_lte?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: gt)
+     */
+    pending_partial_withdrawal_amount_gt?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: gte)
+     */
+    pending_partial_withdrawal_amount_gte?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: between_min)
+     */
+    pending_partial_withdrawal_amount_between_min?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: between_max_value)
+     */
+    pending_partial_withdrawal_amount_between_max_value?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_amount_in_values?: string;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_amount_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_queue_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorQueueDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_queue_daily';
+};
+
+export type FctValidatorQueueDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorQueueDailyServiceListError =
+  FctValidatorQueueDailyServiceListErrors[keyof FctValidatorQueueDailyServiceListErrors];
+
+export type FctValidatorQueueDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorQueueDailyResponse;
+};
+
+export type FctValidatorQueueDailyServiceListResponse =
+  FctValidatorQueueDailyServiceListResponses[keyof FctValidatorQueueDailyServiceListResponses];
+
+export type FctValidatorQueueDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_queue_daily/{day_start_date}';
+};
+
+export type FctValidatorQueueDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorQueueDailyServiceGetError =
+  FctValidatorQueueDailyServiceGetErrors[keyof FctValidatorQueueDailyServiceGetErrors];
+
+export type FctValidatorQueueDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorQueueDailyResponse;
+};
+
+export type FctValidatorQueueDailyServiceGetResponse =
+  FctValidatorQueueDailyServiceGetResponses[keyof FctValidatorQueueDailyServiceGetResponses];
+
+export type FctValidatorQueueWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the week, or the latest epoch for the current week (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: eq)
+     */
+    pending_initialized_count_eq?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: ne)
+     */
+    pending_initialized_count_ne?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: lt)
+     */
+    pending_initialized_count_lt?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: lte)
+     */
+    pending_initialized_count_lte?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: gt)
+     */
+    pending_initialized_count_gt?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: gte)
+     */
+    pending_initialized_count_gte?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: between_min)
+     */
+    pending_initialized_count_between_min?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: between_max_value)
+     */
+    pending_initialized_count_between_max_value?: number;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: in_values) (comma-separated list)
+     */
+    pending_initialized_count_in_values?: string;
+    /**
+     * Validators with status pending_initialized (deposited, not yet eligible for activation) (filter: not_in_values) (comma-separated list)
+     */
+    pending_initialized_count_not_in_values?: string;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: eq)
+     */
+    pending_initialized_balance_eq?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: ne)
+     */
+    pending_initialized_balance_ne?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: lt)
+     */
+    pending_initialized_balance_lt?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: lte)
+     */
+    pending_initialized_balance_lte?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: gt)
+     */
+    pending_initialized_balance_gt?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: gte)
+     */
+    pending_initialized_balance_gte?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: between_min)
+     */
+    pending_initialized_balance_between_min?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: between_max_value)
+     */
+    pending_initialized_balance_between_max_value?: number;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_initialized_balance_in_values?: string;
+    /**
+     * Balance of pending_initialized validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_initialized_balance_not_in_values?: string;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: eq)
+     */
+    activation_queue_count_eq?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: ne)
+     */
+    activation_queue_count_ne?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: lt)
+     */
+    activation_queue_count_lt?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: lte)
+     */
+    activation_queue_count_lte?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: gt)
+     */
+    activation_queue_count_gt?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: gte)
+     */
+    activation_queue_count_gte?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: between_min)
+     */
+    activation_queue_count_between_min?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: between_max_value)
+     */
+    activation_queue_count_between_max_value?: number;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: in_values) (comma-separated list)
+     */
+    activation_queue_count_in_values?: string;
+    /**
+     * Validators with status pending_queued (eligible, waiting for activation) (filter: not_in_values) (comma-separated list)
+     */
+    activation_queue_count_not_in_values?: string;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: eq)
+     */
+    activation_queue_effective_balance_eq?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: ne)
+     */
+    activation_queue_effective_balance_ne?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: lt)
+     */
+    activation_queue_effective_balance_lt?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: lte)
+     */
+    activation_queue_effective_balance_lte?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: gt)
+     */
+    activation_queue_effective_balance_gt?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: gte)
+     */
+    activation_queue_effective_balance_gte?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: between_min)
+     */
+    activation_queue_effective_balance_between_min?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: between_max_value)
+     */
+    activation_queue_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    activation_queue_effective_balance_in_values?: string;
+    /**
+     * Effective balance of pending_queued validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    activation_queue_effective_balance_not_in_values?: string;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: eq)
+     */
+    exit_queue_count_eq?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: ne)
+     */
+    exit_queue_count_ne?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: lt)
+     */
+    exit_queue_count_lt?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: lte)
+     */
+    exit_queue_count_lte?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: gt)
+     */
+    exit_queue_count_gt?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: gte)
+     */
+    exit_queue_count_gte?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: between_min)
+     */
+    exit_queue_count_between_min?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: between_max_value)
+     */
+    exit_queue_count_between_max_value?: number;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    exit_queue_count_in_values?: string;
+    /**
+     * Validators with an exit started but not yet exited (active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    exit_queue_count_not_in_values?: string;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: eq)
+     */
+    exit_queue_effective_balance_eq?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: ne)
+     */
+    exit_queue_effective_balance_ne?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: lt)
+     */
+    exit_queue_effective_balance_lt?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: lte)
+     */
+    exit_queue_effective_balance_lte?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: gt)
+     */
+    exit_queue_effective_balance_gt?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: gte)
+     */
+    exit_queue_effective_balance_gte?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: between_min)
+     */
+    exit_queue_effective_balance_between_min?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: between_max_value)
+     */
+    exit_queue_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    exit_queue_effective_balance_in_values?: string;
+    /**
+     * Effective balance of validators in the exit queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    exit_queue_effective_balance_not_in_values?: string;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_deposit_count_eq?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_deposit_count_ne?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_deposit_count_lt?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_deposit_count_lte?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_deposit_count_gt?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_deposit_count_gte?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_deposit_count_between_min?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_deposit_count_between_max_value?: number;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_deposit_count_in_values?: string;
+    /**
+     * Entries in the pending deposit queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_deposit_count_not_in_values?: string;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: eq)
+     */
+    pending_deposit_amount_eq?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: ne)
+     */
+    pending_deposit_amount_ne?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: lt)
+     */
+    pending_deposit_amount_lt?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: lte)
+     */
+    pending_deposit_amount_lte?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: gt)
+     */
+    pending_deposit_amount_gt?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: gte)
+     */
+    pending_deposit_amount_gte?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: between_min)
+     */
+    pending_deposit_amount_between_min?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: between_max_value)
+     */
+    pending_deposit_amount_between_max_value?: number;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_deposit_amount_in_values?: string;
+    /**
+     * Amount in the pending deposit queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_deposit_amount_not_in_values?: string;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_consolidation_count_eq?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_consolidation_count_ne?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_consolidation_count_lt?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_consolidation_count_lte?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_consolidation_count_gt?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_consolidation_count_gte?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_consolidation_count_between_min?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_consolidation_count_between_max_value?: number;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_consolidation_count_in_values?: string;
+    /**
+     * Entries in the pending consolidation queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_consolidation_count_not_in_values?: string;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: eq)
+     */
+    pending_consolidation_source_effective_balance_eq?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: ne)
+     */
+    pending_consolidation_source_effective_balance_ne?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: lt)
+     */
+    pending_consolidation_source_effective_balance_lt?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: lte)
+     */
+    pending_consolidation_source_effective_balance_lte?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: gt)
+     */
+    pending_consolidation_source_effective_balance_gt?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: gte)
+     */
+    pending_consolidation_source_effective_balance_gte?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: between_min)
+     */
+    pending_consolidation_source_effective_balance_between_min?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: between_max_value)
+     */
+    pending_consolidation_source_effective_balance_between_max_value?: number;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_consolidation_source_effective_balance_in_values?: string;
+    /**
+     * Effective balance of the queued consolidations' source validators in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_consolidation_source_effective_balance_not_in_values?: string;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: eq)
+     */
+    pending_partial_withdrawal_count_eq?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: ne)
+     */
+    pending_partial_withdrawal_count_ne?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: lt)
+     */
+    pending_partial_withdrawal_count_lt?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: lte)
+     */
+    pending_partial_withdrawal_count_lte?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: gt)
+     */
+    pending_partial_withdrawal_count_gt?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: gte)
+     */
+    pending_partial_withdrawal_count_gte?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: between_min)
+     */
+    pending_partial_withdrawal_count_between_min?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: between_max_value)
+     */
+    pending_partial_withdrawal_count_between_max_value?: number;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_count_in_values?: string;
+    /**
+     * Entries in the pending partial withdrawal queue (Electra). 0 before Electra (filter: not_in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_count_not_in_values?: string;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: eq)
+     */
+    pending_partial_withdrawal_amount_eq?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: ne)
+     */
+    pending_partial_withdrawal_amount_ne?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: lt)
+     */
+    pending_partial_withdrawal_amount_lt?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: lte)
+     */
+    pending_partial_withdrawal_amount_lte?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: gt)
+     */
+    pending_partial_withdrawal_amount_gt?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: gte)
+     */
+    pending_partial_withdrawal_amount_gte?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: between_min)
+     */
+    pending_partial_withdrawal_amount_between_min?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: between_max_value)
+     */
+    pending_partial_withdrawal_amount_between_max_value?: number;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_amount_in_values?: string;
+    /**
+     * Amount in the pending partial withdrawal queue in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    pending_partial_withdrawal_amount_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_queue_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorQueueWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_queue_weekly';
+};
+
+export type FctValidatorQueueWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorQueueWeeklyServiceListError =
+  FctValidatorQueueWeeklyServiceListErrors[keyof FctValidatorQueueWeeklyServiceListErrors];
+
+export type FctValidatorQueueWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorQueueWeeklyResponse;
+};
+
+export type FctValidatorQueueWeeklyServiceListResponse =
+  FctValidatorQueueWeeklyServiceListResponses[keyof FctValidatorQueueWeeklyServiceListResponses];
+
+export type FctValidatorQueueWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start of the week (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_queue_weekly/{week_start_date}';
+};
+
+export type FctValidatorQueueWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorQueueWeeklyServiceGetError =
+  FctValidatorQueueWeeklyServiceGetErrors[keyof FctValidatorQueueWeeklyServiceGetErrors];
+
+export type FctValidatorQueueWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorQueueWeeklyResponse;
+};
+
+export type FctValidatorQueueWeeklyServiceGetResponse =
+  FctValidatorQueueWeeklyServiceGetResponses[keyof FctValidatorQueueWeeklyServiceGetResponses];
+
+export type FctValidatorRewardTotalDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Validators with an attestation reward on the day (filter: eq)
+     */
+    attesting_validator_count_eq?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: ne)
+     */
+    attesting_validator_count_ne?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: lt)
+     */
+    attesting_validator_count_lt?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: lte)
+     */
+    attesting_validator_count_lte?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: gt)
+     */
+    attesting_validator_count_gt?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: gte)
+     */
+    attesting_validator_count_gte?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: between_min)
+     */
+    attesting_validator_count_between_min?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: between_max_value)
+     */
+    attesting_validator_count_between_max_value?: number;
+    /**
+     * Validators with an attestation reward on the day (filter: in_values) (comma-separated list)
+     */
+    attesting_validator_count_in_values?: string;
+    /**
+     * Validators with an attestation reward on the day (filter: not_in_values) (comma-separated list)
+     */
+    attesting_validator_count_not_in_values?: string;
+    /**
+     * Head vote rewards in Gwei (filter: eq)
+     */
+    attestation_head_eq?: number;
+    /**
+     * Head vote rewards in Gwei (filter: ne)
+     */
+    attestation_head_ne?: number;
+    /**
+     * Head vote rewards in Gwei (filter: lt)
+     */
+    attestation_head_lt?: number;
+    /**
+     * Head vote rewards in Gwei (filter: lte)
+     */
+    attestation_head_lte?: number;
+    /**
+     * Head vote rewards in Gwei (filter: gt)
+     */
+    attestation_head_gt?: number;
+    /**
+     * Head vote rewards in Gwei (filter: gte)
+     */
+    attestation_head_gte?: number;
+    /**
+     * Head vote rewards in Gwei (filter: between_min)
+     */
+    attestation_head_between_min?: number;
+    /**
+     * Head vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_head_between_max_value?: number;
+    /**
+     * Head vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_head_in_values?: string;
+    /**
+     * Head vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_head_not_in_values?: string;
+    /**
+     * Target vote rewards in Gwei (filter: eq)
+     */
+    attestation_target_eq?: number;
+    /**
+     * Target vote rewards in Gwei (filter: ne)
+     */
+    attestation_target_ne?: number;
+    /**
+     * Target vote rewards in Gwei (filter: lt)
+     */
+    attestation_target_lt?: number;
+    /**
+     * Target vote rewards in Gwei (filter: lte)
+     */
+    attestation_target_lte?: number;
+    /**
+     * Target vote rewards in Gwei (filter: gt)
+     */
+    attestation_target_gt?: number;
+    /**
+     * Target vote rewards in Gwei (filter: gte)
+     */
+    attestation_target_gte?: number;
+    /**
+     * Target vote rewards in Gwei (filter: between_min)
+     */
+    attestation_target_between_min?: number;
+    /**
+     * Target vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_target_between_max_value?: number;
+    /**
+     * Target vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_target_in_values?: string;
+    /**
+     * Target vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_target_not_in_values?: string;
+    /**
+     * Source vote rewards in Gwei (filter: eq)
+     */
+    attestation_source_eq?: number;
+    /**
+     * Source vote rewards in Gwei (filter: ne)
+     */
+    attestation_source_ne?: number;
+    /**
+     * Source vote rewards in Gwei (filter: lt)
+     */
+    attestation_source_lt?: number;
+    /**
+     * Source vote rewards in Gwei (filter: lte)
+     */
+    attestation_source_lte?: number;
+    /**
+     * Source vote rewards in Gwei (filter: gt)
+     */
+    attestation_source_gt?: number;
+    /**
+     * Source vote rewards in Gwei (filter: gte)
+     */
+    attestation_source_gte?: number;
+    /**
+     * Source vote rewards in Gwei (filter: between_min)
+     */
+    attestation_source_between_min?: number;
+    /**
+     * Source vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_source_between_max_value?: number;
+    /**
+     * Source vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_source_in_values?: string;
+    /**
+     * Source vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_source_not_in_values?: string;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: eq)
+     */
+    attestation_inclusion_delay_eq?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: ne)
+     */
+    attestation_inclusion_delay_ne?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: lt)
+     */
+    attestation_inclusion_delay_lt?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: lte)
+     */
+    attestation_inclusion_delay_lte?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: gt)
+     */
+    attestation_inclusion_delay_gt?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: gte)
+     */
+    attestation_inclusion_delay_gte?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: between_min)
+     */
+    attestation_inclusion_delay_between_min?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: between_max_value)
+     */
+    attestation_inclusion_delay_between_max_value?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: in_values) (comma-separated list)
+     */
+    attestation_inclusion_delay_in_values?: string;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: not_in_values) (comma-separated list)
+     */
+    attestation_inclusion_delay_not_in_values?: string;
+    /**
+     * Inactivity penalties in Gwei (filter: eq)
+     */
+    attestation_inactivity_eq?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: ne)
+     */
+    attestation_inactivity_ne?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: lt)
+     */
+    attestation_inactivity_lt?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: lte)
+     */
+    attestation_inactivity_lte?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: gt)
+     */
+    attestation_inactivity_gt?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: gte)
+     */
+    attestation_inactivity_gte?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: between_min)
+     */
+    attestation_inactivity_between_min?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: between_max_value)
+     */
+    attestation_inactivity_between_max_value?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_inactivity_in_values?: string;
+    /**
+     * Inactivity penalties in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_inactivity_not_in_values?: string;
+    /**
+     * Net attestation rewards in Gwei (filter: eq)
+     */
+    attestation_total_eq?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: ne)
+     */
+    attestation_total_ne?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: lt)
+     */
+    attestation_total_lt?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: lte)
+     */
+    attestation_total_lte?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: gt)
+     */
+    attestation_total_gt?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: gte)
+     */
+    attestation_total_gte?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: between_min)
+     */
+    attestation_total_between_min?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: between_max_value)
+     */
+    attestation_total_between_max_value?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_total_in_values?: string;
+    /**
+     * Net attestation rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_total_not_in_values?: string;
+    /**
+     * Negative attestation components in Gwei (filter: eq)
+     */
+    attestation_penalty_eq?: number;
+    /**
+     * Negative attestation components in Gwei (filter: ne)
+     */
+    attestation_penalty_ne?: number;
+    /**
+     * Negative attestation components in Gwei (filter: lt)
+     */
+    attestation_penalty_lt?: number;
+    /**
+     * Negative attestation components in Gwei (filter: lte)
+     */
+    attestation_penalty_lte?: number;
+    /**
+     * Negative attestation components in Gwei (filter: gt)
+     */
+    attestation_penalty_gt?: number;
+    /**
+     * Negative attestation components in Gwei (filter: gte)
+     */
+    attestation_penalty_gte?: number;
+    /**
+     * Negative attestation components in Gwei (filter: between_min)
+     */
+    attestation_penalty_between_min?: number;
+    /**
+     * Negative attestation components in Gwei (filter: between_max_value)
+     */
+    attestation_penalty_between_max_value?: number;
+    /**
+     * Negative attestation components in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_penalty_in_values?: string;
+    /**
+     * Negative attestation components in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_penalty_not_in_values?: string;
+    /**
+     * Positive sync committee rewards in Gwei (filter: eq)
+     */
+    sync_committee_reward_eq?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: ne)
+     */
+    sync_committee_reward_ne?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: lt)
+     */
+    sync_committee_reward_lt?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: lte)
+     */
+    sync_committee_reward_lte?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: gt)
+     */
+    sync_committee_reward_gt?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: gte)
+     */
+    sync_committee_reward_gte?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: between_min)
+     */
+    sync_committee_reward_between_min?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: between_max_value)
+     */
+    sync_committee_reward_between_max_value?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_committee_reward_in_values?: string;
+    /**
+     * Positive sync committee rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_committee_reward_not_in_values?: string;
+    /**
+     * Sync committee penalties in Gwei (filter: eq)
+     */
+    sync_committee_penalty_eq?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: ne)
+     */
+    sync_committee_penalty_ne?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: lt)
+     */
+    sync_committee_penalty_lt?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: lte)
+     */
+    sync_committee_penalty_lte?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: gt)
+     */
+    sync_committee_penalty_gt?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: gte)
+     */
+    sync_committee_penalty_gte?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: between_min)
+     */
+    sync_committee_penalty_between_min?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: between_max_value)
+     */
+    sync_committee_penalty_between_max_value?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_committee_penalty_in_values?: string;
+    /**
+     * Sync committee penalties in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_committee_penalty_not_in_values?: string;
+    /**
+     * Canonical blocks on the day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks on the day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks on the day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks on the day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks on the day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks on the day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks on the day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks on the day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks on the day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks on the day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: eq)
+     */
+    proposer_total_eq?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: ne)
+     */
+    proposer_total_ne?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: lt)
+     */
+    proposer_total_lt?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: lte)
+     */
+    proposer_total_lte?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: gt)
+     */
+    proposer_total_gt?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: gte)
+     */
+    proposer_total_gte?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: between_min)
+     */
+    proposer_total_between_min?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: between_max_value)
+     */
+    proposer_total_between_max_value?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_total_in_values?: string;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_total_not_in_values?: string;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: eq)
+     */
+    proposer_attestations_eq?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: ne)
+     */
+    proposer_attestations_ne?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: lt)
+     */
+    proposer_attestations_lt?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: lte)
+     */
+    proposer_attestations_lte?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: gt)
+     */
+    proposer_attestations_gt?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: gte)
+     */
+    proposer_attestations_gte?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: between_min)
+     */
+    proposer_attestations_between_min?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: between_max_value)
+     */
+    proposer_attestations_between_max_value?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_attestations_in_values?: string;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_attestations_not_in_values?: string;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: eq)
+     */
+    proposer_sync_aggregate_eq?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: ne)
+     */
+    proposer_sync_aggregate_ne?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: lt)
+     */
+    proposer_sync_aggregate_lt?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: lte)
+     */
+    proposer_sync_aggregate_lte?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: gt)
+     */
+    proposer_sync_aggregate_gt?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: gte)
+     */
+    proposer_sync_aggregate_gte?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: between_min)
+     */
+    proposer_sync_aggregate_between_min?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: between_max_value)
+     */
+    proposer_sync_aggregate_between_max_value?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_sync_aggregate_in_values?: string;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_sync_aggregate_not_in_values?: string;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: eq)
+     */
+    proposer_slashings_eq?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: ne)
+     */
+    proposer_slashings_ne?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: lt)
+     */
+    proposer_slashings_lt?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: lte)
+     */
+    proposer_slashings_lte?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: gt)
+     */
+    proposer_slashings_gt?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: gte)
+     */
+    proposer_slashings_gte?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: between_min)
+     */
+    proposer_slashings_between_min?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: between_max_value)
+     */
+    proposer_slashings_between_max_value?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_slashings_in_values?: string;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_slashings_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_reward_total_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorRewardTotalDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_reward_total_daily';
+};
+
+export type FctValidatorRewardTotalDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorRewardTotalDailyServiceListError =
+  FctValidatorRewardTotalDailyServiceListErrors[keyof FctValidatorRewardTotalDailyServiceListErrors];
+
+export type FctValidatorRewardTotalDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorRewardTotalDailyResponse;
+};
+
+export type FctValidatorRewardTotalDailyServiceListResponse =
+  FctValidatorRewardTotalDailyServiceListResponses[keyof FctValidatorRewardTotalDailyServiceListResponses];
+
+export type FctValidatorRewardTotalDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_reward_total_daily/{day_start_date}';
+};
+
+export type FctValidatorRewardTotalDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorRewardTotalDailyServiceGetError =
+  FctValidatorRewardTotalDailyServiceGetErrors[keyof FctValidatorRewardTotalDailyServiceGetErrors];
+
+export type FctValidatorRewardTotalDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorRewardTotalDailyResponse;
+};
+
+export type FctValidatorRewardTotalDailyServiceGetResponse =
+  FctValidatorRewardTotalDailyServiceGetResponses[keyof FctValidatorRewardTotalDailyServiceGetResponses];
+
+export type FctValidatorRewardTotalWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start of the week (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * The start of the week (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: eq)
+     */
+    attesting_validator_count_eq?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: ne)
+     */
+    attesting_validator_count_ne?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: lt)
+     */
+    attesting_validator_count_lt?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: lte)
+     */
+    attesting_validator_count_lte?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: gt)
+     */
+    attesting_validator_count_gt?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: gte)
+     */
+    attesting_validator_count_gte?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: between_min)
+     */
+    attesting_validator_count_between_min?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: between_max_value)
+     */
+    attesting_validator_count_between_max_value?: number;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: in_values) (comma-separated list)
+     */
+    attesting_validator_count_in_values?: string;
+    /**
+     * Distinct validators with an attestation reward in the week (filter: not_in_values) (comma-separated list)
+     */
+    attesting_validator_count_not_in_values?: string;
+    /**
+     * Head vote rewards in Gwei (filter: eq)
+     */
+    attestation_head_eq?: number;
+    /**
+     * Head vote rewards in Gwei (filter: ne)
+     */
+    attestation_head_ne?: number;
+    /**
+     * Head vote rewards in Gwei (filter: lt)
+     */
+    attestation_head_lt?: number;
+    /**
+     * Head vote rewards in Gwei (filter: lte)
+     */
+    attestation_head_lte?: number;
+    /**
+     * Head vote rewards in Gwei (filter: gt)
+     */
+    attestation_head_gt?: number;
+    /**
+     * Head vote rewards in Gwei (filter: gte)
+     */
+    attestation_head_gte?: number;
+    /**
+     * Head vote rewards in Gwei (filter: between_min)
+     */
+    attestation_head_between_min?: number;
+    /**
+     * Head vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_head_between_max_value?: number;
+    /**
+     * Head vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_head_in_values?: string;
+    /**
+     * Head vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_head_not_in_values?: string;
+    /**
+     * Target vote rewards in Gwei (filter: eq)
+     */
+    attestation_target_eq?: number;
+    /**
+     * Target vote rewards in Gwei (filter: ne)
+     */
+    attestation_target_ne?: number;
+    /**
+     * Target vote rewards in Gwei (filter: lt)
+     */
+    attestation_target_lt?: number;
+    /**
+     * Target vote rewards in Gwei (filter: lte)
+     */
+    attestation_target_lte?: number;
+    /**
+     * Target vote rewards in Gwei (filter: gt)
+     */
+    attestation_target_gt?: number;
+    /**
+     * Target vote rewards in Gwei (filter: gte)
+     */
+    attestation_target_gte?: number;
+    /**
+     * Target vote rewards in Gwei (filter: between_min)
+     */
+    attestation_target_between_min?: number;
+    /**
+     * Target vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_target_between_max_value?: number;
+    /**
+     * Target vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_target_in_values?: string;
+    /**
+     * Target vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_target_not_in_values?: string;
+    /**
+     * Source vote rewards in Gwei (filter: eq)
+     */
+    attestation_source_eq?: number;
+    /**
+     * Source vote rewards in Gwei (filter: ne)
+     */
+    attestation_source_ne?: number;
+    /**
+     * Source vote rewards in Gwei (filter: lt)
+     */
+    attestation_source_lt?: number;
+    /**
+     * Source vote rewards in Gwei (filter: lte)
+     */
+    attestation_source_lte?: number;
+    /**
+     * Source vote rewards in Gwei (filter: gt)
+     */
+    attestation_source_gt?: number;
+    /**
+     * Source vote rewards in Gwei (filter: gte)
+     */
+    attestation_source_gte?: number;
+    /**
+     * Source vote rewards in Gwei (filter: between_min)
+     */
+    attestation_source_between_min?: number;
+    /**
+     * Source vote rewards in Gwei (filter: between_max_value)
+     */
+    attestation_source_between_max_value?: number;
+    /**
+     * Source vote rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_source_in_values?: string;
+    /**
+     * Source vote rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_source_not_in_values?: string;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: eq)
+     */
+    attestation_inclusion_delay_eq?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: ne)
+     */
+    attestation_inclusion_delay_ne?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: lt)
+     */
+    attestation_inclusion_delay_lt?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: lte)
+     */
+    attestation_inclusion_delay_lte?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: gt)
+     */
+    attestation_inclusion_delay_gt?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: gte)
+     */
+    attestation_inclusion_delay_gte?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: between_min)
+     */
+    attestation_inclusion_delay_between_min?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: between_max_value)
+     */
+    attestation_inclusion_delay_between_max_value?: number;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: in_values) (comma-separated list)
+     */
+    attestation_inclusion_delay_in_values?: string;
+    /**
+     * Inclusion delay rewards in Gwei (phase0 only, 0 from Altair) (filter: not_in_values) (comma-separated list)
+     */
+    attestation_inclusion_delay_not_in_values?: string;
+    /**
+     * Inactivity penalties in Gwei (filter: eq)
+     */
+    attestation_inactivity_eq?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: ne)
+     */
+    attestation_inactivity_ne?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: lt)
+     */
+    attestation_inactivity_lt?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: lte)
+     */
+    attestation_inactivity_lte?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: gt)
+     */
+    attestation_inactivity_gt?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: gte)
+     */
+    attestation_inactivity_gte?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: between_min)
+     */
+    attestation_inactivity_between_min?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: between_max_value)
+     */
+    attestation_inactivity_between_max_value?: number;
+    /**
+     * Inactivity penalties in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_inactivity_in_values?: string;
+    /**
+     * Inactivity penalties in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_inactivity_not_in_values?: string;
+    /**
+     * Net attestation rewards in Gwei (filter: eq)
+     */
+    attestation_total_eq?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: ne)
+     */
+    attestation_total_ne?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: lt)
+     */
+    attestation_total_lt?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: lte)
+     */
+    attestation_total_lte?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: gt)
+     */
+    attestation_total_gt?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: gte)
+     */
+    attestation_total_gte?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: between_min)
+     */
+    attestation_total_between_min?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: between_max_value)
+     */
+    attestation_total_between_max_value?: number;
+    /**
+     * Net attestation rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_total_in_values?: string;
+    /**
+     * Net attestation rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_total_not_in_values?: string;
+    /**
+     * Negative attestation components in Gwei (filter: eq)
+     */
+    attestation_penalty_eq?: number;
+    /**
+     * Negative attestation components in Gwei (filter: ne)
+     */
+    attestation_penalty_ne?: number;
+    /**
+     * Negative attestation components in Gwei (filter: lt)
+     */
+    attestation_penalty_lt?: number;
+    /**
+     * Negative attestation components in Gwei (filter: lte)
+     */
+    attestation_penalty_lte?: number;
+    /**
+     * Negative attestation components in Gwei (filter: gt)
+     */
+    attestation_penalty_gt?: number;
+    /**
+     * Negative attestation components in Gwei (filter: gte)
+     */
+    attestation_penalty_gte?: number;
+    /**
+     * Negative attestation components in Gwei (filter: between_min)
+     */
+    attestation_penalty_between_min?: number;
+    /**
+     * Negative attestation components in Gwei (filter: between_max_value)
+     */
+    attestation_penalty_between_max_value?: number;
+    /**
+     * Negative attestation components in Gwei (filter: in_values) (comma-separated list)
+     */
+    attestation_penalty_in_values?: string;
+    /**
+     * Negative attestation components in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    attestation_penalty_not_in_values?: string;
+    /**
+     * Positive sync committee rewards in Gwei (filter: eq)
+     */
+    sync_committee_reward_eq?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: ne)
+     */
+    sync_committee_reward_ne?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: lt)
+     */
+    sync_committee_reward_lt?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: lte)
+     */
+    sync_committee_reward_lte?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: gt)
+     */
+    sync_committee_reward_gt?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: gte)
+     */
+    sync_committee_reward_gte?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: between_min)
+     */
+    sync_committee_reward_between_min?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: between_max_value)
+     */
+    sync_committee_reward_between_max_value?: number;
+    /**
+     * Positive sync committee rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_committee_reward_in_values?: string;
+    /**
+     * Positive sync committee rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_committee_reward_not_in_values?: string;
+    /**
+     * Sync committee penalties in Gwei (filter: eq)
+     */
+    sync_committee_penalty_eq?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: ne)
+     */
+    sync_committee_penalty_ne?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: lt)
+     */
+    sync_committee_penalty_lt?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: lte)
+     */
+    sync_committee_penalty_lte?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: gt)
+     */
+    sync_committee_penalty_gt?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: gte)
+     */
+    sync_committee_penalty_gte?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: between_min)
+     */
+    sync_committee_penalty_between_min?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: between_max_value)
+     */
+    sync_committee_penalty_between_max_value?: number;
+    /**
+     * Sync committee penalties in Gwei (filter: in_values) (comma-separated list)
+     */
+    sync_committee_penalty_in_values?: string;
+    /**
+     * Sync committee penalties in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    sync_committee_penalty_not_in_values?: string;
+    /**
+     * Canonical blocks in the week (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks in the week (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks in the week (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks in the week (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks in the week (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks in the week (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks in the week (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks in the week (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks in the week (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks in the week (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: eq)
+     */
+    proposer_total_eq?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: ne)
+     */
+    proposer_total_ne?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: lt)
+     */
+    proposer_total_lt?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: lte)
+     */
+    proposer_total_lte?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: gt)
+     */
+    proposer_total_gt?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: gte)
+     */
+    proposer_total_gte?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: between_min)
+     */
+    proposer_total_between_min?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: between_max_value)
+     */
+    proposer_total_between_max_value?: number;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_total_in_values?: string;
+    /**
+     * Consensus layer proposer rewards in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_total_not_in_values?: string;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: eq)
+     */
+    proposer_attestations_eq?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: ne)
+     */
+    proposer_attestations_ne?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: lt)
+     */
+    proposer_attestations_lt?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: lte)
+     */
+    proposer_attestations_lte?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: gt)
+     */
+    proposer_attestations_gt?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: gte)
+     */
+    proposer_attestations_gte?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: between_min)
+     */
+    proposer_attestations_between_min?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: between_max_value)
+     */
+    proposer_attestations_between_max_value?: number;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_attestations_in_values?: string;
+    /**
+     * Proposer rewards for attestations in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_attestations_not_in_values?: string;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: eq)
+     */
+    proposer_sync_aggregate_eq?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: ne)
+     */
+    proposer_sync_aggregate_ne?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: lt)
+     */
+    proposer_sync_aggregate_lt?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: lte)
+     */
+    proposer_sync_aggregate_lte?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: gt)
+     */
+    proposer_sync_aggregate_gt?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: gte)
+     */
+    proposer_sync_aggregate_gte?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: between_min)
+     */
+    proposer_sync_aggregate_between_min?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: between_max_value)
+     */
+    proposer_sync_aggregate_between_max_value?: number;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_sync_aggregate_in_values?: string;
+    /**
+     * Proposer rewards for sync aggregates in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_sync_aggregate_not_in_values?: string;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: eq)
+     */
+    proposer_slashings_eq?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: ne)
+     */
+    proposer_slashings_ne?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: lt)
+     */
+    proposer_slashings_lt?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: lte)
+     */
+    proposer_slashings_lte?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: gt)
+     */
+    proposer_slashings_gt?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: gte)
+     */
+    proposer_slashings_gte?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: between_min)
+     */
+    proposer_slashings_between_min?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: between_max_value)
+     */
+    proposer_slashings_between_max_value?: number;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: in_values) (comma-separated list)
+     */
+    proposer_slashings_in_values?: string;
+    /**
+     * Proposer rewards for slashings in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    proposer_slashings_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_reward_total_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorRewardTotalWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_reward_total_weekly';
+};
+
+export type FctValidatorRewardTotalWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorRewardTotalWeeklyServiceListError =
+  FctValidatorRewardTotalWeeklyServiceListErrors[keyof FctValidatorRewardTotalWeeklyServiceListErrors];
+
+export type FctValidatorRewardTotalWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorRewardTotalWeeklyResponse;
+};
+
+export type FctValidatorRewardTotalWeeklyServiceListResponse =
+  FctValidatorRewardTotalWeeklyServiceListResponses[keyof FctValidatorRewardTotalWeeklyServiceListResponses];
+
+export type FctValidatorRewardTotalWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start of the week (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_reward_total_weekly/{week_start_date}';
+};
+
+export type FctValidatorRewardTotalWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorRewardTotalWeeklyServiceGetError =
+  FctValidatorRewardTotalWeeklyServiceGetErrors[keyof FctValidatorRewardTotalWeeklyServiceGetErrors];
+
+export type FctValidatorRewardTotalWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorRewardTotalWeeklyResponse;
+};
+
+export type FctValidatorRewardTotalWeeklyServiceGetResponse =
+  FctValidatorRewardTotalWeeklyServiceGetResponses[keyof FctValidatorRewardTotalWeeklyServiceGetResponses];
+
+export type FctValidatorStakeByEntityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Entity label from dim_node as it is today, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * Epoch of the snapshot: the last epoch of the day, or the latest epoch for today (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * Wall clock time when the snapshot epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: eq)
+     */
+    active_validator_count_eq?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: ne)
+     */
+    active_validator_count_ne?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lt)
+     */
+    active_validator_count_lt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lte)
+     */
+    active_validator_count_lte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gt)
+     */
+    active_validator_count_gt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gte)
+     */
+    active_validator_count_gte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_min)
+     */
+    active_validator_count_between_min?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_max_value)
+     */
+    active_validator_count_between_max_value?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    active_validator_count_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    active_validator_count_not_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: eq)
+     */
+    active_effective_balance_eq?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: ne)
+     */
+    active_effective_balance_ne?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lt)
+     */
+    active_effective_balance_lt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lte)
+     */
+    active_effective_balance_lte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gt)
+     */
+    active_effective_balance_gt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gte)
+     */
+    active_effective_balance_gte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_min)
+     */
+    active_effective_balance_between_min?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_max_value)
+     */
+    active_effective_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: in_values) (comma-separated list)
+     */
+    active_effective_balance_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: not_in_values) (comma-separated list)
+     */
+    active_effective_balance_not_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: eq)
+     */
+    active_balance_eq?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: ne)
+     */
+    active_balance_ne?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lt)
+     */
+    active_balance_lt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lte)
+     */
+    active_balance_lte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gt)
+     */
+    active_balance_gt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gte)
+     */
+    active_balance_gte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_min)
+     */
+    active_balance_between_min?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_max_value)
+     */
+    active_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    active_balance_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    active_balance_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_stake_by_entity_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorStakeByEntityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_stake_by_entity_daily';
+};
+
+export type FctValidatorStakeByEntityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorStakeByEntityDailyServiceListError =
+  FctValidatorStakeByEntityDailyServiceListErrors[keyof FctValidatorStakeByEntityDailyServiceListErrors];
+
+export type FctValidatorStakeByEntityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorStakeByEntityDailyResponse;
+};
+
+export type FctValidatorStakeByEntityDailyServiceListResponse =
+  FctValidatorStakeByEntityDailyServiceListResponses[keyof FctValidatorStakeByEntityDailyServiceListResponses];
+
+export type FctValidatorStakeByEntityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_stake_by_entity_daily/{day_start_date}';
+};
+
+export type FctValidatorStakeByEntityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorStakeByEntityDailyServiceGetError =
+  FctValidatorStakeByEntityDailyServiceGetErrors[keyof FctValidatorStakeByEntityDailyServiceGetErrors];
+
+export type FctValidatorStakeByEntityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorStakeByEntityDailyResponse;
+};
+
+export type FctValidatorStakeByEntityDailyServiceGetResponse =
+  FctValidatorStakeByEntityDailyServiceGetResponses[keyof FctValidatorStakeByEntityDailyServiceGetResponses];
 
 export type IntAttestationAttestedServiceListData = {
   body?: never;
