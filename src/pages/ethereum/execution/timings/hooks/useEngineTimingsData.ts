@@ -3,9 +3,11 @@ import { useQueries, keepPreviousData } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadByElClientServiceList,
   fctEngineNewPayloadByElClientHourlyServiceList,
+  fctEngineNewPayloadByElClientDailyServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceList,
   fctEngineGetBlobsByElClientServiceList,
   fctEngineGetBlobsByElClientHourlyServiceList,
+  fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
   fctEngineNewPayloadWinrateHourlyServiceList,
   fctEngineNewPayloadWinrateDailyServiceList,
@@ -14,9 +16,11 @@ import {
 import type {
   FctEngineNewPayloadByElClient,
   FctEngineNewPayloadByElClientHourly,
+  FctEngineNewPayloadByElClientDaily,
   FctEngineNewPayloadDurationChunked50Ms,
   FctEngineGetBlobsByElClient,
   FctEngineGetBlobsByElClientHourly,
+  FctEngineGetBlobsByElClientDaily,
   FctEngineGetBlobsDurationChunked50Ms,
   FctEngineNewPayloadWinrateHourly,
   FctEngineNewPayloadWinrateDaily,
@@ -33,6 +37,9 @@ export interface EngineTimingsData {
   // newPayload hourly aggregations with true percentiles (for summary table)
   newPayloadByElClientHourly: FctEngineNewPayloadByElClientHourly[];
 
+  // newPayload daily aggregations with true percentiles (for long time ranges)
+  newPayloadByElClientDaily: FctEngineNewPayloadByElClientDaily[];
+
   // newPayload duration histogram
   newPayloadDurationHistogram: FctEngineNewPayloadDurationChunked50Ms[];
 
@@ -41,6 +48,9 @@ export interface EngineTimingsData {
 
   // getBlobs hourly aggregations with true percentiles (for summary table)
   getBlobsByElClientHourly: FctEngineGetBlobsByElClientHourly[];
+
+  // getBlobs daily aggregations with true percentiles (for long time ranges)
+  getBlobsByElClientDaily: FctEngineGetBlobsByElClientDaily[];
 
   // getBlobs duration histogram
   getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
@@ -136,7 +146,7 @@ export function useEngineTimingsData({
   const fetchPerSlotData = PER_SLOT_CHART_RANGES.includes(timeRange);
 
   // Hourly and per-slot tables are too heavy for long ranges (90d+),
-  // which rely solely on the daily winrate aggregation
+  // which use the daily aggregations instead
   const fetchHourlyData = HOURLY_CHART_RANGES.includes(timeRange);
 
   const queries = useQueries({
@@ -341,6 +351,46 @@ export function useEngineTimingsData({
         enabled: !!currentNetwork && fetchPerSlotData,
         placeholderData: keepPreviousData,
       },
+      // newPayload daily aggregations (true percentiles) - replaces the hourly table for long ranges (90d+)
+      {
+        queryKey: ['engine-timings', 'newPayload-by-el-client-daily', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineNewPayloadByElClientDaily>(
+            fctEngineNewPayloadByElClientDailyServiceList,
+            {
+              query: {
+                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                order_by: 'day_start_date DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_new_payload_by_el_client_daily',
+            signal
+          ),
+        enabled: !!currentNetwork && !fetchHourlyData,
+        placeholderData: keepPreviousData,
+      },
+      // getBlobs daily aggregations (true percentiles) - replaces the hourly table for long ranges (90d+)
+      {
+        queryKey: ['engine-timings', 'getBlobs-by-el-client-daily', hourlyStart, hourlyEnd, referenceNodesOnly],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineGetBlobsByElClientDaily>(
+            fctEngineGetBlobsByElClientDailyServiceList,
+            {
+              query: {
+                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                order_by: 'day_start_date DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_get_blobs_by_el_client_daily',
+            signal
+          ),
+        enabled: !!currentNetwork && fetchBlobs && !fetchHourlyData,
+        placeholderData: keepPreviousData,
+      },
     ],
   });
 
@@ -355,13 +405,15 @@ export function useEngineTimingsData({
     winrateHourlyQuery,
     winrateDailyQuery,
     winratePerSlotQuery,
+    newPayloadByElClientDailyQuery,
+    getBlobsByElClientDailyQuery,
   ] = queries;
 
   // Primary queries drive the page's loading/empty state: the newPayload queries
-  // for hourly-capable ranges, or the daily winrate (the only data) for long ranges
+  // for hourly-capable ranges, or the daily tables for long ranges
   const newPayloadQueries = queries.slice(0, 3);
-  const primaryQueries = fetchHourlyData ? newPayloadQueries : [winrateDailyQuery];
-  const blobQueries = queries.slice(3, 6);
+  const primaryQueries = fetchHourlyData ? newPayloadQueries : [winrateDailyQuery, newPayloadByElClientDailyQuery];
+  const blobQueries = [...queries.slice(3, 6), getBlobsByElClientDailyQuery];
 
   // Initial loading = no data has ever been fetched yet
   const hasAnyPrimaryData = primaryQueries.some(q => q.data !== undefined);
@@ -378,9 +430,11 @@ export function useEngineTimingsData({
       ? {
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
           newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
+          newPayloadByElClientDaily: newPayloadByElClientDailyQuery.data ?? [],
           newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
           getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
           getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
+          getBlobsByElClientDaily: getBlobsByElClientDailyQuery.data ?? [],
           getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
           winrateHourly: winrateHourlyQuery.data ?? [],
           winrateDaily: winrateDailyQuery.data ?? [],

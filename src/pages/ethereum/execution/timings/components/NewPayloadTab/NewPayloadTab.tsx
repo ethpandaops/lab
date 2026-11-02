@@ -20,7 +20,6 @@ import type {
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
-import { RangeUnavailableNote } from '../RangeUnavailableNote';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
@@ -41,6 +40,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     newPayloadDurationHistogram,
     newPayloadByElClient,
     newPayloadByElClientHourly,
+    newPayloadByElClientDaily,
     winrateHourly,
     winrateDaily,
     winratePerSlot,
@@ -485,18 +485,14 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         anchorId="client-duration"
         modalSize="full"
       >
-        {() =>
-          showHourlyCharts ? (
-            <ClientVersionBreakdown
-              data={validPayloadByElClient}
-              hourlyData={newPayloadByElClientHourly}
-              hideRange
-              noCard
-            />
-          ) : (
-            <RangeUnavailableNote />
-          )
-        }
+        {() => (
+          <ClientVersionBreakdown
+            data={validPayloadByElClient}
+            hourlyData={showHourlyCharts ? newPayloadByElClientHourly : newPayloadByElClientDaily}
+            hideRange
+            noCard
+          />
+        )}
       </PopoutCard>
 
       {/* Per-slot charts — short time ranges only */}

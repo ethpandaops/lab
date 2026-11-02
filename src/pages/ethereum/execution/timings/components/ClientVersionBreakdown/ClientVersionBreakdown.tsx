@@ -46,12 +46,14 @@ interface HourlyClientVersionData {
   max_duration_ms?: number;
   avg_returned_count?: number;
   hour_start_date_time?: number;
+  /** Set instead of hour_start_date_time on daily rows (YYYY-MM-DD, UTC) */
+  day_start_date?: string;
 }
 
 export interface ClientVersionBreakdownProps {
   /** Raw per-slot data with client/version info */
   data: ClientVersionData[];
-  /** Optional hourly aggregated data with true percentiles (used for P50/P95 columns) */
+  /** Optional hourly or daily aggregated data with true percentiles (used for P50/P95 columns) */
   hourlyData?: HourlyClientVersionData[];
   /** Title for the card */
   title?: string;
@@ -121,20 +123,25 @@ function formatAge(timestamp: number): string {
 }
 
 /**
- * Format an active window as a relative range, e.g. "6d ago – now" or "6d – 2d ago"
+ * Format an active window as a relative range, e.g. "6d ago – now" or "6d – 2d ago".
+ * A version counts as current if it was seen in the latest complete bucket.
  */
-function formatActiveWindow(firstSeen: number, lastSeen: number): string {
-  const isCurrent = Date.now() / 1000 - lastSeen < 2 * 3600;
+function formatActiveWindow(firstSeen: number, lastSeen: number, bucketSeconds: number): string {
+  const isCurrent = Date.now() / 1000 - lastSeen < bucketSeconds + 3600;
   if (isCurrent) return `${formatAge(firstSeen)} ago – now`;
   if (firstSeen === lastSeen) return `${formatAge(lastSeen)} ago`;
   return `${formatAge(firstSeen)} – ${formatAge(lastSeen)} ago`;
 }
 
 /**
- * Format an active window as an absolute local date range for tooltips, e.g. "Jul 6, 14:00 – Jul 10, 09:00"
+ * Format an active window as an absolute date range for tooltips, e.g. "Jul 6, 14:00 – Jul 10, 09:00"
+ * (local time), or "Jul 6 – Jul 10" (UTC days) for daily buckets
  */
-function formatActiveRange(firstSeen: number, lastSeen: number): string {
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+function formatActiveRange(firstSeen: number, lastSeen: number, bucketSeconds: number): string {
+  const options: Intl.DateTimeFormatOptions =
+    bucketSeconds >= 86400
+      ? { month: 'short', day: 'numeric', timeZone: 'UTC' }
+      : { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   const first = new Date(firstSeen * 1000).toLocaleString(undefined, options);
   const last = new Date(lastSeen * 1000).toLocaleString(undefined, options);
   return first === last ? last : `${first} – ${last}`;
@@ -378,7 +385,8 @@ export function ClientVersionBreakdown({
       const obs = row.observation_count ?? 0;
       const minDur = row.min_duration_ms ?? 0;
       const maxDur = row.max_duration_ms ?? 0;
-      const seenAt = row.hour_start_date_time ?? 0;
+      const seenAt =
+        row.hour_start_date_time ?? (row.day_start_date ? Date.parse(`${row.day_start_date}T00:00:00Z`) / 1000 : 0);
 
       const existing = map.get(key);
       if (existing) {
@@ -625,6 +633,7 @@ export function ClientVersionBreakdown({
 
   // Whether the data carries timestamps for an Active column
   const hasActivity = aggregatedData.some(r => r.lastSeen > 0);
+  const bucketSeconds = hourlyData?.some(r => r.day_start_date) ? 86400 : 3600;
 
   // Sort grouped data (one row per client, showing primary version)
   const sortedData = useMemo(() => {
@@ -800,9 +809,9 @@ export function ClientVersionBreakdown({
                       {metricRow.lastSeen > 0 ? (
                         <span
                           className="text-sm whitespace-nowrap text-muted"
-                          title={`Active ${formatActiveRange(metricRow.firstSeen, metricRow.lastSeen)} (within the selected range)`}
+                          title={`Active ${formatActiveRange(metricRow.firstSeen, metricRow.lastSeen, bucketSeconds)} (within the selected range)`}
                         >
-                          {formatActiveWindow(metricRow.firstSeen, metricRow.lastSeen)}
+                          {formatActiveWindow(metricRow.firstSeen, metricRow.lastSeen, bucketSeconds)}
                         </span>
                       ) : (
                         <span className="text-sm text-muted">-</span>
