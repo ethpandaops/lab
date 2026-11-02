@@ -181,7 +181,8 @@ export function VersionPage(): JSX.Element {
   const entityCounts = useVersionCounts({ grain: 'entity-daily', client, layer, from: rangeStart, enabled: !!layer });
   const releaseHours = useReleaseHours(client, layer, release?.release_date, rangeStart);
   const previousHours = useReleaseHours(client, layer, previous?.release_date, rangeStart);
-  const blocksLoading = history.isLoading;
+  // Entity counts feed the stats, the comparison and the entities card, so the section waits for them too
+  const blocksLoading = history.isLoading || entityCounts.isLoading;
   // The fork card above the control reads the last 24 hours and the nodes active now
   const recent24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart(), enabled: !!layer });
   const { nodes } = useClientNodes(client, layer);
