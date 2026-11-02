@@ -23,16 +23,10 @@ import {
   EntityFilter,
   GraffitiBlocksTable,
 } from './components';
-import { useClientCounts, useEntityOptions, useGraffitiBlocks, useLatestReleases } from './hooks';
+import { useClientCounts, useEntityOptions, useLatestReleases } from './hooks';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
 import { normalizeClientName } from '@/utils/ethereum';
-import {
-  BLOCK_GRAFFITI_TABLE,
-  DEFAULT_TIME_PERIOD,
-  TIME_PERIOD_OPTIONS,
-  TIME_RANGE_CONFIG,
-  type TimePeriod,
-} from './constants';
+import { BLOCK_GRAFFITI_TABLE, DEFAULT_TIME_PERIOD, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
 import {
   bucketShares,
   buildShareChartConfig,
@@ -45,6 +39,10 @@ import {
   type ClientFilters,
   type ClientLayer,
 } from './utils/client-share';
+import { BLOCK_FILTER_KEYS, type BlockSearch } from './utils/block-filters';
+
+/** Blocks table filters; the filter bar above owns the clients and entity */
+const INDEX_BLOCK_FIELDS = BLOCK_FILTER_KEYS.filter(key => key !== 'cl' && key !== 'el' && key !== 'entity');
 
 /** Formats a share of blocks as a percentage, or a dash when there are no blocks */
 function formatShare(part: number, total: number): string {
@@ -68,7 +66,6 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/clients/' });
   const timePeriod: TimePeriod = search.t ?? DEFAULT_TIME_PERIOD;
   const identifiedOnly = search.identified ?? false;
-  const config = TIME_RANGE_CONFIG[timePeriod];
 
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(BLOCK_GRAFFITI_TABLE);
   const hasData = !!tableBounds;
@@ -93,18 +90,6 @@ export function IndexPage(): JSX.Element {
     return counts;
   }, [nodes]);
 
-  const windowStart = useMemo(() => {
-    if (config.days === null) return tableBounds?.min ?? 0;
-    return Math.floor(Date.now() / 1000) - config.days * 24 * 3600;
-  }, [config.days, tableBounds?.min]);
-
-  const blocks = useGraffitiBlocks({
-    since: windowStart,
-    consensusClient: filters.consensusClient,
-    executionClient: filters.executionClient,
-    entity,
-  });
-
   // Each layer's own filter is skipped for its chart and breakdown, so the selected client shows among the others.
   const filtered = useMemo(() => filterRecords(records, filters), [records, filters]);
   const consensusRecords = useMemo(() => filterRecords(records, filters, 'consensus'), [records, filters]);
@@ -125,9 +110,14 @@ export function IndexPage(): JSX.Element {
     [executionRecords, keys, isDaily, identifiedOnly]
   );
 
+  // Every change here can change the blocks table's rows, so it returns to the table's first page
   const setSearch = useCallback(
     (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string; identified?: boolean }) =>
-      navigate({ search: prev => ({ ...prev, ...update }), replace: true }),
+      navigate({ search: prev => ({ ...prev, ...update, page: undefined }), replace: true }),
+    [navigate]
+  );
+  const setBlockSearch = useCallback(
+    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }), resetScroll: false }),
     [navigate]
   );
   const clearFilters = useCallback(() => setSearch({ cl: undefined, el: undefined, entity: undefined }), [setSearch]);
@@ -372,14 +362,7 @@ export function IndexPage(): JSX.Element {
           )}
 
           {!isEmpty && (
-            <GraffitiBlocksTable
-              blocks={blocks.blocks}
-              isLoading={blocks.isLoading}
-              error={blocks.error}
-              hasNextPage={blocks.hasNextPage}
-              isFetchingNextPage={blocks.isFetchingNextPage}
-              onLoadMore={blocks.fetchNextPage}
-            />
+            <GraffitiBlocksTable search={search} fields={INDEX_BLOCK_FIELDS} onSearchChange={setBlockSearch} />
           )}
         </div>
       )}
