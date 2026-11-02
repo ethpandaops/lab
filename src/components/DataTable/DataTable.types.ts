@@ -62,4 +62,10 @@ export interface DataTableProps<TData> {
   hideColumnVisibility?: boolean;
   // Pagination position
   paginationPosition?: 'top' | 'bottom' | 'both';
+  /**
+   * Row spacing and type size. `comfortable` matches the `Table` recipe (40px rows, text-sm) for short
+   * record lists; `compact` keeps wide, many-column tables on screen.
+   * @default 'compact'
+   */
+  density?: 'compact' | 'comfortable';
 }

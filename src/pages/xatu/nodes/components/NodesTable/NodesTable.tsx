@@ -1,7 +1,8 @@
-import type { JSX } from 'react';
+import { type JSX, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { ExclamationTriangleIcon } from '@heroicons/react/16/solid';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { DataTable } from '@/components/DataTable';
+import { Input } from '@/components/Forms/Input';
 import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
@@ -23,7 +24,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row }) => (
       <span className="flex items-center gap-2">
         <NodeStatus online={row.original.online} />
-        <span className="max-w-32 truncate font-mono text-foreground" title={row.original.nodeId}>
+        <span className="max-w-40 truncate font-mono" title={row.original.nodeId}>
           {row.original.nodeId}
         </span>
       </span>
@@ -34,7 +35,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     id: 'contributor',
     header: 'Contributor',
     accessorFn: row => row.node.username ?? '',
-    cell: ({ getValue }) => <span className="block max-w-24 truncate">{getValue() as string}</span>,
+    cell: ({ getValue }) => <span className="block max-w-32 truncate">{getValue() as string}</span>,
   },
   {
     id: 'client',
@@ -46,13 +47,14 @@ const columns: DataTableColumn<NodeRow>[] = [
       return (
         <span className="flex items-center gap-2">
           <ClientLogo client={client} size={16} />
-          <span className="text-foreground">{formatClientName(client)}</span>
-          <span title={row.original.node.meta_consensus_version}>
+          <span>{formatClientName(client)}</span>
+          <span className="text-muted" title={row.original.node.meta_consensus_version}>
             {shortVersion(row.original.node.meta_consensus_version)}
           </span>
         </span>
       );
     },
+    meta: { cellClassName: 'text-foreground' },
   },
   {
     id: 'location',
@@ -61,30 +63,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row, getValue }) => (
       <span className="flex items-center gap-1.5">
         <span>{getCountryFlag(row.original.node.meta_client_geo_country_code, '')}</span>
-        <span className="max-w-28 truncate">{getValue() as string}</span>
-      </span>
-    ),
-  },
-  {
-    id: 'asn',
-    header: 'ASN',
-    accessorFn: row => row.node.meta_client_geo_autonomous_system_organization ?? '',
-    cell: ({ getValue }) => <span className="block max-w-24 truncate">{(getValue() as string) || '–'}</span>,
-  },
-  {
-    id: 'collector',
-    header: 'Collector',
-    accessorFn: row =>
-      `${row.node.meta_client_implementation ?? ''} ${shortVersion(row.node.meta_client_version)}`.trim(),
-    cell: ({ row, getValue }) => (
-      <span className="flex items-center gap-1" title={row.original.node.meta_client_version}>
-        <span>{(getValue() as string) || '–'}</span>
-        {row.original.newerVersion && (
-          <ExclamationTriangleIcon
-            className="size-3.5 shrink-0 text-warning"
-            title={`${shortVersion(row.original.newerVersion)} available`}
-          />
-        )}
+        <span className="max-w-40 truncate">{getValue() as string}</span>
       </span>
     ),
   },
@@ -94,7 +73,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     accessorFn: row => row.observation?.blockP50 ?? undefined,
     sortUndefined: 'last',
     cell: ({ getValue }) => formatMs(getValue() as number | undefined),
-    meta: { cellClassName: 'text-foreground tabular-nums' },
+    meta: { cellClassName: 'text-foreground' },
   },
   {
     id: 'attestation',
@@ -102,7 +81,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     accessorFn: row => row.observation?.attestationP50 ?? undefined,
     sortUndefined: 'last',
     cell: ({ getValue }) => formatMs(getValue() as number | undefined),
-    meta: { cellClassName: 'text-foreground tabular-nums' },
+    meta: { cellClassName: 'text-foreground' },
   },
   {
     id: 'lastSeen',
@@ -118,12 +97,34 @@ const columns: DataTableColumn<NodeRow>[] = [
  */
 export function NodesTable({ rows }: NodesTableProps): JSX.Element {
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
 
   return (
-    <Card title="All nodes">
+    <Card
+      title="All nodes"
+      actions={
+        <div className="w-56">
+          <Input size="sm">
+            <Input.Leading>
+              <MagnifyingGlassIcon />
+            </Input.Leading>
+            <Input.Field
+              value={search}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+              placeholder="Search nodes"
+              aria-label="Search nodes"
+            />
+          </Input>
+        </div>
+      }
+    >
       <DataTable
+        globalFilter={search}
+        onGlobalFilterChange={setSearch}
+        hideGlobalFilter
         data={rows}
         columns={columns}
+        density="comfortable"
         pageSize={25}
         getRowId={row => row.nodeId}
         onRowClick={row => navigate({ to: '/xatu/nodes/$nodeId', params: { nodeId: row.nodeId } })}

@@ -104,6 +104,7 @@ export function NodeSlotsTable({
       <DataTable
         data={rows}
         columns={columns}
+        density="comfortable"
         pageSize={25}
         getRowId={row => String(row.slot)}
         hideGlobalFilter

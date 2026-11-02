@@ -59,7 +59,12 @@ export function DataTable<TData>({
   hideColumnVisibility = false,
   // Pagination position
   paginationPosition = 'bottom',
+  density = 'compact',
 }: DataTableProps<TData>): JSX.Element {
+  const comfortable = density === 'comfortable';
+  const gap = comfortable
+    ? { left: 'pl-3', right: 'pr-3', both: 'px-3' }
+    : { left: 'pl-2', right: 'pr-2', both: 'px-2' };
   // Internal state (used when not controlled)
   const [internalPagination, setInternalPagination] = useState<PaginationState>({
     pageIndex: controlledPageIndex ?? 0,
@@ -253,12 +258,13 @@ export function DataTable<TData>({
                         scope="col"
                         style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                         className={clsx(
-                          'py-1.5 text-left text-xs font-semibold text-foreground',
+                          'text-left text-xs font-medium whitespace-nowrap text-muted',
+                          comfortable ? 'py-2.5' : 'py-1.5',
                           headerIndex === 0
-                            ? 'pr-2 pl-(--table-inset)'
+                            ? `${gap.right} pl-(--table-inset)`
                             : headerIndex === headerGroup.headers.length - 1
-                              ? 'pr-(--table-inset) pl-2'
-                              : 'px-2'
+                              ? `pr-(--table-inset) ${gap.left}`
+                              : gap.both
                         )}
                       >
                         <div className="flex flex-col gap-2">
@@ -268,25 +274,19 @@ export function DataTable<TData>({
                               <button
                                 onClick={header.column.getToggleSortingHandler()}
                                 className={clsx(
-                                  'group flex items-center gap-1.5 transition-colors select-none',
-                                  'hover:text-primary'
+                                  'group flex items-center gap-1 transition-colors select-none hover:text-foreground',
+                                  isSorted && 'text-foreground'
                                 )}
                               >
                                 {flexRender(header.column.columnDef.header, header.getContext())}
-                                <span className="flex flex-col">
-                                  <ChevronUpIcon
-                                    className={clsx(
-                                      '-mb-1 size-3 transition-colors',
-                                      isSorted === 'asc' ? 'text-primary' : 'text-muted group-hover:text-primary/50'
-                                    )}
-                                  />
-                                  <ChevronDownIcon
-                                    className={clsx(
-                                      '-mt-1 size-3 transition-colors',
-                                      isSorted === 'desc' ? 'text-primary' : 'text-muted group-hover:text-primary/50'
-                                    )}
-                                  />
-                                </span>
+                                {/* Direction shows once sorted; unsorted columns hint on hover */}
+                                {isSorted === 'asc' ? (
+                                  <ChevronUpIcon className="size-3.5" />
+                                ) : isSorted === 'desc' ? (
+                                  <ChevronDownIcon className="size-3.5" />
+                                ) : (
+                                  <ChevronDownIcon className="size-3.5 opacity-0 transition-opacity group-hover:opacity-60" />
+                                )}
                               </button>
                             ) : (
                               flexRender(header.column.columnDef.header, header.getContext())
@@ -342,12 +342,13 @@ export function DataTable<TData>({
                         key={cell.id}
                         style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
                         className={clsx(
-                          'py-1.5 text-xs whitespace-nowrap',
+                          'whitespace-nowrap tabular-nums',
+                          comfortable ? 'py-2.5 text-sm' : 'py-1.5 text-xs',
                           cellIndex === 0
-                            ? 'pr-2 pl-(--table-inset)'
+                            ? `${gap.right} pl-(--table-inset)`
                             : cellIndex === row.getVisibleCells().length - 1
-                              ? 'pr-(--table-inset) pl-2'
-                              : 'px-2',
+                              ? `pr-(--table-inset) ${gap.left}`
+                              : gap.both,
                           (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName || 'text-muted'
                         )}
                       >
