@@ -79,6 +79,8 @@ export function Timestamp({
           minute: '2-digit',
           timeZoneName: 'short',
         });
+      case 'date':
+        return formatTimestamp(timestamp, { year: 'numeric', month: 'short', day: 'numeric' });
       default:
         return getRelativeTime(timestamp);
     }
@@ -96,7 +98,11 @@ export function Timestamp({
 
   // When modal is disabled, render a span to avoid nested button issues
   if (disableModal) {
-    return <span className={clsx('inline-flex items-center text-sm/5', className)}>{formattedTimestamp}</span>;
+    return (
+      <span className={clsx('inline-flex items-center text-sm/5 whitespace-nowrap', className)}>
+        {formattedTimestamp}
+      </span>
+    );
   }
 
   return (
@@ -105,7 +111,7 @@ export function Timestamp({
         type="button"
         onClick={handleClick}
         className={clsx(
-          'inline-flex cursor-pointer items-center text-sm/5 underline decoration-dotted underline-offset-4 hover:text-primary',
+          'inline-flex cursor-pointer items-center text-left text-sm/5 whitespace-nowrap underline decoration-dotted underline-offset-4 hover:text-primary',
           className
         )}
         aria-label={`View timestamp details: ${formattedTimestamp}`}

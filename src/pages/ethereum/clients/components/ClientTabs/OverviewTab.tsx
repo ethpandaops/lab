@@ -4,18 +4,18 @@ import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
-import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { useClientCounts, useNodeWeightedShares } from '../../hooks';
-import { clientOf, summariseClients, type ClientSummary } from '../../utils/client-share';
-import { crossedThreshold, displayVersion, nextThreshold } from '../../utils/client-versions';
-import { SourceAngles } from '../SourceAngles';
+import { useCensus, useClientCounts } from '../../hooks';
+import { CENSUS_TABLES } from '../../api/client-models';
+import { peerShareChart, unifiedClientRows } from '../../utils/census';
+import { clientOf, summariseClients } from '../../utils/client-share';
+import { displayVersion, windowStart } from '../../utils/client-versions';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */
@@ -23,9 +23,11 @@ function percent(part: number, total: number): string {
   return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
 }
 
+type PeerRow = { day_start_date?: string; client?: string; peer_count?: number };
+
 /**
- * The client at a glance: its share counted each way, share of blocks over time, newest release and the forks
- * that set a minimum version for it.
+ * The client at a glance: its share of proposed blocks and of P2P peers, Xatu nodes and adoption of its latest
+ * release, both shares over time, and the forks that set a minimum version for it.
  */
 export function OverviewTab({
   client,
@@ -33,7 +35,6 @@ export function OverviewTab({
   latest,
   last24h,
   nodes,
-  allNodes,
   releases,
   requirements,
   shareWindow,
@@ -41,45 +42,59 @@ export function OverviewTab({
 }: ClientTabProps): JSX.Element {
   const counts = useClientCounts(shareWindow);
   const windowText = SHARE_WINDOW_TEXT[shareWindow];
-  const name = formatClientName(client);
+  const windowDays = SHARE_WINDOW_DAYS[shareWindow];
+  // 0 loads the census from its first day; undefined would load only the latest days
+  const peerFrom = useMemo(() => (windowDays === null ? 0 : windowStart(windowDays)), [windowDays]);
+  const peers = useCensus<PeerRow>(layer === 'consensus' ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers, {}, peerFrom);
 
-  const summary = useMemo(() => {
-    const summaries = summariseClients(counts.records, layer).filter(s => s.client !== UNKNOWN_CLIENT);
-    const index = summaries.findIndex(s => s.client === client);
-    return {
-      mine: index >= 0 ? summaries[index] : undefined,
-      rank: index >= 0 ? index + 1 : undefined,
-      of: summaries.length,
-    };
+  const blockShare = useMemo(() => {
+    const summaries = summariseClients(counts.records, layer);
+    return summaries.find(s => s.client === client)?.identifiedShare ?? null;
   }, [counts.records, layer, client]);
+  const peerShare = useMemo(() => {
+    const latestRows = peers.rows.filter(row => row.day_start_date === peers.day);
+    return unifiedClientRows(layer, [], latestRows).rows.find(row => row.client === client)?.peerShare ?? null;
+  }, [peers.rows, peers.day, layer, client]);
 
-  const shareChart = useMemo(() => {
-    const totals = new Map<string, { identified: number; mine: number }>();
+  const chart = useMemo(() => {
+    const blocks = new Map<string, { named: number; mine: number }>();
     for (const record of counts.records) {
       const recordClient = clientOf(record, layer);
       if (recordClient === UNKNOWN_CLIENT) continue;
-      const entry = totals.get(record.key) ?? { identified: 0, mine: 0 };
-      entry.identified += record.blocks;
+      const entry = blocks.get(record.key) ?? { named: 0, mine: 0 };
+      entry.named += record.blocks;
       if (recordClient === client) entry.mine += record.blocks;
-      totals.set(record.key, entry);
+      blocks.set(record.key, entry);
     }
-    return {
-      labels: counts.keys.map(formatDailyDate),
-      series: [
-        {
-          name,
-          client,
-          color: getClientColor(client),
-          showArea: true,
-          areaOpacity: 0.2,
-          data: counts.keys.map(key => {
-            const entry = totals.get(key);
-            return entry && entry.identified > 0 ? Number(((entry.mine / entry.identified) * 100).toFixed(2)) : null;
-          }),
-        },
-      ],
-    };
-  }, [counts.records, counts.keys, layer, client, name]);
+    const peerDays = peerShareChart(layer, peers.rows);
+    const mine = peerDays.series.find(series => series.name === formatClientName(client));
+    const peerByDay = new Map(peerDays.days.map((day, i) => [day, mine?.data[i] ?? 0]));
+    const days = [...new Set([...counts.keys, ...peerDays.days])].sort();
+    const color = getClientColor(client);
+    const series: SeriesData[] = [
+      {
+        name: 'Proposed blocks',
+        color,
+        showArea: true,
+        areaOpacity: 0.15,
+        showSymbol: false,
+        data: days.map(day => {
+          const entry = blocks.get(day);
+          return entry && entry.named > 0 ? Number(((entry.mine / entry.named) * 100).toFixed(2)) : null;
+        }),
+      },
+    ];
+    if (peerByDay.size > 0) {
+      series.push({
+        name: 'P2P peers',
+        color,
+        lineStyle: 'dashed',
+        showSymbol: peerByDay.size < 30,
+        data: days.map(day => (peerByDay.has(day) ? Number((peerByDay.get(day) as number).toFixed(2)) : null)),
+      });
+    }
+    return { labels: days.map(formatDailyDate), series };
+  }, [counts.records, counts.keys, peers.rows, layer, client]);
 
   const recent = last24h.filter(block => block.version);
   const recentTotal = recent.reduce((sum, row) => sum + row.count, 0);
@@ -88,198 +103,119 @@ export function OverviewTab({
         .filter(block => compareVersions(block.version!, latest.version!) >= 0)
         .reduce((sum, row) => sum + row.count, 0)
     : 0;
-  const nodesOnLatest =
-    layer === 'consensus' && latest?.version
-      ? nodes.filter(
-          node => compareVersions(displayVersion(node.meta_consensus_version, releases), latest.version!) >= 0
-        ).length
-      : 0;
-
-  const nodeWeighted = useNodeWeightedShares(layer);
-  const nodeShare = (shares: ClientSummary[]): string =>
-    nodeWeighted.isLoading
-      ? '…'
-      : shares.length === 0
-        ? '-'
-        : `${(shares.find(item => item.client === client)?.identifiedShare ?? 0).toFixed(1)}%`;
-  const share = summary.mine?.identifiedShare ?? 0;
-  const next = summary.mine ? nextThreshold(share) : null;
+  const nodesOnLatest = latest?.version
+    ? nodes.filter(node => compareVersions(displayVersion(node.meta_consensus_version, releases), latest.version!) >= 0)
+        .length
+    : 0;
 
   return (
-    <div className="flex flex-col gap-6">
-      <SegmentedControl
-        options={SHARE_WINDOW_OPTIONS}
-        value={shareWindow}
-        onChange={onShareWindowChange}
-        ariaLabel="Share window"
-      />
-      <SourceAngles
-        angles={[
+    <div className="flex flex-col gap-4">
+      <div className="self-start">
+        <SegmentedControl
+          options={SHARE_WINDOW_OPTIONS}
+          value={shareWindow}
+          onChange={onShareWindowChange}
+          ariaLabel="Share window"
+        />
+      </div>
+      <Stats
+        gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
+        stats={[
           {
-            id: 'stake',
-            label: 'Stake-weighted (proposers)',
-            value: summary.mine ? `${share.toFixed(1)}%` : '0%',
-            detail: `Share of proposed blocks naming a client, ${windowText}`,
+            id: 'blocks',
+            name: `Share of proposed blocks, ${windowText}`,
+            value: blockShare === null ? '-' : `${blockShare.toFixed(1)}%`,
+            accentColor: getClientColor(client),
           },
           {
-            id: 'p2p',
-            label: 'Node-weighted (P2P peers)',
-            value: nodeShare(nodeWeighted.p2p),
-            detail: nodeWeighted.p2pDay
-              ? `Share of peers seen on the P2P network, ${nodeWeighted.p2pDay}`
-              : 'No P2P census yet',
+            id: 'peers',
+            name: `Share of P2P peers${peers.day ? `, ${peers.day}` : ''}`,
+            value: peers.isLoading ? '…' : peerShare === null ? '-' : `${peerShare.toFixed(1)}%`,
           },
           {
-            id: 'enr',
-            label: 'ENR crawl',
-            value: nodeShare(nodeWeighted.enr),
-            detail: nodeWeighted.enrDay
-              ? `Share of nodes found in discovery records, ${nodeWeighted.enrDay}`
-              : 'No ENR crawl yet',
+            id: 'latest',
+            name: `Blocks on ${latest?.version ?? 'latest'} or newer, 24h`,
+            value: percent(onLatest, recentTotal),
           },
           layer === 'consensus'
             ? {
-                id: 'contributoor',
-                label: 'Xatu nodes',
+                id: 'nodes',
+                name: 'Xatu nodes',
                 value: nodes.length.toLocaleString(),
-                detail: `${percent(nodes.length, allNodes.length)} of ${allNodes.length.toLocaleString()} Xatu nodes`,
+                subtitle: nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest` : undefined,
               }
             : {
-                id: 'contributoor',
-                label: 'Xatu nodes',
-                value: nodes.length.toLocaleString(),
-                detail: 'ethPandaOps nodes running it, by node name',
+                id: 'nodes',
+                name: 'Xatu nodes',
+                value: '-',
+                subtitle: 'Xatu nodes do not report their execution client',
               },
         ]}
       />
 
-      <Stats
-        gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
-        stats={[
-          { id: 'blocks', name: `Blocks, ${windowText}`, value: (summary.mine?.blocks ?? 0).toLocaleString() },
-          {
-            id: 'rank',
-            name: `Rank among ${layer === 'consensus' ? 'consensus' : 'execution'} clients`,
-            value: summary.rank ? `${summary.rank} of ${summary.of}` : '-',
-          },
-          {
-            id: 'threshold',
-            name: next ? `Points below ${next.label}` : 'Diversity threshold',
-            value: next ? next.distance.toFixed(1) : summary.mine ? `Over ${crossedThreshold(share)}` : '-',
-          },
-          {
-            id: 'latest',
-            name: 'Blocks on latest or newer, 24h',
-            value: percent(onLatest, recentTotal),
-          },
-        ]}
-      />
-
-      {!counts.isLoading && !summary.mine ? (
-        <Card rounded>
-          <p className="text-sm text-muted">No block in this window named this client in its graffiti.</p>
-        </Card>
-      ) : (
-        <PopoutCard
-          title="Share of blocks"
-          subtitle="Daily share of blocks whose graffiti names a client"
-          anchorId="client-share"
-          modalSize="full"
-        >
-          {({ inModal }) => (
+      <PopoutCard
+        title="Share over time"
+        subtitle={`Of blocks naming a client (stake-weighted) and of P2P peers with an agent (node-weighted), ${windowText}`}
+        anchorId="client-share"
+        modalSize="full"
+      >
+        {({ inModal }) =>
+          !counts.isLoading && blockShare === null && peerShare === null ? (
+            <p className="text-sm text-muted">No block or P2P peer named this client in this window.</p>
+          ) : (
             <MultiLineChart
-              series={shareChart.series}
-              xAxis={{ type: 'category', labels: shareChart.labels, name: 'Date' }}
+              series={chart.series}
+              xAxis={{ type: 'category', labels: chart.labels, name: 'Date' }}
               yAxis={{ name: 'Share (%)', min: 0 }}
-              height={inModal ? 600 : 280}
+              height={inModal ? 600 : 300}
               showLegend
               legendPosition="top"
             />
-          )}
-        </PopoutCard>
-      )}
+          )
+        }
+      </PopoutCard>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <Card rounded title="Latest release">
-          {latest?.version ? (
-            <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div>
-                <dt className="text-xs/5 text-muted">Version</dt>
-                <dd>
+      {requirements.length > 0 && (
+        <Card rounded title="Fork minimum versions" subtitle="From this network's config">
+          <Table
+            variant="nested"
+            data={requirements}
+            getRowKey={row => row.fork}
+            columns={[
+              {
+                header: 'Fork',
+                accessor: row => (
                   <Link
-                    to="/ethereum/clients/$client/$version"
-                    params={{ client, version: latest.version }}
-                    className="font-mono text-sm/6 font-medium text-primary hover:underline"
+                    to="/ethereum/forks/$fork"
+                    params={{ fork: row.fork }}
+                    className="font-medium text-foreground capitalize hover:underline"
                   >
-                    {latest.version}
+                    {row.fork}
                   </Link>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs/5 text-muted">Released</dt>
-                <dd className="text-sm/6 text-foreground">
-                  {latest.release_date ? <Timestamp timestamp={latest.release_date} format="short" /> : '-'}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs/5 text-muted">Blocks on it or newer, 24h</dt>
-                <dd className="text-sm/6 font-medium text-foreground tabular-nums">{percent(onLatest, recentTotal)}</dd>
-              </div>
-              <div>
-                <dt className="text-xs/5 text-muted">Xatu nodes on it or newer</dt>
-                <dd className="text-sm/6 font-medium text-foreground tabular-nums">
-                  {layer === 'consensus' ? percent(nodesOnLatest, nodes.length) : '-'}
-                </dd>
-              </div>
-            </dl>
-          ) : (
-            <p className="text-sm text-muted">No published releases.</p>
-          )}
+                ),
+              },
+              {
+                header: 'Minimum version',
+                accessor: row => <span className="font-mono text-xs/6">{row.minVersion}</span>,
+              },
+              {
+                header: '',
+                accessor: row => (
+                  <Link
+                    to="/ethereum/clients/$client"
+                    params={{ client }}
+                    search={{ fork: row.fork }}
+                    className="text-primary hover:underline"
+                  >
+                    Readiness
+                  </Link>
+                ),
+                cellClassName: 'text-right',
+              },
+            ]}
+          />
         </Card>
-        <Card rounded title="Fork minimum versions">
-          {requirements.length === 0 ? (
-            <p className="text-sm text-muted">No fork on this network sets a minimum version for this client.</p>
-          ) : (
-            <Table
-              variant="nested"
-              data={requirements}
-              getRowKey={row => row.fork}
-              columns={[
-                {
-                  header: 'Fork',
-                  accessor: row => (
-                    <Link
-                      to="/ethereum/forks/$fork"
-                      params={{ fork: row.fork }}
-                      className="font-medium text-foreground capitalize hover:underline"
-                    >
-                      {row.fork}
-                    </Link>
-                  ),
-                },
-                {
-                  header: 'Minimum version',
-                  accessor: row => <span className="font-mono text-xs/6">{row.minVersion}</span>,
-                },
-                {
-                  header: '',
-                  accessor: row => (
-                    <Link
-                      to="/ethereum/clients/$client"
-                      params={{ client }}
-                      search={{ fork: row.fork }}
-                      className="text-primary hover:underline"
-                    >
-                      Readiness
-                    </Link>
-                  ),
-                  cellClassName: 'text-right',
-                },
-              ]}
-            />
-          )}
-        </Card>
-      </div>
+      )}
     </div>
   );
 }

@@ -68,7 +68,7 @@ export function ReleasesTable({
     {
       header: 'Released',
       accessor: row =>
-        row.release_date ? <Timestamp timestamp={row.release_date} format="short" className="text-xs" /> : '-',
+        row.release_date ? <Timestamp timestamp={row.release_date} format="date" className="text-xs" /> : '-',
     },
     {
       header: 'Blocks',

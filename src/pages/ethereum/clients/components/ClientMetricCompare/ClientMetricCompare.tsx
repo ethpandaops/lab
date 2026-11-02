@@ -9,21 +9,9 @@ import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
+import { ratio, type ClientMetric } from '../../utils/client-metrics';
 
-/** A metric as a ratio of two sums over a client's rows, so it combines across days */
-export interface ClientMetric<T> {
-  id: string;
-  label: string;
-  /** Axis name, with its unit */
-  axis: string;
-  numerator: (row: T) => number;
-  denominator: (row: T) => number;
-  /** Multiplier applied to the ratio, e.g. 100 for a percentage */
-  scale?: number;
-  format: (value: number) => string;
-  /** Whether a lower value is better, for the rank column */
-  lowerIsBetter?: boolean;
-}
+export type { ClientMetric };
 
 export interface ClientMetricCompareProps<T extends { day_start_date?: string; client?: string }> {
   /** Client the page is about, drawn on top and highlighted in the table */
@@ -40,17 +28,6 @@ export interface ClientMetricCompareProps<T extends { day_start_date?: string; c
   actions?: ReactNode;
   /** Shown under the chart and table */
   footer?: ReactNode;
-}
-
-/** Ratio of summed numerator to summed denominator, or null with nothing to divide by */
-function ratio<T>(rows: T[], metric: ClientMetric<T>): number | null {
-  let numerator = 0;
-  let denominator = 0;
-  for (const row of rows) {
-    numerator += metric.numerator(row);
-    denominator += metric.denominator(row);
-  }
-  return denominator > 0 ? (numerator / denominator) * (metric.scale ?? 1) : null;
 }
 
 /** Windows longer than this many days are drawn per week, so small clients' days do not swing the lines */

@@ -542,7 +542,8 @@ export function DetailPage(): JSX.Element {
             <Tab>Node Resources</Tab>
           </ScrollableTabs>
 
-          <TabPanels className="mt-6">
+          {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
+          <TabPanels className="mt-6 min-h-screen">
             {/* Overview Tab - Clean, card-based layout with key metrics */}
             <TabPanel>
               <div className="space-y-6">

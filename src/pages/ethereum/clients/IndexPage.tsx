@@ -3,30 +3,31 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
-import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { InfoBox } from '@/components/Feedback/InfoBox';
-import { Stats } from '@/components/DataDisplay/Stats';
-import { Toggle } from '@/components/Forms/Toggle';
 import { Button } from '@/components/Elements/Button';
-import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import {
-  ClientBreakdown,
   ClientFilter,
   ClientPairs,
   ClientsSkeleton,
-  ClientSummaryGrid,
-  DiversityCard,
   EntityFilter,
   GraffitiBlocksTable,
+  LayerClients,
 } from './components';
-import { useClientCounts, useEntityOptions, useLatestReleases, useNodeWeightedShares } from './hooks';
+import { useCensus, useClientCounts, useEntityOptions, useLatestAdoption, useLatestReleases } from './hooks';
+import { CENSUS_TABLES } from './api/client-models';
+import { windowStart } from './utils/client-versions';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
 import { normalizeClientName } from '@/utils/ethereum';
-import { BLOCK_GRAFFITI_TABLE, DEFAULT_TIME_PERIOD, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
+import {
+  BLOCK_GRAFFITI_TABLE,
+  DEFAULT_TIME_PERIOD,
+  TIME_PERIOD_OPTIONS,
+  TIME_RANGE_CONFIG,
+  type TimePeriod,
+} from './constants';
 import {
   bucketShares,
   buildShareChartConfig,
@@ -44,41 +45,42 @@ import { BLOCK_FILTER_KEYS, type BlockSearch } from './utils/block-filters';
 /** Blocks table filters; the filter bar above owns the clients and entity */
 const INDEX_BLOCK_FIELDS = BLOCK_FILTER_KEYS.filter(key => key !== 'cl' && key !== 'el' && key !== 'entity');
 
-/** What the diversity cards can count */
-const DIVERSITY_OPTIONS: ReadonlyArray<{ value: 'blocks' | 'p2p' | 'enr'; label: string }> = [
-  { value: 'blocks', label: 'Proposed blocks (stake)' },
-  { value: 'p2p', label: 'P2P peers (nodes)' },
-  { value: 'enr', label: 'ENR crawl (nodes)' },
-];
+/** Window text for subtitles, e.g. "in the last 7 days" */
+const WINDOW_TEXT: Record<TimePeriod, string> = {
+  '24h': 'in the last 24 hours',
+  '7d': 'in the last 7 days',
+  '30d': 'in the last 30 days',
+  '90d': 'in the last 90 days',
+  '1y': 'in the last year',
+  all: 'since the first block with graffiti',
+};
 
-const DIVERSITY_SUBTITLES = {
-  blocks: 'Share of blocks whose graffiti names a client',
-  p2p: 'Share of peers seen on the P2P network, latest full day',
-  enr: 'Share of nodes found in discovery records, latest full day',
-} as const;
+/** Days of P2P census the charts load at least, since short windows hold one or two daily points */
+const MIN_PEER_DAYS = 7;
 
-/** Formats a share of blocks as a percentage, or a dash when there are no blocks */
-function formatShare(part: number, total: number): string {
-  return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
-}
-
-/** Describes the blocks a layer's chart covers, e.g. "blocks from coinbase with Geth execution" */
-function describeBlocks(entity: string | undefined, filters: ClientFilters, layer: ClientLayer): string {
+/** Describes a layer's blocks, e.g. "from coinbase with Geth execution in the last 7 days" */
+function describeBlocks(
+  entity: string | undefined,
+  filters: ClientFilters,
+  layer: ClientLayer,
+  timePeriod: TimePeriod
+): string {
   const other = layer === 'consensus' ? filters.executionClient : filters.consensusClient;
-  const parts = [entity ? `blocks from ${entityLabel(entity)}` : 'blocks'];
+  const parts: string[] = [];
+  if (entity) parts.push(`from ${entityLabel(entity)}`);
   if (other) parts.push(`with ${formatClientName(other)} ${layer === 'consensus' ? 'execution' : 'consensus'}`);
-  return entity || other ? parts.join(' ') : 'all proposed blocks';
+  parts.push(WINDOW_TEXT[timePeriod]);
+  return parts.join(' ');
 }
 
 /**
- * Clients overview: every consensus and execution client with its share of proposed blocks parsed from graffiti,
- * diversity against the 33%, 50% and 67% thresholds, newest release and Xatu nodes, with a per-block drill-down.
+ * Clients overview: per layer, every client by share of proposed blocks and of P2P peers, Xatu nodes and adoption of
+ * its latest release, with both shares over time, the most common pairs and a per-block drill-down.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/clients/' });
   const search = useSearch({ from: '/ethereum/clients/' });
   const timePeriod: TimePeriod = search.t ?? DEFAULT_TIME_PERIOD;
-  const identifiedOnly = search.identified ?? false;
 
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(BLOCK_GRAFFITI_TABLE);
   const hasData = !!tableBounds;
@@ -93,9 +95,22 @@ export function IndexPage(): JSX.Element {
   const { records, keys, isDaily, since, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
-  const diversityBy = search.by ?? 'blocks';
-  const clNodes = useNodeWeightedShares(diversityBy === 'blocks' ? null : 'consensus');
-  const elNodes = useNodeWeightedShares(diversityBy === 'blocks' ? null : 'execution');
+  const { adoption } = useLatestAdoption(latestReleases);
+  const peerFrom = useMemo(() => {
+    const days = TIME_RANGE_CONFIG[timePeriod].days;
+    // 0 loads the census from its first day; undefined would load only the latest days
+    return days === null ? 0 : windowStart(Math.max(days, MIN_PEER_DAYS));
+  }, [timePeriod]);
+  const clPeers = useCensus<{ day_start_date?: string; client?: string; peer_count?: number }>(
+    CENSUS_TABLES.clPeers,
+    {},
+    peerFrom
+  );
+  const elPeers = useCensus<{ day_start_date?: string; client?: string; peer_count?: number }>(
+    CENSUS_TABLES.elPeers,
+    {},
+    peerFrom
+  );
   const { nodes } = useActiveNodes();
   const nodeCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -106,7 +121,7 @@ export function IndexPage(): JSX.Element {
     return counts;
   }, [nodes]);
 
-  // Each layer's own filter is skipped for its chart and breakdown, so the selected client shows among the others.
+  // Each layer's own filter is skipped for its rows and chart, so the selected client shows among the others.
   const filtered = useMemo(() => filterRecords(records, filters), [records, filters]);
   const consensusRecords = useMemo(() => filterRecords(records, filters, 'consensus'), [records, filters]);
   const executionRecords = useMemo(() => filterRecords(records, filters, 'execution'), [records, filters]);
@@ -118,22 +133,22 @@ export function IndexPage(): JSX.Element {
   const executionClients = useMemo(() => summariseClients(records, 'execution').map(s => s.client), [records]);
   const pairs = useMemo(() => summarisePairs(filtered), [filtered]);
   const consensusChart = useMemo(
-    () => buildShareChartConfig(consensusRecords, keys, 'consensus', isDaily, identifiedOnly),
-    [consensusRecords, keys, isDaily, identifiedOnly]
+    () => buildShareChartConfig(consensusRecords, keys, 'consensus', isDaily, true),
+    [consensusRecords, keys, isDaily]
   );
   const executionChart = useMemo(
-    () => buildShareChartConfig(executionRecords, keys, 'execution', isDaily, identifiedOnly),
-    [executionRecords, keys, isDaily, identifiedOnly]
+    () => buildShareChartConfig(executionRecords, keys, 'execution', isDaily, true),
+    [executionRecords, keys, isDaily]
   );
 
   // Every change here can change the blocks table's rows, so it returns to the table's first page
   const setSearch = useCallback(
-    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string; identified?: boolean; by?: 'p2p' | 'enr' }) =>
+    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string }) =>
       navigate({ search: prev => ({ ...prev, ...update, page: undefined }), replace: true }),
     [navigate]
   );
   const setBlockSearch = useCallback(
-    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }), resetScroll: false }),
+    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }) }),
     [navigate]
   );
   const clearFilters = useCallback(() => setSearch({ cl: undefined, el: undefined, entity: undefined }), [setSearch]);
@@ -146,7 +161,7 @@ export function IndexPage(): JSX.Element {
         const key = index === undefined ? undefined : keys[index];
         if (!key) return '';
         const layerRecords = layer === 'consensus' ? consensusRecords : executionRecords;
-        const { total, items } = bucketShares(layerRecords, key, layer, identifiedOnly);
+        const { total, items } = bucketShares(layerRecords, key, layer, true);
         return buildTooltipHtml(formatTooltipDate(isDaily ? key : Number(key), isDaily), [
           {
             title: `${layer === 'consensus' ? 'CONSENSUS' : 'EXECUTION'} CLIENTS (${total} blocks)`,
@@ -159,21 +174,17 @@ export function IndexPage(): JSX.Element {
           },
         ]);
       },
-    [keys, consensusRecords, executionRecords, identifiedOnly, isDaily]
+    [keys, consensusRecords, executionRecords, isDaily]
   );
 
-  const periodLabel = isDaily ? 'Daily' : 'Hourly';
-  const shareSubtitle = (layer: ClientLayer): string => {
-    const blocks = describeBlocks(entity, filters, layer);
-    return identifiedOnly
-      ? `${periodLabel} share of ${blocks === 'all proposed blocks' ? 'blocks' : blocks} whose graffiti names a client`
-      : `${periodLabel} share of ${blocks}, unknown included`;
-  };
   const isEmpty = !isLoading && !boundsLoading && !error && coverage.total === 0;
 
   return (
     <Container>
-      <Header title="Clients" description="Consensus and execution clients, by share of proposed blocks" />
+      <Header
+        title="Clients"
+        description="Every consensus and execution client by share of proposed blocks and of P2P peers"
+      />
 
       {!boundsLoading && !hasData ? (
         <Card rounded>
@@ -181,7 +192,7 @@ export function IndexPage(): JSX.Element {
         </Card>
       ) : (
         <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
             <SegmentedControl
               options={TIME_PERIOD_OPTIONS}
               value={timePeriod}
@@ -214,27 +225,7 @@ export function IndexPage(): JSX.Element {
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted">Identified blocks only</span>
-              <Toggle
-                checked={identifiedOnly}
-                onChange={checked => setSearch({ identified: checked || undefined })}
-                size="small"
-                srLabel="Show shares of identified blocks only"
-              />
-            </div>
           </div>
-
-          <InfoBox summary="How this is measured">
-            <p>
-              Clients are read from what proposers put in their graffiti: the engine API client version codes most
-              consensus clients append (for example <span className="font-mono">GEa579PMfea2</span>) or a client&apos;s
-              default version string. Blocks with empty or custom graffiti count as unknown, so these shares describe
-              the blocks that name a client, not the whole validator set. Entities are the proposer&apos;s current
-              validator mapping; validators without one are left out when filtering by entity.
-            </p>
-            <p>A client with over ⅓ of stake can stop finality with a bug; over ⅔, it can finalize an invalid chain.</p>
-          </InfoBox>
 
           {error && (
             <Card rounded>
@@ -264,134 +255,33 @@ export function IndexPage(): JSX.Element {
             </Card>
           ) : (
             <>
-              <section className="flex flex-col gap-3">
-                <div>
-                  <h2 className="text-base/7 font-semibold text-foreground">Consensus clients</h2>
-                  <p className="text-sm/6 text-muted">Share of blocks whose graffiti names a consensus client</p>
-                </div>
-                <ClientSummaryGrid
-                  layer="consensus"
-                  summaries={consensusSummary}
-                  latestReleases={latestReleases}
-                  nodeCounts={nodeCounts}
-                />
-              </section>
-              <section className="flex flex-col gap-3">
-                <div>
-                  <h2 className="text-base/7 font-semibold text-foreground">Execution clients</h2>
-                  <p className="text-sm/6 text-muted">Share of blocks whose graffiti names an execution client</p>
-                </div>
-                <ClientSummaryGrid
-                  layer="execution"
-                  summaries={executionSummary}
-                  latestReleases={latestReleases}
-                  nodeCounts={nodeCounts}
-                />
-              </section>
-
-              <Stats
-                gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
-                stats={[
-                  { id: 'blocks', name: 'Blocks', value: coverage.total.toLocaleString() },
-                  {
-                    id: 'consensus',
-                    name: 'CL identified',
-                    value: formatShare(coverage.withConsensus, coverage.total),
-                  },
-                  {
-                    id: 'execution',
-                    name: 'EL identified',
-                    value: formatShare(coverage.withExecution, coverage.total),
-                  },
-                  { id: 'both', name: 'Both identified', value: formatShare(coverage.withBoth, coverage.total) },
-                ]}
+              <LayerClients
+                layer="consensus"
+                blockSummaries={consensusSummary}
+                blockTotal={coverage.total}
+                blockScope={describeBlocks(entity, filters, 'consensus', timePeriod)}
+                blockChart={consensusChart}
+                blockTooltip={makeTooltip('consensus')}
+                peerRows={clPeers.rows}
+                peerDay={clPeers.day}
+                peersLoading={clPeers.isLoading}
+                xatuNodes={nodeCounts}
+                latestReleases={latestReleases}
+                latestAdoption={adoption}
               />
-
-              <SegmentedControl
-                options={DIVERSITY_OPTIONS}
-                value={diversityBy}
-                onChange={value => setSearch({ by: value === 'blocks' ? undefined : value })}
-                ariaLabel="Count diversity by"
+              <LayerClients
+                layer="execution"
+                blockSummaries={executionSummary}
+                blockTotal={coverage.total}
+                blockScope={describeBlocks(entity, filters, 'execution', timePeriod)}
+                blockChart={executionChart}
+                blockTooltip={makeTooltip('execution')}
+                peerRows={elPeers.rows}
+                peerDay={elPeers.day}
+                peersLoading={elPeers.isLoading}
+                latestReleases={latestReleases}
+                latestAdoption={adoption}
               />
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                <DiversityCard
-                  title="Consensus diversity"
-                  summaries={
-                    diversityBy === 'p2p' ? clNodes.p2p : diversityBy === 'enr' ? clNodes.enr : consensusSummary
-                  }
-                  subtitle={DIVERSITY_SUBTITLES[diversityBy]}
-                  countLabel={diversityBy === 'blocks' ? 'Blocks' : diversityBy === 'p2p' ? 'Peers' : 'Nodes'}
-                  isLoading={diversityBy !== 'blocks' && clNodes.isLoading}
-                />
-                <DiversityCard
-                  title="Execution diversity"
-                  summaries={
-                    diversityBy === 'p2p' ? elNodes.p2p : diversityBy === 'enr' ? elNodes.enr : executionSummary
-                  }
-                  subtitle={DIVERSITY_SUBTITLES[diversityBy]}
-                  countLabel={diversityBy === 'blocks' ? 'Blocks' : diversityBy === 'p2p' ? 'Peers' : 'Nodes'}
-                  isLoading={diversityBy !== 'blocks' && elNodes.isLoading}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                <PopoutCard
-                  title="Consensus Client Share"
-                  subtitle={shareSubtitle('consensus')}
-                  anchorId="consensus-client-share"
-                  modalSize="full"
-                >
-                  {({ inModal }) => (
-                    <MultiLineChart
-                      series={consensusChart.series}
-                      xAxis={{ type: 'category', labels: consensusChart.labels, name: 'Date' }}
-                      yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                      height={inModal ? 600 : 320}
-                      showLegend
-                      legendPosition="top"
-                      enableDataZoom
-                      tooltipFormatter={makeTooltip('consensus')}
-                      syncGroup={inModal ? undefined : 'proposer-clients'}
-                    />
-                  )}
-                </PopoutCard>
-                <PopoutCard
-                  title="Execution Client Share"
-                  subtitle={shareSubtitle('execution')}
-                  anchorId="execution-client-share"
-                  modalSize="full"
-                >
-                  {({ inModal }) => (
-                    <MultiLineChart
-                      series={executionChart.series}
-                      xAxis={{ type: 'category', labels: executionChart.labels, name: 'Date' }}
-                      yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                      height={inModal ? 600 : 320}
-                      showLegend
-                      legendPosition="top"
-                      enableDataZoom
-                      tooltipFormatter={makeTooltip('execution')}
-                      syncGroup={inModal ? undefined : 'proposer-clients'}
-                    />
-                  )}
-                </PopoutCard>
-
-                <ClientBreakdown
-                  title="Consensus clients"
-                  summaries={consensusSummary}
-                  identifiedOnly={identifiedOnly}
-                  selectedClient={filters.consensusClient}
-                  onSelect={client => setSearch({ cl: client })}
-                />
-                <ClientBreakdown
-                  title="Execution clients"
-                  summaries={executionSummary}
-                  identifiedOnly={identifiedOnly}
-                  selectedClient={filters.executionClient}
-                  onSelect={client => setSearch({ el: client })}
-                />
-              </div>
-
               <ClientPairs
                 pairs={pairs}
                 onSelect={pair => setSearch({ cl: pair.consensusClient, el: pair.executionClient })}

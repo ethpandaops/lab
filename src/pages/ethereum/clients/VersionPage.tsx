@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { type JSX, useCallback, useMemo } from 'react';
 import { Link, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
@@ -253,6 +254,7 @@ export function VersionPage(): JSX.Element {
   const name = formatClientName(client);
   const releaseUrl = releasePageUrl(release);
   const title = releaseName(release);
+  const isLatest = !!release && release.version === latest?.version;
   const releaseDay = release?.release_date ? new Date(release.release_date * 1000).toISOString().slice(0, 10) : null;
   const lag50 = lagValue(facts.lag50);
   const lag90 = lagValue(facts.lag90);
@@ -289,7 +291,7 @@ export function VersionPage(): JSX.Element {
           details={[
             {
               label: 'Released',
-              value: release?.release_date ? <Timestamp timestamp={release.release_date} format="short" /> : '-',
+              value: release?.release_date ? <Timestamp timestamp={release.release_date} format="date" /> : '-',
             },
             {
               label: 'Release',
@@ -312,10 +314,9 @@ export function VersionPage(): JSX.Element {
               label: 'Previous release',
               value: previous?.version ? <VersionLink client={client} version={previous.version} /> : '-',
             },
-            {
-              label: 'Latest release',
-              value: latest?.version ? <VersionLink client={client} version={latest.version} /> : '-',
-            },
+            ...(latest?.version && !isLatest
+              ? [{ label: 'Latest release', value: <VersionLink client={client} version={latest.version} /> }]
+              : []),
           ]}
           actions={
             <>
@@ -380,18 +381,26 @@ export function VersionPage(): JSX.Element {
           ) : (
             <>
               <Stats
-                gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6"
+                gridClassName={clsx(
+                  'grid grid-cols-2 gap-4 lg:grid-cols-3',
+                  isLatest ? '2xl:grid-cols-5' : '2xl:grid-cols-6'
+                )}
                 stats={[
                   {
                     id: 'exact',
                     name: 'Blocks on exactly this version, today',
                     ...shareStat(adoption, 'exact', window),
                   },
-                  {
-                    id: 'at-least',
-                    name: 'Blocks on it or newer, today',
-                    ...shareStat(adoption, 'atLeast', window),
-                  },
+                  // On the latest release, "or newer" is the same number
+                  ...(isLatest
+                    ? []
+                    : [
+                        {
+                          id: 'at-least',
+                          name: 'Blocks on it or newer, today',
+                          ...shareStat(adoption, 'atLeast', window),
+                        },
+                      ]),
                   { id: 'lag50', name: 'Time to 50% of blocks', value: lag50.value, subtitle: lag50.note },
                   { id: 'lag90', name: 'Time to 90% of blocks', value: lag90.value, subtitle: lag90.note },
                   { id: 'entities', name: 'Entities proposing with it', value: facts.entities.toLocaleString() },

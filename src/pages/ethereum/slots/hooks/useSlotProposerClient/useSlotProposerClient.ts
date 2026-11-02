@@ -30,6 +30,8 @@ export interface ProposerClientField {
   /** Commit prefix from the graffiti */
   commit?: string;
   commitUrl?: string;
+  /** Version the graffiti states, when it differs from `version` or resolves to no release */
+  statedVersion?: string;
   /** Why the graffiti resolves to no release */
   unresolvedNote?: string;
 }
@@ -92,10 +94,13 @@ function buildField(
   status: string,
   commit: string | undefined,
   release: DimClientRelease | undefined,
-  branchCommit: DimClientCommit | undefined
+  branchCommit: DimClientCommit | undefined,
+  graffitiVersion: string | undefined
 ): ProposerClientField | undefined {
   if (!client || client === UNKNOWN_CLIENT) return undefined;
   const resolved = RESOLVED_STATUSES.has(status) && !!version;
+  // A commit resolving to another release than the graffiti states, or a stated version that resolves to none
+  const statedVersion = status === 'commit_mismatch' ? graffitiVersion : resolved ? undefined : version || undefined;
   const repository = branchCommit?.repository ?? release?.repository;
   return {
     client,
@@ -105,6 +110,7 @@ function buildField(
     commitsSinceRelease: branchCommit?.commits_since_base,
     commit: commit || undefined,
     commitUrl: githubCommitUrl(repository, branchCommit?.commit_sha ?? commit),
+    statedVersion,
     unresolvedNote: resolved ? undefined : UNRESOLVED_LABELS[status],
   };
 }
@@ -169,7 +175,8 @@ export function useSlotProposerClient(slot: number, proposerIndex?: number | nul
       clStatus,
       row.consensus_client_commit,
       clRelease,
-      clBranch
+      clBranch,
+      graffiti?.consensus_client_version || undefined
     ),
     execution: buildField(
       row.execution_client,
@@ -177,7 +184,8 @@ export function useSlotProposerClient(slot: number, proposerIndex?: number | nul
       elStatus,
       row.execution_client_commit,
       elRelease,
-      elBranch
+      elBranch,
+      undefined
     ),
     graffitiText: graffiti?.graffiti_text || undefined,
     graffitiFormat: row.graffiti_format ?? graffiti?.graffiti_format,

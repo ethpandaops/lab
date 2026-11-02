@@ -30,6 +30,8 @@ export type ReleaseStatus =
   | 'commit_match'
   /** A branch commit, counted under the release it builds on */
   | 'commit_untagged'
+  /** The commit resolves to another release than the graffiti states; version is the commit's release */
+  | 'commit_mismatch'
   /** A version string without a commit */
   | 'version_match'
   | 'no_commit'
@@ -42,7 +44,24 @@ export type ReleaseStatus =
   | 'none';
 
 /** Statuses whose version names a release */
-export const RESOLVED_STATUSES: ReadonlySet<string> = new Set(['commit_match', 'commit_untagged', 'version_match']);
+export const RESOLVED_STATUSES: ReadonlySet<string> = new Set([
+  'commit_match',
+  'commit_untagged',
+  'commit_mismatch',
+  'version_match',
+]);
+
+/** Statuses whose version, when there is one, is only what the graffiti or agent states */
+export const UNRESOLVED_STATUSES: readonly string[] = [
+  'no_commit',
+  'commit_zero',
+  'codes_min',
+  'commit_short',
+  'commit_unmatched',
+  'commit_ambiguous',
+  'version_unmatched',
+  'none',
+];
 
 export type {
   DimClientCommit,

@@ -104,6 +104,16 @@ export const LongFormat: Story = {
 };
 
 /**
+ * Date only, for dates where the time of day does not matter (e.g. release dates)
+ */
+export const DateFormat: Story = {
+  args: {
+    timestamp: Math.floor(Date.now() / 1000) - 86400 * 10,
+    format: 'date',
+  },
+};
+
+/**
  * Custom format using render function
  */
 export const CustomFormat: Story = {

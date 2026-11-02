@@ -221,7 +221,8 @@ export function DetailPage(): React.JSX.Element {
             <Tab>MEV</Tab>
           </ScrollableTabs>
 
-          <TabPanels className="mt-6">
+          {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
+          <TabPanels className="mt-6 min-h-screen">
             {/* Slots Tab */}
             <TabPanel>
               <EpochSlotsTable slots={data.slots} />

@@ -1,8 +1,12 @@
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import { getNetworkBPOs, getNetworkForks } from '@/utils/forks';
-import { isKnownClient } from '@/utils/ethereum';
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS, getClientColor } from '@/utils/ethereum';
+import { formatClientName } from '@/utils/graffiti';
+import type { SeriesData } from '@/components/Charts/MultiLine';
+import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
+import { OTHER_VERSION_COLOR } from './client-versions';
 import { RESOLVED_STATUSES } from '../api/client-models';
-import type { ClientSummary } from './client-share';
+import type { ClientLayer, ClientSummary } from './client-share';
 
 /** Census rows carry a day and a client */
 type DayRow = { day_start_date?: string; client?: string };
@@ -22,33 +26,6 @@ export function sum<T>(rows: T[], value: (row: T) => number | undefined): number
   return rows.reduce((total, row) => total + (value(row) ?? 0), 0);
 }
 
-/**
- * Per-client totals of one day as {@link ClientSummary}s, largest first, for the diversity cards. Rows for unknown
- * and other agents count towards the total, and agents that are not known clients (libp2p tools, forks) towards the
- * identified total, but neither is listed.
- */
-export function censusSummaries<T extends DayRow>(rows: T[], count: (row: T) => number | undefined): ClientSummary[] {
-  const totals = new Map<string, number>();
-  let all = 0;
-  for (const row of rows) {
-    const value = count(row) ?? 0;
-    all += value;
-    const client = row.client ?? 'unknown';
-    if (client === 'unknown' || client === 'other') continue;
-    totals.set(client, (totals.get(client) ?? 0) + value);
-  }
-  const identified = [...totals.values()].reduce((total, value) => total + value, 0);
-  return [...totals.entries()]
-    .filter(([client]) => isKnownClient(client))
-    .map(([client, blocks]) => ({
-      client,
-      blocks,
-      share: all > 0 ? (blocks / all) * 100 : 0,
-      identifiedShare: identified > 0 ? (blocks / identified) * 100 : 0,
-    }))
-    .sort((a, b) => b.blocks - a.blocks);
-}
-
 /** One version of a client in a census, with how it resolved */
 export interface CensusVersion {
   /** Release version when resolved, else the version the agent reports, empty when none */
@@ -57,6 +34,8 @@ export interface CensusVersion {
   /** Branch builds after the release */
   untagged: number;
   count: number;
+  /** Peers stating this version whose commit or version string resolved to no release */
+  statedOnly: number;
 }
 
 /**
@@ -68,11 +47,12 @@ export function censusVersions<T extends { version?: string; release_status?: st
 ): CensusVersion[] {
   const byVersion = new Map<string, CensusVersion>();
   for (const row of rows) {
-    // A peer naming a release counts under it, even when its commit is not on an upstream branch
+    // A peer counts under the version it states; `statedOnly` keeps apart those whose commit did not resolve to it
     const version = row.version ?? '';
-    const entry = byVersion.get(version) ?? { version, resolved: false, untagged: 0, count: 0 };
+    const entry = byVersion.get(version) ?? { version, resolved: false, untagged: 0, statedOnly: 0, count: 0 };
     entry.count += count(row) ?? 0;
     if (RESOLVED_STATUSES.has(row.release_status ?? '') && version) entry.resolved = true;
+    else if (version) entry.statedOnly += count(row) ?? 0;
     if (row.release_status === 'commit_untagged') entry.untagged += count(row) ?? 0;
     byVersion.set(version, entry);
   }
@@ -187,4 +167,103 @@ export function groupForkIdNext<T extends { fork_id_next?: string; node_count?: 
     groups.set(label, group);
   }
   return [...groups.values()].sort((a, b) => Number(b.isNext) - Number(a.isNext) || b.count - a.count);
+}
+
+/** Agents that are not one of a layer's clients: unparsed ('other'), tools and forks; empty agents are 'unknown' */
+function isLayerClient(client: string, layer: ClientLayer): boolean {
+  return (
+    layer === 'consensus' ? (CONSENSUS_CLIENTS as readonly string[]) : (EXECUTION_CLIENTS as readonly string[])
+  ).includes(client);
+}
+
+/** One client of a layer by proposed blocks and by P2P peers */
+export interface UnifiedClientRow {
+  client: string;
+  blocks: number;
+  /** Share of blocks whose graffiti names a client of the layer (0-100), null with no such blocks */
+  blockShare: number | null;
+  peers: number;
+  /** Share of peers with an agent (0-100), null with no peers */
+  peerShare: number | null;
+}
+
+/**
+ * A layer's clients with their share of proposed blocks and of P2P peers, largest by blocks then peers. Only the
+ * layer's clients get rows; peers running anything else (tools, forks, unparsed agents) are summed as Other.
+ * Peers without an agent count nowhere.
+ */
+export function unifiedClientRows(
+  layer: ClientLayer,
+  blockSummaries: ClientSummary[],
+  peerRows: Array<{ client?: string; peer_count?: number }>
+): { rows: UnifiedClientRow[]; other: { peers: number; peerShare: number | null }; peerTotal: number } {
+  const peers = new Map<string, number>();
+  let peerTotal = 0;
+  let otherPeers = 0;
+  for (const row of peerRows) {
+    const client = row.client || 'unknown';
+    const count = row.peer_count ?? 0;
+    if (client === 'unknown') continue;
+    peerTotal += count;
+    if (isLayerClient(client, layer)) peers.set(client, (peers.get(client) ?? 0) + count);
+    else otherPeers += count;
+  }
+  const blocks = new Map(
+    blockSummaries
+      .filter(summary => summary.identifiedShare !== null && isLayerClient(summary.client, layer))
+      .map(summary => [summary.client, summary])
+  );
+  const peerShare = (count: number): number | null => (peerTotal > 0 ? (count / peerTotal) * 100 : null);
+  const clients = new Set([...blocks.keys(), ...peers.keys()]);
+  const rows = [...clients]
+    .map(client => ({
+      client,
+      blocks: blocks.get(client)?.blocks ?? 0,
+      blockShare: blocks.size > 0 ? (blocks.get(client)?.identifiedShare ?? 0) : null,
+      peers: peers.get(client) ?? 0,
+      peerShare: peerShare(peers.get(client) ?? 0),
+    }))
+    .filter(row => row.blocks > 0 || row.peers > 0)
+    .sort((a, b) => b.blocks - a.blocks || b.peers - a.peers || a.client.localeCompare(b.client));
+  return { rows, other: { peers: otherPeers, peerShare: peerShare(otherPeers) }, peerTotal };
+}
+
+/**
+ * Daily share of P2P peers per client of a layer, stacked, for peers with an agent. Agents that are not the layer's
+ * clients stack as a faint Other.
+ */
+export function peerShareChart(
+  layer: ClientLayer,
+  rows: Array<{ day_start_date?: string; client?: string; peer_count?: number }>
+): { labels: string[]; days: string[]; series: SeriesData[] } {
+  const byDay = new Map<string, Map<string, number>>();
+  const totals = new Map<string, number>();
+  for (const row of rows) {
+    const client = row.client || 'unknown';
+    if (client === 'unknown' || !row.day_start_date) continue;
+    const key = isLayerClient(client, layer) ? client : 'other';
+    const day = byDay.get(row.day_start_date) ?? new Map<string, number>();
+    day.set(key, (day.get(key) ?? 0) + (row.peer_count ?? 0));
+    byDay.set(row.day_start_date, day);
+    totals.set(key, (totals.get(key) ?? 0) + (row.peer_count ?? 0));
+  }
+  const days = [...byDay.keys()].sort();
+  const clients = [...totals.entries()]
+    .sort((a, b) => Number(a[0] === 'other') - Number(b[0] === 'other') || b[1] - a[1])
+    .map(([client]) => client);
+  const series: SeriesData[] = clients.map(client => ({
+    name: client === 'other' ? 'Other' : formatClientName(client),
+    data: days.map(day => {
+      const counts = byDay.get(day)!;
+      const total = [...counts.values()].reduce((sum, value) => sum + value, 0);
+      return total > 0 ? Number((((counts.get(client) ?? 0) / total) * 100).toFixed(2)) : null;
+    }),
+    color: client === 'other' ? OTHER_VERSION_COLOR : getClientColor(client),
+    stack: 'share',
+    showArea: true,
+    areaOpacity: client === 'other' ? 0.3 : 0.85,
+    lineWidth: 0,
+    showSymbol: false,
+  }));
+  return { days, labels: days.map(formatDailyDate), series };
 }

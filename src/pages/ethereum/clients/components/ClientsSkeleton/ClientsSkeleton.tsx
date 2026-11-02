@@ -22,18 +22,19 @@ function ChartCardSkeleton(): JSX.Element {
   );
 }
 
-/** Client list placeholder matching the breakdown cards */
-function BreakdownSkeleton(): JSX.Element {
+/** Layer table placeholder matching LayerClients: a row per client with two share bars */
+function LayerSkeleton(): JSX.Element {
   return (
     <Card rounded>
       <div className="flex flex-col gap-3 p-4">
         <LoadingContainer className="h-5 w-40 rounded-xs" />
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={`row-${i}`} className="flex items-center gap-3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={`row-${i}`} className="flex items-center gap-4">
             <LoadingContainer className="size-5 rounded-xs" />
             <LoadingContainer className="h-4 w-24 rounded-xs" />
             <LoadingContainer className="h-2 flex-1 rounded-xs" />
-            <LoadingContainer className="h-4 w-12 rounded-xs" />
+            <LoadingContainer className="h-2 flex-1 rounded-xs" />
+            <LoadingContainer className="h-4 w-20 rounded-xs" />
           </div>
         ))}
       </div>
@@ -42,21 +43,15 @@ function BreakdownSkeleton(): JSX.Element {
 }
 
 /**
- * Loading skeleton for the proposer clients page: stats row, two share charts and two breakdowns.
+ * Loading skeleton for the clients overview: a layer table and its two share charts.
  */
 export function ClientsSkeleton(): JSX.Element {
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <LoadingContainer key={`stat-${i}`} className="h-24 rounded-sm" />
-        ))}
-      </div>
+      <LayerSkeleton />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <ChartCardSkeleton />
         <ChartCardSkeleton />
-        <BreakdownSkeleton />
-        <BreakdownSkeleton />
       </div>
     </div>
   );

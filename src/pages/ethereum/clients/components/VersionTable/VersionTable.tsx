@@ -51,7 +51,7 @@ export function VersionTable({ client, versions, releases, latest, minVersion }:
       header: 'Released',
       accessor: row => {
         const date = findReleaseByVersion(releases, row.version)?.release_date;
-        return date ? <Timestamp timestamp={date} format="short" className="text-xs text-muted" /> : '-';
+        return date ? <Timestamp timestamp={date} format="date" className="text-xs text-muted" /> : '-';
       },
     },
     {

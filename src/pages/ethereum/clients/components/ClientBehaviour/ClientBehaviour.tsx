@@ -1,16 +1,17 @@
-import type { JSX, ReactNode } from 'react';
+import { type JSX, type ReactNode, useMemo } from 'react';
+import clsx from 'clsx';
 import { Stats } from '@/components/DataDisplay/Stats';
-import {
-  fctAttestationVoteCorrectnessByClientDailyList,
-  fctBlockProposalByClientDailyList,
-  type FctAttestationVoteCorrectnessByClientDaily,
-  type FctBlockProposalByClientDaily,
+import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
+import type {
+  FctAttestationVoteCorrectnessByClientDaily,
+  FctBlockProposalByClientDaily,
 } from '../../api/client-models';
-import { useDailyByClient } from '../../hooks/useDailyByClient';
 import type { ClientLayer } from '../../utils/client-share';
 import { UNKNOWN_CLIENT } from '../../constants';
 import { sinceSuffix } from '../../utils/client-versions';
-import { ClientMetricCompare, type ClientMetric } from '../ClientMetricCompare';
+import { ClientMetricCompare } from '../ClientMetricCompare';
+import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
+import { useAttestationRows, useProposalRows } from '../../hooks/usePerformanceRows';
 
 export interface ClientBehaviourProps {
   client: string;
@@ -23,142 +24,11 @@ export interface ClientBehaviourProps {
 
 const percent = (value: number): string => `${value.toFixed(2)}%`;
 
-/** Proposals a client was due: blocks it got in, plus orphaned blocks and missed slots attributed to it */
-const duties = (row: FctBlockProposalByClientDaily): number =>
-  (row.block_count ?? 0) + (row.orphaned_block_count ?? 0) + (row.missed_slot_count ?? 0);
-
-const PROPOSAL_METRICS: Array<ClientMetric<FctBlockProposalByClientDaily>> = [
-  {
-    id: 'mev-share',
-    label: 'MEV blocks',
-    axis: 'Share of blocks (%)',
-    numerator: row => row.mev_block_count ?? 0,
-    denominator: row => row.block_count ?? 0,
-    scale: 100,
-    format: percent,
-  },
-  {
-    id: 'mev-value',
-    label: 'MEV value per block',
-    axis: 'ETH',
-    numerator: row => (row.avg_mev_value_eth ?? 0) * (row.mev_block_count ?? 0),
-    denominator: row => (row.avg_mev_value_eth == null ? 0 : (row.mev_block_count ?? 0)),
-    format: value => `${value.toFixed(4)} ETH`,
-  },
-  {
-    id: 'blobs',
-    label: 'Blobs per block',
-    axis: 'Blobs',
-    numerator: row => row.blob_count ?? 0,
-    denominator: row => row.block_count ?? 0,
-    format: value => value.toFixed(2),
-  },
-  {
-    id: 'gas',
-    label: 'Gas per block',
-    axis: 'Mgas',
-    numerator: row => ((row.avg_gas_used ?? 0) * (row.block_count ?? 0)) / 1e6,
-    denominator: row => (row.avg_gas_used == null ? 0 : (row.block_count ?? 0)),
-    format: value => `${value.toFixed(1)} Mgas`,
-  },
-  {
-    id: 'seen-p50',
-    label: 'First seen, p50',
-    axis: 'ms',
-    numerator: row => (row.block_first_seen_p50_ms ?? 0) * (row.block_count ?? 0),
-    denominator: row => (row.block_first_seen_p50_ms == null ? 0 : (row.block_count ?? 0)),
-    format: value => `${Math.round(value).toLocaleString()} ms`,
-    lowerIsBetter: true,
-  },
-  {
-    id: 'seen-p90',
-    label: 'First seen, p90',
-    axis: 'ms',
-    numerator: row => (row.block_first_seen_p90_ms ?? 0) * (row.block_count ?? 0),
-    denominator: row => (row.block_first_seen_p90_ms == null ? 0 : (row.block_count ?? 0)),
-    format: value => `${Math.round(value).toLocaleString()} ms`,
-    lowerIsBetter: true,
-  },
-  {
-    id: 'missed',
-    label: 'Missed slots',
-    axis: 'Share of proposals (%)',
-    numerator: row => row.missed_slot_count ?? 0,
-    denominator: duties,
-    scale: 100,
-    format: percent,
-    lowerIsBetter: true,
-  },
-  {
-    id: 'orphaned',
-    label: 'Orphaned blocks',
-    axis: 'Share of proposals (%)',
-    numerator: row => row.orphaned_block_count ?? 0,
-    denominator: duties,
-    scale: 100,
-    format: percent,
-    lowerIsBetter: true,
-  },
-];
-
-const ATTESTATION_METRICS: Array<ClientMetric<FctAttestationVoteCorrectnessByClientDaily>> = [
-  {
-    id: 'attested',
-    label: 'Attested',
-    axis: 'Share of duties (%)',
-    numerator: row => row.attested_count ?? 0,
-    denominator: row => row.total_duties ?? 0,
-    scale: 100,
-    format: percent,
-  },
-  {
-    id: 'head',
-    label: 'Correct head',
-    axis: 'Share of duties (%)',
-    numerator: row => row.head_correct_count ?? 0,
-    denominator: row => row.total_duties ?? 0,
-    scale: 100,
-    format: percent,
-  },
-  {
-    id: 'target',
-    label: 'Correct target',
-    axis: 'Share of duties (%)',
-    numerator: row => row.target_correct_count ?? 0,
-    denominator: row => row.total_duties ?? 0,
-    scale: 100,
-    format: percent,
-  },
-  {
-    id: 'source',
-    label: 'Correct source',
-    axis: 'Share of duties (%)',
-    numerator: row => row.source_correct_count ?? 0,
-    denominator: row => row.total_duties ?? 0,
-    scale: 100,
-    format: percent,
-  },
-  {
-    id: 'inclusion',
-    label: 'Inclusion distance',
-    axis: 'Slots',
-    numerator: row => (row.avg_inclusion_distance ?? 0) * (row.attested_count ?? 0),
-    denominator: row => (row.avg_inclusion_distance == null ? 0 : (row.attested_count ?? 0)),
-    format: value => `${value.toFixed(3)} slots`,
-    lowerIsBetter: true,
-  },
-];
-
 /**
  * How blocks proposed with each client of a layer fared: MEV, blobs, gas, propagation, missed and orphaned slots.
  */
 export function ProposerBehaviour({ client, layer, from, windowControl }: ClientBehaviourProps): JSX.Element {
-  const { rows, dataStart, isLoading } = useDailyByClient<FctBlockProposalByClientDaily>(
-    fctBlockProposalByClientDailyList,
-    'fct_block_proposal_by_client_daily',
-    { layer_eq: layer },
-    from
-  );
+  const { rows, dataStart, isLoading } = useProposalRows(layer, from);
   return (
     <ClientMetricCompare
       client={client}
@@ -179,52 +49,145 @@ export function ProposerBehaviour({ client, layer, from, windowControl }: Client
  * Attestation duties of validators running each client of a layer: participation, vote correctness and inclusion.
  */
 export function AttestationPerformance({ client, layer, from, windowControl }: ClientBehaviourProps): JSX.Element {
-  const { rows, dataStart, isLoading } = useDailyByClient<FctAttestationVoteCorrectnessByClientDaily>(
-    fctAttestationVoteCorrectnessByClientDailyList,
-    'fct_attestation_vote_correctness_by_client_daily',
-    { layer_eq: layer },
-    from
-  );
-  const allDuties = rows.reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
+  const { rows, dataStart, isLoading } = useAttestationRows(layer, from);
   const known = rows.filter(row => row.client && row.client !== UNKNOWN_CLIENT);
-  const knownDuties = known.reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
-  const latestDay = known.reduce(
-    (day, row) => ((row.day_start_date ?? '') > day ? (row.day_start_date ?? '') : day),
-    ''
-  );
-  const validators = known
-    .filter(row => row.client === client && row.day_start_date === latestDay)
-    .reduce((sum, row) => sum + (row.validator_count ?? 0), 0);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Stats
-        gridClassName="grid grid-cols-2 gap-4"
-        stats={[
-          {
-            id: 'coverage',
-            name: 'Duties from validators with a known client',
-            value: allDuties > 0 ? percent((knownDuties / allDuties) * 100) : '-',
-          },
-          {
-            id: 'validators',
-            name: `Validators on this client, ${latestDay || 'latest day'}`,
-            value: validators.toLocaleString(),
-          },
-        ]}
-      />
-      <ClientMetricCompare
-        client={client}
-        title="Attestation performance"
-        subtitle={`Duties of validators running each ${layer} client${sinceSuffix(dataStart, from)}`}
-        rows={known}
-        metrics={ATTESTATION_METRICS}
-        countLabel="Duties"
-        count={row => row.total_duties ?? 0}
-        isLoading={isLoading}
-        actions={windowControl}
-        footer="A validator's client is the one it last named in block graffiti, within the year before. Validators that never did are left out."
-      />
-    </div>
+    <ClientMetricCompare
+      client={client}
+      title="Attestation performance"
+      subtitle={`Duties of validators running each ${layer} client${sinceSuffix(dataStart, from)}`}
+      rows={known}
+      metrics={ATTESTATION_METRICS}
+      countLabel="Duties"
+      count={row => row.total_duties ?? 0}
+      isLoading={isLoading}
+      actions={windowControl}
+      footer="A validator's client is the one it last named in block graffiti, within the year before. Validators that never did are left out."
+    />
+  );
+}
+
+/** A headline metric and how its difference from the network reads */
+interface Headline<T> {
+  metric: ClientMetric<T>;
+  /** e.g. "+0.12 pts" */
+  delta: (difference: number) => string;
+  /** Differences smaller than this read as level */
+  epsilon: number;
+  /** Neither direction is better, e.g. MEV share */
+  neutral?: boolean;
+}
+
+const sign = (value: number): string => (value >= 0 ? '+' : '−');
+const pts = (d: number): string => `${sign(d)}${Math.abs(d).toFixed(2)} pts`;
+const byId = <T,>(metrics: Array<ClientMetric<T>>, id: string): ClientMetric<T> => metrics.find(m => m.id === id)!;
+
+const PROPOSAL_HEADLINES: Array<Headline<FctBlockProposalByClientDaily>> = [
+  { metric: byId(PROPOSAL_METRICS, 'mev-share'), delta: pts, epsilon: 0.05, neutral: true },
+  { metric: byId(PROPOSAL_METRICS, 'missed'), delta: pts, epsilon: 0.01 },
+  { metric: byId(PROPOSAL_METRICS, 'orphaned'), delta: pts, epsilon: 0.01 },
+  {
+    metric: byId(PROPOSAL_METRICS, 'seen-p50'),
+    delta: d => `${sign(d)}${Math.abs(Math.round(d)).toLocaleString()} ms`,
+    epsilon: 1,
+  },
+];
+
+const ATTESTATION_HEADLINES: Array<Headline<FctAttestationVoteCorrectnessByClientDaily>> = [
+  { metric: byId(ATTESTATION_METRICS, 'attested'), delta: pts, epsilon: 0.01 },
+  { metric: byId(ATTESTATION_METRICS, 'head'), delta: pts, epsilon: 0.01 },
+  { metric: byId(ATTESTATION_METRICS, 'target'), delta: pts, epsilon: 0.01 },
+  {
+    metric: byId(ATTESTATION_METRICS, 'inclusion'),
+    delta: d => `${sign(d)}${Math.abs(d).toFixed(3)} slots`,
+    epsilon: 0.0005,
+  },
+];
+
+/** A stat for a headline metric: the client's value, and its difference from the whole layer coloured by direction */
+function headlineStat<T extends { client?: string }>(headline: Headline<T>, client: string, rows: T[]): Stat {
+  const own = ratio(
+    rows.filter(row => row.client === client),
+    headline.metric
+  );
+  const network = ratio(rows, headline.metric);
+  const difference = own !== null && network !== null ? own - network : null;
+  const better =
+    difference === null || headline.neutral || Math.abs(difference) < headline.epsilon
+      ? null
+      : headline.metric.lowerIsBetter
+        ? difference < 0
+        : difference > 0;
+  return {
+    id: headline.metric.id,
+    name: headline.metric.label,
+    value: own === null ? '-' : headline.metric.format(own),
+    subtitle:
+      difference === null ? undefined : (
+        <span className={clsx(better === true && 'text-success', better === false && 'text-danger')}>
+          {headline.delta(difference)} vs network
+        </span>
+      ),
+  };
+}
+
+/**
+ * The client's own proposal and attestation numbers over the window, each against the whole layer, with how many
+ * validators and duties the attestation figures cover.
+ */
+export function PerformanceHeadline({
+  client,
+  layer,
+  from,
+}: {
+  client: string;
+  layer: ClientLayer;
+  from?: number;
+}): JSX.Element {
+  const proposals = useProposalRows(layer, from);
+  const attestations = useAttestationRows(layer, from);
+  const stats = useMemo(() => {
+    const allDuties = attestations.rows.reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
+    const knownDuties = attestations.rows
+      .filter(row => row.client && row.client !== UNKNOWN_CLIENT)
+      .reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
+    const latestDay = attestations.rows.reduce(
+      (day, row) => ((row.day_start_date ?? '') > day ? (row.day_start_date ?? '') : day),
+      ''
+    );
+    const validators = attestations.rows
+      .filter(row => row.client === client && row.day_start_date === latestDay)
+      .reduce((sum, row) => sum + (row.validator_count ?? 0), 0);
+    return [
+      ...PROPOSAL_HEADLINES.map(headline => headlineStat(headline, client, proposals.rows)),
+      ...ATTESTATION_HEADLINES.map(headline => headlineStat(headline, client, attestations.rows)),
+      {
+        id: 'validators',
+        name: 'Validators',
+        value: validators.toLocaleString(),
+        subtitle: latestDay ? `On ${latestDay}` : undefined,
+      },
+      {
+        id: 'coverage',
+        name: 'Duties with a known client',
+        value: allDuties > 0 ? percent((knownDuties / allDuties) * 100) : '-',
+        subtitle: 'Across the layer',
+      },
+    ];
+  }, [proposals.rows, attestations.rows, client]);
+
+  const dataStart = Math.max(proposals.dataStart ?? 0, attestations.dataStart ?? 0) || undefined;
+  const since = sinceSuffix(dataStart, from).replace(', since ', '');
+
+  return (
+    <section className="flex flex-col gap-2">
+      <Stats gridClassName="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5" stats={stats} />
+      <p className="text-xs/5 text-muted">
+        {since && `Data starts ${since}. `}A validator counts under the client it last named in block graffiti within
+        the year before, which is also who missed and orphaned proposals count against. Network values cover every
+        validator of the layer.
+      </p>
+    </section>
   );
 }

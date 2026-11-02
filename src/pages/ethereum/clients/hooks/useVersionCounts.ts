@@ -4,6 +4,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import {
+  UNRESOLVED_STATUSES,
   fctBlockGraffitiClientVersionByEntityDailyList,
   fctBlockGraffitiClientVersionDailyList,
   fctBlockGraffitiClientVersionHourlyList,
@@ -26,7 +27,7 @@ export interface UseVersionCountsOptions {
   client?: string;
   layer?: ClientLayer | null;
   entity?: string;
-  /** Only unresolved rows (empty version) */
+  /** Only rows that resolve to no release */
   unresolvedOnly?: boolean;
   /** Window start (unix seconds); all history when omitted */
   from?: number;
@@ -135,7 +136,7 @@ export function useVersionCounts({
     ...(client && { client_eq: client }),
     ...(layer && { layer_eq: layer }),
     ...(entity && { entity_eq: entity }),
-    ...(unresolvedOnly && { version_eq: '' }),
+    ...(unresolvedOnly && { release_status_in_values: UNRESOLVED_STATUSES.join(',') }),
   };
 
   const result = useQueries({
