@@ -28,6 +28,8 @@ export interface PerformanceData {
   blocks: FctEngineNewPayloadBySlot[];
   /** Gas split by resource for each block in the block window */
   resourceGas: IntBlockResourceGas[];
+  /** Whether the resource gas query has returned (it starts after the block window is known) */
+  resourceGasLoaded: boolean;
   /** Per-client, per-version newPayload timings per hour over the selected range */
   perClientHourly: FctEngineNewPayloadByElClientHourly[];
   /** Chain-wide gas used per hour over the selected range */
@@ -172,6 +174,7 @@ export function usePerformanceData({
           perClientBlocks: perClientBlocks.data ?? [],
           blocks: blocks.data ?? [],
           resourceGas: resourceGas.data ?? [],
+          resourceGasLoaded: maxBlock === 0 || (!!resourceGas.data && !resourceGas.isPlaceholderData),
           gasUsedHourly: gasUsedHourly.data ?? [],
           perClientHourly: perClientHourly.data ?? [],
           blockWindowSeconds: hourlyEnd - blockStart,

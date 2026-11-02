@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Checkbox } from '@/components/Forms/Checkbox';
+import { Alert } from '@/components/Feedback/Alert';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
@@ -185,6 +186,20 @@ function PerformanceSections({
         <div className="h-24 animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border" />
         <div className="h-96 animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border" />
       </div>
+    );
+  }
+
+  if (model.clients.length === 0) {
+    return (
+      <Alert
+        variant="info"
+        title="No engine_newPayload timings in this window"
+        description={
+          referenceNodesOnly
+            ? 'This network has no reference nodes. Turn off Reference nodes only to use every node.'
+            : 'Try a longer time range.'
+        }
+      />
     );
   }
 
@@ -378,7 +393,13 @@ function PerformanceSections({
           anchorId="workload-sensitivity"
           modalSize="full"
         >
-          <WorkloadSensitivity clients={clients} avgShares={model.avgShares} />
+          {!perf?.resourceGasLoaded ? (
+            <div className="h-48 animate-pulse rounded-xs bg-background" />
+          ) : perf.resourceGas.length === 0 ? (
+            <p className="py-12 text-center text-sm text-muted">No resource gas breakdown for these blocks yet.</p>
+          ) : (
+            <WorkloadSensitivity clients={clients} avgShares={model.avgShares} />
+          )}
         </PopoutCard>
       </div>
 
