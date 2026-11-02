@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
+import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getClientColor } from '@/utils/ethereum';
@@ -12,6 +13,11 @@ export interface DiversityCardProps {
   title: string;
   /** Per-client totals for one layer */
   summaries: ClientSummary[];
+  /** What the shares count */
+  subtitle?: string;
+  /** Header of the count column */
+  countLabel?: string;
+  isLoading?: boolean;
 }
 
 /** Segments narrower than this (percentage points) are too small to label inside the bar */
@@ -33,13 +39,21 @@ function ThresholdCell({ share }: { share: number }): JSX.Element {
  * Client shares of identified blocks as one stacked bar marked at 33%, 50% and 67%, with a row per client
  * showing how far it is from the next threshold.
  */
-export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Element {
+export function DiversityCard({
+  title,
+  summaries,
+  subtitle = 'Share of blocks whose graffiti names a client',
+  countLabel = 'Blocks',
+  isLoading = false,
+}: DiversityCardProps): JSX.Element {
   const identified = summaries.filter(summary => summary.client !== UNKNOWN_CLIENT && summary.identifiedShare !== null);
 
   return (
-    <Card rounded title={title} subtitle="Share of blocks whose graffiti names a client">
-      {identified.length === 0 ? (
-        <p className="text-sm text-muted">No blocks named a client in this window.</p>
+    <Card rounded title={title} subtitle={subtitle}>
+      {isLoading ? (
+        <LoadingContainer className="h-64 rounded-sm" />
+      ) : identified.length === 0 ? (
+        <p className="text-sm text-muted">Nothing counted in this window.</p>
       ) : (
         <div className="flex flex-col gap-5">
           <div className="relative pb-5">
@@ -91,7 +105,7 @@ export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Ele
               <tr className="text-left text-xs/5 text-muted">
                 <th className="pb-1 font-normal">Client</th>
                 <th className="pb-1 text-right font-normal">Share</th>
-                <th className="pb-1 text-right font-normal">Blocks</th>
+                <th className="pb-1 text-right font-normal">{countLabel}</th>
                 <th className="pb-1 text-right font-normal">To next threshold</th>
               </tr>
             </thead>

@@ -7,12 +7,12 @@ import { Input } from '@/components/Forms/Input';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { compareVersions } from '@/utils/version';
-import { OTHER_VERSION_COLOR, summariseVersions, versionColors, type ResolvedBlock } from '../../utils/client-versions';
+import { OTHER_VERSION_COLOR, summariseVersions, versionColors, type VersionCount } from '../../utils/client-versions';
 
 export interface EntityVersionBarsProps {
   client: string;
   /** The client's blocks over the page's window */
-  blocks: ResolvedBlock[];
+  blocks: VersionCount[];
   /** Newest release, for the "behind" sort and column */
   latestVersion?: string;
   /** Version the page is about: it is drawn first in every bar and sorts entities by default */
@@ -87,13 +87,13 @@ export function EntityVersionBars({
         onLatest: 0,
         onFocus: 0,
       };
-      row.blocks++;
+      row.blocks += block.count;
       const version = block.version ?? UNRESOLVED;
-      row.counts.set(version, (row.counts.get(version) ?? 0) + 1);
+      row.counts.set(version, (row.counts.get(version) ?? 0) + block.count);
       if (block.version) {
-        row.resolved++;
-        if (latestVersion && compareVersions(block.version, latestVersion) >= 0) row.onLatest++;
-        if (block.version === focusVersion) row.onFocus++;
+        row.resolved += block.count;
+        if (latestVersion && compareVersions(block.version, latestVersion) >= 0) row.onLatest += block.count;
+        if (block.version === focusVersion) row.onFocus += block.count;
       }
       byEntity.set(block.entity, row);
     }

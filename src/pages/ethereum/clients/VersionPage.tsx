@@ -24,11 +24,10 @@ import {
   EntityVersionBars,
   ForkReadinessCard,
   NodeTable,
-  PendingSource,
   ReferenceEngine,
+  VersionNetwork,
 } from './components';
-import { useClientBlocks, useClientNodes, useClientReleases, usePeerSupport, useReferenceEngine } from './hooks';
-import { PENDING_SOURCES } from './pending';
+import { useVersionCounts, useClientNodes, useClientReleases, usePeerSupport, useReferenceEngine } from './hooks';
 import {
   adoptionByDay,
   buildMatchesRelease,
@@ -45,7 +44,9 @@ import {
   timeToAdoption,
   OTHER_VERSION_COLOR,
   type AdoptionLag,
-  type ResolvedBlock,
+  type VersionCount,
+  last24hStart,
+  windowStart,
 } from './utils/client-versions';
 import { forkRequirements } from './utils/fork-requirements';
 import type { ClientLayer } from './utils/client-share';
@@ -56,11 +57,39 @@ function percent(part: number, total: number): string {
 }
 
 /** Value and note for an adoption lag */
-function lagValue(lag: AdoptionLag | null): { value: string; note?: string } {
+function lagValue(lag: MeasuredLag | null): { value: string; note?: string } {
   if (!lag) return { value: '-' };
   if (lag.status === 'reached') return { value: formatLag(lag.seconds) };
-  if (lag.status === 'not-reached') return { value: 'Not yet' };
+  if (lag.status === 'not-reached') return { value: lag.horizonPassed ? `Over ${LAG_HORIZON_DAYS} days` : 'Not yet' };
   return { value: '-', note: 'Released before the window' };
+}
+
+/** Days after release the time to adoption is measured over */
+const LAG_HORIZON_DAYS = 60;
+/** Days before release the adoption chart starts */
+const CHART_LEAD_DAYS = 14;
+
+/** Lag with whether the measured horizon has passed, so not reaching a share reads as over it */
+type MeasuredLag = AdoptionLag & { horizonPassed?: boolean };
+
+/** Hourly counts around a release, for its time to adoption */
+function useReleaseHours(
+  client: string,
+  layer: ClientLayer | null,
+  releaseTime: number | null | undefined
+): { rows: VersionCount[]; horizonPassed: boolean } {
+  const from = releaseTime ? Math.floor(releaseTime / 3600) * 3600 - 24 * 3600 : undefined;
+  const horizon = releaseTime ? releaseTime + LAG_HORIZON_DAYS * 86400 : undefined;
+  const now = Math.floor(Date.now() / 1000 / 600) * 600;
+  const { rows } = useVersionCounts({
+    grain: 'hourly',
+    client,
+    layer,
+    from,
+    to: horizon && horizon < now ? Math.ceil(horizon / 3600) * 3600 : undefined,
+    enabled: !!releaseTime && !!layer,
+  });
+  return { rows, horizonPassed: !!horizon && horizon < now };
 }
 
 /** Blocks, entities and Xatu nodes on one version */
@@ -69,26 +98,39 @@ interface VersionFacts {
   blocks: number;
   entities: number;
   nodes: number;
-  lag50: AdoptionLag | null;
-  lag90: AdoptionLag | null;
+  lag50: MeasuredLag | null;
+  lag90: MeasuredLag | null;
 }
 
-/** Facts about one version over the loaded blocks and Xatu nodes */
+/**
+ * Facts about one version: blocks over all history, entities over the entity window, time to adoption from the
+ * hours after release, and Xatu nodes now.
+ */
 function versionFacts(
   release: DimClientRelease | undefined,
   version: string,
-  blocks: ResolvedBlock[],
+  history: VersionCount[],
+  entityRows: VersionCount[],
+  hours: { rows: VersionCount[]; horizonPassed: boolean },
   nodeVersions: string[]
 ): VersionFacts {
-  const mine = blocks.filter(block => block.version === version);
   const releaseTime = release?.release_date ?? null;
+  const lag = (threshold: number): MeasuredLag | null =>
+    releaseTime !== null && hours.rows.length > 0
+      ? { ...timeToAdoption(hours.rows, version, releaseTime, threshold), horizonPassed: hours.horizonPassed }
+      : null;
   return {
     release,
-    blocks: mine.length,
-    entities: new Set(mine.map(block => block.entity).filter(Boolean)).size,
+    blocks: history.filter(row => row.version === version).reduce((sum, row) => sum + row.count, 0),
+    entities: new Set(
+      entityRows
+        .filter(row => row.version === version)
+        .map(row => row.entity)
+        .filter(Boolean)
+    ).size,
     nodes: nodeVersions.filter(nodeVersion => nodeVersion === version).length,
-    lag50: releaseTime !== null ? timeToAdoption(blocks, version, releaseTime, 50) : null,
-    lag90: releaseTime !== null ? timeToAdoption(blocks, version, releaseTime, 90) : null,
+    lag50: lag(50),
+    lag90: lag(90),
   };
 }
 
@@ -126,12 +168,28 @@ export function VersionPage(): JSX.Element {
   const previous = release ? previousRelease(releases, release) : undefined;
   const next = release ? nextRelease(releases, release) : undefined;
 
-  const { blocks, isLoading: blocksLoading } = useClientBlocks(client, layer, VERSION_WINDOW_DAYS[window], releases);
+  const history = useVersionCounts({ grain: 'daily', client, layer, enabled: !!layer });
+  const entityCounts = useVersionCounts({
+    grain: 'entity-daily',
+    client,
+    layer,
+    from: windowStart(VERSION_WINDOW_DAYS[window]),
+    enabled: !!layer,
+  });
+  const releaseHours = useReleaseHours(client, layer, release?.release_date);
+  const previousHours = useReleaseHours(client, layer, previous?.release_date);
+  const blocksLoading = history.isLoading;
+  const recent24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart(), enabled: !!layer });
   const { nodes, isLoading: nodesLoading } = useClientNodes(client, layer);
   const peers = usePeerSupport(client, layer === 'consensus');
   const reference = useReferenceEngine(client, layer === 'execution');
 
-  const days = useMemo(() => countVersionsByDay(blocks), [blocks]);
+  // The chart starts shortly before release, or covers all history for a version without a release date
+  const chartFrom = release?.release_date ? release.release_date - CHART_LEAD_DAYS * 86400 : 0;
+  const days = useMemo(
+    () => countVersionsByDay(history.rows.filter(row => row.time + 86400 > chartFrom)),
+    [history.rows, chartFrom]
+  );
   const adoption = useMemo(() => adoptionByDay(days, version), [days, version]);
   const previousAdoption = useMemo(
     () => (previous?.version ? adoptionByDay(days, previous.version) : []),
@@ -142,12 +200,15 @@ export function VersionPage(): JSX.Element {
     [nodes, layer, releases]
   );
   const facts = useMemo(
-    () => versionFacts(release, version, blocks, nodeVersions),
-    [release, version, blocks, nodeVersions]
+    () => versionFacts(release, version, history.rows, entityCounts.rows, releaseHours, nodeVersions),
+    [release, version, history.rows, entityCounts.rows, releaseHours, nodeVersions]
   );
   const previousFacts = useMemo(
-    () => (previous?.version ? versionFacts(previous, previous.version, blocks, nodeVersions) : null),
-    [previous, blocks, nodeVersions]
+    () =>
+      previous?.version
+        ? versionFacts(previous, previous.version, history.rows, entityCounts.rows, previousHours, nodeVersions)
+        : null,
+    [previous, history.rows, entityCounts.rows, previousHours, nodeVersions]
   );
 
   const requirement = forkRequirements(currentNetwork, client).find(item => item.fork === search.fork);
@@ -298,19 +359,12 @@ export function VersionPage(): JSX.Element {
             layer={layer}
             fork={search.fork}
             requirement={requirement}
-            blocks={blocks}
+            blocks={recent24h.rows}
             nodes={nodes}
             releases={releases}
             version={version}
           />
         )}
-
-        <SegmentedControl
-          options={VERSION_WINDOW_OPTIONS}
-          value={window}
-          onChange={onWindowChange}
-          ariaLabel="Window"
-        />
 
         {loading ? (
           <LoadingContainer className="h-96 rounded-sm" />
@@ -340,8 +394,8 @@ export function VersionPage(): JSX.Element {
               ]}
             />
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-              <div className="xl:col-span-2">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
                 <PopoutCard
                   title="Adoption"
                   subtitle="Daily share of this client's blocks with a resolved version"
@@ -410,7 +464,15 @@ export function VersionPage(): JSX.Element {
 
             <EntityVersionBars
               client={client}
-              blocks={blocks}
+              blocks={entityCounts.rows}
+              windowControl={
+                <SegmentedControl
+                  options={VERSION_WINDOW_OPTIONS}
+                  value={window}
+                  onChange={onWindowChange}
+                  ariaLabel="Window"
+                />
+              }
               latestVersion={latest?.version}
               focusVersion={version}
               title="Entities running it"
@@ -443,10 +505,7 @@ export function VersionPage(): JSX.Element {
           </Card>
         )}
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-          {layer === 'consensus' && <PendingSource {...PENDING_SOURCES.nodeCensus} />}
-          <PendingSource {...PENDING_SOURCES.enrCrawl} />
-        </div>
+        <VersionNetwork client={client} layer={layer} version={version} />
       </div>
     </Container>
   );

@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import type { DimClientRelease, FctBlockGraffiti, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
+import type { DimClientRelease, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
 import {
   adoptionByDay,
   buildLine,
   compareOpcodeCosts,
   countVersionsByDay,
   findRelease,
+  groupVersionLines,
   latestRelease,
   matchReleaseVersion,
   nextThreshold,
@@ -14,12 +15,15 @@ import {
   previousRelease,
   releaseName,
   releaseUrl,
-  resolveBlocks,
+  toVersionCounts,
+  summariseVersions,
   summariseBuildLines,
   summariseUnresolved,
   timeToAdoption,
   type ClientRelease,
-  type ResolvedBlock,
+  type VersionCount,
+  type VersionDay,
+  type VersionSummary,
 } from './client-versions';
 
 const release = (version: string, releaseDate: number | null, prerelease = false, commit = ''): DimClientRelease => ({
@@ -78,29 +82,27 @@ describe('matchReleaseVersion', () => {
   });
 });
 
-describe('resolveBlocks', () => {
-  const row = (graffiti: Partial<FctBlockGraffiti>): FctBlockGraffiti => ({
-    slot: 1,
-    slot_start_date_time: 1793500000,
-    consensus_client: 'lighthouse',
-    execution_client: 'geth',
-    ...graffiti,
-  });
-
-  it('should resolve version strings and commit prefixes, leaving unknown commits unresolved', () => {
-    const resolved = resolveBlocks(
-      [
-        row({ consensus_client_version: 'v8.3.1' }),
-        row({ consensus_client_commit: 'a376' }),
-        row({ consensus_client_commit: '0000' }),
-        row({}),
-      ],
-      'consensus',
-      releases
-    );
-    expect(resolved.map(block => block.version)).toEqual(['v8.3.1', 'v8.3.2', null, null]);
-    expect(resolved[0].day).toBe('2026-11-01');
-    expect(resolved[0].partner).toBe('geth');
+describe('toVersionCounts', () => {
+  it('should keep resolved versions, including branch builds, and null unresolved ones', () => {
+    const rows = toVersionCounts([
+      { day_start_date: '2026-11-01', version: 'v8.3.2', release_status: 'commit_match', block_count: 5 },
+      { day_start_date: '2026-11-01', version: 'v8.3.2', release_status: 'commit_untagged', block_count: 2 },
+      {
+        day_start_date: '2026-11-01',
+        version: '',
+        release_status: 'commit_zero',
+        commit_prefix: '0000',
+        block_count: 9,
+      },
+      { day_start_date: '2026-11-01', version: 'v1', release_status: 'commit_match', block_count: 0 },
+    ]);
+    expect(rows.map(row => [row.version, row.status, row.count])).toEqual([
+      ['v8.3.2', 'commit_match', 5],
+      ['v8.3.2', 'commit_untagged', 2],
+      [null, 'commit_zero', 9],
+    ]);
+    expect(rows[0].time).toBe(Date.UTC(2026, 10, 1) / 1000);
+    expect(summariseVersions(rows)).toMatchObject([{ version: 'v8.3.2', blocks: 7, untaggedBlocks: 2, share: 100 }]);
   });
 });
 
@@ -112,12 +114,12 @@ describe('peerClient', () => {
   });
 });
 
-const block = (time: number, version: string | null): ResolvedBlock => ({
-  slot: 0,
+const block = (time: number, version: string | null): VersionCount => ({
   time,
   day: new Date(time * 1000).toISOString().slice(0, 10),
   version,
-  partner: 'geth',
+  status: version ? 'commit_match' : 'commit_zero',
+  count: 1,
 });
 
 describe('adoptionByDay', () => {
@@ -138,7 +140,7 @@ describe('timeToAdoption', () => {
   const releaseTime = 1_000_000 * 3600 + 600; // ten minutes past an hour
 
   // One block every 10 minutes: before release all on v8.3.0, after release every block from `switchAfter` on v8.3.1
-  const series = (hours: number, switchAfter: number): ResolvedBlock[] =>
+  const series = (hours: number, switchAfter: number): VersionCount[] =>
     Array.from({ length: hours * 6 }, (_, i) => {
       const time = releaseTime - 24 * 3600 + i * 600;
       return block(time, time >= releaseTime + switchAfter ? 'v8.3.1' : 'v8.3.0');
@@ -152,6 +154,18 @@ describe('timeToAdoption', () => {
     const most = timeToAdoption(blocks, 'v8.3.1', releaseTime, 90);
     expect(most.status).toBe('reached');
     expect(most.status === 'reached' && most.seconds).toBeGreaterThan(21 * 3600);
+  });
+
+  it('should weight hourly rows by their block count', () => {
+    const hour = Math.floor(releaseTime / 3600) * 3600;
+    // A day of 10 old blocks an hour, then 30 new blocks an hour: 50% of the trailing day is passed once
+    // new blocks outnumber the old ones still in it, after 6 hours
+    const rows: VersionCount[] = [
+      ...Array.from({ length: 24 }, (_, i) => ({ ...block(hour - (24 - i) * 3600, 'v8.3.0'), count: 10 })),
+      ...Array.from({ length: 24 }, (_, i) => ({ ...block(hour + i * 3600, 'v8.3.1'), count: 30 })),
+    ];
+    const lag = timeToAdoption(rows, 'v8.3.1', hour, 50);
+    expect(lag).toEqual({ status: 'reached', seconds: 6 * 3600 });
   });
 
   it('should report not reached when the share never gets there', () => {
@@ -276,28 +290,82 @@ describe('release columns', () => {
 });
 
 describe('summariseUnresolved', () => {
-  it('should separate graffiti without a version from commits in no release', () => {
-    const row = (graffiti: Partial<FctBlockGraffiti>): FctBlockGraffiti => ({
-      slot: 1,
-      slot_start_date_time: 1793500000,
-      consensus_client: 'lighthouse',
-      execution_client: 'geth',
-      ...graffiti,
-    });
-    const blocks = resolveBlocks(
-      [
-        row({ consensus_client_commit: '0000', entity: 'binance' }),
-        row({ consensus_client_commit: '0000', entity: 'binance' }),
-        row({ entity: 'kiln' }),
-        row({ consensus_client_commit: 'ca93', entity: 'coinbase' }),
-        row({ consensus_client_commit: 'a376', entity: 'coinbase' }),
-      ],
-      'consensus',
-      releases
-    );
-    expect(summariseUnresolved(blocks)).toEqual([
-      { reason: 'no-version', commit: undefined, blocks: 3, entities: ['binance', 'kiln'] },
-      { reason: 'unknown-commit', commit: 'ca93', blocks: 1, entities: ['coinbase'] },
+  it('should group commitless reasons alone and commits by commit, weighting by block count', () => {
+    const rows = toVersionCounts([
+      {
+        day_start_date: '2026-11-01',
+        entity: 'binance',
+        release_status: 'commit_zero',
+        commit_prefix: '0000',
+        block_count: 4,
+      },
+      {
+        day_start_date: '2026-11-02',
+        entity: 'kiln',
+        release_status: 'commit_zero',
+        commit_prefix: '00',
+        block_count: 1,
+      },
+      {
+        day_start_date: '2026-11-01',
+        entity: 'coinbase',
+        release_status: 'commit_unmatched',
+        commit_prefix: 'ca93',
+        block_count: 3,
+      },
+      {
+        day_start_date: '2026-11-01',
+        entity: 'coinbase',
+        version: 'v8.3.2',
+        release_status: 'commit_match',
+        block_count: 9,
+      },
     ]);
+    expect(summariseUnresolved(rows)).toEqual([
+      { reason: 'commit_zero', commit: undefined, blocks: 5, entities: ['binance', 'kiln'] },
+      { reason: 'commit_unmatched', commit: 'ca93', blocks: 3, entities: ['coinbase'] },
+    ]);
+  });
+});
+
+describe('groupVersionLines', () => {
+  const summary = (version: string, blocks: number): VersionSummary => ({
+    version,
+    blocks,
+    untaggedBlocks: 0,
+    share: 0,
+    lastSeen: 0,
+  });
+  const day = (counts: Record<string, number>): VersionDay => ({
+    day: '2026-01-01',
+    resolved: Object.values(counts).reduce((a, b) => a + b, 0),
+    unresolved: 0,
+    counts: new Map(Object.entries(counts)),
+  });
+
+  it('keeps releases when the largest few cover the blocks', () => {
+    const versions = [summary('v8.2.1', 90), summary('v8.2.0', 5), summary('v7.0.0', 5)];
+    const result = groupVersionLines([day({ 'v8.2.1': 90 })], versions, 2);
+    expect(result.level).toBe('patch');
+    expect(result.versions.map(v => v.version)).toEqual(['v8.2.1', 'v8.2.0', 'v7.0.0']);
+  });
+
+  it('groups into minor lines when releases are too spread out', () => {
+    const versions = [summary('v8.2.1', 30), summary('v8.2.0', 30), summary('v8.1.0', 30), summary('v7.0.0', 10)];
+    const result = groupVersionLines([day({ 'v8.2.1': 3, 'v8.2.0': 4, 'v8.1.0': 5 })], versions, 2);
+    expect(result.level).toBe('minor');
+    expect(result.versions.map(v => [v.version, v.blocks])).toEqual([
+      ['v8.2.x', 60],
+      ['v8.1.x', 30],
+      ['v7.0.x', 10],
+    ]);
+    expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 7, 'v8.1.x': 5 });
+  });
+
+  it('falls back to major lines, keeping versions it cannot parse', () => {
+    const versions = [summary('25.1.0', 25), summary('25.2.0', 25), summary('24.1.0', 25), summary('nightly', 25)];
+    const result = groupVersionLines([], versions, 2);
+    expect(result.level).toBe('major');
+    expect(result.versions.map(v => v.version).sort()).toEqual(['24.x', '25.x', 'nightly']);
   });
 });

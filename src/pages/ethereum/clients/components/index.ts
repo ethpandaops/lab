@@ -1,4 +1,7 @@
+export { AttestationPerformance, ProposerBehaviour } from './ClientBehaviour';
 export { ClientBreakdown } from './ClientBreakdown';
+export { CustodyCompliance, EnrReadiness, IpPairings, PeerCensus, VersionNetwork } from './Census';
+export { ClientMetricCompare } from './ClientMetricCompare';
 export { ClientFilter } from './ClientFilter';
 export { ClientHeader } from './ClientHeader';
 export { ClientPairs } from './ClientPairs';
@@ -12,7 +15,6 @@ export { GraffitiBlocksTable } from './GraffitiBlocksTable';
 export { NodeClientVersion } from './NodeClientVersion';
 export { NodeTable } from './NodeTable';
 export { PeerSupport } from './PeerSupport';
-export { PendingSource } from './PendingSource';
 export { ReferenceEngine } from './ReferenceEngine';
 export { ReleasesTable } from './ReleasesTable';
 export { ShareBar } from './ShareBar';

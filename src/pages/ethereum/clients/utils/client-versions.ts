@@ -1,18 +1,12 @@
 import type {
   DimClientRelease,
-  FctBlockGraffiti,
   FctEngineNewPayloadByElClientDaily,
   FctOpcodeCostByElClientVersion,
 } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
-import {
-  UNKNOWN_CLIENT,
-  findReleaseByVersion,
-  normaliseVersion,
-  resolveClientRelease,
-  type ClientRelease,
-} from '@/utils/graffiti';
+import { UNKNOWN_CLIENT, findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
+import { RESOLVED_STATUSES, type IntBlockGraffitiRelease, type ReleaseStatus } from '../api/client-models';
 
 export { releaseName, releaseUrl, type ClientRelease } from '@/utils/graffiti';
 import type { ClientLayer } from './client-share';
@@ -131,133 +125,168 @@ export function displayVersion(raw: string | undefined, releases: DimClientRelea
   return matchReleaseVersion(raw, releases)?.version ?? shortVersion(raw);
 }
 
-/**
- * Why a block's version did not resolve: its graffiti carries no version (no commit, or a zero placeholder such as
- * 0000), its commit is in no published release, or it matches several releases.
- */
-export type UnresolvedReason = 'no-version' | 'unknown-commit' | 'ambiguous';
+/** Why a block's version did not resolve, as release_status names it */
+export type UnresolvedReason = Exclude<ReleaseStatus, 'commit_match' | 'commit_untagged' | 'version_match'>;
 
-/** One proposed block with the version of the page's client resolved */
-export interface ResolvedBlock {
-  slot: number;
+/** Blocks sharing a time bucket, entity and version of the page's client */
+export interface VersionCount {
+  /** Start of the bucket (unix seconds): the block's slot time for per-block rows */
   time: number;
   /** YYYY-MM-DD (UTC) */
   day: string;
   /** Release version, or null when the graffiti did not resolve to one */
   version: string | null;
-  /** Commit prefix the graffiti carried for the client */
+  /** How the version was resolved */
+  status: string;
+  /** Client the row counts, on aggregate rows */
+  client?: string;
+  /** Layer of that client, on aggregate rows */
+  layer?: string;
+  /** Commit prefix the graffiti carried */
   commit?: string;
-  /** Set when version is null */
-  unresolved?: UnresolvedReason;
   entity?: string;
-  /** Client of the other layer */
-  partner: string;
-  /** Commit or version the partner's graffiti carried */
-  partnerDetail?: string;
+  /** Client of the other layer, on per-block rows */
+  partner?: string;
+  /** Release of the other layer's client, on per-block rows */
+  partnerVersion?: string;
+  /** Commit of the other layer's client when it names no release, on per-block rows */
+  partnerCommit?: string;
+  count: number;
+}
+
+/** What each unresolved release_status means */
+export const UNRESOLVED_LABELS: Record<string, string> = {
+  no_commit: 'No commit in graffiti',
+  commit_zero: 'Zero commit, such as 0000',
+  codes_min: 'Client codes without commits',
+  commit_short: 'Commit too short to match',
+  commit_unmatched: 'Not on any upstream branch (fork or private build)',
+  commit_ambiguous: 'Commit matches several releases',
+  version_unmatched: 'Version string matches no release',
+  none: 'No client in graffiti',
+};
+
+/** Whether a row's version builds on its release rather than being the tagged release itself */
+export function isUntagged(row: Pick<VersionCount, 'status'>): boolean {
+  return row.status === 'commit_untagged';
+}
+
+/** An aggregate row from the graffiti version tables */
+type AggregateRow = {
+  client?: string;
+  layer?: string;
+  day_start_date?: string;
+  hour_start_date_time?: number;
+  entity?: string;
+  version?: string;
+  commit_prefix?: string;
+  release_status?: string;
+  block_count?: number;
+};
+
+/**
+ * Rows of the daily or hourly graffiti version tables as {@link VersionCount}s.
+ */
+export function toVersionCounts(rows: AggregateRow[]): VersionCount[] {
+  return rows
+    .filter(row => (row.block_count ?? 0) > 0)
+    .map(row => {
+      const time =
+        row.hour_start_date_time ?? (row.day_start_date ? Date.parse(`${row.day_start_date}T00:00:00Z`) / 1000 : 0);
+      const resolved = RESOLVED_STATUSES.has(row.release_status ?? '') && !!row.version;
+      return {
+        time,
+        day: row.day_start_date ?? new Date(time * 1000).toISOString().slice(0, 10),
+        version: resolved ? row.version! : null,
+        status: row.release_status || 'none',
+        client: row.client || undefined,
+        layer: row.layer || undefined,
+        commit: row.commit_prefix || undefined,
+        entity: row.entity || undefined,
+        count: row.block_count ?? 0,
+      };
+    });
 }
 
 /**
- * Resolves the page client's release for every block from its graffiti: a version string matches by version,
- * a commit prefix by commit. Commits shared by several releases resolve by release date, else stay unresolved.
+ * Canonical blocks from int_block_graffiti_release as {@link VersionCount}s for one layer's client, with the other
+ * layer's client and release.
  */
-export function resolveBlocks(
-  rows: FctBlockGraffiti[],
-  layer: ClientLayer,
-  releases: DimClientRelease[]
-): ResolvedBlock[] {
-  const byCommit = new Map<string, ReturnType<typeof resolveClientRelease>>();
-  const byVersion = new Map<string, string | null>();
-
+export function blocksToVersionCounts(rows: IntBlockGraffitiRelease[], layer: ClientLayer): VersionCount[] {
+  const other = layer === 'consensus' ? 'execution' : 'consensus';
   return rows.map(row => {
     const time = row.slot_start_date_time ?? 0;
-    const commit = ((layer === 'consensus' ? row.consensus_client_commit : row.execution_client_commit) ?? '')
-      .trim()
-      .toLowerCase();
-    const graffitiVersion = layer === 'consensus' ? row.consensus_client_version?.trim() : undefined;
-
-    let version: string | null = null;
-    let unresolved: UnresolvedReason | undefined;
-    if (graffitiVersion) {
-      if (!byVersion.has(graffitiVersion)) {
-        byVersion.set(graffitiVersion, findReleaseByVersion(releases, graffitiVersion)?.version ?? graffitiVersion);
-      }
-      version = byVersion.get(graffitiVersion) ?? null;
-    } else if (commit && !/^0+$/.test(commit)) {
-      let resolution = byCommit.get(commit);
-      if (!resolution) {
-        resolution = resolveClientRelease(releases, commit);
-        byCommit.set(commit, resolution);
-      }
-      if (resolution.status === 'ambiguous') resolution = resolveClientRelease(releases, commit, time);
-      if (resolution.status === 'resolved') version = resolution.release.version ?? null;
-      else
-        unresolved =
-          resolution.status === 'ambiguous'
-            ? 'ambiguous'
-            : resolution.status === 'unmatched'
-              ? 'unknown-commit'
-              : 'no-version';
-    } else {
-      unresolved = 'no-version';
-    }
-
-    const partner = layer === 'consensus' ? row.execution_client : row.consensus_client;
+    const status = row[`${layer}_client_release_status`] || 'none';
+    const version = row[`${layer}_client_version`];
+    const partnerStatus = row[`${other}_client_release_status`] ?? '';
+    const partnerVersion = row[`${other}_client_version`];
+    const partnerResolved = RESOLVED_STATUSES.has(partnerStatus) && !!partnerVersion;
     return {
-      slot: row.slot ?? 0,
       time,
       day: new Date(time * 1000).toISOString().slice(0, 10),
-      version,
-      commit: commit || undefined,
-      unresolved,
+      version: RESOLVED_STATUSES.has(status) && version ? version : null,
+      status,
+      commit: row[`${layer}_client_commit`] || undefined,
       entity: row.entity || undefined,
-      partner: (partner ?? '').trim().toLowerCase() || UNKNOWN_CLIENT,
-      partnerDetail:
-        (layer === 'consensus'
-          ? row.execution_client_commit
-          : row.consensus_client_version || row.consensus_client_commit) || undefined,
+      partner: (row[`${other}_client`] ?? '').trim().toLowerCase() || UNKNOWN_CLIENT,
+      partnerVersion: partnerResolved ? partnerVersion : undefined,
+      partnerCommit: partnerResolved ? undefined : row[`${other}_client_commit`] || undefined,
+      count: 1,
     };
   });
 }
 
 /**
- * Release a partner client's graffiti detail names: a version string, or a commit prefix resolved at block time.
+ * ", since <date>" when a table's data starts after the window does, so a chart does not imply history it lacks.
  */
-export function resolveDetail(
-  detail: string | undefined,
-  releases: DimClientRelease[],
-  time?: number
-): DimClientRelease | undefined {
-  const value = (detail ?? '').trim().toLowerCase();
-  if (!value || /^0+$/.test(value)) return undefined;
-  if (/^[0-9a-f]{2,40}$/.test(value)) {
-    const resolution = resolveClientRelease(releases, value, time);
-    return resolution.status === 'resolved' ? resolution.release : undefined;
-  }
-  return findReleaseByVersion(releases, value);
+export function sinceSuffix(dataStart: number | undefined, from: number | undefined): string {
+  if (dataStart === undefined || (from !== undefined && from >= dataStart)) return '';
+  const date = new Date(dataStart * 1000).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+  return `, since ${date}`;
+}
+
+/** Start (unix seconds, UTC midnight) of a window of `days` whole days ending today */
+export function windowStart(days: number, now: number = Date.now()): number {
+  return Math.floor(now / 1000 / 86400) * 86400 - (days - 1) * 86400;
+}
+
+/** Start of the trailing 24 hours, on the hour so the query stays cached */
+export function last24hStart(now: number = Date.now()): number {
+  return Math.floor(now / 1000 / 3600) * 3600 - 24 * 3600;
 }
 
 /** Blocks per version over a window */
 export interface VersionSummary {
   version: string;
   blocks: number;
+  /** Blocks from branch builds after the release rather than the release itself */
+  untaggedBlocks: number;
   /** Share of blocks with a resolved version (0-100) */
   share: number;
-  entities: number;
   lastSeen: number;
 }
 
 /**
- * Blocks, share and entity count per resolved version, newest version first.
+ * Blocks and share per resolved version, newest version first.
  */
-export function summariseVersions(blocks: ResolvedBlock[]): VersionSummary[] {
-  const byVersion = new Map<string, { blocks: number; entities: Set<string>; lastSeen: number }>();
+export function summariseVersions(rows: VersionCount[]): VersionSummary[] {
+  const byVersion = new Map<string, { blocks: number; untaggedBlocks: number; lastSeen: number }>();
   let resolved = 0;
-  for (const block of blocks) {
+  for (const block of rows) {
     if (!block.version) continue;
-    resolved++;
-    const entry = byVersion.get(block.version) ?? { blocks: 0, entities: new Set<string>(), lastSeen: 0 };
-    entry.blocks++;
-    if (block.entity) entry.entities.add(block.entity);
+    resolved += block.count;
+    const entry = byVersion.get(block.version) ?? {
+      blocks: 0,
+      untaggedBlocks: 0,
+      lastSeen: 0,
+    };
+    entry.blocks += block.count;
+    if (isUntagged(block)) entry.untaggedBlocks += block.count;
     entry.lastSeen = Math.max(entry.lastSeen, block.time);
     byVersion.set(block.version, entry);
   }
@@ -265,8 +294,8 @@ export function summariseVersions(blocks: ResolvedBlock[]): VersionSummary[] {
     .map(([version, entry]) => ({
       version,
       blocks: entry.blocks,
+      untaggedBlocks: entry.untaggedBlocks,
       share: resolved > 0 ? (entry.blocks / resolved) * 100 : 0,
-      entities: entry.entities.size,
       lastSeen: entry.lastSeen,
     }))
     .sort((a, b) => compareVersions(b.version, a.version));
@@ -274,28 +303,28 @@ export function summariseVersions(blocks: ResolvedBlock[]): VersionSummary[] {
 
 /** Unresolved blocks sharing a reason and commit */
 export interface UnresolvedGroup {
-  reason: UnresolvedReason;
+  reason: string;
   commit?: string;
   blocks: number;
   /** Entities proposing them, most blocks first */
   entities: string[];
 }
 
+/** Statuses where the commit itself says nothing, so blocks group by reason alone */
+const COMMITLESS_REASONS = new Set(['no_commit', 'commit_zero', 'codes_min', 'none']);
+
 /**
  * Blocks whose version did not resolve, grouped by reason and commit, most blocks first.
  */
-export function summariseUnresolved(blocks: ResolvedBlock[]): UnresolvedGroup[] {
-  const groups = new Map<
-    string,
-    { reason: UnresolvedReason; commit?: string; blocks: number; entities: Map<string, number> }
-  >();
-  for (const block of blocks) {
-    if (block.version || !block.unresolved) continue;
-    const commit = block.unresolved === 'no-version' ? undefined : block.commit;
-    const key = `${block.unresolved}|${commit ?? ''}`;
-    const group = groups.get(key) ?? { reason: block.unresolved, commit, blocks: 0, entities: new Map() };
-    group.blocks++;
-    if (block.entity) group.entities.set(block.entity, (group.entities.get(block.entity) ?? 0) + 1);
+export function summariseUnresolved(rows: VersionCount[]): UnresolvedGroup[] {
+  const groups = new Map<string, { reason: string; commit?: string; blocks: number; entities: Map<string, number> }>();
+  for (const row of rows) {
+    if (row.version) continue;
+    const commit = COMMITLESS_REASONS.has(row.status) ? undefined : row.commit;
+    const key = `${row.status}|${commit ?? ''}`;
+    const group = groups.get(key) ?? { reason: row.status, commit, blocks: 0, entities: new Map() };
+    group.blocks += row.count;
+    if (row.entity) group.entities.set(row.entity, (group.entities.get(row.entity) ?? 0) + row.count);
     groups.set(key, group);
   }
   return [...groups.values()]
@@ -324,6 +353,67 @@ export function versionColors(versions: VersionSummary[], palette: readonly stri
   return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
 }
 
+/** How finely versions are drawn: each release, each minor line or each major line */
+export type VersionLevel = 'patch' | 'minor' | 'major';
+
+/** The release line a version belongs to at `level`, e.g. v8.2.1 is v8.2.x at minor; unparseable versions stay as is */
+export function versionLine(version: string, level: VersionLevel): string {
+  if (level === 'patch') return version;
+  const match = /^(v?)(\d+)\.(\d+)/.exec(version);
+  if (!match) return version;
+  return level === 'minor' ? `${match[1]}${match[2]}.${match[3]}.x` : `${match[1]}${match[2]}.x`;
+}
+
+/**
+ * Days and summaries regrouped into release lines, at the finest level whose `limit` largest lines cover `coverage`
+ * of resolved blocks, so a long window draws a few lines rather than one band of Other.
+ */
+export function groupVersionLines(
+  days: VersionDay[],
+  versions: VersionSummary[],
+  limit: number,
+  coverage = 0.9
+): { days: VersionDay[]; versions: VersionSummary[]; level: VersionLevel } {
+  const total = versions.reduce((sum, summary) => sum + summary.blocks, 0);
+  const levels: VersionLevel[] = ['patch', 'minor', 'major'];
+  for (const level of levels) {
+    const lines = new Map<string, VersionSummary>();
+    for (const summary of versions) {
+      const line = versionLine(summary.version, level);
+      const entry = lines.get(line) ?? {
+        ...summary,
+        version: line,
+        blocks: 0,
+        untaggedBlocks: 0,
+        share: 0,
+        lastSeen: 0,
+      };
+      entry.blocks += summary.blocks;
+      entry.untaggedBlocks += summary.untaggedBlocks;
+      entry.share += summary.share;
+      entry.lastSeen = Math.max(entry.lastSeen, summary.lastSeen);
+      lines.set(line, entry);
+    }
+    const covered = [...lines.values()]
+      .map(line => line.blocks)
+      .sort((a, b) => b - a)
+      .slice(0, limit)
+      .reduce((sum, blocks) => sum + blocks, 0);
+    if (level !== 'major' && total > 0 && covered / total < coverage) continue;
+    if (level === 'patch') return { days, versions, level };
+    const grouped = days.map(day => {
+      const counts = new Map<string, number>();
+      for (const [version, count] of day.counts) {
+        const line = versionLine(version, level);
+        counts.set(line, (counts.get(line) ?? 0) + count);
+      }
+      return { ...day, counts };
+    });
+    return { days: grouped, versions: [...lines.values()], level };
+  }
+  return { days, versions, level: 'patch' };
+}
+
 /** Resolved blocks per version for one UTC day */
 export interface VersionDay {
   day: string;
@@ -335,15 +425,15 @@ export interface VersionDay {
 /**
  * Version counts per UTC day, oldest first.
  */
-export function countVersionsByDay(blocks: ResolvedBlock[]): VersionDay[] {
+export function countVersionsByDay(rows: VersionCount[]): VersionDay[] {
   const days = new Map<string, VersionDay>();
-  for (const block of blocks) {
+  for (const block of rows) {
     const entry = days.get(block.day) ?? { day: block.day, resolved: 0, unresolved: 0, counts: new Map() };
     if (block.version) {
-      entry.resolved++;
-      entry.counts.set(block.version, (entry.counts.get(block.version) ?? 0) + 1);
+      entry.resolved += block.count;
+      entry.counts.set(block.version, (entry.counts.get(block.version) ?? 0) + block.count);
     } else {
-      entry.unresolved++;
+      entry.unresolved += block.count;
     }
     days.set(block.day, entry);
   }
@@ -389,10 +479,10 @@ const LAG_MIN_BLOCKS = 30;
 
 /**
  * Time from release until `threshold` (0-100) of the trailing 24 hours of resolved blocks ran the release or
- * newer, checked at every hour.
+ * newer, checked at every hour. Takes per-block or hourly rows; an hourly row counts once its hour has passed.
  */
 export function timeToAdoption(
-  blocks: ResolvedBlock[],
+  blocks: VersionCount[],
   version: string,
   releaseTime: number,
   threshold: number
@@ -405,17 +495,17 @@ export function timeToAdoption(
   let tail = 0;
   let total = 0;
   let atLeast = 0;
-  const isAtLeast = (block: ResolvedBlock): boolean => compareVersions(block.version ?? '', version) >= 0;
+  const isAtLeast = (block: VersionCount): boolean => compareVersions(block.version ?? '', version) >= 0;
 
   for (let checkpoint = Math.ceil(releaseTime / 3600) * 3600; checkpoint <= end + 3600; checkpoint += 3600) {
     while (head < resolved.length && resolved[head].time < checkpoint) {
-      total++;
-      if (isAtLeast(resolved[head])) atLeast++;
+      total += resolved[head].count;
+      if (isAtLeast(resolved[head])) atLeast += resolved[head].count;
       head++;
     }
     while (tail < head && resolved[tail].time < checkpoint - LAG_WINDOW_SECONDS) {
-      total--;
-      if (isAtLeast(resolved[tail])) atLeast--;
+      total -= resolved[tail].count;
+      if (isAtLeast(resolved[tail])) atLeast -= resolved[tail].count;
       tail++;
     }
     if (total >= LAG_MIN_BLOCKS && (atLeast / total) * 100 >= threshold) {

@@ -1,8 +1,4 @@
 import { type JSX, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { dimClientReleaseServiceList } from '@/api/sdk.gen';
-import type { DimClientRelease } from '@/api/types.gen';
-import { fetchAllPages } from '@/utils/api-pagination';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
@@ -12,16 +8,14 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { getClientColor } from '@/utils/ethereum';
 import {
   CLIENT_WINDOW_OPTIONS,
-  PAGE_SIZE,
+  VERSION_WINDOW_DAYS,
   SHARE_WINDOW_OPTIONS,
   SHARE_WINDOW_TEXT,
   UNKNOWN_CLIENT,
 } from '../../constants';
-import { resolveDetail } from '../../utils/client-versions';
-import { useClientCounts } from '../../hooks';
+import { useClientBlocks, useClientCounts } from '../../hooks';
 import { clientOf, summariseClients } from '../../utils/client-share';
-import { PENDING_SOURCES } from '../../pending';
-import { PendingSource } from '../PendingSource';
+import { IpPairings } from '../Census';
 import { ShareTable } from '../ShareTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
@@ -42,13 +36,12 @@ interface VersionPairing {
 export function PairingsTab({
   client,
   layer,
-  blocks,
-  blocksLoading,
   window,
   onWindowChange,
   shareWindow,
   onShareWindowChange,
 }: ClientTabProps): JSX.Element {
+  const { blocks, isLoading: blocksLoading } = useClientBlocks(client, layer, VERSION_WINDOW_DAYS[window]);
   const counts = useClientCounts(shareWindow);
   const otherLayer = layer === 'consensus' ? 'execution' : 'consensus';
   const partners = useMemo(
@@ -60,57 +53,29 @@ export function PairingsTab({
     [counts.records, layer, client, otherLayer]
   );
 
-  const partnerClients = useMemo(
-    () => [...new Set(blocks.map(block => block.partner))].filter(partner => partner !== UNKNOWN_CLIENT).sort(),
-    [blocks]
-  );
-  const partnerReleases = useQuery({
-    queryKey: ['client-pages', 'partner-releases', partnerClients.join(',')],
-    queryFn: ({ signal }) =>
-      fetchAllPages<DimClientRelease>(
-        dimClientReleaseServiceList,
-        { query: { client_in_values: partnerClients.join(','), page_size: PAGE_SIZE } },
-        'dim_client_release',
-        signal
-      ),
-    enabled: partnerClients.length > 0,
-    staleTime: 30 * 60 * 1000,
-  });
-
   const versionPairs = useMemo(() => {
-    const releasesByClient = new Map<string, DimClientRelease[]>();
-    for (const release of partnerReleases.data ?? []) {
-      const list = releasesByClient.get(release.client ?? '') ?? [];
-      list.push(release);
-      releasesByClient.set(release.client ?? '', list);
-    }
     const byPair = new Map<string, VersionPairing>();
     for (const block of blocks) {
       if (!block.version) continue;
-      const partnerVersion = resolveDetail(
-        block.partnerDetail,
-        releasesByClient.get(block.partner) ?? [],
-        block.time
-      )?.version;
-      const partnerCommit = partnerVersion ? undefined : block.partnerDetail;
-      const key = `${block.version}|${block.partner}|${partnerVersion ?? partnerCommit ?? ''}`;
+      const partner = block.partner ?? UNKNOWN_CLIENT;
+      const key = `${block.version}|${partner}|${block.partnerVersion ?? block.partnerCommit ?? ''}`;
       const entry = byPair.get(key) ?? {
         version: block.version,
-        partner: block.partner,
-        partnerVersion,
-        partnerCommit,
+        partner,
+        partnerVersion: block.partnerVersion,
+        partnerCommit: block.partnerCommit,
         blocks: 0,
         share: 0,
       };
-      entry.blocks++;
+      entry.blocks += block.count;
       byPair.set(key, entry);
     }
-    const total = blocks.filter(block => block.version).length;
+    const total = blocks.filter(block => block.version).reduce((sum, block) => sum + block.count, 0);
     return [...byPair.values()]
       .map(pair => ({ ...pair, share: total > 0 ? (pair.blocks / total) * 100 : 0 }))
       .sort((a, b) => b.blocks - a.blocks)
       .slice(0, 20);
-  }, [blocks, partnerReleases.data]);
+  }, [blocks]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -144,7 +109,7 @@ export function PairingsTab({
             />
           )}
         </Card>
-        <PendingSource {...PENDING_SOURCES.ipPairings} />
+        <IpPairings client={client} layer={layer} />
       </div>
 
       <Card

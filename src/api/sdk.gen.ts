@@ -15,6 +15,12 @@ import type {
   DimBlockBlobSubmitterServiceListData,
   DimBlockBlobSubmitterServiceListErrors,
   DimBlockBlobSubmitterServiceListResponses,
+  DimClientCommitServiceGetData,
+  DimClientCommitServiceGetErrors,
+  DimClientCommitServiceGetResponses,
+  DimClientCommitServiceListData,
+  DimClientCommitServiceListErrors,
+  DimClientCommitServiceListResponses,
   DimClientReleaseServiceGetData,
   DimClientReleaseServiceGetErrors,
   DimClientReleaseServiceGetResponses,
@@ -189,6 +195,12 @@ import type {
   FctAttestationRewardByValidatorWeeklyServiceListData,
   FctAttestationRewardByValidatorWeeklyServiceListErrors,
   FctAttestationRewardByValidatorWeeklyServiceListResponses,
+  FctAttestationVoteCorrectnessByClientDailyServiceGetData,
+  FctAttestationVoteCorrectnessByClientDailyServiceGetErrors,
+  FctAttestationVoteCorrectnessByClientDailyServiceGetResponses,
+  FctAttestationVoteCorrectnessByClientDailyServiceListData,
+  FctAttestationVoteCorrectnessByClientDailyServiceListErrors,
+  FctAttestationVoteCorrectnessByClientDailyServiceListResponses,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
@@ -321,6 +333,30 @@ import type {
   FctBlockGraffitiClientHourlyServiceListData,
   FctBlockGraffitiClientHourlyServiceListErrors,
   FctBlockGraffitiClientHourlyServiceListResponses,
+  FctBlockGraffitiClientVersionByEntityDailyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityDailyServiceGetErrors,
+  FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses,
+  FctBlockGraffitiClientVersionByEntityDailyServiceListData,
+  FctBlockGraffitiClientVersionByEntityDailyServiceListErrors,
+  FctBlockGraffitiClientVersionByEntityDailyServiceListResponses,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceListData,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors,
+  FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses,
+  FctBlockGraffitiClientVersionDailyServiceGetData,
+  FctBlockGraffitiClientVersionDailyServiceGetErrors,
+  FctBlockGraffitiClientVersionDailyServiceGetResponses,
+  FctBlockGraffitiClientVersionDailyServiceListData,
+  FctBlockGraffitiClientVersionDailyServiceListErrors,
+  FctBlockGraffitiClientVersionDailyServiceListResponses,
+  FctBlockGraffitiClientVersionHourlyServiceGetData,
+  FctBlockGraffitiClientVersionHourlyServiceGetErrors,
+  FctBlockGraffitiClientVersionHourlyServiceGetResponses,
+  FctBlockGraffitiClientVersionHourlyServiceListData,
+  FctBlockGraffitiClientVersionHourlyServiceListErrors,
+  FctBlockGraffitiClientVersionHourlyServiceListResponses,
   FctBlockGraffitiServiceGetData,
   FctBlockGraffitiServiceGetErrors,
   FctBlockGraffitiServiceGetResponses,
@@ -393,6 +429,12 @@ import type {
   FctBlockPayloadStatusHourlyServiceListData,
   FctBlockPayloadStatusHourlyServiceListErrors,
   FctBlockPayloadStatusHourlyServiceListResponses,
+  FctBlockProposalByClientDailyServiceGetData,
+  FctBlockProposalByClientDailyServiceGetErrors,
+  FctBlockProposalByClientDailyServiceGetResponses,
+  FctBlockProposalByClientDailyServiceListData,
+  FctBlockProposalByClientDailyServiceListErrors,
+  FctBlockProposalByClientDailyServiceListResponses,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetErrors,
   FctBlockProposalStatusDailyServiceGetResponses,
@@ -501,6 +543,12 @@ import type {
   FctContractStorageStateWithExpiryByBlockHourlyServiceListData,
   FctContractStorageStateWithExpiryByBlockHourlyServiceListErrors,
   FctContractStorageStateWithExpiryByBlockHourlyServiceListResponses,
+  FctCustodyProbeByClientDailyServiceGetData,
+  FctCustodyProbeByClientDailyServiceGetErrors,
+  FctCustodyProbeByClientDailyServiceGetResponses,
+  FctCustodyProbeByClientDailyServiceListData,
+  FctCustodyProbeByClientDailyServiceListErrors,
+  FctCustodyProbeByClientDailyServiceListResponses,
   FctDataColumnAvailabilityByEpochServiceGetData,
   FctDataColumnAvailabilityByEpochServiceGetErrors,
   FctDataColumnAvailabilityByEpochServiceGetResponses,
@@ -885,6 +933,60 @@ import type {
   FctPayloadBidHighestValueChunked50MsServiceListData,
   FctPayloadBidHighestValueChunked50MsServiceListErrors,
   FctPayloadBidHighestValueChunked50MsServiceListResponses,
+  FctPeerCountByClClientAsnDailyServiceGetData,
+  FctPeerCountByClClientAsnDailyServiceGetErrors,
+  FctPeerCountByClClientAsnDailyServiceGetResponses,
+  FctPeerCountByClClientAsnDailyServiceListData,
+  FctPeerCountByClClientAsnDailyServiceListErrors,
+  FctPeerCountByClClientAsnDailyServiceListResponses,
+  FctPeerCountByClClientCountryDailyServiceGetData,
+  FctPeerCountByClClientCountryDailyServiceGetErrors,
+  FctPeerCountByClClientCountryDailyServiceGetResponses,
+  FctPeerCountByClClientCountryDailyServiceListData,
+  FctPeerCountByClClientCountryDailyServiceListErrors,
+  FctPeerCountByClClientCountryDailyServiceListResponses,
+  FctPeerCountByClClientDailyServiceGetData,
+  FctPeerCountByClClientDailyServiceGetErrors,
+  FctPeerCountByClClientDailyServiceGetResponses,
+  FctPeerCountByClClientDailyServiceListData,
+  FctPeerCountByClClientDailyServiceListErrors,
+  FctPeerCountByClClientDailyServiceListResponses,
+  FctPeerCountByClientPairDailyServiceGetData,
+  FctPeerCountByClientPairDailyServiceGetErrors,
+  FctPeerCountByClientPairDailyServiceGetResponses,
+  FctPeerCountByClientPairDailyServiceListData,
+  FctPeerCountByClientPairDailyServiceListErrors,
+  FctPeerCountByClientPairDailyServiceListResponses,
+  FctPeerCountByElClientAsnDailyServiceGetData,
+  FctPeerCountByElClientAsnDailyServiceGetErrors,
+  FctPeerCountByElClientAsnDailyServiceGetResponses,
+  FctPeerCountByElClientAsnDailyServiceListData,
+  FctPeerCountByElClientAsnDailyServiceListErrors,
+  FctPeerCountByElClientAsnDailyServiceListResponses,
+  FctPeerCountByElClientCountryDailyServiceGetData,
+  FctPeerCountByElClientCountryDailyServiceGetErrors,
+  FctPeerCountByElClientCountryDailyServiceGetResponses,
+  FctPeerCountByElClientCountryDailyServiceListData,
+  FctPeerCountByElClientCountryDailyServiceListErrors,
+  FctPeerCountByElClientCountryDailyServiceListResponses,
+  FctPeerCountByElClientDailyServiceGetData,
+  FctPeerCountByElClientDailyServiceGetErrors,
+  FctPeerCountByElClientDailyServiceGetResponses,
+  FctPeerCountByElClientDailyServiceListData,
+  FctPeerCountByElClientDailyServiceListErrors,
+  FctPeerCountByElClientDailyServiceListResponses,
+  FctPeerForkReadinessByClClientDailyServiceGetData,
+  FctPeerForkReadinessByClClientDailyServiceGetErrors,
+  FctPeerForkReadinessByClClientDailyServiceGetResponses,
+  FctPeerForkReadinessByClClientDailyServiceListData,
+  FctPeerForkReadinessByClClientDailyServiceListErrors,
+  FctPeerForkReadinessByClClientDailyServiceListResponses,
+  FctPeerForkReadinessByElClientDailyServiceGetData,
+  FctPeerForkReadinessByElClientDailyServiceGetErrors,
+  FctPeerForkReadinessByElClientDailyServiceGetResponses,
+  FctPeerForkReadinessByElClientDailyServiceListData,
+  FctPeerForkReadinessByElClientDailyServiceListErrors,
+  FctPeerForkReadinessByElClientDailyServiceListResponses,
   FctPeerPartialMessageSupportByClientDailyServiceGetData,
   FctPeerPartialMessageSupportByClientDailyServiceGetErrors,
   FctPeerPartialMessageSupportByClientDailyServiceGetResponses,
@@ -897,6 +999,12 @@ import type {
   FctPeerPartialMessageSupportByClientHourlyServiceListData,
   FctPeerPartialMessageSupportByClientHourlyServiceListErrors,
   FctPeerPartialMessageSupportByClientHourlyServiceListResponses,
+  FctPeerProtocolByClClientDailyServiceGetData,
+  FctPeerProtocolByClClientDailyServiceGetErrors,
+  FctPeerProtocolByClClientDailyServiceGetResponses,
+  FctPeerProtocolByClClientDailyServiceListData,
+  FctPeerProtocolByClClientDailyServiceListErrors,
+  FctPeerProtocolByClClientDailyServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -1191,6 +1299,12 @@ import type {
   IntBlockCanonicalServiceListData,
   IntBlockCanonicalServiceListErrors,
   IntBlockCanonicalServiceListResponses,
+  IntBlockGraffitiReleaseServiceGetData,
+  IntBlockGraffitiReleaseServiceGetErrors,
+  IntBlockGraffitiReleaseServiceGetResponses,
+  IntBlockGraffitiReleaseServiceListData,
+  IntBlockGraffitiReleaseServiceListErrors,
+  IntBlockGraffitiReleaseServiceListResponses,
   IntBlockMevCanonicalServiceGetData,
   IntBlockMevCanonicalServiceGetErrors,
   IntBlockMevCanonicalServiceGetResponses,
@@ -1603,6 +1717,10 @@ import {
   zDimBlockBlobSubmitterServiceGetResponse,
   zDimBlockBlobSubmitterServiceListData,
   zDimBlockBlobSubmitterServiceListResponse,
+  zDimClientCommitServiceGetData,
+  zDimClientCommitServiceGetResponse,
+  zDimClientCommitServiceListData,
+  zDimClientCommitServiceListResponse,
   zDimClientReleaseServiceGetData,
   zDimClientReleaseServiceGetResponse,
   zDimClientReleaseServiceListData,
@@ -1719,6 +1837,10 @@ import {
   zFctAttestationRewardByValidatorWeeklyServiceGetResponse,
   zFctAttestationRewardByValidatorWeeklyServiceListData,
   zFctAttestationRewardByValidatorWeeklyServiceListResponse,
+  zFctAttestationVoteCorrectnessByClientDailyServiceGetData,
+  zFctAttestationVoteCorrectnessByClientDailyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByClientDailyServiceListData,
+  zFctAttestationVoteCorrectnessByClientDailyServiceListResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceListData,
@@ -1807,6 +1929,22 @@ import {
   zFctBlockGraffitiClientHourlyServiceGetResponse,
   zFctBlockGraffitiClientHourlyServiceListData,
   zFctBlockGraffitiClientHourlyServiceListResponse,
+  zFctBlockGraffitiClientVersionByEntityDailyServiceGetData,
+  zFctBlockGraffitiClientVersionByEntityDailyServiceGetResponse,
+  zFctBlockGraffitiClientVersionByEntityDailyServiceListData,
+  zFctBlockGraffitiClientVersionByEntityDailyServiceListResponse,
+  zFctBlockGraffitiClientVersionByEntityHourlyServiceGetData,
+  zFctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse,
+  zFctBlockGraffitiClientVersionByEntityHourlyServiceListData,
+  zFctBlockGraffitiClientVersionByEntityHourlyServiceListResponse,
+  zFctBlockGraffitiClientVersionDailyServiceGetData,
+  zFctBlockGraffitiClientVersionDailyServiceGetResponse,
+  zFctBlockGraffitiClientVersionDailyServiceListData,
+  zFctBlockGraffitiClientVersionDailyServiceListResponse,
+  zFctBlockGraffitiClientVersionHourlyServiceGetData,
+  zFctBlockGraffitiClientVersionHourlyServiceGetResponse,
+  zFctBlockGraffitiClientVersionHourlyServiceListData,
+  zFctBlockGraffitiClientVersionHourlyServiceListResponse,
   zFctBlockGraffitiServiceGetData,
   zFctBlockGraffitiServiceGetResponse,
   zFctBlockGraffitiServiceListData,
@@ -1855,6 +1993,10 @@ import {
   zFctBlockPayloadStatusHourlyServiceGetResponse,
   zFctBlockPayloadStatusHourlyServiceListData,
   zFctBlockPayloadStatusHourlyServiceListResponse,
+  zFctBlockProposalByClientDailyServiceGetData,
+  zFctBlockProposalByClientDailyServiceGetResponse,
+  zFctBlockProposalByClientDailyServiceListData,
+  zFctBlockProposalByClientDailyServiceListResponse,
   zFctBlockProposalStatusDailyServiceGetData,
   zFctBlockProposalStatusDailyServiceGetResponse,
   zFctBlockProposalStatusDailyServiceListData,
@@ -1927,6 +2069,10 @@ import {
   zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse,
   zFctContractStorageStateWithExpiryByBlockHourlyServiceListData,
   zFctContractStorageStateWithExpiryByBlockHourlyServiceListResponse,
+  zFctCustodyProbeByClientDailyServiceGetData,
+  zFctCustodyProbeByClientDailyServiceGetResponse,
+  zFctCustodyProbeByClientDailyServiceListData,
+  zFctCustodyProbeByClientDailyServiceListResponse,
   zFctDataColumnAvailabilityByEpochServiceGetData,
   zFctDataColumnAvailabilityByEpochServiceGetResponse,
   zFctDataColumnAvailabilityByEpochServiceListData,
@@ -2183,6 +2329,42 @@ import {
   zFctPayloadBidHighestValueChunked50MsServiceGetResponse,
   zFctPayloadBidHighestValueChunked50MsServiceListData,
   zFctPayloadBidHighestValueChunked50MsServiceListResponse,
+  zFctPeerCountByClClientAsnDailyServiceGetData,
+  zFctPeerCountByClClientAsnDailyServiceGetResponse,
+  zFctPeerCountByClClientAsnDailyServiceListData,
+  zFctPeerCountByClClientAsnDailyServiceListResponse,
+  zFctPeerCountByClClientCountryDailyServiceGetData,
+  zFctPeerCountByClClientCountryDailyServiceGetResponse,
+  zFctPeerCountByClClientCountryDailyServiceListData,
+  zFctPeerCountByClClientCountryDailyServiceListResponse,
+  zFctPeerCountByClClientDailyServiceGetData,
+  zFctPeerCountByClClientDailyServiceGetResponse,
+  zFctPeerCountByClClientDailyServiceListData,
+  zFctPeerCountByClClientDailyServiceListResponse,
+  zFctPeerCountByClientPairDailyServiceGetData,
+  zFctPeerCountByClientPairDailyServiceGetResponse,
+  zFctPeerCountByClientPairDailyServiceListData,
+  zFctPeerCountByClientPairDailyServiceListResponse,
+  zFctPeerCountByElClientAsnDailyServiceGetData,
+  zFctPeerCountByElClientAsnDailyServiceGetResponse,
+  zFctPeerCountByElClientAsnDailyServiceListData,
+  zFctPeerCountByElClientAsnDailyServiceListResponse,
+  zFctPeerCountByElClientCountryDailyServiceGetData,
+  zFctPeerCountByElClientCountryDailyServiceGetResponse,
+  zFctPeerCountByElClientCountryDailyServiceListData,
+  zFctPeerCountByElClientCountryDailyServiceListResponse,
+  zFctPeerCountByElClientDailyServiceGetData,
+  zFctPeerCountByElClientDailyServiceGetResponse,
+  zFctPeerCountByElClientDailyServiceListData,
+  zFctPeerCountByElClientDailyServiceListResponse,
+  zFctPeerForkReadinessByClClientDailyServiceGetData,
+  zFctPeerForkReadinessByClClientDailyServiceGetResponse,
+  zFctPeerForkReadinessByClClientDailyServiceListData,
+  zFctPeerForkReadinessByClClientDailyServiceListResponse,
+  zFctPeerForkReadinessByElClientDailyServiceGetData,
+  zFctPeerForkReadinessByElClientDailyServiceGetResponse,
+  zFctPeerForkReadinessByElClientDailyServiceListData,
+  zFctPeerForkReadinessByElClientDailyServiceListResponse,
   zFctPeerPartialMessageSupportByClientDailyServiceGetData,
   zFctPeerPartialMessageSupportByClientDailyServiceGetResponse,
   zFctPeerPartialMessageSupportByClientDailyServiceListData,
@@ -2191,6 +2373,10 @@ import {
   zFctPeerPartialMessageSupportByClientHourlyServiceGetResponse,
   zFctPeerPartialMessageSupportByClientHourlyServiceListData,
   zFctPeerPartialMessageSupportByClientHourlyServiceListResponse,
+  zFctPeerProtocolByClClientDailyServiceGetData,
+  zFctPeerProtocolByClClientDailyServiceGetResponse,
+  zFctPeerProtocolByClClientDailyServiceListData,
+  zFctPeerProtocolByClClientDailyServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -2387,6 +2573,10 @@ import {
   zIntBlockCanonicalServiceGetResponse,
   zIntBlockCanonicalServiceListData,
   zIntBlockCanonicalServiceListResponse,
+  zIntBlockGraffitiReleaseServiceGetData,
+  zIntBlockGraffitiReleaseServiceGetResponse,
+  zIntBlockGraffitiReleaseServiceListData,
+  zIntBlockGraffitiReleaseServiceListResponse,
   zIntBlockMevCanonicalServiceGetData,
   zIntBlockMevCanonicalServiceGetResponse,
   zIntBlockMevCanonicalServiceListData,
@@ -2747,6 +2937,36 @@ export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = f
     requestValidator: async data => await zDimBlockBlobSubmitterServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimBlockBlobSubmitterServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_block_blob_submitter/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const dimClientCommitServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimClientCommitServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<DimClientCommitServiceListResponses, DimClientCommitServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zDimClientCommitServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimClientCommitServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_client_commit',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by client
+ */
+export const dimClientCommitServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimClientCommitServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<DimClientCommitServiceGetResponses, DimClientCommitServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zDimClientCommitServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimClientCommitServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_client_commit/{client}',
     ...options,
   });
 
@@ -3831,6 +4051,46 @@ export const fctAttestationRewardByValidatorWeeklyServiceGet = <ThrowOnError ext
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctAttestationVoteCorrectnessByClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByClientDailyServiceListResponses,
+    FctAttestationVoteCorrectnessByClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByClientDailyServiceGetResponses,
+    FctAttestationVoteCorrectnessByClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctAttestationVoteCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData, ThrowOnError>
 ) =>
@@ -4743,6 +5003,162 @@ export const fctBlockGraffitiClientHourlyServiceGet = <ThrowOnError extends bool
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctBlockGraffitiClientVersionByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionByEntityDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityDailyServiceListResponses,
+    FctBlockGraffitiClientVersionByEntityDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionByEntityDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionByEntityDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses,
+    FctBlockGraffitiClientVersionByEntityDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientVersionByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionByEntityHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses,
+    FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientVersionByEntityHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionByEntityHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses,
+    FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientVersionDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionDailyServiceListResponses,
+    FctBlockGraffitiClientVersionDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionDailyServiceGetResponses,
+    FctBlockGraffitiClientVersionDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockGraffitiClientVersionHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionHourlyServiceListResponses,
+    FctBlockGraffitiClientVersionHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockGraffitiClientVersionHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionHourlyServiceGetResponses,
+    FctBlockGraffitiClientVersionHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockHeadServiceListData, ThrowOnError>
 ) =>
@@ -5122,6 +5538,44 @@ export const fctBlockPayloadStatusHourlyServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctBlockPayloadStatusHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockPayloadStatusHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_payload_status_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctBlockProposalByClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalByClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalByClientDailyServiceListResponses,
+    FctBlockProposalByClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalByClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalByClientDailyServiceGetResponses,
+    FctBlockProposalByClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_client_daily/{day_start_date}',
     ...options,
   });
 
@@ -5779,6 +6233,44 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOn
     responseValidator: async data =>
       await zFctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_contract_storage_state_with_expiry_by_block_hourly/{expiry_policy}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctCustodyProbeByClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctCustodyProbeByClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctCustodyProbeByClientDailyServiceListResponses,
+    FctCustodyProbeByClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeByClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeByClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctCustodyProbeByClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctCustodyProbeByClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctCustodyProbeByClientDailyServiceGetResponses,
+    FctCustodyProbeByClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeByClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeByClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_client_daily/{day_start_date}',
     ...options,
   });
 
@@ -8224,6 +8716,348 @@ export const fctPayloadBidHighestValueChunked50MsServiceGet = <ThrowOnError exte
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctPeerCountByClClientAsnDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByClClientAsnDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByClClientAsnDailyServiceListResponses,
+    FctPeerCountByClClientAsnDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientAsnDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientAsnDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_asn_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByClClientAsnDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByClClientAsnDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByClClientAsnDailyServiceGetResponses,
+    FctPeerCountByClClientAsnDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientAsnDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientAsnDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_asn_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByClClientCountryDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByClClientCountryDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByClClientCountryDailyServiceListResponses,
+    FctPeerCountByClClientCountryDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientCountryDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientCountryDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_country_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByClClientCountryDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByClClientCountryDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByClClientCountryDailyServiceGetResponses,
+    FctPeerCountByClClientCountryDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientCountryDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientCountryDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_country_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByClClientDailyServiceListResponses,
+    FctPeerCountByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByClClientDailyServiceGetResponses,
+    FctPeerCountByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_cl_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByClientPairDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByClientPairDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByClientPairDailyServiceListResponses,
+    FctPeerCountByClientPairDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClientPairDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClientPairDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_client_pair_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByClientPairDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByClientPairDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByClientPairDailyServiceGetResponses,
+    FctPeerCountByClientPairDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByClientPairDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByClientPairDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_client_pair_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByElClientAsnDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByElClientAsnDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByElClientAsnDailyServiceListResponses,
+    FctPeerCountByElClientAsnDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientAsnDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientAsnDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_asn_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByElClientAsnDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByElClientAsnDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByElClientAsnDailyServiceGetResponses,
+    FctPeerCountByElClientAsnDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientAsnDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientAsnDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_asn_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByElClientCountryDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByElClientCountryDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByElClientCountryDailyServiceListResponses,
+    FctPeerCountByElClientCountryDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientCountryDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientCountryDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_country_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByElClientCountryDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByElClientCountryDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByElClientCountryDailyServiceGetResponses,
+    FctPeerCountByElClientCountryDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientCountryDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientCountryDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_country_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerCountByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountByElClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountByElClientDailyServiceListResponses,
+    FctPeerCountByElClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByElClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountByElClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountByElClientDailyServiceGetResponses,
+    FctPeerCountByElClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountByElClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountByElClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_el_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerForkReadinessByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerForkReadinessByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerForkReadinessByClClientDailyServiceListResponses,
+    FctPeerForkReadinessByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerForkReadinessByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerForkReadinessByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_fork_readiness_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerForkReadinessByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerForkReadinessByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerForkReadinessByClClientDailyServiceGetResponses,
+    FctPeerForkReadinessByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerForkReadinessByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerForkReadinessByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_fork_readiness_by_cl_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerForkReadinessByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerForkReadinessByElClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerForkReadinessByElClientDailyServiceListResponses,
+    FctPeerForkReadinessByElClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerForkReadinessByElClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerForkReadinessByElClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_fork_readiness_by_el_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerForkReadinessByElClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerForkReadinessByElClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerForkReadinessByElClientDailyServiceGetResponses,
+    FctPeerForkReadinessByElClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerForkReadinessByElClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerForkReadinessByElClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_fork_readiness_by_el_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctPeerPartialMessageSupportByClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData, ThrowOnError>
 ) =>
@@ -8296,6 +9130,44 @@ export const fctPeerPartialMessageSupportByClientHourlyServiceGet = <ThrowOnErro
     responseValidator: async data =>
       await zFctPeerPartialMessageSupportByClientHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_peer_partial_message_support_by_client_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctPeerProtocolByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerProtocolByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerProtocolByClClientDailyServiceListResponses,
+    FctPeerProtocolByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerProtocolByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerProtocolByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_protocol_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerProtocolByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerProtocolByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerProtocolByClClientDailyServiceGetResponses,
+    FctPeerProtocolByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerProtocolByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerProtocolByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_protocol_by_cl_client_daily/{day_start_date}',
     ...options,
   });
 
@@ -10161,6 +11033,44 @@ export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false
       ...options,
     }
   );
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const intBlockGraffitiReleaseServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockGraffitiReleaseServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockGraffitiReleaseServiceListResponses,
+    IntBlockGraffitiReleaseServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockGraffitiReleaseServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockGraffitiReleaseServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_graffiti_release',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intBlockGraffitiReleaseServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockGraffitiReleaseServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockGraffitiReleaseServiceGetResponses,
+    IntBlockGraffitiReleaseServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockGraffitiReleaseServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockGraffitiReleaseServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_graffiti_release/{slot_start_date_time}',
+    ...options,
+  });
 
 /**
  * List records

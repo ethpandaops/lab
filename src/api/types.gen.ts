@@ -55,6 +55,49 @@ export type DimBlockBlobSubmitter = {
   versioned_hashes?: Array<string>;
 };
 
+export type DimClientCommit = {
+  /**
+   * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag
+   */
+  base_tag?: string;
+  /**
+   * Version of base_tag, as in dim_client_release
+   */
+  base_version?: string;
+  /**
+   * Client name as used by fct_block_graffiti, e.g. prysm or geth
+   */
+  client?: string;
+  /**
+   * Committer date of the commit
+   */
+  commit_date?: number;
+  /**
+   * Full commit hash
+   */
+  commit_sha?: string;
+  /**
+   * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit
+   */
+  commits_since_base?: number;
+  /**
+   * Whether a release tag of the client points at this commit
+   */
+  is_tagged?: boolean;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * GitHub repository of the commit
+   */
+  repository?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type DimClientRelease = {
   /**
    * Client name as used by fct_block_graffiti, e.g. lighthouse or geth
@@ -65,9 +108,21 @@ export type DimClientRelease = {
    */
   commit_sha?: string;
   /**
+   * GitHub release page, empty when the tag has no release
+   */
+  html_url?: string;
+  /**
+   * Whether this is the latest release of the client: the release GitHub marks as latest for the repository, else the most recently published stable release
+   */
+  is_latest?: boolean;
+  /**
    * Client layer: consensus or execution
    */
   layer?: string;
+  /**
+   * Title of the GitHub release, empty when the tag has no release
+   */
+  name?: string;
   /**
    * Whether the release is a pre-release (GitHub flag, or a pre-release suffix on the version)
    */
@@ -1410,6 +1465,57 @@ export type FctAttestationRewardByValidatorWeekly = {
    * The start of the week (Monday, UTC)
    */
   week_start_date?: string;
+};
+
+export type FctAttestationVoteCorrectnessByClientDaily = {
+  /**
+   * Attestations included on chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * Attestations missed
+   */
+  missed_count?: number;
+  /**
+   * Source votes that were correct
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Validators with attestation duties in the day mapped to this client
+   */
+  validator_count?: number;
 };
 
 export type FctAttestationVoteCorrectnessByValidator = {
@@ -2904,6 +3010,154 @@ export type FctBlockGraffitiClientHourly = {
   updated_date_time?: number;
 };
 
+export type FctBlockGraffitiClientVersionByEntityDaily = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, empty when unresolved
+   */
+  version?: string;
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourly = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, empty when unresolved
+   */
+  version?: string;
+};
+
+export type FctBlockGraffitiClientVersionDaily = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, empty when unresolved
+   */
+  version?: string;
+};
+
+export type FctBlockGraffitiClientVersionHourly = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, empty when unresolved
+   */
+  version?: string;
+};
+
 export type FctBlockHead = {
   /**
    * The root hash of the beacon block
@@ -3689,6 +3943,65 @@ export type FctBlockPayloadStatusHourly = {
   updated_date_time?: number;
 };
 
+export type FctBlockProposalByClientDaily = {
+  /**
+   * Mean blobs per canonical block
+   */
+  avg_blob_count?: number | null;
+  /**
+   * Mean execution gas used per canonical block
+   */
+  avg_gas_used?: number | null;
+  /**
+   * Mean relay-reported value of the MEV blocks in ETH, NULL when there were none
+   */
+  avg_mev_value_eth?: number | null;
+  /**
+   * Blobs in the canonical blocks
+   */
+  blob_count?: number;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * Median over blocks of the median time sentry nodes first saw the block, in ms from slot start
+   */
+  block_first_seen_p50_ms?: number | null;
+  /**
+   * 90th percentile over blocks of the median time sentry nodes first saw the block, in ms from slot start
+   */
+  block_first_seen_p90_ms?: number | null;
+  /**
+   * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * Canonical blocks delivered by an MEV relay, the rest were built locally
+   */
+  mev_block_count?: number;
+  /**
+   * Missed slots, attributed through the scheduled proposer most recent identifying graffiti
+   */
+  missed_slot_count?: number;
+  /**
+   * Orphaned blocks, attributed through the proposer most recent identifying graffiti
+   */
+  orphaned_block_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctBlockProposalStatusDaily = {
   /**
    * Start of the day period
@@ -4194,6 +4507,61 @@ export type FctContractStorageStateWithExpiryByBlockHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctCustodyProbeByClientDaily = {
+  /**
+   * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Probes that failed
+   */
+  failure_count?: number;
+  /**
+   * Probes where the peer did not return a column it should custody
+   */
+  missing_count?: number;
+  /**
+   * Peers with at least one missing probe
+   */
+  missing_peer_count?: number;
+  /**
+   * Probed peers
+   */
+  peer_count?: number;
+  /**
+   * Probes
+   */
+  probe_count?: number;
+  /**
+   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   */
+  release_status?: string;
+  /**
+   * Median response time of successful probes in ms
+   */
+  response_time_p50_ms?: number | null;
+  /**
+   * 90th percentile response time of successful probes in ms
+   */
+  response_time_p90_ms?: number | null;
+  /**
+   * Probes returning the columns
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
+   */
+  version?: string;
 };
 
 export type FctDataColumnAvailabilityByEpoch = {
@@ -8402,6 +8770,337 @@ export type FctPayloadBidHighestValueChunked50Ms = {
   value?: string;
 };
 
+export type FctPeerCountByClClientAsnDaily = {
+  /**
+   * Autonomous system number of the address, 0 for other and unknown
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Peers
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerCountByClClientCountryDaily = {
+  /**
+   * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Continent code of the address, other for buckets under 3 peers
+   */
+  continent_code?: string;
+  /**
+   * Country name, Other or Unknown
+   */
+  country?: string;
+  /**
+   * Country code of the address, other when the country has under 3 peers, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerCountByClClientDaily = {
+  /**
+   * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Median over peers of each peer longest connection age in ms
+   */
+  connection_age_p50_ms?: number | null;
+  /**
+   * Peers custodying 4 or fewer groups (the minimum)
+   */
+  custody_4_peer_count?: number;
+  /**
+   * Peers custodying 5 to 8 groups
+   */
+  custody_5_8_peer_count?: number;
+  /**
+   * Peers custodying 9 to 127 groups
+   */
+  custody_9_127_peer_count?: number;
+  /**
+   * Peers custodying all 128 groups (supernodes)
+   */
+  custody_128_peer_count?: number;
+  /**
+   * Peers whose custody group count is known from a metadata response
+   */
+  custody_known_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Median over peers of each peer median heartbeat latency in ms, NULL without heartbeats
+   */
+  latency_p50_ms?: number | null;
+  /**
+   * 90th percentile over peers of each peer median heartbeat latency in ms
+   */
+  latency_p90_ms?: number | null;
+  /**
+   * Peers
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC
+   */
+  quic_connected_peer_count?: number;
+  /**
+   * Peers advertising a QUIC listen address in identify
+   */
+  quic_listen_peer_count?: number;
+  /**
+   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
+   */
+  version?: string;
+};
+
+export type FctPeerCountByClientPairDaily = {
+  /**
+   * Addresses in the day with a consensus client
+   */
+  cl_ip_count?: number;
+  /**
+   * Consensus client at the address
+   */
+  consensus_client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Addresses in the day with an execution client
+   */
+  el_ip_count?: number;
+  /**
+   * Execution client at the address
+   */
+  execution_client?: string;
+  /**
+   * Addresses with exactly this consensus and execution client
+   */
+  ip_count?: number;
+  /**
+   * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count
+   */
+  matched_ip_count?: number;
+  /**
+   * Matched addresses with exactly one client per layer, the sum of ip_count over the day
+   */
+  paired_ip_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerCountByElClientAsnDaily = {
+  /**
+   * Autonomous system number of the address, 0 for other and unknown
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Execution client from the node devp2p name (nimbus reported as nimbusel)
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Nodes
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerCountByElClientCountryDaily = {
+  /**
+   * Execution client from the node devp2p name (nimbus reported as nimbusel)
+   */
+  client?: string;
+  /**
+   * Continent code of the address, other for buckets under 3 peers
+   */
+  continent_code?: string;
+  /**
+   * Country name, Other or Unknown
+   */
+  country?: string;
+  /**
+   * Country code of the address, other when the country has under 3 peers, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Nodes
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerCountByElClientDaily = {
+  /**
+   * Execution client from the node devp2p name (nimbus reported as nimbusel)
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Nodes
+   */
+  peer_count?: number;
+  /**
+   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
+   */
+  version?: string;
+};
+
+export type FctPeerForkReadinessByClClientDaily = {
+  /**
+   * Consensus client from the ENR client name (erigon reported as caplin)
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Current fork digest in the ENR
+   */
+  fork_digest?: string;
+  /**
+   * Next fork digest in the ENR, empty when none
+   */
+  next_fork_digest?: string;
+  /**
+   * Nodes
+   */
+  node_count?: number;
+  /**
+   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
+   */
+  version?: string;
+};
+
+export type FctPeerForkReadinessByElClientDaily = {
+  /**
+   * Execution client from the node devp2p name (nimbus reported as nimbusel)
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Fork id hash, the CRC32 of the genesis and passed forks
+   */
+  fork_id_hash?: string;
+  /**
+   * Next fork block number or timestamp, empty when none
+   */
+  fork_id_next?: string;
+  /**
+   * Nodes
+   */
+  node_count?: number;
+  /**
+   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
+   */
+  version?: string;
+};
+
 export type FctPeerPartialMessageSupportByClientDaily = {
   /**
    * Hourly distinct connected peers, averaged over the hours of the day
@@ -8478,6 +9177,33 @@ export type FctPeerPartialMessageSupportByClientHourly = {
    * Subscribed peers that support sending partial messages on a data column topic
    */
   supports_sending_partial_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type FctPeerProtocolByClClientDaily = {
+  /**
+   * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
+   */
+  client?: string;
+  /**
+   * All peers of the client in the day
+   */
+  client_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers supporting the protocol
+   */
+  peer_count?: number;
+  /**
+   * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy
+   */
+  protocol?: string;
   /**
    * Timestamp when the record was last updated
    */
@@ -10043,6 +10769,13 @@ export type GetDimBlockBlobSubmitterResponse = {
 };
 
 /**
+ * Response for getting a single dim_client_commit record
+ */
+export type GetDimClientCommitResponse = {
+  item?: DimClientCommit;
+};
+
+/**
  * Response for getting a single dim_client_release record
  */
 export type GetDimClientReleaseResponse = {
@@ -10246,6 +10979,13 @@ export type GetFctAttestationRewardByValidatorWeeklyResponse = {
 };
 
 /**
+ * Response for getting a single fct_attestation_vote_correctness_by_client_daily record
+ */
+export type GetFctAttestationVoteCorrectnessByClientDailyResponse = {
+  item?: FctAttestationVoteCorrectnessByClientDaily;
+};
+
+/**
  * Response for getting a single fct_attestation_vote_correctness_by_validator_daily record
  */
 export type GetFctAttestationVoteCorrectnessByValidatorDailyResponse = {
@@ -10400,6 +11140,34 @@ export type GetFctBlockGraffitiClientHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_client_version_by_entity_daily record
+ */
+export type GetFctBlockGraffitiClientVersionByEntityDailyResponse = {
+  item?: FctBlockGraffitiClientVersionByEntityDaily;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_version_by_entity_hourly record
+ */
+export type GetFctBlockGraffitiClientVersionByEntityHourlyResponse = {
+  item?: FctBlockGraffitiClientVersionByEntityHourly;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_version_daily record
+ */
+export type GetFctBlockGraffitiClientVersionDailyResponse = {
+  item?: FctBlockGraffitiClientVersionDaily;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_version_hourly record
+ */
+export type GetFctBlockGraffitiClientVersionHourlyResponse = {
+  item?: FctBlockGraffitiClientVersionHourly;
+};
+
+/**
  * Response for getting a single fct_block_graffiti record
  */
 export type GetFctBlockGraffitiResponse = {
@@ -10481,6 +11249,13 @@ export type GetFctBlockPayloadResponse = {
  */
 export type GetFctBlockPayloadStatusHourlyResponse = {
   item?: FctBlockPayloadStatusHourly;
+};
+
+/**
+ * Response for getting a single fct_block_proposal_by_client_daily record
+ */
+export type GetFctBlockProposalByClientDailyResponse = {
+  item?: FctBlockProposalByClientDaily;
 };
 
 /**
@@ -10607,6 +11382,13 @@ export type GetFctContractStorageStateWithExpiryByBlockDailyResponse = {
  */
 export type GetFctContractStorageStateWithExpiryByBlockHourlyResponse = {
   item?: FctContractStorageStateWithExpiryByBlockHourly;
+};
+
+/**
+ * Response for getting a single fct_custody_probe_by_client_daily record
+ */
+export type GetFctCustodyProbeByClientDailyResponse = {
+  item?: FctCustodyProbeByClientDaily;
 };
 
 /**
@@ -11058,6 +11840,69 @@ export type GetFctPayloadBidHighestValueChunked50MsResponse = {
 };
 
 /**
+ * Response for getting a single fct_peer_count_by_cl_client_asn_daily record
+ */
+export type GetFctPeerCountByClClientAsnDailyResponse = {
+  item?: FctPeerCountByClClientAsnDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_cl_client_country_daily record
+ */
+export type GetFctPeerCountByClClientCountryDailyResponse = {
+  item?: FctPeerCountByClClientCountryDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_cl_client_daily record
+ */
+export type GetFctPeerCountByClClientDailyResponse = {
+  item?: FctPeerCountByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_client_pair_daily record
+ */
+export type GetFctPeerCountByClientPairDailyResponse = {
+  item?: FctPeerCountByClientPairDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_el_client_asn_daily record
+ */
+export type GetFctPeerCountByElClientAsnDailyResponse = {
+  item?: FctPeerCountByElClientAsnDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_el_client_country_daily record
+ */
+export type GetFctPeerCountByElClientCountryDailyResponse = {
+  item?: FctPeerCountByElClientCountryDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_el_client_daily record
+ */
+export type GetFctPeerCountByElClientDailyResponse = {
+  item?: FctPeerCountByElClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_fork_readiness_by_cl_client_daily record
+ */
+export type GetFctPeerForkReadinessByClClientDailyResponse = {
+  item?: FctPeerForkReadinessByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_fork_readiness_by_el_client_daily record
+ */
+export type GetFctPeerForkReadinessByElClientDailyResponse = {
+  item?: FctPeerForkReadinessByElClientDaily;
+};
+
+/**
  * Response for getting a single fct_peer_partial_message_support_by_client_daily record
  */
 export type GetFctPeerPartialMessageSupportByClientDailyResponse = {
@@ -11069,6 +11914,13 @@ export type GetFctPeerPartialMessageSupportByClientDailyResponse = {
  */
 export type GetFctPeerPartialMessageSupportByClientHourlyResponse = {
   item?: FctPeerPartialMessageSupportByClientHourly;
+};
+
+/**
+ * Response for getting a single fct_peer_protocol_by_cl_client_daily record
+ */
+export type GetFctPeerProtocolByClClientDailyResponse = {
+  item?: FctPeerProtocolByClClientDaily;
 };
 
 /**
@@ -11412,6 +12264,13 @@ export type GetIntBlockBlobCountCanonicalResponse = {
  */
 export type GetIntBlockCanonicalResponse = {
   item?: IntBlockCanonical;
+};
+
+/**
+ * Response for getting a single int_block_graffiti_release record
+ */
+export type GetIntBlockGraffitiReleaseResponse = {
+  item?: IntBlockGraffitiRelease;
 };
 
 /**
@@ -12455,6 +13314,77 @@ export type IntBlockCanonical = {
    * The root hash of the beacon state at this block
    */
   state_root?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+export type IntBlockGraffitiRelease = {
+  /**
+   * The root of the canonical beacon block
+   */
+  block_root?: string;
+  /**
+   * Consensus client named by the graffiti, e.g. lighthouse, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Consensus client commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  consensus_client_commit?: string;
+  /**
+   * How the consensus client version was resolved, see the table comment for values
+   */
+  consensus_client_release_status?: string;
+  /**
+   * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved
+   */
+  consensus_client_version?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Execution client named by the graffiti, e.g. geth, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Execution client commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  execution_client_commit?: string;
+  /**
+   * How the execution client version was resolved, see the table comment for values
+   */
+  execution_client_release_status?: string;
+  /**
+   * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved
+   */
+  execution_client_version?: string;
+  /**
+   * Graffiti format from fct_block_graffiti that identified the clients
+   */
+  graffiti_format?: string;
+  /**
+   * The validator index of the block proposer
+   */
+  proposer_index?: number;
+  /**
+   * The slot number of the block
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -15319,6 +16249,20 @@ export type ListDimBlockBlobSubmitterResponse = {
 };
 
 /**
+ * Response for listing dim_client_commit records
+ */
+export type ListDimClientCommitResponse = {
+  /**
+   * The list of dim_client_commit.
+   */
+  dim_client_commit?: Array<DimClientCommit>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing dim_client_release records
  */
 export type ListDimClientReleaseResponse = {
@@ -15725,6 +16669,20 @@ export type ListFctAttestationRewardByValidatorWeeklyResponse = {
 };
 
 /**
+ * Response for listing fct_attestation_vote_correctness_by_client_daily records
+ */
+export type ListFctAttestationVoteCorrectnessByClientDailyResponse = {
+  /**
+   * The list of fct_attestation_vote_correctness_by_client_daily.
+   */
+  fct_attestation_vote_correctness_by_client_daily?: Array<FctAttestationVoteCorrectnessByClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_attestation_vote_correctness_by_validator_daily records
  */
 export type ListFctAttestationVoteCorrectnessByValidatorDailyResponse = {
@@ -16033,6 +16991,62 @@ export type ListFctBlockGraffitiClientHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_client_version_by_entity_daily records
+ */
+export type ListFctBlockGraffitiClientVersionByEntityDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_by_entity_daily.
+   */
+  fct_block_graffiti_client_version_by_entity_daily?: Array<FctBlockGraffitiClientVersionByEntityDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_version_by_entity_hourly records
+ */
+export type ListFctBlockGraffitiClientVersionByEntityHourlyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_by_entity_hourly.
+   */
+  fct_block_graffiti_client_version_by_entity_hourly?: Array<FctBlockGraffitiClientVersionByEntityHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_version_daily records
+ */
+export type ListFctBlockGraffitiClientVersionDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_daily.
+   */
+  fct_block_graffiti_client_version_daily?: Array<FctBlockGraffitiClientVersionDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_version_hourly records
+ */
+export type ListFctBlockGraffitiClientVersionHourlyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_hourly.
+   */
+  fct_block_graffiti_client_version_hourly?: Array<FctBlockGraffitiClientVersionHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti records
  */
 export type ListFctBlockGraffitiResponse = {
@@ -16194,6 +17208,20 @@ export type ListFctBlockPayloadStatusHourlyResponse = {
    * The list of fct_block_payload_status_hourly.
    */
   fct_block_payload_status_hourly?: Array<FctBlockPayloadStatusHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposal_by_client_daily records
+ */
+export type ListFctBlockProposalByClientDailyResponse = {
+  /**
+   * The list of fct_block_proposal_by_client_daily.
+   */
+  fct_block_proposal_by_client_daily?: Array<FctBlockProposalByClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -16446,6 +17474,20 @@ export type ListFctContractStorageStateWithExpiryByBlockHourlyResponse = {
    * The list of fct_contract_storage_state_with_expiry_by_block_hourly.
    */
   fct_contract_storage_state_with_expiry_by_block_hourly?: Array<FctContractStorageStateWithExpiryByBlockHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_custody_probe_by_client_daily records
+ */
+export type ListFctCustodyProbeByClientDailyResponse = {
+  /**
+   * The list of fct_custody_probe_by_client_daily.
+   */
+  fct_custody_probe_by_client_daily?: Array<FctCustodyProbeByClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -17349,6 +18391,132 @@ export type ListFctPayloadBidHighestValueChunked50MsResponse = {
 };
 
 /**
+ * Response for listing fct_peer_count_by_cl_client_asn_daily records
+ */
+export type ListFctPeerCountByClClientAsnDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_cl_client_asn_daily.
+   */
+  fct_peer_count_by_cl_client_asn_daily?: Array<FctPeerCountByClClientAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_cl_client_country_daily records
+ */
+export type ListFctPeerCountByClClientCountryDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_cl_client_country_daily.
+   */
+  fct_peer_count_by_cl_client_country_daily?: Array<FctPeerCountByClClientCountryDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_cl_client_daily records
+ */
+export type ListFctPeerCountByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_cl_client_daily.
+   */
+  fct_peer_count_by_cl_client_daily?: Array<FctPeerCountByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_client_pair_daily records
+ */
+export type ListFctPeerCountByClientPairDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_client_pair_daily.
+   */
+  fct_peer_count_by_client_pair_daily?: Array<FctPeerCountByClientPairDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_el_client_asn_daily records
+ */
+export type ListFctPeerCountByElClientAsnDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_el_client_asn_daily.
+   */
+  fct_peer_count_by_el_client_asn_daily?: Array<FctPeerCountByElClientAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_el_client_country_daily records
+ */
+export type ListFctPeerCountByElClientCountryDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_el_client_country_daily.
+   */
+  fct_peer_count_by_el_client_country_daily?: Array<FctPeerCountByElClientCountryDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_el_client_daily records
+ */
+export type ListFctPeerCountByElClientDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_el_client_daily.
+   */
+  fct_peer_count_by_el_client_daily?: Array<FctPeerCountByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_fork_readiness_by_cl_client_daily records
+ */
+export type ListFctPeerForkReadinessByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_fork_readiness_by_cl_client_daily.
+   */
+  fct_peer_fork_readiness_by_cl_client_daily?: Array<FctPeerForkReadinessByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_fork_readiness_by_el_client_daily records
+ */
+export type ListFctPeerForkReadinessByElClientDailyResponse = {
+  /**
+   * The list of fct_peer_fork_readiness_by_el_client_daily.
+   */
+  fct_peer_fork_readiness_by_el_client_daily?: Array<FctPeerForkReadinessByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_peer_partial_message_support_by_client_daily records
  */
 export type ListFctPeerPartialMessageSupportByClientDailyResponse = {
@@ -17370,6 +18538,20 @@ export type ListFctPeerPartialMessageSupportByClientHourlyResponse = {
    * The list of fct_peer_partial_message_support_by_client_hourly.
    */
   fct_peer_partial_message_support_by_client_hourly?: Array<FctPeerPartialMessageSupportByClientHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_protocol_by_cl_client_daily records
+ */
+export type ListFctPeerProtocolByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_protocol_by_cl_client_daily.
+   */
+  fct_peer_protocol_by_cl_client_daily?: Array<FctPeerProtocolByClClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18056,6 +19238,20 @@ export type ListIntBlockCanonicalResponse = {
    * The list of int_block_canonical.
    */
   int_block_canonical?: Array<IntBlockCanonical>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_graffiti_release records
+ */
+export type ListIntBlockGraffitiReleaseResponse = {
+  /**
+   * The list of int_block_graffiti_release.
+   */
+  int_block_graffiti_release?: Array<IntBlockGraffitiRelease>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -19614,6 +20810,420 @@ export type DimBlockBlobSubmitterServiceGetResponses = {
 export type DimBlockBlobSubmitterServiceGetResponse =
   DimBlockBlobSubmitterServiceGetResponses[keyof DimBlockBlobSubmitterServiceGetResponses];
 
+export type DimClientCommitServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Full commit hash (filter: eq)
+     */
+    commit_sha_eq?: string;
+    /**
+     * Full commit hash (filter: ne)
+     */
+    commit_sha_ne?: string;
+    /**
+     * Full commit hash (filter: contains)
+     */
+    commit_sha_contains?: string;
+    /**
+     * Full commit hash (filter: starts_with)
+     */
+    commit_sha_starts_with?: string;
+    /**
+     * Full commit hash (filter: ends_with)
+     */
+    commit_sha_ends_with?: string;
+    /**
+     * Full commit hash (filter: like)
+     */
+    commit_sha_like?: string;
+    /**
+     * Full commit hash (filter: not_like)
+     */
+    commit_sha_not_like?: string;
+    /**
+     * Full commit hash (filter: in_values) (comma-separated list)
+     */
+    commit_sha_in_values?: string;
+    /**
+     * Full commit hash (filter: not_in_values) (comma-separated list)
+     */
+    commit_sha_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * GitHub repository of the commit (filter: eq)
+     */
+    repository_eq?: string;
+    /**
+     * GitHub repository of the commit (filter: ne)
+     */
+    repository_ne?: string;
+    /**
+     * GitHub repository of the commit (filter: contains)
+     */
+    repository_contains?: string;
+    /**
+     * GitHub repository of the commit (filter: starts_with)
+     */
+    repository_starts_with?: string;
+    /**
+     * GitHub repository of the commit (filter: ends_with)
+     */
+    repository_ends_with?: string;
+    /**
+     * GitHub repository of the commit (filter: like)
+     */
+    repository_like?: string;
+    /**
+     * GitHub repository of the commit (filter: not_like)
+     */
+    repository_not_like?: string;
+    /**
+     * GitHub repository of the commit (filter: in_values) (comma-separated list)
+     */
+    repository_in_values?: string;
+    /**
+     * GitHub repository of the commit (filter: not_in_values) (comma-separated list)
+     */
+    repository_not_in_values?: string;
+    /**
+     * Committer date of the commit (filter: eq)
+     */
+    commit_date_eq?: number;
+    /**
+     * Committer date of the commit (filter: ne)
+     */
+    commit_date_ne?: number;
+    /**
+     * Committer date of the commit (filter: lt)
+     */
+    commit_date_lt?: number;
+    /**
+     * Committer date of the commit (filter: lte)
+     */
+    commit_date_lte?: number;
+    /**
+     * Committer date of the commit (filter: gt)
+     */
+    commit_date_gt?: number;
+    /**
+     * Committer date of the commit (filter: gte)
+     */
+    commit_date_gte?: number;
+    /**
+     * Committer date of the commit (filter: between_min)
+     */
+    commit_date_between_min?: number;
+    /**
+     * Committer date of the commit (filter: between_max_value)
+     */
+    commit_date_between_max_value?: number;
+    /**
+     * Committer date of the commit (filter: in_values) (comma-separated list)
+     */
+    commit_date_in_values?: string;
+    /**
+     * Committer date of the commit (filter: not_in_values) (comma-separated list)
+     */
+    commit_date_not_in_values?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: eq)
+     */
+    base_tag_eq?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: ne)
+     */
+    base_tag_ne?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: contains)
+     */
+    base_tag_contains?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: starts_with)
+     */
+    base_tag_starts_with?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: ends_with)
+     */
+    base_tag_ends_with?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: like)
+     */
+    base_tag_like?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: not_like)
+     */
+    base_tag_not_like?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: in_values) (comma-separated list)
+     */
+    base_tag_in_values?: string;
+    /**
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: not_in_values) (comma-separated list)
+     */
+    base_tag_not_in_values?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: eq)
+     */
+    base_version_eq?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: ne)
+     */
+    base_version_ne?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: contains)
+     */
+    base_version_contains?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: starts_with)
+     */
+    base_version_starts_with?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: ends_with)
+     */
+    base_version_ends_with?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: like)
+     */
+    base_version_like?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: not_like)
+     */
+    base_version_not_like?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: in_values) (comma-separated list)
+     */
+    base_version_in_values?: string;
+    /**
+     * Version of base_tag, as in dim_client_release (filter: not_in_values) (comma-separated list)
+     */
+    base_version_not_in_values?: string;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: eq)
+     */
+    commits_since_base_eq?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: ne)
+     */
+    commits_since_base_ne?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: lt)
+     */
+    commits_since_base_lt?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: lte)
+     */
+    commits_since_base_lte?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: gt)
+     */
+    commits_since_base_gt?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: gte)
+     */
+    commits_since_base_gte?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: between_min)
+     */
+    commits_since_base_between_min?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: between_max_value)
+     */
+    commits_since_base_between_max_value?: number;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: in_values) (comma-separated list)
+     */
+    commits_since_base_in_values?: string;
+    /**
+     * Parent steps along the shortest path from the commit to base_tag, 0 for a tagged commit (filter: not_in_values) (comma-separated list)
+     */
+    commits_since_base_not_in_values?: string;
+    /**
+     * Whether a release tag of the client points at this commit (filter: eq)
+     */
+    is_tagged_eq?: boolean;
+    /**
+     * Whether a release tag of the client points at this commit (filter: ne)
+     */
+    is_tagged_ne?: boolean;
+    /**
+     * The maximum number of dim_client_commit to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimClientCommit` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_client_commit';
+};
+
+export type DimClientCommitServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimClientCommitServiceListError = DimClientCommitServiceListErrors[keyof DimClientCommitServiceListErrors];
+
+export type DimClientCommitServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimClientCommitResponse;
+};
+
+export type DimClientCommitServiceListResponse =
+  DimClientCommitServiceListResponses[keyof DimClientCommitServiceListResponses];
+
+export type DimClientCommitServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Client name as used by fct_block_graffiti, e.g. prysm or geth
+     */
+    client: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_client_commit/{client}';
+};
+
+export type DimClientCommitServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimClientCommitServiceGetError = DimClientCommitServiceGetErrors[keyof DimClientCommitServiceGetErrors];
+
+export type DimClientCommitServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimClientCommitResponse;
+};
+
+export type DimClientCommitServiceGetResponse =
+  DimClientCommitServiceGetResponses[keyof DimClientCommitServiceGetResponses];
+
 export type DimClientReleaseServiceListData = {
   body?: never;
   path?: never;
@@ -19922,6 +21532,86 @@ export type DimClientReleaseServiceListData = {
      * GitHub repository the release tags come from, e.g. sigp/lighthouse (filter: not_in_values) (comma-separated list)
      */
     repository_not_in_values?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: eq)
+     */
+    name_eq?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: ne)
+     */
+    name_ne?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: contains)
+     */
+    name_contains?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: starts_with)
+     */
+    name_starts_with?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: ends_with)
+     */
+    name_ends_with?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: like)
+     */
+    name_like?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: not_like)
+     */
+    name_not_like?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: in_values) (comma-separated list)
+     */
+    name_in_values?: string;
+    /**
+     * Title of the GitHub release, empty when the tag has no release (filter: not_in_values) (comma-separated list)
+     */
+    name_not_in_values?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: eq)
+     */
+    html_url_eq?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: ne)
+     */
+    html_url_ne?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: contains)
+     */
+    html_url_contains?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: starts_with)
+     */
+    html_url_starts_with?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: ends_with)
+     */
+    html_url_ends_with?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: like)
+     */
+    html_url_like?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: not_like)
+     */
+    html_url_not_like?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: in_values) (comma-separated list)
+     */
+    html_url_in_values?: string;
+    /**
+     * GitHub release page, empty when the tag has no release (filter: not_in_values) (comma-separated list)
+     */
+    html_url_not_in_values?: string;
+    /**
+     * Whether this is the latest release of the client: the release GitHub marks as latest for the repository, else the most recently published stable release (filter: eq)
+     */
+    is_latest_eq?: boolean;
+    /**
+     * Whether this is the latest release of the client: the release GitHub marks as latest for the repository, else the most recently published stable release (filter: ne)
+     */
+    is_latest_ne?: boolean;
     /**
      * The maximum number of dim_client_release to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -32362,6 +34052,510 @@ export type FctAttestationRewardByValidatorWeeklyServiceGetResponses = {
 
 export type FctAttestationRewardByValidatorWeeklyServiceGetResponse =
   FctAttestationRewardByValidatorWeeklyServiceGetResponses[keyof FctAttestationRewardByValidatorWeeklyServiceGetResponses];
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client of the validator most recent identifying graffiti in the 365 days before the end of the day, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * The maximum number of fct_attestation_vote_correctness_by_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteCorrectnessByClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_correctness_by_client_daily';
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceListError =
+  FctAttestationVoteCorrectnessByClientDailyServiceListErrors[keyof FctAttestationVoteCorrectnessByClientDailyServiceListErrors];
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteCorrectnessByClientDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceListResponse =
+  FctAttestationVoteCorrectnessByClientDailyServiceListResponses[keyof FctAttestationVoteCorrectnessByClientDailyServiceListResponses];
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_correctness_by_client_daily/{day_start_date}';
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceGetError =
+  FctAttestationVoteCorrectnessByClientDailyServiceGetErrors[keyof FctAttestationVoteCorrectnessByClientDailyServiceGetErrors];
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteCorrectnessByClientDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByClientDailyServiceGetResponse =
+  FctAttestationVoteCorrectnessByClientDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByClientDailyServiceGetResponses];
 
 export type FctAttestationVoteCorrectnessByValidatorServiceListData = {
   body?: never;
@@ -46557,6 +48751,1558 @@ export type FctBlockGraffitiClientHourlyServiceGetResponses = {
 export type FctBlockGraffitiClientHourlyServiceGetResponse =
   FctBlockGraffitiClientHourlyServiceGetResponses[keyof FctBlockGraffitiClientHourlyServiceGetResponses];
 
+export type FctBlockGraffitiClientVersionByEntityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_by_entity_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionByEntityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_daily';
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceListError =
+  FctBlockGraffitiClientVersionByEntityDailyServiceListErrors[keyof FctBlockGraffitiClientVersionByEntityDailyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionByEntityDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceListResponse =
+  FctBlockGraffitiClientVersionByEntityDailyServiceListResponses[keyof FctBlockGraffitiClientVersionByEntityDailyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceGetError =
+  FctBlockGraffitiClientVersionByEntityDailyServiceGetErrors[keyof FctBlockGraffitiClientVersionByEntityDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionByEntityDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityDailyServiceGetResponse =
+  FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses];
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_by_entity_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionByEntityHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_hourly';
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceListError =
+  FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors[keyof FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionByEntityHourlyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceListResponse =
+  FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses[keyof FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetError =
+  FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors[keyof FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionByEntityHourlyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse =
+  FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses];
+
+export type FctBlockGraffitiClientVersionDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_daily';
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceListError =
+  FctBlockGraffitiClientVersionDailyServiceListErrors[keyof FctBlockGraffitiClientVersionDailyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceListResponse =
+  FctBlockGraffitiClientVersionDailyServiceListResponses[keyof FctBlockGraffitiClientVersionDailyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceGetError =
+  FctBlockGraffitiClientVersionDailyServiceGetErrors[keyof FctBlockGraffitiClientVersionDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionDailyServiceGetResponse =
+  FctBlockGraffitiClientVersionDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionDailyServiceGetResponses];
+
+export type FctBlockGraffitiClientVersionHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_hourly';
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceListError =
+  FctBlockGraffitiClientVersionHourlyServiceListErrors[keyof FctBlockGraffitiClientVersionHourlyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionHourlyResponse;
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceListResponse =
+  FctBlockGraffitiClientVersionHourlyServiceListResponses[keyof FctBlockGraffitiClientVersionHourlyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceGetError =
+  FctBlockGraffitiClientVersionHourlyServiceGetErrors[keyof FctBlockGraffitiClientVersionHourlyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionHourlyResponse;
+};
+
+export type FctBlockGraffitiClientVersionHourlyServiceGetResponse =
+  FctBlockGraffitiClientVersionHourlyServiceGetResponses[keyof FctBlockGraffitiClientVersionHourlyServiceGetResponses];
+
 export type FctBlockHeadServiceListData = {
   body?: never;
   path?: never;
@@ -54389,6 +58135,446 @@ export type FctBlockPayloadStatusHourlyServiceGetResponses = {
 export type FctBlockPayloadStatusHourlyServiceGetResponse =
   FctBlockPayloadStatusHourlyServiceGetResponses[keyof FctBlockPayloadStatusHourlyServiceGetResponses];
 
+export type FctBlockProposalByClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Proposer client from the block graffiti, or for orphaned blocks and missed slots from the proposer most recent identifying graffiti, else unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: eq)
+     */
+    mev_block_count_eq?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: ne)
+     */
+    mev_block_count_ne?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lt)
+     */
+    mev_block_count_lt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lte)
+     */
+    mev_block_count_lte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gt)
+     */
+    mev_block_count_gt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gte)
+     */
+    mev_block_count_gte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_min)
+     */
+    mev_block_count_between_min?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_max_value)
+     */
+    mev_block_count_between_max_value?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: in_values) (comma-separated list)
+     */
+    mev_block_count_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: not_in_values) (comma-separated list)
+     */
+    mev_block_count_not_in_values?: string;
+    /**
+     * Filter avg_mev_value_eth using value
+     */
+    avg_mev_value_eth_value?: number;
+    /**
+     * Filter avg_gas_used using value
+     */
+    avg_gas_used_value?: number;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * Blobs in the canonical blocks (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Blobs in the canonical blocks (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Blobs in the canonical blocks (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Blobs in the canonical blocks (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Blobs in the canonical blocks (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Blobs in the canonical blocks (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Blobs in the canonical blocks (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Blobs in the canonical blocks (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Blobs in the canonical blocks (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Blobs in the canonical blocks (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Filter block_first_seen_p50_ms using value
+     */
+    block_first_seen_p50_ms_value?: number;
+    /**
+     * Filter block_first_seen_p90_ms using value
+     */
+    block_first_seen_p90_ms_value?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: eq)
+     */
+    orphaned_block_count_eq?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: ne)
+     */
+    orphaned_block_count_ne?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: lt)
+     */
+    orphaned_block_count_lt?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: lte)
+     */
+    orphaned_block_count_lte?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: gt)
+     */
+    orphaned_block_count_gt?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: gte)
+     */
+    orphaned_block_count_gte?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: between_min)
+     */
+    orphaned_block_count_between_min?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: between_max_value)
+     */
+    orphaned_block_count_between_max_value?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: in_values) (comma-separated list)
+     */
+    orphaned_block_count_in_values?: string;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_block_count_not_in_values?: string;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposal_by_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposalByClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposal_by_client_daily';
+};
+
+export type FctBlockProposalByClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByClientDailyServiceListError =
+  FctBlockProposalByClientDailyServiceListErrors[keyof FctBlockProposalByClientDailyServiceListErrors];
+
+export type FctBlockProposalByClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposalByClientDailyResponse;
+};
+
+export type FctBlockProposalByClientDailyServiceListResponse =
+  FctBlockProposalByClientDailyServiceListResponses[keyof FctBlockProposalByClientDailyServiceListResponses];
+
+export type FctBlockProposalByClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposal_by_client_daily/{day_start_date}';
+};
+
+export type FctBlockProposalByClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByClientDailyServiceGetError =
+  FctBlockProposalByClientDailyServiceGetErrors[keyof FctBlockProposalByClientDailyServiceGetErrors];
+
+export type FctBlockProposalByClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposalByClientDailyResponse;
+};
+
+export type FctBlockProposalByClientDailyServiceGetResponse =
+  FctBlockProposalByClientDailyServiceGetResponses[keyof FctBlockProposalByClientDailyServiceGetResponses];
+
 export type FctBlockProposalStatusDailyServiceListData = {
   body?: never;
   path?: never;
@@ -60063,6 +64249,510 @@ export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses = 
 
 export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse =
   FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses];
+
+export type FctCustodyProbeByClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Probed peers (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Probed peers (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Probed peers (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Probed peers (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Probed peers (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Probed peers (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Probed peers (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Probed peers (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Probed peers (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Probed peers (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Probes (filter: eq)
+     */
+    probe_count_eq?: number;
+    /**
+     * Probes (filter: ne)
+     */
+    probe_count_ne?: number;
+    /**
+     * Probes (filter: lt)
+     */
+    probe_count_lt?: number;
+    /**
+     * Probes (filter: lte)
+     */
+    probe_count_lte?: number;
+    /**
+     * Probes (filter: gt)
+     */
+    probe_count_gt?: number;
+    /**
+     * Probes (filter: gte)
+     */
+    probe_count_gte?: number;
+    /**
+     * Probes (filter: between_min)
+     */
+    probe_count_between_min?: number;
+    /**
+     * Probes (filter: between_max_value)
+     */
+    probe_count_between_max_value?: number;
+    /**
+     * Probes (filter: in_values) (comma-separated list)
+     */
+    probe_count_in_values?: string;
+    /**
+     * Probes (filter: not_in_values) (comma-separated list)
+     */
+    probe_count_not_in_values?: string;
+    /**
+     * Probes returning the columns (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Probes returning the columns (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Probes returning the columns (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Probes returning the columns (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Probes returning the columns (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Probes returning the columns (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Probes returning the columns (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Probes returning the columns (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Probes returning the columns (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Probes returning the columns (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: eq)
+     */
+    missing_count_eq?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: ne)
+     */
+    missing_count_ne?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: lt)
+     */
+    missing_count_lt?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: lte)
+     */
+    missing_count_lte?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: gt)
+     */
+    missing_count_gt?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: gte)
+     */
+    missing_count_gte?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: between_min)
+     */
+    missing_count_between_min?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: between_max_value)
+     */
+    missing_count_between_max_value?: number;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: in_values) (comma-separated list)
+     */
+    missing_count_in_values?: string;
+    /**
+     * Probes where the peer did not return a column it should custody (filter: not_in_values) (comma-separated list)
+     */
+    missing_count_not_in_values?: string;
+    /**
+     * Probes that failed (filter: eq)
+     */
+    failure_count_eq?: number;
+    /**
+     * Probes that failed (filter: ne)
+     */
+    failure_count_ne?: number;
+    /**
+     * Probes that failed (filter: lt)
+     */
+    failure_count_lt?: number;
+    /**
+     * Probes that failed (filter: lte)
+     */
+    failure_count_lte?: number;
+    /**
+     * Probes that failed (filter: gt)
+     */
+    failure_count_gt?: number;
+    /**
+     * Probes that failed (filter: gte)
+     */
+    failure_count_gte?: number;
+    /**
+     * Probes that failed (filter: between_min)
+     */
+    failure_count_between_min?: number;
+    /**
+     * Probes that failed (filter: between_max_value)
+     */
+    failure_count_between_max_value?: number;
+    /**
+     * Probes that failed (filter: in_values) (comma-separated list)
+     */
+    failure_count_in_values?: string;
+    /**
+     * Probes that failed (filter: not_in_values) (comma-separated list)
+     */
+    failure_count_not_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: eq)
+     */
+    missing_peer_count_eq?: number;
+    /**
+     * Peers with at least one missing probe (filter: ne)
+     */
+    missing_peer_count_ne?: number;
+    /**
+     * Peers with at least one missing probe (filter: lt)
+     */
+    missing_peer_count_lt?: number;
+    /**
+     * Peers with at least one missing probe (filter: lte)
+     */
+    missing_peer_count_lte?: number;
+    /**
+     * Peers with at least one missing probe (filter: gt)
+     */
+    missing_peer_count_gt?: number;
+    /**
+     * Peers with at least one missing probe (filter: gte)
+     */
+    missing_peer_count_gte?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_min)
+     */
+    missing_peer_count_between_min?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_max_value)
+     */
+    missing_peer_count_between_max_value?: number;
+    /**
+     * Peers with at least one missing probe (filter: in_values) (comma-separated list)
+     */
+    missing_peer_count_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: not_in_values) (comma-separated list)
+     */
+    missing_peer_count_not_in_values?: string;
+    /**
+     * Filter response_time_p50_ms using value
+     */
+    response_time_p50_ms_value?: number;
+    /**
+     * Filter response_time_p90_ms using value
+     */
+    response_time_p90_ms_value?: number;
+    /**
+     * The maximum number of fct_custody_probe_by_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctCustodyProbeByClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_custody_probe_by_client_daily';
+};
+
+export type FctCustodyProbeByClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByClientDailyServiceListError =
+  FctCustodyProbeByClientDailyServiceListErrors[keyof FctCustodyProbeByClientDailyServiceListErrors];
+
+export type FctCustodyProbeByClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctCustodyProbeByClientDailyResponse;
+};
+
+export type FctCustodyProbeByClientDailyServiceListResponse =
+  FctCustodyProbeByClientDailyServiceListResponses[keyof FctCustodyProbeByClientDailyServiceListResponses];
+
+export type FctCustodyProbeByClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_custody_probe_by_client_daily/{day_start_date}';
+};
+
+export type FctCustodyProbeByClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByClientDailyServiceGetError =
+  FctCustodyProbeByClientDailyServiceGetErrors[keyof FctCustodyProbeByClientDailyServiceGetErrors];
+
+export type FctCustodyProbeByClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctCustodyProbeByClientDailyResponse;
+};
+
+export type FctCustodyProbeByClientDailyServiceGetResponse =
+  FctCustodyProbeByClientDailyServiceGetResponses[keyof FctCustodyProbeByClientDailyServiceGetResponses];
 
 export type FctDataColumnAvailabilityByEpochServiceListData = {
   body?: never;
@@ -98766,6 +103456,3422 @@ export type FctPayloadBidHighestValueChunked50MsServiceGetResponses = {
 export type FctPayloadBidHighestValueChunked50MsServiceGetResponse =
   FctPayloadBidHighestValueChunked50MsServiceGetResponses[keyof FctPayloadBidHighestValueChunked50MsServiceGetResponses];
 
+export type FctPeerCountByClClientAsnDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_cl_client_asn_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByClClientAsnDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_cl_client_asn_daily';
+};
+
+export type FctPeerCountByClClientAsnDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientAsnDailyServiceListError =
+  FctPeerCountByClClientAsnDailyServiceListErrors[keyof FctPeerCountByClClientAsnDailyServiceListErrors];
+
+export type FctPeerCountByClClientAsnDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByClClientAsnDailyResponse;
+};
+
+export type FctPeerCountByClClientAsnDailyServiceListResponse =
+  FctPeerCountByClClientAsnDailyServiceListResponses[keyof FctPeerCountByClClientAsnDailyServiceListResponses];
+
+export type FctPeerCountByClClientAsnDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_cl_client_asn_daily/{day_start_date}';
+};
+
+export type FctPeerCountByClClientAsnDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientAsnDailyServiceGetError =
+  FctPeerCountByClClientAsnDailyServiceGetErrors[keyof FctPeerCountByClClientAsnDailyServiceGetErrors];
+
+export type FctPeerCountByClClientAsnDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByClClientAsnDailyResponse;
+};
+
+export type FctPeerCountByClClientAsnDailyServiceGetResponse =
+  FctPeerCountByClClientAsnDailyServiceGetResponses[keyof FctPeerCountByClClientAsnDailyServiceGetResponses];
+
+export type FctPeerCountByClClientCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Other or Unknown (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Other or Unknown (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Other or Unknown (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Other or Unknown (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Other or Unknown (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Other or Unknown (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Other or Unknown (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Other or Unknown (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Other or Unknown (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_cl_client_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByClClientCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_cl_client_country_daily';
+};
+
+export type FctPeerCountByClClientCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientCountryDailyServiceListError =
+  FctPeerCountByClClientCountryDailyServiceListErrors[keyof FctPeerCountByClClientCountryDailyServiceListErrors];
+
+export type FctPeerCountByClClientCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByClClientCountryDailyResponse;
+};
+
+export type FctPeerCountByClClientCountryDailyServiceListResponse =
+  FctPeerCountByClClientCountryDailyServiceListResponses[keyof FctPeerCountByClClientCountryDailyServiceListResponses];
+
+export type FctPeerCountByClClientCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_cl_client_country_daily/{day_start_date}';
+};
+
+export type FctPeerCountByClClientCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientCountryDailyServiceGetError =
+  FctPeerCountByClClientCountryDailyServiceGetErrors[keyof FctPeerCountByClClientCountryDailyServiceGetErrors];
+
+export type FctPeerCountByClClientCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByClClientCountryDailyResponse;
+};
+
+export type FctPeerCountByClClientCountryDailyServiceGetResponse =
+  FctPeerCountByClClientCountryDailyServiceGetResponses[keyof FctPeerCountByClClientCountryDailyServiceGetResponses];
+
+export type FctPeerCountByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC (filter: eq)
+     */
+    quic_connected_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC (filter: ne)
+     */
+    quic_connected_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC (filter: lt)
+     */
+    quic_connected_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC (filter: lte)
+     */
+    quic_connected_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC (filter: gt)
+     */
+    quic_connected_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC (filter: gte)
+     */
+    quic_connected_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC (filter: between_min)
+     */
+    quic_connected_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC (filter: between_max_value)
+     */
+    quic_connected_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC (filter: in_values) (comma-separated list)
+     */
+    quic_connected_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC (filter: not_in_values) (comma-separated list)
+     */
+    quic_connected_peer_count_not_in_values?: string;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: eq)
+     */
+    quic_listen_peer_count_eq?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: ne)
+     */
+    quic_listen_peer_count_ne?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: lt)
+     */
+    quic_listen_peer_count_lt?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: lte)
+     */
+    quic_listen_peer_count_lte?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: gt)
+     */
+    quic_listen_peer_count_gt?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: gte)
+     */
+    quic_listen_peer_count_gte?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: between_min)
+     */
+    quic_listen_peer_count_between_min?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: between_max_value)
+     */
+    quic_listen_peer_count_between_max_value?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: in_values) (comma-separated list)
+     */
+    quic_listen_peer_count_in_values?: string;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: not_in_values) (comma-separated list)
+     */
+    quic_listen_peer_count_not_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: eq)
+     */
+    custody_known_peer_count_eq?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: ne)
+     */
+    custody_known_peer_count_ne?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: lt)
+     */
+    custody_known_peer_count_lt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: lte)
+     */
+    custody_known_peer_count_lte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: gt)
+     */
+    custody_known_peer_count_gt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: gte)
+     */
+    custody_known_peer_count_gte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: between_min)
+     */
+    custody_known_peer_count_between_min?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: between_max_value)
+     */
+    custody_known_peer_count_between_max_value?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: in_values) (comma-separated list)
+     */
+    custody_known_peer_count_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response (filter: not_in_values) (comma-separated list)
+     */
+    custody_known_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: eq)
+     */
+    custody_4_peer_count_eq?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: ne)
+     */
+    custody_4_peer_count_ne?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lt)
+     */
+    custody_4_peer_count_lt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lte)
+     */
+    custody_4_peer_count_lte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gt)
+     */
+    custody_4_peer_count_gt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gte)
+     */
+    custody_4_peer_count_gte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_min)
+     */
+    custody_4_peer_count_between_min?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_max_value)
+     */
+    custody_4_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: in_values) (comma-separated list)
+     */
+    custody_4_peer_count_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: not_in_values) (comma-separated list)
+     */
+    custody_4_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: eq)
+     */
+    custody_5_8_peer_count_eq?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: ne)
+     */
+    custody_5_8_peer_count_ne?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lt)
+     */
+    custody_5_8_peer_count_lt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lte)
+     */
+    custody_5_8_peer_count_lte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gt)
+     */
+    custody_5_8_peer_count_gt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gte)
+     */
+    custody_5_8_peer_count_gte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_min)
+     */
+    custody_5_8_peer_count_between_min?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_max_value)
+     */
+    custody_5_8_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: eq)
+     */
+    custody_9_127_peer_count_eq?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: ne)
+     */
+    custody_9_127_peer_count_ne?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lt)
+     */
+    custody_9_127_peer_count_lt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lte)
+     */
+    custody_9_127_peer_count_lte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gt)
+     */
+    custody_9_127_peer_count_gt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gte)
+     */
+    custody_9_127_peer_count_gte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_min)
+     */
+    custody_9_127_peer_count_between_min?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_max_value)
+     */
+    custody_9_127_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: eq)
+     */
+    custody_128_peer_count_eq?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: ne)
+     */
+    custody_128_peer_count_ne?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lt)
+     */
+    custody_128_peer_count_lt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lte)
+     */
+    custody_128_peer_count_lte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gt)
+     */
+    custody_128_peer_count_gt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gte)
+     */
+    custody_128_peer_count_gte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_min)
+     */
+    custody_128_peer_count_between_min?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_max_value)
+     */
+    custody_128_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: in_values) (comma-separated list)
+     */
+    custody_128_peer_count_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: not_in_values) (comma-separated list)
+     */
+    custody_128_peer_count_not_in_values?: string;
+    /**
+     * Filter latency_p50_ms using value
+     */
+    latency_p50_ms_value?: number;
+    /**
+     * Filter latency_p90_ms using value
+     */
+    latency_p90_ms_value?: number;
+    /**
+     * Filter connection_age_p50_ms using value
+     */
+    connection_age_p50_ms_value?: number;
+    /**
+     * The maximum number of fct_peer_count_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_cl_client_daily';
+};
+
+export type FctPeerCountByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientDailyServiceListError =
+  FctPeerCountByClClientDailyServiceListErrors[keyof FctPeerCountByClClientDailyServiceListErrors];
+
+export type FctPeerCountByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByClClientDailyResponse;
+};
+
+export type FctPeerCountByClClientDailyServiceListResponse =
+  FctPeerCountByClClientDailyServiceListResponses[keyof FctPeerCountByClClientDailyServiceListResponses];
+
+export type FctPeerCountByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerCountByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientDailyServiceGetError =
+  FctPeerCountByClClientDailyServiceGetErrors[keyof FctPeerCountByClClientDailyServiceGetErrors];
+
+export type FctPeerCountByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByClClientDailyResponse;
+};
+
+export type FctPeerCountByClClientDailyServiceGetResponse =
+  FctPeerCountByClClientDailyServiceGetResponses[keyof FctPeerCountByClClientDailyServiceGetResponses];
+
+export type FctPeerCountByClientPairDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client at the address (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client at the address (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client at the address (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client at the address (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client at the address (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client at the address (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client at the address (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client at the address (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client at the address (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client at the address (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client at the address (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client at the address (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client at the address (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client at the address (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client at the address (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client at the address (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client at the address (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client at the address (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: eq)
+     */
+    ip_count_eq?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: ne)
+     */
+    ip_count_ne?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: lt)
+     */
+    ip_count_lt?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: lte)
+     */
+    ip_count_lte?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: gt)
+     */
+    ip_count_gt?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: gte)
+     */
+    ip_count_gte?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: between_min)
+     */
+    ip_count_between_min?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: between_max_value)
+     */
+    ip_count_between_max_value?: number;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: in_values) (comma-separated list)
+     */
+    ip_count_in_values?: string;
+    /**
+     * Addresses with exactly this consensus and execution client (filter: not_in_values) (comma-separated list)
+     */
+    ip_count_not_in_values?: string;
+    /**
+     * Addresses in the day with a consensus client (filter: eq)
+     */
+    cl_ip_count_eq?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: ne)
+     */
+    cl_ip_count_ne?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: lt)
+     */
+    cl_ip_count_lt?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: lte)
+     */
+    cl_ip_count_lte?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: gt)
+     */
+    cl_ip_count_gt?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: gte)
+     */
+    cl_ip_count_gte?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: between_min)
+     */
+    cl_ip_count_between_min?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: between_max_value)
+     */
+    cl_ip_count_between_max_value?: number;
+    /**
+     * Addresses in the day with a consensus client (filter: in_values) (comma-separated list)
+     */
+    cl_ip_count_in_values?: string;
+    /**
+     * Addresses in the day with a consensus client (filter: not_in_values) (comma-separated list)
+     */
+    cl_ip_count_not_in_values?: string;
+    /**
+     * Addresses in the day with an execution client (filter: eq)
+     */
+    el_ip_count_eq?: number;
+    /**
+     * Addresses in the day with an execution client (filter: ne)
+     */
+    el_ip_count_ne?: number;
+    /**
+     * Addresses in the day with an execution client (filter: lt)
+     */
+    el_ip_count_lt?: number;
+    /**
+     * Addresses in the day with an execution client (filter: lte)
+     */
+    el_ip_count_lte?: number;
+    /**
+     * Addresses in the day with an execution client (filter: gt)
+     */
+    el_ip_count_gt?: number;
+    /**
+     * Addresses in the day with an execution client (filter: gte)
+     */
+    el_ip_count_gte?: number;
+    /**
+     * Addresses in the day with an execution client (filter: between_min)
+     */
+    el_ip_count_between_min?: number;
+    /**
+     * Addresses in the day with an execution client (filter: between_max_value)
+     */
+    el_ip_count_between_max_value?: number;
+    /**
+     * Addresses in the day with an execution client (filter: in_values) (comma-separated list)
+     */
+    el_ip_count_in_values?: string;
+    /**
+     * Addresses in the day with an execution client (filter: not_in_values) (comma-separated list)
+     */
+    el_ip_count_not_in_values?: string;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: eq)
+     */
+    matched_ip_count_eq?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: ne)
+     */
+    matched_ip_count_ne?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: lt)
+     */
+    matched_ip_count_lt?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: lte)
+     */
+    matched_ip_count_lte?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: gt)
+     */
+    matched_ip_count_gt?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: gte)
+     */
+    matched_ip_count_gte?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: between_min)
+     */
+    matched_ip_count_between_min?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: between_max_value)
+     */
+    matched_ip_count_between_max_value?: number;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: in_values) (comma-separated list)
+     */
+    matched_ip_count_in_values?: string;
+    /**
+     * Addresses in the day with both, the match rate is matched_ip_count / cl_ip_count (filter: not_in_values) (comma-separated list)
+     */
+    matched_ip_count_not_in_values?: string;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: eq)
+     */
+    paired_ip_count_eq?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: ne)
+     */
+    paired_ip_count_ne?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: lt)
+     */
+    paired_ip_count_lt?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: lte)
+     */
+    paired_ip_count_lte?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: gt)
+     */
+    paired_ip_count_gt?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: gte)
+     */
+    paired_ip_count_gte?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: between_min)
+     */
+    paired_ip_count_between_min?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: between_max_value)
+     */
+    paired_ip_count_between_max_value?: number;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: in_values) (comma-separated list)
+     */
+    paired_ip_count_in_values?: string;
+    /**
+     * Matched addresses with exactly one client per layer, the sum of ip_count over the day (filter: not_in_values) (comma-separated list)
+     */
+    paired_ip_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_client_pair_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByClientPairDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_client_pair_daily';
+};
+
+export type FctPeerCountByClientPairDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClientPairDailyServiceListError =
+  FctPeerCountByClientPairDailyServiceListErrors[keyof FctPeerCountByClientPairDailyServiceListErrors];
+
+export type FctPeerCountByClientPairDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByClientPairDailyResponse;
+};
+
+export type FctPeerCountByClientPairDailyServiceListResponse =
+  FctPeerCountByClientPairDailyServiceListResponses[keyof FctPeerCountByClientPairDailyServiceListResponses];
+
+export type FctPeerCountByClientPairDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_client_pair_daily/{day_start_date}';
+};
+
+export type FctPeerCountByClientPairDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClientPairDailyServiceGetError =
+  FctPeerCountByClientPairDailyServiceGetErrors[keyof FctPeerCountByClientPairDailyServiceGetErrors];
+
+export type FctPeerCountByClientPairDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByClientPairDailyResponse;
+};
+
+export type FctPeerCountByClientPairDailyServiceGetResponse =
+  FctPeerCountByClientPairDailyServiceGetResponses[keyof FctPeerCountByClientPairDailyServiceGetResponses];
+
+export type FctPeerCountByElClientAsnDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, other when the AS has under 3 peers, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for other and unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_el_client_asn_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByElClientAsnDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_el_client_asn_daily';
+};
+
+export type FctPeerCountByElClientAsnDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientAsnDailyServiceListError =
+  FctPeerCountByElClientAsnDailyServiceListErrors[keyof FctPeerCountByElClientAsnDailyServiceListErrors];
+
+export type FctPeerCountByElClientAsnDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByElClientAsnDailyResponse;
+};
+
+export type FctPeerCountByElClientAsnDailyServiceListResponse =
+  FctPeerCountByElClientAsnDailyServiceListResponses[keyof FctPeerCountByElClientAsnDailyServiceListResponses];
+
+export type FctPeerCountByElClientAsnDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_el_client_asn_daily/{day_start_date}';
+};
+
+export type FctPeerCountByElClientAsnDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientAsnDailyServiceGetError =
+  FctPeerCountByElClientAsnDailyServiceGetErrors[keyof FctPeerCountByElClientAsnDailyServiceGetErrors];
+
+export type FctPeerCountByElClientAsnDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByElClientAsnDailyResponse;
+};
+
+export type FctPeerCountByElClientAsnDailyServiceGetResponse =
+  FctPeerCountByElClientAsnDailyServiceGetResponses[keyof FctPeerCountByElClientAsnDailyServiceGetResponses];
+
+export type FctPeerCountByElClientCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, other for buckets under 3 peers (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, other when the country has under 3 peers, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Other or Unknown (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Other or Unknown (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Other or Unknown (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Other or Unknown (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Other or Unknown (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Other or Unknown (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Other or Unknown (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Other or Unknown (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Other or Unknown (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_el_client_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByElClientCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_el_client_country_daily';
+};
+
+export type FctPeerCountByElClientCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientCountryDailyServiceListError =
+  FctPeerCountByElClientCountryDailyServiceListErrors[keyof FctPeerCountByElClientCountryDailyServiceListErrors];
+
+export type FctPeerCountByElClientCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByElClientCountryDailyResponse;
+};
+
+export type FctPeerCountByElClientCountryDailyServiceListResponse =
+  FctPeerCountByElClientCountryDailyServiceListResponses[keyof FctPeerCountByElClientCountryDailyServiceListResponses];
+
+export type FctPeerCountByElClientCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_el_client_country_daily/{day_start_date}';
+};
+
+export type FctPeerCountByElClientCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientCountryDailyServiceGetError =
+  FctPeerCountByElClientCountryDailyServiceGetErrors[keyof FctPeerCountByElClientCountryDailyServiceGetErrors];
+
+export type FctPeerCountByElClientCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByElClientCountryDailyResponse;
+};
+
+export type FctPeerCountByElClientCountryDailyServiceGetResponse =
+  FctPeerCountByElClientCountryDailyServiceGetResponses[keyof FctPeerCountByElClientCountryDailyServiceGetResponses];
+
+export type FctPeerCountByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_el_client_daily';
+};
+
+export type FctPeerCountByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientDailyServiceListError =
+  FctPeerCountByElClientDailyServiceListErrors[keyof FctPeerCountByElClientDailyServiceListErrors];
+
+export type FctPeerCountByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByElClientDailyResponse;
+};
+
+export type FctPeerCountByElClientDailyServiceListResponse =
+  FctPeerCountByElClientDailyServiceListResponses[keyof FctPeerCountByElClientDailyServiceListResponses];
+
+export type FctPeerCountByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_el_client_daily/{day_start_date}';
+};
+
+export type FctPeerCountByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElClientDailyServiceGetError =
+  FctPeerCountByElClientDailyServiceGetErrors[keyof FctPeerCountByElClientDailyServiceGetErrors];
+
+export type FctPeerCountByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByElClientDailyResponse;
+};
+
+export type FctPeerCountByElClientDailyServiceGetResponse =
+  FctPeerCountByElClientDailyServiceGetResponses[keyof FctPeerCountByElClientDailyServiceGetResponses];
+
+export type FctPeerForkReadinessByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the ENR client name (erigon reported as caplin) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Current fork digest in the ENR (filter: eq)
+     */
+    fork_digest_eq?: string;
+    /**
+     * Current fork digest in the ENR (filter: ne)
+     */
+    fork_digest_ne?: string;
+    /**
+     * Current fork digest in the ENR (filter: contains)
+     */
+    fork_digest_contains?: string;
+    /**
+     * Current fork digest in the ENR (filter: starts_with)
+     */
+    fork_digest_starts_with?: string;
+    /**
+     * Current fork digest in the ENR (filter: ends_with)
+     */
+    fork_digest_ends_with?: string;
+    /**
+     * Current fork digest in the ENR (filter: like)
+     */
+    fork_digest_like?: string;
+    /**
+     * Current fork digest in the ENR (filter: not_like)
+     */
+    fork_digest_not_like?: string;
+    /**
+     * Current fork digest in the ENR (filter: in_values) (comma-separated list)
+     */
+    fork_digest_in_values?: string;
+    /**
+     * Current fork digest in the ENR (filter: not_in_values) (comma-separated list)
+     */
+    fork_digest_not_in_values?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: eq)
+     */
+    next_fork_digest_eq?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: ne)
+     */
+    next_fork_digest_ne?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: contains)
+     */
+    next_fork_digest_contains?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: starts_with)
+     */
+    next_fork_digest_starts_with?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: ends_with)
+     */
+    next_fork_digest_ends_with?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: like)
+     */
+    next_fork_digest_like?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: not_like)
+     */
+    next_fork_digest_not_like?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: in_values) (comma-separated list)
+     */
+    next_fork_digest_in_values?: string;
+    /**
+     * Next fork digest in the ENR, empty when none (filter: not_in_values) (comma-separated list)
+     */
+    next_fork_digest_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Nodes (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Nodes (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Nodes (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Nodes (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Nodes (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Nodes (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Nodes (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Nodes (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Nodes (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Nodes (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_fork_readiness_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerForkReadinessByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_fork_readiness_by_cl_client_daily';
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceListError =
+  FctPeerForkReadinessByClClientDailyServiceListErrors[keyof FctPeerForkReadinessByClClientDailyServiceListErrors];
+
+export type FctPeerForkReadinessByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerForkReadinessByClClientDailyResponse;
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceListResponse =
+  FctPeerForkReadinessByClClientDailyServiceListResponses[keyof FctPeerForkReadinessByClClientDailyServiceListResponses];
+
+export type FctPeerForkReadinessByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_fork_readiness_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceGetError =
+  FctPeerForkReadinessByClClientDailyServiceGetErrors[keyof FctPeerForkReadinessByClClientDailyServiceGetErrors];
+
+export type FctPeerForkReadinessByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerForkReadinessByClClientDailyResponse;
+};
+
+export type FctPeerForkReadinessByClClientDailyServiceGetResponse =
+  FctPeerForkReadinessByClClientDailyServiceGetResponses[keyof FctPeerForkReadinessByClClientDailyServiceGetResponses];
+
+export type FctPeerForkReadinessByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client from the node devp2p name (nimbus reported as nimbusel) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: eq)
+     */
+    fork_id_hash_eq?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: ne)
+     */
+    fork_id_hash_ne?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: contains)
+     */
+    fork_id_hash_contains?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: starts_with)
+     */
+    fork_id_hash_starts_with?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: ends_with)
+     */
+    fork_id_hash_ends_with?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: like)
+     */
+    fork_id_hash_like?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: not_like)
+     */
+    fork_id_hash_not_like?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: in_values) (comma-separated list)
+     */
+    fork_id_hash_in_values?: string;
+    /**
+     * Fork id hash, the CRC32 of the genesis and passed forks (filter: not_in_values) (comma-separated list)
+     */
+    fork_id_hash_not_in_values?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: eq)
+     */
+    fork_id_next_eq?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: ne)
+     */
+    fork_id_next_ne?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: contains)
+     */
+    fork_id_next_contains?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: starts_with)
+     */
+    fork_id_next_starts_with?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: ends_with)
+     */
+    fork_id_next_ends_with?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: like)
+     */
+    fork_id_next_like?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: not_like)
+     */
+    fork_id_next_not_like?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: in_values) (comma-separated list)
+     */
+    fork_id_next_in_values?: string;
+    /**
+     * Next fork block number or timestamp, empty when none (filter: not_in_values) (comma-separated list)
+     */
+    fork_id_next_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Nodes (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Nodes (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Nodes (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Nodes (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Nodes (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Nodes (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Nodes (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Nodes (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Nodes (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Nodes (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_fork_readiness_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerForkReadinessByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_fork_readiness_by_el_client_daily';
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceListError =
+  FctPeerForkReadinessByElClientDailyServiceListErrors[keyof FctPeerForkReadinessByElClientDailyServiceListErrors];
+
+export type FctPeerForkReadinessByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerForkReadinessByElClientDailyResponse;
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceListResponse =
+  FctPeerForkReadinessByElClientDailyServiceListResponses[keyof FctPeerForkReadinessByElClientDailyServiceListResponses];
+
+export type FctPeerForkReadinessByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_fork_readiness_by_el_client_daily/{day_start_date}';
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceGetError =
+  FctPeerForkReadinessByElClientDailyServiceGetErrors[keyof FctPeerForkReadinessByElClientDailyServiceGetErrors];
+
+export type FctPeerForkReadinessByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerForkReadinessByElClientDailyResponse;
+};
+
+export type FctPeerForkReadinessByElClientDailyServiceGetResponse =
+  FctPeerForkReadinessByElClientDailyServiceGetResponses[keyof FctPeerForkReadinessByElClientDailyServiceGetResponses];
+
 export type FctPeerPartialMessageSupportByClientDailyServiceListData = {
   body?: never;
   path?: never;
@@ -99469,6 +107575,306 @@ export type FctPeerPartialMessageSupportByClientHourlyServiceGetResponses = {
 
 export type FctPeerPartialMessageSupportByClientHourlyServiceGetResponse =
   FctPeerPartialMessageSupportByClientHourlyServiceGetResponses[keyof FctPeerPartialMessageSupportByClientHourlyServiceGetResponses];
+
+export type FctPeerProtocolByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: eq)
+     */
+    protocol_eq?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: ne)
+     */
+    protocol_ne?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: contains)
+     */
+    protocol_contains?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: starts_with)
+     */
+    protocol_starts_with?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: ends_with)
+     */
+    protocol_ends_with?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: like)
+     */
+    protocol_like?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: not_like)
+     */
+    protocol_not_like?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: in_values) (comma-separated list)
+     */
+    protocol_in_values?: string;
+    /**
+     * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy (filter: not_in_values) (comma-separated list)
+     */
+    protocol_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers supporting the protocol (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers supporting the protocol (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers supporting the protocol (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers supporting the protocol (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers supporting the protocol (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers supporting the protocol (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers supporting the protocol (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers supporting the protocol (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers supporting the protocol (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers supporting the protocol (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * All peers of the client in the day (filter: eq)
+     */
+    client_peer_count_eq?: number;
+    /**
+     * All peers of the client in the day (filter: ne)
+     */
+    client_peer_count_ne?: number;
+    /**
+     * All peers of the client in the day (filter: lt)
+     */
+    client_peer_count_lt?: number;
+    /**
+     * All peers of the client in the day (filter: lte)
+     */
+    client_peer_count_lte?: number;
+    /**
+     * All peers of the client in the day (filter: gt)
+     */
+    client_peer_count_gt?: number;
+    /**
+     * All peers of the client in the day (filter: gte)
+     */
+    client_peer_count_gte?: number;
+    /**
+     * All peers of the client in the day (filter: between_min)
+     */
+    client_peer_count_between_min?: number;
+    /**
+     * All peers of the client in the day (filter: between_max_value)
+     */
+    client_peer_count_between_max_value?: number;
+    /**
+     * All peers of the client in the day (filter: in_values) (comma-separated list)
+     */
+    client_peer_count_in_values?: string;
+    /**
+     * All peers of the client in the day (filter: not_in_values) (comma-separated list)
+     */
+    client_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_protocol_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerProtocolByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_protocol_by_cl_client_daily';
+};
+
+export type FctPeerProtocolByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerProtocolByClClientDailyServiceListError =
+  FctPeerProtocolByClClientDailyServiceListErrors[keyof FctPeerProtocolByClClientDailyServiceListErrors];
+
+export type FctPeerProtocolByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerProtocolByClClientDailyResponse;
+};
+
+export type FctPeerProtocolByClClientDailyServiceListResponse =
+  FctPeerProtocolByClClientDailyServiceListResponses[keyof FctPeerProtocolByClClientDailyServiceListResponses];
+
+export type FctPeerProtocolByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_protocol_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerProtocolByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerProtocolByClClientDailyServiceGetError =
+  FctPeerProtocolByClClientDailyServiceGetErrors[keyof FctPeerProtocolByClClientDailyServiceGetErrors];
+
+export type FctPeerProtocolByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerProtocolByClClientDailyResponse;
+};
+
+export type FctPeerProtocolByClClientDailyServiceGetResponse =
+  FctPeerProtocolByClClientDailyServiceGetResponses[keyof FctPeerProtocolByClClientDailyServiceGetResponses];
 
 export type FctPreparedBlockServiceListData = {
   body?: never;
@@ -121087,6 +129493,714 @@ export type IntBlockCanonicalServiceGetResponses = {
 
 export type IntBlockCanonicalServiceGetResponse =
   IntBlockCanonicalServiceGetResponses[keyof IntBlockCanonicalServiceGetResponses];
+
+export type IntBlockGraffitiReleaseServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The root of the canonical beacon block (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The root of the canonical beacon block (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The root of the canonical beacon block (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The root of the canonical beacon block (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The root of the canonical beacon block (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The root of the canonical beacon block (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The root of the canonical beacon block (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The root of the canonical beacon block (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The root of the canonical beacon block (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number of the block (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the block (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the block (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the block (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the block (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the block (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the block (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the block (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the block (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the block (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The validator index of the block proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the block proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the block proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the block proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the block proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the block proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the block proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the block proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the block proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the block proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: eq)
+     */
+    graffiti_format_eq?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: ne)
+     */
+    graffiti_format_ne?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: contains)
+     */
+    graffiti_format_contains?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: starts_with)
+     */
+    graffiti_format_starts_with?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: ends_with)
+     */
+    graffiti_format_ends_with?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: like)
+     */
+    graffiti_format_like?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: not_like)
+     */
+    graffiti_format_not_like?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: in_values) (comma-separated list)
+     */
+    graffiti_format_in_values?: string;
+    /**
+     * Graffiti format from fct_block_graffiti that identified the clients (filter: not_in_values) (comma-separated list)
+     */
+    graffiti_format_not_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: eq)
+     */
+    consensus_client_version_eq?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ne)
+     */
+    consensus_client_version_ne?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: contains)
+     */
+    consensus_client_version_contains?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: starts_with)
+     */
+    consensus_client_version_starts_with?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ends_with)
+     */
+    consensus_client_version_ends_with?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: like)
+     */
+    consensus_client_version_like?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_like)
+     */
+    consensus_client_version_not_like?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    consensus_client_version_in_values?: string;
+    /**
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_version_not_in_values?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    consensus_client_commit_eq?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    consensus_client_commit_ne?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    consensus_client_commit_contains?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    consensus_client_commit_starts_with?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    consensus_client_commit_ends_with?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    consensus_client_commit_like?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    consensus_client_commit_not_like?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    consensus_client_commit_in_values?: string;
+    /**
+     * Consensus client commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_commit_not_in_values?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: eq)
+     */
+    consensus_client_release_status_eq?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: ne)
+     */
+    consensus_client_release_status_ne?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: contains)
+     */
+    consensus_client_release_status_contains?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: starts_with)
+     */
+    consensus_client_release_status_starts_with?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: ends_with)
+     */
+    consensus_client_release_status_ends_with?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: like)
+     */
+    consensus_client_release_status_like?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: not_like)
+     */
+    consensus_client_release_status_not_like?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    consensus_client_release_status_in_values?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_release_status_not_in_values?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: eq)
+     */
+    execution_client_version_eq?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ne)
+     */
+    execution_client_version_ne?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: contains)
+     */
+    execution_client_version_contains?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: starts_with)
+     */
+    execution_client_version_starts_with?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ends_with)
+     */
+    execution_client_version_ends_with?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: like)
+     */
+    execution_client_version_like?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_like)
+     */
+    execution_client_version_not_like?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    execution_client_version_in_values?: string;
+    /**
+     * Execution client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_version_not_in_values?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    execution_client_commit_eq?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    execution_client_commit_ne?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    execution_client_commit_contains?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    execution_client_commit_starts_with?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    execution_client_commit_ends_with?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    execution_client_commit_like?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    execution_client_commit_not_like?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    execution_client_commit_in_values?: string;
+    /**
+     * Execution client commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_commit_not_in_values?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: eq)
+     */
+    execution_client_release_status_eq?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: ne)
+     */
+    execution_client_release_status_ne?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: contains)
+     */
+    execution_client_release_status_contains?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: starts_with)
+     */
+    execution_client_release_status_starts_with?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: ends_with)
+     */
+    execution_client_release_status_ends_with?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: like)
+     */
+    execution_client_release_status_like?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: not_like)
+     */
+    execution_client_release_status_not_like?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    execution_client_release_status_in_values?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_release_status_not_in_values?: string;
+    /**
+     * The maximum number of int_block_graffiti_release to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockGraffitiRelease` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_graffiti_release';
+};
+
+export type IntBlockGraffitiReleaseServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockGraffitiReleaseServiceListError =
+  IntBlockGraffitiReleaseServiceListErrors[keyof IntBlockGraffitiReleaseServiceListErrors];
+
+export type IntBlockGraffitiReleaseServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockGraffitiReleaseResponse;
+};
+
+export type IntBlockGraffitiReleaseServiceListResponse =
+  IntBlockGraffitiReleaseServiceListResponses[keyof IntBlockGraffitiReleaseServiceListResponses];
+
+export type IntBlockGraffitiReleaseServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_graffiti_release/{slot_start_date_time}';
+};
+
+export type IntBlockGraffitiReleaseServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockGraffitiReleaseServiceGetError =
+  IntBlockGraffitiReleaseServiceGetErrors[keyof IntBlockGraffitiReleaseServiceGetErrors];
+
+export type IntBlockGraffitiReleaseServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockGraffitiReleaseResponse;
+};
+
+export type IntBlockGraffitiReleaseServiceGetResponse =
+  IntBlockGraffitiReleaseServiceGetResponses[keyof IntBlockGraffitiReleaseServiceGetResponses];
 
 export type IntBlockMevCanonicalServiceListData = {
   body?: never;

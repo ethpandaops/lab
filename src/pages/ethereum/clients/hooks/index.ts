@@ -14,3 +14,8 @@ export { useReferenceEngine } from './useReferenceEngine';
 export type { UseReferenceEngineResult } from './useReferenceEngine';
 export { usePeerSupport, PROBE_WINDOW_SECONDS } from './usePeerSupport';
 export type { UsePeerSupportResult } from './usePeerSupport';
+export { useVersionCounts } from './useVersionCounts';
+export type { UseVersionCountsOptions, UseVersionCountsResult } from './useVersionCounts';
+export { useDailyByClient } from './useDailyByClient';
+export { useCensus, useNodeWeightedShares } from './useCensus';
+export type { NodeWeightedShares, UseCensusResult } from './useCensus';

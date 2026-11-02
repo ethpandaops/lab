@@ -23,7 +23,7 @@ import {
   EntityFilter,
   GraffitiBlocksTable,
 } from './components';
-import { useClientCounts, useEntityOptions, useLatestReleases } from './hooks';
+import { useClientCounts, useEntityOptions, useLatestReleases, useNodeWeightedShares } from './hooks';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
 import { normalizeClientName } from '@/utils/ethereum';
 import { BLOCK_GRAFFITI_TABLE, DEFAULT_TIME_PERIOD, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
@@ -43,6 +43,19 @@ import { BLOCK_FILTER_KEYS, type BlockSearch } from './utils/block-filters';
 
 /** Blocks table filters; the filter bar above owns the clients and entity */
 const INDEX_BLOCK_FIELDS = BLOCK_FILTER_KEYS.filter(key => key !== 'cl' && key !== 'el' && key !== 'entity');
+
+/** What the diversity cards can count */
+const DIVERSITY_OPTIONS: ReadonlyArray<{ value: 'blocks' | 'p2p' | 'enr'; label: string }> = [
+  { value: 'blocks', label: 'Proposed blocks (stake)' },
+  { value: 'p2p', label: 'P2P peers (nodes)' },
+  { value: 'enr', label: 'ENR crawl (nodes)' },
+];
+
+const DIVERSITY_SUBTITLES = {
+  blocks: 'Share of blocks whose graffiti names a client',
+  p2p: 'Share of peers seen on the P2P network, latest full day',
+  enr: 'Share of nodes found in discovery records, latest full day',
+} as const;
 
 /** Formats a share of blocks as a percentage, or a dash when there are no blocks */
 function formatShare(part: number, total: number): string {
@@ -80,6 +93,9 @@ export function IndexPage(): JSX.Element {
   const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
+  const diversityBy = search.by ?? 'blocks';
+  const clNodes = useNodeWeightedShares(diversityBy === 'blocks' ? null : 'consensus');
+  const elNodes = useNodeWeightedShares(diversityBy === 'blocks' ? null : 'execution');
   const { nodes } = useActiveNodes();
   const nodeCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -112,7 +128,7 @@ export function IndexPage(): JSX.Element {
 
   // Every change here can change the blocks table's rows, so it returns to the table's first page
   const setSearch = useCallback(
-    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string; identified?: boolean }) =>
+    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string; identified?: boolean; by?: 'p2p' | 'enr' }) =>
       navigate({ search: prev => ({ ...prev, ...update, page: undefined }), replace: true }),
     [navigate]
   );
@@ -291,9 +307,31 @@ export function IndexPage(): JSX.Element {
                 ]}
               />
 
+              <SegmentedControl
+                options={DIVERSITY_OPTIONS}
+                value={diversityBy}
+                onChange={value => setSearch({ by: value === 'blocks' ? undefined : value })}
+                ariaLabel="Count diversity by"
+              />
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                <DiversityCard title="Consensus diversity" summaries={consensusSummary} />
-                <DiversityCard title="Execution diversity" summaries={executionSummary} />
+                <DiversityCard
+                  title="Consensus diversity"
+                  summaries={
+                    diversityBy === 'p2p' ? clNodes.p2p : diversityBy === 'enr' ? clNodes.enr : consensusSummary
+                  }
+                  subtitle={DIVERSITY_SUBTITLES[diversityBy]}
+                  countLabel={diversityBy === 'blocks' ? 'Blocks' : diversityBy === 'p2p' ? 'Peers' : 'Nodes'}
+                  isLoading={diversityBy !== 'blocks' && clNodes.isLoading}
+                />
+                <DiversityCard
+                  title="Execution diversity"
+                  summaries={
+                    diversityBy === 'p2p' ? elNodes.p2p : diversityBy === 'enr' ? elNodes.enr : executionSummary
+                  }
+                  subtitle={DIVERSITY_SUBTITLES[diversityBy]}
+                  countLabel={diversityBy === 'blocks' ? 'Blocks' : diversityBy === 'p2p' ? 'Peers' : 'Nodes'}
+                  isLoading={diversityBy !== 'blocks' && elNodes.isLoading}
+                />
               </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">

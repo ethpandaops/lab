@@ -12,11 +12,9 @@ import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { useClientCounts } from '../../hooks';
-import { clientOf, summariseClients } from '../../utils/client-share';
+import { useClientCounts, useNodeWeightedShares } from '../../hooks';
+import { clientOf, summariseClients, type ClientSummary } from '../../utils/client-share';
 import { crossedThreshold, displayVersion, nextThreshold } from '../../utils/client-versions';
-import { PENDING_SOURCES } from '../../pending';
-import { PendingSource } from '../PendingSource';
 import { SourceAngles } from '../SourceAngles';
 import type { ClientTabProps } from './ClientTabs.types';
 
@@ -33,7 +31,7 @@ export function OverviewTab({
   client,
   layer,
   latest,
-  blocks,
+  last24h,
   nodes,
   allNodes,
   releases,
@@ -83,10 +81,12 @@ export function OverviewTab({
     };
   }, [counts.records, counts.keys, layer, client, name]);
 
-  const latestBlockTime = blocks.length > 0 ? blocks[blocks.length - 1].time : 0;
-  const recent = blocks.filter(block => block.version && block.time > latestBlockTime - 24 * 3600);
+  const recent = last24h.filter(block => block.version);
+  const recentTotal = recent.reduce((sum, row) => sum + row.count, 0);
   const onLatest = latest?.version
-    ? recent.filter(block => compareVersions(block.version!, latest.version!) >= 0).length
+    ? recent
+        .filter(block => compareVersions(block.version!, latest.version!) >= 0)
+        .reduce((sum, row) => sum + row.count, 0)
     : 0;
   const nodesOnLatest =
     layer === 'consensus' && latest?.version
@@ -95,6 +95,13 @@ export function OverviewTab({
         ).length
       : 0;
 
+  const nodeWeighted = useNodeWeightedShares(layer);
+  const nodeShare = (shares: ClientSummary[]): string =>
+    nodeWeighted.isLoading
+      ? '…'
+      : shares.length === 0
+        ? '-'
+        : `${(shares.find(item => item.client === client)?.identifiedShare ?? 0).toFixed(1)}%`;
   const share = summary.mine?.identifiedShare ?? 0;
   const next = summary.mine ? nextThreshold(share) : null;
 
@@ -114,8 +121,22 @@ export function OverviewTab({
             value: summary.mine ? `${share.toFixed(1)}%` : '0%',
             detail: `Share of proposed blocks naming a client, ${windowText}`,
           },
-          { id: 'p2p', label: 'Node-weighted (P2P peers)', detail: 'Share of peers seen on the P2P network' },
-          { id: 'enr', label: 'ENR crawl', detail: 'Share of nodes found in discovery records' },
+          {
+            id: 'p2p',
+            label: 'Node-weighted (P2P peers)',
+            value: nodeShare(nodeWeighted.p2p),
+            detail: nodeWeighted.p2pDay
+              ? `Share of peers seen on the P2P network, ${nodeWeighted.p2pDay}`
+              : 'No P2P census yet',
+          },
+          {
+            id: 'enr',
+            label: 'ENR crawl',
+            value: nodeShare(nodeWeighted.enr),
+            detail: nodeWeighted.enrDay
+              ? `Share of nodes found in discovery records, ${nodeWeighted.enrDay}`
+              : 'No ENR crawl yet',
+          },
           layer === 'consensus'
             ? {
                 id: 'contributoor',
@@ -149,7 +170,7 @@ export function OverviewTab({
           {
             id: 'latest',
             name: 'Blocks on latest or newer, 24h',
-            value: percent(onLatest, recent.length),
+            value: percent(onLatest, recentTotal),
           },
         ]}
       />
@@ -202,9 +223,7 @@ export function OverviewTab({
               </div>
               <div>
                 <dt className="text-xs/5 text-muted">Blocks on it or newer, 24h</dt>
-                <dd className="text-sm/6 font-medium text-foreground tabular-nums">
-                  {percent(onLatest, recent.length)}
-                </dd>
+                <dd className="text-sm/6 font-medium text-foreground tabular-nums">{percent(onLatest, recentTotal)}</dd>
               </div>
               <div>
                 <dt className="text-xs/5 text-muted">Xatu nodes on it or newer</dt>
@@ -260,11 +279,6 @@ export function OverviewTab({
             />
           )}
         </Card>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <PendingSource {...PENDING_SOURCES.proposerBehaviour} />
-        {layer === 'consensus' && <PendingSource {...PENDING_SOURCES.attestations} />}
       </div>
     </div>
   );

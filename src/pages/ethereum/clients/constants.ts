@@ -13,6 +13,8 @@ export const clientsSearchSchema = z.object({
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
   /** Show shares of identified blocks only */
   identified: z.boolean().optional(),
+  /** What the diversity cards count: proposed blocks, P2P peers or ENR nodes */
+  by: z.enum(['blocks', 'p2p', 'enr']).optional().catch(undefined),
 });
 export type ClientsSearch = z.infer<typeof clientsSearchSchema>;
 
@@ -75,6 +77,9 @@ export const VERSION_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label
 
 /** Share chart windows on the client page */
 export type ShareWindow = '30d' | '90d' | '1y' | 'all';
+
+/** Days in each share window; all history when null */
+export const SHARE_WINDOW_DAYS: Record<ShareWindow, number | null> = { '30d': 30, '90d': 90, '1y': 365, all: null };
 
 /** How each share window reads in copy */
 export const SHARE_WINDOW_TEXT: Record<ShareWindow, string> = {

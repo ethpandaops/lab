@@ -22,8 +22,26 @@ import { useSlotProposerClient, type ProposerClientField } from '../../hooks/use
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
-/** Client logo and name linked to the client page, its version to the version page and GitHub release, or the commit prefix when no version resolved */
+/**
+ * Client logo and name linked to the client page; its release linked to the version page and GitHub, marked as a
+ * build after it for a branch commit; or the commit and why it names no release.
+ */
 function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Element {
+  const commit =
+    field.commit &&
+    (field.commitUrl ? (
+      <a
+        href={field.commitUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-mono text-xs text-muted hover:underline"
+      >
+        {field.commit}
+      </a>
+    ) : (
+      <span className="font-mono text-xs text-muted">{field.commit}</span>
+    ));
+
   return (
     <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
       <Link
@@ -31,12 +49,13 @@ function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Ele
         params={{ client: field.client }}
         className="inline-flex items-center gap-2 hover:underline"
       >
-        <ClientLogo client={field.client} size={16} noLink />
+        <ClientLogo client={field.client} size={16} noLink decorative />
         <span>{formatClientName(field.client)}</span>
       </Link>
-      {field.version && (
-        <span className="inline-flex items-center gap-1">
-          {field.isRelease ? (
+      {field.version ? (
+        <>
+          <span className="inline-flex items-center gap-1">
+            {field.buildAfter && <span className="text-muted">build after</span>}
             <Link
               to="/ethereum/clients/$client/$version"
               params={{ client: field.client, version: field.version }}
@@ -44,39 +63,31 @@ function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Ele
             >
               {field.version}
             </Link>
-          ) : (
-            <span>{field.version}</span>
-          )}
-          {field.versionUrl && (
-            <a
-              href={field.versionUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted hover:text-foreground"
-              aria-label={`${field.version} release on GitHub`}
-            >
-              <ArrowTopRightOnSquareIcon className="size-3" />
-            </a>
-          )}
-        </span>
-      )}
-      {!field.version &&
-        field.commit &&
-        (field.commitUrl ? (
-          <a
-            href={field.commitUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-xs text-muted hover:underline"
-            title={field.commitNote}
-          >
-            {field.commit}
-          </a>
-        ) : (
-          <span className="font-mono text-xs text-muted" title={field.commitNote}>
-            {field.commit}
+            {field.versionUrl && (
+              <a
+                href={field.versionUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted hover:text-foreground"
+                aria-label={`${field.version} release on GitHub`}
+              >
+                <ArrowTopRightOnSquareIcon className="size-3" />
+              </a>
+            )}
           </span>
-        ))}
+          {field.buildAfter && commit}
+          {field.buildAfter && field.commitsSinceRelease !== undefined && (
+            <span className="text-xs text-muted">
+              {field.commitsSinceRelease} {field.commitsSinceRelease === 1 ? 'commit' : 'commits'} after
+            </span>
+          )}
+        </>
+      ) : (
+        <>
+          {commit}
+          {field.unresolvedNote && <span className="basis-full text-xs text-muted">{field.unresolvedNote}</span>}
+        </>
+      )}
     </span>
   );
 }

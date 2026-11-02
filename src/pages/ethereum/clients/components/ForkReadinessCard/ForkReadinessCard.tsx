@@ -5,7 +5,7 @@ import { Badge } from '@/components/Elements/Badge';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { meetsMinVersion } from '@/utils/version';
 import type { ClientLayer } from '../../utils/client-share';
-import { displayVersion, type ResolvedBlock } from '../../utils/client-versions';
+import { displayVersion, type VersionCount } from '../../utils/client-versions';
 import type { ForkRequirement } from '../../utils/fork-requirements';
 
 export interface ForkReadinessCardProps {
@@ -13,8 +13,8 @@ export interface ForkReadinessCardProps {
   fork: string;
   /** The fork's minimum version for the client, when the config sets one */
   requirement?: ForkRequirement;
-  /** The client's blocks; the latest 24 hours are counted */
-  blocks: ResolvedBlock[];
+  /** Version counts over the last 24 hours */
+  blocks: VersionCount[];
   nodes: FctNodeActiveLast24h[];
   releases: DimClientRelease[];
   /** Version the page is about, checked against the minimum */
@@ -53,9 +53,11 @@ export function ForkReadinessCard({
     );
   }
 
-  const latestBlock = blocks.length > 0 ? blocks[blocks.length - 1].time : 0;
-  const recent = blocks.filter(block => block.version && block.time > latestBlock - 24 * 3600);
-  const readyBlocks = recent.filter(block => meetsMinVersion(block.version!, requirement.minVersion)).length;
+  const recent = blocks.filter(block => block.version);
+  const recentTotal = recent.reduce((sum, row) => sum + row.count, 0);
+  const readyBlocks = recent
+    .filter(block => meetsMinVersion(block.version!, requirement.minVersion))
+    .reduce((sum, row) => sum + row.count, 0);
   const nodeVersions = nodes.map(node =>
     displayVersion(layer === 'consensus' ? node.meta_consensus_version : undefined, releases)
   );
@@ -91,7 +93,7 @@ export function ForkReadinessCard({
         <div>
           <dt className="text-xs/5 text-muted">Blocks on a ready version, last 24h</dt>
           <dd className="text-sm/6 font-medium text-foreground tabular-nums">
-            {formatShare(readyBlocks, recent.length)}
+            {formatShare(readyBlocks, recentTotal)}
           </dd>
         </div>
         <div>

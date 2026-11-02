@@ -60,16 +60,20 @@ export function VersionTable({ client, versions, releases, latest, minVersion }:
       cellClassName: 'text-right tabular-nums text-muted',
       headerClassName: 'text-right',
     },
+    ...(versions.some(row => row.untaggedBlocks > 0)
+      ? [
+          {
+            header: 'Of which builds after it',
+            accessor: (row: VersionSummary) => (row.untaggedBlocks > 0 ? row.untaggedBlocks.toLocaleString() : '-'),
+            cellClassName: 'text-right tabular-nums text-muted',
+            headerClassName: 'text-right',
+          },
+        ]
+      : []),
     {
       header: 'Share of resolved',
       accessor: row => `${row.share.toFixed(1)}%`,
       cellClassName: 'text-right tabular-nums font-medium text-foreground',
-      headerClassName: 'text-right',
-    },
-    {
-      header: 'Entities',
-      accessor: row => row.entities.toLocaleString(),
-      cellClassName: 'text-right tabular-nums text-muted',
       headerClassName: 'text-right',
     },
   ];

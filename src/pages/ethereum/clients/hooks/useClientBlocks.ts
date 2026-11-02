@@ -1,18 +1,17 @@
 import { useMemo } from 'react';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
-import { fctBlockGraffitiServiceList } from '@/api/sdk.gen';
-import type { DimClientRelease, FctBlockGraffiti } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { PAGE_SIZE } from '../constants';
 import type { ClientLayer } from '../utils/client-share';
-import { resolveBlocks, type ResolvedBlock } from '../utils/client-versions';
+import { intBlockGraffitiReleaseList, type IntBlockGraffitiRelease } from '../api/client-models';
+import { blocksToVersionCounts, type VersionCount } from '../utils/client-versions';
 
 const DAY = 86400;
 
 export interface UseClientBlocksResult {
-  /** Blocks whose graffiti names the client, oldest first, with the client's release resolved */
-  blocks: ResolvedBlock[];
+  /** Blocks whose graffiti names the client, with both layers' releases */
+  blocks: VersionCount[];
   /** Start of the window (unix seconds, UTC midnight) */
   since: number;
   /** Days loaded so far, of `days` */
@@ -22,8 +21,8 @@ export interface UseClientBlocksResult {
 }
 
 /** Joins the per-day queries; module scoped so React Query only re-runs it when a day changes */
-function combineDays(results: Array<UseQueryResult<FctBlockGraffiti[]>>): {
-  rows: FctBlockGraffiti[];
+function combineDays(results: Array<UseQueryResult<IntBlockGraffitiRelease[]>>): {
+  rows: IntBlockGraffitiRelease[];
   loadedDays: number;
   isLoading: boolean;
   error: Error | null;
@@ -37,7 +36,7 @@ function combineDays(results: Array<UseQueryResult<FctBlockGraffiti[]>>): {
 }
 
 /** The graffiti fields version resolution reads, so a long window keeps little in memory */
-function compact(row: FctBlockGraffiti): FctBlockGraffiti {
+function compact(row: IntBlockGraffitiRelease): IntBlockGraffitiRelease {
   return {
     slot: row.slot,
     slot_start_date_time: row.slot_start_date_time,
@@ -45,21 +44,22 @@ function compact(row: FctBlockGraffiti): FctBlockGraffiti {
     consensus_client: row.consensus_client,
     consensus_client_version: row.consensus_client_version,
     consensus_client_commit: row.consensus_client_commit,
+    consensus_client_release_status: row.consensus_client_release_status,
     execution_client: row.execution_client,
+    execution_client_version: row.execution_client_version,
     execution_client_commit: row.execution_client_commit,
+    execution_client_release_status: row.execution_client_release_status,
   };
 }
 
 /**
- * Every block over the last `days` UTC days whose graffiti names the client, with its release resolved against
- * `releases`. Each day loads as its own query, in parallel, and finished days stay cached, so changing the window
+ * Every canonical block over the last `days` UTC days whose graffiti names the client, with both layers' releases. Each day loads as its own query, in parallel, and finished days stay cached, so changing the window
  * only loads the days it adds.
  */
 export function useClientBlocks(
   client: string | undefined,
   layer: ClientLayer | null,
-  days: number,
-  releases: DimClientRelease[]
+  days: number
 ): UseClientBlocksResult {
   const { currentNetwork } = useNetwork();
   const today = useMemo(() => Math.floor(Date.now() / 1000 / DAY) * DAY, []);
@@ -70,8 +70,8 @@ export function useClientBlocks(
       queryKey: ['client-pages', 'blocks-day', currentNetwork?.name, client, layer, start],
       queryFn: async ({ signal }: { signal: AbortSignal }) =>
         (
-          await fetchAllPages<FctBlockGraffiti>(
-            fctBlockGraffitiServiceList,
+          await fetchAllPages<IntBlockGraffitiRelease>(
+            intBlockGraffitiReleaseList,
             {
               query: {
                 ...(layer === 'consensus' ? { consensus_client_eq: client } : { execution_client_eq: client }),
@@ -81,7 +81,7 @@ export function useClientBlocks(
                 page_size: PAGE_SIZE,
               },
             },
-            'fct_block_graffiti',
+            'int_block_graffiti_release',
             signal
           )
         ).map(compact),
@@ -93,7 +93,7 @@ export function useClientBlocks(
   });
 
   const { rows, loadedDays, isLoading, error } = results;
-  const blocks = useMemo(() => (layer ? resolveBlocks(rows, layer, releases) : []), [rows, layer, releases]);
+  const blocks = useMemo(() => (layer ? blocksToVersionCounts(rows, layer) : []), [rows, layer]);
 
   return { blocks, since: dayStarts[0], loadedDays, isLoading, error };
 }
