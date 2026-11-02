@@ -52,21 +52,12 @@ export function ClientReadinessCard({ data, forkName }: ClientReadinessCardProps
               <Link
                 to="/xatu/nodes/$nodeId"
                 params={{ nodeId: node.nodeId }}
-                className="min-w-0 flex-1 truncate text-primary hover:underline"
+                className="min-w-0 flex-1 truncate pr-8 text-primary hover:underline"
               >
                 {formatNodeName(node.nodeName)}
               </Link>
             ) : (
-              <span className="min-w-0 flex-1 truncate text-foreground">{formatNodeName(node.nodeName)}</span>
-            )}
-            {node.username && (
-              <Link
-                to="/xatu/contributors/$id"
-                params={{ id: node.username }}
-                className="hidden max-w-32 shrink-0 truncate text-muted hover:text-foreground hover:underline sm:block"
-              >
-                {node.username}
-              </Link>
+              <span className="min-w-0 flex-1 truncate pr-8 text-foreground">{formatNodeName(node.nodeName)}</span>
             )}
             <span className="shrink-0">
               <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
