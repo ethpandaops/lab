@@ -44,6 +44,7 @@ import { Route as EthereumForksIndexRouteImport } from './routes/ethereum/forks/
 import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
 import { Route as EthereumEntitiesIndexRouteImport } from './routes/ethereum/entities/index'
 import { Route as EthereumContractsIndexRouteImport } from './routes/ethereum/contracts/index'
+import { Route as EthereumClientsIndexRouteImport } from './routes/ethereum/clients/index'
 import { Route as XatuNodesNodeIdRouteImport } from './routes/xatu/nodes/$nodeId'
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumValidatorsInspectRouteImport } from './routes/ethereum/validators/inspect'
@@ -63,6 +64,7 @@ import { Route as EthereumDataAvailabilityPartialColumnsRouteImport } from './ro
 import { Route as EthereumDataAvailabilityCustodyRouteImport } from './routes/ethereum/data-availability/custody'
 import { Route as EthereumContractsAddressRouteImport } from './routes/ethereum/contracts/$address'
 import { Route as EthereumConsensusOverviewRouteImport } from './routes/ethereum/consensus/overview'
+import { Route as EthereumClientsClientRouteImport } from './routes/ethereum/clients/$client'
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
@@ -70,7 +72,9 @@ import { Route as EthereumExecutionPayloadsIndexRouteImport } from './routes/eth
 import { Route as EthereumExecutionGasProfilerIndexRouteImport } from './routes/ethereum/execution/gas-profiler/index'
 import { Route as EthereumDataAvailabilityProbesIndexRouteImport } from './routes/ethereum/data-availability/probes/index'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
+import { Route as EthereumClientsClientIndexRouteImport } from './routes/ethereum/clients/$client/index'
 import { Route as EthereumExecutionGasProfilerSimulateRouteImport } from './routes/ethereum/execution/gas-profiler/simulate'
+import { Route as EthereumClientsClientVersionRouteImport } from './routes/ethereum/clients/$client/$version'
 import { Route as EthereumExecutionGasProfilerTxTxHashRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash'
 import { Route as EthereumExecutionGasProfilerBlockBlockNumberRouteImport } from './routes/ethereum/execution/gas-profiler/block.$blockNumber'
 import { Route as EthereumExecutionGasProfilerTxTxHashCallCallIdRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash_.call.$callId'
@@ -255,6 +259,11 @@ const EthereumContractsIndexRoute = EthereumContractsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EthereumContractsRoute,
 } as any)
+const EthereumClientsIndexRoute = EthereumClientsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumClientsRoute,
+} as any)
 const XatuNodesNodeIdRoute = XatuNodesNodeIdRouteImport.update({
   id: '/$nodeId',
   path: '/$nodeId',
@@ -363,6 +372,11 @@ const EthereumConsensusOverviewRoute =
     path: '/overview',
     getParentRoute: () => EthereumConsensusRoute,
   } as any)
+const EthereumClientsClientRoute = EthereumClientsClientRouteImport.update({
+  id: '/$client',
+  path: '/$client',
+  getParentRoute: () => EthereumClientsRoute,
+} as any)
 const BeaconSlotLiveRoute = BeaconSlotLiveRouteImport.update({
   id: '/beacon/slot/live',
   path: '/beacon/slot/live',
@@ -404,11 +418,23 @@ const EthereumDataAvailabilityCustodyIndexRoute =
     path: '/',
     getParentRoute: () => EthereumDataAvailabilityCustodyRoute,
   } as any)
+const EthereumClientsClientIndexRoute =
+  EthereumClientsClientIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EthereumClientsClientRoute,
+  } as any)
 const EthereumExecutionGasProfilerSimulateRoute =
   EthereumExecutionGasProfilerSimulateRouteImport.update({
     id: '/simulate',
     path: '/simulate',
     getParentRoute: () => EthereumExecutionGasProfilerRoute,
+  } as any)
+const EthereumClientsClientVersionRoute =
+  EthereumClientsClientVersionRouteImport.update({
+    id: '/$version',
+    path: '/$version',
+    getParentRoute: () => EthereumClientsClientRoute,
   } as any)
 const EthereumExecutionGasProfilerTxTxHashRoute =
   EthereumExecutionGasProfilerTxTxHashRouteImport.update({
@@ -435,7 +461,7 @@ export interface FileRoutesByFullPath {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
-  '/ethereum/clients': typeof EthereumClientsRoute
+  '/ethereum/clients': typeof EthereumClientsRouteWithChildren
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
@@ -459,6 +485,7 @@ export interface FileRoutesByFullPath {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/clients/$client': typeof EthereumClientsClientRouteWithChildren
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
@@ -478,6 +505,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/xatu/nodes/$nodeId': typeof XatuNodesNodeIdRoute
+  '/ethereum/clients/': typeof EthereumClientsIndexRoute
   '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
@@ -486,7 +514,9 @@ export interface FileRoutesByFullPath {
   '/ethereum/validators/': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/xatu/nodes/': typeof XatuNodesIndexRoute
+  '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
@@ -501,7 +531,6 @@ export interface FileRoutesByTo {
   '/ethereum': typeof EthereumRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
-  '/ethereum/clients': typeof EthereumClientsRoute
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
@@ -531,6 +560,7 @@ export interface FileRoutesByTo {
   '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/xatu/nodes/$nodeId': typeof XatuNodesNodeIdRoute
+  '/ethereum/clients': typeof EthereumClientsIndexRoute
   '/ethereum/contracts': typeof EthereumContractsIndexRoute
   '/ethereum/entities': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs': typeof EthereumEpochsIndexRoute
@@ -539,7 +569,9 @@ export interface FileRoutesByTo {
   '/ethereum/validators': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
   '/xatu/nodes': typeof XatuNodesIndexRoute
+  '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/clients/$client': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerIndexRoute
@@ -556,7 +588,7 @@ export interface FileRoutesById {
   '/experiments': typeof ExperimentsRouteWithChildren
   '/xatu': typeof XatuRouteWithChildren
   '/beacon/locally-built-blocks': typeof BeaconLocallyBuiltBlocksRoute
-  '/ethereum/clients': typeof EthereumClientsRoute
+  '/ethereum/clients': typeof EthereumClientsRouteWithChildren
   '/ethereum/consensus': typeof EthereumConsensusRouteWithChildren
   '/ethereum/contracts': typeof EthereumContractsRouteWithChildren
   '/ethereum/data-availability': typeof EthereumDataAvailabilityRouteWithChildren
@@ -580,6 +612,7 @@ export interface FileRoutesById {
   '/xatu-data/': typeof XatuDataIndexRoute
   '/beacon/block-production/live': typeof BeaconBlockProductionLiveRoute
   '/beacon/slot/live': typeof BeaconSlotLiveRoute
+  '/ethereum/clients/$client': typeof EthereumClientsClientRouteWithChildren
   '/ethereum/consensus/overview': typeof EthereumConsensusOverviewRoute
   '/ethereum/contracts/$address': typeof EthereumContractsAddressRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyRouteWithChildren
@@ -599,6 +632,7 @@ export interface FileRoutesById {
   '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
   '/xatu/nodes/$nodeId': typeof XatuNodesNodeIdRoute
+  '/ethereum/clients/': typeof EthereumClientsIndexRoute
   '/ethereum/contracts/': typeof EthereumContractsIndexRoute
   '/ethereum/entities/': typeof EthereumEntitiesIndexRoute
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
@@ -607,7 +641,9 @@ export interface FileRoutesById {
   '/ethereum/validators/': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/xatu/nodes/': typeof XatuNodesIndexRoute
+  '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
@@ -649,6 +685,7 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/clients/$client'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
@@ -668,6 +705,7 @@ export interface FileRouteTypes {
     | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/xatu/nodes/$nodeId'
+    | '/ethereum/clients/'
     | '/ethereum/contracts/'
     | '/ethereum/entities/'
     | '/ethereum/epochs/'
@@ -676,7 +714,9 @@ export interface FileRouteTypes {
     | '/ethereum/validators/'
     | '/xatu/contributors/'
     | '/xatu/nodes/'
+    | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
@@ -691,7 +731,6 @@ export interface FileRouteTypes {
     | '/ethereum'
     | '/xatu'
     | '/beacon/locally-built-blocks'
-    | '/ethereum/clients'
     | '/ethereum/consensus'
     | '/ethereum/data-availability'
     | '/ethereum/execution'
@@ -721,6 +760,7 @@ export interface FileRouteTypes {
     | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/xatu/nodes/$nodeId'
+    | '/ethereum/clients'
     | '/ethereum/contracts'
     | '/ethereum/entities'
     | '/ethereum/epochs'
@@ -729,7 +769,9 @@ export interface FileRouteTypes {
     | '/ethereum/validators'
     | '/xatu/contributors'
     | '/xatu/nodes'
+    | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/clients/$client'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
     | '/ethereum/execution/gas-profiler'
@@ -769,6 +811,7 @@ export interface FileRouteTypes {
     | '/xatu-data/'
     | '/beacon/block-production/live'
     | '/beacon/slot/live'
+    | '/ethereum/clients/$client'
     | '/ethereum/consensus/overview'
     | '/ethereum/contracts/$address'
     | '/ethereum/data-availability/custody'
@@ -788,6 +831,7 @@ export interface FileRouteTypes {
     | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
     | '/xatu/nodes/$nodeId'
+    | '/ethereum/clients/'
     | '/ethereum/contracts/'
     | '/ethereum/entities/'
     | '/ethereum/epochs/'
@@ -796,7 +840,9 @@ export interface FileRouteTypes {
     | '/ethereum/validators/'
     | '/xatu/contributors/'
     | '/xatu/nodes/'
+    | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
@@ -1067,6 +1113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumContractsIndexRouteImport
       parentRoute: typeof EthereumContractsRoute
     }
+    '/ethereum/clients/': {
+      id: '/ethereum/clients/'
+      path: '/'
+      fullPath: '/ethereum/clients/'
+      preLoaderRoute: typeof EthereumClientsIndexRouteImport
+      parentRoute: typeof EthereumClientsRoute
+    }
     '/xatu/nodes/$nodeId': {
       id: '/xatu/nodes/$nodeId'
       path: '/$nodeId'
@@ -1200,6 +1253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumConsensusOverviewRouteImport
       parentRoute: typeof EthereumConsensusRoute
     }
+    '/ethereum/clients/$client': {
+      id: '/ethereum/clients/$client'
+      path: '/$client'
+      fullPath: '/ethereum/clients/$client'
+      preLoaderRoute: typeof EthereumClientsClientRouteImport
+      parentRoute: typeof EthereumClientsRoute
+    }
     '/beacon/slot/live': {
       id: '/beacon/slot/live'
       path: '/beacon/slot/live'
@@ -1249,12 +1309,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumDataAvailabilityCustodyIndexRouteImport
       parentRoute: typeof EthereumDataAvailabilityCustodyRoute
     }
+    '/ethereum/clients/$client/': {
+      id: '/ethereum/clients/$client/'
+      path: '/'
+      fullPath: '/ethereum/clients/$client/'
+      preLoaderRoute: typeof EthereumClientsClientIndexRouteImport
+      parentRoute: typeof EthereumClientsClientRoute
+    }
     '/ethereum/execution/gas-profiler/simulate': {
       id: '/ethereum/execution/gas-profiler/simulate'
       path: '/simulate'
       fullPath: '/ethereum/execution/gas-profiler/simulate'
       preLoaderRoute: typeof EthereumExecutionGasProfilerSimulateRouteImport
       parentRoute: typeof EthereumExecutionGasProfilerRoute
+    }
+    '/ethereum/clients/$client/$version': {
+      id: '/ethereum/clients/$client/$version'
+      path: '/$version'
+      fullPath: '/ethereum/clients/$client/$version'
+      preLoaderRoute: typeof EthereumClientsClientVersionRouteImport
+      parentRoute: typeof EthereumClientsClientRoute
     }
     '/ethereum/execution/gas-profiler/tx/$txHash': {
       id: '/ethereum/execution/gas-profiler/tx/$txHash'
@@ -1279,6 +1353,35 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface EthereumClientsClientRouteChildren {
+  EthereumClientsClientVersionRoute: typeof EthereumClientsClientVersionRoute
+  EthereumClientsClientIndexRoute: typeof EthereumClientsClientIndexRoute
+}
+
+const EthereumClientsClientRouteChildren: EthereumClientsClientRouteChildren = {
+  EthereumClientsClientVersionRoute: EthereumClientsClientVersionRoute,
+  EthereumClientsClientIndexRoute: EthereumClientsClientIndexRoute,
+}
+
+const EthereumClientsClientRouteWithChildren =
+  EthereumClientsClientRoute._addFileChildren(
+    EthereumClientsClientRouteChildren,
+  )
+
+interface EthereumClientsRouteChildren {
+  EthereumClientsClientRoute: typeof EthereumClientsClientRouteWithChildren
+  EthereumClientsIndexRoute: typeof EthereumClientsIndexRoute
+}
+
+const EthereumClientsRouteChildren: EthereumClientsRouteChildren = {
+  EthereumClientsClientRoute: EthereumClientsClientRouteWithChildren,
+  EthereumClientsIndexRoute: EthereumClientsIndexRoute,
+}
+
+const EthereumClientsRouteWithChildren = EthereumClientsRoute._addFileChildren(
+  EthereumClientsRouteChildren,
+)
 
 interface EthereumConsensusRouteChildren {
   EthereumConsensusOverviewRoute: typeof EthereumConsensusOverviewRoute
@@ -1503,7 +1606,7 @@ const EthereumValidatorsRouteWithChildren =
   EthereumValidatorsRoute._addFileChildren(EthereumValidatorsRouteChildren)
 
 interface EthereumRouteChildren {
-  EthereumClientsRoute: typeof EthereumClientsRoute
+  EthereumClientsRoute: typeof EthereumClientsRouteWithChildren
   EthereumConsensusRoute: typeof EthereumConsensusRouteWithChildren
   EthereumContractsRoute: typeof EthereumContractsRouteWithChildren
   EthereumDataAvailabilityRoute: typeof EthereumDataAvailabilityRouteWithChildren
@@ -1517,7 +1620,7 @@ interface EthereumRouteChildren {
 }
 
 const EthereumRouteChildren: EthereumRouteChildren = {
-  EthereumClientsRoute: EthereumClientsRoute,
+  EthereumClientsRoute: EthereumClientsRouteWithChildren,
   EthereumConsensusRoute: EthereumConsensusRouteWithChildren,
   EthereumContractsRoute: EthereumContractsRouteWithChildren,
   EthereumDataAvailabilityRoute: EthereumDataAvailabilityRouteWithChildren,

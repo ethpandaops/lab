@@ -1,6 +1,6 @@
 export interface ClientLogoProps {
   /**
-   * Consensus client name (e.g., "lighthouse", "prysm", "teku")
+   * Consensus or execution client name (e.g., "lighthouse", "geth")
    */
   client: string;
   /**
@@ -11,4 +11,8 @@ export interface ClientLogoProps {
    * Additional CSS classes
    */
   className?: string;
+  /**
+   * Render the logo without a link to the client page, e.g. inside buttons, selects, legends or other links
+   */
+  noLink?: boolean;
 }

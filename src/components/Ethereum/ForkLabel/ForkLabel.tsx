@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 
 import { FORK_METADATA } from '@/utils/beacon';
@@ -5,21 +6,27 @@ import { FORK_METADATA } from '@/utils/beacon';
 import type { ForkLabelProps } from './ForkLabel.types';
 
 /**
- * Displays a beacon chain fork label with emoji icon and name
+ * Displays a beacon chain fork label with emoji icon and name, linked to the fork's page
  *
  * @example
  * // Default size with icon
  * <ForkLabel fork="deneb" />
  *
  * @example
- * // Small size without icon
- * <ForkLabel fork="altair" size="sm" showIcon={false} />
+ * // Small size without icon or link
+ * <ForkLabel fork="altair" size="sm" showIcon={false} noLink />
  *
  * @example
  * // Large size
  * <ForkLabel fork="bellatrix" size="lg" />
  */
-export function ForkLabel({ fork, className, size = 'md', showIcon = true }: ForkLabelProps): React.JSX.Element {
+export function ForkLabel({
+  fork,
+  className,
+  size = 'md',
+  showIcon = true,
+  noLink = false,
+}: ForkLabelProps): React.JSX.Element {
   // Networks can serve fork names newer than this build knows about; render
   // them as a plain label instead of crashing on missing metadata.
   const metadata = FORK_METADATA[fork] ?? {
@@ -42,18 +49,36 @@ export function ForkLabel({ fork, className, size = 'md', showIcon = true }: For
     lg: 'text-lg',
   };
 
-  return (
-    <span
-      className={clsx(
-        'inline-flex items-center rounded-xs font-semibold tracking-wide uppercase',
-        metadata.color,
-        sizeClasses[size],
-        className
-      )}
-      title={metadata.description}
-    >
+  const classes = clsx(
+    'inline-flex items-center rounded-xs font-semibold tracking-wide uppercase',
+    metadata.color,
+    sizeClasses[size],
+    className
+  );
+  const content = (
+    <>
       {showIcon && <span className={iconSizeClasses[size]}>{metadata.emoji}</span>}
       <span>{metadata.name}</span>
-    </span>
+    </>
+  );
+
+  if (noLink) {
+    return (
+      <span className={classes} title={metadata.description}>
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      to="/ethereum/forks/$fork"
+      params={{ fork }}
+      className={clsx(classes, 'hover:opacity-80')}
+      title={metadata.description}
+      onClick={event => event.stopPropagation()}
+    >
+      {content}
+    </Link>
   );
 }

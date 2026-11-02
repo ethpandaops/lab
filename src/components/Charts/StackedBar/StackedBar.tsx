@@ -357,7 +357,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
                   className={clsx('size-3 rounded-xs', isSelected && 'ring-2 ring-primary ring-offset-1')}
                   style={{ backgroundColor: color }}
                 />
-                {isKnownClient(seg.name) && <ClientLogo client={seg.name} size={14} />}
+                {isKnownClient(seg.name) && <ClientLogo client={seg.name} size={14} noLink />}
                 <span className="text-foreground">{seg.name}</span>
               </button>
             );

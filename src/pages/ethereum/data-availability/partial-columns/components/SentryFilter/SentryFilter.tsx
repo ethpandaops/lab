@@ -30,7 +30,7 @@ export function SentryFilter({ clients, value, onChange }: SentryFilterProps): J
               : 'border-border bg-surface text-muted hover:border-primary/40'
           )}
         >
-          <ClientLogo client={client} size={14} />
+          <ClientLogo client={client} size={14} noLink />
           {formatClientName(client)}
         </button>
       ))}

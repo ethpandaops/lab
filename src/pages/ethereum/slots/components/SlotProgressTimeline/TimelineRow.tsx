@@ -65,7 +65,7 @@ export function TimelineRow({
         ) : (
           span.depth > 0 && <span className="text-muted">{'└'}</span>
         )}
-        {span.clientName && <ClientLogo client={span.clientName} size={14} className="shrink-0" />}
+        {span.clientName && <ClientLogo client={span.clientName} size={14} className="shrink-0" noLink />}
         <span className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')} title={span.label}>
           {span.label}
           {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}

@@ -1,0 +1,33 @@
+import type { JSX } from 'react';
+import { DIVERSITY_THRESHOLDS } from '../../utils/client-versions';
+
+export interface ShareBarProps {
+  /** Share, 0-100 */
+  share: number;
+  color: string;
+  /** Draw the ⅓, ½ and ⅔ diversity thresholds */
+  showThresholds?: boolean;
+}
+
+/**
+ * A share as a filled bar, with the client diversity thresholds marked.
+ */
+export function ShareBar({ share, color, showThresholds = true }: ShareBarProps): JSX.Element {
+  return (
+    <div className="relative h-2 w-full rounded-full bg-border/50">
+      <div
+        className="h-full rounded-full"
+        style={{ width: `${Math.min(100, Math.max(0, share))}%`, backgroundColor: color }}
+      />
+      {showThresholds &&
+        DIVERSITY_THRESHOLDS.map(threshold => (
+          <span
+            key={threshold.label}
+            className="absolute -top-0.5 h-3 w-px bg-foreground/40"
+            style={{ left: `${threshold.share}%` }}
+            title={`${threshold.label} threshold`}
+          />
+        ))}
+    </div>
+  );
+}

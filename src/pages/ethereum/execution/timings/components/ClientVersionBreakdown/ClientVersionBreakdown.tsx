@@ -906,7 +906,7 @@ export function ClientVersionBreakdown({
                             className={clsx('size-4 text-muted transition-transform', chevronExpanded && 'rotate-90')}
                           />
                         )}
-                        <ClientLogo client={row.client} size={compactClient ? 24 : 20} />
+                        <ClientLogo client={row.client} size={compactClient ? 24 : 20} noLink />
                         {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
                       </div>
                     </td>

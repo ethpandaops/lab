@@ -26,8 +26,8 @@ export function NodeSelector({ nodes, selectedNode, onChange, nodeClientInfo }: 
         icon:
           info?.cl || info?.el ? (
             <span className="flex items-center gap-px">
-              {info.cl && <ClientLogo client={info.cl} size={12} />}
-              {info.el && <ClientLogo client={info.el} size={12} />}
+              {info.cl && <ClientLogo client={info.cl} size={12} noLink />}
+              {info.el && <ClientLogo client={info.el} size={12} noLink />}
             </span>
           ) : undefined,
       };

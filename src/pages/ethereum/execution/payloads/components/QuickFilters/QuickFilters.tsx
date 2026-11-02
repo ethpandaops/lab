@@ -253,7 +253,7 @@ export function QuickFilters({
                   : 'border-border bg-surface text-foreground hover:border-primary/40'
               )}
             >
-              <ClientLogo client={client.id} size={14} />
+              <ClientLogo client={client.id} size={14} noLink />
               <span>{client.name}</span>
             </button>
           );

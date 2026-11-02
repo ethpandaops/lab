@@ -22,4 +22,10 @@ export interface ForkLabelProps {
    * @default true
    */
   showIcon?: boolean;
+
+  /**
+   * Render without a link to the fork's page
+   * @default false
+   */
+  noLink?: boolean;
 }

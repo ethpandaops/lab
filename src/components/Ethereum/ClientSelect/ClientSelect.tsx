@@ -66,7 +66,7 @@ export function ClientSelect({
       ...clients.map(client => ({
         value: client.name,
         label: `${client.name} (${client.count})`,
-        icon: <ClientLogo client={client.name} size={20} />,
+        icon: <ClientLogo client={client.name} size={20} noLink />,
       })),
     ],
     [clients]

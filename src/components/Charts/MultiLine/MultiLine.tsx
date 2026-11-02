@@ -1221,6 +1221,7 @@ export function MultiLineChart({
                   <LegendSwatch series={s} color={seriesColor} active={isVisible} />
                   {isKnownClient(s.client ?? s.name) && (
                     <ClientLogo
+                      noLink
                       client={s.client ?? s.name}
                       size={14}
                       className={isVisible ? undefined : 'opacity-50'}
