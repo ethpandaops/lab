@@ -170,7 +170,7 @@ export function PeerSupport({
       <Card
         rounded
         title="Custody probes by peer version"
-        subtitle="Peers our probers sampled columns from in the last hour"
+        subtitle="Peers Xatu probers sampled columns from in the last hour"
         actions={
           <Link
             to="/ethereum/data-availability/probes"
@@ -202,7 +202,7 @@ export function PeerSupport({
         {isLoading ? (
           <p className="text-sm text-muted">Loading peers</p>
         ) : partialRows.length === 0 ? (
-          <p className="text-sm text-muted">Our sentries saw no peers running this client.</p>
+          <p className="text-sm text-muted">Xatu sentries saw no peers running this client.</p>
         ) : (
           <Table
             variant="nested"

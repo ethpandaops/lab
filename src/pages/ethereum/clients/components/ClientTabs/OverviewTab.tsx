@@ -97,7 +97,11 @@ export function OverviewTab({
 
   const nodeWeighted = useNodeWeightedShares(layer);
   const nodeShare = (shares: ClientSummary[]): string =>
-    nodeWeighted.isLoading ? '…' : `${(shares.find(item => item.client === client)?.identifiedShare ?? 0).toFixed(1)}%`;
+    nodeWeighted.isLoading
+      ? '…'
+      : shares.length === 0
+        ? '-'
+        : `${(shares.find(item => item.client === client)?.identifiedShare ?? 0).toFixed(1)}%`;
   const share = summary.mine?.identifiedShare ?? 0;
   const next = summary.mine ? nextThreshold(share) : null;
 
@@ -121,13 +125,17 @@ export function OverviewTab({
             id: 'p2p',
             label: 'Node-weighted (P2P peers)',
             value: nodeShare(nodeWeighted.p2p),
-            detail: `Share of peers seen on the P2P network, ${nodeWeighted.p2pDay ?? '-'}`,
+            detail: nodeWeighted.p2pDay
+              ? `Share of peers seen on the P2P network, ${nodeWeighted.p2pDay}`
+              : 'No P2P census yet',
           },
           {
             id: 'enr',
             label: 'ENR crawl',
             value: nodeShare(nodeWeighted.enr),
-            detail: `Share of nodes found in discovery records, ${nodeWeighted.enrDay ?? '-'}`,
+            detail: nodeWeighted.enrDay
+              ? `Share of nodes found in discovery records, ${nodeWeighted.enrDay}`
+              : 'No ENR crawl yet',
           },
           layer === 'consensus'
             ? {

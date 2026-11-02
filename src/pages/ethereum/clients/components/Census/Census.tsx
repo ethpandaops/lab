@@ -130,7 +130,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   if (own.rows.length === 0) {
     return (
       <Card rounded title="P2P peers">
-        <p className="text-sm text-muted">Our crawlers have not seen peers running this client.</p>
+        <p className="text-sm text-muted">Xatu crawlers have not seen peers running this client.</p>
       </Card>
     );
   }
@@ -673,6 +673,8 @@ export function VersionNetwork({
       <Card rounded title="P2P peers on this version" subtitle={`Node-weighted, ${own.day ?? '-'}`}>
         {own.isLoading ? (
           <LoadingContainer className="h-24 rounded-sm" />
+        ) : total === 0 ? (
+          <p className="text-sm text-muted">Xatu crawlers have not seen peers running this client.</p>
         ) : (
           <dl className="grid grid-cols-2 gap-4">
             <div>
