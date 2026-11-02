@@ -23,7 +23,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row }) => (
       <span className="flex items-center gap-2">
         <NodeStatus online={row.original.online} />
-        <span className="max-w-44 truncate font-mono text-foreground" title={row.original.nodeId}>
+        <span className="max-w-32 truncate font-mono text-foreground" title={row.original.nodeId}>
           {row.original.nodeId}
         </span>
       </span>
@@ -34,7 +34,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     id: 'contributor',
     header: 'Contributor',
     accessorFn: row => row.node.username ?? '',
-    cell: ({ getValue }) => <span className="block max-w-28 truncate">{getValue() as string}</span>,
+    cell: ({ getValue }) => <span className="block max-w-24 truncate">{getValue() as string}</span>,
   },
   {
     id: 'client',
@@ -61,7 +61,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row, getValue }) => (
       <span className="flex items-center gap-1.5">
         <span>{getCountryFlag(row.original.node.meta_client_geo_country_code, '')}</span>
-        <span className="max-w-32 truncate">{getValue() as string}</span>
+        <span className="max-w-28 truncate">{getValue() as string}</span>
       </span>
     ),
   },
@@ -69,7 +69,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     id: 'asn',
     header: 'ASN',
     accessorFn: row => row.node.meta_client_geo_autonomous_system_organization ?? '',
-    cell: ({ getValue }) => <span className="block max-w-28 truncate">{(getValue() as string) || '–'}</span>,
+    cell: ({ getValue }) => <span className="block max-w-24 truncate">{(getValue() as string) || '–'}</span>,
   },
   {
     id: 'collector',
