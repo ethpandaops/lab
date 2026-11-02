@@ -138,7 +138,8 @@ export function DetailPage(): React.JSX.Element {
 
             {/* Recent Tab */}
             <TabPanel>
-              <RecentActivityTable epochs={data.epochData} />
+              <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Last 10 epochs</h3>
+              <RecentActivityTable epochs={data.epochData.slice(0, 10)} />
             </TabPanel>
 
             {/* Attestations Tab */}

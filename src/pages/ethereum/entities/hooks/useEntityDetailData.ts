@@ -164,11 +164,12 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
     const allEpochs = new Set([...epochAttestationMap.keys(), ...epochBlockMap.keys()]);
     const sortedEpochs = Array.from(allEpochs).sort((a, b) => b - a); // Sort descending (most recent first)
 
-    // Filter out the most recent epoch (still in progress) and limit to last 10 completed epochs
+    // Every complete epoch in the 12h window: drop the newest (still in progress) and the oldest (cut by the
+    // window's start)
     const maxEpoch = sortedEpochs.length > 0 ? sortedEpochs[0] : 0;
+    const minEpoch = sortedEpochs.length > 0 ? sortedEpochs[sortedEpochs.length - 1] : 0;
     const epochData: EntityEpochData[] = sortedEpochs
-      .filter(epoch => epoch !== maxEpoch)
-      .slice(0, 10) // Take only the 10 most recent completed epochs
+      .filter(epoch => epoch !== maxEpoch && epoch !== minEpoch)
       .map(epoch => {
         const attestationStats = epochAttestationMap.get(epoch) ?? {
           totalAttestations: 0,
@@ -190,22 +191,13 @@ export function useEntityDetailData(entity: string): UseEntityDetailDataReturn {
         };
       });
 
-    // Calculate 12h statistics
-    let totalAttestations12h = 0;
-    let missedAttestations12h = 0;
-
-    attestation12hData.forEach((record: FctAttestationLivenessByEntityHead) => {
-      const attestationCount = record.attestation_count ?? 0;
-      const missedCount = record.missed_count ?? 0;
-
-      totalAttestations12h += attestationCount;
-      missedAttestations12h += missedCount;
-    });
-
+    // 12h statistics over the complete epochs
+    const totalAttestations12h = epochData.reduce((sum, e) => sum + e.totalAttestations, 0);
+    const missedAttestations12h = epochData.reduce((sum, e) => sum + e.missedAttestations, 0);
     const total12h = totalAttestations12h + missedAttestations12h;
     const rate12h = total12h > 0 ? totalAttestations12h / total12h : 0;
 
-    // Estimate validator count (average attestations per epoch)
+    // Every active validator attests once per epoch, so the duties per epoch are the active validators
     const validatorCount = epochData.length > 0 ? Math.round(total12h / epochData.length) : 0;
 
     // Count blocks proposed (12h) - using _entity data

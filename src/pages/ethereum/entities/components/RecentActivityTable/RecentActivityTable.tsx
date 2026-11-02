@@ -20,7 +20,6 @@ import type { RecentActivityTableProps } from './RecentActivityTable.types';
  * - Block proposals count
  *
  * Rows are clickable and navigate to the epoch detail page.
- * Shows most recent 10 completed epochs (excludes current epoch in progress).
  */
 export function RecentActivityTable({ epochs }: RecentActivityTableProps): JSX.Element {
   const navigate = useNavigate();
