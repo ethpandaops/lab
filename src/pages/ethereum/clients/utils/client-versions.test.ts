@@ -166,9 +166,9 @@ describe('timeToAdoption', () => {
 
 describe('nextThreshold', () => {
   it('should name the next threshold above a share and the distance to it', () => {
-    expect(nextThreshold(20)?.label).toBe('⅓');
+    expect(nextThreshold(20)?.label).toBe('33%');
     const next = nextThreshold(40);
-    expect(next?.label).toBe('½');
+    expect(next?.label).toBe('50%');
     expect(next?.distance).toBeCloseTo(10);
     expect(nextThreshold(70)).toBeNull();
   });

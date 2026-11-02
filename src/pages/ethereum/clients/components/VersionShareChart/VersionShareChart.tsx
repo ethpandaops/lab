@@ -1,9 +1,8 @@
 import { type JSX, useMemo } from 'react';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import type { VersionDay, VersionSummary } from '../../utils/client-versions';
+import { OTHER_VERSION_COLOR, versionColors, type VersionDay, type VersionSummary } from '../../utils/client-versions';
 
 export interface VersionShareChartProps {
   days: VersionDay[];
@@ -20,21 +19,17 @@ const OTHER = 'Other';
  */
 export function VersionShareChart({ days, versions, limit = 7, height = 320 }: VersionShareChartProps): JSX.Element {
   const { series, labels } = useMemo(() => {
-    const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
-    const top = [...versions]
-      .sort((a, b) => b.blocks - a.blocks)
-      .slice(0, limit)
-      .map(summary => summary.version)
-      .sort((a, b) => compareVersions(b, a));
+    const colors = versionColors(versions, getDataVizColors().CHART_CATEGORICAL_COLORS, limit);
+    const top = [...colors.keys()];
     const shown = new Set(top);
     const hasOther = versions.some(summary => !shown.has(summary.version));
     const share = (day: VersionDay, count: number): number | null =>
       day.resolved > 0 ? Number(((count / day.resolved) * 100).toFixed(2)) : null;
 
-    const result: SeriesData[] = top.map((version, index) => ({
+    const result: SeriesData[] = top.map(version => ({
       name: version,
       data: days.map(day => share(day, day.counts.get(version) ?? 0)),
-      color: CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length],
+      color: colors.get(version),
       stack: 'share',
       showArea: true,
       areaOpacity: 0.85,
@@ -49,7 +44,7 @@ export function VersionShareChart({ days, versions, limit = 7, height = 320 }: V
           for (const [version, count] of day.counts) if (!shown.has(version)) other += count;
           return share(day, other);
         }),
-        color: '#9ca3af',
+        color: OTHER_VERSION_COLOR,
         stack: 'share',
         showArea: true,
         areaOpacity: 0.3,

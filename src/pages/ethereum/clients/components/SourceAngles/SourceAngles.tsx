@@ -2,7 +2,7 @@ import type { JSX, ReactNode } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 
-/** One way of counting a client: by stake, by P2P peers, by ENR records or by our own nodes */
+/** One way of counting a client: by stake, by P2P peers, by ENR records or by Xatu nodes */
 export interface SourceAngle {
   id: string;
   label: string;

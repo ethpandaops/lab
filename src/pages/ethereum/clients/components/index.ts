@@ -6,7 +6,7 @@ export { ClientsSkeleton } from './ClientsSkeleton';
 export { ClientSummaryGrid } from './ClientSummaryGrid';
 export { DiversityCard } from './DiversityCard';
 export { EntityFilter } from './EntityFilter';
-export { EntityTable } from './EntityTable';
+export { EntityVersionBars } from './EntityVersionBars';
 export { ForkReadinessCard } from './ForkReadinessCard';
 export { GraffitiBlocksTable } from './GraffitiBlocksTable';
 export { NodeClientVersion } from './NodeClientVersion';

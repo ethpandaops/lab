@@ -24,7 +24,7 @@ export function ClientLabel({ client, detail, version, noLink = false }: ClientL
   const linked = !noLink && isKnownClient(client);
   const name = (
     <>
-      <ClientLogo client={client} size={16} noLink />
+      <ClientLogo client={client} size={16} noLink decorative />
       <span className={clsx('text-sm/6', isUnknown ? 'text-muted' : 'font-medium text-foreground')}>
         {formatClientName(client)}
       </span>

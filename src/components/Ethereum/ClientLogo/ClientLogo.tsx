@@ -8,7 +8,13 @@ import type { ClientLogoProps } from './ClientLogo.types';
 /**
  * A client's logo, linked to the client's page unless `noLink` is set or the client is not known.
  */
-export function ClientLogo({ client, size = 20, className = '', noLink = false }: ClientLogoProps): JSX.Element {
+export function ClientLogo({
+  client,
+  size = 20,
+  className = '',
+  noLink = false,
+  decorative = false,
+}: ClientLogoProps): JSX.Element {
   const [hasError, setHasError] = useState(false);
 
   if (hasError || client.toLowerCase() === 'unknown') {
@@ -27,14 +33,14 @@ export function ClientLogo({ client, size = 20, className = '', noLink = false }
   const image = (
     <img
       src={getClientLogoUrl(client)}
-      alt={client}
+      alt={decorative ? '' : client}
       className={clsx(
         'rounded-sm',
         LIGHT_GLYPH_CLIENTS.has(normalizeClientName(client)) && 'invert dark:invert-0 star:invert-0',
         !linked && className
       )}
       style={{ width: `${size}px`, height: `${size}px` }}
-      title={client}
+      title={decorative ? undefined : client}
       onError={() => setHasError(true)}
     />
   );
