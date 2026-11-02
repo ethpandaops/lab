@@ -90,7 +90,7 @@ export function IndexPage(): JSX.Element {
   );
   const hasFilters = !!entity || !!filters.consensusClient || !!filters.executionClient;
 
-  const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
+  const { records, keys, isDaily, since, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
   const diversityBy = search.by ?? 'blocks';
@@ -400,7 +400,12 @@ export function IndexPage(): JSX.Element {
           )}
 
           {!isEmpty && (
-            <GraffitiBlocksTable search={search} fields={INDEX_BLOCK_FIELDS} onSearchChange={setBlockSearch} />
+            <GraffitiBlocksTable
+              search={search}
+              fields={INDEX_BLOCK_FIELDS}
+              onSearchChange={setBlockSearch}
+              since={since ?? undefined}
+            />
           )}
         </div>
       )}

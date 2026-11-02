@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { DimClientRelease, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
+import type { DimClientRelease, FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
 import {
   adoptionByDay,
   buildLine,
@@ -11,12 +11,14 @@ import {
   matchReleaseVersion,
   nextThreshold,
   opcodeCosts,
+  opcodeRowsFromDaily,
   peerClient,
   previousRelease,
   releaseName,
   releaseUrl,
-  toVersionCounts,
+  shareStat,
   summariseVersions,
+  toVersionCounts,
   summariseBuildLines,
   summariseUnresolved,
   timeToAdoption,
@@ -133,6 +135,27 @@ describe('adoptionByDay', () => {
       block(day + 4, null),
     ]);
     expect(adoptionByDay(days, 'v8.3.1')).toEqual([{ day: '2026-10-01', exact: 50, atLeast: 75 }]);
+  });
+});
+
+describe('shareStat', () => {
+  it('should show the latest share and its change since the first day with blocks', () => {
+    const points = [
+      { day: '2026-10-01', exact: null, atLeast: null },
+      { day: '2026-10-02', exact: 60, atLeast: 80 },
+      { day: '2026-10-03', exact: 25.04, atLeast: 90 },
+      { day: '2026-10-04', exact: null, atLeast: null },
+    ];
+    expect(shareStat(points, 'exact', '7d')).toEqual({
+      value: '25.0%',
+      delta: { value: '-35.0 pts over 7d', type: 'neutral' },
+    });
+    expect(shareStat(points, 'atLeast', '7d').delta?.value).toBe('+10.0 pts over 7d');
+  });
+
+  it('should leave out the change with a single day of blocks', () => {
+    expect(shareStat([{ day: '2026-10-01', exact: 40, atLeast: 40 }], 'exact', '7d')).toEqual({ value: '40.0%' });
+    expect(shareStat([], 'exact', '7d')).toEqual({ value: '-' });
   });
 });
 
@@ -261,6 +284,33 @@ describe('compareOpcodeCosts', () => {
       ['CALL', false],
     ]);
     expect(changes[0].change).toBeCloseTo(-0.5);
+  });
+});
+
+describe('opcodeRowsFromDaily', () => {
+  const daily = (day: string, versions: string[], hours: number): FctOpcodeCostByElClientDaily => ({
+    day_start_date: day,
+    meta_execution_versions: versions,
+    opcode_group: 'SLOAD',
+    hour_count: hours,
+    block_count: 100,
+    ns_per_op: 50,
+  });
+
+  it('should keep full days on one build line', () => {
+    const rows = opcodeRowsFromDaily(
+      [
+        // Two commits of one line: kept as that line
+        daily('2026-10-28', ['2.8.1-f1cc50e4', '2.8.1-e0378eb6'], 24),
+        // Upgrade day mixes two lines: its fit belongs to neither
+        daily('2026-10-30', ['2.9.0-c3066914', '2.8.1-966010c9'], 24),
+        daily('2026-11-01', ['2.9.0-84caec58'], 24),
+        // Today, still filling
+        daily('2026-11-02', ['2.9.0-84caec58'], 8),
+      ],
+      24
+    );
+    expect(rows.map(row => row.meta_execution_version)).toEqual(['2.8.1-f1cc50e4', '2.9.0-84caec58']);
   });
 });
 

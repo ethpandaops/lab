@@ -13,21 +13,24 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Table } from '@/components/Lists/Table';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import type { DimClientRelease } from '@/api/types.gen';
+import type { DimClientRelease, FctHeadFirstSeenByNodeDaily, IntCustodyProbe } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getClientColor, normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
+import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
 import { VERSION_WINDOW_DAYS, VERSION_WINDOW_OPTIONS, type VersionWindow } from './constants';
+import { ClientHeader, EntityVersionBars, ForkReadinessCard, ReferenceEngine, VersionNetwork } from './components';
 import {
-  ClientHeader,
-  EntityVersionBars,
-  ForkReadinessCard,
-  NodeTable,
-  ReferenceEngine,
-  VersionNetwork,
-} from './components';
-import { useVersionCounts, useClientNodes, useClientReleases, usePeerSupport, useReferenceEngine } from './hooks';
+  PROBE_SLICE_SECONDS,
+  PROBE_SLICES,
+  useClientNodes,
+  useClientReleases,
+  useNodeVersions,
+  useProbeSample,
+  useReferenceEngine,
+  useVersionCounts,
+} from './hooks';
 import {
   adoptionByDay,
   buildMatchesRelease,
@@ -40,6 +43,7 @@ import {
   previousRelease,
   releaseName,
   releaseUrl as releasePageUrl,
+  shareStat,
   summariseBuildLines,
   timeToAdoption,
   OTHER_VERSION_COLOR,
@@ -66,19 +70,21 @@ function lagValue(lag: MeasuredLag | null): { value: string; note?: string } {
 
 /** Days after release the time to adoption is measured over */
 const LAG_HORIZON_DAYS = 60;
-/** Days before release the adoption chart starts */
-const CHART_LEAD_DAYS = 14;
 
 /** Lag with whether the measured horizon has passed, so not reaching a share reads as over it */
 type MeasuredLag = AdoptionLag & { horizonPassed?: boolean };
 
-/** Hourly counts around a release, for its time to adoption */
+/**
+ * Hourly counts after a release within the page's range, for its time to adoption. A release before the range
+ * reads as released before the window.
+ */
 function useReleaseHours(
   client: string,
   layer: ClientLayer | null,
-  releaseTime: number | null | undefined
+  releaseTime: number | null | undefined,
+  rangeStart: number
 ): { rows: VersionCount[]; horizonPassed: boolean } {
-  const from = releaseTime ? Math.floor(releaseTime / 3600) * 3600 - 24 * 3600 : undefined;
+  const from = releaseTime ? Math.max(Math.floor(releaseTime / 3600) * 3600 - 24 * 3600, rangeStart) : undefined;
   const horizon = releaseTime ? releaseTime + LAG_HORIZON_DAYS * 86400 : undefined;
   const now = Math.floor(Date.now() / 1000 / 600) * 600;
   const { rows } = useVersionCounts({
@@ -92,7 +98,7 @@ function useReleaseHours(
   return { rows, horizonPassed: !!horizon && horizon < now };
 }
 
-/** Blocks, entities and Xatu nodes on one version */
+/** Blocks, entities and Xatu nodes on one version over the page's range */
 interface VersionFacts {
   release?: DimClientRelease;
   blocks: number;
@@ -103,8 +109,8 @@ interface VersionFacts {
 }
 
 /**
- * Facts about one version: blocks over all history, entities over the entity window, time to adoption from the
- * hours after release, and Xatu nodes now.
+ * Facts about one version over the page's range: blocks, entities, time to adoption from the hours after release,
+ * and Xatu nodes that ran it on any day.
  */
 function versionFacts(
   release: DimClientRelease | undefined,
@@ -112,7 +118,7 @@ function versionFacts(
   history: VersionCount[],
   entityRows: VersionCount[],
   hours: { rows: VersionCount[]; horizonPassed: boolean },
-  nodeVersions: string[]
+  nodes: VersionNode[]
 ): VersionFacts {
   const releaseTime = release?.release_date ?? null;
   const lag = (threshold: number): MeasuredLag | null =>
@@ -128,7 +134,7 @@ function versionFacts(
         .map(row => row.entity)
         .filter(Boolean)
     ).size,
-    nodes: nodeVersions.filter(nodeVersion => nodeVersion === version).length,
+    nodes: nodes.filter(node => node.version === version).length,
     lag50: lag(50),
     lag90: lag(90),
   };
@@ -168,47 +174,42 @@ export function VersionPage(): JSX.Element {
   const previous = release ? previousRelease(releases, release) : undefined;
   const next = release ? nextRelease(releases, release) : undefined;
 
-  const history = useVersionCounts({ grain: 'daily', client, layer, enabled: !!layer });
-  const entityCounts = useVersionCounts({
-    grain: 'entity-daily',
-    client,
-    layer,
-    from: windowStart(VERSION_WINDOW_DAYS[window]),
-    enabled: !!layer,
-  });
-  const releaseHours = useReleaseHours(client, layer, release?.release_date);
-  const previousHours = useReleaseHours(client, layer, previous?.release_date);
+  // Everything below the range control covers the range
+  const windowDays = VERSION_WINDOW_DAYS[window];
+  const rangeStart = windowStart(windowDays);
+  const history = useVersionCounts({ grain: 'daily', client, layer, from: rangeStart, enabled: !!layer });
+  const entityCounts = useVersionCounts({ grain: 'entity-daily', client, layer, from: rangeStart, enabled: !!layer });
+  const releaseHours = useReleaseHours(client, layer, release?.release_date, rangeStart);
+  const previousHours = useReleaseHours(client, layer, previous?.release_date, rangeStart);
   const blocksLoading = history.isLoading;
+  // The fork card above the control reads the last 24 hours and the nodes active now
   const recent24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart(), enabled: !!layer });
-  const { nodes, isLoading: nodesLoading } = useClientNodes(client, layer);
-  const peers = usePeerSupport(client, layer === 'consensus');
-  const reference = useReferenceEngine(client, layer === 'execution');
-
-  // The chart starts shortly before release, or covers all history for a version without a release date
-  const chartFrom = release?.release_date ? release.release_date - CHART_LEAD_DAYS * 86400 : 0;
-  const days = useMemo(
-    () => countVersionsByDay(history.rows.filter(row => row.time + 86400 > chartFrom)),
-    [history.rows, chartFrom]
+  const { nodes } = useClientNodes(client, layer);
+  const nodeDays = useNodeVersions(client, windowDays, layer === 'consensus');
+  const probeVersions = useMemo(
+    () => [version, previous?.version].filter((item): item is string => !!item),
+    [version, previous?.version]
   );
+  const probes = useProbeSample(client, probeVersions, rangeStart, layer === 'consensus');
+  const reference = useReferenceEngine(client, layer === 'execution', windowDays);
+
+  const days = useMemo(() => countVersionsByDay(history.rows), [history.rows]);
   const adoption = useMemo(() => adoptionByDay(days, version), [days, version]);
   const previousAdoption = useMemo(
     () => (previous?.version ? adoptionByDay(days, previous.version) : []),
     [days, previous?.version]
   );
-  const nodeVersions = useMemo(
-    () => (layer === 'consensus' ? nodes.map(node => displayVersion(node.meta_consensus_version, releases)) : []),
-    [nodes, layer, releases]
-  );
+  const versionNodes = useMemo(() => nodesByVersion(nodeDays.rows, releases), [nodeDays.rows, releases]);
   const facts = useMemo(
-    () => versionFacts(release, version, history.rows, entityCounts.rows, releaseHours, nodeVersions),
-    [release, version, history.rows, entityCounts.rows, releaseHours, nodeVersions]
+    () => versionFacts(release, version, history.rows, entityCounts.rows, releaseHours, versionNodes),
+    [release, version, history.rows, entityCounts.rows, releaseHours, versionNodes]
   );
   const previousFacts = useMemo(
     () =>
       previous?.version
-        ? versionFacts(previous, previous.version, history.rows, entityCounts.rows, previousHours, nodeVersions)
+        ? versionFacts(previous, previous.version, history.rows, entityCounts.rows, previousHours, versionNodes)
         : null,
-    [previous, history.rows, entityCounts.rows, previousHours, nodeVersions]
+    [previous, history.rows, entityCounts.rows, previousHours, versionNodes]
   );
 
   const requirement = forkRequirements(currentNetwork, client).find(item => item.fork === search.fork);
@@ -249,7 +250,6 @@ export function VersionPage(): JSX.Element {
   }
 
   const name = formatClientName(client);
-  const lastPoint = [...adoption].reverse().find(point => point.exact !== null);
   const releaseUrl = releasePageUrl(release);
   const title = releaseName(release);
   const releaseDay = release?.release_date ? new Date(release.release_date * 1000).toISOString().slice(0, 10) : null;
@@ -366,187 +366,215 @@ export function VersionPage(): JSX.Element {
           />
         )}
 
-        {loading ? (
-          <LoadingContainer className="h-96 rounded-sm" />
-        ) : (
-          <>
-            <Stats
-              gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6"
-              stats={[
-                {
-                  id: 'exact',
-                  name: 'Blocks on exactly this version, today',
-                  value: lastPoint?.exact != null ? `${lastPoint.exact.toFixed(1)}%` : '-',
-                },
-                {
-                  id: 'at-least',
-                  name: 'Blocks on it or newer, today',
-                  value: lastPoint?.atLeast != null ? `${lastPoint.atLeast.toFixed(1)}%` : '-',
-                },
-                { id: 'lag50', name: 'Time to 50% of blocks', value: lag50.value, subtitle: lag50.note },
-                { id: 'lag90', name: 'Time to 90% of blocks', value: lag90.value, subtitle: lag90.note },
-                { id: 'entities', name: 'Entities proposing with it', value: facts.entities.toLocaleString() },
-                {
-                  id: 'nodes',
-                  name: 'Xatu nodes on it',
-                  value: layer === 'consensus' ? facts.nodes.toLocaleString() : '-',
-                },
-              ]}
-            />
+        <SegmentedControl
+          options={VERSION_WINDOW_OPTIONS}
+          value={window}
+          onChange={onWindowChange}
+          ariaLabel="Window"
+        />
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
-              <div className="min-w-0">
-                <PopoutCard
-                  title="Adoption"
-                  subtitle="Daily share of this client's blocks with a resolved version"
-                  anchorId="version-adoption"
-                  modalSize="full"
-                >
-                  {({ inModal }) => (
-                    <MultiLineChart
-                      series={[
-                        {
-                          name: `${version} or newer`,
-                          data: adoption.map(point =>
-                            point.atLeast === null ? null : Number(point.atLeast.toFixed(2))
-                          ),
-                          color: getClientColor(client),
-                          showArea: true,
-                          areaOpacity: 0.15,
-                        },
-                        {
-                          name: `Exactly ${version}`,
-                          data: adoption.map(point => (point.exact === null ? null : Number(point.exact.toFixed(2)))),
-                          color: getClientColor(client),
-                          lineStyle: 'dashed',
-                        },
-                        ...(previous?.version
-                          ? [
-                              {
-                                name: `Exactly ${previous.version}`,
-                                data: previousAdoption.map(point =>
-                                  point.exact === null ? null : Number(point.exact.toFixed(2))
-                                ),
-                                color: OTHER_VERSION_COLOR,
-                                lineStyle: 'dotted' as const,
-                              },
-                            ]
-                          : []),
-                      ]}
-                      xAxis={{
-                        type: 'category',
-                        labels: adoption.map(point => formatDailyDate(point.day)),
-                        name: 'Date',
-                      }}
-                      yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                      height={inModal ? 600 : 320}
-                      showLegend
-                      legendPosition="top"
-                      markLines={
-                        releaseDay && adoption.some(point => point.day === releaseDay)
-                          ? [{ xValue: formatDailyDate(releaseDay), label: 'Released', lineStyle: 'dashed' }]
-                          : undefined
-                      }
-                    />
-                  )}
-                </PopoutCard>
+        <InspectSection title="Blocks">
+          {loading ? (
+            <LoadingContainer className="h-96 rounded-sm" />
+          ) : (
+            <>
+              <Stats
+                gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6"
+                stats={[
+                  {
+                    id: 'exact',
+                    name: 'Blocks on exactly this version, today',
+                    ...shareStat(adoption, 'exact', window),
+                  },
+                  {
+                    id: 'at-least',
+                    name: 'Blocks on it or newer, today',
+                    ...shareStat(adoption, 'atLeast', window),
+                  },
+                  { id: 'lag50', name: 'Time to 50% of blocks', value: lag50.value, subtitle: lag50.note },
+                  { id: 'lag90', name: 'Time to 90% of blocks', value: lag90.value, subtitle: lag90.note },
+                  { id: 'entities', name: 'Entities proposing with it', value: facts.entities.toLocaleString() },
+                  {
+                    id: 'nodes',
+                    name: 'Xatu nodes on it',
+                    value: layer === 'consensus' && !nodeDays.isLoading ? facts.nodes.toLocaleString() : '-',
+                  },
+                ]}
+              />
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
+                <div className="min-w-0">
+                  <PopoutCard
+                    title="Adoption"
+                    subtitle="Daily share of this client's blocks with a resolved version"
+                    anchorId="version-adoption"
+                    modalSize="full"
+                  >
+                    {({ inModal }) => (
+                      <MultiLineChart
+                        series={[
+                          {
+                            name: `${version} or newer`,
+                            data: adoption.map(point =>
+                              point.atLeast === null ? null : Number(point.atLeast.toFixed(2))
+                            ),
+                            color: getClientColor(client),
+                            showArea: true,
+                            areaOpacity: 0.15,
+                          },
+                          {
+                            name: `Exactly ${version}`,
+                            data: adoption.map(point => (point.exact === null ? null : Number(point.exact.toFixed(2)))),
+                            color: getClientColor(client),
+                            lineStyle: 'dashed',
+                          },
+                          ...(previous?.version
+                            ? [
+                                {
+                                  name: `Exactly ${previous.version}`,
+                                  data: previousAdoption.map(point =>
+                                    point.exact === null ? null : Number(point.exact.toFixed(2))
+                                  ),
+                                  color: OTHER_VERSION_COLOR,
+                                  lineStyle: 'dotted' as const,
+                                },
+                              ]
+                            : []),
+                        ]}
+                        xAxis={{
+                          type: 'category',
+                          labels: adoption.map(point => formatDailyDate(point.day)),
+                          name: 'Date',
+                        }}
+                        yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
+                        height={inModal ? 600 : 320}
+                        showLegend
+                        legendPosition="top"
+                        markLines={
+                          releaseDay && adoption.some(point => point.day === releaseDay)
+                            ? [{ xValue: formatDailyDate(releaseDay), label: 'Released', lineStyle: 'dashed' }]
+                            : undefined
+                        }
+                      />
+                    )}
+                  </PopoutCard>
+                </div>
+                <ComparisonCard
+                  consensus={layer === 'consensus'}
+                  version={version}
+                  facts={facts}
+                  previous={previous}
+                  previousFacts={previousFacts}
+                />
               </div>
-              <ComparisonCard
-                layer={layer}
+
+              <EntityVersionBars
+                client={client}
+                blocks={entityCounts.rows}
+                latestVersion={latest?.version}
+                focusVersion={version}
+                title="Entities running it"
+                subtitle="Each entity's blocks by version, this version first"
+              />
+            </>
+          )}
+        </InspectSection>
+
+        {layer === 'execution' && (
+          <InspectSection title="On reference hardware">
+            <ReferenceEngine client={client} releases={releases} {...reference} focus={referenceFocus} />
+          </InspectSection>
+        )}
+
+        <InspectSection title="Nodes and peers">
+          {layer === 'consensus' && (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+              <div className="xl:col-span-2">
+                <Card rounded title="Xatu nodes on this version">
+                  {nodeDays.isLoading ? (
+                    <LoadingContainer className="h-32 rounded-sm" />
+                  ) : (
+                    <VersionNodeTable nodes={versionNodes.filter(node => node.version === version)} />
+                  )}
+                </Card>
+              </div>
+              <ProbeCard
                 version={version}
-                facts={facts}
-                previous={previous}
-                previousFacts={previousFacts}
-                probes={peers.probes}
+                previous={previous?.version}
+                probes={probes.probes}
+                isLoading={probes.isLoading}
                 releases={releases}
               />
             </div>
-
-            <EntityVersionBars
-              client={client}
-              blocks={entityCounts.rows}
-              windowControl={
-                <SegmentedControl
-                  options={VERSION_WINDOW_OPTIONS}
-                  value={window}
-                  onChange={onWindowChange}
-                  ariaLabel="Window"
-                />
-              }
-              latestVersion={latest?.version}
-              focusVersion={version}
-              title="Entities running it"
-              subtitle="Each entity's blocks by version, this version first"
-            />
-          </>
-        )}
-
-        {layer === 'execution' && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-base/7 font-semibold text-foreground">On reference hardware</h2>
-            <ReferenceEngine client={client} releases={releases} {...reference} focus={referenceFocus} />
-          </section>
-        )}
-
-        {layer === 'consensus' && (
-          <Card rounded title="Xatu nodes on this version">
-            {nodesLoading ? (
-              <LoadingContainer className="h-32 rounded-sm" />
-            ) : facts.nodes === 0 ? (
-              <p className="text-sm text-muted">No Xatu node ran this version in the last 24 hours.</p>
-            ) : (
-              <NodeTable
-                client={client}
-                layer={layer}
-                nodes={nodes.filter((_, index) => nodeVersions[index] === version)}
-                releases={releases}
-              />
-            )}
-          </Card>
-        )}
-
-        <VersionNetwork client={client} layer={layer} version={version} />
+          )}
+          <VersionNetwork client={client} layer={layer} version={version} from={rangeStart} window={window} />
+        </InspectSection>
       </div>
     </Container>
   );
 }
 
+/** Row of a table comparing this version with the release before it */
+interface ComparisonRow {
+  metric: string;
+  current: string;
+  previous: string;
+}
+
+/** Metrics down the side, this version and the previous one across */
+function ComparisonTable({
+  rows,
+  version,
+  previous,
+}: {
+  rows: ComparisonRow[];
+  version: string;
+  previous?: string;
+}): JSX.Element {
+  return (
+    <Table
+      variant="nested"
+      data={rows}
+      getRowKey={row => row.metric}
+      columns={[
+        { header: 'Metric', accessor: row => row.metric, cellClassName: 'text-muted' },
+        {
+          header: version,
+          accessor: row => row.current,
+          cellClassName: 'text-right tabular-nums font-medium text-foreground',
+          headerClassName: 'text-right font-mono',
+        },
+        ...(previous
+          ? [
+              {
+                header: previous,
+                accessor: (row: ComparisonRow) => row.previous,
+                cellClassName: 'text-right tabular-nums text-muted',
+                headerClassName: 'text-right font-mono',
+              },
+            ]
+          : []),
+      ]}
+    />
+  );
+}
+
 interface ComparisonCardProps {
-  layer: ClientLayer;
+  consensus: boolean;
   version: string;
   facts: VersionFacts;
   previous?: DimClientRelease;
   previousFacts: VersionFacts | null;
-  probes: ReturnType<typeof usePeerSupport>['probes'];
-  releases: DimClientRelease[];
 }
 
-/** This version against the release before it, row by row */
-function ComparisonCard({
-  layer,
-  version,
-  facts,
-  previous,
-  previousFacts,
-  probes,
-  releases,
-}: ComparisonCardProps): JSX.Element {
-  const probeStats = (target: string | undefined): { peers: number; success: string } => {
-    if (!target) return { peers: 0, success: '-' };
-    const mine = probes.filter(probe => displayVersion(probe.meta_peer_version, releases) === target);
-    return {
-      peers: new Set(mine.map(probe => probe.peer_id_unique_key)).size,
-      success: percent(mine.filter(probe => probe.result === 'success').length, mine.length),
-    };
-  };
-  const thisProbes = probeStats(version);
-  const previousProbes = probeStats(previous?.version);
+/** This version against the release before it, row by row, over the window */
+function ComparisonCard({ consensus, version, facts, previous, previousFacts }: ComparisonCardProps): JSX.Element {
   const gapDays =
     facts.release?.release_date && previous?.release_date
       ? Math.round((facts.release.release_date - previous.release_date) / 86400)
       : null;
 
-  const rows: Array<{ metric: string; current: string; previous: string }> = [
+  const rows: ComparisonRow[] = [
     {
       metric: 'Released',
       current: facts.release?.release_date
@@ -574,19 +602,13 @@ function ComparisonCard({
       current: lagValue(facts.lag90).value,
       previous: lagValue(previousFacts?.lag90 ?? null).value,
     },
-    ...(layer === 'consensus'
+    ...(consensus
       ? [
           {
             metric: 'Xatu nodes',
             current: facts.nodes.toLocaleString(),
             previous: previousFacts?.nodes.toLocaleString() ?? '-',
           },
-          {
-            metric: 'Peers probed, last hour',
-            current: thisProbes.peers.toLocaleString(),
-            previous: previousProbes.peers.toLocaleString(),
-          },
-          { metric: 'Probe success', current: thisProbes.success, previous: previousProbes.success },
         ]
       : []),
   ];
@@ -604,25 +626,128 @@ function ComparisonCard({
       {!previous?.version ? (
         <p className="text-sm text-muted">No earlier full release to compare with.</p>
       ) : (
-        <Table
-          variant="nested"
-          data={rows}
-          getRowKey={row => row.metric}
-          columns={[
-            { header: 'Metric', accessor: row => row.metric, cellClassName: 'text-muted' },
-            {
-              header: version,
-              accessor: row => row.current,
-              cellClassName: 'text-right tabular-nums font-medium text-foreground',
-              headerClassName: 'text-right font-mono',
-            },
-            {
-              header: previous.version,
-              accessor: row => row.previous,
-              cellClassName: 'text-right tabular-nums text-muted',
-              headerClassName: 'text-right font-mono',
-            },
+        <ComparisonTable rows={rows} version={version} previous={previous.version} />
+      )}
+    </Card>
+  );
+}
+
+/** A Xatu node on one version: the days in the window it reported that version */
+interface VersionNode {
+  nodeId: string;
+  username?: string;
+  version: string;
+  days: number;
+  lastDay: string;
+}
+
+/** Xatu nodes per version they ran, one entry per node and version, most recent first */
+function nodesByVersion(rows: FctHeadFirstSeenByNodeDaily[], releases: DimClientRelease[]): VersionNode[] {
+  const byKey = new Map<string, VersionNode>();
+  for (const row of rows) {
+    if (!row.node_id || !row.day_start_date) continue;
+    const version = displayVersion(row.meta_consensus_version, releases);
+    if (!version) continue;
+    const key = `${row.node_id}|${version}`;
+    const entry = byKey.get(key) ?? { nodeId: row.node_id, username: row.username, version, days: 0, lastDay: '' };
+    entry.days++;
+    if (row.day_start_date > entry.lastDay) entry.lastDay = row.day_start_date;
+    byKey.set(key, entry);
+  }
+  return [...byKey.values()].sort((a, b) => b.lastDay.localeCompare(a.lastDay) || b.days - a.days);
+}
+
+/** Xatu nodes that ran a version on any day of the window, linked to their node and contributor pages */
+function VersionNodeTable({ nodes }: { nodes: VersionNode[] }): JSX.Element {
+  if (nodes.length === 0) return <p className="text-sm text-muted">No Xatu node ran this version in the window.</p>;
+  return (
+    <Table
+      variant="nested"
+      data={nodes}
+      getRowKey={row => row.nodeId}
+      columns={[
+        {
+          header: 'Node',
+          accessor: row => (
+            <Link
+              to="/xatu/nodes/$nodeId"
+              params={{ nodeId: row.nodeId }}
+              className="block max-w-48 truncate font-mono text-xs/6 text-primary hover:underline"
+              title={row.nodeId}
+            >
+              {row.nodeId}
+            </Link>
+          ),
+        },
+        {
+          header: 'Contributor',
+          accessor: row =>
+            row.username ? (
+              <Link
+                to="/xatu/contributors/$id"
+                params={{ id: row.username }}
+                className="text-sm/6 text-foreground hover:underline"
+              >
+                {row.username}
+              </Link>
+            ) : (
+              '-'
+            ),
+        },
+        {
+          header: 'Days on it',
+          accessor: row => row.days.toLocaleString(),
+          cellClassName: 'text-right tabular-nums text-foreground',
+          headerClassName: 'text-right',
+        },
+        {
+          header: 'Last day on it',
+          accessor: row => row.lastDay,
+          cellClassName: 'tabular-nums text-muted',
+        },
+      ]}
+    />
+  );
+}
+
+interface ProbeCardProps {
+  version: string;
+  previous?: string;
+  probes: IntCustodyProbe[];
+  isLoading: boolean;
+  releases: DimClientRelease[];
+}
+
+/** Custody probes of peers on this version and the previous one, sampled across the window */
+function ProbeCard({ version, previous, probes, isLoading, releases }: ProbeCardProps): JSX.Element {
+  const probeStats = (target: string | undefined): { probes: string; peers: string; success: string } => {
+    const mine = target ? probes.filter(probe => displayVersion(probe.meta_peer_version, releases) === target) : [];
+    return {
+      probes: mine.length.toLocaleString(),
+      peers: new Set(mine.map(probe => probe.peer_id_unique_key)).size.toLocaleString(),
+      success: percent(mine.filter(probe => probe.result === 'success').length, mine.length),
+    };
+  };
+  const current = probeStats(version);
+  const before = probeStats(previous);
+
+  return (
+    <Card
+      rounded
+      title="Custody probes"
+      subtitle={`${PROBE_SLICES} × ${PROBE_SLICE_SECONDS} s spread across the window`}
+    >
+      {isLoading ? (
+        <LoadingContainer className="h-32 rounded-sm" />
+      ) : (
+        <ComparisonTable
+          rows={[
+            { metric: 'Probes', current: current.probes, previous: before.probes },
+            { metric: 'Peers probed', current: current.peers, previous: before.peers },
+            { metric: 'Probe success', current: current.success, previous: before.success },
           ]}
+          version={version}
+          previous={previous}
         />
       )}
     </Card>

@@ -1,13 +1,18 @@
 import { type JSX, useMemo } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { useVersionCounts } from '../../hooks';
-import { displayVersion, summariseVersions } from '../../utils/client-versions';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '../../constants';
+import { useNodeVersions, useVersionCounts } from '../../hooks';
+import { displayVersion, summariseVersions, windowStart } from '../../utils/client-versions';
 import { ReleasesTable } from '../ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
+/** Most days of Xatu node versions the table reads */
+const NODE_SAMPLE_DAYS = 90;
+
 /**
- * Every published release with how many blocks and Xatu nodes run it.
+ * Every published release with how many blocks and Xatu nodes ran it over the window.
  */
 export function ReleasesTab({
   client,
@@ -15,23 +20,33 @@ export function ReleasesTab({
   releases,
   releasesLoading,
   latest,
-  nodes,
   requirement,
+  shareWindow,
+  onShareWindowChange,
 }: ClientTabProps): JSX.Element {
-  const { rows: blocks } = useVersionCounts({ grain: 'daily', client, layer });
+  const days = SHARE_WINDOW_DAYS[shareWindow];
+  const blockCounts = useVersionCounts({
+    grain: 'daily',
+    client,
+    layer,
+    from: days === null ? undefined : windowStart(days),
+  });
   const blocksByVersion = useMemo(
-    () => new Map(summariseVersions(blocks).map(summary => [summary.version, summary.blocks])),
-    [blocks]
+    () => new Map(summariseVersions(blockCounts.rows).map(summary => [summary.version, summary.blocks])),
+    [blockCounts.rows]
   );
+  // Every node reports every day, so long windows read evenly spaced days
+  const nodeDays = useNodeVersions(client, days, layer === 'consensus', NODE_SAMPLE_DAYS);
+  // Distinct nodes that reported each version on any day of the window
   const nodesByVersion = useMemo(() => {
-    const counts = new Map<string, number>();
-    if (layer !== 'consensus') return counts;
-    for (const node of nodes) {
-      const version = displayVersion(node.meta_consensus_version, releases);
-      counts.set(version, (counts.get(version) ?? 0) + 1);
+    const nodeIds = new Map<string, Set<string>>();
+    for (const row of nodeDays.rows) {
+      const version = displayVersion(row.meta_consensus_version, releases);
+      if (!version || !row.node_id) continue;
+      nodeIds.set(version, (nodeIds.get(version) ?? new Set()).add(row.node_id));
     }
-    return counts;
-  }, [nodes, layer, releases]);
+    return new Map([...nodeIds.entries()].map(([version, ids]) => [version, ids.size]));
+  }, [nodeDays.rows, releases]);
 
   if (releasesLoading) return <LoadingContainer className="h-96 rounded-sm" />;
   if (releases.length === 0) {
@@ -43,15 +58,35 @@ export function ReleasesTab({
   }
 
   return (
-    <Card rounded title="Releases" subtitle="Blocks over all time; Xatu nodes over the last 24 hours">
-      <ReleasesTable
-        client={client}
-        releases={releases}
-        latest={latest}
-        blocksByVersion={blocksByVersion}
-        nodesByVersion={nodesByVersion}
-        minVersion={requirement?.minVersion}
-      />
+    <Card
+      rounded
+      title="Releases"
+      subtitle={
+        nodeDays.sampledDays !== null
+          ? `Xatu nodes from ${nodeDays.sampledDays} days spread across the window`
+          : undefined
+      }
+      actions={
+        <SegmentedControl
+          options={SHARE_WINDOW_OPTIONS}
+          value={shareWindow}
+          onChange={onShareWindowChange}
+          ariaLabel="Window"
+        />
+      }
+    >
+      {blockCounts.isLoading || nodeDays.isLoading ? (
+        <LoadingContainer className="h-96 rounded-sm" />
+      ) : (
+        <ReleasesTable
+          client={client}
+          releases={releases}
+          latest={latest}
+          blocksByVersion={blocksByVersion}
+          nodesByVersion={nodesByVersion}
+          minVersion={requirement?.minVersion}
+        />
+      )}
     </Card>
   );
 }

@@ -5,12 +5,13 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { compareVersions } from '@/utils/version';
 import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT } from '../../constants';
 import { useVersionCounts } from '../../hooks';
 import {
   UNRESOLVED_LABELS,
+  adoptionByDay,
   countVersionsByDay,
+  shareStat,
   summariseUnresolved,
   sinceSuffix,
   summariseVersions,
@@ -21,9 +22,6 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { VersionShareChart } from '../VersionShareChart';
 import { VersionTable } from '../VersionTable';
 import type { ClientTabProps } from './ClientTabs.types';
-
-/** Days of unresolved blocks listed with their entities */
-const UNRESOLVED_DAYS = 30;
 
 /** Formats a share, or a dash when nothing was counted */
 function percent(part: number, total: number): string {
@@ -43,40 +41,24 @@ export function VersionsTab({
   requirement,
 }: ClientTabProps): JSX.Element {
   const windowDays = SHARE_WINDOW_DAYS[shareWindow];
-  const history = useVersionCounts({
-    grain: 'daily',
-    client,
-    layer,
-    from: windowDays === null ? undefined : windowStart(windowDays),
-  });
-  const unresolvedRecent = useVersionCounts({
-    grain: 'entity-daily',
-    client,
-    layer,
-    unresolvedOnly: true,
-    from: windowStart(UNRESOLVED_DAYS),
-  });
+  const from = windowDays === null ? undefined : windowStart(windowDays);
+  const history = useVersionCounts({ grain: 'daily', client, layer, from });
+  // Unresolved blocks per entity are few enough to read over any window
+  const unresolvedRows = useVersionCounts({ grain: 'entity-daily', client, layer, unresolvedOnly: true, from });
   const blocks = history.rows;
   const total = useMemo(() => blocks.reduce((sum, row) => sum + row.count, 0), [blocks]);
   const versions = useMemo(() => summariseVersions(blocks), [blocks]);
   const days = useMemo(() => countVersionsByDay(blocks), [blocks]);
-  const unresolved = useMemo(() => summariseUnresolved(unresolvedRecent.rows), [unresolvedRecent.rows]);
+  const unresolved = useMemo(() => summariseUnresolved(unresolvedRows.rows), [unresolvedRows.rows]);
   const resolved = useMemo(
     () => blocks.filter(block => block.version).reduce((sum, row) => sum + row.count, 0),
     [blocks]
   );
   const blocksLoading = history.isLoading;
-  const unresolvedTotal = useMemo(
-    () => history.rows.filter(row => row.time >= windowStart(UNRESOLVED_DAYS)).reduce((sum, row) => sum + row.count, 0),
-    [history.rows]
+  const onLatest = useMemo(
+    () => (latest?.version ? shareStat(adoptionByDay(days, latest.version), 'atLeast', shareWindow) : { value: '-' }),
+    [days, latest?.version, shareWindow]
   );
-  const lastDay = days[days.length - 1];
-  const onLatest =
-    lastDay && latest?.version
-      ? [...lastDay.counts.entries()]
-          .filter(([version]) => compareVersions(version, latest.version!) >= 0)
-          .reduce((sum, [, count]) => sum + count, 0)
-      : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -108,13 +90,13 @@ export function VersionsTab({
               {
                 id: 'latest',
                 name: `On ${latest?.version ?? 'latest'} or newer, today`,
-                value: percent(onLatest, lastDay?.resolved ?? 0),
+                ...onLatest,
               },
             ]}
           />
           <PopoutCard
             title="Version share"
-            subtitle={`Daily share of blocks with a resolved version${sinceSuffix(history.dataStart, windowDays === null ? undefined : windowStart(windowDays))}`}
+            subtitle={`Daily share of blocks with a resolved version${sinceSuffix(history.dataStart, from)}`}
             anchorId="version-share"
             modalSize="full"
           >
@@ -134,11 +116,7 @@ export function VersionsTab({
             )}
           </Card>
           {unresolved.length > 0 && (
-            <Card
-              rounded
-              title="Unresolved blocks"
-              subtitle={`Blocks whose graffiti names no release, last ${UNRESOLVED_DAYS} days`}
-            >
+            <Card rounded title="Unresolved blocks" subtitle="Blocks whose graffiti names no release">
               <Table
                 variant="nested"
                 data={unresolved.slice(0, 15)}
@@ -157,7 +135,7 @@ export function VersionsTab({
                   },
                   {
                     header: 'Share of all blocks',
-                    accessor: row => percent(row.blocks, unresolvedTotal),
+                    accessor: row => percent(row.blocks, total),
                     cellClassName: 'text-right tabular-nums text-muted',
                     headerClassName: 'text-right',
                   },

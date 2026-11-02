@@ -25,6 +25,8 @@ export interface UseClientCountsResult {
   keys: string[];
   /** Whether the window uses daily buckets */
   isDaily: boolean;
+  /** Start of the first bucket (unix seconds); null for all time */
+  since: number | null;
   isLoading: boolean;
   error: Error | null;
 }
@@ -43,6 +45,13 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
     const hourNow = Math.floor(Date.now() / 1000 / 3600) * 3600;
     return hourNow - (config.days ?? 0) * 24 * 3600;
   }, [config.days]);
+
+  // Daily windows start at UTC midnight of their first date.
+  const since = useMemo(() => {
+    if (config.days === null) return null;
+    if (!isDaily) return hourlyStart;
+    return Date.parse(dailyDateValues(config.days).split(',')[0]) / 1000;
+  }, [config.days, isDaily, hourlyStart]);
 
   const query = useQuery({
     queryKey: [
@@ -108,5 +117,5 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
     return fillTimeKeys(unique, isDaily);
   }, [records, isDaily]);
 
-  return { records, keys, isDaily, isLoading: query.isLoading, error: query.error };
+  return { records, keys, isDaily, since, isLoading: query.isLoading, error: query.error };
 }
