@@ -90,13 +90,14 @@ export function LayerClients({
   const peerChart = useMemo(() => peerShareChart(layer, peerRows), [layer, peerRows]);
   const named = blockSummaries.filter(summary => summary.identifiedShare !== null).reduce((n, s) => n + s.blocks, 0);
   const label = layer === 'consensus' ? 'consensus' : 'execution';
+  const article = layer === 'consensus' ? 'a' : 'an';
 
   const footer: ReactNode = (
     <dl className="grid grid-cols-1 gap-x-6 gap-y-1 text-xs/5 text-muted lg:grid-cols-2">
       <div>
         <dt className="inline font-medium text-foreground">Proposed blocks: </dt>
         <dd className="inline">
-          share of the {named.toLocaleString()} blocks {blockScope} whose graffiti names a {label} client (
+          share of the {named.toLocaleString()} blocks {blockScope} whose graffiti names {article} {label} client (
           {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).
         </dd>
       </div>
@@ -210,7 +211,7 @@ export function LayerClients({
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <PopoutCard
           title="Proposed blocks over time"
-          subtitle={`Share of blocks naming a ${label} client ${blockScope}`}
+          subtitle={`Share of blocks naming ${article} ${label} client ${blockScope}`}
           anchorId={`${layer}-block-share`}
           modalSize="full"
         >

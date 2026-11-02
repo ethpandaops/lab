@@ -41,7 +41,9 @@ import { VersionShareChart } from '../VersionShareChart';
 
 /** Formats a share, or a dash when nothing was counted */
 function percent(part: number, total: number): string {
-  return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
+  if (total <= 0) return '-';
+  const share = (part / total) * 100;
+  return share > 0 && share < 0.05 ? '<0.1%' : `${share.toFixed(1)}%`;
 }
 
 /** A req/resp protocol without its shared prefix and encoding, e.g. beacon_blocks_by_range/2 */
@@ -190,7 +192,9 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
           {versionSummaries.length > 0 ? (
             <VersionShareChart days={versionDays} height={300} />
           ) : (
-            <p className="self-center text-sm text-muted">These peers do not advertise a version.</p>
+            <p className="self-center text-sm text-muted">
+              {advertised > 0 ? 'No peer runs a published release.' : 'These peers do not advertise a version.'}
+            </p>
           )}
         </div>
       </Card>
