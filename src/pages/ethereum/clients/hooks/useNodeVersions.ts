@@ -1,80 +1,77 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { fctHeadFirstSeenByNodeDailyServiceList } from '@/api/sdk.gen';
 import type { FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { PAGE_SIZE } from '../constants';
 import { windowStart } from '../utils/client-versions';
-
-const DAY = 86400;
-const TABLE = 'fct_head_first_seen_by_node_daily';
+import { chunksFor } from './useVersionCounts';
 
 export interface UseNodeVersionsResult {
   /** One row per Xatu node, day and consensus version the node ran that day */
   rows: FctHeadFirstSeenByNodeDaily[];
-  /** Days read when the window was sampled, null when every day was read */
-  sampledDays: number | null;
   isLoading: boolean;
   error: Error | null;
 }
 
-/**
- * Up to `max` dates (YYYY-MM-DD) spread evenly from `from` to today, both ends included; every date when the window
- * has no more than `max` days.
- */
-export function spreadDates(from: number, max: number, now: number = Date.now()): string[] {
-  const today = Math.floor(now / 1000 / DAY) * DAY;
-  const first = Math.floor(from / DAY) * DAY;
-  const count = Math.floor((today - first) / DAY) + 1;
-  const offsets =
-    count <= max
-      ? Array.from({ length: count }, (_, i) => i)
-      : Array.from({ length: max }, (_, i) => Math.round((i * (count - 1)) / (max - 1)));
-  return offsets.map(offset => new Date((first + offset * DAY) * 1000).toISOString().slice(0, 10));
+/** The fields node version counts read, so all history keeps little in memory */
+function compact(row: FctHeadFirstSeenByNodeDaily): FctHeadFirstSeenByNodeDaily {
+  return {
+    node_id: row.node_id,
+    username: row.username,
+    day_start_date: row.day_start_date,
+    meta_consensus_version: row.meta_consensus_version,
+  };
+}
+
+function combine(results: Array<UseQueryResult<FctHeadFirstSeenByNodeDaily[]>>): UseNodeVersionsResult {
+  return {
+    rows: results.flatMap(result => result.data ?? []),
+    isLoading: results.some(result => result.isLoading),
+    error: (results.find(result => result.error)?.error as Error | undefined) ?? null,
+  };
 }
 
 /**
- * Consensus versions Xatu nodes running the client reported each day over the last `days` UTC days, or since the
- * table's first day when `days` is null. Every node that sees heads is in the daily head table, so it lists the same
- * nodes as the active node list, per day. Windows longer than `maxDays` read that many days spread across them.
+ * Consensus versions Xatu nodes running the client reported each day over the last `days` UTC days, or all history
+ * when `days` is null. Every node that sees heads is in the daily head table, so it lists the same nodes as the
+ * active node list, per day. Long windows load a query per calendar year, and past years stay cached.
  */
 export function useNodeVersions(
   client: string | undefined,
   days: number | null,
-  enabled: boolean,
-  maxDays = Infinity
+  enabled: boolean
 ): UseNodeVersionsResult {
   const { currentNetwork } = useNetwork();
-  const bounds = useTableBounds(TABLE);
-  const from = days === null ? bounds.data?.min : windowStart(days);
-  const dates = useMemo(() => (from === undefined ? [] : spreadDates(from, maxDays)), [from, maxDays]);
-  const sampled = from !== undefined && dates.length < spreadDates(from, Infinity).length;
+  const from = days === null ? undefined : windowStart(days);
+  // Ten-minute aligned so the chunks, and their cache keys, stay put while the page is open
+  const to = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const chunks = useMemo(() => chunksFor('daily', from, to), [from, to]);
 
-  const query = useQuery({
-    queryKey: ['client-pages', 'node-versions', currentNetwork?.name, client, dates.join(',')],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctHeadFirstSeenByNodeDaily>(
-        fctHeadFirstSeenByNodeDailyServiceList,
-        {
-          query: {
-            day_start_date_in_values: dates.join(','),
-            meta_consensus_implementation_eq: client,
-            page_size: PAGE_SIZE,
-          },
-        },
-        TABLE,
-        signal
-      ),
-    enabled: !!currentNetwork && !!client && enabled && dates.length > 0,
-    staleTime: 30 * 60 * 1000,
+  const result = useQueries({
+    queries: chunks.map(chunk => ({
+      queryKey: ['client-pages', 'node-versions', currentNetwork?.name, client, chunk.key],
+      queryFn: async ({ signal }: { signal: AbortSignal }) =>
+        (
+          await fetchAllPages<FctHeadFirstSeenByNodeDaily>(
+            fctHeadFirstSeenByNodeDailyServiceList,
+            { query: { ...chunk.query, meta_consensus_implementation_eq: client, page_size: PAGE_SIZE } },
+            'fct_head_first_seen_by_node_daily',
+            signal
+          )
+        ).map(compact),
+      enabled: !!currentNetwork && !!client && enabled,
+      staleTime: chunk.open ? 30 * 60 * 1000 : Infinity,
+    })),
+    combine,
   });
 
-  return {
-    rows: query.data ?? [],
-    sampledDays: sampled ? dates.length : null,
-    isLoading: enabled && (query.isLoading || bounds.isLoading),
-    error: query.error,
-  };
+  // Year chunks overrun a window; trim them to it
+  const firstDay = from === undefined ? undefined : new Date(from * 1000).toISOString().slice(0, 10);
+  const rows = useMemo(
+    () => (firstDay ? result.rows.filter(row => (row.day_start_date ?? '') >= firstDay) : result.rows),
+    [result.rows, firstDay]
+  );
+  return { rows, isLoading: result.isLoading, error: result.error };
 }
