@@ -274,6 +274,7 @@ export function SlotProgressTimeline({
                       )}
                       {(span.clientName || span.executionClient) && (
                         <ClientLogo
+                          noLink
                           client={span.clientName ?? span.executionClient ?? ''}
                           size={14}
                           className="shrink-0"

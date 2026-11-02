@@ -63,7 +63,7 @@ export function MobileSlotStats({
       {fastest && (
         <div className="flex shrink-0 items-center gap-1">
           <span className="text-2xs text-muted">Fast</span>
-          <ClientLogo client={fastest.client} size={12} />
+          <ClientLogo client={fastest.client} size={12} noLink />
           <span className="font-mono text-xs font-semibold text-primary tabular-nums">{fastest.medianMs}ms</span>
         </div>
       )}

@@ -58,7 +58,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
     >
       {/* Left: Client logo with country flag overlay */}
       <div className="relative shrink-0">
-        <ClientLogo client={peerClient} size={28} />
+        <ClientLogo client={peerClient} size={28} noLink />
         {peerCountryCode && (
           <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-2xs">
             {getCountryFlag(peerCountryCode)}

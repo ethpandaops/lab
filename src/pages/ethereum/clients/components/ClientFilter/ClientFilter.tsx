@@ -23,7 +23,7 @@ export function ClientFilter({ layer, value, onChange, clients }: ClientFilterPr
       ...names.map(client => ({
         value: client,
         label: formatClientName(client),
-        icon: <ClientLogo client={client} size={20} />,
+        icon: <ClientLogo client={client} size={20} noLink />,
       })),
     ];
   }, [clients, layer, value]);

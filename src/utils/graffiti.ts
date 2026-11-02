@@ -69,7 +69,7 @@ export function resolveClientRelease(
 }
 
 /** Version without a leading "v", so graffiti "v25.9.2" matches tag "25.9.2" */
-function normaliseVersion(version: string): string {
+export function normaliseVersion(version: string): string {
   return version.trim().replace(/^v/i, '');
 }
 

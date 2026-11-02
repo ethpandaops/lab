@@ -48,7 +48,7 @@ export function ClientBreakdown({
                     isSelected && 'bg-primary/10 ring-1 ring-primary/30'
                   )}
                 >
-                  <ClientLogo client={summary.client} size={20} />
+                  <ClientLogo client={summary.client} size={20} noLink />
                   <span
                     className={clsx(
                       'w-28 shrink-0 truncate text-sm/6 font-medium',

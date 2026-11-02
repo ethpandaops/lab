@@ -68,7 +68,7 @@ export function UserCard({
         </div>
         {(clientVersion || hasClients) && (
           <div className="mt-2 flex items-center gap-2">
-            {hasClients && consensusImplementations.map(client => <ClientLogo key={client} client={client} />)}
+            {hasClients && consensusImplementations.map(client => <ClientLogo key={client} client={client} noLink />)}
             {clientVersion && (
               <Badge color="gray" variant="flat" truncate>
                 {clientVersion}

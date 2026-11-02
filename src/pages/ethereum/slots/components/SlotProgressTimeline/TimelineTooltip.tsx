@@ -33,7 +33,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
     >
       {/* Header with label and late badge */}
       <div className="flex items-center gap-2">
-        {span.clientName && <ClientLogo client={span.clientName} size={20} />}
+        {span.clientName && <ClientLogo client={span.clientName} size={20} noLink />}
         <span className="text-sm font-semibold text-foreground">{span.label}</span>
         {span.isLate && (
           <span className="rounded bg-warning/20 px-1.5 py-0.5 text-xs font-medium text-warning">LATE</span>
@@ -74,7 +74,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
             <span className="text-muted">Consensus</span>
             <span className="text-foreground">
               <span className="inline-flex items-center gap-1">
-                <ClientLogo client={span.clientName} size={14} />
+                <ClientLogo client={span.clientName} size={14} noLink />
                 {span.clientName}
               </span>
               {span.clientVersion && <span className="ml-1 text-muted">{formatVersion(span.clientVersion)}</span>}
@@ -88,7 +88,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
             <span className="text-muted">Execution</span>
             <span className="text-foreground">
               <span className="inline-flex items-center gap-1">
-                <ClientLogo client={span.executionClient} size={14} />
+                <ClientLogo client={span.executionClient} size={14} noLink />
                 {span.executionClient}
               </span>
               {span.executionVersion && (

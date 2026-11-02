@@ -178,7 +178,7 @@ export function SlotHud({
               active={propagationMinMs !== null && currentTime >= propagationMinMs + row.medianMs}
               className="flex items-center gap-1.5"
             >
-              <ClientLogo client={row.client} size={11} />
+              <ClientLogo client={row.client} size={11} noLink />
               <span
                 title={row.client}
                 className={clsx('flex-1 truncate text-2xs/3', i === 0 ? 'text-foreground' : 'text-muted')}

@@ -555,7 +555,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                                 border: `2px solid ${s.color}`,
                               }}
                             />
-                            <ClientLogo client={s.name} size={14} className={clsx(!isVisible && 'opacity-50')} />
+                            <ClientLogo client={s.name} size={14} className={clsx(!isVisible && 'opacity-50')} noLink />
                             <span className="font-medium">{s.name}</span>
                           </button>
                         );

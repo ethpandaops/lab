@@ -98,12 +98,12 @@ const STATUS_OPTIONS = [
 
 const EL_CLIENT_OPTIONS = [
   { value: '', label: 'All Clients' },
-  { value: 'go-ethereum', label: 'Geth', icon: <ClientLogo client="geth" size={20} /> },
-  { value: 'Nethermind', label: 'Nethermind', icon: <ClientLogo client="nethermind" size={20} /> },
-  { value: 'Besu', label: 'Besu', icon: <ClientLogo client="besu" size={20} /> },
-  { value: 'erigon', label: 'Erigon', icon: <ClientLogo client="erigon" size={20} /> },
-  { value: 'Reth', label: 'Reth', icon: <ClientLogo client="reth" size={20} /> },
-  { value: 'ethrex', label: 'Ethrex', icon: <ClientLogo client="ethrex" size={20} /> },
+  { value: 'go-ethereum', label: 'Geth', icon: <ClientLogo client="geth" size={20} noLink /> },
+  { value: 'Nethermind', label: 'Nethermind', icon: <ClientLogo client="nethermind" size={20} noLink /> },
+  { value: 'Besu', label: 'Besu', icon: <ClientLogo client="besu" size={20} noLink /> },
+  { value: 'erigon', label: 'Erigon', icon: <ClientLogo client="erigon" size={20} noLink /> },
+  { value: 'Reth', label: 'Reth', icon: <ClientLogo client="reth" size={20} noLink /> },
+  { value: 'ethrex', label: 'Ethrex', icon: <ClientLogo client="ethrex" size={20} noLink /> },
 ];
 
 /**

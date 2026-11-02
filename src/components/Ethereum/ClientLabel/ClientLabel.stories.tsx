@@ -21,12 +21,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Consensus client with a resolved version
+ * Consensus client with a release version, linked to the client and version pages
  */
 export const WithVersion: Story = {
   args: {
     client: 'lighthouse',
-    detail: 'v8.2.3',
+    version: 'v8.2.3',
+  },
+};
+
+/**
+ * Without links, for use inside buttons, selects or other links
+ */
+export const NoLink: Story = {
+  args: {
+    client: 'teku',
+    detail: 'v26.10.3',
+    noLink: true,
   },
 };
 

@@ -18,10 +18,14 @@ import {
   ClientFilter,
   ClientPairs,
   ClientsSkeleton,
+  ClientSummaryGrid,
+  DiversityCard,
   EntityFilter,
   GraffitiBlocksTable,
 } from './components';
-import { useClientCounts, useEntityOptions, useGraffitiBlocks } from './hooks';
+import { useClientCounts, useEntityOptions, useGraffitiBlocks, useLatestReleases } from './hooks';
+import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
+import { normalizeClientName } from '@/utils/ethereum';
 import {
   BLOCK_GRAFFITI_TABLE,
   DEFAULT_TIME_PERIOD,
@@ -55,10 +59,13 @@ function describeBlocks(entity: string | undefined, filters: ClientFilters, laye
   return entity || other ? parts.join(' ') : 'all proposed blocks';
 }
 
-/** Proposer clients page: client shares of proposed blocks parsed from graffiti, with a per-block drill-down. */
+/**
+ * Clients overview: every consensus and execution client with its share of proposed blocks parsed from graffiti,
+ * diversity against the ⅓, ½ and ⅔ thresholds, newest release and our nodes, with a per-block drill-down.
+ */
 export function IndexPage(): JSX.Element {
-  const navigate = useNavigate({ from: '/ethereum/clients' });
-  const search = useSearch({ from: '/ethereum/clients' });
+  const navigate = useNavigate({ from: '/ethereum/clients/' });
+  const search = useSearch({ from: '/ethereum/clients/' });
   const timePeriod: TimePeriod = search.t ?? DEFAULT_TIME_PERIOD;
   const identifiedOnly = search.identified ?? false;
   const config = TIME_RANGE_CONFIG[timePeriod];
@@ -75,6 +82,16 @@ export function IndexPage(): JSX.Element {
 
   const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
+  const { latest: latestReleases } = useLatestReleases();
+  const { nodes } = useActiveNodes();
+  const nodeCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const node of nodes) {
+      const client = normalizeClientName(node.meta_consensus_implementation ?? '');
+      if (client) counts.set(client, (counts.get(client) ?? 0) + 1);
+    }
+    return counts;
+  }, [nodes]);
 
   const windowStart = useMemo(() => {
     if (config.days === null) return tableBounds?.min ?? 0;
@@ -150,10 +167,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header
-        title="Proposer Clients"
-        description="Consensus and execution clients of block proposers, parsed from block graffiti"
-      />
+      <Header title="Clients" description="Consensus and execution clients, by share of proposed blocks" />
 
       {!boundsLoading && !hasData ? (
         <Card rounded>
@@ -206,11 +220,14 @@ export function IndexPage(): JSX.Element {
           </div>
 
           <InfoBox summary="How this is measured">
-            Clients are read from what proposers put in their graffiti: the engine API client version codes most
-            consensus clients append (for example <span className="font-mono">GEa579PMfea2</span>) or a client&apos;s
-            default version string. Blocks with empty or custom graffiti count as unknown, so these shares describe the
-            blocks that name a client, not the whole validator set. Entities are the proposer&apos;s current validator
-            mapping; validators without one are left out when filtering by entity.
+            <p>
+              Clients are read from what proposers put in their graffiti: the engine API client version codes most
+              consensus clients append (for example <span className="font-mono">GEa579PMfea2</span>) or a client&apos;s
+              default version string. Blocks with empty or custom graffiti count as unknown, so these shares describe
+              the blocks that name a client, not the whole validator set. Entities are the proposer&apos;s current
+              validator mapping; validators without one are left out when filtering by entity.
+            </p>
+            <p>A client with over ⅓ of stake can stop finality with a bug; over ⅔, it can finalize an invalid chain.</p>
           </InfoBox>
 
           {error && (
@@ -258,6 +275,36 @@ export function IndexPage(): JSX.Element {
                   { id: 'both', name: 'Both identified', value: formatShare(coverage.withBoth, coverage.total) },
                 ]}
               />
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <DiversityCard title="Consensus diversity" summaries={consensusSummary} />
+                <DiversityCard title="Execution diversity" summaries={executionSummary} />
+              </div>
+
+              <section className="flex flex-col gap-3">
+                <div>
+                  <h2 className="text-base/7 font-semibold text-foreground">Consensus clients</h2>
+                  <p className="text-sm/6 text-muted">Share of blocks that name a consensus client</p>
+                </div>
+                <ClientSummaryGrid
+                  layer="consensus"
+                  summaries={consensusSummary}
+                  latestReleases={latestReleases}
+                  nodeCounts={nodeCounts}
+                />
+              </section>
+              <section className="flex flex-col gap-3">
+                <div>
+                  <h2 className="text-base/7 font-semibold text-foreground">Execution clients</h2>
+                  <p className="text-sm/6 text-muted">Share of blocks that name an execution client</p>
+                </div>
+                <ClientSummaryGrid
+                  layer="execution"
+                  summaries={executionSummary}
+                  latestReleases={latestReleases}
+                  nodeCounts={nodeCounts}
+                />
+              </section>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <PopoutCard

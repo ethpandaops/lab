@@ -430,7 +430,7 @@ function Map2DChartComponent({
                       <td className="py-0.5 pr-4 capitalize">
                         {node.client ? (
                           <span className="flex items-center gap-1.5">
-                            <ClientLogo client={node.client} size={14} />
+                            <ClientLogo client={node.client} size={14} noLink />
                             {node.client}
                           </span>
                         ) : (
