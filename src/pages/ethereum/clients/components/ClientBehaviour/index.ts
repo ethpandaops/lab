@@ -1,2 +1,2 @@
-export { AttestationPerformance, ProposerBehaviour } from './ClientBehaviour';
+export { AttestationPerformance, PerformanceHeadline, ProposerBehaviour } from './ClientBehaviour';
 export type { ClientBehaviourProps } from './ClientBehaviour';

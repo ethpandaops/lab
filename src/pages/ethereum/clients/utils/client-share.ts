@@ -1,5 +1,5 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
-import { getClientColor } from '@/utils/ethereum';
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 
@@ -338,4 +338,59 @@ export function toEntityOptions(
   });
 
   return [...groups, ...options].sort((a, b) => b.validators - a.validators || a.entity.localeCompare(b.entity));
+}
+
+/** A client of the other layer that runs with this one, by proposed blocks and by IP pairing */
+export interface PartnerRow {
+  client: string;
+  blocks: number;
+  /** Share of this client's blocks that name this partner (0-100), null with no blocks naming any partner */
+  blockShare: number | null;
+  /** IPv4 addresses running this client and this partner */
+  addresses: number;
+  /** Share of this client's paired addresses (0-100), null with no paired addresses */
+  addressShare: number | null;
+}
+
+/**
+ * The clients of the other layer that `client` runs with: by the blocks it proposed that name a partner in their
+ * graffiti, and by IPv4 addresses running exactly one consensus and one execution client. Blocks naming no partner
+ * are counted in `unnamedBlocks`, not as a partner. Largest by blocks, then addresses.
+ */
+export function partnerRows(
+  client: string,
+  layer: ClientLayer,
+  records: ClientCountRecord[],
+  ipPairs: Array<{ consensus_client?: string; execution_client?: string; ip_count?: number }>
+): { rows: PartnerRow[]; unnamedBlocks: number } {
+  const other: ClientLayer = layer === 'consensus' ? 'execution' : 'consensus';
+  const blocks = new Map<string, number>();
+  let unnamedBlocks = 0;
+  for (const record of records) {
+    if (clientOf(record, layer) !== client) continue;
+    const partner = clientOf(record, other);
+    if (partner === UNKNOWN_CLIENT) unnamedBlocks += record.blocks;
+    else blocks.set(partner, (blocks.get(partner) ?? 0) + record.blocks);
+  }
+  const otherClients: readonly string[] = other === 'consensus' ? CONSENSUS_CLIENTS : EXECUTION_CLIENTS;
+  const addresses = new Map<string, number>();
+  for (const pair of ipPairs) {
+    const own = layer === 'consensus' ? pair.consensus_client : pair.execution_client;
+    const partner = layer === 'consensus' ? pair.execution_client : pair.consensus_client;
+    // Only the other layer's clients; libp2p tools and forks that share an address are not partners
+    if (own !== client || !partner || !otherClients.includes(partner)) continue;
+    addresses.set(partner, (addresses.get(partner) ?? 0) + (pair.ip_count ?? 0));
+  }
+  const blockTotal = [...blocks.values()].reduce((sum, value) => sum + value, 0);
+  const addressTotal = [...addresses.values()].reduce((sum, value) => sum + value, 0);
+  const rows = [...new Set([...blocks.keys(), ...addresses.keys()])]
+    .map(partner => ({
+      client: partner,
+      blocks: blocks.get(partner) ?? 0,
+      blockShare: blockTotal > 0 ? ((blocks.get(partner) ?? 0) / blockTotal) * 100 : null,
+      addresses: addresses.get(partner) ?? 0,
+      addressShare: addressTotal > 0 ? ((addresses.get(partner) ?? 0) / addressTotal) * 100 : null,
+    }))
+    .sort((a, b) => b.blocks - a.blocks || b.addresses - a.addresses || a.client.localeCompare(b.client));
+  return { rows, unnamedBlocks };
 }

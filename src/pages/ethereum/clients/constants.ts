@@ -11,10 +11,6 @@ export const clientsSearchSchema = z.object({
   ...blockSearchShape,
   /** Time period */
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
-  /** Show shares of identified blocks only */
-  identified: z.boolean().optional(),
-  /** What the diversity cards count: proposed blocks, P2P peers or ENR nodes */
-  by: z.enum(['blocks', 'p2p', 'enr']).optional().catch(undefined),
 });
 export type ClientsSearch = z.infer<typeof clientsSearchSchema>;
 

@@ -11,9 +11,10 @@ export interface TimestampProps {
    * - 'relative': Shows relative time (e.g., "2 minutes ago")
    * - 'short': Shows short date/time
    * - 'long': Shows long date/time
+   * - 'date': Shows the date only (e.g., "23 Oct 2026")
    * - 'custom': Use the `children` prop for custom formatting
    */
-  format?: 'relative' | 'short' | 'long' | 'custom';
+  format?: 'relative' | 'short' | 'long' | 'date' | 'custom';
 
   /**
    * Custom render function or ReactNode

@@ -75,6 +75,7 @@ function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Ele
               </a>
             )}
           </span>
+          {field.statedVersion && <span className="text-xs text-muted">states {field.statedVersion}</span>}
           {field.buildAfter && commit}
           {field.buildAfter && field.commitsSinceRelease !== undefined && (
             <span className="text-xs text-muted">
@@ -84,6 +85,7 @@ function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Ele
         </>
       ) : (
         <>
+          {field.statedVersion && <span className="text-muted">states {field.statedVersion}</span>}
           {commit}
           {field.unresolvedNote && <span className="basis-full text-xs text-muted">{field.unresolvedNote}</span>}
         </>

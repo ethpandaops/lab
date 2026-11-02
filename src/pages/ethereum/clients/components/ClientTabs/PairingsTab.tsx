@@ -5,18 +5,9 @@ import { Table } from '@/components/Lists/Table';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { getClientColor } from '@/utils/ethereum';
-import {
-  CLIENT_WINDOW_OPTIONS,
-  VERSION_WINDOW_DAYS,
-  SHARE_WINDOW_OPTIONS,
-  SHARE_WINDOW_TEXT,
-  UNKNOWN_CLIENT,
-} from '../../constants';
-import { useClientBlocks, useClientCounts } from '../../hooks';
-import { clientOf, summariseClients } from '../../utils/client-share';
-import { IpPairings } from '../Census';
-import { ShareTable } from '../ShareTable';
+import { CLIENT_WINDOW_OPTIONS, VERSION_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, UNKNOWN_CLIENT } from '../../constants';
+import { useClientBlocks } from '../../hooks';
+import { PartnerShares } from '../PartnerBreakdown';
 import type { ClientTabProps } from './ClientTabs.types';
 
 interface VersionPairing {
@@ -31,7 +22,7 @@ interface VersionPairing {
 }
 
 /**
- * Which clients of the other layer this client runs with: by blocks, and by version.
+ * Which clients of the other layer this client runs with: by blocks and IP addresses, and by version.
  */
 export function PairingsTab({
   client,
@@ -42,16 +33,7 @@ export function PairingsTab({
   onShareWindowChange,
 }: ClientTabProps): JSX.Element {
   const { blocks, isLoading: blocksLoading } = useClientBlocks(client, layer, VERSION_WINDOW_DAYS[window]);
-  const counts = useClientCounts(shareWindow);
   const otherLayer = layer === 'consensus' ? 'execution' : 'consensus';
-  const partners = useMemo(
-    () =>
-      summariseClients(
-        counts.records.filter(record => clientOf(record, layer) === client),
-        otherLayer
-      ),
-    [counts.records, layer, client, otherLayer]
-  );
 
   const versionPairs = useMemo(() => {
     const byPair = new Map<string, VersionPairing>();
@@ -78,39 +60,16 @@ export function PairingsTab({
   }, [blocks]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
-        <Card
-          rounded
-          title={`${otherLayer === 'consensus' ? 'Consensus' : 'Execution'} clients it runs with`}
-          subtitle={`Share of its blocks, ${SHARE_WINDOW_TEXT[shareWindow]}`}
-          actions={
-            <SegmentedControl
-              options={SHARE_WINDOW_OPTIONS}
-              value={shareWindow}
-              onChange={onShareWindowChange}
-              ariaLabel="Share window"
-            />
-          }
-        >
-          {counts.isLoading ? (
-            <LoadingContainer className="h-48 rounded-sm" />
-          ) : (
-            <ShareTable
-              labelHeader="Client"
-              countHeader="Blocks"
-              rows={partners.map(partner => ({
-                key: partner.client,
-                label: <ClientLabel client={partner.client} />,
-                share: partner.share,
-                count: partner.blocks,
-                color: getClientColor(partner.client),
-              }))}
-            />
-          )}
-        </Card>
-        <IpPairings client={client} layer={layer} />
+    <div className="flex flex-col gap-4">
+      <div className="self-start">
+        <SegmentedControl
+          options={SHARE_WINDOW_OPTIONS}
+          value={shareWindow}
+          onChange={onShareWindowChange}
+          ariaLabel="Share window"
+        />
       </div>
+      <PartnerShares client={client} layer={layer} shareWindow={shareWindow} />
 
       <Card
         rounded

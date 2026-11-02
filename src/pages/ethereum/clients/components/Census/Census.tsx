@@ -5,7 +5,6 @@ import { Table } from '@/components/Lists/Table';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
-import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { getCountryFlag } from '@/utils/country';
@@ -19,7 +18,6 @@ import {
   type FctPeerCountByClClientDaily,
   type FctPeerCountByClientAsnDaily,
   type FctPeerCountByClientCountryDaily,
-  type FctPeerCountByClientPairDaily,
   type FctPeerCountByElClientDaily,
   type FctPeerForkReadinessByClClientDaily,
   type FctPeerForkReadinessByElClientDaily,
@@ -43,7 +41,9 @@ import { VersionShareChart } from '../VersionShareChart';
 
 /** Formats a share, or a dash when nothing was counted */
 function percent(part: number, total: number): string {
-  return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
+  if (total <= 0) return '-';
+  const share = (part / total) * 100;
+  return share > 0 && share < 0.05 ? '<0.1%' : `${share.toFixed(1)}%`;
 }
 
 /** A req/resp protocol without its shared prefix and encoding, e.g. beacon_blocks_by_range/2 */
@@ -139,7 +139,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   if (own.rows.length === 0) {
     return (
       <Card rounded title="P2P peers">
-        <p className="text-sm text-muted">Xatu crawlers have not seen peers running this client.</p>
+        <p className="text-sm text-muted">The tysm P2P crawler has not seen peers running this client.</p>
       </Card>
     );
   }
@@ -168,7 +168,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Card
         rounded
         title="P2P peers"
-        subtitle={`Peers seen on the P2P network each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
+        subtitle={`Peers the tysm P2P crawler saw each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
         actions={windowControl}
       >
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -190,13 +190,19 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
             legendPosition="top"
           />
           {versionSummaries.length > 0 ? (
-            <VersionShareChart days={versionDays} versions={versionSummaries} height={300} />
+            <VersionShareChart days={versionDays} height={300} />
           ) : (
-            <p className="self-center text-sm text-muted">These peers do not advertise a version.</p>
+            <p className="self-center text-sm text-muted">
+              {advertised > 0 ? 'No peer runs a published release.' : 'These peers do not advertise a version.'}
+            </p>
           )}
         </div>
       </Card>
-      <Card rounded title="Versions on the P2P network" subtitle={`Peers per version, ${own.day}`}>
+      <Card
+        rounded
+        title="Versions on the P2P network"
+        subtitle={`Peers per version their agent states on ${own.day}; Stated only counts peers whose build did not resolve to that release`}
+      >
         <Table
           variant="nested"
           data={latestVersions.slice(0, 20)}
@@ -215,6 +221,17 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
               cellClassName: 'text-right tabular-nums font-medium text-foreground',
               headerClassName: 'text-right',
             },
+            ...(latestVersions.some(row => row.statedOnly > 0 && row.resolved)
+              ? [
+                  {
+                    header: 'Stated only',
+                    accessor: (row: CensusVersion) =>
+                      row.resolved && row.statedOnly > 0 ? row.statedOnly.toLocaleString() : '-',
+                    cellClassName: 'text-right tabular-nums text-muted',
+                    headerClassName: 'text-right',
+                  },
+                ]
+              : []),
             ...(layer === 'consensus'
               ? [
                   {
@@ -264,7 +281,7 @@ function ConsensusPeerDetail({
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Card rounded title="Custody groups" subtitle={`Peers by the column groups they custody, ${day}`}>
+      <Card rounded title="Custody groups" subtitle={`Peers by the column groups they custody on ${day}`}>
         {known === 0 ? (
           <p className="text-sm text-muted">No peer reported its custody.</p>
         ) : (
@@ -311,13 +328,17 @@ function ConsensusPeerDetail({
           </div>
         )}
       </Card>
-      <Card rounded title="Protocols" subtitle={`Share of its peers supporting each protocol, ${protocols.day ?? day}`}>
+      <Card
+        rounded
+        title="Protocols"
+        subtitle={`Share of its peers supporting each protocol on ${protocols.day ?? day}, least supported first`}
+      >
         {protocolRows.length === 0 ? (
           <p className="text-sm text-muted">No protocols reported.</p>
         ) : (
           <ShareTable
             labelHeader="Protocol"
-            labelClassName="w-72"
+            labelClassName="w-44 sm:w-52"
             countHeader="Peers"
             rows={protocolRows.map(row => ({
               key: row.protocol ?? '',
@@ -359,7 +380,11 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Card rounded title="Countries" subtitle={`Peers by country, ${countries.day ?? '-'}`}>
+      <Card
+        rounded
+        title="Countries"
+        subtitle={`Peers by country on ${countries.day ?? '-'}; small countries roll into Other`}
+      >
         <ShareTable
           labelHeader="Country"
           countHeader="Peers"
@@ -380,7 +405,7 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
       <Card
         rounded
         title="Networks"
-        subtitle={`Peers by network, ${networks.day ?? '-'}`}
+        subtitle={`Peers by network on ${networks.day ?? '-'}; small networks roll into Smaller networks`}
         actions={
           <span className="text-sm/6 text-muted">
             Hosting <span className="font-semibold text-foreground tabular-nums">{percent(hosting, networkTotal)}</span>
@@ -461,7 +486,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
     <Card
       rounded
       title="Next fork in ENRs"
-      subtitle={`Nodes found by crawling discovery records${source.day ? `, ${source.day}` : ''}`}
+      subtitle={`Nodes in the discovery-record (ENR) crawl${source.day ? ` on ${source.day}` : ''}, node-weighted`}
       actions={
         next && (
           <Link
@@ -553,7 +578,7 @@ export function CustodyCompliance({ client, from, windowControl }: CustodyCompli
     <Card
       rounded
       title="Custody compliance"
-      subtitle={`Probes for columns a peer custodies, by the peer's version${sinceSuffix(probes.dataStart, from)}`}
+      subtitle={`Probes for columns a peer custodies, by the version it ran that day${sinceSuffix(probes.dataStart, from)}`}
       actions={windowControl}
     >
       {probes.isLoading ? (
@@ -611,65 +636,6 @@ export function CustodyCompliance({ client, from, windowControl }: CustodyCompli
   );
 }
 
-/**
- * Clients of the other layer running behind the same IPv4 address as this one, with how many addresses matched.
- */
-export function IpPairings({ client, layer }: { client: string; layer: ClientLayer }): JSX.Element {
-  const pairs = useCensus<FctPeerCountByClientPairDaily>(CENSUS_TABLES.pairs, {});
-  const ownKey = layer === 'consensus' ? 'consensus_client' : 'execution_client';
-  const otherKey = layer === 'consensus' ? 'execution_client' : 'consensus_client';
-  const mine = pairs.latest.filter(row => row[ownKey] === client);
-  const total = sum(mine, row => row.ip_count);
-  const totals = pairs.latest[0];
-
-  return (
-    <Card
-      rounded
-      title="Pairs by IP"
-      subtitle={`Addresses running this client and one of the other layer, ${pairs.day ?? '-'}`}
-    >
-      {pairs.isLoading ? (
-        <LoadingContainer className="h-40 rounded-sm" />
-      ) : total === 0 ? (
-        <p className="text-sm text-muted">No address paired this client with one of the other layer.</p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          <ShareTable
-            labelHeader="Client"
-            countHeader="Addresses"
-            rows={[...mine]
-              .sort((a, b) => (b.ip_count ?? 0) - (a.ip_count ?? 0))
-              .map(row => ({
-                key: row[otherKey] ?? '',
-                label: <ClientLabel client={row[otherKey] ?? 'unknown'} />,
-                share: ((row.ip_count ?? 0) / total) * 100,
-                count: row.ip_count ?? 0,
-                color: getClientColor(row[otherKey] ?? 'unknown'),
-              }))}
-          />
-          <dl className="grid grid-cols-2 gap-4 border-t border-border pt-3">
-            <div>
-              <dt className="text-xs/5 text-muted">Consensus addresses with an execution client</dt>
-              <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                {percent(totals?.matched_ip_count ?? 0, totals?.cl_ip_count ?? 0)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs/5 text-muted">Addresses paired</dt>
-              <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                {(totals?.paired_ip_count ?? 0).toLocaleString()}
-              </dd>
-            </div>
-          </dl>
-          <p className="text-xs/5 text-muted">
-            Only IPv4 addresses with exactly one consensus and one execution client count as a pair.
-          </p>
-        </div>
-      )}
-    </Card>
-  );
-}
-
 /** Peers on a version and their share of the client's peers on one day's rows */
 function versionPeers(rows: FctPeerCountByElClientDaily[], version: string): { peers: number; share: number | null } {
   const total = sum(rows, row => row.peer_count);
@@ -721,11 +687,15 @@ export function VersionNetwork({
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Card rounded title="P2P peers on this version" subtitle={`Node-weighted, ${own.day ?? '-'}`}>
+      <Card
+        rounded
+        title="P2P peers on this version"
+        subtitle={`Seen by the tysm P2P crawler on ${own.day ?? '-'}, node-weighted`}
+      >
         {own.isLoading ? (
           <LoadingContainer className="h-24 rounded-sm" />
         ) : total === 0 ? (
-          <p className="text-sm text-muted">Xatu crawlers have not seen peers running this client.</p>
+          <p className="text-sm text-muted">The tysm P2P crawler has not seen peers running this client.</p>
         ) : (
           <dl className="grid grid-cols-2 gap-4">
             <div>

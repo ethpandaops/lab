@@ -114,7 +114,8 @@ export function DetailPage(): React.JSX.Element {
             <Tab>Clients</Tab>
           </ScrollableTabs>
 
-          <TabPanels className="mt-6">
+          {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
+          <TabPanels className="mt-6 min-h-screen">
             {/* Validators Tab */}
             <TabPanel>
               <SegmentedControl

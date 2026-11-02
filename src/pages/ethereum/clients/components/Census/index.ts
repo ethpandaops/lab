@@ -1,1 +1,1 @@
-export { CustodyCompliance, EnrReadiness, IpPairings, PeerCensus, VersionNetwork } from './Census';
+export { CustodyCompliance, EnrReadiness, PeerCensus, VersionNetwork } from './Census';

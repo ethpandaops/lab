@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  partnerRows,
   bucketShares,
   buildShareChartConfig,
   computeCoverage,
@@ -181,5 +182,39 @@ describe('entity groups', () => {
     expect(entityQuery('*lido')).toEqual({ entity_ends_with: 'lido' });
     expect(entityLabel('coinbase')).toBe('coinbase');
     expect(entityLabel('*lido')).toBe('Lido (all operators)');
+  });
+});
+
+describe('partnerRows', () => {
+  it('should break a client down by partner from blocks and IP pairs, leaving unnamed partners out', () => {
+    const records = [
+      { key: 'a', consensusClient: 'lodestar', executionClient: 'geth', blocks: 30 },
+      { key: 'b', consensusClient: 'lodestar', executionClient: 'nethermind', blocks: 10 },
+      { key: 'b', consensusClient: 'lodestar', executionClient: 'unknown', blocks: 60 },
+      { key: 'b', consensusClient: 'prysm', executionClient: 'geth', blocks: 500 },
+    ];
+    const pairs = [
+      { consensus_client: 'lodestar', execution_client: 'nethermind', ip_count: 30 },
+      { consensus_client: 'lodestar', execution_client: 'reth', ip_count: 10 },
+      { consensus_client: 'lodestar', execution_client: 'meganode', ip_count: 50 },
+      { consensus_client: 'prysm', execution_client: 'geth', ip_count: 900 },
+    ];
+    const { rows, unnamedBlocks } = partnerRows('lodestar', 'consensus', records, pairs);
+    expect(unnamedBlocks).toBe(60);
+    expect(rows.map(row => [row.client, row.blocks, row.blockShare, row.addresses, row.addressShare])).toEqual([
+      ['geth', 30, 75, 0, 0],
+      ['nethermind', 10, 25, 30, 75],
+      ['reth', 0, 0, 10, 25],
+    ]);
+  });
+
+  it('should read the pair from the execution side for execution clients', () => {
+    const { rows } = partnerRows(
+      'geth',
+      'execution',
+      [{ key: 'a', consensusClient: 'teku', executionClient: 'geth', blocks: 4 }],
+      [{ consensus_client: 'teku', execution_client: 'geth', ip_count: 2 }]
+    );
+    expect(rows.map(row => [row.client, row.blockShare, row.addressShare])).toEqual([['teku', 100, 100]]);
   });
 });

@@ -127,7 +127,10 @@ export function displayVersion(raw: string | undefined, releases: DimClientRelea
 }
 
 /** Why a block's version did not resolve, as release_status names it */
-export type UnresolvedReason = Exclude<ReleaseStatus, 'commit_match' | 'commit_untagged' | 'version_match'>;
+export type UnresolvedReason = Exclude<
+  ReleaseStatus,
+  'commit_match' | 'commit_untagged' | 'commit_mismatch' | 'version_match'
+>;
 
 /** Blocks sharing a time bucket, entity and version of the page's client */
 export interface VersionCount {
@@ -139,6 +142,8 @@ export interface VersionCount {
   version: string | null;
   /** How the version was resolved */
   status: string;
+  /** Version the graffiti states when it resolves to no release; unverified */
+  stated?: string;
   /** Client the row counts, on aggregate rows */
   client?: string;
   /** Layer of that client, on aggregate rows */
@@ -200,6 +205,7 @@ export function toVersionCounts(rows: AggregateRow[]): VersionCount[] {
         day: row.day_start_date ?? new Date(time * 1000).toISOString().slice(0, 10),
         version: resolved ? row.version! : null,
         status: row.release_status || 'none',
+        stated: resolved ? undefined : row.version || undefined,
         client: row.client || undefined,
         layer: row.layer || undefined,
         commit: row.commit_prefix || undefined,
@@ -306,6 +312,8 @@ export function summariseVersions(rows: VersionCount[]): VersionSummary[] {
 export interface UnresolvedGroup {
   reason: string;
   commit?: string;
+  /** Version the graffiti states, unverified */
+  stated?: string;
   blocks: number;
   /** Entities proposing them, most blocks first */
   entities: string[];
@@ -315,15 +323,19 @@ export interface UnresolvedGroup {
 const COMMITLESS_REASONS = new Set(['no_commit', 'commit_zero', 'codes_min', 'none']);
 
 /**
- * Blocks whose version did not resolve, grouped by reason and commit, most blocks first.
+ * Blocks whose version did not resolve, grouped by reason, commit and the version the graffiti states, most blocks
+ * first.
  */
 export function summariseUnresolved(rows: VersionCount[]): UnresolvedGroup[] {
-  const groups = new Map<string, { reason: string; commit?: string; blocks: number; entities: Map<string, number> }>();
+  const groups = new Map<
+    string,
+    { reason: string; commit?: string; stated?: string; blocks: number; entities: Map<string, number> }
+  >();
   for (const row of rows) {
     if (row.version) continue;
     const commit = COMMITLESS_REASONS.has(row.status) ? undefined : row.commit;
-    const key = `${row.status}|${commit ?? ''}`;
-    const group = groups.get(key) ?? { reason: row.status, commit, blocks: 0, entities: new Map() };
+    const key = `${row.status}|${commit ?? ''}|${row.stated ?? ''}`;
+    const group = groups.get(key) ?? { reason: row.status, commit, stated: row.stated, blocks: 0, entities: new Map() };
     group.blocks += row.count;
     if (row.entity) group.entities.set(row.entity, (group.entities.get(row.entity) ?? 0) + row.count);
     groups.set(key, group);
@@ -332,6 +344,7 @@ export function summariseUnresolved(rows: VersionCount[]): UnresolvedGroup[] {
     .map(group => ({
       reason: group.reason,
       commit: group.commit,
+      stated: group.stated,
       blocks: group.blocks,
       entities: [...group.entities.entries()].sort((a, b) => b[1] - a[1]).map(([entity]) => entity),
     }))
@@ -354,65 +367,98 @@ export function versionColors(versions: VersionSummary[], palette: readonly stri
   return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
 }
 
-/** How finely versions are drawn: each release, each minor line or each major line */
-export type VersionLevel = 'patch' | 'minor' | 'major';
+/** How finely versions are drawn: each release, or each minor line */
+export type VersionLevel = 'patch' | 'minor';
 
 /** The release line a version belongs to at `level`, e.g. v8.2.1 is v8.2.x at minor; unparseable versions stay as is */
 export function versionLine(version: string, level: VersionLevel): string {
   if (level === 'patch') return version;
   const match = /^(v?)(\d+)\.(\d+)/.exec(version);
   if (!match) return version;
-  return level === 'minor' ? `${match[1]}${match[2]}.${match[3]}.x` : `${match[1]}${match[2]}.x`;
+  return `${match[1]}${match[2]}.${match[3]}.x`;
+}
+
+/** Share of blocks the `limit` largest entries cover */
+function topCoverage(counts: Map<string, number>, limit: number): number {
+  const values = [...counts.values()].sort((a, b) => b - a);
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return total > 0 ? values.slice(0, limit).reduce((sum, value) => sum + value, 0) / total : 1;
+}
+
+/** The `limit` versions with the most blocks over the last `recentDays` days, so current releases are drawn */
+export function recentTopVersions(days: VersionDay[], limit: number, recentDays = 7): string[] {
+  const counts = new Map<string, number>();
+  for (const day of days.slice(-recentDays)) {
+    for (const [version, count] of day.counts) counts.set(version, (counts.get(version) ?? 0) + count);
+  }
+  return [...counts.entries()]
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([version]) => version);
+}
+
+/** The `limit` lines with the most recent blocks, then the main line of each stretch of the window */
+function pickLines(days: VersionDay[], limit: number, recentDays = 7): string[] {
+  const top = recentTopVersions(days, Math.ceil(limit / 2), recentDays);
+  const segments = limit - top.length;
+  for (let i = 0; i < segments; i++) {
+    const counts = new Map<string, number>();
+    const stretch = days.slice(
+      Math.floor((i * days.length) / segments),
+      Math.floor(((i + 1) * days.length) / segments)
+    );
+    for (const day of stretch) {
+      for (const [version, count] of day.counts) {
+        if (!top.includes(version)) counts.set(version, (counts.get(version) ?? 0) + count);
+      }
+    }
+    const leader = [...counts.entries()].sort((x, y) => y[1] - x[1])[0];
+    if (leader && leader[1] > 0) top.push(leader[0]);
+  }
+  return top;
 }
 
 /**
- * Days and summaries regrouped into release lines, at the finest level whose `limit` largest lines cover `coverage`
- * of resolved blocks, so a long window draws a few lines rather than one band of Other.
+ * Days regrouped for a version share chart, with the lines drawn on their own (the rest stack as Other).
+ *
+ * Releases are drawn as they are when the `limit` largest cover `coverage` of the blocks. Otherwise they are grouped
+ * into minor lines when that leaves at least three lines and merges a good share of releases, since a single-major
+ * client with a long tail would otherwise become one band; never into major lines. The lines drawn are the ones with
+ * the most recent blocks plus the main line of each stretch of the window, and the rest stacks as Other.
  */
 export function groupVersionLines(
   days: VersionDay[],
-  versions: VersionSummary[],
   limit: number,
   coverage = 0.9
-): { days: VersionDay[]; versions: VersionSummary[]; level: VersionLevel } {
-  const total = versions.reduce((sum, summary) => sum + summary.blocks, 0);
-  const levels: VersionLevel[] = ['patch', 'minor', 'major'];
-  for (const level of levels) {
-    const lines = new Map<string, VersionSummary>();
-    for (const summary of versions) {
-      const line = versionLine(summary.version, level);
-      const entry = lines.get(line) ?? {
-        ...summary,
-        version: line,
-        blocks: 0,
-        untaggedBlocks: 0,
-        share: 0,
-        lastSeen: 0,
-      };
-      entry.blocks += summary.blocks;
-      entry.untaggedBlocks += summary.untaggedBlocks;
-      entry.share += summary.share;
-      entry.lastSeen = Math.max(entry.lastSeen, summary.lastSeen);
-      lines.set(line, entry);
+): { days: VersionDay[]; top: string[]; level: VersionLevel } {
+  const patches = new Map<string, number>();
+  const minors = new Map<string, number>();
+  for (const day of days) {
+    for (const [version, count] of day.counts) {
+      patches.set(version, (patches.get(version) ?? 0) + count);
+      const line = versionLine(version, 'minor');
+      minors.set(line, (minors.get(line) ?? 0) + count);
     }
-    const covered = [...lines.values()]
-      .map(line => line.blocks)
-      .sort((a, b) => b - a)
-      .slice(0, limit)
-      .reduce((sum, blocks) => sum + blocks, 0);
-    if (level !== 'major' && total > 0 && covered / total < coverage) continue;
-    if (level === 'patch') return { days, versions, level };
-    const grouped = days.map(day => {
-      const counts = new Map<string, number>();
-      for (const [version, count] of day.counts) {
-        const line = versionLine(version, level);
-        counts.set(line, (counts.get(line) ?? 0) + count);
-      }
-      return { ...day, counts };
-    });
-    return { days: grouped, versions: [...lines.values()], level };
   }
-  return { days, versions, level: 'patch' };
+  if (topCoverage(patches, limit) >= coverage) {
+    return { days, top: recentTopVersions(days, limit, days.length), level: 'patch' };
+  }
+  const minorsHelp = minors.size >= 3 && minors.size <= patches.size * 0.6;
+  if (!minorsHelp) return { days, top: pickLines(days, limit), level: 'patch' };
+  const grouped = days.map(day => {
+    const counts = new Map<string, number>();
+    for (const [version, count] of day.counts) {
+      const line = versionLine(version, 'minor');
+      counts.set(line, (counts.get(line) ?? 0) + count);
+    }
+    return { ...day, counts };
+  });
+  const top =
+    topCoverage(minors, limit) >= coverage
+      ? recentTopVersions(grouped, limit, grouped.length)
+      : pickLines(grouped, limit);
+  return { days: grouped, top, level: 'minor' };
 }
 
 /** Resolved blocks per version for one UTC day */
@@ -537,28 +583,8 @@ export function timeToAdoption(
   return { status: 'not-reached' };
 }
 
-/** Client diversity thresholds: shares of stake at which one client's bug changes what the chain can do */
-export const DIVERSITY_THRESHOLDS = [
-  { share: 100 / 3, label: '33%' },
-  { share: 50, label: '50%' },
-  { share: 200 / 3, label: '67%' },
-] as const;
-
-/**
- * The lowest diversity threshold above a share, with how far below it the share sits (percentage points).
- */
-export function nextThreshold(share: number): { label: string; share: number; distance: number } | null {
-  const next = DIVERSITY_THRESHOLDS.find(threshold => share < threshold.share);
-  return next ? { label: next.label, share: next.share, distance: next.share - share } : null;
-}
-
-/**
- * Highest diversity threshold a share is over, or null below 33%.
- */
-export function crossedThreshold(share: number): string | null {
-  const crossed = DIVERSITY_THRESHOLDS.filter(threshold => share >= threshold.share);
-  return crossed.length > 0 ? crossed[crossed.length - 1].label : null;
-}
+/** Shares of stake at which one client's bug changes what the chain can do, drawn as faint ticks on share bars */
+export const DIVERSITY_THRESHOLDS = [{ share: 100 / 3 }, { share: 50 }, { share: 200 / 3 }] as const;
 
 /**
  * Build line of an execution client version: the version without its trailing commit,

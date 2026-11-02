@@ -2,18 +2,12 @@ import { type JSX, useMemo } from 'react';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import {
-  OTHER_VERSION_COLOR,
-  groupVersionLines,
-  versionColors,
-  type VersionDay,
-  type VersionSummary,
-} from '../../utils/client-versions';
+import { compareVersions } from '@/utils/version';
+import { OTHER_VERSION_COLOR, groupVersionLines, type VersionDay } from '../../utils/client-versions';
 
 export interface VersionShareChartProps {
   days: VersionDay[];
-  versions: VersionSummary[];
-  /** Lines drawn on their own; the rest stack as Other. Versions group into minor or major lines when needed */
+  /** Lines drawn on their own, the most-used recently; the rest stack as Other */
   limit?: number;
   height?: number;
 }
@@ -21,20 +15,17 @@ export interface VersionShareChartProps {
 const OTHER = 'Other';
 
 /**
- * Daily share of resolved blocks per version, stacked, the most-used versions (or release lines) on their own.
+ * Daily share of resolved versions, stacked: current releases (or minor lines) on their own, the rest as Other.
  */
-export function VersionShareChart({
-  days: versionDays,
-  versions: versionSummaries,
-  limit = 7,
-  height = 320,
-}: VersionShareChartProps): JSX.Element {
+export function VersionShareChart({ days: versionDays, limit, height = 320 }: VersionShareChartProps): JSX.Element {
   const { series, labels } = useMemo(() => {
-    const { days, versions } = groupVersionLines(versionDays, versionSummaries, limit);
-    const colors = versionColors(versions, getDataVizColors().CHART_CATEGORICAL_COLORS, limit);
-    const top = [...colors.keys()];
+    // Long windows get more lines, one per stretch of history
+    const { days, top: picked } = groupVersionLines(versionDays, limit ?? (versionDays.length > 180 ? 11 : 7));
+    const top = [...picked].sort((a, b) => compareVersions(b, a));
+    const palette = getDataVizColors().CHART_CATEGORICAL_COLORS;
+    const colors = new Map(top.map((version, index) => [version, palette[index % palette.length]]));
     const shown = new Set(top);
-    const hasOther = versions.some(summary => !shown.has(summary.version));
+    const hasOther = days.some(day => [...day.counts.keys()].some(version => !shown.has(version)));
     const share = (day: VersionDay, count: number): number | null =>
       day.resolved > 0 ? Number(((count / day.resolved) * 100).toFixed(2)) : null;
 
@@ -65,7 +56,7 @@ export function VersionShareChart({
       });
     }
     return { series: result, labels: days.map(day => formatDailyDate(day.day)) };
-  }, [versionDays, versionSummaries, limit]);
+  }, [versionDays, limit]);
 
   return (
     <MultiLineChart

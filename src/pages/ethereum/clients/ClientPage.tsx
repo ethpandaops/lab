@@ -136,7 +136,7 @@ export function ClientPage(): JSX.Element {
             },
             {
               label: 'Released',
-              value: latest?.release_date ? <Timestamp timestamp={latest.release_date} format="short" /> : '-',
+              value: latest?.release_date ? <Timestamp timestamp={latest.release_date} format="date" /> : '-',
             },
             {
               label: 'Repository',
@@ -174,7 +174,8 @@ export function ClientPage(): JSX.Element {
               <Tab key={tab}>{TAB_LABELS[tab]}</Tab>
             ))}
           </ScrollableTabs>
-          <TabPanels className="mt-6">
+          {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
+          <TabPanels className="mt-6 min-h-screen">
             <TabPanel>
               <OverviewTab {...tabProps} />
             </TabPanel>

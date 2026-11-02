@@ -39,7 +39,7 @@ interface VersionRow {
 /** Ranked client shares for one layer */
 function ShareList({ title, summaries }: { title: string; summaries: ClientSummary[] }): JSX.Element {
   return (
-    <Card rounded title={title} subtitle="Share of blocks naming a client, all time">
+    <Card rounded title={title} subtitle="Share of its proposed blocks whose graffiti names a client, all time">
       {summaries.length === 0 ? (
         <p className="text-sm text-muted">No block named a client.</p>
       ) : (
@@ -116,7 +116,7 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
       <Card
         rounded
         title="Versions"
-        subtitle={`Blocks per release, ${VERSION_DAYS} days`}
+        subtitle={`Blocks per release in the last ${VERSION_DAYS} days`}
         actions={
           <Link to="/ethereum/clients" search={{ entity }} className="text-sm text-primary hover:underline">
             Client shares over time

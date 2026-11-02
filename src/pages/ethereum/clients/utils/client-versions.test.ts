@@ -9,7 +9,6 @@ import {
   groupVersionLines,
   latestRelease,
   matchReleaseVersion,
-  nextThreshold,
   opcodeCosts,
   opcodeRowsFromDaily,
   peerClient,
@@ -25,7 +24,6 @@ import {
   type ClientRelease,
   type VersionCount,
   type VersionDay,
-  type VersionSummary,
 } from './client-versions';
 
 const release = (version: string, releaseDate: number | null, prerelease = false, commit = ''): DimClientRelease => ({
@@ -201,16 +199,6 @@ describe('timeToAdoption', () => {
   });
 });
 
-describe('nextThreshold', () => {
-  it('should name the next threshold above a share and the distance to it', () => {
-    expect(nextThreshold(20)?.label).toBe('33%');
-    const next = nextThreshold(40);
-    expect(next?.label).toBe('50%');
-    expect(next?.distance).toBeCloseTo(10);
-    expect(nextThreshold(70)).toBeNull();
-  });
-});
-
 describe('build lines', () => {
   it('should drop trailing commits but keep the channel', () => {
     expect(buildLine('1.17.11-unstable-0x2321bba4')).toBe('1.17.11-unstable');
@@ -359,9 +347,18 @@ describe('summariseUnresolved', () => {
       {
         day_start_date: '2026-11-01',
         entity: 'coinbase',
+        version: 'v8.3.1',
         release_status: 'commit_unmatched',
         commit_prefix: 'ca93',
         block_count: 3,
+      },
+      {
+        day_start_date: '2026-11-01',
+        entity: 'kiln',
+        version: 'v8.3.2',
+        release_status: 'commit_mismatch',
+        commit_prefix: 'a376',
+        block_count: 2,
       },
       {
         day_start_date: '2026-11-01',
@@ -372,50 +369,74 @@ describe('summariseUnresolved', () => {
       },
     ]);
     expect(summariseUnresolved(rows)).toEqual([
-      { reason: 'commit_zero', commit: undefined, blocks: 5, entities: ['binance', 'kiln'] },
-      { reason: 'commit_unmatched', commit: 'ca93', blocks: 3, entities: ['coinbase'] },
+      { reason: 'commit_zero', commit: undefined, stated: undefined, blocks: 5, entities: ['binance', 'kiln'] },
+      { reason: 'commit_unmatched', commit: 'ca93', stated: 'v8.3.1', blocks: 3, entities: ['coinbase'] },
     ]);
+    // A stated version stays out of version shares; a commit resolving to another release counts under that release
+    expect(rows.filter(row => row.version).map(row => [row.version, row.count])).toEqual(
+      [
+        ['v8.3.2', 2],
+        ['v8.3.2', 9],
+      ].sort((a, b) => Number(a[1]) - Number(b[1]))
+    );
   });
 });
 
 describe('groupVersionLines', () => {
-  const summary = (version: string, blocks: number): VersionSummary => ({
-    version,
-    blocks,
-    untaggedBlocks: 0,
-    share: 0,
-    lastSeen: 0,
-  });
-  const day = (counts: Record<string, number>): VersionDay => ({
-    day: '2026-01-01',
+  const day = (date: string, counts: Record<string, number>): VersionDay => ({
+    day: date,
     resolved: Object.values(counts).reduce((a, b) => a + b, 0),
     unresolved: 0,
     counts: new Map(Object.entries(counts)),
   });
 
   it('keeps releases when the largest few cover the blocks', () => {
-    const versions = [summary('v8.2.1', 90), summary('v8.2.0', 5), summary('v7.0.0', 5)];
-    const result = groupVersionLines([day({ 'v8.2.1': 90 })], versions, 2);
+    const result = groupVersionLines(
+      [day('2026-01-01', { 'v8.2.1': 90, 'v8.2.0': 5 }), day('2026-01-02', { 'v8.2.1': 90, 'v7.0.0': 5 })],
+      2
+    );
     expect(result.level).toBe('patch');
-    expect(result.versions.map(v => v.version)).toEqual(['v8.2.1', 'v8.2.0', 'v7.0.0']);
+    expect(result.top).toEqual(['v8.2.1', 'v8.2.0']);
   });
 
-  it('groups into minor lines when releases are too spread out', () => {
-    const versions = [summary('v8.2.1', 30), summary('v8.2.0', 30), summary('v8.1.0', 30), summary('v7.0.0', 10)];
-    const result = groupVersionLines([day({ 'v8.2.1': 3, 'v8.2.0': 4, 'v8.1.0': 5 })], versions, 2);
+  it('groups into minor lines when that leaves several lines', () => {
+    const result = groupVersionLines(
+      [
+        day('2026-01-01', { 'v8.2.1': 30, 'v8.2.0': 30 }),
+        day('2026-01-02', { 'v8.1.0': 30, 'v8.1.1': 20 }),
+        day('2026-01-03', { 'v7.0.0': 40, 'v7.0.1': 1 }),
+      ],
+      3
+    );
     expect(result.level).toBe('minor');
-    expect(result.versions.map(v => [v.version, v.blocks])).toEqual([
-      ['v8.2.x', 60],
-      ['v8.1.x', 30],
-      ['v7.0.x', 10],
-    ]);
-    expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 7, 'v8.1.x': 5 });
+    expect(result.top.sort()).toEqual(['v7.0.x', 'v8.1.x', 'v8.2.x']);
+    expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 60 });
   });
 
-  it('falls back to major lines, keeping versions it cannot parse', () => {
-    const versions = [summary('25.1.0', 25), summary('25.2.0', 25), summary('24.1.0', 25), summary('nightly', 25)];
-    const result = groupVersionLines([], versions, 2);
-    expect(result.level).toBe('major');
-    expect(result.versions.map(v => v.version).sort()).toEqual(['24.x', '25.x', 'nightly']);
+  it('gives each stretch of a long window its main release', () => {
+    const noise = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`v1.${40 + i}.0`, 3]));
+    const era = (i: number): string => (i < 20 ? 'v1.10.0' : i < 40 ? 'v1.20.0' : 'v1.30.0');
+    const days = Array.from({ length: 60 }, (_, i) =>
+      day(`d${String(i).padStart(2, '0')}`, { ...noise, [era(i)]: 40 })
+    );
+    const { top } = groupVersionLines(days, 4);
+    expect(top[0]).toBe('v1.30.0');
+    expect(top).toEqual(expect.arrayContaining(['v1.10.0', 'v1.20.0']));
+  });
+
+  it('keeps the current releases of a long single-major tail apart instead of one band', () => {
+    // Lodestar-like: twenty 1.x minors, each small, with peers lingering on old ones
+    const old = Object.fromEntries(Array.from({ length: 18 }, (_, i) => [`v1.${10 + i}.0`, 10]));
+    const days = Array.from({ length: 30 }, (_, i) =>
+      day(`2026-10-${String(i + 1).padStart(2, '0')}`, {
+        ...old,
+        'v1.34.0': i < 20 ? 40 : 15,
+        'v1.35.0': i < 20 ? 0 : 60,
+      })
+    );
+    const result = groupVersionLines(days, 4);
+    expect(result.level).toBe('patch');
+    expect(result.top.slice(0, 2)).toEqual(['v1.35.0', 'v1.34.0']);
+    expect(result.top.every(version => !version.endsWith('.x'))).toBe(true);
   });
 });

@@ -130,7 +130,8 @@ export function IndexPage(): JSX.Element {
             </div>
           </div>
 
-          <TabPanels className="mt-6">
+          {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
+          <TabPanels className="mt-6 min-h-screen">
             {/* newPayload Tab */}
             <TabPanel>
               <NewPayloadTab data={data} timeRange={timeRange} />

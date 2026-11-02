@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import {
-  censusSummaries,
   censusVersions,
   forkIdNextLabel,
   groupForkIdNext,
   groupNextForkDigests,
   latestFullDay,
+  peerShareChart,
+  unifiedClientRows,
 } from './census';
 
 const network = {
@@ -29,40 +30,6 @@ describe('latestFullDay', () => {
   });
 });
 
-describe('censusSummaries', () => {
-  it('should count unknown and other in the total but not list them', () => {
-    const summaries = censusSummaries(
-      [
-        { client: 'lighthouse', peer_count: 60 },
-        { client: 'lighthouse', peer_count: 15 },
-        { client: 'prysm', peer_count: 25 },
-        { client: 'unknown', peer_count: 50 },
-        { client: 'other', peer_count: 50 },
-      ],
-      row => row.peer_count
-    );
-    expect(summaries.map(s => [s.client, s.blocks, s.share, s.identifiedShare])).toEqual([
-      ['lighthouse', 75, 37.5, 75],
-      ['prysm', 25, 12.5, 25],
-    ]);
-  });
-
-  it('should leave agents that are not clients out of the list but in the identified total', () => {
-    const summaries = censusSummaries(
-      [
-        { client: 'lighthouse', peer_count: 60 },
-        { client: 'rust-libp2p', peer_count: 20 },
-        { client: 'prysm', peer_count: 20 },
-      ],
-      row => row.peer_count
-    );
-    expect(summaries.map(s => [s.client, s.identifiedShare])).toEqual([
-      ['lighthouse', 60],
-      ['prysm', 20],
-    ]);
-  });
-});
-
 describe('censusVersions', () => {
   it('should count a peer under the release it names, whatever its commit', () => {
     const versions = censusVersions(
@@ -76,9 +43,9 @@ describe('censusVersions', () => {
       row => row.peer_count
     );
     expect(versions).toEqual([
-      { version: '', resolved: false, untagged: 0, count: 9 },
-      { version: 'v8.3.2', resolved: true, untagged: 2, count: 8 },
-      { version: 'v9.9.9', resolved: false, untagged: 0, count: 3 },
+      { version: '', resolved: false, untagged: 0, statedOnly: 0, count: 9 },
+      { version: 'v8.3.2', resolved: true, untagged: 2, statedOnly: 1, count: 8 },
+      { version: 'v9.9.9', resolved: false, untagged: 0, statedOnly: 3, count: 3 },
     ]);
   });
 });
@@ -123,5 +90,57 @@ describe('next fork', () => {
       1790000000
     );
     expect(groups[0]).toEqual({ label: 'Glamsterdam', isNext: true, count: 4 });
+  });
+});
+
+describe('unifiedClientRows', () => {
+  it('should give known clients rows and lump every other agent into Other', () => {
+    const { rows, other, peerTotal } = unifiedClientRows(
+      'consensus',
+      [
+        { client: 'lighthouse', blocks: 60, share: 40, identifiedShare: 60 },
+        { client: 'prysm', blocks: 40, share: 30, identifiedShare: 40 },
+        { client: 'unknown', blocks: 50, share: 30, identifiedShare: null },
+      ],
+      [
+        { client: 'lighthouse', peer_count: 500 },
+        { client: 'teku', peer_count: 100 },
+        { client: 'rust-libp2p', peer_count: 150 },
+        { client: 'myotis', peer_count: 50 },
+        { client: 'other', peer_count: 200 },
+        { client: 'unknown', peer_count: 999 },
+      ]
+    );
+    expect(rows.map(row => [row.client, row.blockShare, row.peers, row.peerShare])).toEqual([
+      ['lighthouse', 60, 500, 50],
+      ['prysm', 40, 0, 0],
+      ['teku', 0, 100, 10],
+    ]);
+    expect(other).toEqual({ peers: 400, peerShare: 40 });
+    expect(peerTotal).toBe(1000);
+  });
+
+  it('should keep execution agents out of consensus rows', () => {
+    const { rows, other } = unifiedClientRows('consensus', [], [{ client: 'geth', peer_count: 10 }]);
+    expect(rows).toEqual([]);
+    expect(other.peers).toBe(10);
+  });
+});
+
+describe('peerShareChart', () => {
+  it('should stack daily peer shares per client with Other last', () => {
+    const chart = peerShareChart('execution', [
+      { day_start_date: '2026-11-01', client: 'geth', peer_count: 30 },
+      { day_start_date: '2026-11-01', client: 'meganode', peer_count: 10 },
+      { day_start_date: '2026-11-01', client: 'unknown', peer_count: 100 },
+      { day_start_date: '2026-10-31', client: 'reth', peer_count: 20 },
+      { day_start_date: '2026-10-31', client: 'geth', peer_count: 20 },
+    ]);
+    expect(chart.days).toEqual(['2026-10-31', '2026-11-01']);
+    expect(chart.series.map(series => [series.name, series.data])).toEqual([
+      ['Geth', [50, 75]],
+      ['Reth', [50, 0]],
+      ['Other', [0, 25]],
+    ]);
   });
 });

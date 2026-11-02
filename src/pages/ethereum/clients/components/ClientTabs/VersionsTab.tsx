@@ -70,10 +70,11 @@ export function VersionsTab({
           ariaLabel="Window"
         />
         <InfoBox summary="How versions are read">
-          Versions come from the graffiti&apos;s version string or its commit prefix, matched against the client&apos;s
-          releases. A commit from a branch rather than a release tag counts under the release it builds on, as a build
-          after it. Blocks whose graffiti names no release are left out of version shares and listed under Unresolved
-          blocks.
+          Versions come from proposed blocks, so shares are stake-weighted: the graffiti&apos;s version string or commit
+          prefix is matched against the client&apos;s releases. A commit from a branch rather than a release tag counts
+          under the release it builds on, as a build after it; a commit from another release than the graffiti states
+          counts under the commit&apos;s release. Blocks that resolve to no release are left out of version shares and
+          listed under Unresolved blocks, with the version their graffiti states.
         </InfoBox>
       </div>
 
@@ -100,7 +101,7 @@ export function VersionsTab({
             anchorId="version-share"
             modalSize="full"
           >
-            {({ inModal }) => <VersionShareChart days={days} versions={versions} height={inModal ? 600 : 320} />}
+            {({ inModal }) => <VersionShareChart days={days} height={inModal ? 600 : 320} />}
           </PopoutCard>
           <Card rounded title="Versions">
             {versions.length === 0 ? (
@@ -116,16 +117,24 @@ export function VersionsTab({
             )}
           </Card>
           {unresolved.length > 0 && (
-            <Card rounded title="Unresolved blocks" subtitle="Blocks whose graffiti names no release">
+            <Card
+              rounded
+              title="Unresolved blocks"
+              subtitle={`Blocks whose graffiti resolves to no release, ${SHARE_WINDOW_TEXT[shareWindow]}; a stated version is not counted in version shares`}
+            >
               <Table
                 variant="nested"
                 data={unresolved.slice(0, 15)}
-                getRowKey={row => `${row.reason}-${row.commit ?? ''}`}
+                getRowKey={row => `${row.reason}-${row.commit ?? ''}-${row.stated ?? ''}`}
                 columns={[
                   { header: 'Reason', accessor: row => UNRESOLVED_LABELS[row.reason] ?? row.reason },
                   {
                     header: 'Commit',
                     accessor: row => <span className="font-mono text-xs/6">{row.commit ?? '-'}</span>,
+                  },
+                  {
+                    header: 'Graffiti states',
+                    accessor: row => <span className="font-mono text-xs/6 text-muted">{row.stated ?? '-'}</span>,
                   },
                   {
                     header: 'Blocks',
