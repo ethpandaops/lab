@@ -37,9 +37,12 @@ interface InspectSearch {
 const DAY = 86_400;
 /** Ranges longer than this load one row per validator per week instead of per day */
 const MAX_DAILY_RANGE_DAYS = 120;
+/** Range shown when the URL has none */
+const DEFAULT_RANGE_DAYS = 30;
 
 const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
-const tagsFromUrl = (indices?: string): string[] => (indices ?? '').split(',').filter(Boolean);
+// Links can carry the list JSON-quoted (indices="1,2"), so quotes are dropped
+const tagsFromUrl = (indices?: string): string[] => (indices ?? '').replace(/"/g, '').split(',').filter(Boolean);
 const formatDate = (ts: number): string =>
   new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
@@ -68,9 +71,9 @@ export function InspectPage(): JSX.Element {
   });
 
   const to = range.to ?? startOfDay(Date.now() / 1000);
-  const from = range.from ?? earliest;
-  const allHistory = range.from === undefined;
-  const resolution = from !== undefined && (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
+  const from = range.from ?? to - DEFAULT_RANGE_DAYS * DAY;
+  const allHistory = earliest !== undefined && from <= earliest;
+  const resolution = (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
 
   const { valid: parsedIndices, pubkeys: parsedPubkeys } = useMemo(() => parseValidatorIndices(tags), [tags]);
   const {
@@ -82,7 +85,7 @@ export function InspectPage(): JSX.Element {
     unresolvedPubkeys,
   } = useValidatorResolver(parsedIndices, parsedPubkeys, hasAnalyzed);
 
-  const ready = hasAnalyzed && isResolved && from !== undefined;
+  const ready = hasAnalyzed && isResolved;
   const {
     validators,
     summary,
@@ -142,11 +145,8 @@ export function InspectPage(): JSX.Element {
   );
 
   const handleRangeChange = useCallback(
-    (nextFrom: number, nextTo: number) => {
-      const isAll = earliest !== undefined && nextFrom <= earliest && nextTo === startOfDay(Date.now() / 1000);
-      applyRange(isAll ? {} : { from: nextFrom, to: nextTo });
-    },
-    [earliest, applyRange]
+    (nextFrom: number, nextTo: number) => applyRange({ from: nextFrom, to: nextTo }),
+    [applyRange]
   );
 
   // Analyse straight away when the URL already names validators
@@ -161,17 +161,15 @@ export function InspectPage(): JSX.Element {
 
   const busy = isResolving || isLoading;
   // Attestation tables start later than balances; the heatmap and table begin where they do
-  const performanceFrom =
-    from !== undefined && attestationFloor !== undefined ? Math.max(from, attestationFloor) : from;
-  const rangeMeta =
-    from !== undefined ? (
-      <span className="flex items-center gap-2">
-        {formatDate(from)} – {formatDate(to)}
-        {resolution === 'week' && <Badge color="gray">Weekly</Badge>}
-      </span>
-    ) : undefined;
+  const performanceFrom = attestationFloor !== undefined ? Math.max(from, attestationFloor) : from;
+  const rangeMeta = (
+    <span className="flex items-center gap-2">
+      {formatDate(from)} – {formatDate(to)}
+      {resolution === 'week' && <Badge color="gray">Weekly</Badge>}
+    </span>
+  );
   const performanceNote =
-    from !== undefined && attestationFloor !== undefined && from < attestationFloor
+    attestationFloor !== undefined && from < attestationFloor
       ? `Attestation data starts ${formatDate(attestationFloor)}.`
       : undefined;
 
@@ -182,13 +180,7 @@ export function InspectPage(): JSX.Element {
       <div className="flex flex-col gap-3">
         <ValidatorInput tags={tags} onTagsChange={handleTagsChange} onSubmit={handleAnalyze} disabled={busy} />
         <div className="flex flex-wrap items-center gap-2">
-          <DateRangeSelector
-            from={from ?? to}
-            to={to}
-            earliest={earliest}
-            onChange={handleRangeChange}
-            disabled={busy}
-          />
+          <DateRangeSelector from={from} to={to} earliest={earliest} onChange={handleRangeChange} disabled={busy} />
           <div className="ml-auto flex items-center gap-2">
             {tags.length > 0 && (
               <Button variant="blank" size="sm" onClick={() => handleTagsChange([])} disabled={busy}>
@@ -234,9 +226,7 @@ export function InspectPage(): JSX.Element {
           </p>
         )}
 
-        {hasAnalyzed && from === undefined && <ValidatorsSkeleton />}
-
-        {hasAnalyzed && !error && !resolverError && from !== undefined && (
+        {hasAnalyzed && !error && !resolverError && (
           <>
             <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
               {identityList.length === 1 && <ValidatorIdentityCard identity={identityList[0]} />}
@@ -265,7 +255,7 @@ export function InspectPage(): JSX.Element {
                 blockProposals={blockProposals}
                 metric={heatmapMetric}
                 onMetricChange={setHeatmapMetric}
-                from={performanceFrom ?? from}
+                from={performanceFrom}
                 to={to}
                 stepDays={resolution === 'week' ? 7 : 1}
                 onWeekSelect={weekStart => applyRange({ from: weekStart, to: weekStart + 6 * DAY })}
@@ -285,7 +275,7 @@ export function InspectPage(): JSX.Element {
                   syncCommitteeDaily={syncCommitteeDaily}
                   blockProposals={blockProposals}
                   validatorMap={validatorMap}
-                  from={performanceFrom ?? from}
+                  from={performanceFrom}
                   to={to}
                   getStatusAtTimestamp={getStatusAtTimestamp}
                   selection={selection}
