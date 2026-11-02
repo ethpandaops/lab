@@ -61,7 +61,7 @@ function describeBlocks(entity: string | undefined, filters: ClientFilters, laye
 
 /**
  * Clients overview: every consensus and execution client with its share of proposed blocks parsed from graffiti,
- * diversity against the ⅓, ½ and ⅔ thresholds, newest release and our nodes, with a per-block drill-down.
+ * diversity against the ⅓, ½ and ⅔ thresholds, newest release and Xatu nodes, with a per-block drill-down.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/clients/' });
@@ -284,7 +284,7 @@ export function IndexPage(): JSX.Element {
               <section className="flex flex-col gap-3">
                 <div>
                   <h2 className="text-base/7 font-semibold text-foreground">Consensus clients</h2>
-                  <p className="text-sm/6 text-muted">Share of blocks that name a consensus client</p>
+                  <p className="text-sm/6 text-muted">Share of blocks whose graffiti names a consensus client</p>
                 </div>
                 <ClientSummaryGrid
                   layer="consensus"
@@ -296,7 +296,7 @@ export function IndexPage(): JSX.Element {
               <section className="flex flex-col gap-3">
                 <div>
                   <h2 className="text-base/7 font-semibold text-foreground">Execution clients</h2>
-                  <p className="text-sm/6 text-muted">Share of blocks that name an execution client</p>
+                  <p className="text-sm/6 text-muted">Share of blocks whose graffiti names an execution client</p>
                 </div>
                 <ClientSummaryGrid
                   layer="execution"

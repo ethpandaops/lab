@@ -58,6 +58,14 @@ export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Ele
               />
             ))}
           </div>
+          <ul className="flex flex-wrap gap-x-4 gap-y-1">
+            {identified.map(summary => (
+              <li key={summary.client} className="inline-flex items-center gap-1.5">
+                <ClientLabel client={summary.client} />
+                <span className="text-sm/6 text-muted tabular-nums">{summary.identifiedShare?.toFixed(1)}%</span>
+              </li>
+            ))}
+          </ul>
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
               <dt className="text-xs/5 text-muted">Largest client</dt>

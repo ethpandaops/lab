@@ -61,7 +61,7 @@ export function VersionTable({ client, versions, releases, latest, minVersion }:
       headerClassName: 'text-right',
     },
     {
-      header: 'Share',
+      header: 'Share of resolved',
       accessor: row => `${row.share.toFixed(1)}%`,
       cellClassName: 'text-right tabular-nums font-medium text-foreground',
       headerClassName: 'text-right',

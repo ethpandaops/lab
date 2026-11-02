@@ -1,6 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
+import { Table } from '@/components/Lists/Table';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -9,10 +10,11 @@ import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { UNKNOWN_CLIENT } from '../../constants';
+import { SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useClientCounts } from '../../hooks';
 import { clientOf, summariseClients } from '../../utils/client-share';
-import { displayVersion, nextThreshold } from '../../utils/client-versions';
+import { crossedThreshold, displayVersion, nextThreshold } from '../../utils/client-versions';
 import { PENDING_SOURCES } from '../../pending';
 import { PendingSource } from '../PendingSource';
 import { SourceAngles } from '../SourceAngles';
@@ -36,8 +38,11 @@ export function OverviewTab({
   allNodes,
   releases,
   requirements,
+  shareWindow,
+  onShareWindowChange,
 }: ClientTabProps): JSX.Element {
-  const counts = useClientCounts('30d');
+  const counts = useClientCounts(shareWindow);
+  const windowText = SHARE_WINDOW_TEXT[shareWindow];
   const name = formatClientName(client);
 
   const summary = useMemo(() => {
@@ -95,28 +100,34 @@ export function OverviewTab({
 
   return (
     <div className="flex flex-col gap-6">
+      <SegmentedControl
+        options={SHARE_WINDOW_OPTIONS}
+        value={shareWindow}
+        onChange={onShareWindowChange}
+        ariaLabel="Share window"
+      />
       <SourceAngles
         angles={[
           {
             id: 'stake',
             label: 'Stake-weighted (proposers)',
             value: summary.mine ? `${share.toFixed(1)}%` : '0%',
-            detail: 'Share of proposed blocks naming a client, 30 days',
+            detail: `Share of proposed blocks naming a client, ${windowText}`,
           },
           { id: 'p2p', label: 'Node-weighted (P2P peers)', detail: 'Share of peers seen on the P2P network' },
           { id: 'enr', label: 'ENR crawl', detail: 'Share of nodes found in discovery records' },
           layer === 'consensus'
             ? {
                 id: 'contributoor',
-                label: 'Our contributoor nodes',
+                label: 'Xatu nodes',
                 value: nodes.length.toLocaleString(),
-                detail: `${percent(nodes.length, allNodes.length)} of our ${allNodes.length.toLocaleString()} nodes`,
+                detail: `${percent(nodes.length, allNodes.length)} of ${allNodes.length.toLocaleString()} Xatu nodes`,
               }
             : {
                 id: 'contributoor',
-                label: 'Our ethPandaOps nodes',
+                label: 'Xatu nodes',
                 value: nodes.length.toLocaleString(),
-                detail: 'Running it, by node name',
+                detail: 'ethPandaOps nodes running it, by node name',
               },
         ]}
       />
@@ -124,7 +135,7 @@ export function OverviewTab({
       <Stats
         gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
         stats={[
-          { id: 'blocks', name: 'Blocks, 30 days', value: (summary.mine?.blocks ?? 0).toLocaleString() },
+          { id: 'blocks', name: `Blocks, ${windowText}`, value: (summary.mine?.blocks ?? 0).toLocaleString() },
           {
             id: 'rank',
             name: `Rank among ${layer === 'consensus' ? 'consensus' : 'execution'} clients`,
@@ -132,8 +143,8 @@ export function OverviewTab({
           },
           {
             id: 'threshold',
-            name: next ? `Points below ${next.label}` : 'Points below a threshold',
-            value: next ? next.distance.toFixed(1) : '-',
+            name: next ? `Points below ${next.label}` : 'Diversity threshold',
+            value: next ? next.distance.toFixed(1) : summary.mine ? `Over ${crossedThreshold(share)}` : '-',
           },
           {
             id: 'latest',
@@ -145,11 +156,11 @@ export function OverviewTab({
 
       {!counts.isLoading && !summary.mine ? (
         <Card rounded>
-          <p className="text-sm text-muted">No block in the last 30 days named {name} in its graffiti.</p>
+          <p className="text-sm text-muted">No block in this window named this client in its graffiti.</p>
         </Card>
       ) : (
         <PopoutCard
-          title={`${name} share of blocks`}
+          title="Share of blocks"
           subtitle="Daily share of blocks whose graffiti names a client"
           anchorId="client-share"
           modalSize="full"
@@ -160,6 +171,8 @@ export function OverviewTab({
               xAxis={{ type: 'category', labels: shareChart.labels, name: 'Date' }}
               yAxis={{ name: 'Share (%)', min: 0 }}
               height={inModal ? 600 : 280}
+              showLegend
+              legendPosition="top"
             />
           )}
         </PopoutCard>
@@ -194,7 +207,7 @@ export function OverviewTab({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs/5 text-muted">Our nodes on it or newer</dt>
+                <dt className="text-xs/5 text-muted">Xatu nodes on it or newer</dt>
                 <dd className="text-sm/6 font-medium text-foreground tabular-nums">
                   {layer === 'consensus' ? percent(nodesOnLatest, nodes.length) : '-'}
                 </dd>
@@ -206,30 +219,45 @@ export function OverviewTab({
         </Card>
         <Card rounded title="Fork minimum versions">
           {requirements.length === 0 ? (
-            <p className="text-sm text-muted">This network sets no minimum {name} version for any fork.</p>
+            <p className="text-sm text-muted">No fork on this network sets a minimum version for this client.</p>
           ) : (
-            <ul className="flex flex-col gap-1">
-              {requirements.map(requirement => (
-                <li key={requirement.fork} className="grid grid-cols-3 items-center gap-3 text-sm/6">
-                  <Link
-                    to="/ethereum/forks/$fork"
-                    params={{ fork: requirement.fork }}
-                    className="font-medium text-foreground capitalize hover:underline"
-                  >
-                    {requirement.fork}
-                  </Link>
-                  <span className="font-mono text-muted">{requirement.minVersion}</span>
-                  <Link
-                    to="/ethereum/clients/$client"
-                    params={{ client }}
-                    search={{ fork: requirement.fork }}
-                    className="justify-self-end text-primary hover:underline"
-                  >
-                    Readiness
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <Table
+              variant="nested"
+              data={requirements}
+              getRowKey={row => row.fork}
+              columns={[
+                {
+                  header: 'Fork',
+                  accessor: row => (
+                    <Link
+                      to="/ethereum/forks/$fork"
+                      params={{ fork: row.fork }}
+                      className="font-medium text-foreground capitalize hover:underline"
+                    >
+                      {row.fork}
+                    </Link>
+                  ),
+                },
+                {
+                  header: 'Minimum version',
+                  accessor: row => <span className="font-mono text-xs/6">{row.minVersion}</span>,
+                },
+                {
+                  header: '',
+                  accessor: row => (
+                    <Link
+                      to="/ethereum/clients/$client"
+                      params={{ client }}
+                      search={{ fork: row.fork }}
+                      className="text-primary hover:underline"
+                    >
+                      Readiness
+                    </Link>
+                  ),
+                  cellClassName: 'text-right',
+                },
+              ]}
+            />
           )}
         </Card>
       </div>

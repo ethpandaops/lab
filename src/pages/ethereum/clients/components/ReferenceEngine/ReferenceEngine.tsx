@@ -104,7 +104,7 @@ export function ReferenceEngine({
       focus
         ? focus
             .filter(item => lines.some(line => line.line === item.line))
-            .map(item => ({ name: item.label, line: item.line }))
+            .map(item => ({ name: `${item.label}: ${item.line}`, line: item.line }))
         : [...lines]
             .sort((a, b) => b.lastDay.localeCompare(a.lastDay) || b.observations - a.observations)
             .slice(0, 5)
@@ -183,7 +183,7 @@ export function ReferenceEngine({
     : lines.map(line => ({ ...line, label: undefined as string | undefined }));
 
   const columns: Column<BuildLineStats & { label?: string }>[] = [
-    ...(focus ? [{ header: '', accessor: (row: BuildLineStats & { label?: string }) => row.label ?? '' }] : []),
+    ...(focus ? [{ header: 'Compared', accessor: (row: BuildLineStats & { label?: string }) => row.label ?? '' }] : []),
     {
       header: 'Build',
       accessor: row => {
@@ -261,9 +261,7 @@ export function ReferenceEngine({
   if (lines.length === 0) {
     return (
       <Card rounded title="Reference nodes">
-        <p className="text-sm/6 text-muted">
-          The EIP-7870 reference nodes have not run this client in the last 90 days.
-        </p>
+        <p className="text-sm/6 text-muted">The EIP-7870 reference nodes have not run this client.</p>
       </Card>
     );
   }
@@ -271,7 +269,10 @@ export function ReferenceEngine({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-        <span className="text-muted">EIP-7870 reference nodes, last 90 days</span>
+        <span className="text-muted">
+          EIP-7870 reference nodes, since{' '}
+          {lines.reduce((first, line) => (line.firstDay < first ? line.firstDay : first), lines[0].firstDay)}
+        </span>
         {implementation && (
           <Link
             to="/ethereum/execution/payloads"
@@ -391,7 +392,7 @@ export function ReferenceEngine({
           {winShare.share !== null && (
             <PopoutCard
               title="newPayload wins"
-              subtitle={`Share of slots where ${formatClientName(client)} had the fastest newPayload`}
+              subtitle="Share of slots where this client had the fastest newPayload"
               anchorId="reference-wins"
               modalSize="full"
             >
@@ -400,7 +401,9 @@ export function ReferenceEngine({
                   series={winShare.series}
                   xAxis={{ type: 'category', labels: winShare.labels, name: 'Date' }}
                   yAxis={{ name: 'Share (%)', min: 0 }}
-                  height={inModal ? 600 : 220}
+                  height={inModal ? 600 : 240}
+                  showLegend
+                  legendPosition="top"
                 />
               )}
             </PopoutCard>

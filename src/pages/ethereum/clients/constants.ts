@@ -55,23 +55,47 @@ export const ENTITY_OPTIONS_STATUS = 'active_ongoing';
 export const BLOCK_GRAFFITI_TABLE = 'fct_block_graffiti';
 
 /** Windows of per-block graffiti the version views load; each day is a few thousand blocks per client */
-export type VersionWindow = '7d' | '14d' | '30d' | '60d';
+export type VersionWindow = '7d' | '14d' | '30d' | '60d' | '90d';
 
 /** Days in each version window */
-export const VERSION_WINDOW_DAYS: Record<VersionWindow, number> = { '7d': 7, '14d': 14, '30d': 30, '60d': 60 };
+export const VERSION_WINDOW_DAYS: Record<VersionWindow, number> = {
+  '7d': 7,
+  '14d': 14,
+  '30d': 30,
+  '60d': 60,
+  '90d': 90,
+};
 
 /** Version window options on the client page */
 export const CLIENT_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label: string }> = [
   { value: '7d', label: '7d' },
-  { value: '14d', label: '14d' },
   { value: '30d', label: '30d' },
+  { value: '90d', label: '90d' },
 ];
 
 /** Version window options on the version page, longer so adoption since release fits */
 export const VERSION_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label: string }> = [
-  { value: '14d', label: '14d' },
   { value: '30d', label: '30d' },
-  { value: '60d', label: '60d' },
+  { value: '90d', label: '90d' },
+];
+
+/** Share chart windows on the client page */
+export type ShareWindow = '30d' | '90d' | '1y' | 'all';
+
+/** How each share window reads in copy */
+export const SHARE_WINDOW_TEXT: Record<ShareWindow, string> = {
+  '30d': '30 days',
+  '90d': '90 days',
+  '1y': '1 year',
+  all: 'all time',
+};
+
+/** Share chart window options on the client page */
+export const SHARE_WINDOW_OPTIONS: ReadonlyArray<{ value: ShareWindow; label: string }> = [
+  { value: '30d', label: '30d' },
+  { value: '90d', label: '90d' },
+  { value: '1y', label: '1y' },
+  { value: 'all', label: 'All' },
 ];
 
 /** Tabs of the client page */
@@ -91,7 +115,9 @@ export type ClientTab = (typeof CLIENT_TABS)[number];
 export const clientSearchSchema = z.object({
   tab: z.enum(CLIENT_TABS).optional(),
   /** Window of blocks the version, proposer and pairing views use */
-  w: z.enum(['7d', '14d', '30d']).optional(),
+  w: z.enum(['7d', '14d', '30d', '90d']).optional().catch(undefined),
+  /** Window of the share charts, which come from daily counts and reach back to genesis */
+  t: z.enum(['30d', '90d', '1y', 'all']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
 });
@@ -100,7 +126,7 @@ export type ClientSearch = z.infer<typeof clientSearchSchema>;
 /** Zod schema for the version page search params */
 export const versionSearchSchema = z.object({
   /** Window of blocks adoption is measured over */
-  w: z.enum(['14d', '30d', '60d']).optional(),
+  w: z.enum(['14d', '30d', '60d', '90d']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
 });
@@ -108,6 +134,3 @@ export type VersionSearch = z.infer<typeof versionSearchSchema>;
 
 /** node_class of the EIP-7870 reference nodes in the engine and opcode tables */
 export const REFERENCE_NODE_CLASS = 'eip7870-block-builder';
-
-/** Days of reference node engine data the execution views load */
-export const REFERENCE_DAYS = 90;

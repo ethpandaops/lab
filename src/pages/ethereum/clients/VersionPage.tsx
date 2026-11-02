@@ -56,7 +56,7 @@ function lagValue(lag: AdoptionLag | null): { value: string; note?: string } {
   return { value: '-', note: 'Released before the window' };
 }
 
-/** Blocks, entities and our nodes on one version */
+/** Blocks, entities and Xatu nodes on one version */
 interface VersionFacts {
   release?: DimClientRelease;
   blocks: number;
@@ -66,7 +66,7 @@ interface VersionFacts {
   lag90: AdoptionLag | null;
 }
 
-/** Facts about one version over the loaded blocks and our nodes */
+/** Facts about one version over the loaded blocks and Xatu nodes */
 function versionFacts(
   release: DimClientRelease | undefined,
   version: string,
@@ -109,10 +109,12 @@ export function VersionPage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const client = normalizeClientName(params.client);
   const layer = clientLayerOf(client);
-  const window: VersionWindow = search.w ?? '30d';
 
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
   const release = findRelease(releases, params.version);
+  // Long enough by default to cover adoption since release
+  const releaseAge = release?.release_date ? Date.now() / 1000 - release.release_date : 0;
+  const window: VersionWindow = search.w ?? (releaseAge > 25 * 86400 ? '90d' : '30d');
   const version = release?.version ?? params.version;
   const previous = release ? previousRelease(releases, release) : undefined;
   const next = release ? nextRelease(releases, release) : undefined;
@@ -140,8 +142,7 @@ export function VersionPage(): JSX.Element {
   const requirement = forkRequirements(currentNetwork, client).find(item => item.fork === search.fork);
 
   const onWindowChange = useCallback(
-    (value: VersionWindow) =>
-      navigate({ search: prev => ({ ...prev, w: value as '14d' | '30d' | '60d' }), replace: true }),
+    (value: VersionWindow) => navigate({ search: prev => ({ ...prev, w: value as '30d' | '90d' }), replace: true }),
     [navigate]
   );
 
@@ -277,13 +278,12 @@ export function VersionPage(): JSX.Element {
           <Alert
             variant="warning"
             title="No published release"
-            description={`${name} has no published release ${params.version}. Blocks reporting it are still shown.`}
+            description="Blocks reporting this version are still shown."
           />
         )}
 
         {search.fork && (
           <ForkReadinessCard
-            client={client}
             layer={layer}
             fork={search.fork}
             requirement={requirement}
@@ -323,7 +323,7 @@ export function VersionPage(): JSX.Element {
                 { id: 'entities', name: 'Entities proposing with it', value: facts.entities.toLocaleString() },
                 {
                   id: 'nodes',
-                  name: 'Our nodes on it',
+                  name: 'Xatu nodes on it',
                   value: layer === 'consensus' ? facts.nodes.toLocaleString() : '-',
                 },
               ]}
@@ -331,7 +331,7 @@ export function VersionPage(): JSX.Element {
 
             <PopoutCard
               title="Adoption"
-              subtitle={`Daily share of ${name} blocks with a resolved version`}
+              subtitle="Daily share of this client's blocks with a resolved version"
               anchorId="version-adoption"
               modalSize="full"
             >
@@ -389,11 +389,11 @@ export function VersionPage(): JSX.Element {
         )}
 
         {layer === 'consensus' && (
-          <Card rounded title="Our nodes on this version">
+          <Card rounded title="Xatu nodes on this version">
             {nodesLoading ? (
               <LoadingContainer className="h-32 rounded-sm" />
             ) : facts.nodes === 0 ? (
-              <p className="text-sm text-muted">None of our nodes ran this version in the last 24 hours.</p>
+              <p className="text-sm text-muted">No Xatu node ran this version in the last 24 hours.</p>
             ) : (
               <NodeTable
                 client={client}
@@ -480,7 +480,7 @@ function ComparisonCard({
     ...(layer === 'consensus'
       ? [
           {
-            metric: 'Our nodes',
+            metric: 'Xatu nodes',
             current: facts.nodes.toLocaleString(),
             previous: previousFacts?.nodes.toLocaleString() ?? '-',
           },
@@ -512,7 +512,7 @@ function ComparisonCard({
           data={rows}
           getRowKey={row => row.metric}
           columns={[
-            { header: '', accessor: row => row.metric, cellClassName: 'text-muted' },
+            { header: 'Metric', accessor: row => row.metric, cellClassName: 'text-muted' },
             {
               header: version,
               accessor: row => row.current,

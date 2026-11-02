@@ -1187,6 +1187,10 @@ export function MultiLineChart({
     if (!group) legendGroups.push((group = { name: groupName, items: [] }));
     group.items.push(s);
   }
+  // A single series still gets a legend when it is a client, so its logo and name label the chart
+  const hasLegend =
+    showLegend && (series.length > 1 || (series.length === 1 && isKnownClient(series[0].client ?? series[0].name)));
+
   const legendControls = (
     <>
       {enableAggregateToggle && (
@@ -1333,9 +1337,7 @@ export function MultiLineChart({
       )}
 
       {/* Interactive Legend Controls - Top */}
-      {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'top' && (
-        <div className="mb-3">{legendControls}</div>
-      )}
+      {!useNativeLegend && hasLegend && legendPosition === 'top' && <div className="mb-3">{legendControls}</div>}
 
       <div
         style={{
@@ -1352,9 +1354,9 @@ export function MultiLineChart({
           echarts={echarts}
           option={option}
           style={{
-            height: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
+            height: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
             width: '100%',
-            minHeight: typeof _height === 'number' && !(showLegend && series.length > 1) ? _height + 52 : _height,
+            minHeight: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
           }}
           notMerge={notMerge}
           opts={{ renderer: 'canvas' }}
@@ -1363,9 +1365,7 @@ export function MultiLineChart({
       </div>
 
       {/* Interactive Legend Controls - Bottom */}
-      {showLegend && !useNativeLegend && series.length > 1 && legendPosition === 'bottom' && (
-        <div className="mt-3">{legendControls}</div>
-      )}
+      {!useNativeLegend && hasLegend && legendPosition === 'bottom' && <div className="mt-3">{legendControls}</div>}
     </>
   );
 

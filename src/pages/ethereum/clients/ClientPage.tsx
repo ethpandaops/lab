@@ -12,7 +12,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTabState } from '@/hooks/useTabState';
 import { normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { CLIENT_TABS, VERSION_WINDOW_DAYS, type VersionWindow } from './constants';
+import { CLIENT_TABS, VERSION_WINDOW_DAYS, type ShareWindow, type VersionWindow } from './constants';
 import { ClientHeader, ForkReadinessCard } from './components';
 import {
   NetworkTab,
@@ -41,7 +41,7 @@ const TAB_LABELS: Record<(typeof CLIENT_TABS)[number], string> = {
 };
 
 /**
- * Deep dive into one consensus or execution client: share, versions, proposers, pairings, network, our nodes,
+ * Deep dive into one consensus or execution client: share, versions, proposers, pairings, network, Xatu nodes,
  * performance and releases.
  */
 export function ClientPage(): JSX.Element {
@@ -52,6 +52,7 @@ export function ClientPage(): JSX.Element {
   const client = normalizeClientName(params.client);
   const layer = clientLayerOf(client);
   const window: VersionWindow = search.w ?? '7d';
+  const shareWindow: ShareWindow = search.t ?? 'all';
 
   const { selectedIndex, onChange } = useTabState(CLIENT_TABS.map(id => ({ id })));
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
@@ -64,9 +65,13 @@ export function ClientPage(): JSX.Element {
   const requirements = forkRequirements(currentNetwork, client);
   const requirement = requirements.find(item => item.fork === search.fork);
 
+  const onShareWindowChange = useCallback(
+    (value: ShareWindow) => navigate({ search: prev => ({ ...prev, t: value }), replace: true }),
+    [navigate]
+  );
   const onWindowChange = useCallback(
     (value: VersionWindow) =>
-      navigate({ search: prev => ({ ...prev, w: value as '7d' | '14d' | '30d' }), replace: true }),
+      navigate({ search: prev => ({ ...prev, w: value as '7d' | '30d' | '90d' }), replace: true }),
     [navigate]
   );
 
@@ -95,6 +100,8 @@ export function ClientPage(): JSX.Element {
     window,
     since,
     onWindowChange,
+    shareWindow,
+    onShareWindowChange,
     nodes,
     allNodes,
     nodesLoading,
@@ -150,7 +157,6 @@ export function ClientPage(): JSX.Element {
 
         {search.fork && (
           <ForkReadinessCard
-            client={client}
             layer={layer}
             fork={search.fork}
             requirement={requirement}

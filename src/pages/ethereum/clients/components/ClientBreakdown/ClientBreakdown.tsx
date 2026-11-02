@@ -28,11 +28,22 @@ export function ClientBreakdown({
   onSelect,
 }: ClientBreakdownProps): JSX.Element {
   return (
-    <Card rounded title={title}>
+    <Card
+      rounded
+      title={title}
+      subtitle={identifiedOnly ? 'Share of blocks naming a client' : 'Share of all blocks, unknown included'}
+    >
       {summaries.length === 0 ? (
         <p className="text-sm text-muted">No blocks in this window.</p>
       ) : (
         <ul className="-mx-2 flex flex-col gap-0.5">
+          <li className="flex items-center gap-3 px-2 text-xs/5 text-muted" aria-hidden="true">
+            <span className="w-5 shrink-0" />
+            <span className="w-28 shrink-0">Client</span>
+            <span className="flex-1" />
+            <span className="w-14 shrink-0 text-right">Share</span>
+            <span className="hidden w-16 shrink-0 text-right sm:block">Blocks</span>
+          </li>
           {summaries.map((summary, index) => {
             const isUnknown = summary.client === UNKNOWN_CLIENT;
             const share = identifiedOnly ? summary.identifiedShare : summary.share;

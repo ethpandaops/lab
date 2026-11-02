@@ -15,7 +15,7 @@ export interface ClientSummaryGridProps {
   /** Per-client totals for the layer over the selected window */
   summaries: ClientSummary[];
   latestReleases: Map<string, DimClientRelease>;
-  /** Our nodes per client */
+  /** Xatu nodes per client */
   nodeCounts: Map<string, number>;
 }
 
@@ -62,6 +62,7 @@ export function ClientSummaryGrid({
                 {crossed && <span className="text-xs/5 font-semibold text-danger">Over {crossed}</span>}
               </div>
               <div className="flex flex-col gap-1.5">
+                <span className="text-xs/5 text-muted">Share of identified blocks</span>
                 <span className="text-2xl/8 font-semibold text-foreground tabular-nums">
                   {summary ? `${share.toFixed(1)}%` : '-'}
                 </span>
@@ -78,12 +79,12 @@ export function ClientSummaryGrid({
                   <dt className="text-muted">Latest</dt>
                   <dd className="truncate font-mono font-medium text-foreground">{latest?.version ?? '-'}</dd>
                 </div>
-                <div>
-                  <dt className="text-muted">Our nodes</dt>
-                  <dd className="font-medium text-foreground tabular-nums">
-                    {layer === 'consensus' ? (nodeCounts.get(client) ?? 0) : '-'}
-                  </dd>
-                </div>
+                {layer === 'consensus' && (
+                  <div>
+                    <dt className="text-muted">Xatu nodes</dt>
+                    <dd className="font-medium text-foreground tabular-nums">{nodeCounts.get(client) ?? 0}</dd>
+                  </div>
+                )}
               </dl>
             </Link>
           );

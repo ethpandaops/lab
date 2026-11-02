@@ -16,6 +16,7 @@ import {
   releaseUrl,
   resolveBlocks,
   summariseBuildLines,
+  summariseUnresolved,
   timeToAdoption,
   type ClientRelease,
   type ResolvedBlock,
@@ -271,5 +272,32 @@ describe('release columns', () => {
     expect(releaseName({ ...releases[0], name: 'Fusaka Mainnet' } as ClientRelease)).toBe('Fusaka Mainnet');
     expect(releaseName({ ...releases[0], name: 'v8.3.2' } as ClientRelease)).toBeUndefined();
     expect(releaseName({ ...releases[0], name: '' } as ClientRelease)).toBeUndefined();
+  });
+});
+
+describe('summariseUnresolved', () => {
+  it('should separate graffiti without a version from commits in no release', () => {
+    const row = (graffiti: Partial<FctBlockGraffiti>): FctBlockGraffiti => ({
+      slot: 1,
+      slot_start_date_time: 1793500000,
+      consensus_client: 'lighthouse',
+      execution_client: 'geth',
+      ...graffiti,
+    });
+    const blocks = resolveBlocks(
+      [
+        row({ consensus_client_commit: '0000', entity: 'binance' }),
+        row({ consensus_client_commit: '0000', entity: 'binance' }),
+        row({ entity: 'kiln' }),
+        row({ consensus_client_commit: 'ca93', entity: 'coinbase' }),
+        row({ consensus_client_commit: 'a376', entity: 'coinbase' }),
+      ],
+      'consensus',
+      releases
+    );
+    expect(summariseUnresolved(blocks)).toEqual([
+      { reason: 'no-version', commit: undefined, blocks: 3, entities: ['binance', 'kiln'] },
+      { reason: 'unknown-commit', commit: 'ca93', blocks: 1, entities: ['coinbase'] },
+    ]);
   });
 });

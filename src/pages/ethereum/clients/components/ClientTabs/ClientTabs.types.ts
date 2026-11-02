@@ -1,5 +1,5 @@
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
-import type { VersionWindow } from '../../constants';
+import type { ShareWindow, VersionWindow } from '../../constants';
 import type { ClientLayer } from '../../utils/client-share';
 import type { ResolvedBlock } from '../../utils/client-versions';
 import type { ForkRequirement } from '../../utils/fork-requirements';
@@ -19,7 +19,10 @@ export interface ClientTabProps {
   /** Start of the window (unix seconds) */
   since: number;
   onWindowChange: (window: VersionWindow) => void;
-  /** Our nodes running the client */
+  /** Window of the share charts, from daily counts */
+  shareWindow: ShareWindow;
+  onShareWindowChange: (window: ShareWindow) => void;
+  /** Xatu nodes running the client */
   nodes: FctNodeActiveLast24h[];
   /** Every node that reported in the last 24 hours */
   allNodes: FctNodeActiveLast24h[];
