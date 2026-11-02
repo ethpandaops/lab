@@ -40,13 +40,13 @@ export function LiveProbeEvents({
   const { data, isLoading, error, isFetched } = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
       query: {
-        slot_start_date_time_gte: range.timeStart,
+        // Starts no earlier than Fulu (PeerDAS only exists after it). Bounded by time, not slot_gte: the API drops
+        // the slot_start_date_time filters when a slot range filter is present.
+        slot_start_date_time_gte: Math.max(range.timeStart, fuluActivation?.dateTime ?? 0),
         slot_start_date_time_lt: range.timeEnd,
         ...(range.slot !== undefined && { slot_eq: range.slot }),
         page_size: maxEvents,
         order_by: 'probe_date_time desc',
-        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
-        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
     }),
     enabled: !!currentNetwork && !!fuluActivation,

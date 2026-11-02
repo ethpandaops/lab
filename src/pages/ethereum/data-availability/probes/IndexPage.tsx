@@ -79,8 +79,6 @@ export function IndexPage(): JSX.Element {
     page_size: search.pageSize ?? 25,
     page_token: search.pageToken,
     order_by: orderBy,
-    // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
-    ...(fuluActivation && { slot_gte: fuluActivation.slot }),
     // Server-side filters
     ...(search.result && { result_eq: search.result }),
     ...(search.prober && { meta_client_implementation_eq: search.prober }),
@@ -101,13 +99,25 @@ export function IndexPage(): JSX.Element {
   };
   const probeTimeQuery = useQuery({
     ...intCustodyProbeServiceListOptions({
-      query: { probe_date_time_gte: timeRange.start, probe_date_time_lte: timeRange.end, ...listQuery },
+      query: {
+        probe_date_time_gte: timeRange.start,
+        probe_date_time_lte: timeRange.end,
+        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
+        ...listQuery,
+      },
     }),
     enabled: !!currentNetwork && !!fuluActivation && !isLive && !hasSlotWindow,
   });
   const slotWindowQuery = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
-      query: { slot_start_date_time_gte: search.timeStart, slot_start_date_time_lt: search.timeEnd, ...listQuery },
+      query: {
+        // From Fulu on (PeerDAS only exists after it). Bounded by time, not slot_gte: the API drops the
+        // slot_start_date_time filters when a slot range filter is present.
+        slot_start_date_time_gte: Math.max(search.timeStart ?? 0, fuluActivation?.dateTime ?? 0),
+        slot_start_date_time_lt: search.timeEnd,
+        ...listQuery,
+      },
     }),
     enabled: !!currentNetwork && !!fuluActivation && !isLive && hasSlotWindow,
   });

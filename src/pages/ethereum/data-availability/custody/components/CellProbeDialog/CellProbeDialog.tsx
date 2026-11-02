@@ -179,12 +179,12 @@ export function CellProbeDialog({
       column_indices_has: cellContext.columnIndex,
       page_size: MAX_PROBES,
       order_by: 'probe_date_time desc',
-      // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
-      slot_gte: fuluActivation.slot,
     };
 
-    // Probes of the slots in the window (matches _by_slot table partition key)
-    params.slot_start_date_time_gte = timeRangeContext.timeStart;
+    // Probes of the slots in the window (matches _by_slot table partition key), from Fulu on (PeerDAS only exists
+    // after it). Bounded by time, not slot_gte: the API drops the slot_start_date_time filters when a slot range
+    // filter is present.
+    params.slot_start_date_time_gte = Math.max(timeRangeContext.timeStart, fuluActivation.dateTime);
     params.slot_start_date_time_lt = timeRangeContext.timeEnd;
     if (timeRangeContext.slot !== undefined) {
       params.slot_eq = timeRangeContext.slot;
