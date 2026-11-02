@@ -102,3 +102,25 @@ export function formatTimestamp(
 ): string {
   return new Date(timestamp * 1000).toLocaleString(undefined, options);
 }
+
+/**
+ * Format a span between two Unix timestamps, collapsing the parts they share
+ * @param start - Unix timestamp in seconds
+ * @param end - Unix timestamp in seconds
+ * @returns Formatted range with timezone
+ *
+ * @example
+ * ```ts
+ * formatTimeRange(1610712000, 1610715600); // "Jan 15, 2021, 12:00 – 1:00 PM UTC"
+ * ```
+ */
+export function formatTimeRange(start: number, end: number): string {
+  return new Intl.DateTimeFormat(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }).formatRange(new Date(start * 1000), new Date(end * 1000));
+}

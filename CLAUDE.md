@@ -195,6 +195,14 @@ Detailed standards for specific topics are in `.claude/rules/`:
 
 Give every value its own place. Don't run separate values together in one line of text (`5 · 7,638 ETH`, `Head 99% · Target 98%`, a root and a percentage in one cell). Each value gets a label and a slot: a table column, a `<dl>` term and definition, a stat, its own line. If you're reaching for a `·`, `|` or `/` separator, the layout probably needs structure instead.
 
+## Time Ranges
+
+A page's time range applies to everything under it. When a page has a range control (`?t=`, a period selector, date pickers), every stat, chart, card and table column it governs covers that range. Never put a value over some other window (the last 50 epochs, the last 30 days, `now - 6h`) under a selector that says 1y.
+
+Make every value cover the range before reaching for anything else: read a coarser table, or sample evenly across the range when per-slot data is too large, and say so where it's shown ("64 epochs spread across the range"). A second range control for one section is not a fix. If a value truly can't cover the selected range (no table holds it at all), don't quietly swap in a shorter window. Move it out of the range's scope, into its own section or card, and name its window where it's shown: "Last 50 epochs", "Latest day", in the title or the column header. Point-in-time values (current stake, validator count) are the range's end; where it's cheap, show how they changed over the range.
+
+Scope the control to what it drives: if only part of the page follows the range, put the control on that section, not above the whole page.
+
 ## Clients
 
 Every client looks the same everywhere. Wherever a client appears — table cell, stat, badge, tooltip, chart legend, dropdown — render its logo (`ClientLogo`) beside the name, and draw any mark that stands for it (series, bar, dot, swatch) in its colour from `getClientColor` (`getExecutionClientColor` / `getConsensusClientColor` when the layer is known). Never colour a client from a chart palette or by index.

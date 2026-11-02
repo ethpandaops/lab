@@ -14,6 +14,7 @@ import {
   fctHeadFirstSeenByNodeHourlyServiceList,
 } from '@/api/sdk.gen';
 import type {
+  FctNodeActiveLast24h,
   FctAttestationObservationByNodeHourly,
   FctBlockDataColumnSidecarFirstSeenByNodeHourly,
   FctBlockFirstSeenByNodeHourly,
@@ -36,6 +37,8 @@ export interface HistoryRow {
   /** Consensus client, or execution client for engine metrics */
   client: string;
   clientVersion?: string;
+  /** Consensus metrics: the identity fields the rollup carries, in the shape of an active-node row */
+  node?: NodeIdentity;
   /** Slots (or engine calls) the summary covers */
   count: number;
   p10: number | null;
@@ -138,12 +141,35 @@ const SOURCES: Record<
   },
 } as never;
 
-function identity(row: { node_id?: string; username?: string; meta_consensus_implementation?: string }): {
-  nodeId: string;
-  username: string;
-  client: string;
-} {
-  return { nodeId: row.node_id ?? '', username: row.username ?? '', client: row.meta_consensus_implementation ?? '' };
+/** Identity fields every consensus rollup shares with fct_node_active_last_24h; location and last seen are not among them */
+export type NodeIdentity = Pick<
+  FctNodeActiveLast24h,
+  | 'node_id'
+  | 'username'
+  | 'classification'
+  | 'meta_client_name'
+  | 'meta_client_implementation'
+  | 'meta_client_version'
+  | 'meta_consensus_implementation'
+  | 'meta_consensus_version'
+>;
+
+function identity(row: NodeIdentity): { nodeId: string; username: string; client: string; node: NodeIdentity } {
+  return {
+    nodeId: row.node_id ?? '',
+    username: row.username ?? '',
+    client: row.meta_consensus_implementation ?? '',
+    node: {
+      node_id: row.node_id,
+      username: row.username,
+      classification: row.classification,
+      meta_client_name: row.meta_client_name,
+      meta_client_implementation: row.meta_client_implementation,
+      meta_client_version: row.meta_client_version,
+      meta_consensus_implementation: row.meta_consensus_implementation,
+      meta_consensus_version: row.meta_consensus_version,
+    },
+  };
 }
 
 function arrival(row: FctBlockFirstSeenByNodeHourly): Omit<HistoryRow, 'start'> {

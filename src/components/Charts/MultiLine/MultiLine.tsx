@@ -579,6 +579,7 @@ export function MultiLineChart({
       },
       min: isTimeAxis ? (xAxis.min ?? timeMin) : xAxis.type === 'value' ? xAxis.min : undefined,
       max: isTimeAxis ? (xAxis.max ?? timeMax) : xAxis.type === 'value' ? xAxis.max : undefined,
+      interval: xAxis.type === 'category' ? undefined : xAxis.interval,
     };
 
     // Build y-axis configuration (primary)

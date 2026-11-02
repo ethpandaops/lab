@@ -1,24 +1,12 @@
-/**
- * Context for filtering probe events based on drill-down level
- */
-export type ProbeFilterContext =
-  | { type: 'window' }
-  | { type: 'day'; date: string }
-  | { type: 'hour'; date: string; hourStartDateTime: number }
-  | { type: 'epoch'; date: string; hourStartDateTime: number; epoch: number }
-  | { type: 'slot'; date: string; hourStartDateTime: number; epoch: number; slot: number };
+import type { TimeRangeContext } from '../CellProbeDialog';
 
 export type LiveProbeEventsProps = {
-  /** Current drill-down context for filtering */
-  context: ProbeFilterContext;
+  /** Slot start time window of the current drill-down level */
+  range: TimeRangeContext;
+  /** Names the window, e.g. "Epoch 1234" */
+  scopeLabel: string;
   /** Maximum number of events to display */
   maxEvents?: number;
   /** Polling interval in milliseconds */
   pollInterval?: number;
-  /** Optional params for the "View All Probes" link */
-  probesLinkParams?: {
-    slot?: number;
-    timeStart?: number;
-    timeEnd?: number;
-  };
 };

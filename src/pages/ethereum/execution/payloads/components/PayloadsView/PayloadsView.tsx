@@ -160,6 +160,8 @@ export type PayloadsViewProps = {
   onBlockSelect: (block: Payload | null) => void;
   // Duration threshold for display
   durationThreshold: number;
+  /** The time window the table covers, shown as its title */
+  windowLabel?: string;
   // External links
   tracoorUrl?: string;
   // Live mode props
@@ -182,6 +184,7 @@ export function PayloadsView({
   onFiltersChange,
   onClearFilters,
   durationThreshold,
+  windowLabel,
   tracoorUrl,
   isLive = false,
   onLiveModeToggle,
@@ -430,6 +433,7 @@ export function PayloadsView({
         data={data}
         columns={columns}
         isLoading={isLoading}
+        title={isLive ? undefined : windowLabel}
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         onPaginationChange={pagination.onPaginationChange}

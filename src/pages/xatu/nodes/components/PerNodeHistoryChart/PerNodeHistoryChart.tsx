@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
+import { rowsByBucket, type HistoryRow, type NodeHistory } from '../../hooks/useNodeHistory';
 import { axisCeiling, formatMs } from '../../utils/node-stats';
 import { TimeSeriesChart } from '../TimeSeriesChart';
 
@@ -10,29 +10,31 @@ export interface PerNodeHistoryChartProps {
   subtitle?: string;
   anchorId: string;
   history: NodeHistory;
-  /** Node IDs to draw, one line each */
-  nodeIds: string[];
-  /** Line label per node, e.g. its client */
-  clientOf: (nodeId: string) => string | undefined;
   /** Bucket starts where each node was behind the network; those points are left out of its line */
   behindOf?: (nodeId: string) => Set<number>;
 }
 
 /**
- * One median line per node over time, coloured by each node's consensus client.
+ * One median line per node with data in the range, coloured by the node's latest consensus client.
  */
 export function PerNodeHistoryChart({
   title,
   subtitle,
   anchorId,
   history,
-  nodeIds,
-  clientOf,
   behindOf,
 }: PerNodeHistoryChartProps): JSX.Element {
-  const lines = nodeIds.map((nodeId, index) => {
+  // Each node's latest row, most recently seen node first
+  const latest = new Map<string, HistoryRow>();
+  history.rows.forEach(row => {
+    const current = latest.get(row.nodeId);
+    if (!current || row.start > current.start) latest.set(row.nodeId, row);
+  });
+  const nodes = [...latest.values()].sort((a, b) => b.start - a.start);
+
+  const lines = nodes.map(({ nodeId, client: latestClient }, index) => {
     const byBucket = rowsByBucket(history.rows, nodeId);
-    const client = clientOf(nodeId) ?? 'unknown';
+    const client = latestClient || 'unknown';
     const behind = behindOf?.(nodeId) ?? new Set<number>();
     const raw = history.buckets.map(start => byBucket.get(start)?.p50 ?? null);
     return {

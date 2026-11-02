@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getRelativeTime, formatTimestamp } from './time';
+import { getRelativeTime, formatTimestamp, formatTimeRange } from './time';
 
 describe('getRelativeTime', () => {
   let mockNow: number;
@@ -283,5 +283,20 @@ describe('formatTimestamp', () => {
     expect(result).toMatch(/Jul/);
     expect(result).toMatch(/15/);
     expect(result).toMatch(/2023/);
+  });
+});
+
+describe('formatTimeRange', () => {
+  it('names both ends of a range that spans days', () => {
+    // Jan 10, 2021 12:00 GMT → Jan 20, 2021 12:00 GMT
+    const result = formatTimeRange(1610280000, 1611144000);
+    expect(result).toMatch(/Jan 10/);
+    expect(result).toMatch(/Jan 20/);
+  });
+
+  it('states the shared date once for a range within one day', () => {
+    // Jan 15, 2021 12:00 GMT → 12:30 GMT
+    const result = formatTimeRange(1610712000, 1610713800);
+    expect(result.match(/Jan/g)).toHaveLength(1);
   });
 });

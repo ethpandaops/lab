@@ -1,51 +1,30 @@
 import type { JSX } from 'react';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { Table } from '@/components/Lists/Table';
 
 /**
- * Loading skeleton for the Entities page
- * Matches the layout of the entities table with search input
+ * Loading skeleton for the entities overview: stats strip, stake share chart, two cards and the table
  */
 export function EntitiesSkeleton(): JSX.Element {
-  // Create skeleton data for 20 rows
-  const skeletonData = Array.from({ length: 20 }, (_, i) => ({ id: i }));
-
   return (
-    <>
-      {/* Search Input Skeleton */}
-      <div className="mt-6">
-        <LoadingContainer className="h-10 w-full rounded-sm" />
-        <div className="mt-2 flex items-center justify-between">
-          <LoadingContainer className="h-4 w-48 rounded-sm" />
-          <LoadingContainer className="h-4 w-40 rounded-sm" />
-        </div>
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border md:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-2 px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
+          >
+            <LoadingContainer className="h-4 w-24 rounded-xs" shimmer={false} />
+            <LoadingContainer className="h-8 w-20 rounded-xs" shimmer={false} />
+            <LoadingContainer className="h-3 w-28 rounded-xs" shimmer={false} />
+          </div>
+        ))}
       </div>
-
-      {/* Table Section Skeleton */}
-      <div className="mt-6">
-        <Table
-          variant="nested"
-          data={skeletonData}
-          columns={[
-            {
-              header: 'Entity Name',
-              accessor: () => <LoadingContainer className="h-5 w-32 rounded-sm" />,
-            },
-            {
-              header: 'Status',
-              accessor: () => <LoadingContainer className="h-5 w-20 rounded-sm" />,
-            },
-            {
-              header: 'Validators',
-              accessor: () => <LoadingContainer className="h-5 w-16 rounded-sm" />,
-            },
-            {
-              header: 'Online Rate',
-              accessor: () => <LoadingContainer className="h-5 w-20 rounded-sm" />,
-            },
-          ]}
-        />
+      <LoadingContainer className="h-[460px] w-full rounded-sm" shimmer={false} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <LoadingContainer className="h-96 w-full rounded-sm" shimmer={false} />
+        <LoadingContainer className="h-96 w-full rounded-sm" shimmer={false} />
       </div>
-    </>
+      <LoadingContainer className="h-[600px] w-full rounded-sm" shimmer={false} />
+    </div>
   );
 }

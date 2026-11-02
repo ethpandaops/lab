@@ -133,32 +133,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      {/* Header with title and global timeframe filter */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <Header title="State Growth" description="Data extracted from go-ethereum node" className="mb-0!" />
-
-        {/* Global timeframe toggle */}
-        <div className="flex flex-col items-end gap-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted">Compare:</span>
-            <SegmentedControl
-              ariaLabel="Compare timeframe"
-              options={TIMEFRAME_OPTIONS}
-              value={timeframe}
-              onChange={setTimeframe}
-            />
-          </div>
-          {isLoading ? (
-            <div className="h-4 w-40 animate-pulse rounded-xs bg-muted/20" />
-          ) : (
-            delta && (
-              <p className="text-xs text-muted">
-                {delta.previousDate} → {delta.currentDate}
-              </p>
-            )
-          )}
-        </div>
-      </div>
+      <Header title="State Growth" description="Data extracted from go-ethereum node" />
 
       {isLoading && <StateSizeSkeleton />}
 
@@ -170,129 +145,146 @@ export function IndexPage(): JSX.Element {
 
       {chartData && latestData && delta && (
         <div className="space-y-6">
-          {/* Stats Row: Total State Size + Metric Cards */}
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-12">
-            {/* Total State Size */}
-            <div className="flex shrink-0 flex-col justify-center">
-              <p className="text-xs font-medium text-muted">Total State Size</p>
-              <span className="mt-1 text-6xl font-bold text-foreground tabular-nums">
-                {formatBytes(latestData.total_bytes)}
-              </span>
-              <div className="mt-2 flex items-center gap-3">
-                <div
-                  className={clsx(
-                    'flex items-center gap-1.5 rounded-sm px-2 py-1',
-                    totalIsPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
-                  )}
-                >
-                  <TotalIcon className="size-4" />
-                  <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
-                </div>
-                <span
-                  className={clsx(
-                    'text-sm font-medium tabular-nums',
-                    totalIsPositive ? 'text-warning' : 'text-success'
-                  )}
-                >
-                  {delta.total.percentChange >= 0 ? '+' : ''}
-                  {delta.total.percentChange.toFixed(3)}%
+          {/* Stats: current sizes and their change over the chosen timeframe */}
+          <section className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted">Change over</span>
+              <SegmentedControl
+                ariaLabel="Change over"
+                options={TIMEFRAME_OPTIONS}
+                value={timeframe}
+                onChange={setTimeframe}
+              />
+              <p className="text-xs text-muted tabular-nums">
+                {delta.previousDate} → {delta.currentDate}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-12">
+              {/* Total State Size */}
+              <div className="flex shrink-0 flex-col justify-center">
+                <p className="text-xs font-medium text-muted">Total State Size</p>
+                <span className="mt-1 text-6xl font-bold text-foreground tabular-nums">
+                  {formatBytes(latestData.total_bytes)}
                 </span>
+                <div className="mt-2 flex items-center gap-3">
+                  <div
+                    className={clsx(
+                      'flex items-center gap-1.5 rounded-sm px-2 py-1',
+                      totalIsPositive ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                    )}
+                  >
+                    <TotalIcon className="size-4" />
+                    <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
+                  </div>
+                  <span
+                    className={clsx(
+                      'text-sm font-medium tabular-nums',
+                      totalIsPositive ? 'text-warning' : 'text-success'
+                    )}
+                  >
+                    {delta.total.percentChange >= 0 ? '+' : ''}
+                    {delta.total.percentChange.toFixed(3)}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Metric Cards: Account Trie, Storage Tries, Contract Codes */}
+              <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
+                {/* Account Trie */}
+                <Card rounded className="p-3">
+                  <p className="text-xs font-medium text-muted">Account Trie</p>
+                  <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
+                    {formatBytes(latestData.account_trienode_bytes)}
+                  </p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span
+                      className={clsx(
+                        'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                        delta.accounts.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                      )}
+                    >
+                      {formatDeltaBytes(delta.accounts.bytes.delta)}
+                    </span>
+                    <span
+                      className={clsx(
+                        'text-xs font-medium tabular-nums',
+                        delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      )}
+                    >
+                      {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
+                      {delta.accounts.bytes.percentChange.toFixed(3)}%
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-sm text-muted tabular-nums">
+                    Account Leaves: {latestData.accounts.toLocaleString()} ({formatBytes(latestData.account_bytes)})
+                  </p>
+                </Card>
+
+                {/* Storage Tries */}
+                <Card rounded className="p-3">
+                  <p className="text-xs font-medium text-muted">Storage Tries</p>
+                  <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
+                    {formatBytes(latestData.storage_trienode_bytes)}
+                  </p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span
+                      className={clsx(
+                        'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                        delta.storage.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
+                      )}
+                    >
+                      {formatDeltaBytes(delta.storage.bytes.delta)}
+                    </span>
+                    <span
+                      className={clsx(
+                        'text-xs font-medium tabular-nums',
+                        delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      )}
+                    >
+                      {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
+                      {delta.storage.bytes.percentChange.toFixed(3)}%
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-sm text-muted tabular-nums">
+                    Storage Leaves: {latestData.storages.toLocaleString()} ({formatBytes(latestData.storage_bytes)})
+                  </p>
+                </Card>
+
+                {/* Contract Codes */}
+                <Card rounded className="p-3">
+                  <p className="text-xs font-medium text-muted">Contract Codes</p>
+                  <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
+                    {formatBytes(latestData.contract_code_bytes)}
+                  </p>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span
+                      className={clsx(
+                        'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
+                        delta.contractCodes.bytes.delta >= 0
+                          ? 'bg-warning/10 text-warning'
+                          : 'bg-success/10 text-success'
+                      )}
+                    >
+                      {formatDeltaBytes(delta.contractCodes.bytes.delta)}
+                    </span>
+                    <span
+                      className={clsx(
+                        'text-xs font-medium tabular-nums',
+                        delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                      )}
+                    >
+                      {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
+                      {delta.contractCodes.bytes.percentChange.toFixed(3)}%
+                    </span>
+                  </div>
+                  <p className="mt-1.5 text-sm text-muted tabular-nums">
+                    Unique Bytecodes: {latestData.contract_codes.toLocaleString()}
+                  </p>
+                </Card>
               </div>
             </div>
-
-            {/* Metric Cards: Account Trie, Storage Tries, Contract Codes */}
-            <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-              {/* Account Trie */}
-              <Card rounded className="p-3">
-                <p className="text-xs font-medium text-muted">Account Trie</p>
-                <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
-                  {formatBytes(latestData.account_trienode_bytes)}
-                </p>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <span
-                    className={clsx(
-                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
-                    )}
-                  >
-                    {formatDeltaBytes(delta.accounts.bytes.delta)}
-                  </span>
-                  <span
-                    className={clsx(
-                      'text-xs font-medium tabular-nums',
-                      delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                    )}
-                  >
-                    {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
-                    {delta.accounts.bytes.percentChange.toFixed(3)}%
-                  </span>
-                </div>
-                <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Account Leaves: {latestData.accounts.toLocaleString()} ({formatBytes(latestData.account_bytes)})
-                </p>
-              </Card>
-
-              {/* Storage Tries */}
-              <Card rounded className="p-3">
-                <p className="text-xs font-medium text-muted">Storage Tries</p>
-                <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
-                  {formatBytes(latestData.storage_trienode_bytes)}
-                </p>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <span
-                    className={clsx(
-                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
-                    )}
-                  >
-                    {formatDeltaBytes(delta.storage.bytes.delta)}
-                  </span>
-                  <span
-                    className={clsx(
-                      'text-xs font-medium tabular-nums',
-                      delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                    )}
-                  >
-                    {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
-                    {delta.storage.bytes.percentChange.toFixed(3)}%
-                  </span>
-                </div>
-                <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Storage Leaves: {latestData.storages.toLocaleString()} ({formatBytes(latestData.storage_bytes)})
-                </p>
-              </Card>
-
-              {/* Contract Codes */}
-              <Card rounded className="p-3">
-                <p className="text-xs font-medium text-muted">Contract Codes</p>
-                <p className="mt-0.5 text-2xl font-bold text-foreground tabular-nums">
-                  {formatBytes(latestData.contract_code_bytes)}
-                </p>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <span
-                    className={clsx(
-                      'rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0 ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
-                    )}
-                  >
-                    {formatDeltaBytes(delta.contractCodes.bytes.delta)}
-                  </span>
-                  <span
-                    className={clsx(
-                      'text-xs font-medium tabular-nums',
-                      delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                    )}
-                  >
-                    {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
-                    {delta.contractCodes.bytes.percentChange.toFixed(3)}%
-                  </span>
-                </div>
-                <p className="mt-1.5 text-sm text-muted tabular-nums">
-                  Unique Bytecodes: {latestData.contract_codes.toLocaleString()}
-                </p>
-              </Card>
-            </div>
-          </div>
+          </section>
 
           {/* Main Chart */}
           <PopoutCard

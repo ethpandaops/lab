@@ -11,7 +11,6 @@ import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/com
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { LiveProbeEvents } from './components/LiveProbeEvents';
-import type { ProbeFilterContext } from './components/LiveProbeEvents';
 import { CellProbeDialog } from './components/CellProbeDialog';
 import type { CellContext, TimeRangeContext } from './components/CellProbeDialog';
 import type {
@@ -21,6 +20,7 @@ import type {
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
+import { SECONDS_PER_SLOT, epochToTimestamp, slotToTimestamp } from '@/utils/beacon';
 import { useFuluActivation } from './hooks/useFuluActivation';
 import {
   ChevronRightIcon,
@@ -101,6 +101,41 @@ const SLOTS_PER_EPOCH = 32;
 
 /** Button look for router links */
 const SECONDARY_LINK_CLASS = buttonClassName({ variant: 'secondary', size: 'sm' });
+
+/** Slot start times of one epoch's slots */
+function epochWindow(epoch: number, genesisTime: number): TimeRangeContext {
+  return { timeStart: epochToTimestamp(epoch, genesisTime), timeEnd: epochToTimestamp(epoch + 1, genesisTime) };
+}
+
+/** Slot start times of the epochs that start in an hour; the last one runs past the hour */
+function hourOfEpochsWindow(hourStart: number, genesisTime: number): TimeRangeContext {
+  const epochSeconds = SLOTS_PER_EPOCH * SECONDS_PER_SLOT;
+  const firstEpoch = Math.ceil((hourStart - genesisTime) / epochSeconds);
+  const endEpoch = Math.ceil((hourStart + SECONDS_PER_HOUR - genesisTime) / epochSeconds);
+  return { timeStart: epochToTimestamp(firstEpoch, genesisTime), timeEnd: epochToTimestamp(endEpoch, genesisTime) };
+}
+
+/** Slot start time window covered by a drill-down level */
+function levelWindow(level: DrillDownLevel, genesisTime: number): TimeRangeContext {
+  switch (level.type) {
+    case 'window': {
+      const tomorrow = (Math.floor(Date.now() / 1000 / SECONDS_PER_DAY) + 1) * SECONDS_PER_DAY;
+      return { timeStart: tomorrow - WINDOW_DAYS * SECONDS_PER_DAY, timeEnd: tomorrow };
+    }
+    case 'day': {
+      const dayStart = Date.parse(level.date) / 1000;
+      return { timeStart: dayStart, timeEnd: dayStart + SECONDS_PER_DAY };
+    }
+    case 'hour':
+      return hourOfEpochsWindow(level.hourStartDateTime, genesisTime);
+    case 'epoch':
+      return epochWindow(level.epoch, genesisTime);
+    case 'slot': {
+      const slotStart = slotToTimestamp(level.slot, genesisTime);
+      return { timeStart: slotStart, timeEnd: slotStart + SECONDS_PER_SLOT, slot: level.slot };
+    }
+  }
+}
 
 /**
  * Derives the current drill-down level from URL search parameters
@@ -215,8 +250,9 @@ export function IndexPage(): JSX.Element {
   // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
   const timezone = 'UTC' as const;
 
-  // Network for default threshold
+  // Network for default threshold and slot times
   const { currentNetwork } = useNetwork();
+  const genesisTime = currentNetwork?.genesis_time ?? 0;
 
   // View mode from URL (default to 'percentage')
   const viewMode: ViewMode = search.mode ?? 'percentage';
@@ -596,67 +632,40 @@ export function IndexPage(): JSX.Element {
         parentContext,
       };
 
-      // Build time range context based on granularity
-      let timeRange: TimeRangeContext = {};
-
+      // Probes of the clicked row's own slots
+      let timeRange: TimeRangeContext;
       switch (currentLevel.type) {
-        case 'window': {
-          // Row is a date - filter by that day
-          const dayStart = Math.floor(new Date(rowIdentifier).getTime() / 1000);
-          timeRange = {
-            timeStart: dayStart,
-            timeEnd: dayStart + SECONDS_PER_DAY,
-          };
+        case 'window':
+          // Row is a date
+          timeRange = levelWindow({ type: 'day', date: rowIdentifier }, genesisTime);
           break;
-        }
         case 'day': {
-          // Row is hour start timestamp - filter by that hour
+          // Row is an hour start timestamp
           const hourStart = Number(rowIdentifier);
-          timeRange = {
-            timeStart: hourStart,
-            timeEnd: hourStart + SECONDS_PER_HOUR,
-          };
+          timeRange = { timeStart: hourStart, timeEnd: hourStart + SECONDS_PER_HOUR };
           break;
         }
-        case 'hour': {
-          // Row is epoch number - filter by slots in that epoch
-          const epoch = Number(rowIdentifier);
-          const epochStartSlot = epoch * SLOTS_PER_EPOCH;
-          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
-          // Use the hour's time range but filter by specific slots
-          timeRange = {
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-            slots,
-          };
+        case 'hour':
+          // Row is an epoch
+          timeRange = epochWindow(Number(rowIdentifier), genesisTime);
           break;
-        }
         case 'epoch': {
-          // Row is slot number - filter by that specific slot
+          // Row is a slot
           const slot = Number(rowIdentifier);
-          timeRange = {
-            slot,
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-          };
+          timeRange = levelWindow({ ...currentLevel, type: 'slot', slot }, genesisTime);
           break;
         }
-        case 'slot': {
-          // Row is blob index - use the slot from currentLevel
-          timeRange = {
-            slot: currentLevel.slot,
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-          };
+        case 'slot':
+          // Row is a blob index in the current slot
+          timeRange = levelWindow(currentLevel, genesisTime);
           break;
-        }
       }
 
       setCellContext(cellCtx);
       setTimeRangeContext(timeRange);
       setCellDialogOpen(true);
     },
-    [rows, granularity, currentLevel]
+    [rows, granularity, currentLevel, genesisTime]
   );
 
   /**
@@ -721,63 +730,14 @@ export function IndexPage(): JSX.Element {
         contextLabel,
       };
 
-      // Build time range context based on current view level (full range)
-      let timeRange: TimeRangeContext = {};
-      const now = Math.floor(Date.now() / 1000);
-
-      switch (currentLevel.type) {
-        case 'window': {
-          // Full 19-day window
-          timeRange = {
-            timeStart: now - WINDOW_DAYS * SECONDS_PER_DAY,
-            timeEnd: now,
-          };
-          break;
-        }
-        case 'day': {
-          // Full day
-          const dayStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
-          timeRange = {
-            timeStart: dayStart,
-            timeEnd: dayStart + SECONDS_PER_DAY,
-          };
-          break;
-        }
-        case 'hour': {
-          // Full hour
-          timeRange = {
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-          };
-          break;
-        }
-        case 'epoch': {
-          // All slots in the epoch
-          const epochStartSlot = currentLevel.epoch * SLOTS_PER_EPOCH;
-          const slots = Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => epochStartSlot + i);
-          timeRange = {
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-            slots,
-          };
-          break;
-        }
-        case 'slot': {
-          // Just the slot
-          timeRange = {
-            slot: currentLevel.slot,
-            timeStart: currentLevel.hourStartDateTime,
-            timeEnd: currentLevel.hourStartDateTime + SECONDS_PER_HOUR,
-          };
-          break;
-        }
-      }
+      // Probes of every slot the current level covers
+      const timeRange = levelWindow(currentLevel, genesisTime);
 
       setCellContext(cellCtx);
       setTimeRangeContext(timeRange);
       setCellDialogOpen(true);
     },
-    [granularity, currentLevel]
+    [granularity, currentLevel, genesisTime]
   );
 
   /**
@@ -904,58 +864,7 @@ export function IndexPage(): JSX.Element {
     return crumbs;
   }, [currentLevel, navigate, search.mode, search.threshold]);
 
-  // Calculate time range for View Probes link (must be before early returns)
-  const probesLinkParams = useMemo(() => {
-    let timeStart: number | undefined;
-    let timeEnd: number | undefined;
-
-    if (currentLevel.type === 'day') {
-      timeStart = Math.floor(new Date(currentLevel.date).getTime() / 1000);
-      timeEnd = timeStart + SECONDS_PER_DAY;
-    } else if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
-      timeStart = currentLevel.hourStartDateTime;
-      timeEnd = timeStart + SECONDS_PER_HOUR;
-    }
-
-    const hasTimeFilter = timeStart !== undefined && timeEnd !== undefined;
-    const hasSlotFilter = currentLevel.type === 'slot';
-
-    return {
-      ...(hasSlotFilter && { slot: currentLevel.slot }),
-      ...(hasTimeFilter && !hasSlotFilter && { timeStart, timeEnd }),
-    };
-  }, [currentLevel]);
-
-  // Convert currentLevel to ProbeFilterContext for LiveProbeEvents
-  const probeFilterContext: ProbeFilterContext = useMemo(() => {
-    switch (currentLevel.type) {
-      case 'window':
-        return { type: 'window' };
-      case 'day':
-        return { type: 'day', date: currentLevel.date };
-      case 'hour':
-        return {
-          type: 'hour',
-          date: currentLevel.date,
-          hourStartDateTime: currentLevel.hourStartDateTime,
-        };
-      case 'epoch':
-        return {
-          type: 'epoch',
-          date: currentLevel.date,
-          hourStartDateTime: currentLevel.hourStartDateTime,
-          epoch: currentLevel.epoch,
-        };
-      case 'slot':
-        return {
-          type: 'slot',
-          date: currentLevel.date,
-          hourStartDateTime: currentLevel.hourStartDateTime,
-          epoch: currentLevel.epoch,
-          slot: currentLevel.slot,
-        };
-    }
-  }, [currentLevel]);
+  const levelTitle = getLevelTitle(currentLevel);
 
   if (error) {
     return (
@@ -1018,8 +927,8 @@ export function IndexPage(): JSX.Element {
         {/* Main Content: Heatmap (3/4 width) */}
         <div className="lg:col-span-3">
           <Card
-            title={getLevelTitle(currentLevel).main}
-            subtitle={getLevelTitle(currentLevel).sub}
+            title={levelTitle.main}
+            subtitle={levelTitle.sub}
             actions={
               <div className="flex flex-wrap items-center gap-2">
                 {/* Detail page links */}
@@ -1126,7 +1035,12 @@ export function IndexPage(): JSX.Element {
         {/* Sidebar: Live Probes (1/4 width) */}
         <div className="lg:col-span-1">
           <div className="sticky top-4 space-y-4">
-            <LiveProbeEvents context={probeFilterContext} probesLinkParams={probesLinkParams} />
+            {currentNetwork && (
+              <LiveProbeEvents
+                range={levelWindow(currentLevel, genesisTime)}
+                scopeLabel={currentLevel.type === 'window' ? levelTitle.sub : levelTitle.main}
+              />
+            )}
           </div>
         </div>
       </div>

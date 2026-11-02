@@ -10,6 +10,9 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { epochToTimestamp } from '@/utils';
 import type { ValidatorIdentity as Identity } from '../../hooks/useValidatorIdentity';
 
+/** Status and balances at one point in time */
+export type ValidatorState = Pick<Identity, 'status' | 'slashed' | 'balanceEth' | 'effectiveBalanceEth'>;
+
 const CREDENTIAL_LABELS = { '0x00': '0x00 BLS', '0x01': '0x01 Execution', '0x02': '0x02 Compounding' } as const;
 
 function statusColor(status: string): BadgeColor {
@@ -87,15 +90,19 @@ function EpochDate({ epoch }: { epoch: number }): JSX.Element {
 }
 
 /**
- * One validator: status, balances, keys, entity and lifecycle.
+ * One validator: status, balances, keys, entity and lifecycle. With `endState`, status and balances are
+ * those on the range's last day, and credentials are labelled as current.
  */
 export function ValidatorIdentityCard({
   identity,
+  endState,
   className,
 }: {
   identity: Identity;
+  endState?: ValidatorState;
   className?: string;
 }): JSX.Element {
+  const state = endState ?? identity;
   const maxEffective = identity.credentialType === '0x02' ? 2048 : 32;
 
   return (
@@ -104,11 +111,10 @@ export function ValidatorIdentityCard({
       className={className}
       actions={
         <div className="flex items-center gap-2">
-          <Badge color={statusColor(identity.status)} dot>
-            {statusLabel(identity.status)}
+          <Badge color={statusColor(state.status)} dot>
+            {statusLabel(state.status)}
           </Badge>
-          {identity.slashed && <Badge color="red">Slashed</Badge>}
-          <Badge color="gray">{CREDENTIAL_LABELS[identity.credentialType]}</Badge>
+          {state.slashed && <Badge color="red">Slashed</Badge>}
           <BeaconchainLink index={identity.index} />
         </div>
       }
@@ -116,13 +122,13 @@ export function ValidatorIdentityCard({
       <div className="grid grid-cols-2 gap-4">
         <Figure
           label="Balance"
-          value={eth(identity.balanceEth, 4)}
-          detail={`${eth(identity.balanceEth - identity.effectiveBalanceEth, 4)} above effective`}
+          value={eth(state.balanceEth, 4)}
+          detail={`${eth(state.balanceEth - state.effectiveBalanceEth, 4)} above effective`}
         />
         <Figure
           label="Effective balance"
-          value={eth(identity.effectiveBalanceEth)}
-          detail={`of ${eth(maxEffective)} max`}
+          value={eth(state.effectiveBalanceEth)}
+          detail={endState ? undefined : `of ${eth(maxEffective)} max`}
         />
       </div>
       <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-border pt-4 sm:grid-cols-2">
@@ -132,7 +138,10 @@ export function ValidatorIdentityCard({
             <CopyToClipboard content={identity.pubkey} />
           </span>
         </Fact>
-        <Fact label="Withdrawal address">
+        <Fact label={endState ? 'Current credentials' : 'Credentials'}>
+          {CREDENTIAL_LABELS[identity.credentialType]}
+        </Fact>
+        <Fact label={endState ? 'Current withdrawal address' : 'Withdrawal address'}>
           {identity.withdrawalAddress ? (
             <a
               href={`https://etherscan.io/address/${identity.withdrawalAddress}`}
@@ -180,29 +189,34 @@ export function ValidatorIdentityCard({
 
 /**
  * A set of validators: status counts, combined balances, withdrawal addresses, entities and credentials.
+ * With `endStates`, status counts and balances are those on the range's last day, and credentials are
+ * labelled as current.
  */
 export function ValidatorSetCard({
   identities,
+  endStates,
   className,
 }: {
   identities: Identity[];
+  endStates?: Map<number, ValidatorState>;
   className?: string;
 }): JSX.Element {
-  const active = identities.filter(i => i.status.startsWith('active'));
-  const balance = identities.reduce((a, i) => a + i.balanceEth, 0);
-  const effective = identities.reduce((a, i) => a + i.effectiveBalanceEth, 0);
+  const states = identities.map(i => endStates?.get(i.index) ?? i);
+  const active = states.filter(s => s.status.startsWith('active'));
+  const balance = states.reduce((a, s) => a + s.balanceEth, 0);
+  const effective = states.reduce((a, s) => a + s.effectiveBalanceEth, 0);
   const statuses = new Map<string, number>();
+  for (const s of states) statuses.set(s.status, (statuses.get(s.status) ?? 0) + 1);
   const entities = new Map<string, number>();
   const addresses = new Set<string>();
   for (const i of identities) {
-    statuses.set(i.status, (statuses.get(i.status) ?? 0) + 1);
     if (i.entity) entities.set(i.entity, (entities.get(i.entity) ?? 0) + 1);
     if (i.withdrawalAddress) addresses.add(i.withdrawalAddress);
   }
   const credentials = (['0x02', '0x01', '0x00'] as const)
     .map(ct => {
-      const members = identities.filter(i => i.credentialType === ct);
-      return { ct, count: members.length, stake: members.reduce((a, i) => a + i.effectiveBalanceEth, 0) };
+      const members = states.filter((_, n) => identities[n].credentialType === ct);
+      return { ct, count: members.length, stake: members.reduce((a, s) => a + s.effectiveBalanceEth, 0) };
     })
     .filter(c => c.count > 0);
 
@@ -226,7 +240,9 @@ export function ValidatorSetCard({
         <Figure label="Active" value={`${active.length} / ${identities.length}`} />
       </div>
       <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-border pt-4 sm:grid-cols-2">
-        <Fact label="Withdrawal addresses">{addresses.size.toLocaleString()}</Fact>
+        <Fact label={endStates ? 'Current withdrawal addresses' : 'Withdrawal addresses'}>
+          {addresses.size.toLocaleString()}
+        </Fact>
         <Fact label="Entities">
           {entities.size === 1 ? <Entity entity={[...entities.keys()][0]} /> : entities.size || '—'}
         </Fact>
@@ -234,7 +250,7 @@ export function ValidatorSetCard({
       <table className="mt-5 w-full text-sm/6">
         <thead>
           <tr className="border-b border-border text-left text-xs/5 text-muted">
-            <th className="pb-1.5 font-medium">Credentials</th>
+            <th className="pb-1.5 font-medium">{endStates ? 'Current credentials' : 'Credentials'}</th>
             <th className="pb-1.5 text-right font-medium">Validators</th>
             <th className="pb-1.5 text-right font-medium">Effective balance</th>
           </tr>

@@ -4,22 +4,21 @@ import { fctOpcodeCostByElClientDailyServiceList, fctOpcodeCostByElClientVersion
 import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { TIME_RANGE_CONFIG, type TimeRange } from '../IndexPage.types';
 import { buildOpcodeCostModel, MIN_VERSION_HOURS, type OpcodeCostModel } from '../utils/opcode-costs';
+import { rangeDays } from '../utils/performance';
 import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
 
 /** The opcode model is fitted only on reference nodes, which share hardware */
 const NODE_CLASS = 'eip7870-block-builder';
 
-/** Single days are noisy, and the daily table has one row per opcode per client per day */
-const MIN_WINDOW_DAYS = 7;
-const MAX_WINDOW_DAYS = 90;
-
 /**
- * Opcode cost fits for the selected range, clamped to 7–90 days: daily fits per client, and
- * per-release fits for releases that ran in the window.
+ * Opcode cost fits over the whole UTC days that contain the range [rangeStart, rangeEnd), since the
+ * fits are daily: daily fits per client, and per-release fits for releases that ran in those days.
  */
-export function useOpcodeCostData(timeRange: TimeRange): {
+export function useOpcodeCostData(
+  rangeStart: number,
+  rangeEnd: number
+): {
   model: OpcodeCostModel | null;
   isLoading: boolean;
   error: Error | null;
@@ -27,14 +26,9 @@ export function useOpcodeCostData(timeRange: TimeRange): {
   const { currentNetwork } = useNetwork();
 
   const { start, end } = useMemo(() => {
-    const d = Math.min(
-      MAX_WINDOW_DAYS,
-      Math.max(MIN_WINDOW_DAYS, Math.round(TIME_RANGE_CONFIG[timeRange].seconds / 86400))
-    );
-    // End at the start of today (UTC): today's fit is still partial
-    const todayStart = Math.floor(Date.now() / 1000 / 86400) * 86400;
-    return { start: todayStart - d * 86400, end: todayStart - 1 };
-  }, [timeRange]);
+    const days = rangeDays(rangeStart, rangeEnd);
+    return { start: days.start, end: days.end - 1 };
+  }, [rangeStart, rangeEnd]);
 
   const daily = useQuery({
     queryKey: ['opcode-cost', 'daily', currentNetwork?.name, start, end],

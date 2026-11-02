@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { IndexPage } from '@/pages/ethereum/entities';
+import { entitiesSearchSchema } from '@/pages/ethereum/entities/constants';
 
 export const Route = createFileRoute('/ethereum/entities/')({
   component: IndexPage,
+  validateSearch: entitiesSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
   }),

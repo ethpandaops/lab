@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Time ranges for the performance page. Beyond 31 days the hourly per-client table is too heavy
- * to fetch, and the opcode fits already cover their own 7–90 day window.
+ * to fetch.
  */
 export type TimeRange = '1hour' | '6hours' | '24hours' | '7days' | '31days';
 

@@ -395,6 +395,15 @@
     outline: none;
   }
 
+  /* No persistent scrollbars anywhere: Windows draws them as solid gutters. Scrolling still works. */
+  * {
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Hide scrollbars while maintaining scroll functionality */
   .scrollbar-hide {
     -ms-overflow-style: none; /* IE and Edge */

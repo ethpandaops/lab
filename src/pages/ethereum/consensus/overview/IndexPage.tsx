@@ -64,6 +64,7 @@ import {
   formatBand,
   dailyWindowStartDate,
   trimDailyRecords,
+  rollUpHourlyToDaily,
   buildBlobCountChartConfig,
   buildAttestationParticipationChartConfig,
   buildHeadVoteCorrectnessChartConfig,
@@ -78,6 +79,9 @@ import {
 } from './overview.utils';
 
 const { DATA_COLORS } = getDataVizColors();
+
+/** Days of hourly payload-status rows that fit in one PAGE_SIZE page */
+const PAYLOAD_STATUS_MAX_DAYS = 90;
 
 /**
  * IndexPage - Consensus Overview page
@@ -208,17 +212,29 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
-  // Gloas (ePBS): hourly payload delivery outcomes judged by the PTC. The
-  // table is empty pre-gloas, so the chart self-gates by data presence.
+  // Gloas (ePBS): payload delivery outcomes judged by the PTC. The table is
+  // empty pre-gloas, so the chart self-gates by data presence. It is hourly
+  // only, and one page of it covers PAYLOAD_STATUS_MAX_DAYS, so daily windows
+  // roll it up to days and anything longer gets its own fixed-window card.
+  const payloadWindow = useMemo(() => {
+    if (!isDaily) return { start: startTimestamp, followsRange: true };
+    const maxStart = Date.parse(dailyWindowStartDate(PAYLOAD_STATUS_MAX_DAYS)!) / 1000;
+    const genesis = currentNetwork?.genesis_time ?? 0;
+    const rangeStart = dailyStartDate ? Date.parse(dailyStartDate) / 1000 : genesis;
+    return {
+      start: Math.max(rangeStart, maxStart),
+      followsRange: Math.max(rangeStart, genesis) >= maxStart,
+    };
+  }, [isDaily, startTimestamp, dailyStartDate, currentNetwork?.genesis_time]);
+
   const payloadStatusHourlyQuery = useQuery({
     ...fctBlockPayloadStatusHourlyServiceListOptions({
       query: {
-        hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_gte: payloadWindow.start,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
     }),
-    enabled: !isDaily,
   });
 
   const inclusionDelayHourlyQuery = useQuery({
@@ -502,16 +518,25 @@ export function IndexPage(): JSX.Element {
   }, [proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors]);
 
   const payloadStatusChartConfig = useMemo(() => {
-    const records = payloadStatusHourlyQuery.data?.fct_block_payload_status_hourly ?? [];
-    if (isDaily || !records.length || !unifiedTimeKeys.length) return null;
+    const hourly = payloadStatusHourlyQuery.data?.fct_block_payload_status_hourly ?? [];
+    if (!hourly.length) return null;
     // Same record shape as proposal status: (time key, status, slot_count).
-    return buildBlockProposalStatusChartConfig(
-      records as unknown as FctBlockProposalStatusHourly[],
-      unifiedTimeKeys,
-      isDaily,
-      themeColors
-    );
-  }, [payloadStatusHourlyQuery.data, unifiedTimeKeys, isDaily, themeColors]);
+    if (!isDaily) {
+      if (!unifiedTimeKeys.length) return null;
+      return buildBlockProposalStatusChartConfig(
+        hourly as unknown as FctBlockProposalStatusHourly[],
+        unifiedTimeKeys,
+        false,
+        themeColors
+      );
+    }
+    const records = rollUpHourlyToDaily(hourly);
+    const keys = payloadWindow.followsRange
+      ? unifiedTimeKeys
+      : fillTimeKeys([...new Set(records.map(r => r.day_start_date))].sort(), true);
+    if (!keys.length) return null;
+    return buildBlockProposalStatusChartConfig(records, keys, true, themeColors);
+  }, [payloadStatusHourlyQuery.data, unifiedTimeKeys, isDaily, payloadWindow.followsRange, themeColors]);
 
   const inclusionDelayChartConfig = useMemo(() => {
     if (!inclusionDelayRecords?.length || !unifiedTimeKeys.length) return null;
@@ -1060,7 +1085,7 @@ export function IndexPage(): JSX.Element {
           )}
 
           {/* Gloas (ePBS): payload delivery rate judged by the PTC */}
-          {payloadStatusChartConfig && (
+          {payloadStatusChartConfig && payloadWindow.followsRange && (
             <PopoutCard title="Payload Delivery (ePBS)" anchorId="payload-delivery-chart" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
@@ -1099,6 +1124,30 @@ export function IndexPage(): JSX.Element {
             </PopoutCard>
           )}
         </div>
+      )}
+
+      {/* ePBS payload delivery beyond what the hourly table can cover, on its own window */}
+      {!isLoading && payloadStatusChartConfig && !payloadWindow.followsRange && (
+        <PopoutCard
+          title="Payload Delivery (ePBS)"
+          subtitle={`Last ${PAYLOAD_STATUS_MAX_DAYS} days`}
+          anchorId="payload-delivery-chart"
+          modalSize="full"
+          className="mt-8"
+        >
+          {({ inModal }) => (
+            <MultiLineChart
+              series={payloadStatusChartConfig.series}
+              xAxis={{ type: 'category', labels: payloadStatusChartConfig.labels, name: 'Date' }}
+              yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
+              height={inModal ? 600 : 200}
+              showLegend
+              legendPosition="top"
+              enableDataZoom
+              showDataZoomSlider={inModal}
+            />
+          )}
+        </PopoutCard>
       )}
     </Container>
   );

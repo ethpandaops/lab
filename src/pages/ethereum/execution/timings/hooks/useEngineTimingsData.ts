@@ -90,6 +90,8 @@ export interface UseEngineTimingsDataResult {
 function getTimeRangeTimestamps(range: TimeRange): {
   hourlyStart: number;
   hourlyEnd: number;
+  /** UTC dates of the range's full days, ending yesterday, for the daily tables */
+  days: string;
 } {
   const now = Math.floor(Date.now() / 1000);
   const config = TIME_RANGE_CONFIG[range];
@@ -97,7 +99,10 @@ function getTimeRangeTimestamps(range: TimeRange): {
   const hourlyEnd = Math.floor(now / 3600) * 3600;
   const hourlyStart = hourlyEnd - config.seconds;
 
-  return { hourlyStart, hourlyEnd };
+  const todayStart = Math.floor(now / 86400) * 86400;
+  const days = generateDateRange(todayStart - config.seconds, todayStart - 1);
+
+  return { hourlyStart, hourlyEnd, days };
 }
 
 /**
@@ -130,7 +135,7 @@ export function useEngineTimingsData({
 }: UseEngineTimingsDataOptions): UseEngineTimingsDataResult {
   const { currentNetwork } = useNetwork();
 
-  const { hourlyStart, hourlyEnd } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
+  const { hourlyStart, hourlyEnd, days } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
 
   // Track if blobs tab has ever been visited (to keep data cached after switching away)
   const [blobsVisited, setBlobsVisited] = useState(false);
@@ -318,7 +323,7 @@ export function useEngineTimingsData({
             fctEngineNewPayloadWinrateDailyServiceList,
             {
               query: {
-                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                day_start_date_in_values: days,
                 order_by: 'day_start_date ASC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -359,7 +364,7 @@ export function useEngineTimingsData({
             fctEngineNewPayloadByElClientDailyServiceList,
             {
               query: {
-                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                day_start_date_in_values: days,
                 order_by: 'day_start_date DESC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -379,7 +384,7 @@ export function useEngineTimingsData({
             fctEngineGetBlobsByElClientDailyServiceList,
             {
               query: {
-                day_start_date_in_values: generateDateRange(hourlyStart, hourlyEnd),
+                day_start_date_in_values: days,
                 order_by: 'day_start_date DESC',
                 page_size: 10000,
                 ...refNodeFilter,
