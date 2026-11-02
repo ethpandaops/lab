@@ -17,9 +17,10 @@ const OTHER = 'Other';
 /**
  * Daily share of resolved versions, stacked: current releases (or minor lines) on their own, the rest as Other.
  */
-export function VersionShareChart({ days: versionDays, limit = 7, height = 320 }: VersionShareChartProps): JSX.Element {
+export function VersionShareChart({ days: versionDays, limit, height = 320 }: VersionShareChartProps): JSX.Element {
   const { series, labels } = useMemo(() => {
-    const { days, top: picked } = groupVersionLines(versionDays, limit);
+    // Long windows get more lines, one per stretch of history
+    const { days, top: picked } = groupVersionLines(versionDays, limit ?? (versionDays.length > 180 ? 11 : 7));
     const top = [...picked].sort((a, b) => compareVersions(b, a));
     const palette = getDataVizColors().CHART_CATEGORICAL_COLORS;
     const colors = new Map(top.map((version, index) => [version, palette[index % palette.length]]));

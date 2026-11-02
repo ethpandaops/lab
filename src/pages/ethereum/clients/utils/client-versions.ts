@@ -398,13 +398,34 @@ export function recentTopVersions(days: VersionDay[], limit: number, recentDays 
     .map(([version]) => version);
 }
 
+/** The `limit` lines with the most recent blocks, then the main line of each stretch of the window */
+function pickLines(days: VersionDay[], limit: number, recentDays = 7): string[] {
+  const top = recentTopVersions(days, Math.ceil(limit / 2), recentDays);
+  const segments = limit - top.length;
+  for (let i = 0; i < segments; i++) {
+    const counts = new Map<string, number>();
+    const stretch = days.slice(
+      Math.floor((i * days.length) / segments),
+      Math.floor(((i + 1) * days.length) / segments)
+    );
+    for (const day of stretch) {
+      for (const [version, count] of day.counts) {
+        if (!top.includes(version)) counts.set(version, (counts.get(version) ?? 0) + count);
+      }
+    }
+    const leader = [...counts.entries()].sort((x, y) => y[1] - x[1])[0];
+    if (leader && leader[1] > 0) top.push(leader[0]);
+  }
+  return top;
+}
+
 /**
  * Days regrouped for a version share chart, with the lines drawn on their own (the rest stack as Other).
  *
  * Releases are drawn as they are when the `limit` largest cover `coverage` of the blocks. Otherwise they are grouped
- * into minor lines, but only when that still leaves at least three lines that cover `coverage`; a single-major client
- * with a long tail would otherwise become one band. Failing both, the releases with the most recent blocks are drawn,
- * with the main release of each stretch of a long window, and the rest stacks as Other.
+ * into minor lines when that leaves at least three lines and merges a good share of releases, since a single-major
+ * client with a long tail would otherwise become one band; never into major lines. The lines drawn are the ones with
+ * the most recent blocks plus the main line of each stretch of the window, and the rest stacks as Other.
  */
 export function groupVersionLines(
   days: VersionDay[],
@@ -423,33 +444,21 @@ export function groupVersionLines(
   if (topCoverage(patches, limit) >= coverage) {
     return { days, top: recentTopVersions(days, limit, days.length), level: 'patch' };
   }
-  if (minors.size >= 3 && topCoverage(minors, limit) >= coverage) {
-    const grouped = days.map(day => {
-      const counts = new Map<string, number>();
-      for (const [version, count] of day.counts) {
-        const line = versionLine(version, 'minor');
-        counts.set(line, (counts.get(line) ?? 0) + count);
-      }
-      return { ...day, counts };
-    });
-    return { days: grouped, top: recentTopVersions(grouped, limit, grouped.length), level: 'minor' };
-  }
-  // Half the lines go to the current releases; the rest to the main release of each stretch of the window
-  const top = recentTopVersions(days, Math.ceil(limit / 2));
-  const segments = limit - top.length;
-  for (let i = 0; i < segments; i++) {
+  const minorsHelp = minors.size >= 3 && minors.size <= patches.size * 0.6;
+  if (!minorsHelp) return { days, top: pickLines(days, limit), level: 'patch' };
+  const grouped = days.map(day => {
     const counts = new Map<string, number>();
-    for (const day of days.slice(
-      Math.floor((i * days.length) / segments),
-      Math.floor(((i + 1) * days.length) / segments)
-    )) {
-      for (const [version, count] of day.counts)
-        if (!top.includes(version)) counts.set(version, (counts.get(version) ?? 0) + count);
+    for (const [version, count] of day.counts) {
+      const line = versionLine(version, 'minor');
+      counts.set(line, (counts.get(line) ?? 0) + count);
     }
-    const leader = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-    if (leader && leader[1] > 0) top.push(leader[0]);
-  }
-  return { days, top, level: 'patch' };
+    return { ...day, counts };
+  });
+  const top =
+    topCoverage(minors, limit) >= coverage
+      ? recentTopVersions(grouped, limit, grouped.length)
+      : pickLines(grouped, limit);
+  return { days: grouped, top, level: 'minor' };
 }
 
 /** Resolved blocks per version for one UTC day */
