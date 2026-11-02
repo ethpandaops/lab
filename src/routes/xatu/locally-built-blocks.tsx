@@ -1,15 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod';
 import { IndexPage } from '@/pages/xatu/locally-built-blocks';
-
-/** `from` is the top slot of the page shown; absent means the latest indexed slots. */
-const searchSchema = z.object({
-  from: z.coerce.number().int().nonnegative().optional(),
-});
+import { locallyBuiltBlocksSearchSchema } from '@/pages/xatu/locally-built-blocks/IndexPage.types';
 
 export const Route = createFileRoute('/xatu/locally-built-blocks')({
   component: IndexPage,
-  validateSearch: searchSchema,
+  validateSearch: locallyBuiltBlocksSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ label: 'Locally Built Blocks' }),
   }),

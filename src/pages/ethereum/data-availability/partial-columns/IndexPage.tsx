@@ -21,6 +21,7 @@ import {
 import { CompletionBlocksTable, PartialColumnsSkeleton, SentryFilter, VersionAdoption } from './components';
 import { useCompletionBlocks, usePartialColumnRollups } from './hooks';
 import {
+  BLOCKS_PAGE_SIZE,
   COMPLETION_HOURLY_TABLE,
   COMPLETION_PATHS,
   DEFAULT_TIME_PERIOD,
@@ -29,7 +30,13 @@ import {
   TIME_PERIOD_OPTIONS,
   TIME_RANGE_CONFIG,
 } from './constants';
-import type { TimePeriod } from './IndexPage.types';
+import {
+  BLOCK_FILTER_KEYS,
+  type BlockFilters,
+  type BlockSortKey,
+  type PartialColumnsSearch,
+  type TimePeriod,
+} from './IndexPage.types';
 import {
   buildAdoptionSeries,
   buildCellSourceSeries,
@@ -74,6 +81,11 @@ function seriesItems(
   });
 }
 
+/** The blocks table filters out of a search, every key present so a navigation also clears removed filters */
+function pickBlockFilters(search: BlockFilters): BlockFilters {
+  return Object.fromEntries(BLOCK_FILTER_KEYS.map(key => [key, search[key]]));
+}
+
 /** Partial columns page: partial message adoption, how sentry nodes complete their columns, and recent blocks. */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/partial-columns' });
@@ -98,7 +110,19 @@ export function IndexPage(): JSX.Element {
     if (config.days === null) return tableBounds?.min ?? 0;
     return Math.floor(Date.now() / 1000) - config.days * 24 * 3600;
   }, [config.days, tableBounds?.min]);
-  const blocks = useCompletionBlocks(windowStart);
+  const blockFilters = pickBlockFilters(search);
+  const blockSort: BlockSortKey = search.sort ?? 'slot';
+  const blockOrder = search.order ?? 'desc';
+  const blockPage = search.page ?? 0;
+  const blockPageSize = search.pageSize ?? BLOCKS_PAGE_SIZE;
+  const blocks = useCompletionBlocks({
+    since: windowStart,
+    filters: blockFilters,
+    sort: blockSort,
+    order: blockOrder,
+    page: blockPage,
+    pageSize: blockPageSize,
+  });
 
   const completion = useMemo(() => summariseCompletions(sentryPaths), [sentryPaths]);
   const partials = useMemo(() => summarisePartials(sentryPartials), [sentryPartials]);
@@ -121,8 +145,8 @@ export function IndexPage(): JSX.Element {
   );
 
   const setSearch = useCallback(
-    (update: { t?: TimePeriod; sentry?: string }) =>
-      navigate({ search: prev => ({ ...prev, ...update }), replace: true }),
+    (update: Partial<PartialColumnsSearch>) =>
+      navigate({ search: prev => ({ ...prev, ...update }), replace: true, resetScroll: false }),
     [navigate]
   );
 
@@ -232,7 +256,7 @@ export function IndexPage(): JSX.Element {
             <SegmentedControl
               options={TIME_PERIOD_OPTIONS}
               value={timePeriod}
-              onChange={value => setSearch({ t: value })}
+              onChange={value => setSearch({ t: value, page: undefined })}
               ariaLabel="Time window"
             />
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
@@ -501,8 +525,25 @@ export function IndexPage(): JSX.Element {
               isLoading={blocks.isLoading}
               error={blocks.error}
               hasNextPage={blocks.hasNextPage}
-              isFetchingNextPage={blocks.isFetchingNextPage}
-              onLoadMore={blocks.fetchNextPage}
+              filters={blockFilters}
+              onFiltersChange={filters => setSearch({ ...pickBlockFilters(filters), page: undefined })}
+              sort={blockSort}
+              order={blockOrder}
+              onSortChange={(sort, order) =>
+                setSearch({
+                  sort: sort === 'slot' && order === 'desc' ? undefined : sort,
+                  order: sort === 'slot' && order === 'desc' ? undefined : order,
+                  page: undefined,
+                })
+              }
+              page={blockPage}
+              pageSize={blockPageSize}
+              onPageChange={(page, pageSize) =>
+                setSearch({
+                  page: pageSize === blockPageSize && page > 0 ? page : undefined,
+                  pageSize: pageSize === BLOCKS_PAGE_SIZE ? undefined : pageSize,
+                })
+              }
             />
           )}
         </div>

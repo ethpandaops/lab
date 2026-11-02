@@ -1,0 +1,1 @@
+export { PreparedBlocksTable } from './PreparedBlocksTable';

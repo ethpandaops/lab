@@ -1,11 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctPreparedBlock } from '@/api/types.gen';
-import { useTableBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
-import { slotToTimestamp, timestampToSlot } from '@/utils/beacon';
-import { getRangePage, type RangePage } from '@/components/Lists/RangePager';
 import { parseClientName } from '../utils';
+import type { PreparedBlockQuery } from '../utils/block-query';
 
 /**
  * Extended block data with parsed client names
@@ -47,140 +45,53 @@ export interface UseSlotBlocksResult {
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
-  /** Page range for the pager */
-  page: RangePage;
 }
 
-/** Slots per page (timeline columns) */
+/** Slots in the timeline */
 const SLOTS_TO_SHOW = 6;
 
+/** Rows fetched for the timeline, enough for its slots with every node */
+const TIMELINE_ROWS = 500;
+
+/** Refresh interval while the timeline follows the newest slots, one slot */
+const LIVE_REFETCH_MS = 12_000;
+
+/** Unique nodes per key */
+function countNodes(blocks: ParsedBlock[], keyOf: (block: ParsedBlock) => string | null): Map<string, number> {
+  const nodes = new Map<string, Set<string>>();
+  for (const block of blocks) {
+    const key = keyOf(block);
+    if (!key || !block.meta_client_name) continue;
+    if (!nodes.has(key)) nodes.set(key, new Set());
+    nodes.get(key)!.add(block.meta_client_name);
+  }
+  return new Map([...nodes].map(([key, names]) => [key, names.size]));
+}
+
 /**
- * Hook to fetch prepared blocks for one page of slots and group them by slot.
- * `from` is the page's top slot; undefined follows the latest indexed slot. Pages are bounded by
- * the prepared-block table's indexed range from the bounds API.
+ * The newest slots with blocks matching the filters, grouped by slot, with per-client and pairing node counts.
+ * `live` refreshes every slot, for queries without an upper bound.
  */
-export function useSlotBlocks(from?: number): UseSlotBlocksResult {
-  // Bounds contain timestamps (slot_start_date_time), not slot numbers
-  const { data: bounds, isLoading: boundsLoading, error: boundsError } = useTableBounds('fct_prepared_block');
+export function useSlotBlocks(filters: PreparedBlockQuery, live: boolean): UseSlotBlocksResult {
   const { currentNetwork } = useNetwork();
-  const genesisTime = currentNetwork?.genesis_time;
 
-  const latestSlot = bounds && genesisTime ? timestampToSlot(bounds.max, genesisTime) : 0;
-  const earliestSlot = bounds && genesisTime ? timestampToSlot(bounds.min, genesisTime) : 0;
-  const page = getRangePage(from, latestSlot, earliestSlot, SLOTS_TO_SHOW);
-
-  const maxTimestamp = bounds && genesisTime ? slotToTimestamp(page.top, genesisTime) : undefined;
-  const minTimestamp = bounds && genesisTime ? slotToTimestamp(page.bottom, genesisTime) : undefined;
-
-  const {
-    data,
-    error,
-    isPending: dataPending,
-    isFetching: dataFetching,
-  } = useQuery({
+  const { data, error, isPending, isFetching } = useQuery({
     ...fctPreparedBlockServiceListOptions({
-      query: {
-        // Query by timestamp range (slot_start_date_time field)
-        slot_start_date_time_gte: minTimestamp,
-        slot_start_date_time_lte: maxTimestamp,
-        page_size: 1000, // Fetch enough to cover multiple slots and all client combinations
-        order_by: 'slot desc',
-      },
+      query: { ...filters, page_size: TIMELINE_ROWS, order_by: 'slot_start_date_time desc' },
     }),
-    // Only enable query when we have bounds
-    enabled: !!bounds && !!minTimestamp && !!maxTimestamp,
-    // Keep previous data while fetching new data (prevents flash)
-    placeholderData: previousData => previousData,
+    enabled: !!currentNetwork && !!filters.slot_start_date_time_gte,
+    placeholderData: keepPreviousData,
+    refetchInterval: live ? LIVE_REFETCH_MS : false,
   });
 
-  // Handle errors from either bounds or data query
-  if (boundsError) {
-    return {
-      slotGroups: [],
-      allExecutionClients: [],
-      allConsensusClients: [],
-      blockCountMap: new Map(),
-      maxBlockCount: 0,
-      clientPairingMap: new Map(),
-      maxPairingCount: 0,
-      allBlocks: [],
-      isLoading: false,
-      isFetching: false,
-      error: boundsError as Error,
-      page,
-    };
-  }
-
-  if (error) {
-    return {
-      slotGroups: [],
-      allExecutionClients: [],
-      allConsensusClients: [],
-      blockCountMap: new Map(),
-      maxBlockCount: 0,
-      clientPairingMap: new Map(),
-      maxPairingCount: 0,
-      allBlocks: [],
-      isLoading: false,
-      isFetching: false,
-      error: error as Error,
-      page,
-    };
-  }
-
-  // Initial loading (no data yet) - use isPending which is only true on first load
-  if (boundsLoading || dataPending || !bounds) {
-    return {
-      slotGroups: [],
-      allExecutionClients: [],
-      allConsensusClients: [],
-      blockCountMap: new Map(),
-      maxBlockCount: 0,
-      clientPairingMap: new Map(),
-      maxPairingCount: 0,
-      allBlocks: [],
-      isLoading: true,
-      isFetching: true,
-      error: null,
-      page,
-    };
-  }
-
-  if (!data?.fct_prepared_block) {
-    return {
-      slotGroups: [],
-      allExecutionClients: [],
-      allConsensusClients: [],
-      blockCountMap: new Map(),
-      maxBlockCount: 0,
-      clientPairingMap: new Map(),
-      maxPairingCount: 0,
-      allBlocks: [],
-      isLoading: false,
-      isFetching: dataFetching,
-      error: null,
-      page,
-    };
-  }
-
-  // Parse client names ONCE and augment blocks
-  const parsedBlocks: ParsedBlock[] = data.fct_prepared_block.map(block => {
+  const parsedBlocks: ParsedBlock[] = (data?.fct_prepared_block ?? []).map(block => {
     const { executionClient, consensusClient } = parseClientName(block.meta_client_name);
-    return {
-      ...block,
-      parsedExecutionClient: executionClient,
-      parsedConsensusClient: consensusClient,
-    };
+    return { ...block, parsedExecutionClient: executionClient, parsedConsensusClient: consensusClient };
   });
 
-  // Group blocks by slot
   const slotMap = new Map<number, SlotBlocksGroup>();
-  const allExecClients = new Set<string>();
-  const allConsensusClients = new Set<string>();
-
   for (const block of parsedBlocks) {
     if (!block.slot || !block.slot_start_date_time) continue;
-
     if (!slotMap.has(block.slot)) {
       slotMap.set(block.slot, {
         slot: block.slot,
@@ -190,102 +101,42 @@ export function useSlotBlocks(from?: number): UseSlotBlocksResult {
         consensusClients: new Set(),
       });
     }
-
     const group = slotMap.get(block.slot)!;
     group.blocks.push(block);
-
-    // Track clients at slot level and globally
-    if (block.parsedExecutionClient) {
-      group.executionClients.add(block.parsedExecutionClient);
-      allExecClients.add(block.parsedExecutionClient);
-    }
-    if (block.parsedConsensusClient) {
-      group.consensusClients.add(block.parsedConsensusClient);
-      allConsensusClients.add(block.parsedConsensusClient);
-    }
+    if (block.parsedExecutionClient) group.executionClients.add(block.parsedExecutionClient);
+    if (block.parsedConsensusClient) group.consensusClients.add(block.parsedConsensusClient);
   }
 
-  // Convert to array and sort by slot descending, then take first N
-  const slotGroups = Array.from(slotMap.values())
-    .sort((a, b) => b.slot - a.slot)
-    .slice(0, SLOTS_TO_SHOW);
+  const slotGroups = [...slotMap.values()].sort((a, b) => b.slot - a.slot).slice(0, SLOTS_TO_SHOW);
+  const allBlocks = slotGroups.flatMap(group => group.blocks);
 
-  // Pre-calculate block counts for each client in each slot
-  // This eliminates the need for components to loop and count repeatedly
-  const blockCountMap = new Map<string, number>();
-
+  const blockCountMap: BlockCountMap = new Map();
   for (const group of slotGroups) {
-    // Track unique nodes (not blocks) per client per slot
-    const execNodeMap = new Map<string, Set<string>>(); // client -> Set of node names
-    const consensusNodeMap = new Map<string, Set<string>>(); // client -> Set of node names
-
-    for (const block of group.blocks) {
-      // Execution clients
-      if (block.parsedExecutionClient && block.meta_client_name) {
-        if (!execNodeMap.has(block.parsedExecutionClient)) {
-          execNodeMap.set(block.parsedExecutionClient, new Set());
-        }
-        execNodeMap.get(block.parsedExecutionClient)!.add(block.meta_client_name);
-      }
-
-      // Consensus clients
-      if (block.parsedConsensusClient && block.meta_client_name) {
-        if (!consensusNodeMap.has(block.parsedConsensusClient)) {
-          consensusNodeMap.set(block.parsedConsensusClient, new Set());
-        }
-        consensusNodeMap.get(block.parsedConsensusClient)!.add(block.meta_client_name);
-      }
-    }
-
-    // Store counts in the map with key format "slot:client:isExecution"
-    execNodeMap.forEach((nodes, client) => {
-      const key = `${group.slot}:${client}:true`;
-      blockCountMap.set(key, nodes.size);
-    });
-
-    consensusNodeMap.forEach((nodes, client) => {
-      const key = `${group.slot}:${client}:false`;
-      blockCountMap.set(key, nodes.size);
-    });
+    countNodes(group.blocks, block => block.parsedExecutionClient).forEach((count, client) =>
+      blockCountMap.set(`${group.slot}:${client}:true`, count)
+    );
+    countNodes(group.blocks, block => block.parsedConsensusClient).forEach((count, client) =>
+      blockCountMap.set(`${group.slot}:${client}:false`, count)
+    );
   }
 
-  // Find the maximum count for color scaling
-  const maxBlockCount = Math.max(...Array.from(blockCountMap.values()), 1);
-
-  // Calculate client pairing counts
-  // Count unique node pairings (not individual blocks)
-  const clientPairingMap = new Map<string, Set<string>>(); // "exec:consensus" -> Set of node names
-
-  for (const block of parsedBlocks) {
-    if (block.parsedExecutionClient && block.parsedConsensusClient && block.meta_client_name) {
-      const key = `${block.parsedExecutionClient}:${block.parsedConsensusClient}`;
-      if (!clientPairingMap.has(key)) {
-        clientPairingMap.set(key, new Set());
-      }
-      clientPairingMap.get(key)!.add(block.meta_client_name);
-    }
-  }
-
-  // Convert Set sizes to counts
-  const pairingCounts = new Map<string, number>();
-  for (const [key, nodes] of clientPairingMap.entries()) {
-    pairingCounts.set(key, nodes.size);
-  }
-
-  const maxPairingCount = Math.max(...Array.from(pairingCounts.values()), 1);
+  const clientPairingMap: ClientPairingMap = countNodes(allBlocks, block =>
+    block.parsedExecutionClient && block.parsedConsensusClient
+      ? `${block.parsedExecutionClient}:${block.parsedConsensusClient}`
+      : null
+  );
 
   return {
     slotGroups,
-    allExecutionClients: Array.from(allExecClients).sort(),
-    allConsensusClients: Array.from(allConsensusClients).sort(),
+    allExecutionClients: [...new Set(slotGroups.flatMap(group => [...group.executionClients]))].sort(),
+    allConsensusClients: [...new Set(slotGroups.flatMap(group => [...group.consensusClients]))].sort(),
     blockCountMap,
-    maxBlockCount,
-    clientPairingMap: pairingCounts,
-    maxPairingCount,
-    allBlocks: parsedBlocks,
-    isLoading: false,
-    isFetching: dataFetching,
-    error: null,
-    page,
+    maxBlockCount: Math.max(...blockCountMap.values(), 1),
+    clientPairingMap,
+    maxPairingCount: Math.max(...clientPairingMap.values(), 1),
+    allBlocks,
+    isLoading: isPending,
+    isFetching,
+    error: error as Error | null,
   };
 }

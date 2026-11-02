@@ -8,3 +8,7 @@ export { LocallyBuiltBlocksSkeleton } from './LocallyBuiltBlocksSkeleton';
 
 export { SlotTimeline } from './SlotTimeline';
 export type { SlotTimelineProps } from './SlotTimeline';
+
+export { BlocksFilterPanel } from './BlocksFilterPanel';
+
+export { PreparedBlocksTable } from './PreparedBlocksTable';
