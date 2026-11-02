@@ -1,1 +1,0 @@
-export { MockBadge } from './MockBadge';

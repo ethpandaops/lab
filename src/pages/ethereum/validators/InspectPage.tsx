@@ -244,9 +244,10 @@ export function InspectPage(): JSX.Element {
               {hasData && !isLoading && (
                 <ValidatorBalance
                   balances={raw.balance}
-                  sync={raw.syncCommittee}
-                  proposals={raw.blockProposal}
                   validatorIndices={resolvedIndices}
+                  from={from}
+                  to={to}
+                  allHistory={allHistory}
                   daysPerRow={resolution === 'week' ? 7 : 1}
                 />
               )}
@@ -298,15 +299,7 @@ export function InspectPage(): JSX.Element {
             </InspectSection>
 
             {hasData && !isLoading && (
-              <ValidatorDuties
-                indices={resolvedIndices}
-                from={from}
-                to={to}
-                proposals={raw.blockProposal}
-                balances={raw.balance}
-                sync={raw.syncCommittee}
-                identities={identityList}
-              />
+              <ValidatorDuties indices={resolvedIndices} from={from} to={to} proposals={raw.blockProposal} />
             )}
           </>
         )}

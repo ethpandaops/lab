@@ -23,16 +23,17 @@ import {
   fctHeadVoteCorrectnessRateDailyServiceListOptions,
   fctMissedSlotRateDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import { MockBadge, TableCard, TableSearch } from './components';
-import { buildOverviewDays, CREDENTIAL_TYPES, fixture, formatDayLabel } from './mocks/overview';
-import type { CredentialType, OverviewDay, OverviewFixture } from './mocks/overview';
+import { Alert } from '@/components/Feedback/Alert';
+import { TableCard, TableSearch, ValidatorsSkeleton } from './components';
+import { useOverviewData } from './hooks/useOverviewData';
+import type { OverviewPeriod } from './hooks/useOverviewData';
 import {
-  bucketDays,
+  CREDENTIAL_TYPES,
   formatCompact,
+  formatDayLabel,
   lowestSince,
   OVERVIEW_WINDOW_OPTIONS,
-  sliceWindow,
-  sum,
+  type CredentialType,
   type OverviewWindow,
 } from './utils/overview';
 
@@ -41,9 +42,6 @@ const CREDENTIAL_LABELS: Record<CredentialType, string> = {
   '0x01': '0x01 Execution',
   '0x02': '0x02 Compounding',
 };
-
-/** ETH that can enter or leave the active set per day (256 ETH per epoch) */
-const CHURN_ETH_PER_DAY = 256 * 225;
 
 const EB_BUCKETS: { label: string; min: number; max: number }[] = [
   { label: '<32', min: 0, max: 31 },
@@ -69,6 +67,26 @@ const bar = (stack: string): Partial<SeriesData> => ({ stack, seriesType: 'bar' 
 
 const formatEth = (v: number): string => `${formatCompact(v)} ETH`;
 
+interface EntityRow {
+  entity: string;
+  count: number;
+  effectiveBalanceEth: number;
+  byCredential: Record<CredentialType, { effectiveBalanceEth: number }>;
+}
+
+/** True when the operations table covers the period */
+const hasOps = (d: OverviewPeriod): boolean => Object.keys(d.ops).length > 0;
+
+/** An operation's count for the period; null when the operations table doesn't cover it */
+const opCount = (d: OverviewPeriod, name: string): number | null => (hasOps(d) ? (d.ops[name]?.count ?? 0) : null);
+
+/** ETH in minus ETH out for the period, rounded; null when the operations table doesn't cover it */
+const flow = (d: OverviewPeriod, ins: string[], outs: string[]): number | null => {
+  if (!hasOps(d)) return null;
+  const total = (names: string[]): number => names.reduce((a, n) => a + (d.ops[n]?.amountEth ?? 0), 0);
+  return Math.round(total(ins) - total(outs));
+};
+
 /**
  * Network-wide validator overview: validator set size, stake by withdrawal credential type, queues,
  * operations, rewards and duty performance.
@@ -90,12 +108,10 @@ export function IndexPage(): JSX.Element {
     '0x02': palette[1],
   };
 
-  const allDays = useMemo(() => buildOverviewDays(), []);
-  const days = sliceWindow(allDays, window);
-  const weekly = days.length > 400;
-  const buckets = bucketDays(days, weekly);
+  const { period, periods: days, snapshot, isLoading, error } = useOverviewData(window);
+  const weekly = period === 'week';
   const labels = days.map(d => formatDayLabel(d.day));
-  const bucketLabels = buckets.map(b => b.label);
+  const perPeriod = weekly ? 'per week' : 'per day';
 
   // --- Fork marks: nearest label on or after each fork ---
   const { allForks } = useForks();
@@ -120,43 +136,43 @@ export function IndexPage(): JSX.Element {
         ];
       });
   };
-  const dailyForkMarks = forkMarks(
+  const periodForkMarks = forkMarks(
     days.map(d => d.day),
     labels
   );
-  const bucketForkMarks = forkMarks(
-    buckets.map(b => b.days[0].day),
-    bucketLabels
-  );
 
-  // --- Snapshot (real, from a beacon state) ---
-  const { snapshot } = fixture;
-  const active = snapshot.byCredentialStatus.filter(r => r.status.startsWith('active_'));
-  const activeByType = Object.fromEntries(
-    CREDENTIAL_TYPES.map(ct => {
-      const rows = active.filter(r => r.credentialType === ct);
-      return [
-        ct,
-        {
-          count: rows.reduce((a, r) => a + r.count, 0),
-          stake: rows.reduce((a, r) => a + r.effectiveBalanceEth, 0),
-        },
-      ];
-    })
-  ) as Record<CredentialType, { count: number; stake: number }>;
+  // --- Latest snapshot ---
+  const activeByType =
+    snapshot?.byType ??
+    (Object.fromEntries(CREDENTIAL_TYPES.map(ct => [ct, { count: 0, stake: 0 }])) as Record<
+      CredentialType,
+      { count: number; stake: number }
+    >);
   const activeCount = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].count, 0);
   const activeStake = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].stake, 0);
-  const lowDay = lowestSince(allDays, d => d.status.active + d.status.exiting);
-  const { queues } = snapshot;
-  const entryEth = queues.activationQueue.effectiveBalanceEth + (queues.pendingDeposits?.amountEth ?? 0);
-  const exitWaitDays = Math.max(0, ((queues.exitQueue.maxExitEpoch - snapshot.epoch) * 384) / 86_400);
+  const lowDay = lowestSince(days, d => d.status.active + d.status.exiting);
+  const queue = snapshot?.queue;
+  const entryEth = queue
+    ? ((queue.activation_queue_effective_balance ?? 0) + (queue.pending_deposit_amount ?? 0)) / 1e9
+    : null;
+  const exitEth = queue ? (queue.exit_queue_effective_balance ?? 0) / 1e9 : null;
 
   // --- Real duty performance from existing daily tables ---
   const dailyQuery = { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 10_000 };
   const participation = useQuery(fctAttestationParticipationRateDailyServiceListOptions({ query: dailyQuery }));
   const headVote = useQuery(fctHeadVoteCorrectnessRateDailyServiceListOptions({ query: dailyQuery }));
   const missed = useQuery(fctMissedSlotRateDailyServiceListOptions({ query: dailyQuery }));
-  const dutyDays = days.map(d => d.day);
+  // Network-level daily rates: one row per day, plotted on their own daily axis
+  const firstDay = days[0]?.day ?? '';
+  const dutyDays = [
+    ...new Set(
+      (participation.data?.fct_attestation_participation_rate_daily ?? [])
+        .map(r => r.day_start_date ?? '')
+        .filter(d => d >= firstDay)
+    ),
+  ].sort();
+  const dutyLabels = dutyDays.map(formatDayLabel);
+  const dutyForkMarks = forkMarks(dutyDays, dutyLabels);
   const byDay = <T extends { day_start_date?: string }>(
     rows: T[] | undefined,
     pick: (r: T) => number | undefined
@@ -172,12 +188,32 @@ export function IndexPage(): JSX.Element {
   const missedSeries = byDay(missed.data?.fct_missed_slot_rate_daily, r => r.missed_rate);
 
   // Memoised: DataTable returns to page 1 whenever its data array changes
-  const entities = useMemo(
-    () => snapshot.topEntities.filter(e => e.entity.toLowerCase().includes(entitySearch.trim().toLowerCase())),
-    [snapshot.topEntities, entitySearch]
-  );
+  const entities = useMemo(() => {
+    const byEntity = new Map<string, EntityRow>();
+    for (const r of snapshot?.entities ?? []) {
+      const name = r.entity ?? 'unknown';
+      const row =
+        byEntity.get(name) ??
+        ({
+          entity: name,
+          count: 0,
+          effectiveBalanceEth: 0,
+          byCredential: Object.fromEntries(CREDENTIAL_TYPES.map(ct => [ct, { effectiveBalanceEth: 0 }])),
+        } as EntityRow);
+      const stake = (r.active_effective_balance ?? 0) / 1e9;
+      row.count += r.active_validator_count ?? 0;
+      row.effectiveBalanceEth += stake;
+      const ct = r.credential_type as CredentialType;
+      if (row.byCredential[ct]) row.byCredential[ct].effectiveBalanceEth += stake;
+      byEntity.set(name, row);
+    }
+    const query = entitySearch.trim().toLowerCase();
+    return [...byEntity.values()]
+      .filter(e => e.entity.toLowerCase().includes(query))
+      .sort((a, b) => b.effectiveBalanceEth - a.effectiveBalanceEth);
+  }, [snapshot?.entities, entitySearch]);
 
-  const entityColumns: DataTableColumn<OverviewFixture['snapshot']['topEntities'][number]>[] = [
+  const entityColumns: DataTableColumn<EntityRow>[] = [
     {
       id: 'entity',
       header: 'Entity',
@@ -259,428 +295,413 @@ export function IndexPage(): JSX.Element {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <Stats
-          gridClassName="grid grid-cols-2 gap-px md:grid-cols-3 xl:grid-cols-6"
-          stats={[
-            {
-              id: 'active',
-              name: 'Active validators',
-              value: activeCount.toLocaleString(),
-              subtitle: lowDay
-                ? `Lowest since ${new Date(`${lowDay}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`
-                : undefined,
-            },
-            {
-              id: 'stake',
-              name: 'Staked',
-              value: formatEth(activeStake),
-              subtitle: 'Effective balance',
-            },
-            {
-              id: 'compounding',
-              name: 'Compounding (0x02)',
-              value: activeByType['0x02'].count.toLocaleString(),
-              subtitle: `${((activeByType['0x02'].stake / activeStake) * 100).toFixed(1)}% of stake`,
-            },
-            {
-              id: 'avg-eb',
-              name: 'Avg effective balance',
-              value: `${(activeStake / activeCount).toFixed(1)} ETH`,
-            },
-            {
-              id: 'entry',
-              name: 'Entry queue',
-              value: formatEth(entryEth),
-              subtitle: `~${Math.ceil(entryEth / CHURN_ETH_PER_DAY)} days`,
-            },
-            {
-              id: 'exit',
-              name: 'Exit queue',
-              value: formatEth(queues.exitQueue.effectiveBalanceEth),
-              subtitle:
-                exitWaitDays < 1 ? `~${Math.ceil(exitWaitDays * 24)} hours` : `~${Math.ceil(exitWaitDays)} days`,
-            },
-          ]}
-        />
+      {error && <Alert variant="error" title="Could not load validator data" description={error.message} />}
+      {!error && (isLoading || !snapshot) && <ValidatorsSkeleton />}
 
-        <Card
-          title="Credential mix"
-          actions={
-            <SegmentedControl
-              options={[
-                { value: 'stake', label: 'Stake' },
-                { value: 'validators', label: 'Validators' },
-              ]}
-              value={mixMode}
-              onChange={setMixMode}
-              ariaLabel="Credential mix measure"
-            />
-          }
-        >
-          <StackedBar
-            segments={CREDENTIAL_TYPES.map(ct => ({
-              name: CREDENTIAL_LABELS[ct],
-              value: mixMode === 'stake' ? activeByType[ct].stake : activeByType[ct].count,
-              color: credentialColors[ct],
-            }))}
-            showPercentages
-            showLegend
-            valueFormatter={v => (mixMode === 'stake' ? formatEth(v) : formatCompact(v))}
+      {!error && !isLoading && snapshot && (
+        <div className="flex flex-col gap-4">
+          <Stats
+            gridClassName="grid grid-cols-2 gap-px md:grid-cols-3 xl:grid-cols-6"
+            stats={[
+              {
+                id: 'active',
+                name: 'Active validators',
+                value: activeCount.toLocaleString(),
+                subtitle: lowDay
+                  ? `Lowest since ${new Date(`${lowDay}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`
+                  : undefined,
+              },
+              {
+                id: 'stake',
+                name: 'Staked',
+                value: formatEth(activeStake),
+                subtitle: 'Effective balance',
+              },
+              {
+                id: 'compounding',
+                name: 'Compounding (0x02)',
+                value: activeByType['0x02'].count.toLocaleString(),
+                subtitle: `${((activeByType['0x02'].stake / activeStake) * 100).toFixed(1)}% of stake`,
+              },
+              {
+                id: 'avg-eb',
+                name: 'Avg effective balance',
+                value: `${(activeStake / activeCount).toFixed(1)} ETH`,
+              },
+              {
+                id: 'entry',
+                name: 'Entry queue',
+                value: entryEth === null ? '—' : formatEth(entryEth),
+              },
+              {
+                id: 'exit',
+                name: 'Exit queue',
+                value: exitEth === null ? '—' : formatEth(exitEth),
+              },
+            ]}
           />
-        </Card>
 
-        <PopoutCard
-          title="Stake by credential type"
-          anchorId="stake-by-credential"
-          modalSize="full"
-          headerActions={fixture.weeklyCredential.some(w => w.modelled) ? <MockBadge /> : undefined}
-        >
-          {({ inModal }) => (
-            <MultiLineChart
-              series={[
-                ...CREDENTIAL_TYPES.map(ct => ({
-                  name: CREDENTIAL_LABELS[ct],
-                  data: days.map(d => Math.round(d.credential[ct].effectiveBalanceEth)),
-                  color: credentialColors[ct],
-                  ...area('stake'),
-                })),
-                {
-                  name: 'Active validators',
-                  data: days.map(d => Math.round(d.status.active + d.status.exiting)),
-                  color: themeColors.foreground,
-                  yAxisIndex: 1,
-                  showSymbol: false,
-                },
-              ]}
-              xAxis={{ type: 'category', labels }}
-              yAxis={{ name: 'Staked ETH', min: 0 }}
-              secondaryYAxis={{ name: 'Active validators', min: 0 }}
-              height={inModal ? 600 : 380}
-              showLegend
-              legendPosition="top"
-              enableDataZoom
-              markLines={dailyForkMarks}
-              syncGroup={inModal ? undefined : 'validators-overview'}
-            />
-          )}
-        </PopoutCard>
-
-        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-          <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
-            {({ inModal }) => (
-              <MultiLineChart
-                series={[
-                  {
-                    name: 'Active',
-                    data: days.map(d => Math.round(d.status.active)),
-                    color: themeColors.success,
-                    ...area('status'),
-                  },
-                  {
-                    name: 'Exiting',
-                    data: days.map(d => Math.round(d.status.exiting)),
-                    color: themeColors.warning,
-                    ...area('status'),
-                  },
-                  {
-                    name: 'Pending',
-                    data: days.map(d => Math.round(d.status.pending)),
-                    color: palette[0],
-                    ...area('status'),
-                  },
-                  {
-                    name: 'Exited',
-                    initiallyVisible: false,
-                    data: days.map(d => Math.round(d.status.exited + d.status.withdrawn)),
-                    color: themeColors.muted,
-                    showSymbol: false,
-                    lineStyle: 'dashed',
-                  },
-                ]}
-                xAxis={{ type: 'category', labels }}
-                yAxis={{ name: 'Validators', min: 0 }}
-                height={inModal ? 600 : 300}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                markLines={dailyForkMarks}
-                syncGroup={inModal ? undefined : 'validators-overview'}
-              />
-            )}
-          </PopoutCard>
-
-          <PopoutCard
-            title="Effective balance distribution"
-            anchorId="effective-balance-distribution"
-            modalSize="full"
-            headerActions={
+          <Card
+            title="Credential mix"
+            actions={
               <SegmentedControl
                 options={[
                   { value: 'stake', label: 'Stake' },
                   { value: 'validators', label: 'Validators' },
                 ]}
-                value={ebMode}
-                onChange={setEbMode}
-                ariaLabel="Distribution measure"
+                value={mixMode}
+                onChange={setMixMode}
+                ariaLabel="Credential mix measure"
               />
             }
           >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={CREDENTIAL_TYPES.map(ct => ({
-                  name: CREDENTIAL_LABELS[ct],
-                  data: EB_BUCKETS.map(b =>
-                    snapshot.effectiveBalanceHistogram
-                      .filter(
-                        h => h.credentialType === ct && h.effectiveBalanceEth >= b.min && h.effectiveBalanceEth <= b.max
-                      )
-                      .reduce((a, h) => a + (ebMode === 'stake' ? h.count * h.effectiveBalanceEth : h.count), 0)
-                  ),
-                  color: credentialColors[ct],
-                  ...bar('eb'),
-                }))}
-                xAxis={{ type: 'category', labels: EB_BUCKETS.map(b => b.label), name: 'Effective balance (ETH)' }}
-                yAxis={{ name: ebMode === 'stake' ? 'ETH' : 'Validators', min: 0 }}
-                height={inModal ? 600 : 300}
-                showLegend
-                legendPosition="top"
-              />
-            )}
-          </PopoutCard>
-        </div>
+            <StackedBar
+              segments={CREDENTIAL_TYPES.map(ct => ({
+                name: CREDENTIAL_LABELS[ct],
+                value: mixMode === 'stake' ? activeByType[ct].stake : activeByType[ct].count,
+                color: credentialColors[ct],
+              }))}
+              showPercentages
+              showLegend
+              valueFormatter={v => (mixMode === 'stake' ? formatEth(v) : formatCompact(v))}
+            />
+          </Card>
 
-        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-          <PopoutCard title="Entry and exit queues" anchorId="queues" modalSize="full" headerActions={<MockBadge />}>
+          <PopoutCard title="Stake by credential type" anchorId="stake-by-credential" modalSize="full">
             {({ inModal }) => (
               <MultiLineChart
                 series={[
+                  ...CREDENTIAL_TYPES.map(ct => ({
+                    name: CREDENTIAL_LABELS[ct],
+                    data: days.map(d => Math.round(d.credential[ct].effectiveBalanceEth)),
+                    color: credentialColors[ct],
+                    ...area('stake'),
+                  })),
                   {
-                    name: 'Entry',
-                    data: days.map(d => Math.round(d.activationQueueEth)),
-                    color: themeColors.success,
-                    showArea: true,
-                    areaOpacity: 0.3,
-                    showSymbol: false,
-                  },
-                  {
-                    name: 'Exit',
-                    data: days.map(d => -Math.round(d.exitQueueEth)),
-                    color: themeColors.danger,
-                    showArea: true,
-                    areaOpacity: 0.3,
-                    showSymbol: false,
-                  },
-                ]}
-                xAxis={{ type: 'category', labels }}
-                yAxis={{ name: 'Queued ETH', formatter: v => formatCompact(Math.abs(v)) }}
-                height={inModal ? 600 : 300}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                markLines={dailyForkMarks}
-                syncGroup={inModal ? undefined : 'validators-overview'}
-              />
-            )}
-          </PopoutCard>
-
-          <PopoutCard
-            title={weekly ? 'Validator operations per week' : 'Validator operations per day'}
-            anchorId="operations"
-            modalSize="full"
-            headerActions={<MockBadge />}
-          >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={(
-                  [
-                    ['New deposits', d => d.ops.deposits, palette[0]],
-                    ['Top-ups', d => d.ops.topUps, palette[4]],
-                    ['Consolidations', d => d.ops.consolidations, palette[1]],
-                    ['Switch to 0x02', d => d.ops.switchToCompounding, palette[10]],
-                    ['Partial withdrawal requests', d => d.ops.partialWithdrawalRequests, palette[2]],
-                    ['Exit requests (EL)', d => d.ops.fullExitRequests, palette[6]],
-                    ['Voluntary exits', d => d.ops.voluntaryExits, palette[3]],
-                  ] as [string, (d: OverviewDay) => number, string][]
-                ).map(([name, pick, color]) => ({
-                  name,
-                  data: buckets.map(b => sum(b.days, pick)),
-                  color,
-                  ...bar('ops'),
-                }))}
-                xAxis={{ type: 'category', labels: bucketLabels }}
-                yAxis={{ name: 'Operations', min: 0 }}
-                height={inModal ? 600 : 300}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                markLines={bucketForkMarks}
-              />
-            )}
-          </PopoutCard>
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-          <PopoutCard
-            title={weekly ? 'ETH in and out per week' : 'ETH in and out per day'}
-            anchorId="flows"
-            modalSize="full"
-            headerActions={<MockBadge />}
-          >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={[
-                  {
-                    name: 'Deposited',
-                    data: buckets.map(b => Math.round(sum(b.days, d => d.flows.depositedEth))),
-                    color: themeColors.success,
-                    ...bar('flows'),
-                  },
-                  {
-                    name: 'Reward skims',
-                    data: buckets.map(b => -Math.round(sum(b.days, d => d.flows.skimmedEth))),
-                    color: palette[2],
-                    ...bar('flows'),
-                  },
-                  {
-                    name: 'Full withdrawals',
-                    data: buckets.map(b => -Math.round(sum(b.days, d => d.flows.fullWithdrawnEth))),
-                    color: themeColors.danger,
-                    ...bar('flows'),
-                  },
-                  {
-                    name: 'Net',
-                    data: buckets.map(b =>
-                      Math.round(sum(b.days, d => d.flows.depositedEth - d.flows.skimmedEth - d.flows.fullWithdrawnEth))
-                    ),
-                    color: themeColors.foreground,
-                    showSymbol: false,
-                  },
-                ]}
-                xAxis={{ type: 'category', labels: bucketLabels }}
-                yAxis={{ name: 'ETH' }}
-                height={inModal ? 600 : 300}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                markLines={bucketForkMarks}
-              />
-            )}
-          </PopoutCard>
-
-          <PopoutCard
-            title={weekly ? 'Consensus rewards per week' : 'Consensus rewards per day'}
-            anchorId="rewards"
-            modalSize="full"
-            headerActions={<MockBadge />}
-          >
-            {({ inModal }) => (
-              <MultiLineChart
-                series={[
-                  {
-                    name: 'Attestations',
-                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.attestationEth))),
-                    color: palette[0],
-                    ...bar('rewards'),
-                  },
-                  {
-                    name: 'Proposals',
-                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.proposerEth))),
-                    color: palette[7],
-                    ...bar('rewards'),
-                  },
-                  {
-                    name: 'Sync committee',
-                    data: buckets.map(b => Math.round(sum(b.days, d => d.rewards.syncEth))),
-                    color: palette[4],
-                    ...bar('rewards'),
-                  },
-                  {
-                    name: 'Penalties',
-                    data: buckets.map(b => -Math.round(sum(b.days, d => d.rewards.penaltiesEth))),
-                    color: themeColors.danger,
-                    ...bar('rewards'),
-                  },
-                  {
-                    name: 'APR',
-                    data: buckets.map(b => {
-                      const stake = CREDENTIAL_TYPES.reduce(
-                        (a, ct) => a + b.last.credential[ct].effectiveBalanceEth,
-                        0
-                      );
-                      const r = sum(
-                        b.days,
-                        d =>
-                          d.rewards.attestationEth + d.rewards.proposerEth + d.rewards.syncEth - d.rewards.penaltiesEth
-                      );
-                      return Number(((((r / b.days.length) * 365) / stake) * 100).toFixed(2));
-                    }),
+                    name: 'Active validators',
+                    data: days.map(d => Math.round(d.status.active + d.status.exiting)),
                     color: themeColors.foreground,
                     yAxisIndex: 1,
                     showSymbol: false,
                   },
                 ]}
-                xAxis={{ type: 'category', labels: bucketLabels }}
-                yAxis={{ name: 'ETH' }}
-                secondaryYAxis={{ name: 'APR', formatter: v => `${v}%` }}
-                height={inModal ? 600 : 300}
+                xAxis={{ type: 'category', labels }}
+                yAxis={{ name: 'Staked ETH', min: 0 }}
+                secondaryYAxis={{ name: 'Active validators', min: 0 }}
+                height={inModal ? 600 : 380}
                 showLegend
                 legendPosition="top"
                 enableDataZoom
-                markLines={bucketForkMarks}
+                markLines={periodForkMarks}
+                syncGroup={inModal ? undefined : 'validators-overview'}
               />
             )}
           </PopoutCard>
-        </div>
 
-        <PopoutCard title="Duty performance" anchorId="duty-performance" modalSize="full">
-          {({ inModal }) => (
-            <MultiLineChart
-              series={[
-                {
-                  name: 'Attestation participation',
-                  data: participationSeries,
-                  color: palette[0],
-                  showSymbol: false,
-                },
-                { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
-                {
-                  name: 'Missed slots',
-                  data: missedSeries,
-                  color: themeColors.danger,
-                  showSymbol: false,
-                  yAxisIndex: 1,
-                },
-              ]}
-              xAxis={{ type: 'category', labels }}
-              yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
-              secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
-              height={inModal ? 600 : 280}
-              showLegend
-              legendPosition="top"
-              enableDataZoom
-              connectNulls
-              markLines={dailyForkMarks}
-              syncGroup={inModal ? undefined : 'validators-overview'}
+          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={[
+                    {
+                      name: 'Active',
+                      data: days.map(d => Math.round(d.status.active)),
+                      color: themeColors.success,
+                      ...area('status'),
+                    },
+                    {
+                      name: 'Exiting',
+                      data: days.map(d => Math.round(d.status.exiting)),
+                      color: themeColors.warning,
+                      ...area('status'),
+                    },
+                    {
+                      name: 'Pending',
+                      data: days.map(d => Math.round(d.status.pending)),
+                      color: palette[0],
+                      ...area('status'),
+                    },
+                    {
+                      name: 'Exited',
+                      initiallyVisible: false,
+                      data: days.map(d => Math.round(d.status.exited)),
+                      color: themeColors.muted,
+                      showSymbol: false,
+                      lineStyle: 'dashed',
+                    },
+                  ]}
+                  xAxis={{ type: 'category', labels }}
+                  yAxis={{ name: 'Validators', min: 0 }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  markLines={periodForkMarks}
+                  syncGroup={inModal ? undefined : 'validators-overview'}
+                />
+              )}
+            </PopoutCard>
+
+            <PopoutCard
+              title="Effective balance distribution"
+              anchorId="effective-balance-distribution"
+              modalSize="full"
+              headerActions={
+                <SegmentedControl
+                  options={[
+                    { value: 'stake', label: 'Stake' },
+                    { value: 'validators', label: 'Validators' },
+                  ]}
+                  value={ebMode}
+                  onChange={setEbMode}
+                  ariaLabel="Distribution measure"
+                />
+              }
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={CREDENTIAL_TYPES.map(ct => ({
+                    name: CREDENTIAL_LABELS[ct],
+                    data: EB_BUCKETS.map(b =>
+                      (snapshot?.histogram ?? [])
+                        .filter(
+                          h =>
+                            h.credential_type === ct &&
+                            (h.effective_balance_eth ?? 0) >= b.min &&
+                            (h.effective_balance_eth ?? 0) <= b.max
+                        )
+                        .reduce(
+                          (a, h) =>
+                            a +
+                            (ebMode === 'stake'
+                              ? (h.validator_count ?? 0) * (h.effective_balance_eth ?? 0)
+                              : (h.validator_count ?? 0)),
+                          0
+                        )
+                    ),
+                    color: credentialColors[ct],
+                    ...bar('eb'),
+                  }))}
+                  xAxis={{ type: 'category', labels: EB_BUCKETS.map(b => b.label), name: 'Effective balance (ETH)' }}
+                  yAxis={{ name: ebMode === 'stake' ? 'ETH' : 'Validators', min: 0 }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                />
+              )}
+            </PopoutCard>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <PopoutCard title="Entry and exit queues" anchorId="queues" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={[
+                    {
+                      name: 'Entry',
+                      data: days.map(d => (d.activationQueueEth === null ? null : Math.round(d.activationQueueEth))),
+                      color: themeColors.success,
+                      showArea: true,
+                      areaOpacity: 0.3,
+                      showSymbol: false,
+                    },
+                    {
+                      name: 'Exit',
+                      data: days.map(d => (d.exitQueueEth === null ? null : -Math.round(d.exitQueueEth))),
+                      color: themeColors.danger,
+                      showArea: true,
+                      areaOpacity: 0.3,
+                      showSymbol: false,
+                    },
+                  ]}
+                  xAxis={{ type: 'category', labels }}
+                  yAxis={{ name: 'Queued ETH', formatter: v => formatCompact(Math.abs(v)) }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  markLines={periodForkMarks}
+                  syncGroup={inModal ? undefined : 'validators-overview'}
+                />
+              )}
+            </PopoutCard>
+
+            <PopoutCard title={`Validator operations ${perPeriod}`} anchorId="operations" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={(
+                    [
+                      ['New deposits', d => opCount(d, 'deposit'), palette[0]],
+                      ['Top-ups', d => opCount(d, 'top_up'), palette[4]],
+                      ['Consolidations', d => opCount(d, 'consolidation'), palette[1]],
+                      ['Switch to 0x02', d => opCount(d, 'switch_to_compounding'), palette[10]],
+                      ['Partial withdrawal requests', d => opCount(d, 'withdrawal_request'), palette[2]],
+                      ['Exit requests (EL)', d => opCount(d, 'exit_request'), palette[6]],
+                      ['Voluntary exits', d => opCount(d, 'voluntary_exit'), palette[3]],
+                    ] as [string, (d: OverviewPeriod) => number | null, string][]
+                  ).map(([name, pick, color]) => ({
+                    name,
+                    data: days.map(pick),
+                    color,
+                    ...bar('ops'),
+                  }))}
+                  xAxis={{ type: 'category', labels }}
+                  yAxis={{ name: 'Operations', min: 0 }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  markLines={periodForkMarks}
+                />
+              )}
+            </PopoutCard>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <PopoutCard title={`ETH in and out ${perPeriod}`} anchorId="flows" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={[
+                    {
+                      name: 'Deposited',
+                      data: days.map(d => flow(d, ['deposit', 'top_up'], [])),
+                      color: themeColors.success,
+                      ...bar('flows'),
+                    },
+                    {
+                      name: 'Reward skims',
+                      data: days.map(d => flow(d, [], ['withdrawal_partial'])),
+                      color: palette[2],
+                      ...bar('flows'),
+                    },
+                    {
+                      name: 'Full withdrawals',
+                      data: days.map(d => flow(d, [], ['withdrawal_full'])),
+                      color: themeColors.danger,
+                      ...bar('flows'),
+                    },
+                    {
+                      name: 'Net',
+                      data: days.map(d => flow(d, ['deposit', 'top_up'], ['withdrawal_partial', 'withdrawal_full'])),
+                      color: themeColors.foreground,
+                      showSymbol: false,
+                    },
+                  ]}
+                  xAxis={{ type: 'category', labels }}
+                  yAxis={{ name: 'ETH' }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  markLines={periodForkMarks}
+                />
+              )}
+            </PopoutCard>
+
+            <PopoutCard title={`Consensus rewards ${perPeriod}`} anchorId="rewards" modalSize="full">
+              {({ inModal }) => (
+                <MultiLineChart
+                  series={[
+                    {
+                      name: 'Attestations',
+                      data: days.map(d => (d.rewards ? Math.round(d.rewards.attestationEth) : null)),
+                      color: palette[0],
+                      ...bar('rewards'),
+                    },
+                    {
+                      name: 'Proposals',
+                      data: days.map(d => (d.rewards ? Math.round(d.rewards.proposerEth) : null)),
+                      color: palette[7],
+                      ...bar('rewards'),
+                    },
+                    {
+                      name: 'Sync committee',
+                      data: days.map(d => (d.rewards ? Math.round(d.rewards.syncEth) : null)),
+                      color: palette[4],
+                      ...bar('rewards'),
+                    },
+                    {
+                      name: 'Penalties',
+                      data: days.map(d => (d.rewards ? -Math.round(d.rewards.penaltiesEth) : null)),
+                      color: themeColors.danger,
+                      ...bar('rewards'),
+                    },
+                    {
+                      name: 'APR',
+                      data: days.map(d => {
+                        const stake = CREDENTIAL_TYPES.reduce((a, ct) => a + d.credential[ct].effectiveBalanceEth, 0);
+                        if (!d.rewards || !stake) return null;
+                        const r =
+                          d.rewards.attestationEth + d.rewards.proposerEth + d.rewards.syncEth - d.rewards.penaltiesEth;
+                        return Number(((((r / d.dayCount) * 365) / stake) * 100).toFixed(2));
+                      }),
+                      color: themeColors.foreground,
+                      yAxisIndex: 1,
+                      showSymbol: false,
+                    },
+                  ]}
+                  xAxis={{ type: 'category', labels }}
+                  yAxis={{ name: 'ETH' }}
+                  secondaryYAxis={{ name: 'APR', formatter: v => `${v}%` }}
+                  height={inModal ? 600 : 300}
+                  showLegend
+                  legendPosition="top"
+                  enableDataZoom
+                  markLines={periodForkMarks}
+                />
+              )}
+            </PopoutCard>
+          </div>
+
+          <PopoutCard title="Duty performance" anchorId="duty-performance" modalSize="full">
+            {({ inModal }) => (
+              <MultiLineChart
+                series={[
+                  {
+                    name: 'Attestation participation',
+                    data: participationSeries,
+                    color: palette[0],
+                    showSymbol: false,
+                  },
+                  { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
+                  {
+                    name: 'Missed slots',
+                    data: missedSeries,
+                    color: themeColors.danger,
+                    showSymbol: false,
+                    yAxisIndex: 1,
+                  },
+                ]}
+                xAxis={{ type: 'category', labels: dutyLabels }}
+                yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
+                secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
+                height={inModal ? 600 : 280}
+                showLegend
+                legendPosition="top"
+                enableDataZoom
+                connectNulls
+                markLines={dutyForkMarks}
+                syncGroup={inModal ? undefined : 'validators-overview'}
+              />
+            )}
+          </PopoutCard>
+
+          <TableCard
+            title="Entities by stake"
+            filters={<TableSearch value={entitySearch} onChange={setEntitySearch} placeholder="Search entities" />}
+          >
+            <DataTable
+              data={entities}
+              columns={entityColumns}
+              pageSize={10}
+              hideGlobalFilter
+              hideColumnVisibility
+              getRowId={e => e.entity}
+              emptyMessage="No entities match this search"
             />
-          )}
-        </PopoutCard>
-
-        <TableCard
-          title="Entities by stake"
-          filters={<TableSearch value={entitySearch} onChange={setEntitySearch} placeholder="Search entities" />}
-        >
-          <DataTable
-            data={entities}
-            columns={entityColumns}
-            pageSize={10}
-            hideGlobalFilter
-            hideColumnVisibility
-            getRowId={e => e.entity}
-            emptyMessage="No entities match this search"
-          />
-        </TableCard>
-      </div>
+          </TableCard>
+        </div>
+      )}
     </Container>
   );
 }

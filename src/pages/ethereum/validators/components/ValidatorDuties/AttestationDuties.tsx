@@ -9,7 +9,6 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { useAttestationDuties, type AttestationDuty, type AttestationOutcome } from '../../hooks/useAttestationDuties';
 import { useCursorPagination } from '../../hooks/useCursorPagination';
-import { attestationRewardGwei } from '../../utils/rewards';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
 import { formatGwei, shortRoot } from './format';
 
@@ -37,7 +36,6 @@ interface AttestationDutiesProps {
   onValidatorChange: (validator: number | null) => void;
   from: number;
   to: number;
-  effectiveBalanceEth: (validatorIndex: number, timestamp: number) => number;
 }
 
 /**
@@ -49,7 +47,6 @@ export function AttestationDuties({
   onValidatorChange,
   from,
   to,
-  effectiveBalanceEth,
 }: AttestationDutiesProps): JSX.Element {
   const [outcome, setOutcome] = useState<AttestationOutcome>('all');
   const [slotQuery, setSlotQuery] = useState('');
@@ -163,17 +160,10 @@ export function AttestationDuties({
     },
     {
       id: 'reward',
-      header: 'Reward (est.)',
+      header: 'Reward',
       cell: ({ row }) => {
-        const d = row.original;
-        const gwei = attestationRewardGwei({
-          effectiveBalanceEth: effectiveBalanceEth(d.validatorIndex, d.timestamp),
-          attested: d.attested,
-          sourceCorrect: d.sourceCorrect,
-          targetCorrect: d.targetCorrect,
-          headCorrect: d.headCorrect,
-          inclusionDistance: d.inclusionDistance,
-        });
+        const gwei = row.original.rewardGwei;
+        if (gwei === null || gwei === undefined) return '—';
         return <span className={gwei < 0 ? 'text-danger' : 'text-foreground'}>{formatGwei(gwei)}</span>;
       },
       meta: { cellClassName: 'tabular-nums' },

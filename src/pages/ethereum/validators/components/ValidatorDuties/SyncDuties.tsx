@@ -6,10 +6,12 @@ import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import { fctSyncCommitteeParticipationByValidatorServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import {
+  fctSyncCommitteeParticipationByValidatorServiceListOptions,
+  fctSyncCommitteeRewardByValidatorServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
 import type { FctSyncCommitteeParticipationByValidator } from '@/api/types.gen';
 import { useCursorPagination } from '../../hooks/useCursorPagination';
-import { SYNC_REWARD_PER_SLOT_GWEI } from '../../utils/rewards';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
 import { formatGwei } from './format';
 
@@ -50,6 +52,24 @@ export function SyncDuties({ indices, validator, onValidatorChange, from, to }: 
     placeholderData: keepPreviousData,
   });
   const rows = data?.fct_sync_committee_participation_by_validator ?? [];
+  const slotTimes = rows.map(r => r.slot_start_date_time ?? 0);
+  const rewards = useQuery({
+    ...fctSyncCommitteeRewardByValidatorServiceListOptions({
+      query: {
+        validator_index_in_values: [...new Set(rows.map(r => r.validator_index ?? 0))].join(','),
+        slot_start_date_time_gte: Math.min(...slotTimes),
+        slot_start_date_time_lte: Math.max(...slotTimes),
+        page_size: 10_000,
+      },
+    }),
+    enabled: rows.length > 0,
+  });
+  const rewardBySlot = new Map(
+    rewards.data?.fct_sync_committee_reward_by_validator?.map(r => [
+      `${r.validator_index}:${r.slot}`,
+      Number(r.reward ?? 0),
+    ])
+  );
   const nextPageToken = data?.next_page_token || undefined;
 
   const { recordNextToken } = page;
@@ -95,9 +115,10 @@ export function SyncDuties({ indices, validator, onValidatorChange, from, to }: 
     },
     {
       id: 'reward',
-      header: 'Reward (est.)',
+      header: 'Reward',
       cell: ({ row }) => {
-        const gwei = row.original.participated ? SYNC_REWARD_PER_SLOT_GWEI : -SYNC_REWARD_PER_SLOT_GWEI;
+        const gwei = rewardBySlot.get(`${row.original.validator_index}:${row.original.slot}`);
+        if (gwei === null || gwei === undefined) return '—';
         return <span className={gwei < 0 ? 'text-danger' : 'text-foreground'}>{formatGwei(gwei)}</span>;
       },
       meta: { cellClassName: 'tabular-nums' },
