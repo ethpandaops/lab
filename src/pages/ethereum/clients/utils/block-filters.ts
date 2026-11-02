@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { FctBlockGraffitiServiceListData } from '@/api/types.gen';
 import { entityQuery } from './client-share';
+import { offsetPageToken } from '@/utils/page-token';
 
 /** Rows per page the block tables offer */
 export const BLOCK_PAGE_SIZES = [10, 25, 50, 100] as const;
@@ -131,14 +132,6 @@ export function parseSort(
   return { field: 'slot_start_date_time', desc: true };
 }
 
-/**
- * Page token for a 1-based page. The API's tokens encode the row offset, so any page is reachable directly
- * rather than only by following next_page_token.
- */
-export function pageToken(page: number, size: number): string | undefined {
-  return page > 1 ? btoa(`offset:${(page - 1) * size}`) : undefined;
-}
-
 type GraffitiQuery = NonNullable<FctBlockGraffitiServiceListData['query']>;
 
 /**
@@ -170,7 +163,7 @@ export function graffitiBlocksQuery(search: BlockSearch, genesisTime: number): G
     ...(search.graffiti && { graffiti_text_contains: search.graffiti }),
     order_by: order,
     page_size: size,
-    page_token: pageToken(search.page ?? 1, size),
+    page_token: offsetPageToken((search.page ?? 1) - 1, size),
   };
 }
 
