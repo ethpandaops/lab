@@ -8,9 +8,6 @@ import { displayVersion, summariseVersions, windowStart } from '../../utils/clie
 import { ReleasesTable } from '../ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
-/** Most days of Xatu node versions the table reads */
-const NODE_SAMPLE_DAYS = 90;
-
 /**
  * Every published release with how many blocks and Xatu nodes ran it over the window.
  */
@@ -35,8 +32,7 @@ export function ReleasesTab({
     () => new Map(summariseVersions(blockCounts.rows).map(summary => [summary.version, summary.blocks])),
     [blockCounts.rows]
   );
-  // Every node reports every day, so long windows read evenly spaced days
-  const nodeDays = useNodeVersions(client, days, layer === 'consensus', NODE_SAMPLE_DAYS);
+  const nodeDays = useNodeVersions(client, days, layer === 'consensus');
   // Distinct nodes that reported each version on any day of the window
   const nodesByVersion = useMemo(() => {
     const nodeIds = new Map<string, Set<string>>();
@@ -61,11 +57,6 @@ export function ReleasesTab({
     <Card
       rounded
       title="Releases"
-      subtitle={
-        nodeDays.sampledDays !== null
-          ? `Xatu nodes from ${nodeDays.sampledDays} days spread across the window`
-          : undefined
-      }
       actions={
         <SegmentedControl
           options={SHARE_WINDOW_OPTIONS}
