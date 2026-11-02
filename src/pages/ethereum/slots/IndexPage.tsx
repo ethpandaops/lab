@@ -1,279 +1,421 @@
-import { type JSX, useMemo, useCallback, type ReactNode } from 'react';
+import { type JSX, type MouseEvent, type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import { createColumnHelper, type SortingState, type VisibilityState } from '@tanstack/react-table';
+import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { Table } from '@/components/Lists/Table';
-import type { Column } from '@/components/Lists/Table/Table.types';
+import { DataTable } from '@/components/DataTable';
+import { Alert } from '@/components/Feedback/Alert';
+import { Button } from '@/components/Elements/Button';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Slot } from '@/components/Ethereum/Slot';
+import { Epoch } from '@/components/Ethereum/Epoch';
 import { Entity } from '@/components/Ethereum/Entity';
 import { Validator } from '@/components/Ethereum/Validator';
-import { useSlotsPage, type SlotData } from './hooks';
-import { RangePager } from '@/components/Lists/RangePager';
-import { Alert } from '@/components/Feedback/Alert';
+import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getForkEpoch } from '@/utils/forks';
-import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { Epoch } from '@/components/Ethereum/Epoch';
-import clsx from 'clsx';
+import { formatSlot, truncateAddress, weiToEth } from '@/utils';
+import { useSlotsPage } from './hooks';
+import { SlotsFilters } from './components/SlotsFilters';
+import type { SlotRow } from './utils/slot-query';
+import {
+  DEFAULT_PAGE_SIZE,
+  SLOT_FILTER_KEYS,
+  SLOT_SORTS,
+  type SlotFilters,
+  type SlotSort,
+  type SlotsSearch,
+} from './IndexPage.types';
+
+const column = createColumnHelper<SlotRow>();
+
+const STATUS_STYLES = {
+  proposed: { label: 'Proposed', className: 'text-muted' },
+  missed: { label: 'Missed', className: 'text-danger' },
+  orphaned: { label: 'Orphaned', className: 'text-warning' },
+} as const;
+
+/** Columns off by default; the Columns menu brings them back */
+const HIDDEN_BY_DEFAULT: VisibilityState = { epoch: false, relays: false, builder: false, value: false, block: false };
+
+function Muted(): JSX.Element {
+  return <span className="text-muted">-</span>;
+}
+
+/** A cell value that narrows the list to rows sharing it */
+function FilterButton({
+  onClick,
+  title,
+  className,
+  children,
+}: {
+  onClick: () => void;
+  title: string;
+  className?: string;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={(event: MouseEvent) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      className={clsx('cursor-pointer transition-colors hover:text-primary hover:underline', className)}
+    >
+      {children}
+    </button>
+  );
+}
 
 /**
- * Slots list page component.
- *
- * Displays a paginated table of recent Ethereum consensus layer slots with:
- * - Slot number
- * - Epoch number
- * - Proposer validator index
- * - Blob count
- * - Status (canonical, orphaned, missed)
- * - Bidirectional pagination (load newer/older slots)
- * - Smooth animations and visual polish
- *
- * Rows are clickable to navigate to slot detail page if data is available.
+ * Slots list: the latest slots by default, narrowed and reordered by filters and sorts that live in the URL.
  */
 export function IndexPage(): JSX.Element {
-  const { from } = useSearch({ from: '/ethereum/slots/' });
-  const { slots, page, isLoading, isPlaceholderData, error } = useSlotsPage(from);
+  const navigate = useNavigate({ from: '/ethereum/slots/' });
+  const search = useSearch({ from: '/ethereum/slots/' }) as SlotsSearch;
   const { currentNetwork } = useNetwork();
   const hasGloas = currentNetwork ? getForkEpoch(currentNetwork, 'gloas') !== null : false;
-  const navigate = useNavigate();
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(HIDDEN_BY_DEFAULT);
 
-  /**
-   * Capture the initial current slot once on mount
-   */
+  const filters = useMemo(
+    () => Object.fromEntries(SLOT_FILTER_KEYS.map(key => [key, search[key]])) as SlotFilters,
+    [search]
+  );
+  const sort: SlotSort = search.sort ?? 'slot';
+  const dir = sort === 'slot' ? 'desc' : (search.dir ?? 'desc');
+  const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
+  const pageIndex = search.page ?? 0;
 
-  /**
-   * Handle row click to navigate to slot detail page
-   */
-  const handleRowClick = useCallback(
-    (slot: SlotData) => {
-      if (slot.hasData && slot.slot > 0) {
-        navigate({ to: '/ethereum/slots/$slot', params: { slot: slot.slot.toString() } });
+  const { data, isLoading, isPlaceholderData, error } = useSlotsPage(
+    { filters, sort, dir, pageSize, cursor: search.cursor },
+    hasGloas
+  );
+  const rows = data?.rows ?? [];
+
+  // Cursors of pages already visited, so Previous works for value sorts where only Next can be derived
+  const visited = useRef(new Map<string, string | undefined>());
+  const viewKey = JSON.stringify([filters, sort, dir, pageSize]);
+
+  const setFilters = useCallback(
+    (next: SlotFilters) =>
+      navigate({
+        search: prev => ({
+          ...prev,
+          ...Object.fromEntries(SLOT_FILTER_KEYS.map(key => [key, next[key]])),
+          page: undefined,
+          cursor: undefined,
+        }),
+      }),
+    [navigate]
+  );
+
+  const addFilter = useCallback((patch: SlotFilters) => setFilters({ ...filters, ...patch }), [filters, setFilters]);
+
+  const goToPage = useCallback(
+    (page: number, cursor: string | undefined) => {
+      visited.current.set(`${viewKey}|${pageIndex}`, search.cursor);
+      navigate({ search: prev => ({ ...prev, page: page || undefined, cursor: page ? cursor : undefined }) });
+    },
+    [navigate, viewKey, pageIndex, search.cursor]
+  );
+
+  const handlePagination = useCallback(
+    (nextIndex: number, nextSize: number) => {
+      if (nextSize !== pageSize) {
+        navigate({
+          search: prev => ({
+            ...prev,
+            pageSize: nextSize === DEFAULT_PAGE_SIZE ? undefined : nextSize,
+            page: undefined,
+            cursor: undefined,
+          }),
+        });
+        return;
       }
+      if (nextIndex > pageIndex && data?.nextCursor) {
+        goToPage(pageIndex + 1, data.nextCursor);
+      } else if (nextIndex < pageIndex) {
+        const target = pageIndex - 1;
+        const key = `${viewKey}|${target}`;
+        if (sort === 'slot') goToPage(target, data?.prevCursor);
+        // Value orders can only page forwards; without the earlier cursor (e.g. after a reload) start over
+        else if (visited.current.has(key)) goToPage(target, visited.current.get(key));
+        else goToPage(0, undefined);
+      }
+    },
+    [navigate, pageSize, pageIndex, data, goToPage, viewKey, sort]
+  );
+
+  const sorting: SortingState = useMemo(() => [{ id: sort, desc: dir === 'desc' }], [sort, dir]);
+  const handleSorting = useCallback(
+    (next: SortingState) => {
+      const [first] = next;
+      const id = first && (SLOT_SORTS as readonly string[]).includes(first.id) ? (first.id as SlotSort) : 'slot';
+      navigate({
+        search: prev => ({
+          ...prev,
+          sort: id === 'slot' ? undefined : id,
+          dir: id === 'slot' || first?.desc !== false ? undefined : 'asc',
+          page: undefined,
+          cursor: undefined,
+        }),
+      });
     },
     [navigate]
   );
 
-  const goToPage = useCallback(
-    (next: number | undefined) => navigate({ to: '/ethereum/slots', search: prev => ({ ...prev, from: next }) }),
-    [navigate]
-  );
-
-  /**
-   * Skeleton data for loading state
-   */
-  const skeletonColumns = useMemo<Column<{ id: number }>[]>(
+  const columns = useMemo(
     () => [
-      {
+      column.accessor('slot', {
+        id: 'slot',
         header: 'Slot',
-        accessor: () => <LoadingContainer className="h-5 w-20 rounded-sm" shimmer={false} />,
-      },
-      {
+        cell: info => <Slot slot={info.getValue()} />,
+        sortDescFirst: true,
+        meta: { cellClassName: 'font-medium text-foreground' },
+        enableHiding: false,
+      }),
+      column.accessor('epoch', {
+        id: 'epoch',
         header: 'Epoch',
-        accessor: () => <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />,
-      },
-      {
-        header: 'Timestamp',
-        accessor: () => <LoadingContainer className="h-4 w-40 rounded-sm" shimmer={false} />,
-      },
-      {
-        header: 'Relative Time',
-        accessor: () => <LoadingContainer className="h-4 w-28 rounded-sm" shimmer={false} />,
-      },
-      {
-        header: 'Proposer Index',
-        accessor: () => <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />,
-      },
-      {
-        header: 'Proposer Entity',
-        accessor: () => <LoadingContainer className="h-5 w-24 rounded-sm" shimmer={false} />,
-      },
-      {
-        header: 'Blob Count',
-        accessor: () => <LoadingContainer className="h-5 w-8 rounded-sm" shimmer={false} />,
-      },
-      {
+        cell: info => <Epoch epoch={info.getValue()} />,
+        enableSorting: false,
+      }),
+      column.accessor('timestamp', {
+        id: 'time',
+        header: 'Time',
+        cell: info => <Timestamp timestamp={info.getValue()} format="relative" className="text-muted" />,
+        enableSorting: false,
+      }),
+      column.accessor('proposerIndex', {
+        id: 'proposer',
+        header: 'Proposer',
+        cell: info => {
+          const index = info.getValue();
+          return index === null ? <Muted /> : <Validator index={index} />;
+        },
+        enableSorting: false,
+      }),
+      column.accessor('entity', {
+        id: 'entity',
+        header: 'Entity',
+        cell: info => <Entity entity={info.getValue()} />,
+        enableSorting: false,
+      }),
+      column.accessor('status', {
+        id: 'status',
         header: 'Status',
-        accessor: () => <LoadingContainer className="h-5 w-20 rounded-sm" shimmer={false} />,
-      },
-    ],
-    []
-  );
-
-  const skeletonData = useMemo(() => Array.from({ length: 10 }, (_, i) => ({ id: i })), []);
-
-  /**
-   * Table column definitions
-   */
-
-  /**
-   * Prepend initial current slot to the slots array for display (only once on mount)
-   */
-
-  const columns = useMemo<Column<SlotData>[]>(
-    () => [
-      {
-        header: 'Slot',
-        accessor: (row): ReactNode => <Slot slot={row.slot} />,
-        cellClassName: 'text-foreground font-semibold',
-      },
-      {
-        header: 'Epoch',
-        accessor: (row): ReactNode => {
-          const rowIndex = slots.findIndex(s => s.slot === row.slot);
-          const isEpochTransition = rowIndex > 0 && row.epoch !== slots[rowIndex - 1]?.epoch;
-
+        cell: info => {
+          const status = info.getValue();
+          if (!status) return <Muted />;
+          const style = STATUS_STYLES[status];
           return (
-            <span
-              className={clsx(
-                'rounded-sm px-2 py-0.5 text-sm/6 font-medium',
-                isEpochTransition ? 'bg-accent/10 text-accent' : 'text-muted'
-              )}
+            <FilterButton
+              title={`Only ${style.label.toLowerCase()} slots`}
+              onClick={() => addFilter({ status })}
+              className={clsx('font-medium', style.className)}
             >
-              <Epoch epoch={row.epoch} />
+              {style.label}
+            </FilterButton>
+          );
+        },
+        enableSorting: false,
+      }),
+      column.accessor('source', {
+        id: 'source',
+        header: 'Source',
+        cell: info => {
+          const source = info.getValue();
+          if (!source) return <Muted />;
+          return (
+            <FilterButton
+              title={source === 'mev' ? 'Only MEV blocks' : 'Only locally built blocks'}
+              onClick={() => addFilter({ source })}
+              className={source === 'mev' ? 'text-foreground' : 'text-muted'}
+            >
+              {source === 'mev' ? 'MEV' : 'Local'}
+            </FilterButton>
+          );
+        },
+        enableSorting: false,
+      }),
+      column.accessor('relays', {
+        id: 'relays',
+        header: 'Relays',
+        cell: info => {
+          const relays = info.getValue();
+          if (relays.length === 0) return <Muted />;
+          return (
+            <span className="inline-flex gap-1">
+              {relays.map(relay => (
+                <FilterButton
+                  key={relay}
+                  title={`Only blocks delivered by ${relay}`}
+                  onClick={() => addFilter({ relay, source: undefined })}
+                  className="rounded-xs bg-muted/10 px-1.5 py-0.5 text-foreground hover:no-underline"
+                >
+                  {relay}
+                </FilterButton>
+              ))}
             </span>
           );
         },
-        cellClassName: 'text-muted',
-      },
-      {
-        header: 'Timestamp',
-        accessor: row =>
-          row.timestamp > 0 ? (
-            <Timestamp timestamp={row.timestamp} format="short" className="text-xs text-muted" />
-          ) : (
-            '-'
-          ),
-        cellClassName: 'text-muted text-xs',
-      },
-      {
-        header: 'Relative Time',
-        accessor: row =>
-          row.timestamp > 0 ? (
-            <Timestamp timestamp={row.timestamp} format="relative" className="text-xs text-muted" />
-          ) : (
-            '-'
-          ),
-        cellClassName: 'text-muted text-xs',
-      },
-      {
-        header: 'Proposer Index',
-        accessor: row => (row.proposerIndex !== null ? <Validator index={row.proposerIndex} /> : '-'),
-        cellClassName: 'text-muted',
-      },
-      {
-        header: 'Proposer Entity',
-        accessor: row => (row.proposerEntity ? <Entity entity={row.proposerEntity} /> : '-'),
-        cellClassName: 'text-muted',
-      },
-      {
-        header: 'Blob Count',
-        accessor: row => (row.blobCount !== null ? row.blobCount : '-'),
-        cellClassName: 'text-muted',
-      },
+        enableSorting: false,
+      }),
+      column.accessor('builder', {
+        id: 'builder',
+        header: 'Builder',
+        cell: info => {
+          const builder = info.getValue();
+          if (!builder) return <Muted />;
+          return (
+            <FilterButton
+              title="Only blocks from this builder"
+              onClick={() => addFilter({ builder })}
+              className="font-mono"
+            >
+              {truncateAddress(builder)}
+            </FilterButton>
+          );
+        },
+        enableSorting: false,
+      }),
+      column.accessor('value', {
+        id: 'value',
+        header: 'MEV value',
+        cell: info => {
+          const value = info.getValue();
+          return value ? <span className="text-foreground">{weiToEth(value).toFixed(4)} ETH</span> : <Muted />;
+        },
+        enableSorting: false,
+      }),
+      column.accessor('blockNumber', {
+        id: 'block',
+        header: 'Block',
+        cell: info => info.getValue() ?? <Muted />,
+        enableSorting: false,
+      }),
+      column.accessor('blobCount', {
+        id: 'blobs',
+        header: 'Blobs',
+        cell: info => info.getValue() ?? <Muted />,
+        sortDescFirst: true,
+      }),
+      column.accessor('gasUsed', {
+        id: 'gas',
+        header: 'Gas used',
+        cell: info => {
+          const gas = info.getValue();
+          return gas === null ? <Muted /> : `${(gas / 1e6).toFixed(1)}M`;
+        },
+        sortDescFirst: true,
+      }),
+      column.accessor('txCount', {
+        id: 'txs',
+        header: 'Txs',
+        cell: info => info.getValue() ?? <Muted />,
+        sortDescFirst: true,
+      }),
+      column.accessor('cl', {
+        id: 'cl',
+        header: 'CL client',
+        cell: info => {
+          const client = info.getValue();
+          return client ? <ClientLabel client={client} /> : <Muted />;
+        },
+        enableSorting: false,
+      }),
+      column.accessor('el', {
+        id: 'el',
+        header: 'EL client',
+        cell: info => {
+          const client = info.getValue();
+          return client ? <ClientLabel client={client} /> : <Muted />;
+        },
+        enableSorting: false,
+      }),
       ...(hasGloas
         ? [
-            {
+            column.display({
+              id: 'payload',
               header: 'Payload',
-              accessor: (row: SlotData): ReactNode => {
-                // The PTC's verdict on whether the builder revealed in time.
-                if (row.ptcVotesSeen == null || row.ptcVotesSeen === 0) {
-                  return <span className="text-muted">-</span>;
-                }
-
-                const delivered = (row.ptcPresentVotes ?? 0) * 2 >= row.ptcVotesSeen;
-
+              cell: ({ row }) => {
+                // The PTC's verdict on whether the builder revealed in time
+                const { ptcPresentVotes, ptcVotesSeen } = row.original;
+                if (!ptcVotesSeen) return <Muted />;
+                const delivered = (ptcPresentVotes ?? 0) * 2 >= ptcVotesSeen;
                 return (
                   <span
                     className={clsx('font-medium', delivered ? 'text-success' : 'text-danger')}
-                    title={`PTC: ${row.ptcPresentVotes ?? 0}/${row.ptcVotesSeen} present votes`}
+                    title={`PTC: ${ptcPresentVotes ?? 0}/${ptcVotesSeen} present votes`}
                   >
                     {delivered ? 'Delivered' : 'Absent'}
                   </span>
                 );
               },
-              cellClassName: 'text-muted',
-            },
+            }),
           ]
         : []),
-      {
-        header: 'Status',
-        accessor: row => {
-          // Show data availability status instead of block status
-          if (row.hasData) {
-            return <span className={clsx('font-medium text-success')}>Ready</span>;
-          }
-
-          // Check if slot is in the future
-          if (row.timestamp > Date.now() / 1000) {
-            return <span className={clsx('font-medium text-muted')}>Scheduled</span>;
-          }
-
-          // Slot has occurred but no data
-          return <span className={clsx('font-medium text-muted')}>Processing</span>;
-        },
-        cellClassName: 'text-muted',
-      },
     ],
-    [slots, hasGloas]
+    [addFilter, hasGloas]
   );
 
-  // Loading state (initial load only)
-  if (isLoading) {
-    return (
-      <Container>
-        <Header title="Slots" />
-        <div className="mt-6">
-          <Table
-            data={skeletonData}
-            columns={skeletonColumns}
-            variant="nested"
-            getRowClassName={() => 'bg-surface/30'}
-          />
-        </div>
-      </Container>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <Container>
-        <Header title="Slots" />
-        <Alert variant="error" title="Error loading slots" description={error.message} />
-      </Container>
-    );
-  }
+  const emptyMessage =
+    data?.searchedTo !== undefined
+      ? `No matches down to slot ${formatSlot(data.searchedTo)}`
+      : data?.partial
+        ? 'No matches yet'
+        : 'No slots match these filters';
 
   return (
     <Container>
       <Header title="Slots" />
 
-      <RangePager page={page} noun="slot" onNavigate={goToPage} className="mb-4" />
-
-      <div className={clsx('transition-opacity', isPlaceholderData && 'opacity-60')}>
-        <Table
-          data={slots}
-          columns={columns}
-          variant="nested"
-          onRowClick={handleRowClick}
-          getRowKey={row => row.slot}
-          getRowClassName={(row, rowIndex) => {
-            const isCurrentSlot = page.isLatest && row.slot === page.top;
-            const isEvenEpoch = row.epoch % 2 === 0;
-            const isEpochTransition = rowIndex > 0 && row.epoch !== slots[rowIndex - 1]?.epoch;
-
-            return clsx(
-              row.hasData ? 'cursor-pointer hover:bg-surface/80' : 'cursor-not-allowed opacity-50',
-              isCurrentSlot && 'bg-primary/5',
-              !isCurrentSlot && isEvenEpoch && 'bg-surface/30',
-              isEpochTransition && 'border-t-2 border-t-accent/20'
-            );
-          }}
+      <div className="mb-4">
+        <SlotsFilters
+          filters={filters}
+          onChange={setFilters}
+          onGoToSlot={slot => setFilters({ ...filters, slotMax: slot })}
         />
       </div>
 
-      <RangePager page={page} noun="slot" onNavigate={goToPage} className="mt-4" />
+      {error && <Alert variant="error" title="Error loading slots" description={error.message} className="mb-4" />}
+
+      <div className={clsx('transition-opacity', isPlaceholderData && 'opacity-60')}>
+        <DataTable
+          data={rows}
+          columns={columns}
+          isLoading={isLoading}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          onPaginationChange={handlePagination}
+          hasNextPage={Boolean(data?.nextCursor)}
+          manualPagination
+          manualSorting
+          sorting={sorting}
+          onSortingChange={handleSorting}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={setColumnVisibility}
+          onRowClick={row => navigate({ to: '/ethereum/slots/$slot', params: { slot: String(row.slot) } })}
+          getRowId={row => String(row.slot)}
+          emptyMessage={emptyMessage}
+          hideGlobalFilter
+          paginationPosition="both"
+        />
+      </div>
+
+      {data?.partial && data.nextCursor && (
+        <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-sm text-muted">
+          {data.searchedTo !== undefined && rows.length > 0 && (
+            <span className="tabular-nums">Searched down to slot {formatSlot(data.searchedTo)}</span>
+          )}
+          <Button variant="secondary" size="sm" onClick={() => goToPage(pageIndex + 1, data.nextCursor)}>
+            Keep searching
+          </Button>
+        </div>
+      )}
     </Container>
   );
 }

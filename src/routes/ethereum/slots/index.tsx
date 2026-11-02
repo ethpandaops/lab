@@ -1,15 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod';
 import { IndexPage } from '@/pages/ethereum/slots';
-
-/** `from` is the top slot of the page shown; absent means the latest page. */
-const searchSchema = z.object({
-  from: z.coerce.number().int().nonnegative().optional(),
-});
+import { slotsSearchSchema } from '@/pages/ethereum/slots/IndexPage.types';
 
 export const Route = createFileRoute('/ethereum/slots/')({
   component: IndexPage,
-  validateSearch: searchSchema,
+  validateSearch: slotsSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
   }),
