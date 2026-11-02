@@ -25,8 +25,8 @@ import {
   VersionsTab,
   type ClientTabProps,
 } from './components/ClientTabs';
-import { useClientBlocks, useClientNodes, useClientReleases } from './hooks';
-import { clientLayerOf } from './utils/client-versions';
+import { useClientNodes, useClientReleases, useVersionCounts } from './hooks';
+import { clientLayerOf, last24hStart, windowStart } from './utils/client-versions';
 import { forkRequirements } from './utils/fork-requirements';
 
 const TAB_LABELS: Record<(typeof CLIENT_TABS)[number], string> = {
@@ -56,11 +56,14 @@ export function ClientPage(): JSX.Element {
 
   const { selectedIndex, onChange } = useTabState(CLIENT_TABS.map(id => ({ id })));
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
-  const {
-    blocks,
-    since,
-    isLoading: blocksLoading,
-  } = useClientBlocks(client, layer, VERSION_WINDOW_DAYS[window], releases);
+  const since = windowStart(VERSION_WINDOW_DAYS[window]);
+  const { rows: last24h } = useVersionCounts({
+    grain: 'hourly',
+    client,
+    layer,
+    from: last24hStart(),
+    enabled: !!layer,
+  });
   const { nodes, allNodes, isLoading: nodesLoading } = useClientNodes(client, layer);
   const requirements = forkRequirements(currentNetwork, client);
   const requirement = requirements.find(item => item.fork === search.fork);
@@ -95,8 +98,7 @@ export function ClientPage(): JSX.Element {
     releases,
     latest,
     releasesLoading,
-    blocks,
-    blocksLoading: blocksLoading || releasesLoading,
+    last24h,
     window,
     since,
     onWindowChange,
@@ -160,7 +162,7 @@ export function ClientPage(): JSX.Element {
             layer={layer}
             fork={search.fork}
             requirement={requirement}
-            blocks={blocks}
+            blocks={last24h}
             nodes={nodes}
             releases={releases}
           />

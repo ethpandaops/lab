@@ -1,6 +1,7 @@
 import { type JSX, useMemo } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { useVersionCounts } from '../../hooks';
 import { displayVersion, summariseVersions } from '../../utils/client-versions';
 import { ReleasesTable } from '../ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
@@ -14,11 +15,10 @@ export function ReleasesTab({
   releases,
   releasesLoading,
   latest,
-  blocks,
   nodes,
   requirement,
-  window,
 }: ClientTabProps): JSX.Element {
+  const { rows: blocks } = useVersionCounts({ grain: 'daily', client, layer });
   const blocksByVersion = useMemo(
     () => new Map(summariseVersions(blocks).map(summary => [summary.version, summary.blocks])),
     [blocks]
@@ -43,7 +43,7 @@ export function ReleasesTab({
   }
 
   return (
-    <Card rounded title="Releases" subtitle={`Blocks over the last ${window}; Xatu nodes over the last 24 hours`}>
+    <Card rounded title="Releases" subtitle="Blocks over all time; Xatu nodes over the last 24 hours">
       <ReleasesTable
         client={client}
         releases={releases}

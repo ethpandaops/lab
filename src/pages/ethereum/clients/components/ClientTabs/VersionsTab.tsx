@@ -6,12 +6,15 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { compareVersions } from '@/utils/version';
-import { CLIENT_WINDOW_OPTIONS } from '../../constants';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT } from '../../constants';
+import { useVersionCounts } from '../../hooks';
 import {
+  UNRESOLVED_LABELS,
   countVersionsByDay,
   summariseUnresolved,
+  sinceSuffix,
   summariseVersions,
-  type UnresolvedReason,
+  windowStart,
 } from '../../utils/client-versions';
 import { Table } from '@/components/Lists/Table';
 import { Entity } from '@/components/Ethereum/Entity';
@@ -19,12 +22,8 @@ import { VersionShareChart } from '../VersionShareChart';
 import { VersionTable } from '../VersionTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
-/** What each unresolved reason means, for the table */
-const REASON_LABELS: Record<UnresolvedReason, string> = {
-  'no-version': 'No version in graffiti',
-  'unknown-commit': 'Commit in no release',
-  ambiguous: 'Commit in several releases',
-};
+/** Days of unresolved blocks listed with their entities */
+const UNRESOLVED_DAYS = 30;
 
 /** Formats a share, or a dash when nothing was counted */
 function percent(part: number, total: number): string {
@@ -36,18 +35,41 @@ function percent(part: number, total: number): string {
  */
 export function VersionsTab({
   client,
-  blocks,
-  blocksLoading,
+  layer,
   releases,
   latest,
-  window,
-  onWindowChange,
+  shareWindow,
+  onShareWindowChange,
   requirement,
 }: ClientTabProps): JSX.Element {
+  const windowDays = SHARE_WINDOW_DAYS[shareWindow];
+  const history = useVersionCounts({
+    grain: 'daily',
+    client,
+    layer,
+    from: windowDays === null ? undefined : windowStart(windowDays),
+  });
+  const unresolvedRecent = useVersionCounts({
+    grain: 'entity-daily',
+    client,
+    layer,
+    unresolvedOnly: true,
+    from: windowStart(UNRESOLVED_DAYS),
+  });
+  const blocks = history.rows;
+  const total = useMemo(() => blocks.reduce((sum, row) => sum + row.count, 0), [blocks]);
   const versions = useMemo(() => summariseVersions(blocks), [blocks]);
   const days = useMemo(() => countVersionsByDay(blocks), [blocks]);
-  const unresolved = useMemo(() => summariseUnresolved(blocks), [blocks]);
-  const resolved = blocks.filter(block => block.version).length;
+  const unresolved = useMemo(() => summariseUnresolved(unresolvedRecent.rows), [unresolvedRecent.rows]);
+  const resolved = useMemo(
+    () => blocks.filter(block => block.version).reduce((sum, row) => sum + row.count, 0),
+    [blocks]
+  );
+  const blocksLoading = history.isLoading;
+  const unresolvedTotal = useMemo(
+    () => history.rows.filter(row => row.time >= windowStart(UNRESOLVED_DAYS)).reduce((sum, row) => sum + row.count, 0),
+    [history.rows]
+  );
   const lastDay = days[days.length - 1];
   const onLatest =
     lastDay && latest?.version
@@ -59,11 +81,17 @@ export function VersionsTab({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center gap-4">
-        <SegmentedControl options={CLIENT_WINDOW_OPTIONS} value={window} onChange={onWindowChange} ariaLabel="Window" />
+        <SegmentedControl
+          options={SHARE_WINDOW_OPTIONS}
+          value={shareWindow}
+          onChange={onShareWindowChange}
+          ariaLabel="Window"
+        />
         <InfoBox summary="How versions are read">
           Versions come from the graffiti&apos;s version string or its commit prefix, matched against the client&apos;s
-          published releases. Blocks whose graffiti has no version, or a commit from no published release, are left out
-          of version shares and listed under Unresolved blocks.
+          releases. A commit from a branch rather than a release tag counts under the release it builds on, as a build
+          after it. Blocks whose graffiti names no release are left out of version shares and listed under Unresolved
+          blocks.
         </InfoBox>
       </div>
 
@@ -74,8 +102,8 @@ export function VersionsTab({
           <Stats
             gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
             stats={[
-              { id: 'blocks', name: 'Blocks', value: blocks.length.toLocaleString() },
-              { id: 'resolved', name: 'Resolved to a release', value: percent(resolved, blocks.length) },
+              { id: 'blocks', name: `Blocks, ${SHARE_WINDOW_TEXT[shareWindow]}`, value: total.toLocaleString() },
+              { id: 'resolved', name: 'Resolved to a release', value: percent(resolved, total) },
               { id: 'versions', name: 'Versions seen', value: versions.length.toLocaleString() },
               {
                 id: 'latest',
@@ -86,7 +114,7 @@ export function VersionsTab({
           />
           <PopoutCard
             title="Version share"
-            subtitle="Daily share of blocks with a resolved version"
+            subtitle={`Daily share of blocks with a resolved version${sinceSuffix(history.dataStart, windowDays === null ? undefined : windowStart(windowDays))}`}
             anchorId="version-share"
             modalSize="full"
           >
@@ -106,13 +134,17 @@ export function VersionsTab({
             )}
           </Card>
           {unresolved.length > 0 && (
-            <Card rounded title="Unresolved blocks" subtitle="Blocks whose graffiti did not name a published release">
+            <Card
+              rounded
+              title="Unresolved blocks"
+              subtitle={`Blocks whose graffiti names no release, last ${UNRESOLVED_DAYS} days`}
+            >
               <Table
                 variant="nested"
                 data={unresolved.slice(0, 15)}
                 getRowKey={row => `${row.reason}-${row.commit ?? ''}`}
                 columns={[
-                  { header: 'Reason', accessor: row => REASON_LABELS[row.reason] },
+                  { header: 'Reason', accessor: row => UNRESOLVED_LABELS[row.reason] ?? row.reason },
                   {
                     header: 'Commit',
                     accessor: row => <span className="font-mono text-xs/6">{row.commit ?? '-'}</span>,
@@ -124,8 +156,8 @@ export function VersionsTab({
                     headerClassName: 'text-right',
                   },
                   {
-                    header: 'Share of blocks',
-                    accessor: row => percent(row.blocks, blocks.length),
+                    header: 'Share of all blocks',
+                    accessor: row => percent(row.blocks, unresolvedTotal),
                     cellClassName: 'text-right tabular-nums text-muted',
                     headerClassName: 'text-right',
                   },

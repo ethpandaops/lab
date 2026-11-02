@@ -1,8 +1,8 @@
 import { type JSX, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { dimClientReleaseServiceList, fctBlockGraffitiServiceList } from '@/api/sdk.gen';
-import type { DimClientRelease, FctBlockGraffiti } from '@/api/types.gen';
+import { dimClientReleaseServiceList } from '@/api/sdk.gen';
+import type { DimClientRelease } from '@/api/types.gen';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
@@ -12,7 +12,8 @@ import { fetchAllPages } from '@/utils/api-pagination';
 import { normalizeClientName } from '@/utils/ethereum';
 import { meetsMinVersion } from '@/utils/version';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
-import { displayVersion, resolveBlocks } from '@/pages/ethereum/clients/utils/client-versions';
+import { displayVersion, last24hStart, type VersionCount } from '@/pages/ethereum/clients/utils/client-versions';
+import { useVersionCounts } from '@/pages/ethereum/clients/hooks/useVersionCounts';
 import type { ConsensusFork } from '@/hooks/useConfig/useConfig.types';
 
 export interface ForkReadinessProps {
@@ -47,8 +48,6 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
       .map(([client, minVersion]) => ({ client: normalizeClientName(client), minVersion }));
   }, [currentNetwork, fork]);
   const clients = requirements.map(requirement => requirement.client);
-  const since = useMemo(() => Math.floor(Date.now() / 1000 / 600) * 600 - 24 * 3600, []);
-
   const releases = useQuery({
     queryKey: ['fork-readiness', 'releases', clients.join(',')],
     queryFn: ({ signal }) =>
@@ -61,17 +60,11 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
     enabled: clients.length > 0,
     staleTime: 30 * 60 * 1000,
   });
-  const blocks = useQuery({
-    queryKey: ['fork-readiness', 'blocks', currentNetwork?.name, since],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctBlockGraffiti>(
-        fctBlockGraffitiServiceList,
-        { query: { slot_start_date_time_gte: since, page_size: 10000 } },
-        'fct_block_graffiti',
-        signal
-      ),
-    enabled: !!currentNetwork && clients.length > 0,
-    staleTime: 10 * 60 * 1000,
+  const blocks = useVersionCounts({
+    grain: 'hourly',
+    layer: 'consensus',
+    from: last24hStart(),
+    enabled: clients.length > 0,
   });
   const { nodes, isLoading: nodesLoading } = useActiveNodes();
 
@@ -79,11 +72,8 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
     const allReleases = releases.data ?? [];
     return requirements.map(({ client, minVersion }) => {
       const clientReleases = allReleases.filter(release => release.client === client);
-      const clientBlocks = resolveBlocks(
-        (blocks.data ?? []).filter(row => row.consensus_client === client),
-        'consensus',
-        clientReleases
-      ).filter(block => block.version);
+      const clientBlocks = blocks.rows.filter(row => row.client === client && row.version);
+      const sum = (rows: VersionCount[]): number => rows.reduce((total, row) => total + row.count, 0);
       const nodeVersions = nodes
         .filter(node => normalizeClientName(node.meta_consensus_implementation ?? '') === client)
         .map(node => displayVersion(node.meta_consensus_version, clientReleases))
@@ -91,13 +81,13 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
       return {
         client,
         minVersion,
-        blocksReady: clientBlocks.filter(block => meetsMinVersion(block.version!, minVersion)).length,
-        blocksCounted: clientBlocks.length,
+        blocksReady: sum(clientBlocks.filter(block => meetsMinVersion(block.version!, minVersion))),
+        blocksCounted: sum(clientBlocks),
         nodesReady: nodeVersions.filter(version => meetsMinVersion(version, minVersion)).length,
         nodesCounted: nodeVersions.length,
       };
     });
-  }, [requirements, releases.data, blocks.data, nodes]);
+  }, [requirements, releases.data, blocks.rows, nodes]);
 
   if (requirements.length === 0) return null;
 

@@ -1,4 +1,6 @@
+export { AttestationPerformance, ProposerBehaviour } from './ClientBehaviour';
 export { ClientBreakdown } from './ClientBreakdown';
+export { ClientMetricCompare } from './ClientMetricCompare';
 export { ClientFilter } from './ClientFilter';
 export { ClientHeader } from './ClientHeader';
 export { ClientPairs } from './ClientPairs';

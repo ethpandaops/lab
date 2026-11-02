@@ -5,6 +5,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { compareVersions } from '@/utils/version';
 import { CLIENT_WINDOW_OPTIONS } from '../../constants';
+import { useVersionCounts } from '../../hooks';
 import { BLOCK_FILTER_KEYS, type BlockSearch } from '../../utils/block-filters';
 import { EntityVersionBars } from '../EntityVersionBars';
 import { GraffitiBlocksTable } from '../GraffitiBlocksTable';
@@ -18,15 +19,14 @@ function percent(part: number, total: number): string {
 /**
  * Who proposes blocks with the client: how concentrated it is, each top entity's version mix, and the latest blocks.
  */
-export function ProposersTab({
-  client,
-  layer,
-  blocks,
-  blocksLoading,
-  latest,
-  window,
-  onWindowChange,
-}: ClientTabProps): JSX.Element {
+export function ProposersTab({ client, layer, latest, since, window, onWindowChange }: ClientTabProps): JSX.Element {
+  const { rows: blocks, isLoading: blocksLoading } = useVersionCounts({
+    grain: 'entity-daily',
+    client,
+    layer,
+    from: since,
+  });
+  const total = useMemo(() => blocks.reduce((sum, row) => sum + row.count, 0), [blocks]);
   const search = useSearch({ from: '/ethereum/clients/$client/' });
   const navigate = useNavigate({ from: '/ethereum/clients/$client/' });
   const onBlockSearchChange = useCallback(
@@ -42,10 +42,10 @@ export function ProposersTab({
     for (const block of blocks) {
       if (!block.entity) continue;
       const entry = byEntity.get(block.entity) ?? { blocks: 0, resolved: 0, onLatest: 0 };
-      entry.blocks++;
+      entry.blocks += block.count;
       if (block.version) {
-        entry.resolved++;
-        if (latest?.version && compareVersions(block.version, latest.version) >= 0) entry.onLatest++;
+        entry.resolved += block.count;
+        if (latest?.version && compareVersions(block.version, latest.version) >= 0) entry.onLatest += block.count;
       }
       byEntity.set(block.entity, entry);
     }
@@ -74,12 +74,12 @@ export function ProposersTab({
               {
                 id: 'top1',
                 name: "Largest entity's share of blocks",
-                value: percent(concentration.top1, blocks.length),
+                value: percent(concentration.top1, total),
               },
               {
                 id: 'top5',
                 name: "Top 5 entities' share of blocks",
-                value: percent(concentration.top5, blocks.length),
+                value: percent(concentration.top5, total),
               },
               {
                 id: 'upgraded',

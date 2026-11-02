@@ -15,8 +15,6 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useClientCounts } from '../../hooks';
 import { clientOf, summariseClients } from '../../utils/client-share';
 import { crossedThreshold, displayVersion, nextThreshold } from '../../utils/client-versions';
-import { PENDING_SOURCES } from '../../pending';
-import { PendingSource } from '../PendingSource';
 import { SourceAngles } from '../SourceAngles';
 import type { ClientTabProps } from './ClientTabs.types';
 
@@ -33,7 +31,7 @@ export function OverviewTab({
   client,
   layer,
   latest,
-  blocks,
+  last24h,
   nodes,
   allNodes,
   releases,
@@ -83,10 +81,12 @@ export function OverviewTab({
     };
   }, [counts.records, counts.keys, layer, client, name]);
 
-  const latestBlockTime = blocks.length > 0 ? blocks[blocks.length - 1].time : 0;
-  const recent = blocks.filter(block => block.version && block.time > latestBlockTime - 24 * 3600);
+  const recent = last24h.filter(block => block.version);
+  const recentTotal = recent.reduce((sum, row) => sum + row.count, 0);
   const onLatest = latest?.version
-    ? recent.filter(block => compareVersions(block.version!, latest.version!) >= 0).length
+    ? recent
+        .filter(block => compareVersions(block.version!, latest.version!) >= 0)
+        .reduce((sum, row) => sum + row.count, 0)
     : 0;
   const nodesOnLatest =
     layer === 'consensus' && latest?.version
@@ -149,7 +149,7 @@ export function OverviewTab({
           {
             id: 'latest',
             name: 'Blocks on latest or newer, 24h',
-            value: percent(onLatest, recent.length),
+            value: percent(onLatest, recentTotal),
           },
         ]}
       />
@@ -202,9 +202,7 @@ export function OverviewTab({
               </div>
               <div>
                 <dt className="text-xs/5 text-muted">Blocks on it or newer, 24h</dt>
-                <dd className="text-sm/6 font-medium text-foreground tabular-nums">
-                  {percent(onLatest, recent.length)}
-                </dd>
+                <dd className="text-sm/6 font-medium text-foreground tabular-nums">{percent(onLatest, recentTotal)}</dd>
               </div>
               <div>
                 <dt className="text-xs/5 text-muted">Xatu nodes on it or newer</dt>
@@ -260,11 +258,6 @@ export function OverviewTab({
             />
           )}
         </Card>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <PendingSource {...PENDING_SOURCES.proposerBehaviour} />
-        {layer === 'consensus' && <PendingSource {...PENDING_SOURCES.attestations} />}
       </div>
     </div>
   );

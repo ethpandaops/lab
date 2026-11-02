@@ -1,12 +1,8 @@
 import { type JSX, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import {
-  dimClientReleaseServiceList,
-  fctBlockGraffitiClientByEntityDailyServiceList,
-  fctBlockGraffitiServiceList,
-} from '@/api/sdk.gen';
-import type { DimClientRelease, FctBlockGraffiti, FctBlockGraffitiClientByEntityDaily } from '@/api/types.gen';
+import { fctBlockGraffitiClientByEntityDailyServiceList } from '@/api/sdk.gen';
+import type { FctBlockGraffitiClientByEntityDaily } from '@/api/types.gen';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
@@ -22,7 +18,7 @@ import {
   type ClientLayer,
   type ClientSummary,
 } from '@/pages/ethereum/clients/utils/client-share';
-import { resolveBlocks } from '@/pages/ethereum/clients/utils/client-versions';
+import { useVersionCounts } from '@/pages/ethereum/clients/hooks/useVersionCounts';
 
 export interface EntityClientsProps {
   entity: string;
@@ -82,38 +78,7 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
       ),
     enabled: !!currentNetwork,
   });
-  const blocks = useQuery({
-    queryKey: ['entity-clients', 'blocks', currentNetwork?.name, entity, since],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctBlockGraffiti>(
-        fctBlockGraffitiServiceList,
-        { query: { entity_eq: entity, slot_start_date_time_gte: since, page_size: 10000 } },
-        'fct_block_graffiti',
-        signal
-      ),
-    enabled: !!currentNetwork,
-  });
-
-  const clients = useMemo(() => {
-    const names = new Set<string>();
-    for (const row of blocks.data ?? []) {
-      if (row.consensus_client && row.consensus_client !== UNKNOWN_CLIENT) names.add(row.consensus_client);
-      if (row.execution_client && row.execution_client !== UNKNOWN_CLIENT) names.add(row.execution_client);
-    }
-    return [...names].sort();
-  }, [blocks.data]);
-  const releases = useQuery({
-    queryKey: ['entity-clients', 'releases', clients.join(',')],
-    queryFn: ({ signal }) =>
-      fetchAllPages<DimClientRelease>(
-        dimClientReleaseServiceList,
-        { query: { client_in_values: clients.join(','), page_size: 10000 } },
-        'dim_client_release',
-        signal
-      ),
-    enabled: clients.length > 0,
-    staleTime: 30 * 60 * 1000,
-  });
+  const blocks = useVersionCounts({ grain: 'entity-daily', entity, from: since });
 
   const shares = useMemo(() => {
     const records = toClientCountRecords(counts.data ?? [], true);
@@ -123,33 +88,22 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
   }, [counts.data]);
 
   const versions = useMemo((): VersionRow[] => {
-    const rows = blocks.data ?? [];
-    const all = releases.data ?? [];
-    const result: VersionRow[] = [];
-    for (const layer of ['consensus', 'execution'] as const) {
-      const byClient = new Map<string, FctBlockGraffiti[]>();
-      for (const row of rows) {
-        const client = layer === 'consensus' ? row.consensus_client : row.execution_client;
-        if (!client || client === UNKNOWN_CLIENT) continue;
-        byClient.set(client, [...(byClient.get(client) ?? []), row]);
-      }
-      const named = [...byClient.values()].reduce((sum, group) => sum + group.length, 0);
-      for (const [client, group] of byClient) {
-        const counts = new Map<string, number>();
-        for (const block of resolveBlocks(
-          group,
-          layer,
-          all.filter(release => release.client === client)
-        )) {
-          if (block.version) counts.set(block.version, (counts.get(block.version) ?? 0) + 1);
-        }
-        for (const [version, count] of counts) {
-          result.push({ layer, client, version, blocks: count, share: named > 0 ? (count / named) * 100 : 0 });
-        }
-      }
+    const named = { consensus: 0, execution: 0 };
+    const byVersion = new Map<string, VersionRow>();
+    for (const row of blocks.rows) {
+      const layer = row.layer === 'execution' ? 'execution' : 'consensus';
+      if (!row.client || row.client === UNKNOWN_CLIENT) continue;
+      named[layer] += row.count;
+      if (!row.version) continue;
+      const key = `${layer}|${row.client}|${row.version}`;
+      const entry = byVersion.get(key) ?? { layer, client: row.client, version: row.version, blocks: 0, share: 0 };
+      entry.blocks += row.count;
+      byVersion.set(key, entry);
     }
-    return result.sort((a, b) => b.blocks - a.blocks);
-  }, [blocks.data, releases.data]);
+    return [...byVersion.values()]
+      .map(row => ({ ...row, share: named[row.layer] > 0 ? (row.blocks / named[row.layer]) * 100 : 0 }))
+      .sort((a, b) => b.blocks - a.blocks);
+  }, [blocks.rows]);
 
   if (counts.isLoading) return <LoadingContainer className="h-96 rounded-sm" />;
 
@@ -169,7 +123,7 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
           </Link>
         }
       >
-        {blocks.isLoading || releases.isLoading ? (
+        {blocks.isLoading ? (
           <LoadingContainer className="h-48 rounded-sm" />
         ) : versions.length === 0 ? (
           <p className="text-sm text-muted">No block resolved to a client release.</p>

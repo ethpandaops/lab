@@ -76,6 +76,9 @@ export const VERSION_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label
 /** Share chart windows on the client page */
 export type ShareWindow = '30d' | '90d' | '1y' | 'all';
 
+/** Days in each share window; all history when null */
+export const SHARE_WINDOW_DAYS: Record<ShareWindow, number | null> = { '30d': 30, '90d': 90, '1y': 365, all: null };
+
 /** How each share window reads in copy */
 export const SHARE_WINDOW_TEXT: Record<ShareWindow, string> = {
   '30d': '30 days',

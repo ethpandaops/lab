@@ -20,14 +20,6 @@ export const PENDING_SOURCES = {
     description:
       'Nodes advertising the next fork: next_fork_digest on consensus nodes, fork_id_next on execution nodes.',
   },
-  proposerBehaviour: {
-    title: 'Proposer behaviour',
-    description: 'MEV share and value, blobs, gas, propagation and reorgs of the blocks this client proposed.',
-  },
-  attestations: {
-    title: 'Attestation performance',
-    description: 'Head, target and source correctness of validators running this client.',
-  },
   custodyCompliance: {
     title: 'Custody compliance',
     description: 'Whether peers on each version serve the columns they custody.',

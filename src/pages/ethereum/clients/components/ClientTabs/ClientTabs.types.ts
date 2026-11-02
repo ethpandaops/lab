@@ -1,7 +1,7 @@
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import type { ShareWindow, VersionWindow } from '../../constants';
 import type { ClientLayer } from '../../utils/client-share';
-import type { ResolvedBlock } from '../../utils/client-versions';
+import type { VersionCount } from '../../utils/client-versions';
 import type { ForkRequirement } from '../../utils/fork-requirements';
 
 /** Data the client page loads once and its tabs share */
@@ -12,9 +12,8 @@ export interface ClientTabProps {
   releases: DimClientRelease[];
   latest?: DimClientRelease;
   releasesLoading: boolean;
-  /** The client's blocks over the window, oldest first */
-  blocks: ResolvedBlock[];
-  blocksLoading: boolean;
+  /** Hourly version counts over the last 24 hours */
+  last24h: VersionCount[];
   window: VersionWindow;
   /** Start of the window (unix seconds) */
   since: number;
