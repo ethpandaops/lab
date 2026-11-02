@@ -1,24 +1,30 @@
 import type { JSX } from 'react';
+import type { SortingState } from '@tanstack/react-table';
+import { DataTable } from '@/components/DataTable';
+import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { Card } from '@/components/Layout/Card';
-import { Table } from '@/components/Lists/Table';
-import type { Column } from '@/components/Lists/Table/Table.types';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { Button } from '@/components/Elements/Button';
-import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { PATH_COLORS, PATH_LABELS } from '../../constants';
-import type { CompletionPath } from '../../IndexPage.types';
+import type { BlockFilters, BlockSortKey, CompletionPath } from '../../IndexPage.types';
 import type { CompletionBlock } from '../../hooks';
 import { formatSeconds, formatShare } from '../../utils/partial-columns';
+import { BlockFilterPanel } from '../BlockFilterPanel';
 
 export interface CompletionBlocksTableProps {
   blocks: CompletionBlock[];
   isLoading: boolean;
   error: Error | null;
   hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-  onLoadMore: () => void;
+  filters: BlockFilters;
+  onFiltersChange: (filters: BlockFilters) => void;
+  sort: BlockSortKey;
+  order: 'asc' | 'desc';
+  onSortChange: (sort: BlockSortKey | undefined, order: 'asc' | 'desc' | undefined) => void;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number, pageSize: number) => void;
 }
 
 /** Completions of one block per path, in stacking order */
@@ -51,74 +57,122 @@ function PathBar({ block }: { block: CompletionBlock }): JSX.Element {
   );
 }
 
-const columns: Column<CompletionBlock>[] = [
+const value = 'tabular-nums text-foreground';
+const muted = 'tabular-nums text-muted';
+
+/** Columns, their ids the sort keys of the sortable ones */
+const columns: DataTableColumn<CompletionBlock>[] = [
   {
+    id: 'slot' satisfies BlockSortKey,
+    accessorFn: row => row.slot,
     header: 'Slot',
-    accessor: row => (row.slot !== undefined ? <Slot slot={row.slot} /> : '-'),
-    cellClassName: 'font-medium text-foreground',
+    cell: ({ row }) => (row.original.slot !== undefined ? <Slot slot={row.original.slot} /> : '-'),
+    meta: { cellClassName: 'font-medium text-foreground' },
   },
   {
+    id: 'time',
     header: 'Time',
-    accessor: row =>
-      row.slot_start_date_time ? (
-        <Timestamp timestamp={row.slot_start_date_time} format="relative" className="text-xs text-muted" />
+    enableSorting: false,
+    cell: ({ row }) =>
+      row.original.slot_start_date_time ? (
+        <Timestamp timestamp={row.original.slot_start_date_time} format="relative" className="text-xs text-muted" />
       ) : (
         '-'
       ),
   },
-  { header: 'Blobs', accessor: row => row.blob_count ?? '-', cellClassName: 'tabular-nums text-muted' },
   {
+    id: 'blob_count' satisfies BlockSortKey,
+    accessorFn: row => row.blob_count,
+    header: 'Blobs',
+    cell: ({ row }) => row.original.blob_count ?? '-',
+    meta: { cellClassName: muted },
+  },
+  {
+    id: 'completion_count' satisfies BlockSortKey,
+    accessorFn: row => row.completion_count,
     header: 'Completions',
-    accessor: row => (
+    cell: ({ row }) => (
       <span className="flex items-center gap-2">
-        <PathBar block={row} />
-        <span className="text-xs text-muted tabular-nums">{row.completion_count ?? 0}</span>
+        <PathBar block={row.original} />
+        <span className="text-xs text-muted tabular-nums">{row.original.completion_count ?? 0}</span>
       </span>
     ),
   },
   {
+    id: 'partial',
     header: 'Partial',
-    accessor: row => formatShare(row.partial_gossip_completion_count ?? 0, row.completion_count ?? 0),
-    cellClassName: 'tabular-nums text-foreground',
+    enableSorting: false,
+    cell: ({ row }) =>
+      formatShare(row.original.partial_gossip_completion_count ?? 0, row.original.completion_count ?? 0),
+    meta: { cellClassName: value },
   },
   {
+    id: 'el_cells',
     header: 'EL cells',
-    accessor: row => formatShare(row.cells_from_el ?? 0, row.cells_total ?? 0),
-    cellClassName: 'tabular-nums text-foreground',
+    enableSorting: false,
+    cell: ({ row }) => formatShare(row.original.cells_from_el ?? 0, row.original.cells_total ?? 0),
+    meta: { cellClassName: value },
   },
   {
+    id: 'p50' satisfies BlockSortKey,
+    accessorFn: row => row.p50_completion_slot_start_diff,
     header: 'p50',
-    accessor: row => formatSeconds(row.p50_completion_slot_start_diff),
-    cellClassName: 'tabular-nums text-foreground',
+    cell: ({ row }) => formatSeconds(row.original.p50_completion_slot_start_diff),
+    meta: { cellClassName: value },
   },
   {
+    id: 'p90' satisfies BlockSortKey,
+    accessorFn: row => row.p90_completion_slot_start_diff,
     header: 'p90',
-    accessor: row => formatSeconds(row.p90_completion_slot_start_diff),
-    cellClassName: 'tabular-nums text-muted',
+    cell: ({ row }) => formatSeconds(row.original.p90_completion_slot_start_diff),
+    meta: { cellClassName: muted },
   },
   {
+    id: 'node_done' satisfies BlockSortKey,
+    accessorFn: row => row.p50_node_last_completion_slot_start_diff,
     header: 'Node done',
-    accessor: row => formatSeconds(row.p50_node_last_completion_slot_start_diff),
-    cellClassName: 'tabular-nums text-foreground',
+    cell: ({ row }) => formatSeconds(row.original.p50_node_last_completion_slot_start_diff),
+    meta: { cellClassName: value },
   },
   {
+    id: 'last' satisfies BlockSortKey,
+    accessorFn: row => row.max_completion_slot_start_diff,
+    header: 'Last',
+    cell: ({ row }) => formatSeconds(row.original.max_completion_slot_start_diff),
+    meta: { cellClassName: muted },
+  },
+  {
+    id: 'header',
     header: 'Header',
-    accessor: row => formatSeconds(row.header?.seen_slot_start_diff),
-    cellClassName: 'tabular-nums text-muted',
+    enableSorting: false,
+    cell: ({ row }) => formatSeconds(row.original.header?.seen_slot_start_diff),
+    meta: { cellClassName: muted },
   },
 ];
 
 /**
- * Recent blocks with how sentry nodes completed their columns, newest first.
+ * Blocks with how sentry nodes completed their columns, filtered, sorted and paged by the API.
  */
 export function CompletionBlocksTable({
   blocks,
   isLoading,
   error,
   hasNextPage,
-  isFetchingNextPage,
-  onLoadMore,
+  filters,
+  onFiltersChange,
+  sort,
+  order,
+  onSortChange,
+  page,
+  pageSize,
+  onPageChange,
 }: CompletionBlocksTableProps): JSX.Element {
+  const sorting: SortingState = [{ id: sort, desc: order === 'desc' }];
+  const handleSorting = (next: SortingState): void => {
+    const [first] = next;
+    onSortChange(first?.id as BlockSortKey | undefined, first ? (first.desc ? 'desc' : 'asc') : undefined);
+  };
+
   return (
     <Card
       rounded
@@ -126,31 +180,37 @@ export function CompletionBlocksTable({
       subtitle="Column completions across all sentry nodes by path, with completion times from slot start."
     >
       <InfoBox summary="How this is measured" className="mb-4">
-        Node done is when the median node completed its last column, and header is when a node first received the
-        partial column header.
+        Node done is when the median node completed its last column, last is the latest completion by any node, and
+        header is when a node first received the partial column header.
       </InfoBox>
-      {error && <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>}
-      {!error && isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <LoadingContainer key={`block-row-${i}`} className="h-8 w-full rounded-xs" />
-          ))}
-        </div>
-      )}
-      {!error && !isLoading && blocks.length === 0 && (
-        <p className="text-sm text-muted">No blocks with column completions in this window.</p>
-      )}
-      {!error && !isLoading && blocks.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <Table variant="nested" data={blocks} columns={columns} getRowKey={row => `${row.slot}-${row.block_root}`} />
-          {hasNextPage && (
-            <div className="flex justify-center">
-              <Button variant="secondary" size="sm" onClick={onLoadMore} disabled={isFetchingNextPage}>
-                {isFetchingNextPage ? 'Loading' : 'Load older blocks'}
-              </Button>
-            </div>
-          )}
-        </div>
+      <div className="mb-4">
+        <BlockFilterPanel filters={filters} onChange={onFiltersChange} />
+      </div>
+      {error ? (
+        <p className="text-sm text-danger">Failed to load blocks: {error.message}</p>
+      ) : (
+        <DataTable
+          data={blocks}
+          columns={columns}
+          isLoading={isLoading}
+          getRowId={row => `${row.slot}-${row.block_root}`}
+          sorting={sorting}
+          onSortingChange={handleSorting}
+          manualSorting
+          pageIndex={page}
+          pageSize={pageSize}
+          onPaginationChange={onPageChange}
+          manualPagination
+          hasNextPage={hasNextPage}
+          paginationPosition="bottom"
+          emptyMessage={
+            Object.values(filters).some(v => v !== undefined)
+              ? 'No blocks match these filters.'
+              : 'No blocks with column completions in this window.'
+          }
+          hideGlobalFilter
+          hideColumnVisibility
+        />
       )}
     </Card>
   );

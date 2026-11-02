@@ -6,3 +6,6 @@ export type {
   BlockCountMap,
   ClientPairingMap,
 } from './useSlotBlocks';
+export { usePreparedBlocks } from './usePreparedBlocks';
+export { useNodeRoster } from './useNodeRoster';
+export type { NodeRoster } from './useNodeRoster';
