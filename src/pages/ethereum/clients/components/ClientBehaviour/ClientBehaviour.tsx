@@ -156,7 +156,7 @@ export function ProposerBehaviour({ client, layer, from, windowControl }: Client
   const { rows, dataStart, isLoading } = useDailyByClient<FctBlockProposalByClientDaily>(
     fctBlockProposalByClientDailyList,
     'fct_block_proposal_by_client_daily',
-    layer,
+    { layer_eq: layer },
     from
   );
   return (
@@ -182,7 +182,7 @@ export function AttestationPerformance({ client, layer, from, windowControl }: C
   const { rows, dataStart, isLoading } = useDailyByClient<FctAttestationVoteCorrectnessByClientDaily>(
     fctAttestationVoteCorrectnessByClientDailyList,
     'fct_attestation_vote_correctness_by_client_daily',
-    layer,
+    { layer_eq: layer },
     from
   );
   const allDuties = rows.reduce((sum, row) => sum + (row.total_duties ?? 0), 0);

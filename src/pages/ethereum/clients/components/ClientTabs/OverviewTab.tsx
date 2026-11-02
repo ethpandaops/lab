@@ -12,8 +12,8 @@ import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { useClientCounts } from '../../hooks';
-import { clientOf, summariseClients } from '../../utils/client-share';
+import { useClientCounts, useNodeWeightedShares } from '../../hooks';
+import { clientOf, summariseClients, type ClientSummary } from '../../utils/client-share';
 import { crossedThreshold, displayVersion, nextThreshold } from '../../utils/client-versions';
 import { SourceAngles } from '../SourceAngles';
 import type { ClientTabProps } from './ClientTabs.types';
@@ -95,6 +95,9 @@ export function OverviewTab({
         ).length
       : 0;
 
+  const nodeWeighted = useNodeWeightedShares(layer);
+  const nodeShare = (shares: ClientSummary[]): string =>
+    nodeWeighted.isLoading ? '…' : `${(shares.find(item => item.client === client)?.identifiedShare ?? 0).toFixed(1)}%`;
   const share = summary.mine?.identifiedShare ?? 0;
   const next = summary.mine ? nextThreshold(share) : null;
 
@@ -114,8 +117,18 @@ export function OverviewTab({
             value: summary.mine ? `${share.toFixed(1)}%` : '0%',
             detail: `Share of proposed blocks naming a client, ${windowText}`,
           },
-          { id: 'p2p', label: 'Node-weighted (P2P peers)', detail: 'Share of peers seen on the P2P network' },
-          { id: 'enr', label: 'ENR crawl', detail: 'Share of nodes found in discovery records' },
+          {
+            id: 'p2p',
+            label: 'Node-weighted (P2P peers)',
+            value: nodeShare(nodeWeighted.p2p),
+            detail: `Share of peers seen on the P2P network, ${nodeWeighted.p2pDay ?? '-'}`,
+          },
+          {
+            id: 'enr',
+            label: 'ENR crawl',
+            value: nodeShare(nodeWeighted.enr),
+            detail: `Share of nodes found in discovery records, ${nodeWeighted.enrDay ?? '-'}`,
+          },
           layer === 'consensus'
             ? {
                 id: 'contributoor',

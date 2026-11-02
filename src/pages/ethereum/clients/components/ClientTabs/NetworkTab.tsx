@@ -1,38 +1,46 @@
 import type { JSX } from 'react';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '../../constants';
 import { usePeerSupport } from '../../hooks';
-import { PENDING_SOURCES } from '../../pending';
+import { windowStart } from '../../utils/client-versions';
+import { CustodyCompliance, EnrReadiness, PeerCensus } from '../Census';
 import { PeerSupport } from '../PeerSupport';
-import { PendingSource } from '../PendingSource';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /**
- * The client on the P2P network: what our sentries and probers see of its peers, and the census views to come.
+ * The client on the network: its P2P peers, the next fork its ENRs advertise, and for consensus clients, whether its
+ * peers serve the columns they custody.
  */
-export function NetworkTab({ client, layer, releases }: ClientTabProps): JSX.Element {
+export function NetworkTab({ client, layer, releases, shareWindow, onShareWindowChange }: ClientTabProps): JSX.Element {
   const peers = usePeerSupport(client, layer === 'consensus');
+  const days = SHARE_WINDOW_DAYS[shareWindow];
+  const from = days === null ? undefined : windowStart(days);
+  const windowControl = (
+    <SegmentedControl
+      options={SHARE_WINDOW_OPTIONS}
+      value={shareWindow}
+      onChange={onShareWindowChange}
+      ariaLabel="Window"
+    />
+  );
 
   return (
     <div className="flex flex-col gap-6">
+      <PeerCensus client={client} layer={layer} from={from} windowControl={windowControl} />
+      <EnrReadiness client={client} layer={layer} />
       {layer === 'consensus' && (
-        <PeerSupport
-          client={client}
-          releases={releases}
-          partial={peers.partial}
-          partialDay={peers.partialDay}
-          probes={peers.probes}
-          isLoading={peers.isLoading}
-        />
+        <>
+          <CustodyCompliance client={client} from={from} windowControl={windowControl} />
+          <PeerSupport
+            client={client}
+            releases={releases}
+            partial={peers.partial}
+            partialDay={peers.partialDay}
+            probes={peers.probes}
+            isLoading={peers.isLoading}
+          />
+        </>
       )}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {layer === 'consensus' && <PendingSource {...PENDING_SOURCES.nodeCensus} />}
-        <PendingSource {...PENDING_SOURCES.enrCrawl} />
-        <PendingSource {...PENDING_SOURCES.enrForkReadiness} />
-        {layer === 'consensus' ? (
-          <PendingSource {...PENDING_SOURCES.custodyCompliance} />
-        ) : (
-          <PendingSource {...PENDING_SOURCES.ipPairings} />
-        )}
-      </div>
     </div>
   );
 }

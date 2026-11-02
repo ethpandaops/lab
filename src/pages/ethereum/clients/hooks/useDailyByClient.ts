@@ -4,7 +4,6 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { PAGE_SIZE } from '../constants';
-import type { ClientLayer } from '../utils/client-share';
 import { chunksFor } from './useVersionCounts';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
@@ -18,7 +17,7 @@ export interface UseDailyByClientResult<T> {
 }
 
 /** Joins the chunk queries */
-function combine<T>(results: Array<UseQueryResult<T[]>>): UseDailyByClientResult<T> {
+function combine<T>(results: Array<UseQueryResult<T[]>>): Omit<UseDailyByClientResult<T>, 'dataStart'> {
   return {
     rows: results.flatMap(result => result.data ?? []),
     isLoading: results.some(result => result.isLoading),
@@ -27,12 +26,13 @@ function combine<T>(results: Array<UseQueryResult<T[]>>): UseDailyByClientResult
 }
 
 /**
- * Every row of a daily per-client table for one layer over a window, or all history, in cached chunks.
+ * Every row of a daily table matching `filters` over a window, or all its history, in cached chunks. Pass null
+ * filters to skip loading.
  */
 export function useDailyByClient<T extends { day_start_date?: string }>(
   list: ListFn,
   dataKey: string,
-  layer: ClientLayer | null,
+  filters: Record<string, unknown> | null,
   from: number | undefined
 ): UseDailyByClientResult<T> {
   const { currentNetwork } = useNetwork();
@@ -45,10 +45,10 @@ export function useDailyByClient<T extends { day_start_date?: string }>(
 
   const result = useQueries({
     queries: chunks.map(chunk => ({
-      queryKey: ['client-pages', dataKey, currentNetwork?.name, layer, chunk.key],
+      queryKey: ['client-pages', dataKey, currentNetwork?.name, filters, chunk.key],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchAllPages<T>(list, { query: { ...chunk.query, layer_eq: layer, page_size: PAGE_SIZE } }, dataKey, signal),
-      enabled: !!currentNetwork && !!layer && !bounds.isLoading,
+        fetchAllPages<T>(list, { query: { ...chunk.query, ...filters, page_size: PAGE_SIZE } }, dataKey, signal),
+      enabled: !!currentNetwork && filters !== null && !bounds.isLoading,
       staleTime: chunk.open ? 10 * 60 * 1000 : Infinity,
     })),
     combine: combine<T>,

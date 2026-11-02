@@ -24,11 +24,10 @@ import {
   EntityVersionBars,
   ForkReadinessCard,
   NodeTable,
-  PendingSource,
   ReferenceEngine,
+  VersionNetwork,
 } from './components';
 import { useVersionCounts, useClientNodes, useClientReleases, usePeerSupport, useReferenceEngine } from './hooks';
-import { PENDING_SOURCES } from './pending';
 import {
   adoptionByDay,
   buildMatchesRelease,
@@ -506,10 +505,7 @@ export function VersionPage(): JSX.Element {
           </Card>
         )}
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-          {layer === 'consensus' && <PendingSource {...PENDING_SOURCES.nodeCensus} />}
-          <PendingSource {...PENDING_SOURCES.enrCrawl} />
-        </div>
+        <VersionNetwork client={client} layer={layer} version={version} />
       </div>
     </Container>
   );

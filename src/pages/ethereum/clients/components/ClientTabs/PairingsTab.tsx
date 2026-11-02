@@ -15,8 +15,7 @@ import {
 } from '../../constants';
 import { useClientBlocks, useClientCounts } from '../../hooks';
 import { clientOf, summariseClients } from '../../utils/client-share';
-import { PENDING_SOURCES } from '../../pending';
-import { PendingSource } from '../PendingSource';
+import { IpPairings } from '../Census';
 import { ShareTable } from '../ShareTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
@@ -110,7 +109,7 @@ export function PairingsTab({
             />
           )}
         </Card>
-        <PendingSource {...PENDING_SOURCES.ipPairings} />
+        <IpPairings client={client} layer={layer} />
       </div>
 
       <Card
