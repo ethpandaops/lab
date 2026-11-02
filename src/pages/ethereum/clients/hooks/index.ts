@@ -19,3 +19,7 @@ export type { UseVersionCountsOptions, UseVersionCountsResult } from './useVersi
 export { useDailyByClient } from './useDailyByClient';
 export { useCensus, useNodeWeightedShares } from './useCensus';
 export type { NodeWeightedShares, UseCensusResult } from './useCensus';
+export { useNodeVersions } from './useNodeVersions';
+export type { UseNodeVersionsResult } from './useNodeVersions';
+export { useProbeSample, PROBE_SLICES, PROBE_SLICE_SECONDS } from './useProbeSample';
+export type { UseProbeSampleResult } from './useProbeSample';

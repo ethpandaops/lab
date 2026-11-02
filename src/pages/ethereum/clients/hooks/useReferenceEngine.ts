@@ -4,18 +4,22 @@ import {
   fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineNewPayloadByElClientDailyServiceList,
   fctEngineNewPayloadWinrateDailyServiceList,
+  fctOpcodeCostByElClientDailyServiceList,
   fctOpcodeCostByElClientVersionServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineGetBlobsByElClientDaily,
   FctEngineNewPayloadByElClientDaily,
   FctEngineNewPayloadWinrateDaily,
+  FctOpcodeCostByElClientDaily,
   FctOpcodeCostByElClientVersion,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { normalizeClientName } from '@/utils/ethereum';
 import { PAGE_SIZE, REFERENCE_NODE_CLASS } from '../constants';
+import { dailyDateValues } from '../utils/client-share';
+import { opcodeRowsFromDaily } from '../utils/client-versions';
 
 export interface UseReferenceEngineResult {
   /** Daily engine_newPayload per version of the client on the reference nodes, oldest first */
@@ -38,18 +42,24 @@ const isClient = (client: string) => (row: { meta_execution_implementation?: str
 
 /**
  * Engine API timings, wins and opcode costs of an execution client on the EIP-7870 reference nodes, which run
- * on standardised hardware so versions compare fairly.
+ * on standardised hardware so versions compare fairly. Covers the last `days` UTC days, or every day when omitted.
  */
-export function useReferenceEngine(client: string | undefined, enabled: boolean): UseReferenceEngineResult {
+export function useReferenceEngine(
+  client: string | undefined,
+  enabled: boolean,
+  days?: number
+): UseReferenceEngineResult {
   const { currentNetwork } = useNetwork();
   const network = currentNetwork?.name;
   const on = !!currentNetwork && !!client && enabled;
 
-  // The daily tables only filter their date key by value; every date starts with 20
-  const dailyQuery = { day_start_date_like: '20%', node_class_eq: REFERENCE_NODE_CLASS, page_size: PAGE_SIZE };
+  // The daily tables only filter their date key by value: list the window's dates, or match every date
+  const dates = useMemo(() => (days ? dailyDateValues(days) : null), [days]);
+  const dateFilter = dates ? { day_start_date_in_values: dates } : { day_start_date_like: '20%' };
+  const dailyQuery = { ...dateFilter, node_class_eq: REFERENCE_NODE_CLASS, page_size: PAGE_SIZE };
 
   const newPayload = useQuery({
-    queryKey: ['client-pages', 'reference', 'new-payload', network],
+    queryKey: ['client-pages', 'reference', 'new-payload', network, dates],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadByElClientDaily>(
         fctEngineNewPayloadByElClientDailyServiceList,
@@ -61,7 +71,7 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const getBlobs = useQuery({
-    queryKey: ['client-pages', 'reference', 'get-blobs', network],
+    queryKey: ['client-pages', 'reference', 'get-blobs', network, dates],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineGetBlobsByElClientDaily>(
         fctEngineGetBlobsByElClientDailyServiceList,
@@ -73,7 +83,7 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const winrate = useQuery({
-    queryKey: ['client-pages', 'reference', 'winrate', network],
+    queryKey: ['client-pages', 'reference', 'winrate', network, dates],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadWinrateDaily>(
         fctEngineNewPayloadWinrateDailyServiceList,
@@ -85,20 +95,27 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const opcodes = useQuery({
-    queryKey: ['client-pages', 'reference', 'opcodes', network],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctOpcodeCostByElClientVersion>(
-        fctOpcodeCostByElClientVersionServiceList,
-        {
-          query: {
-            node_class_eq: REFERENCE_NODE_CLASS,
-            hour_count_gte: MIN_OPCODE_HOURS,
-            page_size: PAGE_SIZE,
-          },
-        },
-        'fct_opcode_cost_by_el_client_version',
-        signal
-      ),
+    queryKey: ['client-pages', 'reference', 'opcodes', network, dates],
+    // Over a window, daily fits of the window's days; otherwise each version's fit over its whole life
+    queryFn: async ({ signal }): Promise<FctOpcodeCostByElClientVersion[]> =>
+      dates
+        ? opcodeRowsFromDaily(
+            await fetchAllPages<FctOpcodeCostByElClientDaily>(
+              fctOpcodeCostByElClientDailyServiceList,
+              { query: dailyQuery },
+              'fct_opcode_cost_by_el_client_daily',
+              signal
+            ),
+            MIN_OPCODE_HOURS
+          )
+        : fetchAllPages<FctOpcodeCostByElClientVersion>(
+            fctOpcodeCostByElClientVersionServiceList,
+            {
+              query: { node_class_eq: REFERENCE_NODE_CLASS, hour_count_gte: MIN_OPCODE_HOURS, page_size: PAGE_SIZE },
+            },
+            'fct_opcode_cost_by_el_client_version',
+            signal
+          ),
     enabled: on,
     staleTime: 30 * 60 * 1000,
   });

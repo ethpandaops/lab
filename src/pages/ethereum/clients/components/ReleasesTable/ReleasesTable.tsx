@@ -15,7 +15,7 @@ export interface ReleasesTableProps {
   latest?: DimClientRelease;
   /** Blocks per version over the page's window */
   blocksByVersion: Map<string, number>;
-  /** Xatu nodes per version */
+  /** Xatu nodes per version over the page's window */
   nodesByVersion: Map<string, number>;
   /** Minimum version of the fork in ?fork */
   minVersion?: string;

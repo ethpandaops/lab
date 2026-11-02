@@ -670,25 +670,54 @@ export function IpPairings({ client, layer }: { client: string; layer: ClientLay
   );
 }
 
+/** Peers on a version and their share of the client's peers on one day's rows */
+function versionPeers(rows: FctPeerCountByElClientDaily[], version: string): { peers: number; share: number | null } {
+  const total = sum(rows, row => row.peer_count);
+  const peers = sum(
+    rows.filter(row => row.version === version),
+    row => row.peer_count
+  );
+  return { peers, share: total > 0 ? (peers / total) * 100 : null };
+}
+
 /**
- * One version on the network: its share of the client's P2P peers, and whether its ENR nodes advertise the next fork.
+ * One version on the network: its share of the client's P2P peers on the range's last full day with the change
+ * since its first, and whether its ENR nodes advertise the next fork.
  */
 export function VersionNetwork({
   client,
   layer,
   version,
+  from,
+  window,
 }: {
   client: string;
   layer: ClientLayer;
   version: string;
+  /** Start of the page's range (unix seconds) */
+  from: number;
+  /** The range as it reads in copy, e.g. 30d */
+  window: string;
 }): JSX.Element {
   const table = layer === 'consensus' ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers;
-  const own = useCensus<FctPeerCountByElClientDaily>(table, { client_eq: client });
+  const own = useCensus<FctPeerCountByElClientDaily>(table, { client_eq: client }, from);
   const total = sum(own.latest, row => row.peer_count);
-  const onVersion = sum(
-    own.latest.filter(row => row.version === version),
-    row => row.peer_count
-  );
+  const { peers: onVersion } = versionPeers(own.latest, version);
+  const change = useMemo(() => {
+    const firstDay = own.rows.reduce<string | null>(
+      (first, row) => (row.day_start_date && (!first || row.day_start_date < first) ? row.day_start_date : first),
+      null
+    );
+    if (!firstDay || firstDay === own.day) return null;
+    const start = versionPeers(
+      own.rows.filter(row => row.day_start_date === firstDay),
+      version
+    );
+    const end = versionPeers(own.latest, version);
+    const points = start.share !== null && end.share !== null ? Math.round((end.share - start.share) * 10) / 10 : null;
+    return { peers: end.peers - start.peers, points };
+  }, [own.rows, own.latest, own.day, version]);
+  const signed = (value: number, digits = 0): string => `${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -701,11 +730,29 @@ export function VersionNetwork({
           <dl className="grid grid-cols-2 gap-4">
             <div>
               <dt className="text-xs/5 text-muted">Peers</dt>
-              <dd className="text-2xl/8 font-semibold text-foreground tabular-nums">{onVersion.toLocaleString()}</dd>
+              <dd className="flex items-baseline gap-2">
+                <span className="text-2xl/8 font-semibold text-foreground tabular-nums">
+                  {onVersion.toLocaleString()}
+                </span>
+                {change && (
+                  <span className="text-xs text-muted tabular-nums">
+                    {signed(change.peers)} over {window}
+                  </span>
+                )}
+              </dd>
             </div>
             <div>
               <dt className="text-xs/5 text-muted">Share of the client&apos;s peers</dt>
-              <dd className="text-2xl/8 font-semibold text-foreground tabular-nums">{percent(onVersion, total)}</dd>
+              <dd className="flex items-baseline gap-2">
+                <span className="text-2xl/8 font-semibold text-foreground tabular-nums">
+                  {percent(onVersion, total)}
+                </span>
+                {change?.points != null && (
+                  <span className="text-xs text-muted tabular-nums">
+                    {signed(change.points, 1)} pts over {window}
+                  </span>
+                )}
+              </dd>
             </div>
           </dl>
         )}

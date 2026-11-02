@@ -1,6 +1,7 @@
 import type {
   DimClientRelease,
   FctEngineNewPayloadByElClientDaily,
+  FctOpcodeCostByElClientDaily,
   FctOpcodeCostByElClientVersion,
 } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } from '@/utils/ethereum';
@@ -465,6 +466,27 @@ export function adoptionByDay(days: VersionDay[], version: string): AdoptionPoin
   });
 }
 
+/**
+ * Stat for a share on the latest day with blocks, with its change in percentage points since the first such day
+ * of the window, e.g. "50.8%" and "+48.2 pts over 30d".
+ */
+export function shareStat(
+  points: AdoptionPoint[],
+  key: 'exact' | 'atLeast',
+  window: string
+): { value: string; delta?: { value: string; type: 'neutral' } } {
+  const counted = points.map(point => point[key]).filter((share): share is number => share !== null);
+  if (counted.length === 0) return { value: '-' };
+  const latest = counted[counted.length - 1];
+  const value = `${latest.toFixed(1)}%`;
+  if (counted.length < 2) return { value };
+  const change = Math.round((latest - counted[0]) * 10) / 10;
+  return {
+    value,
+    delta: { value: `${change > 0 ? '+' : ''}${change.toFixed(1)} pts over ${window}`, type: 'neutral' },
+  };
+}
+
 /** How long a release took to reach a share of blocks */
 export type AdoptionLag =
   | { status: 'reached'; seconds: number }
@@ -653,6 +675,21 @@ export interface OpcodeCostChange {
   change: number;
   /** Whether the two builds' intervals do not overlap */
   significant: boolean;
+}
+
+/**
+ * Per-version opcode rows from daily fits, for a window: keeps the days with at least `minHours` hours of fits whose
+ * builds all report one build line, so each kept fit belongs to one line.
+ */
+export function opcodeRowsFromDaily(
+  rows: FctOpcodeCostByElClientDaily[],
+  minHours: number
+): FctOpcodeCostByElClientVersion[] {
+  return rows.flatMap(({ meta_execution_versions: versions = [], day_start_date: _day, ...row }) =>
+    (row.hour_count ?? 0) >= minHours && new Set(versions.map(buildLine)).size === 1
+      ? [{ ...row, meta_execution_version: versions[0] }]
+      : []
+  );
 }
 
 /** Opcode groups below this share of gas are too rare to cost reliably */

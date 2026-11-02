@@ -35,6 +35,8 @@ export interface GraffitiBlocksTableProps {
   hideEntity?: boolean;
   /** Controls shown before the filters */
   toolbar?: ReactNode;
+  /** Start of the page's window (unix seconds); the table's own From filter can only narrow it */
+  since?: number;
 }
 
 /** Badge color per graffiti format: client codes and version strings parsed, the rest did not */
@@ -68,8 +70,11 @@ export function GraffitiBlocksTable({
   onSearchChange,
   hideEntity = false,
   toolbar,
+  since,
 }: GraffitiBlocksTableProps): JSX.Element {
-  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useGraffitiBlocks(search);
+  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useGraffitiBlocks(
+    since === undefined ? search : { ...search, since: Math.max(search.since ?? 0, since) }
+  );
   const { field, desc } = parseSort(search.sort);
   const hasFilters = fields.some(key => search[key] !== undefined);
   const canFilterFormat = fields.includes('format');

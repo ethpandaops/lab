@@ -102,6 +102,7 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
         search={{ ...search, [ownKey]: client }}
         fields={blockFields}
         onSearchChange={onBlockSearchChange}
+        since={since}
       />
     </div>
   );
