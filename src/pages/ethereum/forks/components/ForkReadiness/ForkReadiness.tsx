@@ -35,7 +35,7 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Per client: the fork's minimum version, and how many of the last 24 hours of blocks and of our nodes already
+ * Per client: the fork's minimum version, and how many of the last 24 hours of blocks and of Xatu nodes already
  * run it or newer. Renders nothing for forks without minimum versions.
  */
 export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null {
@@ -105,7 +105,7 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
     <Card
       rounded
       title="Client readiness"
-      subtitle="Blocks over the last 24 hours and our nodes on the minimum version or newer"
+      subtitle="Blocks over the last 24 hours and Xatu nodes on the minimum version or newer"
       actions={
         <Link to="/xatu/fork-readiness" className="text-sm text-primary hover:underline">
           Node readiness
@@ -144,7 +144,7 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
               headerClassName: 'text-right',
             },
             {
-              header: 'Our nodes ready',
+              header: 'Xatu nodes ready',
               accessor: row => percent(row.nodesReady, row.nodesCounted),
               cellClassName: 'text-right tabular-nums text-foreground',
               headerClassName: 'text-right',

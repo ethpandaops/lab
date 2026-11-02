@@ -16,7 +16,7 @@ export interface NodeTableProps {
 }
 
 /**
- * Our nodes running the client, linked to their node and contributor pages, most recently seen first.
+ * Xatu nodes running the client, linked to their node and contributor pages, most recently seen first.
  */
 export function NodeTable({ client, layer, nodes, releases }: NodeTableProps): JSX.Element {
   const columns: Column<FctNodeActiveLast24h>[] = [

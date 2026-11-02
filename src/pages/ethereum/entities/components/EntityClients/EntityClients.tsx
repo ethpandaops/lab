@@ -15,9 +15,8 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT } from '@/utils/graffiti';
-import { ShareBar } from '@/pages/ethereum/clients/components/ShareBar';
+import { ShareTable } from '@/pages/ethereum/clients/components/ShareTable';
 import {
-  dailyDateValues,
   summariseClients,
   toClientCountRecords,
   type ClientLayer,
@@ -29,8 +28,6 @@ export interface EntityClientsProps {
   entity: string;
 }
 
-/** Days of per-client block counts for the shares */
-const SHARE_DAYS = 90;
 /** Days of per-block graffiti for the versions */
 const VERSION_DAYS = 30;
 
@@ -46,32 +43,21 @@ interface VersionRow {
 /** Ranked client shares for one layer */
 function ShareList({ title, summaries }: { title: string; summaries: ClientSummary[] }): JSX.Element {
   return (
-    <Card rounded title={title} subtitle={`Share of blocks naming a client, ${SHARE_DAYS} days`}>
+    <Card rounded title={title} subtitle="Share of blocks naming a client, all time">
       {summaries.length === 0 ? (
         <p className="text-sm text-muted">No block named a client.</p>
       ) : (
-        <ul className="flex flex-col gap-1.5">
-          {summaries.map(summary => (
-            <li key={summary.client} className="flex items-center gap-3">
-              <span className="w-36 shrink-0">
-                <ClientLabel client={summary.client} />
-              </span>
-              <span className="flex-1">
-                <ShareBar
-                  share={summary.identifiedShare ?? 0}
-                  color={getClientColor(summary.client)}
-                  showThresholds={false}
-                />
-              </span>
-              <span className="w-14 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
-                {(summary.identifiedShare ?? 0).toFixed(1)}%
-              </span>
-              <span className="hidden w-16 shrink-0 text-right text-xs/6 text-muted tabular-nums sm:block">
-                {summary.blocks.toLocaleString()}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ShareTable
+          labelHeader="Client"
+          countHeader="Blocks"
+          rows={summaries.map(summary => ({
+            key: summary.client,
+            label: <ClientLabel client={summary.client} />,
+            share: summary.identifiedShare ?? 0,
+            count: summary.blocks,
+            color: getClientColor(summary.client),
+          }))}
+        />
       )}
     </Card>
   );
@@ -82,15 +68,15 @@ function ShareList({ title, summaries }: { title: string; summaries: ClientSumma
  */
 export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
   const { currentNetwork } = useNetwork();
-  const dates = useMemo(() => dailyDateValues(SHARE_DAYS), []);
   const since = useMemo(() => Math.floor(Date.now() / 1000 / 86400) * 86400 - (VERSION_DAYS - 1) * 86400, []);
 
   const counts = useQuery({
-    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity, dates],
+    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity],
     queryFn: ({ signal }) =>
       fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
         fctBlockGraffitiClientByEntityDailyServiceList,
-        { query: { entity_eq: entity, day_start_date_in_values: dates, page_size: 10000 } },
+        // The daily table only filters its date key by value; every date starts with 20
+        { query: { entity_eq: entity, day_start_date_like: '20%', page_size: 10000 } },
         'fct_block_graffiti_client_by_entity_daily',
         signal
       ),
@@ -206,7 +192,7 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
                 headerClassName: 'text-right',
               },
               {
-                header: 'Share of layer',
+                header: 'Share of its blocks',
                 accessor: row => `${row.share.toFixed(1)}%`,
                 cellClassName: 'text-right tabular-nums font-medium text-foreground',
                 headerClassName: 'text-right',

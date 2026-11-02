@@ -7,7 +7,7 @@ import { getClientColor } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
 import { displayVersion } from '../../utils/client-versions';
 import { NodeTable } from '../NodeTable';
-import { ShareBar } from '../ShareBar';
+import { ShareTable } from '../ShareTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */
@@ -16,7 +16,7 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Our contributoor nodes running the client: how many, where, on which versions, linked to each node.
+ * Xatu nodes running the client: how many, where, on which versions, linked to each node.
  */
 export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest }: ClientTabProps): JSX.Element {
   const versions = useMemo(() => {
@@ -61,43 +61,35 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
         <Card rounded>
           <p className="text-sm/6 text-muted">
             {layer === 'consensus'
-              ? 'None of our nodes ran this client in the last 24 hours.'
-              : 'Contributoor reports the consensus client only, and no ethPandaOps node name lists this client.'}
+              ? 'No Xatu node ran this client in the last 24 hours.'
+              : 'Xatu nodes report their consensus client only, and no ethPandaOps node name lists this client.'}
           </p>
         </Card>
       ) : (
         <>
           {versions.length > 0 && (
-            <Card rounded title="Versions on our nodes">
-              <ul className="flex flex-col gap-1.5">
-                {versions.map(row => (
-                  <li key={row.version} className="flex items-center gap-3">
-                    <span className="w-40 shrink-0 font-mono text-xs/6">
-                      {isReleased(row.version) ? (
-                        <Link
-                          to="/ethereum/clients/$client/$version"
-                          params={{ client, version: row.version }}
-                          className="text-primary hover:underline"
-                        >
-                          {row.version}
-                        </Link>
-                      ) : (
-                        <span className="text-muted">{row.version}</span>
-                      )}
-                    </span>
-                    <span className="flex-1">
-                      <ShareBar
-                        share={(row.count / nodes.length) * 100}
-                        color={getClientColor(client)}
-                        showThresholds={false}
-                      />
-                    </span>
-                    <span className="w-10 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
-                      {row.count}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <Card rounded title="Versions on Xatu nodes">
+              <ShareTable
+                labelHeader="Version"
+                countHeader="Nodes"
+                rows={versions.map(row => ({
+                  key: row.version,
+                  label: isReleased(row.version) ? (
+                    <Link
+                      to="/ethereum/clients/$client/$version"
+                      params={{ client, version: row.version }}
+                      className="font-mono text-xs/6 text-primary hover:underline"
+                    >
+                      {row.version}
+                    </Link>
+                  ) : (
+                    <span className="font-mono text-xs/6 text-muted">{row.version}</span>
+                  ),
+                  share: (row.count / nodes.length) * 100,
+                  count: row.count,
+                  color: getClientColor(client),
+                }))}
+              />
             </Card>
           )}
           <Card

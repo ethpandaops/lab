@@ -15,7 +15,7 @@ export interface ReleasesTableProps {
   latest?: DimClientRelease;
   /** Blocks per version over the page's window */
   blocksByVersion: Map<string, number>;
-  /** Our nodes per version */
+  /** Xatu nodes per version */
   nodesByVersion: Map<string, number>;
   /** Minimum version of the fork in ?fork */
   minVersion?: string;
@@ -77,7 +77,7 @@ export function ReleasesTable({
       headerClassName: 'text-right',
     },
     {
-      header: 'Our nodes',
+      header: 'Xatu nodes',
       accessor: row => (nodesByVersion.get(row.version ?? '') ?? 0).toLocaleString(),
       cellClassName: 'text-right tabular-nums text-muted',
       headerClassName: 'text-right',

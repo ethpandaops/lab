@@ -16,6 +16,7 @@ export { PendingSource } from './PendingSource';
 export { ReferenceEngine } from './ReferenceEngine';
 export { ReleasesTable } from './ReleasesTable';
 export { ShareBar } from './ShareBar';
+export { ShareTable } from './ShareTable';
 export { SourceAngles } from './SourceAngles';
 export { VersionShareChart } from './VersionShareChart';
 export { VersionTable } from './VersionTable';

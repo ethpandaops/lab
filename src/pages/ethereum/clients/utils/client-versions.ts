@@ -131,6 +131,12 @@ export function displayVersion(raw: string | undefined, releases: DimClientRelea
   return matchReleaseVersion(raw, releases)?.version ?? shortVersion(raw);
 }
 
+/**
+ * Why a block's version did not resolve: its graffiti carries no version (no commit, or a zero placeholder such as
+ * 0000), its commit is in no published release, or it matches several releases.
+ */
+export type UnresolvedReason = 'no-version' | 'unknown-commit' | 'ambiguous';
+
 /** One proposed block with the version of the page's client resolved */
 export interface ResolvedBlock {
   slot: number;
@@ -139,6 +145,10 @@ export interface ResolvedBlock {
   day: string;
   /** Release version, or null when the graffiti did not resolve to one */
   version: string | null;
+  /** Commit prefix the graffiti carried for the client */
+  commit?: string;
+  /** Set when version is null */
+  unresolved?: UnresolvedReason;
   entity?: string;
   /** Client of the other layer */
   partner: string;
@@ -166,12 +176,13 @@ export function resolveBlocks(
     const graffitiVersion = layer === 'consensus' ? row.consensus_client_version?.trim() : undefined;
 
     let version: string | null = null;
+    let unresolved: UnresolvedReason | undefined;
     if (graffitiVersion) {
       if (!byVersion.has(graffitiVersion)) {
         byVersion.set(graffitiVersion, findReleaseByVersion(releases, graffitiVersion)?.version ?? graffitiVersion);
       }
       version = byVersion.get(graffitiVersion) ?? null;
-    } else if (commit) {
+    } else if (commit && !/^0+$/.test(commit)) {
       let resolution = byCommit.get(commit);
       if (!resolution) {
         resolution = resolveClientRelease(releases, commit);
@@ -179,6 +190,15 @@ export function resolveBlocks(
       }
       if (resolution.status === 'ambiguous') resolution = resolveClientRelease(releases, commit, time);
       if (resolution.status === 'resolved') version = resolution.release.version ?? null;
+      else
+        unresolved =
+          resolution.status === 'ambiguous'
+            ? 'ambiguous'
+            : resolution.status === 'unmatched'
+              ? 'unknown-commit'
+              : 'no-version';
+    } else {
+      unresolved = 'no-version';
     }
 
     const partner = layer === 'consensus' ? row.execution_client : row.consensus_client;
@@ -187,6 +207,8 @@ export function resolveBlocks(
       time,
       day: new Date(time * 1000).toISOString().slice(0, 10),
       version,
+      commit: commit || undefined,
+      unresolved,
       entity: row.entity || undefined,
       partner: (partner ?? '').trim().toLowerCase() || UNKNOWN_CLIENT,
       partnerDetail:
@@ -195,6 +217,23 @@ export function resolveBlocks(
           : row.consensus_client_version || row.consensus_client_commit) || undefined,
     };
   });
+}
+
+/**
+ * Release a partner client's graffiti detail names: a version string, or a commit prefix resolved at block time.
+ */
+export function resolveDetail(
+  detail: string | undefined,
+  releases: DimClientRelease[],
+  time?: number
+): DimClientRelease | undefined {
+  const value = (detail ?? '').trim().toLowerCase();
+  if (!value || /^0+$/.test(value)) return undefined;
+  if (/^[0-9a-f]{2,40}$/.test(value)) {
+    const resolution = resolveClientRelease(releases, value, time);
+    return resolution.status === 'resolved' ? resolution.release : undefined;
+  }
+  return findReleaseByVersion(releases, value);
 }
 
 /** Blocks per version over a window */
@@ -231,6 +270,42 @@ export function summariseVersions(blocks: ResolvedBlock[]): VersionSummary[] {
       lastSeen: entry.lastSeen,
     }))
     .sort((a, b) => compareVersions(b.version, a.version));
+}
+
+/** Unresolved blocks sharing a reason and commit */
+export interface UnresolvedGroup {
+  reason: UnresolvedReason;
+  commit?: string;
+  blocks: number;
+  /** Entities proposing them, most blocks first */
+  entities: string[];
+}
+
+/**
+ * Blocks whose version did not resolve, grouped by reason and commit, most blocks first.
+ */
+export function summariseUnresolved(blocks: ResolvedBlock[]): UnresolvedGroup[] {
+  const groups = new Map<
+    string,
+    { reason: UnresolvedReason; commit?: string; blocks: number; entities: Map<string, number> }
+  >();
+  for (const block of blocks) {
+    if (block.version || !block.unresolved) continue;
+    const commit = block.unresolved === 'no-version' ? undefined : block.commit;
+    const key = `${block.unresolved}|${commit ?? ''}`;
+    const group = groups.get(key) ?? { reason: block.unresolved, commit, blocks: 0, entities: new Map() };
+    group.blocks++;
+    if (block.entity) group.entities.set(block.entity, (group.entities.get(block.entity) ?? 0) + 1);
+    groups.set(key, group);
+  }
+  return [...groups.values()]
+    .map(group => ({
+      reason: group.reason,
+      commit: group.commit,
+      blocks: group.blocks,
+      entities: [...group.entities.entries()].sort((a, b) => b[1] - a[1]).map(([entity]) => entity),
+    }))
+    .sort((a, b) => b.blocks - a.blocks);
 }
 
 /** Resolved blocks per version for one UTC day */

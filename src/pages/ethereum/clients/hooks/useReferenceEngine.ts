@@ -15,8 +15,7 @@ import type {
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { normalizeClientName } from '@/utils/ethereum';
-import { PAGE_SIZE, REFERENCE_DAYS, REFERENCE_NODE_CLASS } from '../constants';
-import { dailyDateValues } from '../utils/client-share';
+import { PAGE_SIZE, REFERENCE_NODE_CLASS } from '../constants';
 
 export interface UseReferenceEngineResult {
   /** Daily engine_newPayload per version of the client on the reference nodes, oldest first */
@@ -43,14 +42,14 @@ const isClient = (client: string) => (row: { meta_execution_implementation?: str
  */
 export function useReferenceEngine(client: string | undefined, enabled: boolean): UseReferenceEngineResult {
   const { currentNetwork } = useNetwork();
-  const dates = useMemo(() => dailyDateValues(REFERENCE_DAYS), []);
   const network = currentNetwork?.name;
   const on = !!currentNetwork && !!client && enabled;
 
-  const dailyQuery = { day_start_date_in_values: dates, node_class_eq: REFERENCE_NODE_CLASS, page_size: PAGE_SIZE };
+  // The daily tables only filter their date key by value; every date starts with 20
+  const dailyQuery = { day_start_date_like: '20%', node_class_eq: REFERENCE_NODE_CLASS, page_size: PAGE_SIZE };
 
   const newPayload = useQuery({
-    queryKey: ['client-pages', 'reference', 'new-payload', network, dates],
+    queryKey: ['client-pages', 'reference', 'new-payload', network],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadByElClientDaily>(
         fctEngineNewPayloadByElClientDailyServiceList,
@@ -62,7 +61,7 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const getBlobs = useQuery({
-    queryKey: ['client-pages', 'reference', 'get-blobs', network, dates],
+    queryKey: ['client-pages', 'reference', 'get-blobs', network],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineGetBlobsByElClientDaily>(
         fctEngineGetBlobsByElClientDailyServiceList,
@@ -74,7 +73,7 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const winrate = useQuery({
-    queryKey: ['client-pages', 'reference', 'winrate', network, dates],
+    queryKey: ['client-pages', 'reference', 'winrate', network],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadWinrateDaily>(
         fctEngineNewPayloadWinrateDailyServiceList,
@@ -86,14 +85,13 @@ export function useReferenceEngine(client: string | undefined, enabled: boolean)
     staleTime: 30 * 60 * 1000,
   });
   const opcodes = useQuery({
-    queryKey: ['client-pages', 'reference', 'opcodes', network, dates],
+    queryKey: ['client-pages', 'reference', 'opcodes', network],
     queryFn: ({ signal }) =>
       fetchAllPages<FctOpcodeCostByElClientVersion>(
         fctOpcodeCostByElClientVersionServiceList,
         {
           query: {
             node_class_eq: REFERENCE_NODE_CLASS,
-            last_seen_date_time_gte: Math.floor(Date.now() / 1000 / 86400) * 86400 - REFERENCE_DAYS * 86400,
             hour_count_gte: MIN_OPCODE_HOURS,
             page_size: PAGE_SIZE,
           },

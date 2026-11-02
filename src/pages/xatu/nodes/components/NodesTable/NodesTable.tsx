@@ -43,7 +43,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     cell: ({ row }) => {
       const client = row.original.node.meta_consensus_implementation;
       if (!client) return '–';
-      return <NodeClientVersion client={client} version={row.original.node.meta_consensus_version} />;
+      return <NodeClientVersion client={client} version={row.original.node.meta_consensus_version} showNewer />;
     },
     meta: { cellClassName: 'text-foreground' },
   },

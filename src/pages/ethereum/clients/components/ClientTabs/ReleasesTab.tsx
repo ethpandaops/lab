@@ -6,7 +6,7 @@ import { ReleasesTable } from '../ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /**
- * Every published release with how many blocks and our nodes run it.
+ * Every published release with how many blocks and Xatu nodes run it.
  */
 export function ReleasesTab({
   client,
@@ -43,7 +43,7 @@ export function ReleasesTab({
   }
 
   return (
-    <Card rounded title="Releases" subtitle={`Blocks over the last ${window}; our nodes over the last 24 hours`}>
+    <Card rounded title="Releases" subtitle={`Blocks over the last ${window}; Xatu nodes over the last 24 hours`}>
       <ReleasesTable
         client={client}
         releases={releases}

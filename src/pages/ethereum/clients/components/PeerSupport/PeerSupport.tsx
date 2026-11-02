@@ -116,7 +116,7 @@ export function PeerSupport({
   const partialColumns: Column<PartialRow>[] = [
     { header: 'Version', accessor: row => <VersionCell client={client} version={row.version} releases={releases} /> },
     {
-      header: 'Connected peers',
+      header: 'Connected peers (avg)',
       accessor: row => row.connected.toFixed(1),
       cellClassName: 'text-right tabular-nums text-muted',
       headerClassName: 'text-right',
@@ -138,7 +138,7 @@ export function PeerSupport({
   const probeColumns: Column<ProbeRow>[] = [
     { header: 'Version', accessor: row => <VersionCell client={client} version={row.version} releases={releases} /> },
     {
-      header: 'Peers',
+      header: 'Peers probed',
       accessor: row => row.peers.toLocaleString(),
       cellClassName: 'text-right tabular-nums font-medium text-foreground',
       headerClassName: 'text-right',

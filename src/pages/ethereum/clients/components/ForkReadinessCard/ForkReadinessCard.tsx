@@ -4,13 +4,11 @@ import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { meetsMinVersion } from '@/utils/version';
-import { formatClientName } from '@/utils/graffiti';
 import type { ClientLayer } from '../../utils/client-share';
 import { displayVersion, type ResolvedBlock } from '../../utils/client-versions';
 import type { ForkRequirement } from '../../utils/fork-requirements';
 
 export interface ForkReadinessCardProps {
-  client: string;
   layer: ClientLayer;
   fork: string;
   /** The fork's minimum version for the client, when the config sets one */
@@ -33,7 +31,6 @@ function formatShare(part: number, total: number): string {
  * nodes already run it or newer.
  */
 export function ForkReadinessCard({
-  client,
   layer,
   fork,
   requirement,
@@ -51,9 +48,7 @@ export function ForkReadinessCard({
   if (!requirement) {
     return (
       <Card rounded title={<span className="flex items-center gap-1">{forkLink} readiness</span>}>
-        <p className="text-sm/6 text-muted">
-          The network config sets no minimum {formatClientName(client)} version for this fork.
-        </p>
+        <p className="text-sm/6 text-muted">This fork sets no minimum version for this client.</p>
       </Card>
     );
   }
@@ -85,7 +80,7 @@ export function ForkReadinessCard({
         </div>
         {version && (
           <div>
-            <dt className="text-xs/5 text-muted">{version}</dt>
+            <dt className="text-xs/5 text-muted">This version</dt>
             <dd>
               <Badge color={versionReady ? 'green' : 'red'} size="small" variant="flat">
                 {versionReady ? 'Ready' : 'Below minimum'}
@@ -100,7 +95,7 @@ export function ForkReadinessCard({
           </dd>
         </div>
         <div>
-          <dt className="text-xs/5 text-muted">Our nodes on a ready version</dt>
+          <dt className="text-xs/5 text-muted">Xatu nodes on a ready version</dt>
           <dd className="text-sm/6 font-medium text-foreground tabular-nums">
             {layer === 'consensus' ? formatShare(readyNodes, countedNodes.length) : '-'}
           </dd>
