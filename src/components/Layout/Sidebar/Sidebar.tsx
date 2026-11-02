@@ -1,11 +1,12 @@
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 import { useMemo } from 'react';
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
-import { Link } from '@tanstack/react-router';
+import { Dialog, DialogBackdrop, DialogPanel, Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
+import { Link, useRouterState } from '@tanstack/react-router';
 import clsx from 'clsx';
 import {
   ArchiveBoxXMarkIcon,
   ChartBarIcon,
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CubeIcon,
@@ -30,11 +31,14 @@ import {
 } from '@heroicons/react/24/outline';
 import { NetworkSelect } from '@/components/Ethereum/NetworkSelect';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { GitHubIcon } from '@/components/Elements/Icons';
 import { ThemeToggle } from '@/components/Layout/ThemeToggle';
 import { useConfig } from '@/hooks/useConfig';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getNetworkFullLabel } from '@/utils/networks';
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS } from '@/utils/ethereum';
+import { formatClientName } from '@/utils/graffiti';
 import type { SidebarProps } from './Sidebar.types';
 
 /**
@@ -156,10 +160,41 @@ function SidebarFooter({
   );
 }
 
+/** A page listed in a nav item's flyout */
+interface NavChild {
+  name: string;
+  to: string;
+  icon?: ReactNode;
+}
+
+/** A group of pages in a nav item's flyout, shown as one column */
+interface NavGroup {
+  label?: string;
+  items: NavChild[];
+}
+
 interface NavItem {
   name: string;
   to: string;
   icon: typeof ChartBarIcon;
+  /** Nested pages, opened from a chevron beside the item (or the item's icon in the collapsed rail) */
+  children?: NavGroup[];
+}
+
+/** Clients with no proposed block in any network's history, left out of the sidebar */
+const UNLISTED_CLIENTS = new Set(['trin-execution', 'ethereumjs', 'nimbusel']);
+
+function clientGroup(label: string, clients: readonly string[]): NavGroup {
+  return {
+    label,
+    items: clients
+      .filter(client => !UNLISTED_CLIENTS.has(client))
+      .map(client => ({
+        name: formatClientName(client),
+        to: `/ethereum/clients/${client}`,
+        icon: <ClientLogo client={client} size={16} noLink />,
+      })),
+  };
 }
 
 const ethereumConsensusPages: NavItem[] = [
@@ -169,7 +204,12 @@ const ethereumConsensusPages: NavItem[] = [
   { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
   { name: 'Validators', to: '/ethereum/validators', icon: ShieldCheckIcon },
   { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },
-  { name: 'Clients', to: '/ethereum/clients', icon: CpuChipIcon },
+  {
+    name: 'Clients',
+    to: '/ethereum/clients',
+    icon: CpuChipIcon,
+    children: [clientGroup('Consensus', CONSENSUS_CLIENTS), clientGroup('Execution', EXECUTION_CLIENTS)],
+  },
   { name: 'Forks', to: '/ethereum/forks', icon: SignalIcon },
 ];
 
@@ -213,29 +253,136 @@ function isPageEnabled(
   return true;
 }
 
+const navItemClassName =
+  'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground/5 hover:text-foreground';
+const navItemActiveClassName = 'bg-foreground/[0.07] !text-foreground [&>svg]:text-primary';
+
 /**
- * Navigation link component that handles both collapsed and expanded states
+ * Navigation link component that handles both collapsed and expanded states.
+ * Items with children also get a flyout listing them; `inDrawer` opens it below the item instead of beside it.
  */
-function NavLink({ page, collapsed }: { page: NavItem; collapsed: boolean }): JSX.Element {
+function NavLink({
+  page,
+  collapsed,
+  inDrawer = false,
+}: {
+  page: NavItem;
+  collapsed: boolean;
+  inDrawer?: boolean;
+}): JSX.Element {
   const Icon = page.icon;
 
-  return (
+  const link = (
     <Link
       to={page.to}
       preload="viewport"
       preloadDelay={100}
       title={collapsed ? page.name : undefined}
       className={clsx(
-        'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground/5 hover:text-foreground',
-        collapsed ? 'justify-center p-2' : 'px-2 py-1 text-sm/5 font-medium'
+        navItemClassName,
+        collapsed ? 'justify-center p-2' : 'px-2 py-1 text-sm/5 font-medium',
+        page.children && 'flex-1'
       )}
-      activeProps={{
-        className: 'bg-foreground/[0.07] !text-foreground [&>svg]:text-primary',
-      }}
+      activeProps={{ className: navItemActiveClassName }}
     >
       <Icon className="size-4 shrink-0" />
       {!collapsed && <span>{page.name}</span>}
     </Link>
+  );
+
+  if (!page.children) return link;
+
+  return <NavFlyout page={page} link={link} collapsed={collapsed} inDrawer={inDrawer} />;
+}
+
+/**
+ * Flyout listing a nav item's children. Expanded, a chevron beside the item's link opens it so the link stays
+ * clickable; in the collapsed rail the icon opens it, with the item's own page linked at the top.
+ */
+function NavFlyout({
+  page,
+  link,
+  collapsed,
+  inDrawer,
+}: {
+  page: NavItem;
+  link: JSX.Element;
+  collapsed: boolean;
+  inDrawer: boolean;
+}): JSX.Element {
+  const Icon = page.icon;
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const inSection = pathname === page.to || pathname.startsWith(`${page.to}/`);
+  const Chevron = inDrawer ? ChevronDownIcon : ChevronRightIcon;
+
+  return (
+    <Popover className="flex items-center gap-x-0.5">
+      {collapsed ? (
+        <PopoverButton
+          title={page.name}
+          aria-label={page.name}
+          className={clsx(
+            navItemClassName,
+            'w-full justify-center p-2 data-open:bg-foreground/5 data-open:text-foreground',
+            inSection && navItemActiveClassName
+          )}
+        >
+          <Icon className="size-4 shrink-0" />
+        </PopoverButton>
+      ) : (
+        <>
+          {link}
+          <PopoverButton
+            aria-label={`${page.name} pages`}
+            className="shrink-0 rounded-sm p-1.5 text-muted/70 transition-colors hover:bg-foreground/5 hover:text-foreground data-open:bg-foreground/[0.07] data-open:text-foreground"
+          >
+            <Chevron className="size-3.5" />
+          </PopoverButton>
+        </>
+      )}
+      <PopoverPanel
+        transition
+        anchor={{ to: inDrawer ? 'bottom end' : 'right start', gap: inDrawer ? 4 : 18, padding: 8 }}
+        className="z-60 flex max-w-[calc(100vw-1rem)] flex-col gap-y-2 rounded-sm border border-border bg-background p-2 shadow-lg transition duration-100 ease-out data-closed:-translate-x-1 data-closed:opacity-0"
+      >
+        {({ close }) => (
+          <>
+            {collapsed && (
+              <Link
+                to={page.to}
+                onClick={() => close()}
+                className="rounded-sm px-2 py-1 text-sm/5 font-semibold text-foreground hover:bg-foreground/5"
+              >
+                {page.name}
+              </Link>
+            )}
+            <div className="flex flex-wrap gap-x-3 gap-y-2">
+              {page.children?.map((group, index) => (
+                <div key={group.label ?? index} className="flex min-w-40 flex-1 flex-col">
+                  {group.label && (
+                    <div className="px-2 pt-0.5 pb-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">
+                      {group.label}
+                    </div>
+                  )}
+                  {group.items.map(item => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => close()}
+                      className="flex items-center gap-x-2 rounded-sm px-2 py-1 text-sm/5 font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
+                      activeProps={{ className: 'bg-foreground/[0.07] !text-foreground' }}
+                    >
+                      {item.icon}
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </PopoverPanel>
+    </Popover>
   );
 }
 
@@ -333,7 +480,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                           <SubsectionHeader title="Consensus" collapsed={false} />
                           <div className="space-y-0.5">
                             {filteredEthereumConsensusPages.map(page => (
-                              <NavLink key={page.to} page={page} collapsed={false} />
+                              <NavLink key={page.to} page={page} collapsed={false} inDrawer />
                             ))}
                           </div>
                         </div>
@@ -343,7 +490,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                           <SubsectionHeader title="Data Availability" collapsed={false} />
                           <div className="space-y-0.5">
                             {filteredEthereumDataAvailabilityPages.map(page => (
-                              <NavLink key={page.to} page={page} collapsed={false} />
+                              <NavLink key={page.to} page={page} collapsed={false} inDrawer />
                             ))}
                           </div>
                         </div>
@@ -353,7 +500,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                           <SubsectionHeader title="Execution" collapsed={false} />
                           <div className="space-y-0.5">
                             {filteredEthereumExecutionPages.map(page => (
-                              <NavLink key={page.to} page={page} collapsed={false} />
+                              <NavLink key={page.to} page={page} collapsed={false} inDrawer />
                             ))}
                           </div>
                         </div>
@@ -366,7 +513,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                       <SectionHeader title="Xatu" collapsed={false} type="xatu" />
                       <div className="mt-2 space-y-0.5">
                         {filteredXatuPages.map(page => (
-                          <NavLink key={page.to} page={page} collapsed={false} />
+                          <NavLink key={page.to} page={page} collapsed={false} inDrawer />
                         ))}
                       </div>
                     </div>

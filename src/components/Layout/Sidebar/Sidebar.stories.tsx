@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type JSX, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Sidebar } from './Sidebar';
 import { Button } from '@/components/Elements/Button';
 
@@ -98,6 +99,34 @@ export const MobileOpen: Story = {
     viewport: {
       defaultViewport: 'iphone14promax',
     },
+  },
+};
+
+/**
+ * Items with `children` (here Clients) get a chevron that opens a flyout of their nested pages, grouped into
+ * columns, while the item itself stays a link. In the drawer the flyout opens below the item; Escape closes the
+ * flyout and leaves the drawer open.
+ */
+export const ItemWithChildren: Story = {
+  args: {} as never,
+  render: () => <SidebarWrapper initialOpen />,
+  parameters: {
+    viewport: {
+      defaultViewport: 'iphone14promax',
+    },
+  },
+  play: async () => {
+    const body = within(document.body);
+    const drawer = within(await body.findByRole('dialog'));
+    await userEvent.click(drawer.getByRole('button', { name: 'Clients pages' }));
+    await expect(await body.findByRole('link', { name: /Lighthouse/ })).toHaveAttribute(
+      'href',
+      '/ethereum/clients/lighthouse'
+    );
+    await expect(body.queryByRole('link', { name: /Trin Execution/ })).not.toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(body.queryByRole('link', { name: /Lighthouse/ })).not.toBeInTheDocument());
+    await expect(drawer.getByRole('link', { name: 'Clients' })).toBeVisible();
   },
 };
 
