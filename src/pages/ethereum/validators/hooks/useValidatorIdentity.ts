@@ -1,11 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { dimNodeServiceListOptions } from '@/api/@tanstack/react-query.gen';
-
-/** PROTOTYPE: read straight from a public beacon node until xatu-cbt exposes withdrawal credentials. */
-const BEACON_API = 'https://ethereum-beacon-api.publicnode.com';
-
-const FAR_FUTURE = '18446744073709551615';
+import { dimNodeServiceListOptions, dimValidatorServiceListOptions } from '@/api/@tanstack/react-query.gen';
 
 export interface ValidatorIdentity {
   index: number;
@@ -25,24 +20,6 @@ export interface ValidatorIdentity {
   entity: string | null;
 }
 
-interface BeaconValidator {
-  index: string;
-  balance: string;
-  status: string;
-  validator: {
-    pubkey: string;
-    withdrawal_credentials: string;
-    effective_balance: string;
-    slashed: boolean;
-    activation_eligibility_epoch: string;
-    activation_epoch: string;
-    exit_epoch: string;
-    withdrawable_epoch: string;
-  };
-}
-
-const epochOrNull = (v: string): number | null => (v === FAR_FUTURE ? null : Number(v));
-
 /**
  * Current state, withdrawal credentials and entity for a set of validators.
  */
@@ -51,21 +28,12 @@ export function useValidatorIdentity(indices: number[]): {
   isLoading: boolean;
 } {
   const enabled = indices.length > 0;
-  const ids = indices.map(String);
 
-  const beacon = useQuery({
-    queryKey: ['prototype-beacon-validators', ids],
+  const validators = useQuery({
+    ...dimValidatorServiceListOptions({
+      query: { validator_index_in_values: indices.join(','), page_size: 10_000 },
+    }),
     enabled,
-    staleTime: 60_000,
-    queryFn: async (): Promise<BeaconValidator[]> => {
-      const res = await fetch(`${BEACON_API}/eth/v1/beacon/states/head/validators`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ids }),
-      });
-      if (!res.ok) throw new Error(`beacon node returned ${res.status}`);
-      return ((await res.json()) as { data: BeaconValidator[] }).data;
-    },
   });
 
   const nodes = useQuery({
@@ -79,29 +47,28 @@ export function useValidatorIdentity(indices: number[]): {
   const identities = useMemo(() => {
     const entityByIndex = new Map(nodes.data?.dim_node?.map(n => [n.validator_index ?? -1, n.source ?? null]));
     const out = new Map<number, ValidatorIdentity>();
-    for (const v of beacon.data ?? []) {
-      const creds = v.validator.withdrawal_credentials;
-      const type = creds.slice(0, 4) as ValidatorIdentity['credentialType'];
-      const index = Number(v.index);
+    for (const v of validators.data?.dim_validator ?? []) {
+      const index = v.validator_index ?? 0;
+      const epoch = (e: number | null | undefined): number | null => (e === null || e === undefined ? null : Number(e));
       out.set(index, {
         index,
-        pubkey: v.validator.pubkey,
-        status: v.status,
-        slashed: v.validator.slashed,
-        balanceEth: Number(v.balance) / 1e9,
-        effectiveBalanceEth: Number(v.validator.effective_balance) / 1e9,
-        withdrawalCredentials: creds,
-        credentialType: type,
-        withdrawalAddress: type === '0x00' ? null : `0x${creds.slice(26)}`,
-        activationEligibilityEpoch: epochOrNull(v.validator.activation_eligibility_epoch),
-        activationEpoch: epochOrNull(v.validator.activation_epoch),
-        exitEpoch: epochOrNull(v.validator.exit_epoch),
-        withdrawableEpoch: epochOrNull(v.validator.withdrawable_epoch),
+        pubkey: v.pubkey ?? '',
+        status: v.status ?? 'unknown',
+        slashed: v.slashed ?? false,
+        balanceEth: Number(v.balance ?? 0) / 1e9,
+        effectiveBalanceEth: Number(v.effective_balance ?? 0) / 1e9,
+        withdrawalCredentials: v.withdrawal_credentials ?? '',
+        credentialType: (v.credential_type ?? '0x00') as ValidatorIdentity['credentialType'],
+        withdrawalAddress: v.withdrawal_address ?? null,
+        activationEligibilityEpoch: epoch(v.activation_eligibility_epoch),
+        activationEpoch: epoch(v.activation_epoch),
+        exitEpoch: epoch(v.exit_epoch),
+        withdrawableEpoch: epoch(v.withdrawable_epoch),
         entity: entityByIndex.get(index) ?? null,
       });
     }
     return out;
-  }, [beacon.data, nodes.data]);
+  }, [validators.data, nodes.data]);
 
-  return { identities, isLoading: beacon.isLoading || nodes.isLoading };
+  return { identities, isLoading: validators.isLoading || nodes.isLoading };
 }

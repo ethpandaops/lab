@@ -1,4 +1,6 @@
 import { type JSX, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fctBlockProposerRewardServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { DataTable } from '@/components/DataTable';
 import type { DataTableColumn } from '@/components/DataTable';
 import { Badge } from '@/components/Elements/Badge';
@@ -6,16 +8,7 @@ import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type { FctBlockProposerByValidator } from '@/api/types.gen';
-import { MockBadge } from '../MockBadge';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
-
-/** Stable pseudo-random fraction for mocked proposer rewards */
-const hashFraction = (n: number, salt: number): number =>
-  (((Math.sin(n * 12.9898 + salt * 78.233) * 43758.5453) % 1) + 1) % 1;
-
-/** PROTOTYPE: consensus proposer reward until xatu-cbt has per-block rewards */
-const mockProposerRewardEth = (slot: number): number =>
-  0.032 + hashFraction(slot, 9) * 0.012 + hashFraction(slot, 10) ** 3 * 0.25;
 
 const STATUS_COLORS: Record<string, 'green' | 'red' | 'orange'> = { canonical: 'green', missed: 'red' };
 
@@ -32,6 +25,22 @@ interface ProposalDutiesProps {
 export function ProposalDuties({ indices, validator, onValidatorChange, proposals }: ProposalDutiesProps): JSX.Element {
   const [status, setStatus] = useState('all');
   const [slotQuery, setSlotQuery] = useState('');
+  // Consensus-layer reward for each canonical block, as computed by the beacon node
+  const canonicalSlots = proposals.filter(p => p.status === 'canonical').map(p => p.slot_start_date_time ?? 0);
+  const rewards = useQuery({
+    ...fctBlockProposerRewardServiceListOptions({
+      query: {
+        proposer_index_in_values: indices.join(','),
+        slot_start_date_time_gte: Math.min(...canonicalSlots),
+        slot_start_date_time_lte: Math.max(...canonicalSlots),
+        page_size: 10_000,
+      },
+    }),
+    enabled: canonicalSlots.length > 0,
+  });
+  const rewardBySlot = new Map(
+    (rewards.data?.fct_block_proposer_reward ?? []).map(r => [r.slot ?? -1, Number(r.total ?? 0)])
+  );
   const statuses = [...new Set(proposals.map(p => p.status ?? ''))].filter(Boolean).sort();
 
   // Memoised: DataTable returns to page 1 whenever its data array changes
@@ -84,10 +93,12 @@ export function ProposalDuties({ indices, validator, onValidatorChange, proposal
     },
     {
       id: 'reward',
-      header: 'Reward',
+      header: 'Reward (CL)',
       enableSorting: false,
-      cell: ({ row }) =>
-        row.original.status === 'canonical' ? `${mockProposerRewardEth(row.original.slot ?? 0).toFixed(4)} ETH` : '—',
+      cell: ({ row }) => {
+        const gwei = rewardBySlot.get(row.original.slot ?? -1);
+        return gwei === undefined ? '—' : `${(gwei / 1e9).toFixed(4)} ETH`;
+      },
       meta: { cellClassName: 'text-foreground tabular-nums' },
     },
   ];
@@ -107,9 +118,6 @@ export function ProposalDuties({ indices, validator, onValidatorChange, proposal
             ]}
             expandToFit
           />
-          <span className="ml-auto">
-            <MockBadge />
-          </span>
         </>
       }
     >

@@ -3,6 +3,7 @@ import {
   fctAttestationCorrectnessByValidatorCanonicalServiceListOptions,
   fctAttestationCorrectnessCanonicalServiceListOptions,
   fctAttestationVoteCorrectnessByValidatorServiceListOptions,
+  fctAttestationRewardByValidatorServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type { FctAttestationVoteCorrectnessByValidatorServiceListData } from '@/api/types.gen';
 
@@ -24,6 +25,8 @@ export interface AttestationDuty {
   /** Committee votes for the canonical root, and the committee size */
   votesHead: number | null;
   votesMax: number | null;
+  /** Consensus reward for the epoch's attestation duty, in gwei (negative for a penalty) */
+  rewardGwei: number | null;
 }
 
 type DutyQuery = NonNullable<FctAttestationVoteCorrectnessByValidatorServiceListData['query']>;
@@ -104,6 +107,26 @@ export function useAttestationDuties({
     enabled: rows.length > 0,
   });
 
+  // Rewards are per validator per epoch; the epoch starts (slot % 32) slots before the duty's slot
+  const epochStarts = rows.map(r => (r.slot_start_date_time ?? 0) - ((r.slot ?? 0) % 32) * 12);
+  const rewards = useQuery({
+    ...fctAttestationRewardByValidatorServiceListOptions({
+      query: {
+        validator_index_in_values: voters,
+        epoch_start_date_time_gte: Math.min(...epochStarts),
+        epoch_start_date_time_lte: Math.max(...epochStarts),
+        page_size: 10_000,
+      },
+    }),
+    enabled: rows.length > 0,
+  });
+  const rewardByEpoch = new Map(
+    rewards.data?.fct_attestation_reward_by_validator?.map(r => [
+      `${r.validator_index}:${r.epoch}`,
+      Number(r.total ?? 0),
+    ])
+  );
+
   const votedRoot = new Map(
     votes.data?.fct_attestation_correctness_by_validator_canonical?.map(v => [
       `${v.attesting_validator_index}:${v.slot}`,
@@ -128,11 +151,12 @@ export function useAttestationDuties({
         canonicalRoot: n?.block_root ?? null,
         votesHead: n?.votes_head ?? null,
         votesMax: n?.votes_max ?? null,
+        rewardGwei: rewardByEpoch.get(`${r.validator_index}:${Math.floor((r.slot ?? 0) / 32)}`) ?? null,
       };
     }),
     nextPageToken: duties.data?.next_page_token || undefined,
     isLoading: duties.isLoading,
     isPlaceholderData: duties.isPlaceholderData,
-    error: (duties.error ?? votes.error ?? network.error ?? null) as Error | null,
+    error: (duties.error ?? votes.error ?? network.error ?? rewards.error ?? null) as Error | null,
   };
 }

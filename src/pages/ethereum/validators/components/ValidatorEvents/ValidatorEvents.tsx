@@ -1,193 +1,151 @@
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX, useEffect, useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/DataTable';
 import type { DataTableColumn } from '@/components/DataTable';
+import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { Slot } from '@/components/Ethereum/Slot';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import { useNetwork } from '@/hooks/useNetwork';
-import { epochToTimestamp } from '@/utils';
-import type {
-  FctBlockProposerByValidator,
-  FctSyncCommitteeParticipationByValidatorDaily,
-  FctValidatorBalanceDaily,
-} from '@/api/types.gen';
-import type { ValidatorIdentity } from '../../hooks/useValidatorIdentity';
-import { estimateRewards } from '../../utils/rewards';
-import { MockBadge } from '../MockBadge';
+import { fctValidatorEventServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { FctValidatorEvent } from '@/api/types.gen';
+import { useTableBounds } from '@/hooks/useBounds';
+import { useCursorPagination } from '../../hooks/useCursorPagination';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
 
-const CAPELLA_EPOCH = 194_048;
-const ELECTRA_EPOCH = 364_032;
+const EVENT_LABELS: Record<string, string> = {
+  deposit: 'Deposit',
+  top_up: 'Top-up',
+  bls_to_execution_change: 'Credential change to 0x01',
+  switch_to_compounding: 'Switch to 0x02',
+  consolidation_source: 'Consolidated into',
+  consolidation_target: 'Consolidated from',
+  withdrawal_partial: 'Partial withdrawal',
+  withdrawal_full: 'Full withdrawal',
+  withdrawal_request: 'Partial withdrawal request',
+  exit_request: 'Exit request (EL)',
+  voluntary_exit: 'Voluntary exit',
+  slashed: 'Slashed',
+};
+
+const EVENT_OPTIONS = [
+  { value: 'all', label: 'All events' },
+  ...Object.entries(EVENT_LABELS).map(([value, label]) => ({ value, label })),
+];
+
+const formatEth = (gwei: number): string =>
+  `${(gwei / 1e9).toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ETH`;
 
 interface ValidatorEventsProps {
-  identities: ValidatorIdentity[];
-  balances: FctValidatorBalanceDaily[];
-  sync: FctSyncCommitteeParticipationByValidatorDaily[];
-  proposals: FctBlockProposerByValidator[];
+  indices: number[];
+  /** Range start and end day (unix seconds, start of day UTC); the end day is included */
+  from: number;
+  to: number;
   validator: number | null;
   onValidatorChange: (validator: number | null) => void;
 }
 
-interface ActivityEvent {
-  key: string;
-  timestamp: number;
-  validatorIndex: number;
-  kind: string;
-  detail: string;
-  amount?: string;
-}
-
-/** Stable pseudo-random fraction per validator for mocked event timing */
-const hashFraction = (n: number, salt: number): number =>
-  (((Math.sin(n * 12.9898 + salt * 78.233) * 43758.5453) % 1) + 1) % 1;
-
-const dateLabel = (ts: number): string =>
-  new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-/** Lifecycle events for the validators, newest first */
-function buildEvents(
-  identities: ValidatorIdentity[],
-  balances: FctValidatorBalanceDaily[],
-  sync: FctSyncCommitteeParticipationByValidatorDaily[],
-  proposals: FctBlockProposerByValidator[],
-  genesis: number
-): ActivityEvent[] {
-  const at = (epoch: number): number => epochToTimestamp(epoch, genesis);
-  const { withdrawals } = estimateRewards(balances, sync, proposals);
-
-  const events: ActivityEvent[] = [];
-  for (const v of identities) {
-    if (v.activationEligibilityEpoch !== null) {
-      events.push({
-        key: `${v.index}-deposit`,
-        timestamp: at(Math.max(0, v.activationEligibilityEpoch - 1)),
-        validatorIndex: v.index,
-        kind: 'Deposit',
-        detail: '',
-        amount: '32 ETH',
-      });
-    }
-    if (v.activationEpoch !== null) {
-      events.push({
-        key: `${v.index}-active`,
-        timestamp: at(v.activationEpoch),
-        validatorIndex: v.index,
-        kind: 'Activated',
-        detail: `Epoch ${v.activationEpoch}`,
-      });
-    }
-    if (v.credentialType !== '0x00' && (v.activationEpoch ?? 0) < CAPELLA_EPOCH) {
-      events.push({
-        key: `${v.index}-bls`,
-        timestamp: at(CAPELLA_EPOCH + Math.floor(hashFraction(v.index, 1) * 15_000)),
-        validatorIndex: v.index,
-        kind: 'Credential change',
-        detail: '0x00 → 0x01',
-      });
-    }
-    if (v.credentialType === '0x02') {
-      const ts = at(ELECTRA_EPOCH + Math.floor(hashFraction(v.index, 2) * 80_000));
-      events.push({
-        key: `${v.index}-compound`,
-        timestamp: ts,
-        validatorIndex: v.index,
-        kind: 'Credential change',
-        detail: '0x01 → 0x02',
-      });
-      const merged = Math.floor((v.effectiveBalanceEth - 32) / 32);
-      for (let i = 0; i < Math.min(merged, 3); i++) {
-        events.push({
-          key: `${v.index}-consolidation-${i}`,
-          timestamp: ts + (i + 1) * 86_400 * 3,
-          validatorIndex: v.index,
-          kind: 'Consolidation',
-          detail: `From validator ${v.index + 1 + Math.floor(hashFraction(v.index, i + 3) * 400_000)}`,
-          amount: '32 ETH',
-        });
-      }
-    }
-    if (v.exitEpoch !== null) {
-      events.push({
-        key: `${v.index}-exit`,
-        timestamp: at(v.exitEpoch),
-        validatorIndex: v.index,
-        kind: 'Exit',
-        detail: `Epoch ${v.exitEpoch}`,
-      });
-    }
-  }
-  for (const w of withdrawals) {
-    events.push({
-      key: `${w.validatorIndex}-wd-${w.day}`,
-      timestamp: Date.parse(`${w.day}T12:00:00Z`) / 1000,
-      validatorIndex: w.validatorIndex,
-      kind: 'Withdrawal',
-      detail: '',
-      amount: `${w.amountEth.toFixed(4)} ETH`,
-    });
-  }
-  events.sort((a, b) => b.timestamp - a.timestamp);
-  return events;
-}
-
 /**
- * Lifecycle events: deposits, activations, credential changes, consolidations, withdrawals and exits.
+ * Lifecycle events from the beacon chain: deposits, credential changes, consolidations, withdrawals,
+ * exits and slashings, newest first.
  */
 export function ValidatorEvents({
-  identities,
-  balances,
-  sync,
-  proposals,
+  indices,
+  from,
+  to,
   validator,
   onValidatorChange,
 }: ValidatorEventsProps): JSX.Element {
   const [kind, setKind] = useState('all');
-  const [search, setSearch] = useState('');
-  const { currentNetwork } = useNetwork();
-  const genesis = currentNetwork?.genesis_time ?? 1606824023;
-  const multi = identities.length > 1;
-  // Memoised: DataTable returns to page 1 whenever its data array changes
-  const events = useMemo(
-    () => buildEvents(identities, balances, sync, proposals, genesis),
-    [identities, balances, sync, proposals, genesis]
-  );
+  const [slotQuery, setSlotQuery] = useState('');
+  const slot = /^\d+$/.test(slotQuery.trim()) ? Number(slotQuery.trim()) : null;
 
-  const kinds = [...new Set(events.map(e => e.kind))].sort();
-  const query = search.trim().toLowerCase();
-  const rows = useMemo(
-    () =>
-      events.filter(
-        e =>
-          (validator === null || e.validatorIndex === validator) &&
-          (kind === 'all' || e.kind === kind) &&
-          (query === '' || `${e.kind} ${e.detail} ${e.amount ?? ''} ${e.validatorIndex}`.toLowerCase().includes(query))
-      ),
-    [events, validator, kind, query]
-  );
+  const page = useCursorPagination(JSON.stringify([indices, from, to, validator, kind, slot]));
+  const { data, isLoading, isPlaceholderData, error } = useQuery({
+    ...fctValidatorEventServiceListOptions({
+      query: {
+        validator_index_in_values: (validator === null ? indices : [validator]).join(','),
+        slot_start_date_time_gte: from,
+        slot_start_date_time_lte: to + 86_400,
+        order_by: 'slot DESC, event_position ASC',
+        page_size: page.pageSize,
+        page_token: page.pageToken,
+        ...(kind !== 'all' && { event_type_eq: kind }),
+        ...(slot !== null && { slot_eq: slot }),
+      },
+    }),
+    enabled: indices.length > 0,
+    placeholderData: keepPreviousData,
+  });
+  const rows = data?.fct_validator_event ?? [];
+  // The event table is still filling backwards; an empty result before its start means no data, not no events
+  const bounds = useTableBounds('fct_validator_event');
+  const coverageStart =
+    bounds.data && bounds.data.min > from
+      ? new Date(bounds.data.min * 1000).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      : null;
+  const nextPageToken = data?.next_page_token || undefined;
 
-  const columns: DataTableColumn<ActivityEvent>[] = [
+  const { recordNextToken } = page;
+  useEffect(() => {
+    if (!isLoading && !isPlaceholderData) recordNextToken(nextPageToken);
+  }, [isLoading, isPlaceholderData, nextPageToken, recordNextToken]);
+
+  const columns: DataTableColumn<FctValidatorEvent>[] = [
     {
-      id: 'date',
-      header: 'Date',
-      accessorFn: e => e.timestamp,
-      cell: ({ row }) => dateLabel(row.original.timestamp),
+      id: 'slot',
+      header: 'Slot',
+      cell: ({ row }) => <Slot slot={row.original.slot ?? 0} />,
+      meta: { cellClassName: 'text-foreground tabular-nums' },
     },
-    ...(multi
+    {
+      id: 'time',
+      header: 'Time',
+      cell: ({ row }) => <Timestamp timestamp={row.original.slot_start_date_time ?? 0} className="text-xs" />,
+    },
+    ...(indices.length > 1
       ? [
           {
             id: 'validator',
             header: 'Validator',
-            accessorFn: e => e.validatorIndex,
+            cell: ({ row }) => row.original.validator_index,
             meta: { cellClassName: 'text-foreground tabular-nums' },
-          } satisfies DataTableColumn<ActivityEvent>,
+          } satisfies DataTableColumn<FctValidatorEvent>,
         ]
       : []),
-    { id: 'kind', header: 'Event', accessorKey: 'kind', meta: { cellClassName: 'text-foreground' } },
-    { id: 'detail', header: 'Detail', accessorKey: 'detail', enableSorting: false },
+    {
+      id: 'event',
+      header: 'Event',
+      cell: ({ row }) => EVENT_LABELS[row.original.event_type ?? ''] ?? row.original.event_type,
+      meta: { cellClassName: 'text-foreground' },
+    },
     {
       id: 'amount',
       header: 'Amount',
-      accessorFn: e => e.amount ?? '',
-      enableSorting: false,
+      cell: ({ row }) => (row.original.amount == null ? '—' : formatEth(Number(row.original.amount))),
       meta: { cellClassName: 'text-foreground tabular-nums' },
+    },
+    {
+      id: 'counterparty',
+      header: 'Counterparty',
+      cell: ({ row }) => row.original.counterparty_validator_index ?? '—',
+      meta: { cellClassName: 'text-foreground tabular-nums' },
+    },
+    {
+      id: 'address',
+      header: 'Address',
+      cell: ({ row }) => {
+        const address = row.original.address;
+        if (!address) return '—';
+        return (
+          <span className="font-mono" title={address}>
+            {address.slice(0, 8)}…{address.slice(-6)}
+          </span>
+        );
+      },
     },
   ];
 
@@ -195,29 +153,36 @@ export function ValidatorEvents({
     <TableCard
       filters={
         <>
-          <TableSearch value={search} onChange={setSearch} placeholder="Search events" />
-          <ValidatorFilter indices={identities.map(i => i.index)} value={validator} onChange={onValidatorChange} />
-          <SelectMenu
-            value={kind}
-            onChange={setKind}
-            options={[{ value: 'all', label: 'All events' }, ...kinds.map(k => ({ value: k, label: k }))]}
-            expandToFit
-          />
-          <span className="ml-auto">
-            <MockBadge />
-          </span>
+          <TableSearch value={slotQuery} onChange={setSlotQuery} placeholder="Slot" />
+          <ValidatorFilter indices={indices} value={validator} onChange={onValidatorChange} />
+          <SelectMenu value={kind} onChange={setKind} options={EVENT_OPTIONS} expandToFit />
         </>
       }
     >
-      <DataTable
-        data={rows}
-        columns={columns}
-        pageSize={25}
-        hideGlobalFilter
-        hideColumnVisibility
-        getRowId={e => e.key}
-        emptyMessage="No events match these filters"
-      />
+      {error ? (
+        <p className="px-5 py-8 text-center text-sm text-danger">{error.message}</p>
+      ) : (
+        <DataTable
+          data={rows}
+          columns={columns.map(c => ({ ...c, enableSorting: false }))}
+          isLoading={isLoading}
+          pageIndex={page.pageIndex}
+          pageSize={page.pageSize}
+          onPaginationChange={page.onPaginationChange}
+          hasNextPage={nextPageToken !== undefined}
+          manualPagination
+          manualFiltering
+          manualSorting
+          hideGlobalFilter
+          hideColumnVisibility
+          getRowId={e => `${e.validator_index}:${e.slot}:${e.event_type}:${e.event_position}`}
+          emptyMessage={
+            coverageStart
+              ? `Event data starts ${coverageStart}. No events since then.`
+              : 'No events match these filters'
+          }
+        />
+      )}
     </TableCard>
   );
 }

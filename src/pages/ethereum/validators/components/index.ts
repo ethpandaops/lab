@@ -9,7 +9,6 @@ export { ValidatorHeatmap } from './ValidatorHeatmap';
 export type { HeatmapMetric, ValidatorSelection } from './ValidatorHeatmap';
 export { DailyBreakdownTable } from './DailyBreakdownTable';
 export { StatusSummaryCard } from './StatusSummaryCard';
-export { MockBadge } from './MockBadge';
 export { ValidatorIdentityCard, ValidatorSetCard } from './ValidatorIdentity/ValidatorIdentity';
 export { ValidatorBalance } from './ValidatorBalance';
 export { ValidatorDuties } from './ValidatorDuties';

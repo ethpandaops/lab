@@ -3,22 +3,21 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useTableBounds } from '@/hooks/useBounds';
 import { getDataVizColors } from '@/utils';
-import type {
-  FctBlockProposerByValidator,
-  FctSyncCommitteeParticipationByValidatorDaily,
-  FctValidatorBalanceDaily,
-} from '@/api/types.gen';
-import { formatDayLabel } from '../../mocks/overview';
-import { estimateRewards } from '../../utils/rewards';
+import type { FctValidatorBalanceDaily } from '@/api/types.gen';
+import { useValidatorRewards } from '../../hooks/useValidatorRewards';
+import { formatDayLabel } from '../../utils/overview';
 import { weekStartOf } from '../../utils/week';
-import { MockBadge } from '../MockBadge';
 
 interface ValidatorBalanceProps {
   balances: FctValidatorBalanceDaily[];
-  sync: FctSyncCommitteeParticipationByValidatorDaily[];
-  proposals: FctBlockProposerByValidator[];
   validatorIndices: number[];
+  /** Range start and end day (unix seconds, start of day UTC); the end day is included */
+  from: number;
+  to: number;
+  /** The range starts at the earliest data */
+  allHistory: boolean;
   /** Days covered by each row: 1 for daily rows, 7 for weekly */
   daysPerRow: 1 | 7;
 }
@@ -44,9 +43,10 @@ function Figure({ label, value }: { label: string; value: string }): JSX.Element
  */
 export function ValidatorBalance({
   balances,
-  sync,
-  proposals,
   validatorIndices,
+  from,
+  to,
+  allHistory,
   daysPerRow,
 }: ValidatorBalanceProps): JSX.Element {
   const [view, setView] = useState<View>('balance');
@@ -91,18 +91,48 @@ export function ValidatorBalance({
           },
         ];
 
-  const { days: rewardRows } = estimateRewards(balances, sync, proposals, daysPerRow === 7 ? weekStartOf : undefined);
-  const totalReward = rewardRows.reduce((a, d) => a + d.attestationEth + d.syncEth + d.proposerEth, 0);
-  const withdrawn = rewardRows.reduce((a, d) => a + d.withdrawnEth, 0);
+  const dayKeys: string[] = [];
+  for (let t = from; t <= to; t += 86_400) dayKeys.push(new Date(t * 1000).toISOString().slice(0, 10));
+  const periodKeys = daysPerRow === 7 ? [...new Set(dayKeys.map(weekStartOf))] : dayKeys;
+  const rewards = useValidatorRewards({
+    indices: validatorIndices,
+    from,
+    to,
+    resolution: daysPerRow === 7 ? 'week' : 'day',
+    periodKeys,
+    allHistory,
+  });
+  const rewardRows = rewards.periods;
+  const totalReward = rewards.totalRewardEth;
+  const withdrawn = rewards.withdrawnEth;
   // Rewards over stake-time, so a validator whose balance grew (consolidations, top-ups) isn't
-  // judged against its final balance for the whole range
-  const stakeEthDays = balances.reduce((a, b) => {
-    const rowDays =
-      b.start_epoch !== undefined && b.end_epoch !== undefined
-        ? ((b.end_epoch - b.start_epoch + 1) * 384) / 86_400
-        : daysPerRow;
-    return a + ((b.effective_balance ?? 0) / 1e9) * rowDays;
-  }, 0);
+  // judged against its final balance for the whole range. Only periods with reward data count.
+  const rewardDays = new Set(rewardRows.map(r => r.day));
+  const stakeEthDays = balances
+    .filter(b => rewardDays.has(b.day_start_date ?? ''))
+    .reduce((a, b) => {
+      const rowDays =
+        b.start_epoch !== undefined && b.end_epoch !== undefined
+          ? ((b.end_epoch - b.start_epoch + 1) * 384) / 86_400
+          : daysPerRow;
+      return a + ((b.effective_balance ?? 0) / 1e9) * rowDays;
+    }, 0);
+  // Reward and withdrawal tables are still filling backwards; say where they start inside the range
+  const rewardBounds = useTableBounds(
+    daysPerRow === 7 ? 'fct_attestation_reward_by_validator_weekly' : 'fct_attestation_reward_by_validator_daily'
+  );
+  const eventBounds = useTableBounds('fct_validator_event');
+  const startsAfter = (min: number | undefined): string | null =>
+    min !== undefined && min > from
+      ? new Date(min * 1000).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      : null;
+  const rewardsStart = startsAfter(rewardBounds.data?.min);
+  const withdrawalsStart = startsAfter(eventBounds.data?.min);
   const apr = stakeEthDays ? (totalReward * 365) / stakeEthDays : 0;
   const rewardLabels = rewardRows.map(d => formatDayLabel(d.day));
 
@@ -115,7 +145,6 @@ export function ValidatorBalance({
       modalSize="full"
       headerActions={
         <div className="flex items-center gap-2">
-          {view === 'rewards' && <MockBadge />}
           <SegmentedControl<View>
             options={[
               { value: 'balance', label: 'Balance' },
@@ -146,6 +175,12 @@ export function ValidatorBalance({
               <Figure label="APR" value={`${(apr * 100).toFixed(2)}%`} />
               <Figure label="Withdrawn" value={eth(withdrawn)} />
             </div>
+            {(rewardsStart || withdrawalsStart) && (
+              <div className="-mt-2 text-xs/5 text-muted">
+                {rewardsStart && <p>Reward data starts {rewardsStart}.</p>}
+                {withdrawalsStart && <p>Withdrawal data starts {withdrawalsStart}.</p>}
+              </div>
+            )}
             <MultiLineChart
               series={[
                 {
