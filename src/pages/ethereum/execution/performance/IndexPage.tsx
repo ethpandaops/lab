@@ -17,17 +17,23 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
+import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
 import { usePerformanceData } from './hooks/usePerformanceData';
 import { useOpcodeCostData } from './hooks/useOpcodeCostData';
 import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 import {
+  BLOCK_SLICE_COUNT,
+  BLOCK_SLICE_SECONDS,
   GAS_BUCKET_MGAS,
   RESOURCES,
+  blockSlices,
   buildClientPerformance,
   bucketedThroughputSeries,
   chainDemand,
+  clientThroughput,
   gasCeiling,
   hourlyThroughputSeries,
+  rangeBounds,
   versionRows,
   type ClientPerformance,
   type SlowBlock,
@@ -136,9 +142,19 @@ export function IndexPage(): JSX.Element {
   );
 }
 
+/** UTC days a model's daily fits span, as "Oct 26 – Nov 1", or "Nov 2" for one day */
+function fmtDayWindow(start: number, end: number): string {
+  const fmt = (t: number): string =>
+    new Date(t * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const last = end - 86400;
+  return last <= start ? fmt(start) : `${fmt(start)} – ${fmt(last)}`;
+}
+
+const SKELETON = 'animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border';
+
 /**
  * Turns engine_newPayload timings plus block gas into execution throughput (Mgas/s), per-client
- * cost models, gas limit headroom, workload sensitivity and opcode pricing.
+ * cost models, gas limit headroom, workload sensitivity and opcode pricing, all over the range.
  */
 function PerformanceSections({
   timeRange,
@@ -156,40 +172,52 @@ function PerformanceSections({
     setLastMethodology(section);
     setMethodology(section);
   };
-  const opcodeCosts = useOpcodeCostData(timeRange);
 
-  const { data: perf } = usePerformanceData({ timeRange, referenceNodesOnly, enabled: true });
+  const { start, end } = useMemo(() => rangeBounds(TIME_RANGE_CONFIG[timeRange].seconds), [timeRange]);
+  const opcodeCosts = useOpcodeCostData(start, end);
+  const { hourly, blocks, slowBlocks } = usePerformanceData({ start, end, referenceNodesOnly });
   const usePerSlotTrend = PER_SLOT_CHART_RANGES.includes(timeRange);
+  const sampled = blockSlices(start, end).length > 1;
 
   const model = useMemo(
-    () => (perf ? buildClientPerformance(perf.perClientBlocks, perf.blocks, perf.resourceGas) : null),
-    [perf]
+    () => (blocks ? buildClientPerformance(blocks.perClientBlocks, blocks.blocks, blocks.resourceGas) : null),
+    [blocks]
   );
 
-  const demand = perf ? chainDemand(perf.gasUsedHourly) : 0;
-  const gasLimitM = perf?.blocks.length
-    ? perf.blocks.reduce((s, b) => s + (b.gas_limit ?? 0), 0) / perf.blocks.length / 1e6
-    : 60;
+  // The hourly gas table lags an hour or two, so short ranges, which read every block, take demand
+  // from their blocks. Each row carries its block's gas, so a mean over rows is gas per block.
+  const demand = usePerSlotTrend
+    ? blocks
+      ? chainDemand(blocks.blocks.map(b => ({ total_gas_used: b.gas_used ?? 0, block_count: 1 })))
+      : 0
+    : hourly
+      ? chainDemand(hourly.gasUsedHourly)
+      : 0;
+  // The gas limit at the end of the range (hourly rows are newest first)
+  const gasLimitM = (hourly?.perClientHourly.find(r => r.avg_gas_limit)?.avg_gas_limit ?? 60e6) / 1e6;
 
   const trend = useMemo(() => {
     if (usePerSlotTrend) {
-      return perf ? bucketedThroughputSeries(perf.perClientBlocks, timeRange === '1hour' ? 60 : 300, percentile) : [];
+      return blocks
+        ? bucketedThroughputSeries(blocks.perClientBlocks, timeRange === '1hour' ? 60 : 300, percentile)
+        : null;
     }
-    return perf ? hourlyThroughputSeries(perf.perClientHourly, percentile) : [];
-  }, [usePerSlotTrend, perf, timeRange, percentile]);
+    return hourly ? hourlyThroughputSeries(hourly.perClientHourly, percentile) : null;
+  }, [usePerSlotTrend, blocks, hourly, timeRange, percentile]);
 
-  const versions = useMemo(() => (perf ? versionRows(perf.perClientHourly) : []), [perf]);
+  const rangeClients = useMemo(() => (hourly ? clientThroughput(hourly.perClientHourly) : []), [hourly]);
+  const versions = useMemo(() => (hourly ? versionRows(hourly.perClientHourly) : []), [hourly]);
 
-  if (!perf || !model) {
+  if (!hourly) {
     return (
       <div className="flex flex-col gap-6">
-        <div className="h-24 animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border" />
-        <div className="h-96 animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border" />
+        <div className={clsx('h-24', SKELETON)} />
+        <div className={clsx('h-96', SKELETON)} />
       </div>
     );
   }
 
-  if (model.clients.length === 0) {
+  if (rangeClients.length === 0) {
     return (
       <Alert
         variant="info"
@@ -203,236 +231,256 @@ function PerformanceSections({
     );
   }
 
-  const { clients, slowBlocks } = model;
-  const fastest = clients[0];
-  const slowest = clients[clients.length - 1];
+  const fastest = rangeClients[0];
+  const slowest = rangeClients[rangeClients.length - 1];
+  const clients = model?.clients ?? [];
   const budgetMs = Number(budget);
   const ceilings = clients
     .map(c => ({ client: c, mgas: gasCeiling(ceilingBasis === 'p50' ? c.fitP50 : c.fitP95, budgetMs) }))
     .sort((a, b) => b.mgas - a.mgas);
-  const networkCeiling = ceilings[ceilings.length - 1];
-  const blockWindowLabel = `${Math.round(perf.blockWindowSeconds / 3600)}h`;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-10">
       <MethodologyDialog
         open={methodology !== null}
         section={methodology ?? lastMethodology}
         onClose={() => setMethodology(null)}
       />
 
-      <Stats
-        gridClassName="grid grid-cols-1 sm:grid-cols-2 sm:*:last:col-span-2 lg:grid-cols-3 xl:grid-cols-5 xl:*:last:col-span-1"
-        stats={[
-          {
-            id: 'fastest',
-            name: 'Fastest client',
-            value: `${fmtMgas(fastest.throughput)} Mgas/s`,
-            subtitle: <ClientInline client={fastest.client} />,
-          },
-          {
-            id: 'slowest',
-            name: 'Slowest client',
-            value: `${fmtMgas(slowest.throughput)} Mgas/s`,
-            subtitle: <ClientInline client={slowest.client} />,
-          },
-          {
-            id: 'demand',
-            name: 'Chain demand',
-            value: demand > 0 ? `${demand.toFixed(2)} Mgas/s` : '–',
-            subtitle: `${fmtGasM(gasLimitM)} gas limit every ${12}s`,
-          },
-          {
-            id: 'headroom',
-            name: 'Headroom',
-            value: demand > 0 ? `${Math.round(slowest.throughput / demand)}×` : '–',
-            subtitle: 'Slowest client vs chain demand',
-          },
-          {
-            id: 'ceiling',
-            name: `Gas limit ceiling · ${BUDGET_OPTIONS.find(b => b.value === budget)?.label}`,
-            value: fmtGasM(networkCeiling.mgas),
-            subtitle: (
-              <span className="flex flex-wrap items-center gap-x-1">
-                {(networkCeiling.mgas / gasLimitM).toFixed(1)}× today, set by
-                <ClientInline client={networkCeiling.client.client} />
-              </span>
-            ),
-          },
-        ]}
-      />
+      <InspectSection title="Throughput">
+        <Stats
+          gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          stats={[
+            {
+              id: 'fastest',
+              name: 'Fastest client',
+              value: `${fmtMgas(fastest.throughput)} Mgas/s`,
+              subtitle: <ClientInline client={fastest.client} />,
+            },
+            {
+              id: 'slowest',
+              name: 'Slowest client',
+              value: `${fmtMgas(slowest.throughput)} Mgas/s`,
+              subtitle: <ClientInline client={slowest.client} />,
+            },
+            {
+              id: 'demand',
+              name: 'Chain demand',
+              value: demand > 0 ? `${demand.toFixed(2)} Mgas/s` : '–',
+              subtitle: `${fmtGasM(gasLimitM)} gas limit every ${12}s`,
+            },
+            {
+              id: 'headroom',
+              name: 'Headroom',
+              value: demand > 0 ? `${Math.round(slowest.throughput / demand)}×` : '–',
+              subtitle: 'Slowest client vs chain demand',
+            },
+          ]}
+        />
 
-      {/* Throughput over time */}
-      <PopoutCard
-        title="Execution Throughput"
-        subtitle={`Gas executed per second of engine_newPayload, ${usePerSlotTrend ? (timeRange === '1hour' ? 'per minute' : 'per 5 minutes') : 'hourly'}`}
-        anchorId="throughput"
-        modalSize="full"
-        headerActions={
-          <div className="flex flex-wrap items-center gap-2">
-            <MethodologyButton onClick={() => openMethodology('throughput')} />
-            <SegmentedControl
-              ariaLabel="Percentile"
-              options={PERCENTILE_OPTIONS}
-              value={percentile}
-              onChange={setPercentile}
-            />
-          </div>
-        }
-      >
-        {({ inModal }) => (
-          <MultiLineChart
-            series={trend.map((s, i) => ({
-              name: s.client,
-              data: s.points,
-              color: getExecutionClientColor(s.client, i),
-            }))}
-            xAxis={{
-              type: 'value',
-              name: 'Time',
-              min: 'dataMin',
-              max: 'dataMax',
-              formatter: timeFormatter(timeRange),
-            }}
-            yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
-            height={inModal ? 600 : 340}
-            showLegend
-            enableDataZoom
-            tooltipFormatter={params => throughputTooltip(params)}
-          />
-        )}
-      </PopoutCard>
-
-      {/* Gas limit ceiling */}
-      <PopoutCard
-        title="Gas Limit Ceiling"
-        subtitle={`Largest block each client executes inside the budget, extrapolated from its cost model (last ${blockWindowLabel})`}
-        anchorId="gas-ceiling"
-        modalSize="full"
-        headerActions={
-          <div className="flex flex-wrap items-center gap-2">
-            <MethodologyButton onClick={() => openMethodology('cost-model')} />
-            <SegmentedControl
-              ariaLabel="Execution budget"
-              options={BUDGET_OPTIONS}
-              value={budget}
-              onChange={setBudget}
-            />
-            <SegmentedControl
-              ariaLabel="Node percentile"
-              options={[
-                { value: 'p50', label: 'Typical node' },
-                { value: 'p95', label: 'Slow node' },
-              ]}
-              value={ceilingBasis}
-              onChange={setCeilingBasis}
-            />
-          </div>
-        }
-      >
-        <GasCeiling ceilings={ceilings} gasLimitM={gasLimitM} basis={ceilingBasis} />
-      </PopoutCard>
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {/* Cost model */}
+        {/* Throughput over time */}
         <PopoutCard
-          title="Cost Model"
-          subtitle="Fixed overhead plus marginal cost per Mgas, fitted to every block"
-          headerActions={<MethodologyButton onClick={() => openMethodology('cost-model')} />}
-          anchorId="cost-model"
+          title="Execution Throughput"
+          subtitle={`Gas executed per second of engine_newPayload, ${usePerSlotTrend ? (timeRange === '1hour' ? 'per minute' : 'per 5 minutes') : 'hourly'}`}
+          anchorId="throughput"
           modalSize="full"
+          headerActions={
+            <div className="flex flex-wrap items-center gap-2">
+              <MethodologyButton onClick={() => openMethodology('throughput')} />
+              <SegmentedControl
+                ariaLabel="Percentile"
+                options={PERCENTILE_OPTIONS}
+                value={percentile}
+                onChange={setPercentile}
+              />
+            </div>
+          }
         >
-          {({ inModal }) => <CostModel clients={clients} inModal={inModal} />}
+          {({ inModal }) =>
+            trend ? (
+              <MultiLineChart
+                series={trend.map((s, i) => ({
+                  name: s.client,
+                  data: s.points,
+                  color: getExecutionClientColor(s.client, i),
+                }))}
+                xAxis={{
+                  type: 'value',
+                  name: 'Time',
+                  min: 'dataMin',
+                  max: 'dataMax',
+                  formatter: timeFormatter(timeRange),
+                }}
+                yAxis={{ name: percentile === 'avg' ? 'Mgas/s' : 'P95 Mgas/s', min: 0 }}
+                height={inModal ? 600 : 340}
+                showLegend
+                enableDataZoom
+                tooltipFormatter={params => throughputTooltip(params)}
+              />
+            ) : (
+              <div className="h-[340px] animate-pulse rounded-xs bg-background" />
+            )
+          }
         </PopoutCard>
 
-        {/* Scaling curve */}
+        {/* Slowest blocks: read from the whole range, never from the sampled slices */}
         <PopoutCard
-          title="Throughput by Block Size"
-          subtitle="Median Mgas/s per block, grouped by gas used"
-          headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
-          anchorId="scaling-curve"
+          title="Slowest Blocks"
+          subtitle="Blocks that took the slowest client longest to execute"
+          anchorId="slowest-blocks"
           modalSize="full"
+          noPadding
         >
-          {({ inModal }) => <ScalingCurve clients={clients} inModal={inModal} gasLimitM={gasLimitM} />}
-        </PopoutCard>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {/* Distribution */}
-        <PopoutCard
-          title="Throughput Distribution"
-          subtitle="Per-block Mgas/s, P5–P95, blocks above 5M gas"
-          headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
-          anchorId="throughput-distribution"
-          modalSize="full"
-        >
-          {({ inModal }) => (
-            <BoxPlot
-              series={[
-                {
-                  name: 'Mgas/s',
-                  data: clients.map(c => ({
-                    value: c.distribution,
-                    itemStyle: { color: `${c.color}33`, borderColor: c.color, borderWidth: 1.5 },
-                  })),
-                },
-              ]}
-              categories={clients.map(c => c.client)}
-              categoryLabelInterval={0}
-              yAxisTitle="Mgas/s"
-              height={inModal ? 600 : 340}
-            />
-          )}
-        </PopoutCard>
-
-        {/* Workload sensitivity */}
-        <PopoutCard
-          title="Workload Sensitivity"
-          subtitle="Throughput on blocks heaviest in each gas resource vs blocks lightest in it"
-          headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
-          anchorId="workload-sensitivity"
-          modalSize="full"
-        >
-          {!perf?.resourceGasLoaded ? (
-            <div className="h-48 animate-pulse rounded-xs bg-background" />
-          ) : perf.resourceGas.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted">No resource gas breakdown for these blocks yet.</p>
+          {slowBlocks ? (
+            <SlowBlocks blocks={slowBlocks} />
           ) : (
-            <WorkloadSensitivity clients={clients} avgShares={model.avgShares} />
+            <div className="m-4 h-64 animate-pulse rounded-xs bg-background" />
           )}
         </PopoutCard>
-      </div>
 
-      {opcodeCosts.model ? (
-        <>
-          <OpcodePricingCard model={opcodeCosts.model} onMethodology={() => openMethodology('opcodes')} />
-          <OpcodeVersionsCard model={opcodeCosts.model} onMethodology={() => openMethodology('opcodes')} />
-        </>
-      ) : opcodeCosts.isLoading ? (
-        <div className="h-96 animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border" />
-      ) : null}
+        {/* Versions */}
+        <PopoutCard
+          title="Version Tracker"
+          subtitle="Throughput per release, compared with the release it replaced"
+          anchorId="versions"
+          modalSize="full"
+          noPadding
+        >
+          <VersionTracker rows={versions} />
+        </PopoutCard>
+      </InspectSection>
 
-      {/* Slowest blocks */}
-      <PopoutCard
-        title="Slowest Blocks"
-        subtitle={`Blocks that took the slowest client longest to execute, last ${blockWindowLabel}`}
-        anchorId="slowest-blocks"
-        modalSize="full"
-        noPadding
+      <InspectSection
+        title="Blocks"
+        meta={sampled && `${BLOCK_SLICE_COUNT} × ${BLOCK_SLICE_SECONDS / 60} min spread across the range`}
       >
-        <SlowBlocks blocks={slowBlocks} />
-      </PopoutCard>
+        {!model ? (
+          <>
+            <div className={clsx('h-80', SKELETON)} />
+            <div className={clsx('h-96', SKELETON)} />
+          </>
+        ) : clients.length === 0 ? (
+          <p className="rounded-sm border border-dashed border-border px-6 py-10 text-center text-sm text-muted">
+            No block timings in this range.
+          </p>
+        ) : (
+          <>
+            {/* Gas limit ceiling */}
+            <PopoutCard
+              title="Gas Limit Ceiling"
+              subtitle="Largest block each client executes inside the budget, extrapolated from its cost model"
+              anchorId="gas-ceiling"
+              modalSize="full"
+              headerActions={
+                <div className="flex flex-wrap items-center gap-2">
+                  <MethodologyButton onClick={() => openMethodology('cost-model')} />
+                  <SegmentedControl
+                    ariaLabel="Execution budget"
+                    options={BUDGET_OPTIONS}
+                    value={budget}
+                    onChange={setBudget}
+                  />
+                  <SegmentedControl
+                    ariaLabel="Node percentile"
+                    options={[
+                      { value: 'p50', label: 'Typical node' },
+                      { value: 'p95', label: 'Slow node' },
+                    ]}
+                    value={ceilingBasis}
+                    onChange={setCeilingBasis}
+                  />
+                </div>
+              }
+            >
+              <GasCeiling ceilings={ceilings} gasLimitM={gasLimitM} basis={ceilingBasis} />
+            </PopoutCard>
 
-      {/* Versions */}
-      <PopoutCard
-        title="Version Tracker"
-        subtitle="Throughput per release, compared with the release it replaced"
-        anchorId="versions"
-        modalSize="full"
-        noPadding
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              {/* Cost model */}
+              <PopoutCard
+                title="Cost Model"
+                subtitle="Fixed overhead plus marginal cost per Mgas, fitted to every block"
+                headerActions={<MethodologyButton onClick={() => openMethodology('cost-model')} />}
+                anchorId="cost-model"
+                modalSize="full"
+              >
+                {({ inModal }) => <CostModel clients={clients} inModal={inModal} />}
+              </PopoutCard>
+
+              {/* Scaling curve */}
+              <PopoutCard
+                title="Throughput by Block Size"
+                subtitle="Median Mgas/s per block, grouped by gas used"
+                headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
+                anchorId="scaling-curve"
+                modalSize="full"
+              >
+                {({ inModal }) => <ScalingCurve clients={clients} inModal={inModal} gasLimitM={gasLimitM} />}
+              </PopoutCard>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              {/* Distribution */}
+              <PopoutCard
+                title="Throughput Distribution"
+                subtitle="Per-block Mgas/s, P5–P95, blocks above 5M gas"
+                headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
+                anchorId="throughput-distribution"
+                modalSize="full"
+              >
+                {({ inModal }) => (
+                  <BoxPlot
+                    series={[
+                      {
+                        name: 'Mgas/s',
+                        data: clients.map(c => ({
+                          value: c.distribution,
+                          itemStyle: { color: `${c.color}33`, borderColor: c.color, borderWidth: 1.5 },
+                        })),
+                      },
+                    ]}
+                    categories={clients.map(c => c.client)}
+                    categoryLabelInterval={0}
+                    yAxisTitle="Mgas/s"
+                    height={inModal ? 600 : 340}
+                  />
+                )}
+              </PopoutCard>
+
+              {/* Workload sensitivity */}
+              <PopoutCard
+                title="Workload Sensitivity"
+                subtitle="Throughput on blocks heaviest in each gas resource vs blocks lightest in it"
+                headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
+                anchorId="workload-sensitivity"
+                modalSize="full"
+              >
+                {blocks?.resourceGas.length === 0 ? (
+                  <p className="py-12 text-center text-sm text-muted">
+                    No resource gas breakdown for these blocks yet.
+                  </p>
+                ) : (
+                  <WorkloadSensitivity clients={clients} avgShares={model.avgShares} />
+                )}
+              </PopoutCard>
+            </div>
+          </>
+        )}
+      </InspectSection>
+
+      <InspectSection
+        title="Opcodes"
+        meta={opcodeCosts.model && fmtDayWindow(opcodeCosts.model.windowStart, opcodeCosts.model.windowEnd)}
       >
-        <VersionTracker rows={versions} />
-      </PopoutCard>
+        {opcodeCosts.model ? (
+          <>
+            <OpcodePricingCard model={opcodeCosts.model} onMethodology={() => openMethodology('opcodes')} />
+            <OpcodeVersionsCard model={opcodeCosts.model} onMethodology={() => openMethodology('opcodes')} />
+          </>
+        ) : opcodeCosts.isLoading ? (
+          <div className={clsx('h-96', SKELETON)} />
+        ) : null}
+      </InspectSection>
     </div>
   );
 }

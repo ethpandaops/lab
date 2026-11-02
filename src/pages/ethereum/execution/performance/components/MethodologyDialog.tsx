@@ -80,8 +80,9 @@ export function MethodologyDialog({
         <Section id="cost-model" title="Cost model and gas limit ceiling">
           <Formula>duration ms = overhead + marginal cost × Mgas</Formula>
           <p>
-            Fitted by least squares to every block of the last 6 hours (less for shorter ranges), per client. Typical
-            node uses each block&apos;s median duration across reference nodes, slow node its 95th percentile.
+            Fitted by least squares to every block in the range, per client; ranges over 6 hours use 28 15-minute slices
+            spread evenly across the range. Typical node uses each block&apos;s median duration across reference nodes,
+            slow node its 95th percentile.
           </p>
           <Formula>ceiling = (budget − overhead) ÷ marginal cost</Formula>
           <p>

@@ -79,12 +79,10 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
       rows: rowsFor(model, 'state'),
     },
   ];
-  const days = model.days;
-
   return (
     <PopoutCard
       title="Opcode Pricing"
-      subtitle={`Execution time per gas relative to each client's average, median of daily fits over ${days} days`}
+      subtitle="Execution time per gas relative to each client's average, median of daily fits"
       anchorId="opcode-pricing"
       modalSize="full"
       noPadding

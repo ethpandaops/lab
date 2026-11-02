@@ -16,6 +16,35 @@ const MIN_GAS_FOR_THROUGHPUT = 5_000_000;
 /** Gas buckets (in Mgas) for the throughput-vs-block-size curve */
 export const GAS_BUCKET_MGAS = 5;
 
+/** Ranges up to this long read every block; longer ones read evenly spread slices */
+export const FULL_BLOCK_RANGE_SECONDS = 6 * 3600;
+export const BLOCK_SLICE_COUNT = 28;
+export const BLOCK_SLICE_SECONDS = 15 * 60;
+
+/** The range [start, end) in seconds, ending at the last full hour so hourly rows are complete */
+export function rangeBounds(seconds: number, nowMs = Date.now()): { start: number; end: number } {
+  const end = Math.floor(nowMs / 1000 / 3600) * 3600;
+  return { start: end - seconds, end };
+}
+
+/**
+ * Windows to read blocks from: the whole range when it's short, otherwise BLOCK_SLICE_COUNT
+ * slices of BLOCK_SLICE_SECONDS, one at the end of each equal part of the range.
+ */
+export function blockSlices(start: number, end: number): [number, number][] {
+  if (end - start <= FULL_BLOCK_RANGE_SECONDS) return [[start, end]];
+  const step = (end - start) / BLOCK_SLICE_COUNT;
+  return Array.from({ length: BLOCK_SLICE_COUNT }, (_, i) => {
+    const sliceEnd = Math.round(start + (i + 1) * step);
+    return [sliceEnd - BLOCK_SLICE_SECONDS, sliceEnd];
+  });
+}
+
+/** The whole UTC days that contain [start, end), as [first day start, last day end) */
+export function rangeDays(start: number, end: number): { start: number; end: number } {
+  return { start: Math.floor(start / 86400) * 86400, end: Math.ceil(end / 86400) * 86400 };
+}
+
 /** Resource gas dimensions, in display order */
 export const RESOURCES = [
   { key: 'gas_compute', label: 'Compute' },
@@ -305,6 +334,26 @@ export function chainDemand(hourly: FctExecutionGasUsedHourly[]): number {
   const gas = hourly.reduce((s, h) => s + (h.total_gas_used ?? 0), 0);
   const blocks = hourly.reduce((s, h) => s + (h.block_count ?? 0), 0);
   return blocks > 0 ? gas / (blocks * SLOT_SECONDS) / 1e6 : 0;
+}
+
+/** Throughput per client over every hour and version: total gas over total execution time, fastest first */
+export function clientThroughput(
+  hourly: FctEngineNewPayloadByElClientHourly[]
+): { client: string; throughput: number }[] {
+  const agg = new Map<string, { gas: number; ms: number }>();
+  for (const row of hourly) {
+    const obs = row.observation_count ?? 0;
+    const ms = row.avg_duration_ms ?? 0;
+    if (!obs || !ms) continue;
+    const client = normalizeClient(row.meta_execution_implementation);
+    const cur = agg.get(client) ?? { gas: 0, ms: 0 };
+    cur.gas += (row.avg_gas_used ?? 0) * obs;
+    cur.ms += ms * obs;
+    agg.set(client, cur);
+  }
+  return [...agg.entries()]
+    .map(([client, v]) => ({ client, throughput: mgasPerSecond(v.gas, v.ms) }))
+    .sort((a, b) => b.throughput - a.throughput);
 }
 
 /**

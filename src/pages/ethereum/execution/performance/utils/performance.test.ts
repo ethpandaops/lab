@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { chainDemand, gasCeiling, linearFit, mgasPerSecond, normalizeClient } from './performance';
+import {
+  blockSlices,
+  chainDemand,
+  clientThroughput,
+  gasCeiling,
+  linearFit,
+  mgasPerSecond,
+  normalizeClient,
+  rangeDays,
+} from './performance';
 
 describe('linearFit', () => {
   it('recovers overhead and marginal cost from noisy-free points', () => {
@@ -37,6 +46,53 @@ describe('chainDemand', () => {
         { total_gas_used: 3_000_000_000, block_count: 100 },
       ])
     ).toBeCloseTo(2.5);
+  });
+});
+
+describe('clientThroughput', () => {
+  it('weights every hour and version by its observations', () => {
+    const rows = [
+      // geth: 3 obs of 30M gas in 50 ms, 1 obs of 60M gas in 200 ms → 150M gas / 350 ms
+      { meta_execution_implementation: 'go-ethereum', observation_count: 3, avg_gas_used: 30e6, avg_duration_ms: 50 },
+      { meta_execution_implementation: 'Geth', observation_count: 1, avg_gas_used: 60e6, avg_duration_ms: 200 },
+      { meta_execution_implementation: 'Reth', observation_count: 2, avg_gas_used: 30e6, avg_duration_ms: 30 },
+      { meta_execution_implementation: 'Besu', observation_count: 0, avg_gas_used: 30e6, avg_duration_ms: 10 },
+    ];
+    const result = clientThroughput(rows);
+    expect(result.map(r => r.client)).toEqual(['reth', 'geth']);
+    expect(result[0].throughput).toBeCloseTo(1000);
+    expect(result[1].throughput).toBeCloseTo(150_000 / 350);
+  });
+});
+
+describe('blockSlices', () => {
+  const H = 3600;
+
+  it('reads the whole range up to 6 hours', () => {
+    expect(blockSlices(1000, 1000 + 6 * H)).toEqual([[1000, 1000 + 6 * H]]);
+  });
+
+  it('spreads 28 fifteen-minute slices evenly, the last ending at the range end', () => {
+    const start = 1_700_000_000;
+    const end = start + 7 * 24 * H;
+    const slices = blockSlices(start, end);
+    expect(slices).toHaveLength(28);
+    expect(slices.every(([s, e]) => e - s === 900 && s >= start && e <= end)).toBe(true);
+    expect(slices[0]).toEqual([start + 6 * H - 900, start + 6 * H]);
+    expect(slices[27][1]).toBe(end);
+  });
+});
+
+describe('rangeDays', () => {
+  const day = Date.UTC(2026, 10, 2) / 1000;
+
+  it('widens an hour inside one day to that day', () => {
+    expect(rangeDays(day + 5 * 3600, day + 6 * 3600)).toEqual({ start: day, end: day + 86400 });
+  });
+
+  it('takes both days a range crossing midnight touches, and no more when it ends at midnight', () => {
+    expect(rangeDays(day - 3600, day + 3600)).toEqual({ start: day - 86400, end: day + 86400 });
+    expect(rangeDays(day - 86400, day)).toEqual({ start: day - 86400, end: day });
   });
 });
 

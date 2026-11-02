@@ -15,7 +15,7 @@ import { TimingsSkeleton } from './components/TimingsSkeleton';
 import { NewPayloadTab } from './components/NewPayloadTab';
 import { GetBlobsTab } from './components/GetBlobsTab';
 import { ReferenceNodesInfoDialog } from './components/ReferenceNodesInfoDialog';
-import { DEFAULT_TIME_RANGE, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
+import { DEFAULT_TIME_RANGE, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 
 /**
  * Engine API Timings page
@@ -52,6 +52,25 @@ export function IndexPage(): JSX.Element {
   // Show skeleton only on initial load (no data yet), not on time range changes
   const showInitialSkeleton = isLoading && !data;
 
+  // The daily tables start partway through the longest ranges; say where the shown data begins
+  const dailyRows = activeTab === 'newPayload' ? data?.newPayloadByElClientDaily : data?.getBlobsByElClientDaily;
+  const firstDay = HOURLY_CHART_RANGES.includes(timeRange)
+    ? undefined
+    : dailyRows?.reduce<string | undefined>(
+        (min, r) => (r.day_start_date && (!min || r.day_start_date < min) ? r.day_start_date : min),
+        undefined
+      );
+  const rangeStartDay = new Date(Date.now() - TIME_RANGE_CONFIG[timeRange].seconds * 1000).toISOString().slice(0, 10);
+  const dataSince =
+    firstDay && firstDay > rangeStartDay
+      ? new Date(`${firstDay}T00:00:00Z`).toLocaleDateString([], {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      : undefined;
+
   return (
     <Container>
       <Header
@@ -60,16 +79,18 @@ export function IndexPage(): JSX.Element {
       />
 
       {/* Time Range Selector */}
-      <SegmentedControl
-        options={(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => ({
-          value: r,
-          label: TIME_RANGE_CONFIG[r].label,
-        }))}
-        value={timeRange}
-        onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
-        ariaLabel="Time window"
-        className="mb-6"
-      />
+      <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <SegmentedControl
+          options={(Object.keys(TIME_RANGE_CONFIG) as TimeRange[]).map(r => ({
+            value: r,
+            label: TIME_RANGE_CONFIG[r].label,
+          }))}
+          value={timeRange}
+          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+          ariaLabel="Time window"
+        />
+        {dataSince && <span className="text-sm text-muted">Since {dataSince}</span>}
+      </div>
 
       {/* Reference Node Info Dialog */}
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />

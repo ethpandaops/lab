@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQueries, useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadByElClientServiceList,
   fctEngineNewPayloadBySlotServiceList,
@@ -16,123 +16,159 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { TIME_RANGE_CONFIG, type TimeRange } from '../IndexPage.types';
+import { blockSlices, buildClientPerformance, type SlowBlock } from '../utils/performance';
 
-/** Block-level analysis covers at most this many seconds, so it stays fast at any range */
-export const BLOCK_WINDOW_MAX_SECONDS = 6 * 3600;
+/** Rows of the per-slot timing table read to find the slowest blocks' candidate slots */
+const SLOWEST_CANDIDATE_ROWS = 100;
 
-export interface PerformanceData {
-  /** Per-slot, per-EL-client newPayload timings over the block window */
-  perClientBlocks: FctEngineNewPayloadByElClient[];
-  /** Per-slot newPayload summary (carries block_number for joins) over the block window */
-  blocks: FctEngineNewPayloadBySlot[];
-  /** Gas split by resource for each block in the block window */
-  resourceGas: IntBlockResourceGas[];
-  /** Whether the resource gas query has returned (it starts after the block window is known) */
-  resourceGasLoaded: boolean;
-  /** Per-client, per-version newPayload timings per hour over the selected range */
+export interface HourlyData {
+  /** Per-client, per-version newPayload timings per hour over the range */
   perClientHourly: FctEngineNewPayloadByElClientHourly[];
-  /** Chain-wide gas used per hour over the selected range */
+  /** Chain-wide gas used per hour over the range */
   gasUsedHourly: FctExecutionGasUsedHourly[];
-  /** Length of the block window in seconds */
-  blockWindowSeconds: number;
+}
+
+export interface BlockData {
+  /** Per-slot, per-EL-client newPayload timings */
+  perClientBlocks: FctEngineNewPayloadByElClient[];
+  /** Per-slot newPayload summary (carries block_number for joins) */
+  blocks: FctEngineNewPayloadBySlot[];
+  /** Gas split by resource for each block */
+  resourceGas: IntBlockResourceGas[];
+}
+
+type RefNodeFilter = { node_class_eq?: string };
+
+/** Every block's client timings, summary and resource gas in [start, end) */
+async function fetchBlocks(
+  start: number,
+  end: number,
+  refNodeFilter: RefNodeFilter,
+  signal: AbortSignal
+): Promise<BlockData> {
+  const range = { slot_start_date_time_gte: start, slot_start_date_time_lt: end, page_size: 10000, ...refNodeFilter };
+  const [perClientBlocks, blocks] = await Promise.all([
+    fetchAllPages<FctEngineNewPayloadByElClient>(
+      fctEngineNewPayloadByElClientServiceList,
+      { query: { ...range, status_eq: 'VALID' } },
+      'fct_engine_new_payload_by_el_client',
+      signal
+    ),
+    fetchAllPages<FctEngineNewPayloadBySlot>(
+      fctEngineNewPayloadBySlotServiceList,
+      { query: range },
+      'fct_engine_new_payload_by_slot',
+      signal
+    ),
+  ]);
+  const numbers = blocks.map(b => b.block_number ?? 0).filter(n => n > 0);
+  const resourceGas = numbers.length
+    ? await fetchAllPages<IntBlockResourceGas>(
+        intBlockResourceGasServiceList,
+        {
+          query: {
+            block_number_gte: Math.min(...numbers),
+            block_number_lte: Math.max(...numbers),
+            page_size: 10000,
+          },
+        },
+        'int_block_resource_gas',
+        signal
+      )
+    : [];
+  return { perClientBlocks, blocks, resourceGas };
 }
 
 /**
- * Fetches everything behind the performance page: hourly per-client timings over the range,
- * per-block client timings joined with per-block resource gas, and chain-wide gas used.
+ * The slowest blocks across the whole range: the server orders per-slot client timings by
+ * duration, then every client's timing, the summary and resource gas are read for those slots.
  */
-export function usePerformanceData({
-  timeRange,
-  referenceNodesOnly,
-  enabled,
-}: {
-  timeRange: TimeRange;
-  referenceNodesOnly: boolean;
-  enabled: boolean;
-}): { data: PerformanceData | null; isLoading: boolean } {
-  const { currentNetwork } = useNetwork();
-  const refNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
-
-  const { hourlyStart, hourlyEnd, blockStart } = useMemo(() => {
-    const end = Math.floor(Date.now() / 1000 / 3600) * 3600;
-    const seconds = TIME_RANGE_CONFIG[timeRange].seconds;
-    return {
-      hourlyStart: end - seconds,
-      hourlyEnd: end,
-      blockStart: end - Math.min(seconds, BLOCK_WINDOW_MAX_SECONDS),
-    };
-  }, [timeRange]);
-
-  const on = !!currentNetwork && enabled;
-
-  const perClientBlocks = useQuery({
-    queryKey: ['engine-perf', 'by-el-client', blockStart, hourlyEnd, referenceNodesOnly],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctEngineNewPayloadByElClient>(
-        fctEngineNewPayloadByElClientServiceList,
-        {
-          query: {
-            slot_start_date_time_gte: blockStart,
-            slot_start_date_time_lt: hourlyEnd,
-            status_eq: 'VALID',
-            page_size: 10000,
-            ...refNodeFilter,
-          },
-        },
-        'fct_engine_new_payload_by_el_client',
-        signal
-      ),
-    enabled: on,
-    placeholderData: keepPreviousData,
+async function fetchSlowestBlocks(
+  start: number,
+  end: number,
+  refNodeFilter: RefNodeFilter,
+  signal: AbortSignal
+): Promise<SlowBlock[]> {
+  const range = { slot_start_date_time_gte: start, slot_start_date_time_lt: end, ...refNodeFilter };
+  const { data } = await fctEngineNewPayloadByElClientServiceList({
+    query: {
+      ...range,
+      status_eq: 'VALID',
+      gas_used_gt: 0,
+      order_by: 'median_duration_ms DESC',
+      page_size: SLOWEST_CANDIDATE_ROWS,
+    },
+    signal,
+    throwOnError: true,
   });
+  const slots = [...new Set((data.fct_engine_new_payload_by_el_client ?? []).map(r => r.slot ?? 0))];
+  if (slots.length === 0) return [];
 
-  const blocks = useQuery({
-    queryKey: ['engine-perf', 'by-slot', blockStart, hourlyEnd, referenceNodesOnly],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctEngineNewPayloadBySlot>(
-        fctEngineNewPayloadBySlotServiceList,
-        {
-          query: {
-            slot_start_date_time_gte: blockStart,
-            slot_start_date_time_lt: hourlyEnd,
-            page_size: 10000,
-            ...refNodeFilter,
-          },
-        },
-        'fct_engine_new_payload_by_slot',
-        signal
-      ),
-    enabled: on,
-    placeholderData: keepPreviousData,
-  });
-
-  const blockNumbers = (blocks.data ?? []).map(b => b.block_number ?? 0).filter(n => n > 0);
-  const minBlock = blockNumbers.length ? Math.min(...blockNumbers) : 0;
-  const maxBlock = blockNumbers.length ? Math.max(...blockNumbers) : 0;
-
-  const resourceGas = useQuery({
-    queryKey: ['engine-perf', 'resource-gas', minBlock, maxBlock],
-    queryFn: ({ signal }) =>
-      fetchAllPages<IntBlockResourceGas>(
+  const query = { ...range, slot_in_values: slots.join(','), page_size: 10000 };
+  const [perClientBlocks, blocks] = await Promise.all([
+    fetchAllPages<FctEngineNewPayloadByElClient>(
+      fctEngineNewPayloadByElClientServiceList,
+      { query: { ...query, status_eq: 'VALID' } },
+      'fct_engine_new_payload_by_el_client',
+      signal
+    ),
+    fetchAllPages<FctEngineNewPayloadBySlot>(
+      fctEngineNewPayloadBySlotServiceList,
+      { query },
+      'fct_engine_new_payload_by_slot',
+      signal
+    ),
+  ]);
+  const numbers = blocks.map(b => b.block_number ?? 0).filter(n => n > 0);
+  const resourceGas = numbers.length
+    ? await fetchAllPages<IntBlockResourceGas>(
         intBlockResourceGasServiceList,
-        { query: { block_number_gte: minBlock, block_number_lte: maxBlock, page_size: 10000 } },
+        { query: { block_number_in_values: [...new Set(numbers)].join(','), page_size: 10000 } },
         'int_block_resource_gas',
         signal
-      ),
-    enabled: on && maxBlock > 0,
-    placeholderData: keepPreviousData,
-  });
+      )
+    : [];
+  return buildClientPerformance(perClientBlocks, blocks, resourceGas).slowBlocks;
+}
+
+/** All slices joined once every one has loaded; module-level so useQueries can memoize it */
+function combineSlices(results: { data?: BlockData }[]): BlockData | null {
+  if (!results.every(r => r.data)) return null;
+  return {
+    perClientBlocks: results.flatMap(r => r.data!.perClientBlocks),
+    blocks: results.flatMap(r => r.data!.blocks),
+    resourceGas: results.flatMap(r => r.data!.resourceGas),
+  };
+}
+
+/**
+ * Fetches everything behind the performance page over [start, end): hourly per-client timings and
+ * chain gas, block-level data (every block, or evenly spread slices on long ranges) and the
+ * slowest blocks of the whole range.
+ */
+export function usePerformanceData({
+  start,
+  end,
+  referenceNodesOnly,
+}: {
+  start: number;
+  end: number;
+  referenceNodesOnly: boolean;
+}): { hourly: HourlyData | null; blocks: BlockData | null; slowBlocks: SlowBlock[] | null } {
+  const { currentNetwork } = useNetwork();
+  const network = currentNetwork?.name;
+  const refNodeFilter: RefNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
+  const on = !!currentNetwork;
 
   const gasUsedHourly = useQuery({
-    queryKey: ['engine-perf', 'gas-used-hourly', hourlyStart, hourlyEnd],
+    queryKey: ['engine-perf', 'gas-used-hourly', network, start, end],
     queryFn: ({ signal }) =>
       fetchAllPages<FctExecutionGasUsedHourly>(
         fctExecutionGasUsedHourlyServiceList,
         {
           query: {
-            hour_start_date_time_gte: hourlyStart,
-            hour_start_date_time_lt: hourlyEnd,
+            hour_start_date_time_gte: start,
+            hour_start_date_time_lt: end,
             order_by: 'hour_start_date_time ASC',
             page_size: 10000,
           },
@@ -145,14 +181,14 @@ export function usePerformanceData({
   });
 
   const perClientHourly = useQuery({
-    queryKey: ['engine-perf', 'by-el-client-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
+    queryKey: ['engine-perf', 'by-el-client-hourly', network, start, end, referenceNodesOnly],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadByElClientHourly>(
         fctEngineNewPayloadByElClientHourlyServiceList,
         {
           query: {
-            hour_start_date_time_gte: hourlyStart,
-            hour_start_date_time_lt: hourlyEnd,
+            hour_start_date_time_gte: start,
+            hour_start_date_time_lt: end,
             order_by: 'hour_start_date_time DESC',
             page_size: 10000,
             ...refNodeFilter,
@@ -165,20 +201,30 @@ export function usePerformanceData({
     placeholderData: keepPreviousData,
   });
 
-  const isLoading = !perClientBlocks.data || !blocks.data || !perClientHourly.data;
+  const blocks = useQueries({
+    queries: blockSlices(start, end).map(([s, e]) => ({
+      queryKey: ['engine-perf', 'blocks', network, s, e, referenceNodesOnly],
+      queryFn: ({ signal }: { signal: AbortSignal }) => fetchBlocks(s, e, refNodeFilter, signal),
+      enabled: on,
+    })),
+    combine: combineSlices,
+  });
+
+  const slowBlocks = useQuery({
+    queryKey: ['engine-perf', 'slowest-blocks', network, start, end, referenceNodesOnly],
+    queryFn: ({ signal }) => fetchSlowestBlocks(start, end, refNodeFilter, signal),
+    enabled: on,
+  });
+
+  const hourly = useMemo(
+    () =>
+      perClientHourly.data ? { perClientHourly: perClientHourly.data, gasUsedHourly: gasUsedHourly.data ?? [] } : null,
+    [perClientHourly.data, gasUsedHourly.data]
+  );
 
   return {
-    data: isLoading
-      ? null
-      : {
-          perClientBlocks: perClientBlocks.data ?? [],
-          blocks: blocks.data ?? [],
-          resourceGas: resourceGas.data ?? [],
-          resourceGasLoaded: maxBlock === 0 || (!!resourceGas.data && !resourceGas.isPlaceholderData),
-          gasUsedHourly: gasUsedHourly.data ?? [],
-          perClientHourly: perClientHourly.data ?? [],
-          blockWindowSeconds: hourlyEnd - blockStart,
-        },
-    isLoading,
+    hourly,
+    blocks,
+    slowBlocks: slowBlocks.data ?? null,
   };
 }
