@@ -1,163 +1,208 @@
-import { useCallback } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
+import { Button } from '@/components/Elements/Button';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { Table } from '@/components/Lists/Table';
-import { RangePager } from '@/components/Lists/RangePager';
-
+import { DataTable } from '@/components/DataTable';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { formatEpoch } from '@/utils';
 
 import { useEpochsData } from './hooks';
-import { EpochsSkeleton } from './components/EpochsSkeleton';
+import { EpochsFilters } from './components/EpochsFilters';
 import { OfflineValidatorsTable } from './components/OfflineValidatorsTable';
+import type { EpochRow } from './utils/epoch-query';
+import { DEFAULT_PAGE_SIZE, EPOCH_FILTER_KEYS, type EpochFilters, type EpochsSearch } from './IndexPage.types';
+
+const column = createColumnHelper<EpochRow>();
+
+function participationClass(rate: number): string {
+  if (rate < 2 / 3) return 'text-danger';
+  if (rate < 0.95) return 'text-warning';
+  if (rate >= 0.99) return 'text-success';
+  return 'text-muted';
+}
 
 /**
- * Epochs list page - one page of epochs at a time, newest first, navigable back to the earliest
- * indexed epoch
- *
- * Shows:
- * - Epoch number
- * - Start timestamp
- * - Block counts (canonical/missed)
- * - Attestation participation
- *
- * Allows navigation to epoch detail page
+ * Epochs list: the latest epochs by default, narrowed by range, participation and missed-slot filters that live
+ * in the URL, with the offline validators for the epochs on the page.
  */
-export function IndexPage(): React.JSX.Element {
-  const navigate = useNavigate();
-  const { from } = useSearch({ from: '/ethereum/epochs/' });
-  const { epochs, missedAttestationsByEntity, isLoading, isPlaceholderData, error, currentEpoch, page } =
-    useEpochsData(from);
+export function IndexPage(): JSX.Element {
+  const navigate = useNavigate({ from: '/ethereum/epochs/' });
+  const search = useSearch({ from: '/ethereum/epochs/' }) as EpochsSearch;
 
-  const goToPage = useCallback(
-    (next: number | undefined) => navigate({ to: '/ethereum/epochs', search: prev => ({ ...prev, from: next }) }),
+  const filters = useMemo(
+    () => Object.fromEntries(EPOCH_FILTER_KEYS.map(key => [key, search[key]])) as EpochFilters,
+    [search]
+  );
+  const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
+  const pageIndex = search.page ?? 0;
+
+  const { data, missedAttestationsByEntity, isLoading, isPlaceholderData, error, currentEpoch } = useEpochsData({
+    filters,
+    pageSize,
+    cursor: search.cursor,
+  });
+  const rows = data?.rows ?? [];
+  const epochs = rows.map(row => row.epoch);
+
+  const setFilters = useCallback(
+    (next: EpochFilters) =>
+      navigate({
+        search: prev => ({
+          ...prev,
+          ...Object.fromEntries(EPOCH_FILTER_KEYS.map(key => [key, next[key]])),
+          page: undefined,
+          cursor: undefined,
+        }),
+      }),
     [navigate]
   );
 
-  const tableData = epochs.map(epoch => {
-    const isCurrent = epoch.epoch === currentEpoch;
-    // For current epoch, show "-" for missed blocks since it's incomplete
-    const missedBlocks = isCurrent ? null : epoch.missedBlockCount;
+  const goToPage = useCallback(
+    (page: number, cursor: string | undefined) =>
+      navigate({ search: prev => ({ ...prev, page: page || undefined, cursor: page ? cursor : undefined }) }),
+    [navigate]
+  );
 
-    return {
-      epoch: epoch.epoch,
-      timestamp: epoch.epochStartDateTime,
-      blocks: `${epoch.canonicalBlockCount}/${epoch.canonicalBlockCount + epoch.missedBlockCount}`,
-      missedBlocks,
-      participation: `${(epoch.participationRate * 100).toFixed(2)}%`,
-      participationValue: epoch.participationRate,
-      isCurrent,
-    };
-  });
+  const handlePagination = useCallback(
+    (nextIndex: number, nextSize: number) => {
+      if (nextSize !== pageSize) {
+        navigate({
+          search: prev => ({
+            ...prev,
+            pageSize: nextSize === DEFAULT_PAGE_SIZE ? undefined : nextSize,
+            page: undefined,
+            cursor: undefined,
+          }),
+        });
+      } else if (nextIndex > pageIndex && data?.nextCursor) {
+        goToPage(pageIndex + 1, data.nextCursor);
+      } else if (nextIndex < pageIndex) {
+        goToPage(pageIndex - 1, data?.prevCursor);
+      }
+    },
+    [navigate, pageSize, pageIndex, data, goToPage]
+  );
 
-  // Handle row click navigation
-  const handleRowClick = (row: (typeof tableData)[0]): void => {
-    navigate({
-      to: '/ethereum/epochs/$epoch',
-      params: { epoch: row.epoch.toString() },
-    });
-  };
+  const columns = useMemo(
+    () => [
+      column.accessor('epoch', {
+        header: 'Epoch',
+        enableSorting: false,
+        cell: info => (
+          <span className={info.getValue() === currentEpoch ? 'text-primary' : undefined}>
+            <Epoch epoch={info.getValue()} />
+          </span>
+        ),
+        meta: { cellClassName: 'font-medium text-foreground' },
+        enableHiding: false,
+      }),
+      column.accessor('startTime', {
+        id: 'start',
+        header: 'Start time',
+        enableSorting: false,
+        cell: info => <Timestamp timestamp={info.getValue()} format="short" />,
+      }),
+      column.accessor('startTime', {
+        id: 'age',
+        header: 'Age',
+        enableSorting: false,
+        cell: info => <Timestamp timestamp={info.getValue()} format="relative" />,
+      }),
+      column.accessor('proposed', {
+        header: 'Proposed',
+        enableSorting: false,
+        cell: info => info.getValue(),
+      }),
+      column.accessor('missed', {
+        header: 'Missed',
+        enableSorting: false,
+        cell: info => <span className={info.getValue() > 0 ? 'text-warning' : 'text-muted'}>{info.getValue()}</span>,
+      }),
+      column.accessor('participation', {
+        header: 'Participation',
+        enableSorting: false,
+        cell: info => {
+          const rate = info.getValue();
+          if (rate === null) return <span className="text-muted">-</span>;
+          return <span className={participationClass(rate)}>{(rate * 100).toFixed(2)}%</span>;
+        },
+      }),
+    ],
+    [currentEpoch]
+  );
 
-  if (isLoading) {
-    return (
-      <Container>
-        <Header title="Epochs" />
-        <EpochsSkeleton />
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container>
-        <Header title="Epochs" />
-        <Alert variant="error" title="Error loading epochs" description={error.message} />
-      </Container>
-    );
-  }
+  const emptyMessage =
+    data?.searchedTo !== undefined
+      ? `No matches down to epoch ${formatEpoch(data.searchedTo)}`
+      : 'No epochs match these filters';
 
   return (
     <Container>
       <Header title="Epochs" />
 
-      <RangePager page={page} noun="epoch" onNavigate={goToPage} className="mb-4" />
+      <div className="mb-4">
+        <EpochsFilters
+          filters={filters}
+          onChange={setFilters}
+          onGoToEpoch={epoch => setFilters({ ...filters, epochMax: epoch })}
+        />
+      </div>
+
+      {error && <Alert variant="error" title="Error loading epochs" description={error.message} className="mb-4" />}
 
       <div className={clsx('flex flex-col gap-6 transition-opacity', isPlaceholderData && 'opacity-60')}>
-        <Table
-          variant="nested"
-          data={tableData}
-          columns={[
-            {
-              header: 'Epoch',
-              accessor: row => (
-                <span className={row.isCurrent ? 'font-bold text-primary' : ''}>
-                  <Epoch epoch={row.epoch} />
-                </span>
-              ),
-            },
-            {
-              header: 'Start Time',
-              accessor: row => <Timestamp timestamp={row.timestamp} format="short" />,
-            },
-            {
-              header: 'Relative Time',
-              accessor: row => <Timestamp timestamp={row.timestamp} format="relative" />,
-            },
-            {
-              header: 'Blocks',
-              accessor: 'blocks',
-            },
-            {
-              header: 'Missed Blocks',
-              accessor: row => {
-                if (row.missedBlocks === null) {
-                  return <span className="text-muted">-</span>;
-                }
-                return <span className={row.missedBlocks > 0 ? 'text-warning' : 'text-muted'}>{row.missedBlocks}</span>;
-              },
-            },
-            {
-              header: 'Participation %',
-              accessor: row => (
-                <span
-                  className={
-                    row.participationValue < 2 / 3
-                      ? 'text-danger'
-                      : row.participationValue < 0.95
-                        ? 'text-warning'
-                        : row.participationValue >= 0.99
-                          ? 'text-success'
-                          : 'text-muted'
-                  }
-                >
-                  {row.participation}
-                </span>
-              ),
-            },
-          ]}
-          onRowClick={handleRowClick}
-        />
+        <div>
+          <DataTable
+            data={rows}
+            columns={columns}
+            isLoading={isLoading}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            onPaginationChange={handlePagination}
+            hasNextPage={Boolean(data?.nextCursor)}
+            manualPagination
+            onRowClick={row => navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(row.epoch) } })}
+            getRowId={row => String(row.epoch)}
+            emptyMessage={emptyMessage}
+            hideGlobalFilter
+            hideColumnVisibility
+            paginationPosition="both"
+          />
 
-        <TopEntitiesChart
-          data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
-          xAxis={{
-            name: 'Epoch',
-            min: epochs.length > 0 ? Math.min(...epochs.map(e => e.epoch)) : undefined,
-            max: epochs.length > 0 ? Math.max(...epochs.map(e => e.epoch)) : undefined,
-          }}
-          yAxis={{ name: 'Missed' }}
-          title="Offline Validators"
-          topN={10}
-          anchorId="offline-validators-chart"
-          emptyMessage="No offline validators in these epochs"
-        />
+          {data?.partial && data.nextCursor && (
+            <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-sm text-muted">
+              {data.searchedTo !== undefined && rows.length > 0 && (
+                <span className="tabular-nums">Searched down to epoch {formatEpoch(data.searchedTo)}</span>
+              )}
+              <Button variant="secondary" size="sm" onClick={() => goToPage(pageIndex + 1, data.nextCursor)}>
+                Keep searching
+              </Button>
+            </div>
+          )}
+        </div>
 
-        <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs.map(e => e.epoch)} />
+        {epochs.length > 0 && (
+          <>
+            <TopEntitiesChart
+              data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
+              xAxis={{ name: 'Epoch', min: Math.min(...epochs), max: Math.max(...epochs) }}
+              yAxis={{ name: 'Missed' }}
+              title="Offline Validators"
+              topN={10}
+              anchorId="offline-validators-chart"
+              emptyMessage="No offline validators in these epochs"
+            />
+
+            <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs} />
+          </>
+        )}
       </div>
     </Container>
   );

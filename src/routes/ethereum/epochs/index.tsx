@@ -1,16 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod';
 
 import { IndexPage } from '@/pages/ethereum/epochs';
-
-/** `from` is the top epoch of the page shown; absent means the latest page. */
-const searchSchema = z.object({
-  from: z.coerce.number().int().nonnegative().optional(),
-});
+import { epochsSearchSchema } from '@/pages/ethereum/epochs/IndexPage.types';
 
 export const Route = createFileRoute('/ethereum/epochs/')({
   component: IndexPage,
-  validateSearch: searchSchema,
+  validateSearch: epochsSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ show: false }), // Index routes should not show breadcrumbs
   }),
