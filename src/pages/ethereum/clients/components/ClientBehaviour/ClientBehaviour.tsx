@@ -124,7 +124,9 @@ function headlineStat<T extends { client?: string }>(headline: Headline<T>, clie
     name: headline.metric.label,
     value: own === null ? '-' : headline.metric.format(own),
     subtitle:
-      difference === null ? undefined : (
+      difference === null ? undefined : Math.abs(difference) < headline.epsilon ? (
+        'Level with network'
+      ) : (
         <span className={clsx(better === true && 'text-success', better === false && 'text-danger')}>
           {headline.delta(difference)} vs network
         </span>

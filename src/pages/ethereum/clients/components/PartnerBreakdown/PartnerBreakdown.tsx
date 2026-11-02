@@ -10,6 +10,7 @@ import { SHARE_WINDOW_TEXT, UNKNOWN_CLIENT, type ShareWindow } from '../../const
 import { useCensus, useClientCounts } from '../../hooks';
 import { usePairMetrics, type AttestationPairRow, type ProposalPairRow } from '../../hooks/usePairMetrics';
 import { partnerRows, type ClientLayer, type PartnerRow } from '../../utils/client-share';
+import { sinceSuffix } from '../../utils/client-versions';
 import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
 import { ShareBar } from '../ShareBar';
 
@@ -236,7 +237,11 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
     <Card
       rounded
       title={`By ${other} client`}
-      subtitle={`Its proposed blocks by the ${other} client named alongside it in graffiti, ${SHARE_WINDOW_TEXT[shareWindow]}`}
+      subtitle={`Its proposed blocks by the ${other} client named alongside it in graffiti, ${SHARE_WINDOW_TEXT[shareWindow]}${
+        columns.length > 0
+          ? `; per-pair metrics${sinceSuffix(pairMetrics.dataStart, from) || ' over the same window'}`
+          : ''
+      }`}
     >
       {partners.isLoading || pairMetrics.isLoading ? (
         <LoadingContainer className="h-40 rounded-sm" />

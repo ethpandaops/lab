@@ -1,13 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
 import { client as apiClient } from '@/api/client.gen';
-import { useNetwork } from '@/hooks/useNetwork';
+import { useTableBounds } from '@/hooks/useBounds';
 import type { FctAttestationVoteCorrectnessByClientDaily, FctBlockProposalByClientDaily } from '../api/client-models';
 import type { ClientLayer } from '../utils/client-share';
 import { useDailyByClient } from './useDailyByClient';
 
 /**
- * Per consensus and execution client pair tables requested from xatu-cbt. They are not in the generated client yet,
- * so they are called by path and only used once a probe finds them.
+ * Per consensus and execution client pair tables (xatu-cbt#343), called by path and used once the API reports
+ * bounds for them.
  */
 const PAIR_TABLES = {
   proposals: 'fct_block_proposal_by_client_pair_daily',
@@ -29,20 +28,9 @@ function listByPath(table: string) {
     }) as Promise<{ data: unknown }>;
 }
 
-/** Whether the API serves a table, by asking for one row */
+/** Whether the API serves a table: it has bounds once it does */
 function useServes(table: string): boolean {
-  const { currentNetwork } = useNetwork();
-  const probe = useQuery({
-    queryKey: ['client-pages', 'serves', currentNetwork?.name, table],
-    queryFn: async ({ signal }) => {
-      await listByPath(table)({ query: { page_size: 1 }, signal });
-      return true;
-    },
-    enabled: !!currentNetwork,
-    retry: false,
-    staleTime: 60 * 60 * 1000,
-  });
-  return probe.data === true;
+  return useTableBounds(table).data !== undefined;
 }
 
 /**
@@ -53,7 +41,14 @@ export function usePairMetrics(
   client: string,
   layer: ClientLayer,
   from: number | undefined
-): { proposals: ProposalPairRow[]; attestations: AttestationPairRow[]; available: boolean; isLoading: boolean } {
+): {
+  proposals: ProposalPairRow[];
+  attestations: AttestationPairRow[];
+  available: boolean;
+  /** Latest first day of the two tables (unix seconds), as they may not reach back as far as the window */
+  dataStart?: number;
+  isLoading: boolean;
+} {
   const servesProposals = useServes(PAIR_TABLES.proposals);
   const servesAttestations = useServes(PAIR_TABLES.attestations);
   const filter = { [layer === 'consensus' ? 'consensus_client_eq' : 'execution_client_eq']: client };
@@ -73,6 +68,7 @@ export function usePairMetrics(
     proposals: proposals.rows,
     attestations: attestations.rows,
     available: proposals.rows.length > 0 || attestations.rows.length > 0,
+    dataStart: Math.max(proposals.dataStart ?? 0, attestations.dataStart ?? 0) || undefined,
     isLoading: (servesProposals && proposals.isLoading) || (servesAttestations && attestations.isLoading),
   };
 }
