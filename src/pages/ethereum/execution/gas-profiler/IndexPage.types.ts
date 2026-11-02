@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
+import { BLOCK_TX_SORT_FIELDS } from './utils/blockTransactionFilters';
 
 /**
  * Zod schema for gas profiler home page search parameters
@@ -13,15 +14,34 @@ export const gasProfilerHomeSearchSchema = z.object({
   t: z.enum(['24h', '72h', '7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
 });
 
+const optionalCount = z.coerce.number().min(0).optional().catch(undefined);
+
 /**
- * Zod schema for block detail page search parameters
+ * Zod schema for block detail page search parameters.
+ * Transactions tab filters, sort and page live here so a filtered view can be shared.
  */
 export const gasProfilerBlockSearchSchema = z.object({
-  // Sort transactions
-  sort: z.enum(['index', 'gas', 'depth']).default('gas'),
-  sortDir: z.enum(['asc', 'desc']).default('desc'),
-  // Filter by call type
-  callType: z.string().optional(),
+  // Search by tx hash, target or called contract
+  q: z.coerce.string().optional(),
+  // `Transfer` or root call type
+  type: z.coerce.string().optional(),
+  status: z.enum(['succeeded', 'failed']).optional().catch(undefined),
+  gasMin: optionalCount,
+  gasMax: optionalCount,
+  callsMin: optionalCount,
+  callsMax: optionalCount,
+  depthMin: optionalCount,
+  depthMax: optionalCount,
+  // Comma-separated opcodes the tx must execute
+  opcodes: z.coerce.string().optional(),
+  // Opcode category with the most gas
+  category: z.coerce.string().optional(),
+  // Sort transactions (defaults to gas, descending)
+  sort: z.enum(BLOCK_TX_SORT_FIELDS).optional().catch(undefined),
+  sortDir: z.enum(['asc', 'desc']).optional().catch(undefined),
+  // Pagination (0-indexed page)
+  page: z.coerce.number().int().min(0).optional().catch(undefined),
+  pageSize: z.coerce.number().int().min(1).max(100).optional().catch(undefined),
   // Highlight specific TX
   highlight: z.string().optional(),
 });

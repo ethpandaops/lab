@@ -1,9 +1,8 @@
 import { ExplorerLinks } from '../ExplorerLinks';
-import { Button } from '@/components/Elements/Button';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import {
   CheckCircleIcon,
@@ -13,6 +12,7 @@ import {
   XMarkIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 import { Alert } from '@/components/Feedback/Alert';
 import { Card } from '@/components/Layout/Card';
@@ -24,7 +24,27 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
 import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
-import type { BlockSimulationResult, TxSummary, OpcodeSummary, CallError } from '../../SimulatePage.types';
+import type {
+  BlockSimulationResult,
+  TxSummary,
+  OpcodeSummary,
+  CallError,
+  GasProfilerSimulateSearch,
+} from '../../SimulatePage.types';
+import {
+  DEFAULT_SIM_TX_PAGE_SIZE,
+  DEFAULT_SIM_TX_SORT,
+  SIM_TX_SORT_FIELDS,
+  type SimTxFilters,
+  type SimTxSortField,
+  filterSimulationTransactions,
+  sortSimulationTransactions,
+} from '../../utils/simulationTransactionFilters';
+import { formatRangeChip } from '../../utils/blockTransactionFilters';
+import { type ActiveFilterChip, FilterBar, FilterField, type FilterPreset, RangeFields } from '../FilterBar';
+import { ListPagination } from '../ListPagination';
+import { Input } from '@/components/Forms/Input';
+import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
@@ -601,8 +621,32 @@ function OpcodeBreakdownSection({
 // TRANSACTION IMPACT VIEW (card-based, self-contained)
 // ============================================================================
 
-type TxFilter = 'all' | 'diverged' | 'status' | 'errors';
-type TxSort = 'delta' | 'index' | 'gas';
+const SIMULATE_ROUTE = '/ethereum/execution/gas-profiler/simulate';
+
+const SIM_SORT_LABELS: Record<SimTxSortField, string> = {
+  impact: 'Impact',
+  delta: 'Gas change',
+  index: 'Index',
+  originalGas: 'Original gas',
+  simulatedGas: 'Simulated gas',
+  reverts: 'Reverts',
+};
+
+const SIM_STATUS_LABELS = { succeeded: 'Succeeded', failed: 'Failed' } as const;
+const SIM_CHANGE_LABELS = { up: 'More gas', down: 'Less gas', none: 'Unchanged' } as const;
+
+/** URL keys for each filter, so a filtered view of the simulation can be shared */
+const SIM_FILTER_PARAMS = {
+  q: 'txQ',
+  diverged: 'txDiverged',
+  statusChanged: 'txStatusChanged',
+  errors: 'txErrors',
+  status: 'txStatus',
+  change: 'txChange',
+  gasMin: 'txGasMin',
+  gasMax: 'txGasMax',
+  impactMin: 'txImpactMin',
+} as const satisfies Record<keyof SimTxFilters, keyof GasProfilerSimulateSearch>;
 
 function TransactionImpactView({
   transactions,
@@ -614,11 +658,9 @@ function TransactionImpactView({
   onEnableMaxGasLimit?: () => void;
 }): JSX.Element {
   const { currentNetwork } = useNetwork();
-  const [filter, setFilter] = useState<TxFilter>('all');
-  const [sortBy, setSortBy] = useState<TxSort>('delta');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const search = useSearch({ from: SIMULATE_ROUTE }) as GasProfilerSimulateSearch;
+  const navigate = useNavigate({ from: SIMULATE_ROUTE });
   const [expandedTxs, setExpandedTxs] = useState<Set<string>>(new Set());
-  const [visibleCount, setVisibleCount] = useState(20);
 
   const toggleExpand = useCallback((hash: string) => {
     setExpandedTxs(prev => {
@@ -629,125 +671,222 @@ function TransactionImpactView({
     });
   }, []);
 
-  const counts = useMemo(
-    () => ({
-      all: transactions.length,
-      diverged: transactions.filter(t => t.diverged).length,
-      status: transactions.filter(t => t.originalStatus !== t.simulatedStatus).length,
-      errors: transactions.filter(
-        t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0 || !!t.error
-      ).length,
-    }),
-    [transactions]
+  const filters: SimTxFilters = useMemo(
+    () =>
+      Object.fromEntries(
+        (Object.keys(SIM_FILTER_PARAMS) as (keyof SimTxFilters)[]).map(key => [key, search[SIM_FILTER_PARAMS[key]]])
+      ) as SimTxFilters,
+    [search]
   );
+  const sortBy: SimTxSortField = search.txSort ?? DEFAULT_SIM_TX_SORT;
+  const sortDir = search.txDir ?? 'desc';
+  const pageSize = search.txPageSize ?? DEFAULT_SIM_TX_PAGE_SIZE;
 
-  const filteredAndSorted = useMemo(() => {
-    let txs = [...transactions];
-
-    switch (filter) {
-      case 'diverged':
-        txs = txs.filter(t => t.diverged);
-        break;
-      case 'status':
-        txs = txs.filter(t => t.originalStatus !== t.simulatedStatus);
-        break;
-      case 'errors':
-        txs = txs.filter(t => (t.originalErrors?.length ?? 0) > 0 || (t.simulatedErrors?.length ?? 0) > 0 || !!t.error);
-        break;
-    }
-
-    txs.sort((a, b) => {
-      switch (sortBy) {
-        case 'index':
-          return a.index - b.index;
-        case 'gas':
-          return a.simulatedGas - b.simulatedGas;
-        case 'delta':
-          return Math.abs(a.deltaPercent) - Math.abs(b.deltaPercent);
-        default:
-          return 0;
-      }
-    });
-
-    if (sortDir === 'desc') txs.reverse();
-    return txs;
-  }, [transactions, filter, sortBy, sortDir]);
-
-  const toggleSort = useCallback(
-    (field: TxSort) => {
-      if (sortBy === field) {
-        setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
-      } else {
-        setSortBy(field);
-        setSortDir('desc');
-      }
+  /** Write filter changes to the URL and return to the first page */
+  const update = useCallback(
+    (patch: Partial<SimTxFilters>, extra: Partial<GasProfilerSimulateSearch> = {}, replace = false) => {
+      const mapped = Object.fromEntries(
+        Object.entries(patch).map(([key, value]) => [SIM_FILTER_PARAMS[key as keyof SimTxFilters], value])
+      );
+      navigate({
+        search: prev => {
+          const next: Record<string, unknown> = { ...prev, txPage: undefined, ...mapped, ...extra };
+          for (const key of Object.keys(next)) {
+            if (next[key] === '' || next[key] === undefined || next[key] === false) delete next[key];
+          }
+          return next as GasProfilerSimulateSearch;
+        },
+        replace,
+        resetScroll: false,
+      });
     },
-    [sortBy]
+    [navigate]
   );
 
-  const filterOptions: { key: TxFilter; label: string; count: number }[] = [
-    { key: 'all', label: 'All', count: counts.all },
-    { key: 'diverged', label: 'Diverged', count: counts.diverged },
-    { key: 'status', label: 'Status \u0394', count: counts.status },
-    { key: 'errors', label: 'Errors', count: counts.errors },
-  ];
+  const clearAll = useCallback(
+    () =>
+      update(Object.fromEntries(Object.keys(SIM_FILTER_PARAMS).map(key => [key, undefined])) as Partial<SimTxFilters>),
+    [update]
+  );
+  const handleSearchChange = useCallback((q: string) => update({ q }, {}, true), [update]);
 
-  const sortOptions: { key: TxSort; label: string }[] = [
-    { key: 'delta', label: 'Impact' },
-    { key: 'index', label: 'Index' },
-    { key: 'gas', label: 'Gas' },
+  const filteredAndSorted = useMemo(
+    () => sortSimulationTransactions(filterSimulationTransactions(transactions, filters), sortBy, sortDir),
+    [transactions, filters, sortBy, sortDir]
+  );
+
+  const pageCount = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
+  const pageIndex = Math.min(search.txPage ?? 0, pageCount - 1);
+  const pageRows = filteredAndSorted.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+
+  const presetDefs: { id: string; label: string; key: 'diverged' | 'statusChanged' | 'errors'; dot: string }[] = [
+    { id: 'diverged', label: 'Diverged', key: 'diverged', dot: 'bg-warning' },
+    { id: 'status', label: 'Status changed', key: 'statusChanged', dot: 'bg-danger' },
+    { id: 'errors', label: 'Errors', key: 'errors', dot: 'bg-danger' },
   ];
+  const presets: FilterPreset[] = presetDefs.map(def => {
+    const active = !!filters[def.key];
+    const count = filterSimulationTransactions(transactions, { [def.key]: true }).length;
+    return {
+      id: def.id,
+      label: def.label,
+      icon: <span className={clsx('size-1.5 rounded-full', def.dot)} />,
+      count,
+      active,
+      disabled: !active && count === 0,
+      onToggle: () => update({ [def.key]: active ? undefined : true }),
+    };
+  });
+
+  const chips: ActiveFilterChip[] = [];
+  const addChip = (id: string, label: string, value: string | undefined, clear: Partial<SimTxFilters>): void => {
+    if (value) chips.push({ id, label, value, onRemove: () => update(clear) });
+  };
+  for (const def of presetDefs) {
+    if (filters[def.key])
+      chips.push({ id: def.id, label: 'Only', value: def.label, onRemove: () => update({ [def.key]: undefined }) });
+  }
+  addChip('status', 'Simulated status', filters.status && SIM_STATUS_LABELS[filters.status], { status: undefined });
+  addChip('change', 'Gas change', filters.change && SIM_CHANGE_LABELS[filters.change], { change: undefined });
+  addChip('gas', 'Original gas', formatRangeChip(filters.gasMin, filters.gasMax), {
+    gasMin: undefined,
+    gasMax: undefined,
+  });
+  addChip('impact', 'Impact', filters.impactMin !== undefined ? `≥${filters.impactMin}%` : undefined, {
+    impactMin: undefined,
+  });
+
+  const [draft, setDraft] = useState<SimTxFilters>({});
+  const setDraftValue = <K extends keyof SimTxFilters>(key: K, value: SimTxFilters[K]): void =>
+    setDraft(prev => ({ ...prev, [key]: value === '' ? undefined : value }));
+
+  const dialogContent = (
+    <>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FilterField label="Simulated status">
+          <SegmentedControl
+            ariaLabel="Simulated status"
+            value={draft.status ?? ''}
+            onChange={value => setDraftValue('status', (value || undefined) as SimTxFilters['status'])}
+            options={[
+              { value: '', label: 'All' },
+              { value: 'succeeded', label: SIM_STATUS_LABELS.succeeded },
+              { value: 'failed', label: SIM_STATUS_LABELS.failed },
+            ]}
+          />
+        </FilterField>
+        <FilterField label="Gas change">
+          <SegmentedControl
+            ariaLabel="Gas change"
+            value={draft.change ?? ''}
+            onChange={value => setDraftValue('change', (value || undefined) as SimTxFilters['change'])}
+            options={[
+              { value: '', label: 'All' },
+              { value: 'up', label: SIM_CHANGE_LABELS.up },
+              { value: 'down', label: SIM_CHANGE_LABELS.down },
+              { value: 'none', label: SIM_CHANGE_LABELS.none },
+            ]}
+          />
+        </FilterField>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FilterField label="Original gas">
+          <RangeFields
+            min={draft.gasMin}
+            max={draft.gasMax}
+            onMinChange={v => setDraftValue('gasMin', v)}
+            onMaxChange={v => setDraftValue('gasMax', v)}
+          />
+        </FilterField>
+        <FilterField label="Minimum impact (%)">
+          <Input size="sm">
+            <Input.Field
+              type="number"
+              min={0}
+              step="any"
+              inputMode="decimal"
+              value={draft.impactMin ?? ''}
+              onChange={e =>
+                setDraftValue('impactMin', e.target.value === '' ? undefined : Math.abs(Number(e.target.value)))
+              }
+              placeholder="0"
+              aria-label="Minimum impact (%)"
+            />
+          </Input>
+        </FilterField>
+      </div>
+    </>
+  );
+
+  const sortControl = (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-medium text-muted">Sort</span>
+      <SelectMenu
+        value={sortBy}
+        onChange={(value: SimTxSortField) =>
+          update({}, { txSort: value === DEFAULT_SIM_TX_SORT ? undefined : value, txDir: undefined })
+        }
+        options={SIM_TX_SORT_FIELDS.map(field => ({ value: field, label: SIM_SORT_LABELS[field] }))}
+        expandToFit
+        rounded
+      />
+      <SegmentedControl
+        ariaLabel="Sort direction"
+        value={sortDir}
+        onChange={value => update({}, { txDir: value === 'desc' ? undefined : value })}
+        options={[
+          {
+            value: 'desc',
+            label: (
+              <>
+                <ArrowDownIcon className="size-3.5" />
+                <span className="sr-only">Descending</span>
+              </>
+            ),
+          },
+          {
+            value: 'asc',
+            label: (
+              <>
+                <ArrowUpIcon className="size-3.5" />
+                <span className="sr-only">Ascending</span>
+              </>
+            ),
+          },
+        ]}
+      />
+    </div>
+  );
 
   return (
     <div>
-      {/* Filter + Sort bar */}
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        {/* Filters */}
-        <SegmentedControl
-          ariaLabel="Filter transactions"
-          options={filterOptions.map(opt => ({
-            value: opt.key,
-            label: (
-              <>
-                {opt.label} <span className="font-mono tabular-nums">{opt.count}</span>
-              </>
-            ),
-            disabled: opt.count === 0 && opt.key !== 'all',
-          }))}
-          value={filter}
-          onChange={key => {
-            setFilter(key);
-            setVisibleCount(20);
-          }}
-        />
-
-        <div className="flex-1" />
-
-        {/* Sort */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted">Sort</span>
-          <SegmentedControl
-            ariaLabel="Sort transactions"
-            options={sortOptions.map(opt => ({
-              value: opt.key,
-              label: (
-                <>
-                  {opt.label}
-                  {sortBy === opt.key && (
-                    <span className="ml-1 text-primary">{sortDir === 'desc' ? '\u2193' : '\u2191'}</span>
-                  )}
-                </>
-              ),
-            }))}
-            value={sortBy}
-            onChange={toggleSort}
-          />
-        </div>
-      </div>
+      <FilterBar
+        search={filters.q ?? ''}
+        onSearchChange={handleSearchChange}
+        searchPlaceholder="Hash, address or error"
+        presets={presets}
+        chips={chips}
+        onClearAll={clearAll}
+        shownCount={filteredAndSorted.length}
+        totalCount={transactions.length}
+        noun="transactions"
+        dialogTitle="Filter transactions"
+        onDialogOpen={() => setDraft({ ...filters, q: undefined })}
+        onDialogApply={() =>
+          update({
+            ...Object.fromEntries(Object.keys(SIM_FILTER_PARAMS).map(k => [k, undefined])),
+            ...draft,
+            q: filters.q,
+          })
+        }
+        onDialogReset={() => setDraft({})}
+        dialogContent={dialogContent}
+        trailing={sortControl}
+      />
 
       {/* Transaction cards */}
       <div className="divide-y divide-border/20">
-        {filteredAndSorted.slice(0, visibleCount).map(tx => {
+        {pageRows.map(tx => {
           const statusChanged = tx.originalStatus !== tx.simulatedStatus;
           const hasErrors = (tx.originalErrors?.length ?? 0) > 0 || (tx.simulatedErrors?.length ?? 0) > 0;
           const hasPreExecError = !!tx.error;
@@ -946,17 +1085,23 @@ function TransactionImpactView({
         })}
       </div>
 
-      {/* Load more */}
-      {filteredAndSorted.length > visibleCount && (
-        <div className="mt-4 flex justify-center">
-          <Button variant="secondary" size="sm" onClick={() => setVisibleCount(filteredAndSorted.length)}>
-            Show All ({filteredAndSorted.length - visibleCount} more)
-          </Button>
-        </div>
-      )}
-
-      {filteredAndSorted.length === 0 && (
-        <div className="py-12 text-center text-sm text-muted">No transactions match the selected filter.</div>
+      {filteredAndSorted.length === 0 ? (
+        <div className="py-12 text-center text-sm text-muted">No transactions match these filters</div>
+      ) : (
+        <ListPagination
+          className="mt-2"
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalRows={filteredAndSorted.length}
+          onChange={(nextPage, nextSize) =>
+            update(
+              {},
+              nextSize !== pageSize
+                ? { txPageSize: nextSize === DEFAULT_SIM_TX_PAGE_SIZE ? undefined : nextSize }
+                : { txPage: nextPage || undefined }
+            )
+          }
+        />
       )}
     </div>
   );

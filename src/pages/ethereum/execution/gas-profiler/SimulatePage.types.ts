@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { SIM_TX_SORT_FIELDS } from './utils/simulationTransactionFilters';
 
 const { DATA_COLORS } = getDataVizColors();
 
@@ -9,6 +10,20 @@ const { DATA_COLORS } = getDataVizColors();
 export const gasProfilerSimulateSearchSchema = z.object({
   // Block number to simulate
   block: z.coerce.number().optional(),
+  // Transactions tab: search, filters, sort and page
+  txQ: z.coerce.string().optional(),
+  txDiverged: z.boolean().optional().catch(undefined),
+  txStatusChanged: z.boolean().optional().catch(undefined),
+  txErrors: z.boolean().optional().catch(undefined),
+  txStatus: z.enum(['succeeded', 'failed']).optional().catch(undefined),
+  txChange: z.enum(['up', 'down', 'none']).optional().catch(undefined),
+  txGasMin: z.coerce.number().min(0).optional().catch(undefined),
+  txGasMax: z.coerce.number().min(0).optional().catch(undefined),
+  txImpactMin: z.coerce.number().min(0).optional().catch(undefined),
+  txSort: z.enum(SIM_TX_SORT_FIELDS).optional().catch(undefined),
+  txDir: z.enum(['asc', 'desc']).optional().catch(undefined),
+  txPage: z.coerce.number().int().min(0).optional().catch(undefined),
+  txPageSize: z.coerce.number().int().min(1).max(100).optional().catch(undefined),
 });
 
 export type GasProfilerSimulateSearch = z.infer<typeof gasProfilerSimulateSearchSchema>;
