@@ -38,7 +38,7 @@ function Detail({ label, children }: { label: string; children: ReactNode }): JS
  * Node identity: client, ID, status and owner, then the node's software, location and network.
  */
 export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Element {
-  const { node, nodeId, online, newerVersion } = row;
+  const { node, nodeId, online } = row;
   const client = node.meta_consensus_implementation;
   const classification = node.classification || 'unclassified';
   // Engine events report geth as "Go-ethereum"
@@ -106,11 +106,6 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
           <span className="text-muted" title={node.meta_client_version}>
             {shortVersion(node.meta_client_version)}
           </span>
-          {newerVersion && (
-            <span className="basis-full text-xs/5 text-warning" title={newerVersion}>
-              {shortVersion(newerVersion)} available
-            </span>
-          )}
         </Detail>
         <Detail label="Location">
           <span>{getCountryFlag(node.meta_client_geo_country_code, '')}</span>

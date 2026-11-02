@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import {
   axisCeiling,
   getIngestedEndSlot,
-  getLatestVersions,
   getSyncState,
   getSlotWindow,
   histogram,
@@ -77,20 +75,6 @@ describe('histogram', () => {
     const { starts, counts } = histogram([90, 140, 150, 260], 50, 300, 100);
     expect(starts).toEqual([100, 150, 200, 250]);
     expect(counts).toEqual([2, 1, 0, 1]);
-  });
-});
-
-describe('getLatestVersions', () => {
-  it('picks the highest version per implementation, ignoring build hashes', () => {
-    const nodes = [
-      { meta_client_implementation: 'Contributoor', meta_client_version: 'v0.0.70-7195855' },
-      { meta_client_implementation: 'Contributoor', meta_client_version: 'v0.0.72-5328921' },
-      { meta_client_implementation: 'Contributoor', meta_client_version: 'v0.0.9-aaaaaaa' },
-      { meta_client_implementation: 'Xatu', meta_client_version: 'v1.30.2-719b24d7' },
-    ] as FctNodeActiveLast24h[];
-    const latest = getLatestVersions(nodes);
-    expect(latest.get('Contributoor')).toBe('v0.0.72-5328921');
-    expect(latest.get('Xatu')).toBe('v1.30.2-719b24d7');
   });
 });
 

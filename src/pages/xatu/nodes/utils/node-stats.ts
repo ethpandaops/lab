@@ -1,5 +1,4 @@
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { compareVersions } from '@/utils/version';
 import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '../constants';
 
 /** Distribution summary of a set of millisecond timings */
@@ -139,21 +138,6 @@ export function getArrivalTier(ms: number): ArrivalTier {
   if (ms < 3000) return 'fair';
   if (ms < 4000) return 'slow';
   return 'poor';
-}
-
-/**
- * Newest client version reported per collector implementation (e.g. Contributoor, Xatu).
- */
-export function getLatestVersions(nodes: FctNodeActiveLast24h[]): Map<string, string> {
-  const latest = new Map<string, string>();
-  nodes.forEach(node => {
-    const implementation = node.meta_client_implementation;
-    const version = node.meta_client_version;
-    if (!implementation || !version) return;
-    const current = latest.get(implementation);
-    if (!current || compareVersions(version, current) > 0) latest.set(implementation, version);
-  });
-  return latest;
 }
 
 /**
