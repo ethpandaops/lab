@@ -1,5 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
+import { Link } from '@tanstack/react-router';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getClientColor } from '@/utils/ethereum';
@@ -19,7 +21,7 @@ export interface ClientBreakdownProps {
   onSelect: (client: string | undefined) => void;
 }
 
-/** Ranked clients with share bars; rows filter the page and unknown keeps its own row. */
+/** Ranked clients with share bars; rows filter the page, the chevron opens the client's page. */
 export function ClientBreakdown({
   title,
   summaries,
@@ -43,19 +45,20 @@ export function ClientBreakdown({
             <span className="flex-1" />
             <span className="w-14 shrink-0 text-right">Share</span>
             <span className="hidden w-16 shrink-0 text-right sm:block">Blocks</span>
+            <span className="w-6 shrink-0" />
           </li>
           {summaries.map((summary, index) => {
             const isUnknown = summary.client === UNKNOWN_CLIENT;
             const share = identifiedOnly ? summary.identifiedShare : summary.share;
             const isSelected = selectedClient === summary.client;
             return (
-              <li key={summary.client}>
+              <li key={summary.client} className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => onSelect(isSelected ? undefined : summary.client)}
                   aria-pressed={isSelected}
                   className={clsx(
-                    'flex w-full items-center gap-3 rounded-sm px-2 py-1.5 text-left transition-colors hover:bg-primary/10',
+                    'flex min-w-0 flex-1 items-center gap-3 rounded-sm px-2 py-1.5 text-left transition-colors hover:bg-primary/10',
                     isSelected && 'bg-primary/10 ring-1 ring-primary/30'
                   )}
                 >
@@ -85,6 +88,18 @@ export function ClientBreakdown({
                     {summary.blocks.toLocaleString()}
                   </span>
                 </button>
+                {isUnknown ? (
+                  <span className="w-6 shrink-0" />
+                ) : (
+                  <Link
+                    to="/ethereum/clients/$client"
+                    params={{ client: summary.client }}
+                    className="flex size-6 shrink-0 items-center justify-center rounded-xs text-muted hover:bg-primary/10 hover:text-primary"
+                    aria-label={`${formatClientName(summary.client)} page`}
+                  >
+                    <ChevronRightIcon className="size-4" />
+                  </Link>
+                )}
               </li>
             );
           })}

@@ -737,7 +737,7 @@ export function ProbesView({
             Each probe samples a specific peer&apos;s custody of data columns, validating responses against KZG
             commitments.
           </p>
-          <p>The prober (our node) requests data from a peer.</p>
+          <p>The prober, a Xatu node, requests data from a peer.</p>
           <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
             <p className="text-foreground">
               <span className="font-medium">Result meanings:</span>

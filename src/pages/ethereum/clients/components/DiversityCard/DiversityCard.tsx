@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
+import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { UNKNOWN_CLIENT } from '../../constants';
@@ -13,9 +14,12 @@ export interface DiversityCardProps {
   summaries: ClientSummary[];
 }
 
+/** Segments narrower than this (percentage points) are too small to label inside the bar */
+const MIN_LABELLED_SEGMENT = 9;
+
 /**
- * Client shares of identified blocks as one bar, marked at ⅓, ½ and ⅔, with the largest client's distance to
- * the next threshold.
+ * Client shares of identified blocks as one stacked bar marked at 33%, 50% and 67%, a row per client, and the
+ * largest client's position against those thresholds.
  */
 export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Element {
   const identified = summaries.filter(summary => summary.client !== UNKNOWN_CLIENT && summary.identifiedShare !== null);
@@ -25,70 +29,107 @@ export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Ele
   const crossed = largest ? crossedThreshold(share) : null;
 
   return (
-    <Card rounded title={title}>
+    <Card rounded title={title} subtitle="Share of blocks whose graffiti names a client">
       {!largest ? (
         <p className="text-sm text-muted">No blocks named a client in this window.</p>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="relative pt-5">
-            {DIVERSITY_THRESHOLDS.map(threshold => (
-              <span
-                key={threshold.label}
-                className="absolute top-0 -translate-x-1/2 text-xs/4 text-muted"
-                style={{ left: `${threshold.share}%` }}
-              >
-                {threshold.label}
-              </span>
-            ))}
-            <div className="relative flex h-4 w-full overflow-hidden rounded-xs bg-border/50">
-              {identified.map(summary => (
-                <span
-                  key={summary.client}
-                  className="h-full border-r border-surface last:border-r-0"
-                  style={{ width: `${summary.identifiedShare}%`, backgroundColor: getClientColor(summary.client) }}
-                  title={`${formatClientName(summary.client)} ${summary.identifiedShare?.toFixed(1)}%`}
-                />
-              ))}
+        <div className="flex flex-col gap-5">
+          <div className="relative pb-5">
+            <div className="flex h-7 w-full overflow-hidden rounded-xs bg-border/50">
+              {identified.map(summary => {
+                const segment = summary.identifiedShare ?? 0;
+                return (
+                  <span
+                    key={summary.client}
+                    className="flex h-full min-w-0 items-center justify-center gap-1 overflow-hidden border-r border-surface text-xs/4 font-semibold text-white last:border-r-0"
+                    style={{ width: `${segment}%`, backgroundColor: getClientColor(summary.client) }}
+                    title={`${formatClientName(summary.client)} ${segment.toFixed(1)}%`}
+                  >
+                    {segment >= MIN_LABELLED_SEGMENT && (
+                      <span
+                        className="relative z-10 inline-flex items-center gap-1 rounded-xs px-1"
+                        style={{ backgroundColor: getClientColor(summary.client) }}
+                      >
+                        <ClientLogo client={summary.client} size={14} noLink decorative />
+                        <span className="truncate [text-shadow:0_1px_1px_rgb(0_0_0/0.4)]">{segment.toFixed(0)}%</span>
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
             </div>
             {DIVERSITY_THRESHOLDS.map(threshold => (
-              <span
-                key={threshold.label}
-                className="absolute top-4 h-6 w-px bg-foreground/60"
-                style={{ left: `${threshold.share}%` }}
-              />
+              <span key={threshold.label}>
+                <span
+                  className="absolute top-0 h-7 w-px -translate-x-1/2 bg-white/70"
+                  style={{ left: `${threshold.share}%` }}
+                />
+                <span
+                  className="absolute top-7 h-1.5 w-0.5 -translate-x-1/2 bg-foreground"
+                  style={{ left: `${threshold.share}%` }}
+                />
+                <span
+                  className="absolute bottom-0 -translate-x-1/2 text-xs/4 font-medium text-foreground"
+                  style={{ left: `${threshold.share}%` }}
+                >
+                  {threshold.label}
+                </span>
+              </span>
             ))}
           </div>
-          <ul className="flex flex-wrap gap-x-4 gap-y-1">
-            {identified.map(summary => (
-              <li key={summary.client} className="inline-flex items-center gap-1.5">
-                <ClientLabel client={summary.client} />
-                <span className="text-sm/6 text-muted tabular-nums">{summary.identifiedShare?.toFixed(1)}%</span>
-              </li>
-            ))}
-          </ul>
-          <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+          <table className="w-full text-sm/6">
+            <thead>
+              <tr className="text-left text-xs/5 text-muted">
+                <th className="pb-1 font-normal">Client</th>
+                <th className="pb-1 text-right font-normal">Share</th>
+                <th className="pb-1 text-right font-normal">Blocks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {identified.map(summary => (
+                <tr key={summary.client}>
+                  <td className="py-0.5">
+                    <span className="inline-flex items-center gap-2">
+                      <span
+                        className="size-2.5 shrink-0 rounded-xs"
+                        style={{ backgroundColor: getClientColor(summary.client) }}
+                      />
+                      <ClientLabel client={summary.client} />
+                    </span>
+                  </td>
+                  <td className="py-0.5 text-right font-medium text-foreground tabular-nums">
+                    {summary.identifiedShare?.toFixed(1)}%
+                  </td>
+                  <td className="py-0.5 text-right text-muted tabular-nums">{summary.blocks.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <dl className="grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
             <div>
               <dt className="text-xs/5 text-muted">Largest client</dt>
-              <dd>
+              <dd className="mt-0.5">
                 <ClientLabel client={largest.client} />
               </dd>
             </div>
             <div>
-              <dt className="text-xs/5 text-muted">Its share</dt>
-              <dd className="text-sm/6 font-semibold text-foreground tabular-nums">{share.toFixed(1)}%</dd>
+              <dt className="text-xs/5 text-muted">Largest client&apos;s share</dt>
+              <dd className="mt-0.5 text-sm/6 font-semibold text-foreground tabular-nums">{share.toFixed(1)}%</dd>
             </div>
             <div>
-              <dt className="text-xs/5 text-muted">{crossed ? 'Over' : 'Next threshold'}</dt>
+              <dt className="text-xs/5 text-muted">Threshold crossed</dt>
               <dd
-                className={crossed ? 'text-sm/6 font-semibold text-danger' : 'text-sm/6 font-semibold text-foreground'}
+                className={crossed ? 'mt-0.5 text-sm/6 font-semibold text-danger' : 'mt-0.5 text-sm/6 text-foreground'}
               >
-                {crossed ?? next?.label ?? '-'}
+                {crossed ?? 'None'}
               </dd>
             </div>
             <div>
-              <dt className="text-xs/5 text-muted">To next threshold</dt>
-              <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                {next ? `${next.distance.toFixed(1)} pts` : '-'}
+              <dt className="text-xs/5 text-muted">{next ? `Points below ${next.label}` : 'Next threshold'}</dt>
+              <dd className="mt-0.5 text-sm/6 font-semibold text-foreground tabular-nums">
+                {next ? next.distance.toFixed(1) : 'None'}
               </dd>
             </div>
           </dl>

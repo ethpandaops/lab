@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { Link } from '@tanstack/react-router';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import type { DimClientRelease } from '@/api/types.gen';
@@ -21,7 +22,7 @@ export interface ClientSummaryGridProps {
 
 /**
  * A card per client of a layer, linking to its page: share of identified blocks against the diversity
- * thresholds, newest release and our node count. Clients with no blocks or nodes are listed underneath.
+ * thresholds, newest release and Xatu node count. Clients with no blocks or nodes are listed underneath.
  */
 export function ClientSummaryGrid({
   layer,
@@ -52,14 +53,22 @@ export function ClientSummaryGrid({
               key={client}
               to="/ethereum/clients/$client"
               params={{ client }}
-              className="flex flex-col gap-3 rounded-sm border border-border bg-surface p-4 transition-colors hover:border-primary/50"
+              className="group flex flex-col gap-3 rounded-sm border border-border bg-surface p-4 shadow-xs transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2">
                   <ClientLogo client={client} size={24} noLink />
-                  <span className="text-sm/6 font-semibold text-foreground">{formatClientName(client)}</span>
+                  <span className="text-sm/6 font-semibold text-foreground group-hover:text-primary">
+                    {formatClientName(client)}
+                  </span>
                 </span>
-                {crossed && <span className="text-xs/5 font-semibold text-danger">Over {crossed}</span>}
+                <span className="flex items-center gap-2">
+                  {crossed && <span className="text-xs/5 font-semibold text-danger">Over {crossed}</span>}
+                  <ChevronRightIcon
+                    aria-hidden="true"
+                    className="size-5 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                  />
+                </span>
               </div>
               <div className="flex flex-col gap-1.5">
                 <span className="text-xs/5 text-muted">Share of identified blocks</span>

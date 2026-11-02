@@ -308,6 +308,22 @@ export function summariseUnresolved(blocks: ResolvedBlock[]): UnresolvedGroup[] 
     .sort((a, b) => b.blocks - a.blocks);
 }
 
+/** Colour of versions outside the most-used ones */
+export const OTHER_VERSION_COLOR = '#9ca3af';
+
+/**
+ * A colour per version for the `limit` most-used versions, newest first, so every chart on a page colours a version
+ * the same way. Versions outside them are drawn as Other.
+ */
+export function versionColors(versions: VersionSummary[], palette: readonly string[], limit = 7): Map<string, string> {
+  const top = [...versions]
+    .sort((a, b) => b.blocks - a.blocks)
+    .slice(0, limit)
+    .map(summary => summary.version)
+    .sort((a, b) => compareVersions(b, a));
+  return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
+}
+
 /** Resolved blocks per version for one UTC day */
 export interface VersionDay {
   day: string;
@@ -411,9 +427,9 @@ export function timeToAdoption(
 
 /** Client diversity thresholds: shares of stake at which one client's bug changes what the chain can do */
 export const DIVERSITY_THRESHOLDS = [
-  { share: 100 / 3, label: '⅓' },
-  { share: 50, label: '½' },
-  { share: 200 / 3, label: '⅔' },
+  { share: 100 / 3, label: '33%' },
+  { share: 50, label: '50%' },
+  { share: 200 / 3, label: '67%' },
 ] as const;
 
 /**
@@ -425,7 +441,7 @@ export function nextThreshold(share: number): { label: string; share: number; di
 }
 
 /**
- * Highest diversity threshold a share is over, or null below ⅓.
+ * Highest diversity threshold a share is over, or null below 33%.
  */
 export function crossedThreshold(share: number): string | null {
   const crossed = DIVERSITY_THRESHOLDS.filter(threshold => share >= threshold.share);

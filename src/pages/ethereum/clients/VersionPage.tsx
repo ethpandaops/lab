@@ -11,7 +11,6 @@ import { Badge } from '@/components/Elements/Badge';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Table } from '@/components/Lists/Table';
-import { Entity } from '@/components/Ethereum/Entity';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease } from '@/api/types.gen';
@@ -20,7 +19,14 @@ import { getClientColor, normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { VERSION_WINDOW_DAYS, VERSION_WINDOW_OPTIONS, type VersionWindow } from './constants';
-import { ClientHeader, ForkReadinessCard, NodeTable, PendingSource, ReferenceEngine } from './components';
+import {
+  ClientHeader,
+  EntityVersionBars,
+  ForkReadinessCard,
+  NodeTable,
+  PendingSource,
+  ReferenceEngine,
+} from './components';
 import { useClientBlocks, useClientNodes, useClientReleases, usePeerSupport, useReferenceEngine } from './hooks';
 import { PENDING_SOURCES } from './pending';
 import {
@@ -37,6 +43,7 @@ import {
   releaseUrl as releasePageUrl,
   summariseBuildLines,
   timeToAdoption,
+  OTHER_VERSION_COLOR,
   type AdoptionLag,
   type ResolvedBlock,
 } from './utils/client-versions';
@@ -126,6 +133,10 @@ export function VersionPage(): JSX.Element {
 
   const days = useMemo(() => countVersionsByDay(blocks), [blocks]);
   const adoption = useMemo(() => adoptionByDay(days, version), [days, version]);
+  const previousAdoption = useMemo(
+    () => (previous?.version ? adoptionByDay(days, previous.version) : []),
+    [days, previous?.version]
+  );
   const nodeVersions = useMemo(
     () => (layer === 'consensus' ? nodes.map(node => displayVersion(node.meta_consensus_version, releases)) : []),
     [nodes, layer, releases]
@@ -329,44 +340,63 @@ export function VersionPage(): JSX.Element {
               ]}
             />
 
-            <PopoutCard
-              title="Adoption"
-              subtitle="Daily share of this client's blocks with a resolved version"
-              anchorId="version-adoption"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={[
-                    {
-                      name: `${version} or newer`,
-                      data: adoption.map(point => (point.atLeast === null ? null : Number(point.atLeast.toFixed(2)))),
-                      color: getClientColor(client),
-                      showArea: true,
-                      areaOpacity: 0.15,
-                    },
-                    {
-                      name: `Exactly ${version}`,
-                      data: adoption.map(point => (point.exact === null ? null : Number(point.exact.toFixed(2)))),
-                      color: getClientColor(client),
-                      lineStyle: 'dashed',
-                    },
-                  ]}
-                  xAxis={{ type: 'category', labels: adoption.map(point => formatDailyDate(point.day)), name: 'Date' }}
-                  yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                  height={inModal ? 600 : 320}
-                  showLegend
-                  legendPosition="top"
-                  markLines={
-                    releaseDay && adoption.some(point => point.day === releaseDay)
-                      ? [{ xValue: formatDailyDate(releaseDay), label: 'Released', lineStyle: 'dashed' }]
-                      : undefined
-                  }
-                />
-              )}
-            </PopoutCard>
-
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+              <div className="xl:col-span-2">
+                <PopoutCard
+                  title="Adoption"
+                  subtitle="Daily share of this client's blocks with a resolved version"
+                  anchorId="version-adoption"
+                  modalSize="full"
+                >
+                  {({ inModal }) => (
+                    <MultiLineChart
+                      series={[
+                        {
+                          name: `${version} or newer`,
+                          data: adoption.map(point =>
+                            point.atLeast === null ? null : Number(point.atLeast.toFixed(2))
+                          ),
+                          color: getClientColor(client),
+                          showArea: true,
+                          areaOpacity: 0.15,
+                        },
+                        {
+                          name: `Exactly ${version}`,
+                          data: adoption.map(point => (point.exact === null ? null : Number(point.exact.toFixed(2)))),
+                          color: getClientColor(client),
+                          lineStyle: 'dashed',
+                        },
+                        ...(previous?.version
+                          ? [
+                              {
+                                name: `Exactly ${previous.version}`,
+                                data: previousAdoption.map(point =>
+                                  point.exact === null ? null : Number(point.exact.toFixed(2))
+                                ),
+                                color: OTHER_VERSION_COLOR,
+                                lineStyle: 'dotted' as const,
+                              },
+                            ]
+                          : []),
+                      ]}
+                      xAxis={{
+                        type: 'category',
+                        labels: adoption.map(point => formatDailyDate(point.day)),
+                        name: 'Date',
+                      }}
+                      yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
+                      height={inModal ? 600 : 320}
+                      showLegend
+                      legendPosition="top"
+                      markLines={
+                        releaseDay && adoption.some(point => point.day === releaseDay)
+                          ? [{ xValue: formatDailyDate(releaseDay), label: 'Released', lineStyle: 'dashed' }]
+                          : undefined
+                      }
+                    />
+                  )}
+                </PopoutCard>
+              </div>
               <ComparisonCard
                 layer={layer}
                 version={version}
@@ -376,8 +406,16 @@ export function VersionPage(): JSX.Element {
                 probes={peers.probes}
                 releases={releases}
               />
-              <VersionEntities version={version} blocks={blocks} />
             </div>
+
+            <EntityVersionBars
+              client={client}
+              blocks={blocks}
+              latestVersion={latest?.version}
+              focusVersion={version}
+              title="Entities running it"
+              subtitle="Each entity's blocks by version, this version first"
+            />
           </>
         )}
 
@@ -524,53 +562,6 @@ function ComparisonCard({
               accessor: row => row.previous,
               cellClassName: 'text-right tabular-nums text-muted',
               headerClassName: 'text-right font-mono',
-            },
-          ]}
-        />
-      )}
-    </Card>
-  );
-}
-
-/** Entities proposing with a version, and how much of their client's blocks it is */
-function VersionEntities({ version, blocks }: { version: string; blocks: ResolvedBlock[] }): JSX.Element {
-  const rows = useMemo(() => {
-    const byEntity = new Map<string, { onVersion: number; resolved: number }>();
-    for (const block of blocks) {
-      if (!block.entity || !block.version) continue;
-      const entry = byEntity.get(block.entity) ?? { onVersion: 0, resolved: 0 };
-      entry.resolved++;
-      if (block.version === version) entry.onVersion++;
-      byEntity.set(block.entity, entry);
-    }
-    return [...byEntity.entries()]
-      .filter(([, entry]) => entry.onVersion > 0)
-      .map(([entity, entry]) => ({ entity, ...entry }))
-      .sort((a, b) => b.onVersion - a.onVersion);
-  }, [blocks, version]);
-
-  return (
-    <Card rounded title="Entities running it" subtitle="Blocks on this version, and their share of the entity's blocks">
-      {rows.length === 0 ? (
-        <p className="text-sm text-muted">No entity proposed with this version in the window.</p>
-      ) : (
-        <Table
-          variant="nested"
-          data={rows.slice(0, 20)}
-          getRowKey={row => row.entity}
-          columns={[
-            { header: 'Entity', accessor: row => <Entity entity={row.entity} className="text-sm/6 font-medium" /> },
-            {
-              header: 'Blocks',
-              accessor: row => row.onVersion.toLocaleString(),
-              cellClassName: 'text-right tabular-nums text-foreground',
-              headerClassName: 'text-right',
-            },
-            {
-              header: 'Of its blocks',
-              accessor: row => percent(row.onVersion, row.resolved),
-              cellClassName: 'text-right tabular-nums text-muted',
-              headerClassName: 'text-right',
             },
           ]}
         />

@@ -6,7 +6,7 @@ export interface ShareBarProps {
   /** Share, 0-100 */
   share: number;
   color: string;
-  /** Draw the ⅓, ½ and ⅔ diversity thresholds */
+  /** Draw the 33%, 50% and 67% diversity thresholds */
   showThresholds?: boolean;
 }
 

@@ -61,7 +61,7 @@ function describeBlocks(entity: string | undefined, filters: ClientFilters, laye
 
 /**
  * Clients overview: every consensus and execution client with its share of proposed blocks parsed from graffiti,
- * diversity against the ⅓, ½ and ⅔ thresholds, newest release and Xatu nodes, with a per-block drill-down.
+ * diversity against the 33%, 50% and 67% thresholds, newest release and Xatu nodes, with a per-block drill-down.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/clients/' });
@@ -258,29 +258,6 @@ export function IndexPage(): JSX.Element {
             </Card>
           ) : (
             <>
-              <Stats
-                gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
-                stats={[
-                  { id: 'blocks', name: 'Blocks', value: coverage.total.toLocaleString() },
-                  {
-                    id: 'consensus',
-                    name: 'CL identified',
-                    value: formatShare(coverage.withConsensus, coverage.total),
-                  },
-                  {
-                    id: 'execution',
-                    name: 'EL identified',
-                    value: formatShare(coverage.withExecution, coverage.total),
-                  },
-                  { id: 'both', name: 'Both identified', value: formatShare(coverage.withBoth, coverage.total) },
-                ]}
-              />
-
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                <DiversityCard title="Consensus diversity" summaries={consensusSummary} />
-                <DiversityCard title="Execution diversity" summaries={executionSummary} />
-              </div>
-
               <section className="flex flex-col gap-3">
                 <div>
                   <h2 className="text-base/7 font-semibold text-foreground">Consensus clients</h2>
@@ -305,6 +282,29 @@ export function IndexPage(): JSX.Element {
                   nodeCounts={nodeCounts}
                 />
               </section>
+
+              <Stats
+                gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
+                stats={[
+                  { id: 'blocks', name: 'Blocks', value: coverage.total.toLocaleString() },
+                  {
+                    id: 'consensus',
+                    name: 'CL identified',
+                    value: formatShare(coverage.withConsensus, coverage.total),
+                  },
+                  {
+                    id: 'execution',
+                    name: 'EL identified',
+                    value: formatShare(coverage.withExecution, coverage.total),
+                  },
+                  { id: 'both', name: 'Both identified', value: formatShare(coverage.withBoth, coverage.total) },
+                ]}
+              />
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <DiversityCard title="Consensus diversity" summaries={consensusSummary} />
+                <DiversityCard title="Execution diversity" summaries={executionSummary} />
+              </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <PopoutCard
