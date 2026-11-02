@@ -46,6 +46,11 @@ function percent(part: number, total: number): string {
   return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
 }
 
+/** A req/resp protocol without its shared prefix and encoding, e.g. beacon_blocks_by_range/2 */
+function protocolLabel(protocol: string): string {
+  return protocol.replace(/^\/eth2\/beacon_chain\/req\//, '').replace(/\/ssz_snappy$/, '');
+}
+
 /** Formats milliseconds, or a dash */
 function ms(value: number | null | undefined): string {
   return value == null ? '-' : `${Math.round(value).toLocaleString()} ms`;
@@ -80,10 +85,14 @@ function toVersionCounts<T extends { day_start_date?: string; version?: string; 
   rows: T[],
   count: (row: T) => number | undefined
 ): VersionCount[] {
+  // A version is drawn when any peer resolved it to a release, so forks naming made-up versions stay out
+  const releases = new Set(
+    rows.filter(row => row.version && RESOLVED_STATUSES.has(row.release_status ?? '')).map(row => row.version)
+  );
   return rows.map(row => ({
     time: Date.parse(`${row.day_start_date}T00:00:00Z`) / 1000,
     day: row.day_start_date ?? '',
-    version: RESOLVED_STATUSES.has(row.release_status ?? '') && row.version ? row.version : null,
+    version: releases.has(row.version) ? (row.version ?? null) : null,
     status: row.release_status || 'none',
     count: count(row) ?? 0,
   }));
@@ -138,11 +147,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   // Latency of a version is that of its largest row, since percentiles do not add up across rows
   const latencyByVersion = (version: CensusVersion): FctPeerCountByClClientDaily | undefined =>
     own.latest
-      .filter(
-        row =>
-          (row.version ?? '') === version.version &&
-          (RESOLVED_STATUSES.has(row.release_status ?? '') && !!row.version) === version.resolved
-      )
+      .filter(row => (row.version ?? '') === version.version)
       .sort((a, b) => (b.peer_count ?? 0) - (a.peer_count ?? 0))[0];
 
   return (
@@ -248,7 +253,14 @@ function ConsensusPeerDetail({
   const protocols = useCensus<FctPeerProtocolByClClientDaily>(CENSUS_TABLES.clProtocol, { client_eq: client });
   const known = sum(rows, row => row.custody_known_peer_count);
   const color = getClientColor(client);
-  const protocolRows = [...protocols.latest].sort((a, b) => (b.peer_count ?? 0) - (a.peer_count ?? 0)).slice(0, 12);
+  // Least-supported first: nearly every peer speaks the rest
+  const protocolRows = [...protocols.latest]
+    .sort(
+      (a, b) =>
+        (a.peer_count ?? 0) / (a.client_peer_count || 1) - (b.peer_count ?? 0) / (b.client_peer_count || 1) ||
+        (a.protocol ?? '').localeCompare(b.protocol ?? '')
+    )
+    .slice(0, 12);
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -305,10 +317,15 @@ function ConsensusPeerDetail({
         ) : (
           <ShareTable
             labelHeader="Protocol"
+            labelClassName="w-72"
             countHeader="Peers"
             rows={protocolRows.map(row => ({
               key: row.protocol ?? '',
-              label: <span className="font-mono text-xs/6">{row.protocol}</span>,
+              label: (
+                <span className="font-mono text-xs/6" title={row.protocol}>
+                  {protocolLabel(row.protocol ?? '')}
+                </span>
+              ),
               share: row.client_peer_count ? ((row.peer_count ?? 0) / row.client_peer_count) * 100 : 0,
               count: row.peer_count ?? 0,
               color,
@@ -378,7 +395,11 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
             {
               header: 'Network',
               accessor: row => (
-                <span className="block max-w-56 truncate">{row.autonomous_system_organization || 'Other'}</span>
+                <span className="block max-w-56 truncate" title={row.autonomous_system_organization}>
+                  {!row.autonomous_system_organization || row.autonomous_system_organization === 'other'
+                    ? 'Smaller networks'
+                    : row.autonomous_system_organization}
+                </span>
               ),
             },
             {
@@ -395,6 +416,7 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
             },
           ]}
         />
+        <p className="mt-3 text-xs/5 text-muted">Other is mostly residential and business ISPs.</p>
       </Card>
     </div>
   );
@@ -664,7 +686,7 @@ export function VersionNetwork({
   const own = useCensus<FctPeerCountByElClientDaily>(table, { client_eq: client });
   const total = sum(own.latest, row => row.peer_count);
   const onVersion = sum(
-    own.latest.filter(row => row.version === version && RESOLVED_STATUSES.has(row.release_status ?? '')),
+    own.latest.filter(row => row.version === version),
     row => row.peer_count
   );
 

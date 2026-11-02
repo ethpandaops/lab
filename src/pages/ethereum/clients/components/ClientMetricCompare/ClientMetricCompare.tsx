@@ -53,8 +53,18 @@ function ratio<T>(rows: T[], metric: ClientMetric<T>): number | null {
   return denominator > 0 ? (numerator / denominator) * (metric.scale ?? 1) : null;
 }
 
+/** Windows longer than this many days are drawn per week, so small clients' days do not swing the lines */
+const WEEKLY_AFTER_DAYS = 120;
+
+/** Monday of a UTC day's week (YYYY-MM-DD) */
+function weekStart(day: string): string {
+  const date = new Date(`${day}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+  return date.toISOString().slice(0, 10);
+}
+
 /**
- * One metric for every client of a layer: a daily line per client with the page's client on top, and a table of
+ * One metric for every client of a layer: a daily (weekly over long windows) line per client with the page's client on top, and a table of
  * each client's value over the window, ranked. The metric is chosen from a menu.
  */
 export function ClientMetricCompare<T extends { day_start_date?: string; client?: string }>({
@@ -72,7 +82,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
   const [metricId, setMetricId] = useState(metrics[0].id);
   const metric = metrics.find(item => item.id === metricId) ?? metrics[0];
 
-  const { series, labels, table } = useMemo(() => {
+  const { series, labels, table, weekly } = useMemo(() => {
     const byClient = new Map<string, T[]>();
     const days = new Set<string>();
     for (const row of rows) {
@@ -81,7 +91,12 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
       byClient.set(name, [...(byClient.get(name) ?? []), row]);
       if (row.day_start_date) days.add(row.day_start_date);
     }
-    const sortedDays = [...days].sort();
+    const allDays = [...days].sort();
+    const weekly =
+      allDays.length > 1 &&
+      (Date.parse(allDays[allDays.length - 1]) - Date.parse(allDays[0])) / 86_400_000 > WEEKLY_AFTER_DAYS;
+    const bucket = (day: string): string => (weekly ? weekStart(day) : day);
+    const sortedDays = [...new Set(allDays.map(bucket))];
     const clients = [...byClient.entries()]
       .map(([name, clientRows]) => ({
         client: name,
@@ -96,8 +111,10 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
       .sort((a, b) => Number(a.client === client) - Number(b.client === client))
       .map(entry => {
         const byDay = new Map<string, T[]>();
-        for (const row of entry.rows)
-          byDay.set(row.day_start_date ?? '', [...(byDay.get(row.day_start_date ?? '') ?? []), row]);
+        for (const row of entry.rows) {
+          const key = bucket(row.day_start_date ?? '');
+          byDay.set(key, [...(byDay.get(key) ?? []), row]);
+        }
         const isFocus = entry.client === client;
         return {
           name: formatClientName(entry.client),
@@ -116,7 +133,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
     const ranked = clients
       .filter(entry => entry.value !== null)
       .sort((a, b) => (metric.lowerIsBetter ? a.value! - b.value! : b.value! - a.value!));
-    return { series: chartSeries, labels: sortedDays.map(formatDailyDate), table: ranked };
+    return { series: chartSeries, labels: sortedDays.map(formatDailyDate), table: ranked, weekly };
   }, [rows, metric, client, count]);
 
   return (
@@ -145,7 +162,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <MultiLineChart
               series={series}
-              xAxis={{ type: 'category', labels, name: 'Date' }}
+              xAxis={{ type: 'category', labels, name: weekly ? 'Week' : 'Date' }}
               yAxis={{ name: metric.axis }}
               height={320}
               showLegend

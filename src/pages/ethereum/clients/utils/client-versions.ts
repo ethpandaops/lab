@@ -268,18 +268,14 @@ export interface VersionSummary {
   untaggedBlocks: number;
   /** Share of blocks with a resolved version (0-100) */
   share: number;
-  entities: number;
   lastSeen: number;
 }
 
 /**
- * Blocks, share and entity count per resolved version, newest version first.
+ * Blocks and share per resolved version, newest version first.
  */
 export function summariseVersions(rows: VersionCount[]): VersionSummary[] {
-  const byVersion = new Map<
-    string,
-    { blocks: number; untaggedBlocks: number; entities: Set<string>; lastSeen: number }
-  >();
+  const byVersion = new Map<string, { blocks: number; untaggedBlocks: number; lastSeen: number }>();
   let resolved = 0;
   for (const block of rows) {
     if (!block.version) continue;
@@ -287,12 +283,10 @@ export function summariseVersions(rows: VersionCount[]): VersionSummary[] {
     const entry = byVersion.get(block.version) ?? {
       blocks: 0,
       untaggedBlocks: 0,
-      entities: new Set<string>(),
       lastSeen: 0,
     };
     entry.blocks += block.count;
     if (isUntagged(block)) entry.untaggedBlocks += block.count;
-    if (block.entity) entry.entities.add(block.entity);
     entry.lastSeen = Math.max(entry.lastSeen, block.time);
     byVersion.set(block.version, entry);
   }
@@ -302,7 +296,6 @@ export function summariseVersions(rows: VersionCount[]): VersionSummary[] {
       blocks: entry.blocks,
       untaggedBlocks: entry.untaggedBlocks,
       share: resolved > 0 ? (entry.blocks / resolved) * 100 : 0,
-      entities: entry.entities.size,
       lastSeen: entry.lastSeen,
     }))
     .sort((a, b) => compareVersions(b.version, a.version));
@@ -358,6 +351,67 @@ export function versionColors(versions: VersionSummary[], palette: readonly stri
     .map(summary => summary.version)
     .sort((a, b) => compareVersions(b, a));
   return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
+}
+
+/** How finely versions are drawn: each release, each minor line or each major line */
+export type VersionLevel = 'patch' | 'minor' | 'major';
+
+/** The release line a version belongs to at `level`, e.g. v8.2.1 is v8.2.x at minor; unparseable versions stay as is */
+export function versionLine(version: string, level: VersionLevel): string {
+  if (level === 'patch') return version;
+  const match = /^(v?)(\d+)\.(\d+)/.exec(version);
+  if (!match) return version;
+  return level === 'minor' ? `${match[1]}${match[2]}.${match[3]}.x` : `${match[1]}${match[2]}.x`;
+}
+
+/**
+ * Days and summaries regrouped into release lines, at the finest level whose `limit` largest lines cover `coverage`
+ * of resolved blocks, so a long window draws a few lines rather than one band of Other.
+ */
+export function groupVersionLines(
+  days: VersionDay[],
+  versions: VersionSummary[],
+  limit: number,
+  coverage = 0.9
+): { days: VersionDay[]; versions: VersionSummary[]; level: VersionLevel } {
+  const total = versions.reduce((sum, summary) => sum + summary.blocks, 0);
+  const levels: VersionLevel[] = ['patch', 'minor', 'major'];
+  for (const level of levels) {
+    const lines = new Map<string, VersionSummary>();
+    for (const summary of versions) {
+      const line = versionLine(summary.version, level);
+      const entry = lines.get(line) ?? {
+        ...summary,
+        version: line,
+        blocks: 0,
+        untaggedBlocks: 0,
+        share: 0,
+        lastSeen: 0,
+      };
+      entry.blocks += summary.blocks;
+      entry.untaggedBlocks += summary.untaggedBlocks;
+      entry.share += summary.share;
+      entry.lastSeen = Math.max(entry.lastSeen, summary.lastSeen);
+      lines.set(line, entry);
+    }
+    const covered = [...lines.values()]
+      .map(line => line.blocks)
+      .sort((a, b) => b - a)
+      .slice(0, limit)
+      .reduce((sum, blocks) => sum + blocks, 0);
+    if (level !== 'major' && total > 0 && covered / total < coverage) continue;
+    if (level === 'patch') return { days, versions, level };
+    const grouped = days.map(day => {
+      const counts = new Map<string, number>();
+      for (const [version, count] of day.counts) {
+        const line = versionLine(version, level);
+        counts.set(line, (counts.get(line) ?? 0) + count);
+      }
+      return { ...day, counts };
+    });
+    return { days: grouped, versions: [...lines.values()], level };
+  }
+  return { days, versions, level: 'patch' };
 }
 
 /** Resolved blocks per version for one UTC day */

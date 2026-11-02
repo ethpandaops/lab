@@ -6,6 +6,7 @@ import {
   compareOpcodeCosts,
   countVersionsByDay,
   findRelease,
+  groupVersionLines,
   latestRelease,
   matchReleaseVersion,
   nextThreshold,
@@ -21,6 +22,8 @@ import {
   timeToAdoption,
   type ClientRelease,
   type VersionCount,
+  type VersionDay,
+  type VersionSummary,
 } from './client-versions';
 
 const release = (version: string, releaseDate: number | null, prerelease = false, commit = ''): DimClientRelease => ({
@@ -322,5 +325,47 @@ describe('summariseUnresolved', () => {
       { reason: 'commit_zero', commit: undefined, blocks: 5, entities: ['binance', 'kiln'] },
       { reason: 'commit_unmatched', commit: 'ca93', blocks: 3, entities: ['coinbase'] },
     ]);
+  });
+});
+
+describe('groupVersionLines', () => {
+  const summary = (version: string, blocks: number): VersionSummary => ({
+    version,
+    blocks,
+    untaggedBlocks: 0,
+    share: 0,
+    lastSeen: 0,
+  });
+  const day = (counts: Record<string, number>): VersionDay => ({
+    day: '2026-01-01',
+    resolved: Object.values(counts).reduce((a, b) => a + b, 0),
+    unresolved: 0,
+    counts: new Map(Object.entries(counts)),
+  });
+
+  it('keeps releases when the largest few cover the blocks', () => {
+    const versions = [summary('v8.2.1', 90), summary('v8.2.0', 5), summary('v7.0.0', 5)];
+    const result = groupVersionLines([day({ 'v8.2.1': 90 })], versions, 2);
+    expect(result.level).toBe('patch');
+    expect(result.versions.map(v => v.version)).toEqual(['v8.2.1', 'v8.2.0', 'v7.0.0']);
+  });
+
+  it('groups into minor lines when releases are too spread out', () => {
+    const versions = [summary('v8.2.1', 30), summary('v8.2.0', 30), summary('v8.1.0', 30), summary('v7.0.0', 10)];
+    const result = groupVersionLines([day({ 'v8.2.1': 3, 'v8.2.0': 4, 'v8.1.0': 5 })], versions, 2);
+    expect(result.level).toBe('minor');
+    expect(result.versions.map(v => [v.version, v.blocks])).toEqual([
+      ['v8.2.x', 60],
+      ['v8.1.x', 30],
+      ['v7.0.x', 10],
+    ]);
+    expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 7, 'v8.1.x': 5 });
+  });
+
+  it('falls back to major lines, keeping versions it cannot parse', () => {
+    const versions = [summary('25.1.0', 25), summary('25.2.0', 25), summary('24.1.0', 25), summary('nightly', 25)];
+    const result = groupVersionLines([], versions, 2);
+    expect(result.level).toBe('major');
+    expect(result.versions.map(v => v.version).sort()).toEqual(['24.x', '25.x', 'nightly']);
   });
 });

@@ -1,5 +1,6 @@
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import { getNetworkBPOs, getNetworkForks } from '@/utils/forks';
+import { isKnownClient } from '@/utils/ethereum';
 import { RESOLVED_STATUSES } from '../api/client-models';
 import type { ClientSummary } from './client-share';
 
@@ -23,7 +24,8 @@ export function sum<T>(rows: T[], value: (row: T) => number | undefined): number
 
 /**
  * Per-client totals of one day as {@link ClientSummary}s, largest first, for the diversity cards. Rows for unknown
- * and other agents count towards the total but are not listed.
+ * and other agents count towards the total, and agents that are not known clients (libp2p tools, forks) towards the
+ * identified total, but neither is listed.
  */
 export function censusSummaries<T extends DayRow>(rows: T[], count: (row: T) => number | undefined): ClientSummary[] {
   const totals = new Map<string, number>();
@@ -37,6 +39,7 @@ export function censusSummaries<T extends DayRow>(rows: T[], count: (row: T) => 
   }
   const identified = [...totals.values()].reduce((total, value) => total + value, 0);
   return [...totals.entries()]
+    .filter(([client]) => isKnownClient(client))
     .map(([client, blocks]) => ({
       client,
       blocks,
@@ -65,21 +68,20 @@ export function censusVersions<T extends { version?: string; release_status?: st
 ): CensusVersion[] {
   const byVersion = new Map<string, CensusVersion>();
   for (const row of rows) {
-    const resolved = RESOLVED_STATUSES.has(row.release_status ?? '') && !!row.version;
+    // A peer naming a release counts under it, even when its commit is not on an upstream branch
     const version = row.version ?? '';
-    const key = `${resolved}|${version}`;
-    const entry = byVersion.get(key) ?? { version, resolved, untagged: 0, count: 0 };
+    const entry = byVersion.get(version) ?? { version, resolved: false, untagged: 0, count: 0 };
     entry.count += count(row) ?? 0;
+    if (RESOLVED_STATUSES.has(row.release_status ?? '') && version) entry.resolved = true;
     if (row.release_status === 'commit_untagged') entry.untagged += count(row) ?? 0;
-    byVersion.set(key, entry);
+    byVersion.set(version, entry);
   }
   return [...byVersion.values()].filter(entry => entry.count > 0).sort((a, b) => b.count - a.count);
 }
 
 /** Label of a network_type value */
 export function networkTypeLabel(type: string | undefined): string {
-  if (type === 'hosting') return 'Hosting';
-  return 'Other (mostly residential or business ISP)';
+  return type === 'hosting' ? 'Hosting' : 'Other';
 }
 
 /** What a custody bucket means */

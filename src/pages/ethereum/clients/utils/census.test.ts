@@ -46,23 +46,39 @@ describe('censusSummaries', () => {
       ['prysm', 25, 12.5, 25],
     ]);
   });
+
+  it('should leave agents that are not clients out of the list but in the identified total', () => {
+    const summaries = censusSummaries(
+      [
+        { client: 'lighthouse', peer_count: 60 },
+        { client: 'rust-libp2p', peer_count: 20 },
+        { client: 'prysm', peer_count: 20 },
+      ],
+      row => row.peer_count
+    );
+    expect(summaries.map(s => [s.client, s.identifiedShare])).toEqual([
+      ['lighthouse', 60],
+      ['prysm', 20],
+    ]);
+  });
 });
 
 describe('censusVersions', () => {
-  it('should keep a resolved release apart from the same unresolved agent version', () => {
+  it('should count a peer under the release it names, whatever its commit', () => {
     const versions = censusVersions(
       [
         { version: 'v8.3.2', release_status: 'commit_match', peer_count: 5 },
         { version: 'v8.3.2', release_status: 'commit_untagged', peer_count: 2 },
-        { version: 'v8.3.2', release_status: 'version_unmatched', peer_count: 1 },
+        { version: 'v8.3.2', release_status: 'commit_unmatched', peer_count: 1 },
+        { version: 'v9.9.9', release_status: 'version_unmatched', peer_count: 3 },
         { version: '', release_status: 'none', peer_count: 9 },
       ],
       row => row.peer_count
     );
     expect(versions).toEqual([
       { version: '', resolved: false, untagged: 0, count: 9 },
-      { version: 'v8.3.2', resolved: true, untagged: 2, count: 7 },
-      { version: 'v8.3.2', resolved: false, untagged: 0, count: 1 },
+      { version: 'v8.3.2', resolved: true, untagged: 2, count: 8 },
+      { version: 'v9.9.9', resolved: false, untagged: 0, count: 3 },
     ]);
   });
 });

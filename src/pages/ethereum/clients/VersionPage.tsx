@@ -394,8 +394,8 @@ export function VersionPage(): JSX.Element {
               ]}
             />
 
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-              <div className="xl:col-span-2">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
+              <div className="min-w-0">
                 <PopoutCard
                   title="Adoption"
                   subtitle="Daily share of this client's blocks with a resolved version"

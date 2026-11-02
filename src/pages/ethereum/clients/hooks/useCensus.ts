@@ -9,7 +9,7 @@ import { useDailyByClient } from './useDailyByClient';
 const LATEST_DAYS = 3;
 
 export interface UseCensusResult<T> {
-  /** Rows of every day in the window */
+  /** Rows of every full day in the window */
   rows: T[];
   /** Rows of the latest full day */
   latest: T[];
@@ -31,8 +31,10 @@ export function useCensus<T extends { day_start_date?: string; client?: string }
   const start = useMemo(() => from ?? windowStart(LATEST_DAYS), [from]);
   const { rows, dataStart, isLoading } = useDailyByClient<T>(censusList(table), table, filters, start);
   const day = useMemo(() => latestFullDay(rows), [rows]);
+  // Today is still filling, so trends stop at the latest full day
+  const fullRows = useMemo(() => (day ? rows.filter(row => (row.day_start_date ?? '') <= day) : rows), [rows, day]);
   const latest = useMemo(() => rows.filter(row => row.day_start_date === day), [rows, day]);
-  return { rows, latest, day, dataStart, isLoading };
+  return { rows: fullRows, latest, day, dataStart, isLoading };
 }
 
 /** Per-client shares of one layer, counted by peers on the P2P network and by nodes in the ENR crawl */

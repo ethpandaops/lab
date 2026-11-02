@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { JSX, ReactNode } from 'react';
 import { ShareBar } from '../ShareBar';
 
@@ -17,23 +18,25 @@ export interface ShareTableProps {
   labelHeader: string;
   /** Header of the count column, e.g. Blocks or Nodes */
   countHeader: string;
+  /** Width of the label column */
+  labelClassName?: string;
 }
 
 /**
  * Ranked rows with a share bar, under labelled Share and count columns.
  */
-export function ShareTable({ rows, labelHeader, countHeader }: ShareTableProps): JSX.Element {
+export function ShareTable({ rows, labelHeader, countHeader, labelClassName = 'w-40' }: ShareTableProps): JSX.Element {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-3 text-xs/5 text-muted">
-        <span className="w-40 shrink-0">{labelHeader}</span>
+        <span className={clsx(labelClassName, 'shrink-0')}>{labelHeader}</span>
         <span className="flex-1" />
         <span className="w-14 shrink-0 text-right">Share</span>
         <span className="w-16 shrink-0 text-right">{countHeader}</span>
       </div>
       {rows.map(row => (
         <div key={row.key} className="flex items-center gap-3">
-          <span className="w-40 shrink-0 truncate">{row.label}</span>
+          <span className={clsx(labelClassName, 'shrink-0 truncate')}>{row.label}</span>
           <span className="flex-1">
             <ShareBar share={row.share} color={row.color} showThresholds={false} />
           </span>

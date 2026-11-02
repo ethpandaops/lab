@@ -2,12 +2,18 @@ import { type JSX, useMemo } from 'react';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { OTHER_VERSION_COLOR, versionColors, type VersionDay, type VersionSummary } from '../../utils/client-versions';
+import {
+  OTHER_VERSION_COLOR,
+  groupVersionLines,
+  versionColors,
+  type VersionDay,
+  type VersionSummary,
+} from '../../utils/client-versions';
 
 export interface VersionShareChartProps {
   days: VersionDay[];
   versions: VersionSummary[];
-  /** Versions drawn on their own; the rest stack as Other */
+  /** Lines drawn on their own; the rest stack as Other. Versions group into minor or major lines when needed */
   limit?: number;
   height?: number;
 }
@@ -15,10 +21,16 @@ export interface VersionShareChartProps {
 const OTHER = 'Other';
 
 /**
- * Daily share of resolved blocks per version, stacked, the most-used versions on their own.
+ * Daily share of resolved blocks per version, stacked, the most-used versions (or release lines) on their own.
  */
-export function VersionShareChart({ days, versions, limit = 7, height = 320 }: VersionShareChartProps): JSX.Element {
+export function VersionShareChart({
+  days: versionDays,
+  versions: versionSummaries,
+  limit = 7,
+  height = 320,
+}: VersionShareChartProps): JSX.Element {
   const { series, labels } = useMemo(() => {
+    const { days, versions } = groupVersionLines(versionDays, versionSummaries, limit);
     const colors = versionColors(versions, getDataVizColors().CHART_CATEGORICAL_COLORS, limit);
     const top = [...colors.keys()];
     const shown = new Set(top);
@@ -53,7 +65,7 @@ export function VersionShareChart({ days, versions, limit = 7, height = 320 }: V
       });
     }
     return { series: result, labels: days.map(day => formatDailyDate(day.day)) };
-  }, [days, versions, limit]);
+  }, [versionDays, versionSummaries, limit]);
 
   return (
     <MultiLineChart
