@@ -22,7 +22,7 @@ export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
   return (
     <Card
       title="Data column custody"
-      subtitle={`${custody} of ${DATA_COLUMN_COUNT} columns, last 64 slots`}
+      subtitle={`${custody} of ${DATA_COLUMN_COUNT} columns`}
       actions={
         <span className="text-xs/5 text-muted tabular-nums">
           {hovered === null ? null : hoveredColumn ? (

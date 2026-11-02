@@ -100,7 +100,7 @@ export function NodeSlotsTable({
   }
 
   return (
-    <Card title="Recent slots" subtitle="Last 64 slots">
+    <Card title="Slots">
       <DataTable
         data={rows}
         columns={columns}

@@ -123,7 +123,7 @@ export function formatNodeLocation(
 ): string {
   const { meta_client_geo_city: city, meta_client_geo_country: country } = node;
   if (city && country) return `${city}, ${country}`;
-  return country || city || 'Unknown';
+  return country || city || '–';
 }
 
 /** Step of the performance gradient (`--color-performance-*`) an arrival time falls in */

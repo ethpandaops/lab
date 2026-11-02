@@ -1,16 +1,17 @@
 import { useMemo } from 'react';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { compareVersions } from '@/utils/version';
-import { summarizeByNode, type RangeSummary } from '../utils/history';
+import type { NodeRange } from '../constants';
+import { summarizeByNode } from '../utils/history';
 import { isNodeOnline, median } from '../utils/node-stats';
 import type { DimClientRelease } from '@/api/types.gen';
 import { normalizeClientName } from '@/utils/ethereum';
 import { useLatestReleases } from '@/pages/ethereum/clients/hooks/useClientReleases';
 import { displayVersion } from '@/pages/ethereum/clients/utils/client-versions';
 import { useActiveNodes } from './useActiveNodes';
-import { useNodeHistory, type NodeHistory } from './useNodeHistory';
+import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 
-/** One node's typical timings over the last 24 hours */
+/** One node's typical timings over the selected range */
 export interface NodeObservation {
   blockP50: number | null;
   attestationP50: number | null;
@@ -18,9 +19,13 @@ export interface NodeObservation {
   blockSlots: number;
 }
 
-/** One active node joined with its last-24h timings */
+/** One node that reported in the range, joined with its timings over the range */
 export interface NodeRow {
   nodeId: string;
+  /**
+   * The node's fct_node_active_last_24h row, or for a node only active earlier in the range the identity its
+   * latest rollup row carries, without location or last seen
+   */
   node: FctNodeActiveLast24h;
   online: boolean;
   observation: NodeObservation | null;
@@ -34,40 +39,56 @@ export interface NodeRow {
 
 export interface UseNodeRowsResult {
   rows: NodeRow[];
-  /** Median across nodes of each node's last-24h median */
+  /** Median across nodes of each node's median over the range */
   network: { blockP50: number | null; attestationP50: number | null };
-  /** Block rollups of every node over the last 24 hours */
-  block24h: NodeHistory | null;
+  /** Block rollups of every node over the range */
+  block: NodeHistory | null;
   isLoading: boolean;
-  timingsLoading: boolean;
   error: Error | null;
 }
 
 /**
- * Join active nodes with their last-24h timings and whether their consensus client is behind its latest release,
- * most recently seen first.
+ * Every node that reported in the range, with its timings over the range and whether its consensus client is
+ * behind its latest release, most recently seen first.
+ *
+ * A node reported in the range if it has block or attestation rollup rows in it, or an active row, since the
+ * last 24 hours sit inside every range. Identity comes from the active row when there is one, otherwise from the
+ * node's latest rollup row.
  */
 export function buildNodeRows(
   nodes: FctNodeActiveLast24h[],
-  block: Map<string, RangeSummary>,
-  attestation: Map<string, RangeSummary>,
+  block: HistoryRow[],
+  attestation: HistoryRow[],
   nowSeconds: number,
   latest: Map<string, DimClientRelease> = new Map(),
   releases: Map<string, DimClientRelease[]> = new Map()
 ): NodeRow[] {
-  return nodes
-    .filter((node): node is FctNodeActiveLast24h & { node_id: string } => !!node.node_id)
-    .map(node => {
+  const blockSummaries = summarizeByNode(block);
+  const attestationSummaries = summarizeByNode(attestation);
+
+  const identities = new Map<string, FctNodeActiveLast24h>();
+  const newestStart = new Map<string, number>();
+  [...block, ...attestation].forEach(row => {
+    if (!row.nodeId || !row.node || row.start < (newestStart.get(row.nodeId) ?? -Infinity)) return;
+    newestStart.set(row.nodeId, row.start);
+    identities.set(row.nodeId, row.node);
+  });
+  nodes.forEach(node => {
+    if (node.node_id) identities.set(node.node_id, node);
+  });
+
+  return [...identities.entries()]
+    .map(([nodeId, node]) => {
       const client = normalizeClientName(node.meta_consensus_implementation ?? '');
       const clientVersion = displayVersion(node.meta_consensus_version, releases.get(client) ?? []);
       const newest = latest.get(client)?.version;
       const outdated = !!newest && !!clientVersion && compareVersions(clientVersion, newest) < 0;
-      const blockSummary = block.get(node.node_id);
-      const attestationSummary = attestation.get(node.node_id);
+      const blockSummary = blockSummaries.get(nodeId);
+      const attestationSummary = attestationSummaries.get(nodeId);
       return {
-        nodeId: node.node_id,
+        nodeId,
         node,
-        online: isNodeOnline(node.last_seen_date_time, nowSeconds),
+        online: node.last_seen_date_time !== undefined && isNodeOnline(node.last_seen_date_time, nowSeconds),
         observation:
           blockSummary || attestationSummary
             ? {
@@ -81,37 +102,48 @@ export function buildNodeRows(
         newerVersion: outdated ? newest! : null,
       };
     })
-    .sort((a, b) => (b.node.last_seen_date_time ?? 0) - (a.node.last_seen_date_time ?? 0));
+    .sort(
+      (a, b) =>
+        (b.node.last_seen_date_time ?? newestStart.get(b.nodeId) ?? 0) -
+        (a.node.last_seen_date_time ?? newestStart.get(a.nodeId) ?? 0)
+    );
 }
 
 /**
- * Every active node with its block and attestation timings over the last 24 hours.
+ * Every node that reported in the range, with its block and attestation timings over the range.
  */
-export function useNodeRows(): UseNodeRowsResult {
-  const { nodes, isLoading, error } = useActiveNodes();
-  const block = useNodeHistory('block', '24h', {});
-  const attestation = useNodeHistory('attestation', '24h', {});
+export function useNodeRows(range: NodeRange): UseNodeRowsResult {
+  const active = useActiveNodes();
+  const block = useNodeHistory('block', range, {});
+  const attestation = useNodeHistory('attestation', range, {});
   const { latest, releases } = useLatestReleases();
 
   const { rows, network } = useMemo(() => {
-    const blockSummaries = summarizeByNode(block.data?.rows ?? []);
-    const attestationSummaries = summarizeByNode(attestation.data?.rows ?? []);
+    const rows = buildNodeRows(
+      active.nodes,
+      block.data?.rows ?? [],
+      attestation.data?.rows ?? [],
+      Date.now() / 1000,
+      latest,
+      releases
+    );
     return {
-      rows: buildNodeRows(nodes, blockSummaries, attestationSummaries, Date.now() / 1000, latest, releases),
+      rows,
       network: {
-        blockP50: median([...blockSummaries.values()].map(summary => summary.p50)),
-        attestationP50: median([...attestationSummaries.values()].map(summary => summary.p50)),
+        blockP50: median(rows.flatMap(row => (row.observation?.blockP50 == null ? [] : [row.observation.blockP50]))),
+        attestationP50: median(
+          rows.flatMap(row => (row.observation?.attestationP50 == null ? [] : [row.observation.attestationP50]))
+        ),
       },
     };
-  }, [nodes, block.data, attestation.data, latest, releases]);
+  }, [active.nodes, block.data, attestation.data, latest, releases]);
 
   return {
     rows,
     network,
-    block24h: block.data,
-    isLoading,
-    timingsLoading: block.isLoading || attestation.isLoading,
-    // Missing timings leave the table's timing columns empty; only the node list is required
-    error,
+    block: block.data,
+    // The node list depends on the range's rollups, so wait for them before listing nodes
+    isLoading: active.isLoading || block.isLoading || attestation.isLoading,
+    error: active.error,
   };
 }

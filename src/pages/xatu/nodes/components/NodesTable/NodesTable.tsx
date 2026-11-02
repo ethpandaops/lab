@@ -77,14 +77,18 @@ const columns: DataTableColumn<NodeRow>[] = [
   {
     id: 'lastSeen',
     header: () => <span className="whitespace-nowrap">Last seen</span>,
-    accessorFn: row => row.node.last_seen_date_time ?? 0,
-    cell: ({ getValue }) => getRelativeTime(getValue() as number),
+    accessorFn: row => row.node.last_seen_date_time ?? undefined,
+    sortUndefined: 'last',
+    cell: ({ getValue }) => {
+      const seconds = getValue() as number | undefined;
+      return seconds === undefined ? '–' : getRelativeTime(seconds);
+    },
     enableGlobalFilter: false,
   },
 ];
 
 /**
- * Every active node, searchable and sortable; rows open the node page.
+ * Every node that reported in the range, searchable and sortable; rows open the node page.
  */
 export function NodesTable({ rows }: NodesTableProps): JSX.Element {
   const navigate = useNavigate();

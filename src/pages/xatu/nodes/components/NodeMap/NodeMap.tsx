@@ -9,14 +9,15 @@ import { ArrivalLegend } from '../ArrivalLegend';
 
 export interface NodeMapProps {
   rows: NodeRow[];
-  /** Changes when the network window moves, so the map redraws its points */
+  rangeLabel: string;
+  /** Changes when the timings behind the points change, so the map redraws them */
   resetKey?: number;
 }
 
 /**
  * Node locations, one point per city sized by node count and coloured by the city's median block arrival.
  */
-export function NodeMap({ rows, resetKey }: NodeMapProps): JSX.Element {
+export function NodeMap({ rows, rangeLabel, resetKey }: NodeMapProps): JSX.Element {
   const points = useMemo(() => {
     const { PERFORMANCE_TIME_COLORS } = getDataVizColors();
     const byLocation = new Map<string, { point: PointData; timings: number[] }>();
@@ -57,7 +58,7 @@ export function NodeMap({ rows, resetKey }: NodeMapProps): JSX.Element {
   return (
     <PopoutCard
       title="Node locations"
-      subtitle="Median block arrival per city, last 24h"
+      subtitle={`Median block arrival per city, ${rangeLabel.toLowerCase()}`}
       anchorId="node-map"
       modalSize="full"
       headerActions={<ArrivalLegend className="hidden lg:flex" />}

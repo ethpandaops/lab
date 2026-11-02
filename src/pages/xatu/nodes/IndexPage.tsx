@@ -23,11 +23,10 @@ import {
 } from './components';
 import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
-import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
 import { formatMs, median } from './utils/node-stats';
 
-const DESCRIPTION = 'Nodes that reported to Xatu in the last 24 hours.';
+const DESCRIPTION = 'Nodes that reported to Xatu.';
 
 /** Count rows by key, with the median block arrival of each group */
 function groupRows(
@@ -49,12 +48,11 @@ function groupRows(
  * Nodes overview: headline counts, where nodes are, how fast they see blocks, and every node in a table.
  */
 export function IndexPage(): JSX.Element {
-  const { rows, network, block24h, isLoading, timingsLoading, error } = useNodeRows();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: '/xatu/nodes/' });
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
-  const history = useNodeHistory('block', range, {});
+  const { rows, network, block, isLoading, error } = useNodeRows(range);
 
   if (isLoading) {
     return (
@@ -134,6 +132,14 @@ export function IndexPage(): JSX.Element {
       <Header title="Nodes" description={DESCRIPTION} />
 
       <div className="flex flex-col gap-6">
+        <SegmentedControl
+          options={NODE_RANGE_OPTIONS}
+          value={range}
+          onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
+          ariaLabel="Time range"
+          className="self-start"
+        />
+
         <Stats
           gridClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6"
           stats={[
@@ -144,38 +150,30 @@ export function IndexPage(): JSX.Element {
             {
               id: 'block',
               name: 'Block arrival p50',
-              value: timingsLoading ? '…' : formatMs(network.blockP50),
-              subtitle: 'Last 24h',
+              value: formatMs(network.blockP50),
+              subtitle: rangeLabel,
             },
             {
               id: 'attestation',
               name: 'Attestation arrival p50',
-              value: timingsLoading ? '…' : formatMs(network.attestationP50),
-              subtitle: 'Last 24h',
+              value: formatMs(network.attestationP50),
+              subtitle: rangeLabel,
             },
           ]}
         />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <NodeMap rows={rows} resetKey={block24h?.buckets[0]} />
+            <NodeMap rows={rows} rangeLabel={rangeLabel} resetKey={block?.buckets[0]} />
           </div>
           <BreakdownList title="Consensus clients" items={clientItems} detailLabel="Block p50" />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg/7 font-semibold tracking-tight text-foreground">Block arrival</h2>
-          <SegmentedControl
-            options={NODE_RANGE_OPTIONS}
-            value={range}
-            onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
-            ariaLabel="Time range"
-          />
-        </div>
-        {history.data ? (
+        <h2 className="text-lg/7 font-semibold tracking-tight text-foreground">Block arrival</h2>
+        {block ? (
           <div className="-mt-2 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <NetworkArrivalChart history={history.data} rangeLabel={rangeLabel} />
-            <ClientArrivalChart history={history.data} rangeLabel={rangeLabel} />
+            <NetworkArrivalChart history={block} rangeLabel={rangeLabel} />
+            <ClientArrivalChart history={block} rangeLabel={rangeLabel} />
           </div>
         ) : (
           <div className="-mt-2 grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -189,7 +187,7 @@ export function IndexPage(): JSX.Element {
           <BreakdownList title="Countries" items={countryItems} detailLabel="Block p50" limit={6} />
           <ArrivalHistogram
             title="Node block arrival"
-            subtitle="Each node's median, last 24h"
+            subtitle={`Each node's median, ${rangeLabel.toLowerCase()}`}
             anchorId="node-arrival-histogram"
             values={nodeMedians}
             unit="Nodes"

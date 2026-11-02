@@ -21,12 +21,13 @@ import {
   VsNetworkChart,
 } from './components';
 import { DEFAULT_NODE_RANGE, NETWORK_WINDOW_SLOTS, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
+import { useActiveNodes } from './hooks/useActiveNodes';
 import { useNetworkObservations } from './hooks/useNetworkObservations';
 import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodePerformance } from './hooks/useNodePerformance';
-import { useNodeRows } from './hooks/useNodeRows';
-import { behindStarts, medianByStart, rangeValue } from './utils/history';
+import { buildNodeRows } from './hooks/useNodeRows';
+import { behindStarts, medianByStart, rangeValue, summarizeByNode } from './utils/history';
 import { formatMs, getIngestedEndSlot, getSyncState, shareSlowerThan } from './utils/node-stats';
 import { expectedSlots } from './utils/time-buckets';
 
@@ -64,12 +65,18 @@ export function DetailPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
 
-  const { rows, isLoading, error } = useNodeRows();
-  const row = rows.find(candidate => candidate.nodeId === nodeId);
+  const { nodes, isLoading, error } = useActiveNodes();
   const filter = { nodeId };
   const block = useNodeHistory('block', range, filter);
   const head = useNodeHistory('head', range, filter);
   const attestation = useNodeHistory('attestation', range, filter);
+  // A node absent from the last 24 hours takes its identity from its rollup rows
+  const row = buildNodeRows(
+    nodes.filter(node => node.node_id === nodeId),
+    block.data?.rows ?? [],
+    attestation.data?.rows ?? [],
+    Date.now() / 1000
+  )[0];
   const dataColumn = useNodeHistory('dataColumn', range, filter);
   const network = useNodeHistory('block', range, {});
   // Only ethPandaOps nodes report engine API calls
@@ -80,7 +87,16 @@ export function DetailPage(): JSX.Element {
   const recentNetwork = useNetworkObservations();
   const custody = useNodeDataColumns(nodeId);
 
-  if (isLoading) {
+  const rangeControl = (
+    <SegmentedControl
+      options={NODE_RANGE_OPTIONS}
+      value={range}
+      onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
+      ariaLabel="Time range"
+    />
+  );
+
+  if (isLoading || (!row && (block.isLoading || attestation.isLoading))) {
     return (
       <Container>
         <NodeDetailSkeleton />
@@ -101,11 +117,10 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title={nodeId} />
-        <Alert
-          variant="info"
-          title="Node not found"
-          description="No node with this ID reported in the last 24 hours."
-        />
+        <div className="flex flex-col items-start gap-4">
+          {rangeControl}
+          <Alert variant="info" title="Node not found" description="No reports from this node in this range." />
+        </div>
         <Link to="/xatu/nodes" className="mt-4 inline-block text-sm text-primary hover:underline">
           All nodes
         </Link>
@@ -113,10 +128,9 @@ export function DetailPage(): JSX.Element {
     );
   }
 
-  const ownP50 = row.observation?.blockP50 ?? null;
-  const otherP50s = rows.flatMap(other =>
-    other.nodeId === nodeId || other.observation?.blockP50 == null ? [] : [other.observation.blockP50]
-  );
+  const networkByNode = summarizeByNode(network.data?.rows ?? []);
+  const ownP50 = networkByNode.get(nodeId)?.p50 ?? null;
+  const otherP50s = [...networkByNode].flatMap(([otherId, summary]) => (otherId === nodeId ? [] : [summary.p50]));
   const fasterThan = ownP50 === null ? null : shareSlowerThan(ownP50, otherP50s);
 
   const blockRows = block.data?.rows ?? [];
@@ -140,6 +154,8 @@ export function DetailPage(): JSX.Element {
     : null;
   const hasEngine = !!newPayload.data && newPayload.data.rows.length > 0;
   const hasColumns = !!dataColumn.data && dataColumn.data.rows.length > 0;
+  const hasCustody = !!custody.data && custody.data.columns.size > 0;
+  const hasRecent = !!recent.data && recent.data.block.size > 0;
   // Hours the node trailed the network by more than a slot were spent catching up after downtime or a resync
   const behind = behindStarts(blockRows, medianByStart(network.data?.rows ?? []));
   const sync =
@@ -155,17 +171,7 @@ export function DetailPage(): JSX.Element {
       <div className="flex flex-col gap-10">
         <NodeHeader row={row} execution={execution} sync={sync} />
 
-        <Section
-          title="Performance"
-          actions={
-            <SegmentedControl
-              options={NODE_RANGE_OPTIONS}
-              value={range}
-              onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
-              ariaLabel="Time range"
-            />
-          }
-        >
+        <Section title="Performance" actions={rangeControl}>
           <Stats
             gridClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6"
             stats={[
@@ -203,7 +209,7 @@ export function DetailPage(): JSX.Element {
                 id: 'rank',
                 name: 'Faster than',
                 value: fasterThan === null ? '–' : `${Math.round(fasterThan * 100)}%`,
-                subtitle: 'of nodes, last 24h',
+                subtitle: `of nodes, ${rangeLabel.toLowerCase()}`,
               },
             ]}
           />
@@ -223,45 +229,42 @@ export function DetailPage(): JSX.Element {
                 <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} behind={behind} />
                 <VsNetworkChart nodeId={nodeId} network={network.data} rangeLabel={rangeLabel} behind={behind} />
                 {attestation.data && (
-                  <div className="xl:col-span-2">
+                  <div className={hasColumns ? undefined : 'xl:col-span-2'}>
                     <AttestationArrivalChart history={attestation.data} rangeLabel={rangeLabel} behind={behind} />
                   </div>
+                )}
+                {hasColumns && (
+                  <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} behind={behind} />
                 )}
               </div>
             </>
           )}
+
+          {hasEngine && (
+            <EngineSection newPayload={newPayload.data!} getBlobs={getBlobs.data} rangeLabel={rangeLabel} />
+          )}
         </Section>
 
-        {(hasColumns || (custody.data && custody.data.columns.size > 0)) && (
-          <Section title="Data columns">
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
-              {custody.data && custody.data.columns.size > 0 && (
+        {(hasCustody || hasRecent) && (
+          <Section title={`Last ${NETWORK_WINDOW_SLOTS} slots`}>
+            <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-5">
+              {hasCustody && (
                 <div className="xl:col-span-2">
-                  <CustodyGrid columns={custody.data} />
+                  <CustodyGrid columns={custody.data!} />
                 </div>
               )}
-              {hasColumns && (
-                <div className="xl:col-span-3">
-                  <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} behind={behind} />
+              {hasRecent && (
+                <div className={hasCustody ? 'xl:col-span-3' : 'xl:col-span-5'}>
+                  <NodeSlotsTable
+                    performance={recent.data!}
+                    network={recentNetwork.data}
+                    columns={custody.data}
+                    endSlot={recentEndSlot}
+                  />
                 </div>
               )}
             </div>
           </Section>
-        )}
-
-        {hasEngine && (
-          <Section title="Execution">
-            <EngineSection newPayload={newPayload.data!} getBlobs={getBlobs.data} rangeLabel={rangeLabel} />
-          </Section>
-        )}
-
-        {recent.data && recent.data.block.size > 0 && (
-          <NodeSlotsTable
-            performance={recent.data}
-            network={recentNetwork.data}
-            columns={custody.data}
-            endSlot={recentEndSlot}
-          />
         )}
       </div>
     </Container>

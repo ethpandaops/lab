@@ -351,8 +351,6 @@ export function DetailPage(): JSX.Element {
                 subtitle={`${chart.subtitle}, ${rangeLabel.toLowerCase()}`}
                 anchorId={chart.anchorId}
                 history={history}
-                nodeIds={nodes.flatMap(node => (node.node_id ? [node.node_id] : []))}
-                clientOf={nodeId => nodes.find(node => node.node_id === nodeId)?.meta_consensus_implementation}
                 behindOf={behindOf}
               />
             ) : (
