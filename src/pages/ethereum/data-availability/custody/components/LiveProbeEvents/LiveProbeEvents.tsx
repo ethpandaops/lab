@@ -11,75 +11,7 @@ import { ProbeDetailDialog } from '@/pages/ethereum/data-availability/probes/com
 import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import { Card } from '@/components/Layout/Card';
 import { ScrollArea } from '@/components/Layout/ScrollArea';
-import type { LiveProbeEventsProps, ProbeFilterContext } from './LiveProbeEvents.types';
-
-/** Number of seconds in a day */
-const SECONDS_PER_DAY = 86400;
-
-/** Number of seconds in an hour */
-const SECONDS_PER_HOUR = 3600;
-
-/** Number of slots per epoch */
-const SLOTS_PER_EPOCH = 32;
-
-/** Buffer in seconds to add around time ranges (2 minutes) */
-const TIME_BUFFER = 120;
-
-/** Round to nearest minute to stabilize query params and prevent flickering */
-const ROUND_INTERVAL = 60;
-
-/**
- * Build API query parameters based on the current drill-down context
- * Uses slot_start_date_time for time filtering (matches _by_slot table primary key)
- */
-function buildQueryParams(context: ProbeFilterContext): {
-  slot_start_date_time_gte?: number;
-  slot_start_date_time_lte?: number;
-  slot_in_values?: string;
-  slot_eq?: number;
-} {
-  // Round to nearest minute to prevent query key changes on every render
-  const now = Math.floor(Date.now() / 1000 / ROUND_INTERVAL) * ROUND_INTERVAL;
-
-  switch (context.type) {
-    case 'window':
-      // Last 24 hours for window view (with buffer)
-      return {
-        slot_start_date_time_gte: now - SECONDS_PER_DAY - TIME_BUFFER,
-        slot_start_date_time_lte: now + TIME_BUFFER,
-      };
-    case 'day': {
-      // Specific day (with buffer)
-      const dayStart = Math.floor(new Date(context.date).getTime() / 1000);
-      return {
-        slot_start_date_time_gte: dayStart - TIME_BUFFER,
-        slot_start_date_time_lte: dayStart + SECONDS_PER_DAY + TIME_BUFFER,
-      };
-    }
-    case 'hour':
-      // Specific hour (with buffer)
-      return {
-        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
-        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
-      };
-    case 'epoch':
-      // Specific epoch - use hour time range with buffer, plus slot filter
-      return {
-        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
-        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
-        slot_in_values: Array.from({ length: SLOTS_PER_EPOCH }, (_, i) => context.epoch * SLOTS_PER_EPOCH + i).join(
-          ','
-        ),
-      };
-    case 'slot':
-      // Specific slot - use hour time range with buffer, plus slot filter
-      return {
-        slot_start_date_time_gte: context.hourStartDateTime - TIME_BUFFER,
-        slot_start_date_time_lte: context.hourStartDateTime + SECONDS_PER_HOUR + TIME_BUFFER,
-        slot_eq: context.slot,
-      };
-  }
-}
+import type { LiveProbeEventsProps } from './LiveProbeEvents.types';
 
 /** Generate a unique key for a probe */
 function getProbeKey(probe: IntCustodyProbeOrderBySlot): string {
@@ -87,13 +19,13 @@ function getProbeKey(probe: IntCustodyProbeOrderBySlot): string {
 }
 
 /**
- * Live probe events component showing recent probes relevant to the current view
+ * Live probe events component showing the latest probes of the current view's slots
  */
 export function LiveProbeEvents({
-  context,
+  range,
+  scopeLabel,
   maxEvents = 30,
   pollInterval = 60000,
-  probesLinkParams,
 }: LiveProbeEventsProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
   const { fuluActivation } = useFuluActivation();
@@ -103,15 +35,14 @@ export function LiveProbeEvents({
   const knownProbeKeysRef = useRef<Set<string>>(new Set());
   const [newProbeKeys, setNewProbeKeys] = useState<Set<string>>(new Set());
 
-  // Build query parameters based on context
-  const queryParams = useMemo(() => buildQueryParams(context), [context]);
-
   // Fetch probe data with polling
   // Use placeholderData to keep showing previous data during refetches (prevents flickering)
   const { data, isLoading, error, isFetched } = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
       query: {
-        ...queryParams,
+        slot_start_date_time_gte: range.timeStart,
+        slot_start_date_time_lt: range.timeEnd,
+        ...(range.slot !== undefined && { slot_eq: range.slot }),
         page_size: maxEvents,
         order_by: 'probe_date_time desc',
         // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
@@ -163,22 +94,6 @@ export function LiveProbeEvents({
     setSelectedProbe(null);
   }, []);
 
-  // Get context label for header subtitle
-  const contextLabel = useMemo(() => {
-    switch (context.type) {
-      case 'window':
-        return 'Last 24 hours';
-      case 'day':
-        return context.date;
-      case 'hour':
-        return 'Current hour';
-      case 'epoch':
-        return `Epoch ${context.epoch}`;
-      case 'slot':
-        return `Slot ${context.slot}`;
-    }
-  }, [context]);
-
   if (error) {
     return null; // Silently fail - this is supplementary data
   }
@@ -186,20 +101,18 @@ export function LiveProbeEvents({
   return (
     <>
       <Card
-        title="Recent Probes"
-        subtitle={contextLabel}
+        title={`Latest ${maxEvents} Probes`}
+        subtitle={scopeLabel}
         className="h-[32rem] *:data-[slot=card-body]:p-0"
         actions={
-          probesLinkParams && (
-            <Link
-              to="/ethereum/data-availability/probes"
-              search={probesLinkParams}
-              className={buttonClassName({ variant: 'secondary', size: 'sm' })}
-            >
-              <MagnifyingGlassIcon className="size-3.5" />
-              View All
-            </Link>
-          )
+          <Link
+            to="/ethereum/data-availability/probes"
+            search={{ timeStart: range.timeStart, timeEnd: range.timeEnd, slot: range.slot }}
+            className={buttonClassName({ variant: 'secondary', size: 'sm' })}
+          >
+            <MagnifyingGlassIcon className="size-3.5" />
+            View All
+          </Link>
         }
       >
         {/* Events list - scrollable (header is ~70px, so calc remaining height) */}

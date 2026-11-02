@@ -2,7 +2,11 @@ import { type JSX, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
-import { intCustodyProbeServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import {
+  intCustodyProbeServiceListOptions,
+  intCustodyProbeOrderBySlotServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
+import { formatTimeRange } from '@/utils/time';
 import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { ProbesSearch } from './IndexPage.types';
 import { ProbesView } from './components/ProbesView';
@@ -24,19 +28,15 @@ export function IndexPage(): JSX.Element {
   // This prevents time range recalculation when user clicks on rows to view details
   const initialProbeTimeRef = useRef<number | undefined>(search.probeTime);
 
+  // timeStart/timeEnd scope the list to probes of slots in that window (the custody drill-down's
+  // range), read from the slot-ordered table. Without them, probes run in the last 7 days.
+  const hasSlotWindow = search.timeStart !== undefined && search.timeEnd !== undefined;
+
   // Calculate time range in seconds for the probe_date_time filter
-  // Use URL params if provided, otherwise default to last 7 days
   // If probeTime was in URL on initial load (deep-linking), ensure the time range includes it
   const timeRange = useMemo(() => {
     const nowSeconds = Math.floor(Date.now() / 1000);
     const sevenDaysSeconds = 7 * 24 * 60 * 60;
-
-    if (search.timeStart !== undefined && search.timeEnd !== undefined) {
-      return {
-        start: search.timeStart,
-        end: search.timeEnd,
-      };
-    }
 
     // Only use initial probeTime for deep-linking (not when user clicks rows)
     const initialProbeTime = initialProbeTimeRef.current;
@@ -48,6 +48,7 @@ export function IndexPage(): JSX.Element {
       return {
         start: rangeStart,
         end: rangeEnd,
+        label: formatTimeRange(rangeStart, rangeEnd),
       };
     }
 
@@ -55,8 +56,11 @@ export function IndexPage(): JSX.Element {
     return {
       start: nowSeconds - sevenDaysSeconds,
       end: nowSeconds,
+      label: 'Last 7 days',
     };
-  }, [search.timeStart, search.timeEnd]);
+  }, []);
+
+  const windowLabel = hasSlotWindow ? `Slots ${formatTimeRange(search.timeStart!, search.timeEnd!)}` : timeRange.label;
 
   // Check if live mode is enabled from URL (needed before query)
   const isLive = search.isLive ?? false;
@@ -71,41 +75,44 @@ export function IndexPage(): JSX.Element {
 
   // Fetch data from the API with server-side filtering and sorting
   // Disabled in live mode - live mode uses its own polling
-  const {
-    data: apiData,
-    isLoading,
-    error,
-  } = useQuery({
+  const listQuery = {
+    page_size: search.pageSize ?? 25,
+    page_token: search.pageToken,
+    order_by: orderBy,
+    // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+    ...(fuluActivation && { slot_gte: fuluActivation.slot }),
+    // Server-side filters
+    ...(search.result && { result_eq: search.result }),
+    ...(search.prober && { meta_client_implementation_eq: search.prober }),
+    ...(search.peer && { meta_peer_implementation_eq: search.peer }),
+    ...(search.peerId && { peer_id_unique_key_eq: Number(search.peerId) }),
+    ...(search.nodeId && { node_id_eq: search.nodeId }),
+    ...(search.proberCountry && { meta_client_geo_country_eq: search.proberCountry }),
+    ...(search.peerCountry && { meta_peer_geo_country_eq: search.peerCountry }),
+    ...(search.proberCity && { meta_client_geo_city_eq: search.proberCity }),
+    ...(search.peerCity && { meta_peer_geo_city_eq: search.peerCity }),
+    ...(search.proberVersion && { meta_client_version_eq: search.proberVersion }),
+    ...(search.peerVersion && { meta_peer_version_eq: search.peerVersion }),
+    ...(search.proberAsn && { meta_client_geo_autonomous_system_number_eq: search.proberAsn }),
+    ...(search.peerAsn && { meta_peer_geo_autonomous_system_number_eq: search.peerAsn }),
+    ...(search.slot && { slot_eq: search.slot }),
+    ...(search.column && { column_indices_has: search.column }),
+    ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
+  };
+  const probeTimeQuery = useQuery({
     ...intCustodyProbeServiceListOptions({
-      query: {
-        probe_date_time_gte: timeRange.start,
-        probe_date_time_lte: timeRange.end,
-        page_size: search.pageSize ?? 25,
-        page_token: search.pageToken,
-        order_by: orderBy,
-        // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
-        ...(fuluActivation && { slot_gte: fuluActivation.slot }),
-        // Server-side filters
-        ...(search.result && { result_eq: search.result }),
-        ...(search.prober && { meta_client_implementation_eq: search.prober }),
-        ...(search.peer && { meta_peer_implementation_eq: search.peer }),
-        ...(search.peerId && { peer_id_unique_key_eq: Number(search.peerId) }),
-        ...(search.nodeId && { node_id_eq: search.nodeId }),
-        ...(search.proberCountry && { meta_client_geo_country_eq: search.proberCountry }),
-        ...(search.peerCountry && { meta_peer_geo_country_eq: search.peerCountry }),
-        ...(search.proberCity && { meta_client_geo_city_eq: search.proberCity }),
-        ...(search.peerCity && { meta_peer_geo_city_eq: search.peerCity }),
-        ...(search.proberVersion && { meta_client_version_eq: search.proberVersion }),
-        ...(search.peerVersion && { meta_peer_version_eq: search.peerVersion }),
-        ...(search.proberAsn && { meta_client_geo_autonomous_system_number_eq: search.proberAsn }),
-        ...(search.peerAsn && { meta_peer_geo_autonomous_system_number_eq: search.peerAsn }),
-        ...(search.slot && { slot_eq: search.slot }),
-        ...(search.column && { column_indices_has: search.column }),
-        ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
-      },
+      query: { probe_date_time_gte: timeRange.start, probe_date_time_lte: timeRange.end, ...listQuery },
     }),
-    enabled: !!currentNetwork && !!fuluActivation && !isLive,
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && !hasSlotWindow,
   });
+  const slotWindowQuery = useQuery({
+    ...intCustodyProbeOrderBySlotServiceListOptions({
+      query: { slot_start_date_time_gte: search.timeStart, slot_start_date_time_lt: search.timeEnd, ...listQuery },
+    }),
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && hasSlotWindow,
+  });
+  const { isLoading, error } = hasSlotWindow ? slotWindowQuery : probeTimeQuery;
+  const nextPageToken = hasSlotWindow ? slotWindowQuery.data?.next_page_token : probeTimeQuery.data?.next_page_token;
 
   // Build current filter values from URL for live mode hook
   const currentFilterValues: FilterValues = useMemo(
@@ -143,9 +150,13 @@ export function IndexPage(): JSX.Element {
   });
 
   // Use API data directly (for non-live mode)
-  const paginatedData = useMemo(() => {
-    return apiData?.int_custody_probe ?? [];
-  }, [apiData]);
+  const paginatedData = useMemo(
+    (): IntCustodyProbe[] =>
+      (hasSlotWindow
+        ? slotWindowQuery.data?.int_custody_probe_order_by_slot
+        : probeTimeQuery.data?.int_custody_probe) ?? [],
+    [hasSlotWindow, slotWindowQuery.data, probeTimeQuery.data]
+  );
 
   // Choose which data to display based on mode
   const data = isLive ? liveItems : paginatedData;
@@ -183,9 +194,6 @@ export function IndexPage(): JSX.Element {
     // Only fetch if probe is not already in current page data
     enabled: !!currentNetwork && !!fuluActivation && !!search.probeTime && !!search.probePeerId && !probeInCurrentData,
   });
-
-  // Store the next page token for pagination
-  const nextPageToken = apiData?.next_page_token;
 
   // Handle pagination change
   const handlePaginationChange = useCallback(
@@ -491,12 +499,13 @@ export function IndexPage(): JSX.Element {
       columnFilters={currentFilters}
       onColumnFiltersChange={handleColumnFiltersChange}
       onFilterClick={handleFilterClick}
-      hasNextPage={!!apiData?.next_page_token}
+      hasNextPage={!!nextPageToken}
       filters={currentFilterValues}
       onFiltersChange={handleFiltersChange}
       onClearFilters={handleClearFilters}
       selectedProbe={selectedProbe}
       onProbeSelect={handleProbeSelect}
+      windowLabel={windowLabel}
       // Live mode props
       isLive={isLive}
       onLiveModeToggle={handleLiveModeToggle}

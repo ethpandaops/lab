@@ -36,17 +36,15 @@ export interface CellContext {
 }
 
 /**
- * Time range context passed from the parent page
+ * Slot start time window the probes come from, passed from the parent page
  */
 export interface TimeRangeContext {
-  /** Start of the time period (Unix timestamp in seconds) */
-  timeStart?: number;
-  /** End of the time period (Unix timestamp in seconds) */
-  timeEnd?: number;
-  /** Specific slot (for epoch/slot granularity) */
+  /** First slot start time in the window (Unix seconds, inclusive) */
+  timeStart: number;
+  /** End of the window (Unix seconds, exclusive) */
+  timeEnd: number;
+  /** The single slot the window covers, when it covers one */
   slot?: number;
-  /** Specific slots (for epoch granularity - all slots in that epoch) */
-  slots?: number[];
 }
 
 /**

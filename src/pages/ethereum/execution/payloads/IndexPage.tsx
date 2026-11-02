@@ -2,6 +2,7 @@ import { type JSX, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
+import { formatTimeRange } from '@/utils/time';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { PayloadsSearch, FilterValues } from './IndexPage.types';
 import {
@@ -40,6 +41,7 @@ export function IndexPage(): JSX.Element {
       return {
         start: undefined,
         end: undefined,
+        label: undefined,
       };
     }
 
@@ -47,6 +49,7 @@ export function IndexPage(): JSX.Element {
       return {
         start: search.timeStart,
         end: search.timeEnd,
+        label: formatTimeRange(search.timeStart, search.timeEnd),
       };
     }
 
@@ -60,13 +63,15 @@ export function IndexPage(): JSX.Element {
       return {
         start: rangeStart,
         end: rangeEnd,
+        label: formatTimeRange(rangeStart, rangeEnd),
       };
     }
 
-    // Default: NOW - 1h with no upper bound (undefined lets API use current time)
+    // Default: the last DEFAULT_TIME_RANGE_HOURS with no upper bound (undefined lets API use current time)
     return {
       start: nowSeconds - defaultRangeSeconds,
       end: undefined,
+      label: `Last ${DEFAULT_TIME_RANGE_HOURS} hours`,
     };
   }, [search.timeStart, search.timeEnd, search.blockNumber]);
 
@@ -381,6 +386,7 @@ export function IndexPage(): JSX.Element {
       selectedBlock={selectedBlock}
       onBlockSelect={handleBlockSelect}
       durationThreshold={durationMin}
+      windowLabel={timeRange.label}
       tracoorUrl={tracoorUrl}
       // Live mode props (disabled when LIVE_MODE_ENABLED is false)
       isLive={isLive}

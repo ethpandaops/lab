@@ -111,6 +111,8 @@ export type ProbesViewProps = {
   // Controlled dialog state for URL-based linking
   selectedProbe: CustodyProbe | null;
   onProbeSelect: (probe: CustodyProbe | null) => void;
+  /** The time window the table covers, shown as its title */
+  windowLabel?: string;
   // Live mode props
   isLive?: boolean;
   onLiveModeToggle?: () => void;
@@ -134,6 +136,7 @@ export function ProbesView({
   onClearFilters,
   selectedProbe,
   onProbeSelect,
+  windowLabel,
   // Live mode
   isLive = false,
   onLiveModeToggle,
@@ -794,6 +797,7 @@ export function ProbesView({
             data={data}
             columns={columns}
             isLoading={isLoading}
+            title={windowLabel}
             pageSize={pagination.pageSize}
             pageIndex={pagination.pageIndex}
             onPaginationChange={pagination.onPaginationChange}

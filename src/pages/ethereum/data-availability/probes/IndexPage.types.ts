@@ -52,7 +52,7 @@ export const probesSearchSchema = z.object({
   // Blob poster filter (filter by blob submitter names - multiselect)
   blobPosters: z.array(z.string()).optional(),
 
-  // Time range filters (Unix timestamps) - for linking from custody drill-down
+  // Slot start time window (Unix seconds, end exclusive) - scopes probes to the custody drill-down's slots
   timeStart: z.coerce.number().optional(),
   timeEnd: z.coerce.number().optional(),
 

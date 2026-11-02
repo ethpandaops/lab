@@ -183,22 +183,11 @@ export function CellProbeDialog({
       slot_gte: fuluActivation.slot,
     };
 
-    // Add time range filters using slot_start_date_time (matches _by_slot table partition key)
-    if (timeRangeContext.timeStart !== undefined) {
-      params.slot_start_date_time_gte = timeRangeContext.timeStart;
-    }
-    if (timeRangeContext.timeEnd !== undefined) {
-      params.slot_start_date_time_lte = timeRangeContext.timeEnd;
-    }
-
-    // Add slot filter if specific slot
+    // Probes of the slots in the window (matches _by_slot table partition key)
+    params.slot_start_date_time_gte = timeRangeContext.timeStart;
+    params.slot_start_date_time_lt = timeRangeContext.timeEnd;
     if (timeRangeContext.slot !== undefined) {
       params.slot_eq = timeRangeContext.slot;
-    }
-
-    // Add slots filter if range of slots (epoch level)
-    if (timeRangeContext.slots !== undefined && timeRangeContext.slots.length > 0) {
-      params.slot_in_values = timeRangeContext.slots.join(',');
     }
 
     // Add server-side result filter
@@ -232,13 +221,11 @@ export function CellProbeDialog({
 
     const params: Record<string, unknown> = {
       column: cellContext.columnIndex,
+      timeStart: timeRangeContext.timeStart,
+      timeEnd: timeRangeContext.timeEnd,
     };
-
     if (timeRangeContext.slot !== undefined) {
       params.slot = timeRangeContext.slot;
-    } else if (timeRangeContext.timeStart !== undefined && timeRangeContext.timeEnd !== undefined) {
-      params.timeStart = timeRangeContext.timeStart;
-      params.timeEnd = timeRangeContext.timeEnd;
     }
 
     return params;
