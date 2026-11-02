@@ -6,14 +6,18 @@ import {
   compareOpcodeCosts,
   countVersionsByDay,
   findRelease,
+  latestRelease,
   matchReleaseVersion,
   nextThreshold,
   opcodeCosts,
   peerClient,
   previousRelease,
+  releaseName,
+  releaseUrl,
   resolveBlocks,
   summariseBuildLines,
   timeToAdoption,
+  type ClientRelease,
   type ResolvedBlock,
 } from './client-versions';
 
@@ -242,5 +246,30 @@ describe('compareOpcodeCosts', () => {
       ['CALL', false],
     ]);
     expect(changes[0].change).toBeCloseTo(-0.5);
+  });
+});
+
+describe('release columns', () => {
+  it('should take the release GitHub marks latest over the newest by date', () => {
+    const flagged = [...releases, { ...release('v8.2.9', 10), is_latest: true } as ClientRelease];
+    expect(latestRelease(flagged)?.version).toBe('v8.2.9');
+    expect(latestRelease(releases)?.version).toBe('v8.3.2');
+  });
+
+  it('should link html_url, no page for tags without a release, and build one only when the column is missing', () => {
+    expect(
+      releaseUrl({
+        ...releases[0],
+        html_url: 'https://github.com/sigp/lighthouse/releases/tag/v8.3.2',
+      } as ClientRelease)
+    ).toBe('https://github.com/sigp/lighthouse/releases/tag/v8.3.2');
+    expect(releaseUrl({ ...releases[0], html_url: '' } as ClientRelease)).toBeUndefined();
+    expect(releaseUrl(releases[0])).toBe('https://github.com/sigp/lighthouse/releases/tag/v8.3.2');
+  });
+
+  it('should show a release name only when it says more than the version', () => {
+    expect(releaseName({ ...releases[0], name: 'Fusaka Mainnet' } as ClientRelease)).toBe('Fusaka Mainnet');
+    expect(releaseName({ ...releases[0], name: 'v8.3.2' } as ClientRelease)).toBeUndefined();
+    expect(releaseName({ ...releases[0], name: '' } as ClientRelease)).toBeUndefined();
   });
 });
