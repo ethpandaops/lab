@@ -17,20 +17,28 @@ export interface DiversityCardProps {
 /** Segments narrower than this (percentage points) are too small to label inside the bar */
 const MIN_LABELLED_SEGMENT = 9;
 
+/** Points below the next threshold, with the threshold a client is already over */
+function ThresholdCell({ share }: { share: number }): JSX.Element {
+  const next = nextThreshold(share);
+  const crossed = crossedThreshold(share);
+  return (
+    <span className="inline-flex items-center justify-end gap-2">
+      {crossed && <span className="text-xs/5 font-semibold text-danger">Over {crossed}</span>}
+      <span className="text-muted">{next ? `${next.distance.toFixed(1)} pts below ${next.label}` : '-'}</span>
+    </span>
+  );
+}
+
 /**
- * Client shares of identified blocks as one stacked bar marked at 33%, 50% and 67%, a row per client, and the
- * largest client's position against those thresholds.
+ * Client shares of identified blocks as one stacked bar marked at 33%, 50% and 67%, with a row per client
+ * showing how far it is from the next threshold.
  */
 export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Element {
   const identified = summaries.filter(summary => summary.client !== UNKNOWN_CLIENT && summary.identifiedShare !== null);
-  const largest = identified[0];
-  const share = largest?.identifiedShare ?? 0;
-  const next = largest ? nextThreshold(share) : null;
-  const crossed = largest ? crossedThreshold(share) : null;
 
   return (
     <Card rounded title={title} subtitle="Share of blocks whose graffiti names a client">
-      {!largest ? (
+      {identified.length === 0 ? (
         <p className="text-sm text-muted">No blocks named a client in this window.</p>
       ) : (
         <div className="flex flex-col gap-5">
@@ -84,6 +92,7 @@ export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Ele
                 <th className="pb-1 font-normal">Client</th>
                 <th className="pb-1 text-right font-normal">Share</th>
                 <th className="pb-1 text-right font-normal">Blocks</th>
+                <th className="pb-1 text-right font-normal">To next threshold</th>
               </tr>
             </thead>
             <tbody>
@@ -102,37 +111,13 @@ export function DiversityCard({ title, summaries }: DiversityCardProps): JSX.Ele
                     {summary.identifiedShare?.toFixed(1)}%
                   </td>
                   <td className="py-0.5 text-right text-muted tabular-nums">{summary.blocks.toLocaleString()}</td>
+                  <td className="py-0.5 text-right tabular-nums">
+                    <ThresholdCell share={summary.identifiedShare ?? 0} />
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          <dl className="grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
-            <div>
-              <dt className="text-xs/5 text-muted">Largest client</dt>
-              <dd className="mt-0.5">
-                <ClientLabel client={largest.client} />
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs/5 text-muted">Largest client&apos;s share</dt>
-              <dd className="mt-0.5 text-sm/6 font-semibold text-foreground tabular-nums">{share.toFixed(1)}%</dd>
-            </div>
-            <div>
-              <dt className="text-xs/5 text-muted">Threshold crossed</dt>
-              <dd
-                className={crossed ? 'mt-0.5 text-sm/6 font-semibold text-danger' : 'mt-0.5 text-sm/6 text-foreground'}
-              >
-                {crossed ?? 'None'}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs/5 text-muted">{next ? `Points below ${next.label}` : 'Next threshold'}</dt>
-              <dd className="mt-0.5 text-sm/6 font-semibold text-foreground tabular-nums">
-                {next ? next.distance.toFixed(1) : 'None'}
-              </dd>
-            </div>
-          </dl>
         </div>
       )}
     </Card>
