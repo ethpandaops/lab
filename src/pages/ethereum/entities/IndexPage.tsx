@@ -70,14 +70,15 @@ export function IndexPage(): JSX.Element {
 
   const stake = useEntityStake(window);
   const { entities, totalStakeEth, firstDay, latestDay, startDay } = stake;
-  const liveness = useEntityLiveness(windowDays === null ? null : nowHour - windowDays * 86_400);
+  const rangeStart = windowDays === null ? null : nowHour - windowDays * 86_400;
+  const liveness = useEntityLiveness(rangeStart);
 
   // Named operators only: the aggregate buckets hold unrelated validators
   const named = entities.filter(e => e.validators > 0 && !AGGREGATE_ENTITIES.has(e.entity));
   const chartEntities = named.slice(0, SHARE_CHART_ENTITIES).map(e => e.entity);
   const history = useStakeShareHistory(chartEntities, firstDay, latestDay);
   const labels = history.days.map(formatDayLabel);
-  const blocks = useEntityBlocks(chartEntities, firstDay, latestDay);
+  const blocks = useEntityBlocks(chartEntities, rangeStart, firstDay, latestDay);
 
   // --- Concentration at the window's end and start, against all stake ---
   const largest = named[0];
