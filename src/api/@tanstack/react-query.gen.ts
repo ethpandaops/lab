@@ -190,6 +190,8 @@ import {
   fctDataColumnPartialMessageDailyServiceList,
   fctDataColumnPartialMessageHourlyServiceGet,
   fctDataColumnPartialMessageHourlyServiceList,
+  fctEngineGetBlobsByElClientDailyServiceGet,
+  fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineGetBlobsByElClientHourlyServiceGet,
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsByElClientServiceGet,
@@ -202,6 +204,8 @@ import {
   fctEngineGetBlobsBySlotServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceGet,
   fctEngineGetBlobsDurationChunked50MsServiceList,
+  fctEngineNewPayloadByElClientDailyServiceGet,
+  fctEngineNewPayloadByElClientDailyServiceList,
   fctEngineNewPayloadByElClientHourlyServiceGet,
   fctEngineNewPayloadByElClientHourlyServiceList,
   fctEngineNewPayloadByElClientServiceGet,
@@ -1091,6 +1095,12 @@ import type {
   FctDataColumnPartialMessageHourlyServiceListData,
   FctDataColumnPartialMessageHourlyServiceListError,
   FctDataColumnPartialMessageHourlyServiceListResponse,
+  FctEngineGetBlobsByElClientDailyServiceGetData,
+  FctEngineGetBlobsByElClientDailyServiceGetError,
+  FctEngineGetBlobsByElClientDailyServiceGetResponse,
+  FctEngineGetBlobsByElClientDailyServiceListData,
+  FctEngineGetBlobsByElClientDailyServiceListError,
+  FctEngineGetBlobsByElClientDailyServiceListResponse,
   FctEngineGetBlobsByElClientHourlyServiceGetData,
   FctEngineGetBlobsByElClientHourlyServiceGetError,
   FctEngineGetBlobsByElClientHourlyServiceGetResponse,
@@ -1127,6 +1137,12 @@ import type {
   FctEngineGetBlobsDurationChunked50MsServiceListData,
   FctEngineGetBlobsDurationChunked50MsServiceListError,
   FctEngineGetBlobsDurationChunked50MsServiceListResponse,
+  FctEngineNewPayloadByElClientDailyServiceGetData,
+  FctEngineNewPayloadByElClientDailyServiceGetError,
+  FctEngineNewPayloadByElClientDailyServiceGetResponse,
+  FctEngineNewPayloadByElClientDailyServiceListData,
+  FctEngineNewPayloadByElClientDailyServiceListError,
+  FctEngineNewPayloadByElClientDailyServiceListResponse,
   FctEngineNewPayloadByElClientHourlyServiceGetData,
   FctEngineNewPayloadByElClientHourlyServiceGetError,
   FctEngineNewPayloadByElClientHourlyServiceGetResponse,
@@ -7616,6 +7632,66 @@ export const fctEngineGetBlobsByElClientServiceGetOptions = (
     queryKey: fctEngineGetBlobsByElClientServiceGetQueryKey(options),
   });
 
+export const fctEngineGetBlobsByElClientDailyServiceListQueryKey = (
+  options?: Options<FctEngineGetBlobsByElClientDailyServiceListData>
+) => createQueryKey('fctEngineGetBlobsByElClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineGetBlobsByElClientDailyServiceListOptions = (
+  options?: Options<FctEngineGetBlobsByElClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsByElClientDailyServiceListResponse,
+    FctEngineGetBlobsByElClientDailyServiceListError,
+    FctEngineGetBlobsByElClientDailyServiceListResponse,
+    ReturnType<typeof fctEngineGetBlobsByElClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsByElClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsByElClientDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineGetBlobsByElClientDailyServiceGetQueryKey = (
+  options: Options<FctEngineGetBlobsByElClientDailyServiceGetData>
+) => createQueryKey('fctEngineGetBlobsByElClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsByElClientDailyServiceGetOptions = (
+  options: Options<FctEngineGetBlobsByElClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsByElClientDailyServiceGetResponse,
+    FctEngineGetBlobsByElClientDailyServiceGetError,
+    FctEngineGetBlobsByElClientDailyServiceGetResponse,
+    ReturnType<typeof fctEngineGetBlobsByElClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsByElClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsByElClientDailyServiceGetQueryKey(options),
+  });
+
 export const fctEngineGetBlobsByElClientHourlyServiceListQueryKey = (
   options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData>
 ) => createQueryKey('fctEngineGetBlobsByElClientHourlyServiceList', options);
@@ -7968,6 +8044,66 @@ export const fctEngineNewPayloadByElClientServiceGetOptions = (
       return data;
     },
     queryKey: fctEngineNewPayloadByElClientServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadByElClientDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadByElClientDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadByElClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadByElClientDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadByElClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadByElClientDailyServiceListResponse,
+    FctEngineNewPayloadByElClientDailyServiceListError,
+    FctEngineNewPayloadByElClientDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadByElClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadByElClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadByElClientDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadByElClientDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadByElClientDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadByElClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadByElClientDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadByElClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadByElClientDailyServiceGetResponse,
+    FctEngineNewPayloadByElClientDailyServiceGetError,
+    FctEngineNewPayloadByElClientDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadByElClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadByElClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadByElClientDailyServiceGetQueryKey(options),
   });
 
 export const fctEngineNewPayloadByElClientHourlyServiceListQueryKey = (

@@ -561,6 +561,12 @@ import type {
   FctDataColumnPartialMessageHourlyServiceListData,
   FctDataColumnPartialMessageHourlyServiceListErrors,
   FctDataColumnPartialMessageHourlyServiceListResponses,
+  FctEngineGetBlobsByElClientDailyServiceGetData,
+  FctEngineGetBlobsByElClientDailyServiceGetErrors,
+  FctEngineGetBlobsByElClientDailyServiceGetResponses,
+  FctEngineGetBlobsByElClientDailyServiceListData,
+  FctEngineGetBlobsByElClientDailyServiceListErrors,
+  FctEngineGetBlobsByElClientDailyServiceListResponses,
   FctEngineGetBlobsByElClientHourlyServiceGetData,
   FctEngineGetBlobsByElClientHourlyServiceGetErrors,
   FctEngineGetBlobsByElClientHourlyServiceGetResponses,
@@ -597,6 +603,12 @@ import type {
   FctEngineGetBlobsDurationChunked50MsServiceListData,
   FctEngineGetBlobsDurationChunked50MsServiceListErrors,
   FctEngineGetBlobsDurationChunked50MsServiceListResponses,
+  FctEngineNewPayloadByElClientDailyServiceGetData,
+  FctEngineNewPayloadByElClientDailyServiceGetErrors,
+  FctEngineNewPayloadByElClientDailyServiceGetResponses,
+  FctEngineNewPayloadByElClientDailyServiceListData,
+  FctEngineNewPayloadByElClientDailyServiceListErrors,
+  FctEngineNewPayloadByElClientDailyServiceListResponses,
   FctEngineNewPayloadByElClientHourlyServiceGetData,
   FctEngineNewPayloadByElClientHourlyServiceGetErrors,
   FctEngineNewPayloadByElClientHourlyServiceGetResponses,
@@ -1955,6 +1967,10 @@ import {
   zFctDataColumnPartialMessageHourlyServiceGetResponse,
   zFctDataColumnPartialMessageHourlyServiceListData,
   zFctDataColumnPartialMessageHourlyServiceListResponse,
+  zFctEngineGetBlobsByElClientDailyServiceGetData,
+  zFctEngineGetBlobsByElClientDailyServiceGetResponse,
+  zFctEngineGetBlobsByElClientDailyServiceListData,
+  zFctEngineGetBlobsByElClientDailyServiceListResponse,
   zFctEngineGetBlobsByElClientHourlyServiceGetData,
   zFctEngineGetBlobsByElClientHourlyServiceGetResponse,
   zFctEngineGetBlobsByElClientHourlyServiceListData,
@@ -1979,6 +1995,10 @@ import {
   zFctEngineGetBlobsDurationChunked50MsServiceGetResponse,
   zFctEngineGetBlobsDurationChunked50MsServiceListData,
   zFctEngineGetBlobsDurationChunked50MsServiceListResponse,
+  zFctEngineNewPayloadByElClientDailyServiceGetData,
+  zFctEngineNewPayloadByElClientDailyServiceGetResponse,
+  zFctEngineNewPayloadByElClientDailyServiceListData,
+  zFctEngineNewPayloadByElClientDailyServiceListResponse,
   zFctEngineNewPayloadByElClientHourlyServiceGetData,
   zFctEngineNewPayloadByElClientHourlyServiceGetResponse,
   zFctEngineNewPayloadByElClientHourlyServiceListData,
@@ -6185,6 +6205,44 @@ export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boole
  *
  * Retrieve paginated results with optional filtering
  */
+export const fctEngineGetBlobsByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsByElClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineGetBlobsByElClientDailyServiceListResponses,
+    FctEngineGetBlobsByElClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByElClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByElClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_el_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsByElClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsByElClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineGetBlobsByElClientDailyServiceGetResponses,
+    FctEngineGetBlobsByElClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsByElClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineGetBlobsByElClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_by_el_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
 export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData, ThrowOnError>
 ) =>
@@ -6405,6 +6463,44 @@ export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boo
     requestValidator: async data => await zFctEngineNewPayloadByElClientServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctEngineNewPayloadByElClientServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_by_el_client/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Retrieve paginated results with optional filtering
+ */
+export const fctEngineNewPayloadByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadByElClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadByElClientDailyServiceListResponses,
+    FctEngineNewPayloadByElClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByElClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByElClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_el_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadByElClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadByElClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadByElClientDailyServiceGetResponses,
+    FctEngineNewPayloadByElClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadByElClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadByElClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_by_el_client_daily/{day_start_date}',
     ...options,
   });
 

@@ -14,7 +14,6 @@ import { formatSlot, getExecutionClientColor } from '@/utils';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
-import { RangeUnavailableNote } from '../RangeUnavailableNote';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;
@@ -82,20 +81,16 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     return <GetBlobsTabSkeleton />;
   }
 
-  // getBlobs data is only aggregated hourly or finer, which is too heavy for long ranges (90d+)
-  if (!HOURLY_CHART_RANGES.includes(timeRange)) {
-    return (
-      <div className="space-y-6">
-        <EIP7870SpecsBanner />
-        <RangeUnavailableNote />
-      </div>
-    );
-  }
-
-  const { getBlobsByElClient, getBlobsByElClientHourly, getBlobsDurationHistogram } = data;
+  const { getBlobsByElClient, getBlobsByElClientHourly, getBlobsByElClientDaily, getBlobsDurationHistogram } = data;
 
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
+
+  // Long ranges (90d+) only fetch daily data - hourly trend charts are hidden
+  const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
+
+  // Per-client/version rows for the summary stats and client table
+  const summaryRows = showHourlyCharts ? getBlobsByElClientHourly : getBlobsByElClientDaily;
 
   // Filter to SUCCESS status only for duration-based charts
   const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
@@ -103,9 +98,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   // Hourly data is already filtered to SUCCESS status in the SQL query (via quantileIf)
   // so we can use it directly for the summary table
 
-  // Calculate summary stats from hourly data (always available, accurate aggregations)
+  // Calculate summary stats from hourly/daily data (always available, accurate aggregations)
   const aggregatedStats = (() => {
-    if (getBlobsByElClientHourly.length === 0) {
+    if (summaryRows.length === 0) {
       return { totalObservations: 0, successRate: '0', avgDuration: '0', avgBlobsPerRequest: '0' };
     }
 
@@ -117,7 +112,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     let totalWeightedDuration = 0;
     let totalWeightedBlobs = 0;
 
-    getBlobsByElClientHourly.forEach(row => {
+    summaryRows.forEach(row => {
       const obs = row.observation_count ?? 0;
       successCount += row.success_count ?? 0;
       partialCount += row.partial_count ?? 0;
@@ -477,7 +472,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
         {() => (
           <ClientVersionBreakdown
             data={successBlobsByElClient}
-            hourlyData={getBlobsByElClientHourly}
+            hourlyData={summaryRows}
             showBlobCount
             hideObservations
             hideRange
@@ -567,7 +562,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             </PopoutCard>
           </div>
         </>
-      ) : (
+      ) : showHourlyCharts ? (
         /* Hourly trend charts for longer time ranges */
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Hourly Duration (P50/P95 toggle) */}
@@ -718,7 +713,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             </div>
           </PopoutCard>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

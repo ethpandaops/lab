@@ -5201,6 +5201,85 @@ export type FctEngineGetBlobsByElClient = {
   updated_date_time?: number;
 };
 
+export type FctEngineGetBlobsByElClientDaily = {
+  /**
+   * Average duration of SUCCESS engine_getBlobs calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average number of blobs returned (SUCCESS status only)
+   */
+  avg_returned_count?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of observations with EMPTY status
+   */
+  empty_count?: number;
+  /**
+   * Number of observations with ERROR status
+   */
+  error_count?: number;
+  /**
+   * Maximum duration of SUCCESS calls in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration of SUCCESS calls in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this day
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration of SUCCESS calls over the day in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of observations with PARTIAL status
+   */
+  partial_count?: number;
+  /**
+   * Number of unique slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SUCCESS status
+   */
+  success_count?: number;
+  /**
+   * Number of unique nodes reporting for this client in this day
+   */
+  unique_node_count?: number;
+  /**
+   * Number of observations with UNSUPPORTED status
+   */
+  unsupported_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
 export type FctEngineGetBlobsByElClientHourly = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -5657,6 +5736,93 @@ export type FctEngineNewPayloadByElClient = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+export type FctEngineNewPayloadByElClientDaily = {
+  /**
+   * Number of observations with ACCEPTED status
+   */
+  accepted_count?: number;
+  /**
+   * Average blob count per block (VALID status only)
+   */
+  avg_blob_count?: number;
+  /**
+   * Average duration of VALID engine_newPayload calls in milliseconds
+   */
+  avg_duration_ms?: number;
+  /**
+   * Average gas limit per block (VALID status only)
+   */
+  avg_gas_limit?: number;
+  /**
+   * Average gas used per block (VALID status only)
+   */
+  avg_gas_used?: number;
+  /**
+   * Average transaction count per block (VALID status only)
+   */
+  avg_tx_count?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of observations with INVALID status
+   */
+  invalid_count?: number;
+  /**
+   * Maximum duration of VALID calls in milliseconds
+   */
+  max_duration_ms?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Execution client version string
+   */
+  meta_execution_version?: string;
+  /**
+   * Minimum duration of VALID calls in milliseconds
+   */
+  min_duration_ms?: number;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Total number of observations for this client in this day
+   */
+  observation_count?: number;
+  /**
+   * 50th percentile (median) duration of VALID calls over the day in milliseconds
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile duration of VALID calls over the day in milliseconds
+   */
+  p95_duration_ms?: number;
+  /**
+   * Number of unique slots in this day
+   */
+  slot_count?: number;
+  /**
+   * Number of observations with SYNCING status
+   */
+  syncing_count?: number;
+  /**
+   * Number of unique nodes reporting for this client in this day
+   */
+  unique_node_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of observations with VALID status
+   */
+  valid_count?: number;
 };
 
 export type FctEngineNewPayloadByElClientHourly = {
@@ -10514,6 +10680,13 @@ export type GetFctDataColumnPartialMessageHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_get_blobs_by_el_client_daily record
+ */
+export type GetFctEngineGetBlobsByElClientDailyResponse = {
+  item?: FctEngineGetBlobsByElClientDaily;
+};
+
+/**
  * Response for getting a single fct_engine_get_blobs_by_el_client_hourly record
  */
 export type GetFctEngineGetBlobsByElClientHourlyResponse = {
@@ -10553,6 +10726,13 @@ export type GetFctEngineGetBlobsBySlotResponse = {
  */
 export type GetFctEngineGetBlobsDurationChunked50MsResponse = {
   item?: FctEngineGetBlobsDurationChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_by_el_client_daily record
+ */
+export type GetFctEngineNewPayloadByElClientDailyResponse = {
+  item?: FctEngineNewPayloadByElClientDaily;
 };
 
 /**
@@ -16413,6 +16593,20 @@ export type ListFctDataColumnPartialMessageHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_engine_get_blobs_by_el_client_daily records
+ */
+export type ListFctEngineGetBlobsByElClientDailyResponse = {
+  /**
+   * The list of fct_engine_get_blobs_by_el_client_daily.
+   */
+  fct_engine_get_blobs_by_el_client_daily?: Array<FctEngineGetBlobsByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_get_blobs_by_el_client_hourly records
  */
 export type ListFctEngineGetBlobsByElClientHourlyResponse = {
@@ -16490,6 +16684,20 @@ export type ListFctEngineGetBlobsDurationChunked50MsResponse = {
    * The list of fct_engine_get_blobs_duration_chunked_50ms.
    */
   fct_engine_get_blobs_duration_chunked_50ms?: Array<FctEngineGetBlobsDurationChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_by_el_client_daily records
+ */
+export type ListFctEngineNewPayloadByElClientDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_by_el_client_daily.
+   */
+  fct_engine_new_payload_by_el_client_daily?: Array<FctEngineNewPayloadByElClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -69764,6 +69972,786 @@ export type FctEngineGetBlobsByElClientServiceGetResponses = {
 export type FctEngineGetBlobsByElClientServiceGetResponse =
   FctEngineGetBlobsByElClientServiceGetResponses[keyof FctEngineGetBlobsByElClientServiceGetResponses];
 
+export type FctEngineGetBlobsByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this day (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this day (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Number of observations with SUCCESS status (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Number of observations with SUCCESS status (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: eq)
+     */
+    partial_count_eq?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: ne)
+     */
+    partial_count_ne?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lt)
+     */
+    partial_count_lt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: lte)
+     */
+    partial_count_lte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gt)
+     */
+    partial_count_gt?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: gte)
+     */
+    partial_count_gte?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_min)
+     */
+    partial_count_between_min?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: between_max_value)
+     */
+    partial_count_between_max_value?: number;
+    /**
+     * Number of observations with PARTIAL status (filter: in_values) (comma-separated list)
+     */
+    partial_count_in_values?: string;
+    /**
+     * Number of observations with PARTIAL status (filter: not_in_values) (comma-separated list)
+     */
+    partial_count_not_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: eq)
+     */
+    empty_count_eq?: number;
+    /**
+     * Number of observations with EMPTY status (filter: ne)
+     */
+    empty_count_ne?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lt)
+     */
+    empty_count_lt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: lte)
+     */
+    empty_count_lte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gt)
+     */
+    empty_count_gt?: number;
+    /**
+     * Number of observations with EMPTY status (filter: gte)
+     */
+    empty_count_gte?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_min)
+     */
+    empty_count_between_min?: number;
+    /**
+     * Number of observations with EMPTY status (filter: between_max_value)
+     */
+    empty_count_between_max_value?: number;
+    /**
+     * Number of observations with EMPTY status (filter: in_values) (comma-separated list)
+     */
+    empty_count_in_values?: string;
+    /**
+     * Number of observations with EMPTY status (filter: not_in_values) (comma-separated list)
+     */
+    empty_count_not_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: eq)
+     */
+    unsupported_count_eq?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: ne)
+     */
+    unsupported_count_ne?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lt)
+     */
+    unsupported_count_lt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: lte)
+     */
+    unsupported_count_lte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gt)
+     */
+    unsupported_count_gt?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: gte)
+     */
+    unsupported_count_gte?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_min)
+     */
+    unsupported_count_between_min?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: between_max_value)
+     */
+    unsupported_count_between_max_value?: number;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: in_values) (comma-separated list)
+     */
+    unsupported_count_in_values?: string;
+    /**
+     * Number of observations with UNSUPPORTED status (filter: not_in_values) (comma-separated list)
+     */
+    unsupported_count_not_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of observations with ERROR status (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of observations with ERROR status (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of observations with ERROR status (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of observations with ERROR status (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of observations with ERROR status (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of observations with ERROR status (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of observations with ERROR status (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of observations with ERROR status (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * Filter avg_returned_count using value
+     */
+    avg_returned_count_value?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of SUCCESS engine_getBlobs calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration of SUCCESS calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration of SUCCESS calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration of SUCCESS calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration of SUCCESS calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_get_blobs_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineGetBlobsByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_daily';
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListError =
+  FctEngineGetBlobsByElClientDailyServiceListErrors[keyof FctEngineGetBlobsByElClientDailyServiceListErrors];
+
+export type FctEngineGetBlobsByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineGetBlobsByElClientDailyResponse;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceListResponse =
+  FctEngineGetBlobsByElClientDailyServiceListResponses[keyof FctEngineGetBlobsByElClientDailyServiceListResponses];
+
+export type FctEngineGetBlobsByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_get_blobs_by_el_client_daily/{day_start_date}';
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetError =
+  FctEngineGetBlobsByElClientDailyServiceGetErrors[keyof FctEngineGetBlobsByElClientDailyServiceGetErrors];
+
+export type FctEngineGetBlobsByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineGetBlobsByElClientDailyResponse;
+};
+
+export type FctEngineGetBlobsByElClientDailyServiceGetResponse =
+  FctEngineGetBlobsByElClientDailyServiceGetResponses[keyof FctEngineGetBlobsByElClientDailyServiceGetResponses];
+
 export type FctEngineGetBlobsByElClientHourlyServiceListData = {
   body?: never;
   path?: never;
@@ -74363,6 +75351,830 @@ export type FctEngineNewPayloadByElClientServiceGetResponses = {
 
 export type FctEngineNewPayloadByElClientServiceGetResponse =
   FctEngineNewPayloadByElClientServiceGetResponses[keyof FctEngineNewPayloadByElClientServiceGetResponses];
+
+export type FctEngineNewPayloadByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Execution client version string (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Execution client version string (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Execution client version string (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Execution client version string (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Execution client version string (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Execution client version string (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Execution client version string (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Execution client version string (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Execution client version string (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of unique slots in this day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of unique slots in this day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of unique slots in this day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of unique slots in this day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of unique slots in this day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of unique slots in this day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of unique slots in this day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of unique slots in this day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of unique slots in this day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Total number of observations for this client in this day (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Total number of observations for this client in this day (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Total number of observations for this client in this day (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Total number of observations for this client in this day (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Total number of observations for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: eq)
+     */
+    unique_node_count_eq?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: ne)
+     */
+    unique_node_count_ne?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lt)
+     */
+    unique_node_count_lt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: lte)
+     */
+    unique_node_count_lte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gt)
+     */
+    unique_node_count_gt?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: gte)
+     */
+    unique_node_count_gte?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_min)
+     */
+    unique_node_count_between_min?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: between_max_value)
+     */
+    unique_node_count_between_max_value?: number;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: in_values) (comma-separated list)
+     */
+    unique_node_count_in_values?: string;
+    /**
+     * Number of unique nodes reporting for this client in this day (filter: not_in_values) (comma-separated list)
+     */
+    unique_node_count_not_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: eq)
+     */
+    valid_count_eq?: number;
+    /**
+     * Number of observations with VALID status (filter: ne)
+     */
+    valid_count_ne?: number;
+    /**
+     * Number of observations with VALID status (filter: lt)
+     */
+    valid_count_lt?: number;
+    /**
+     * Number of observations with VALID status (filter: lte)
+     */
+    valid_count_lte?: number;
+    /**
+     * Number of observations with VALID status (filter: gt)
+     */
+    valid_count_gt?: number;
+    /**
+     * Number of observations with VALID status (filter: gte)
+     */
+    valid_count_gte?: number;
+    /**
+     * Number of observations with VALID status (filter: between_min)
+     */
+    valid_count_between_min?: number;
+    /**
+     * Number of observations with VALID status (filter: between_max_value)
+     */
+    valid_count_between_max_value?: number;
+    /**
+     * Number of observations with VALID status (filter: in_values) (comma-separated list)
+     */
+    valid_count_in_values?: string;
+    /**
+     * Number of observations with VALID status (filter: not_in_values) (comma-separated list)
+     */
+    valid_count_not_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: eq)
+     */
+    invalid_count_eq?: number;
+    /**
+     * Number of observations with INVALID status (filter: ne)
+     */
+    invalid_count_ne?: number;
+    /**
+     * Number of observations with INVALID status (filter: lt)
+     */
+    invalid_count_lt?: number;
+    /**
+     * Number of observations with INVALID status (filter: lte)
+     */
+    invalid_count_lte?: number;
+    /**
+     * Number of observations with INVALID status (filter: gt)
+     */
+    invalid_count_gt?: number;
+    /**
+     * Number of observations with INVALID status (filter: gte)
+     */
+    invalid_count_gte?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_min)
+     */
+    invalid_count_between_min?: number;
+    /**
+     * Number of observations with INVALID status (filter: between_max_value)
+     */
+    invalid_count_between_max_value?: number;
+    /**
+     * Number of observations with INVALID status (filter: in_values) (comma-separated list)
+     */
+    invalid_count_in_values?: string;
+    /**
+     * Number of observations with INVALID status (filter: not_in_values) (comma-separated list)
+     */
+    invalid_count_not_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: eq)
+     */
+    syncing_count_eq?: number;
+    /**
+     * Number of observations with SYNCING status (filter: ne)
+     */
+    syncing_count_ne?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lt)
+     */
+    syncing_count_lt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: lte)
+     */
+    syncing_count_lte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gt)
+     */
+    syncing_count_gt?: number;
+    /**
+     * Number of observations with SYNCING status (filter: gte)
+     */
+    syncing_count_gte?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_min)
+     */
+    syncing_count_between_min?: number;
+    /**
+     * Number of observations with SYNCING status (filter: between_max_value)
+     */
+    syncing_count_between_max_value?: number;
+    /**
+     * Number of observations with SYNCING status (filter: in_values) (comma-separated list)
+     */
+    syncing_count_in_values?: string;
+    /**
+     * Number of observations with SYNCING status (filter: not_in_values) (comma-separated list)
+     */
+    syncing_count_not_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: eq)
+     */
+    accepted_count_eq?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: ne)
+     */
+    accepted_count_ne?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lt)
+     */
+    accepted_count_lt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: lte)
+     */
+    accepted_count_lte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gt)
+     */
+    accepted_count_gt?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: gte)
+     */
+    accepted_count_gte?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_min)
+     */
+    accepted_count_between_min?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: between_max_value)
+     */
+    accepted_count_between_max_value?: number;
+    /**
+     * Number of observations with ACCEPTED status (filter: in_values) (comma-separated list)
+     */
+    accepted_count_in_values?: string;
+    /**
+     * Number of observations with ACCEPTED status (filter: not_in_values) (comma-separated list)
+     */
+    accepted_count_not_in_values?: string;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: eq)
+     */
+    avg_duration_ms_eq?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: ne)
+     */
+    avg_duration_ms_ne?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: lt)
+     */
+    avg_duration_ms_lt?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: lte)
+     */
+    avg_duration_ms_lte?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: gt)
+     */
+    avg_duration_ms_gt?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: gte)
+     */
+    avg_duration_ms_gte?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: between_min)
+     */
+    avg_duration_ms_between_min?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: between_max_value)
+     */
+    avg_duration_ms_between_max_value?: number;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    avg_duration_ms_in_values?: string;
+    /**
+     * Average duration of VALID engine_newPayload calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    avg_duration_ms_not_in_values?: string;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: eq)
+     */
+    p50_duration_ms_eq?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: ne)
+     */
+    p50_duration_ms_ne?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: lt)
+     */
+    p50_duration_ms_lt?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: lte)
+     */
+    p50_duration_ms_lte?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: gt)
+     */
+    p50_duration_ms_gt?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: gte)
+     */
+    p50_duration_ms_gte?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: between_min)
+     */
+    p50_duration_ms_between_min?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: between_max_value)
+     */
+    p50_duration_ms_between_max_value?: number;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p50_duration_ms_in_values?: string;
+    /**
+     * 50th percentile (median) duration of VALID calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p50_duration_ms_not_in_values?: string;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: eq)
+     */
+    p95_duration_ms_eq?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: ne)
+     */
+    p95_duration_ms_ne?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: lt)
+     */
+    p95_duration_ms_lt?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: lte)
+     */
+    p95_duration_ms_lte?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: gt)
+     */
+    p95_duration_ms_gt?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: gte)
+     */
+    p95_duration_ms_gte?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: between_min)
+     */
+    p95_duration_ms_between_min?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: between_max_value)
+     */
+    p95_duration_ms_between_max_value?: number;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: in_values) (comma-separated list)
+     */
+    p95_duration_ms_in_values?: string;
+    /**
+     * 95th percentile duration of VALID calls over the day in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    p95_duration_ms_not_in_values?: string;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: eq)
+     */
+    min_duration_ms_eq?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: ne)
+     */
+    min_duration_ms_ne?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: lt)
+     */
+    min_duration_ms_lt?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: lte)
+     */
+    min_duration_ms_lte?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: gt)
+     */
+    min_duration_ms_gt?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: gte)
+     */
+    min_duration_ms_gte?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: between_min)
+     */
+    min_duration_ms_between_min?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: between_max_value)
+     */
+    min_duration_ms_between_max_value?: number;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    min_duration_ms_in_values?: string;
+    /**
+     * Minimum duration of VALID calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    min_duration_ms_not_in_values?: string;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: eq)
+     */
+    max_duration_ms_eq?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: ne)
+     */
+    max_duration_ms_ne?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: lt)
+     */
+    max_duration_ms_lt?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: lte)
+     */
+    max_duration_ms_lte?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: gt)
+     */
+    max_duration_ms_gt?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: gte)
+     */
+    max_duration_ms_gte?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: between_min)
+     */
+    max_duration_ms_between_min?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: between_max_value)
+     */
+    max_duration_ms_between_max_value?: number;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: in_values) (comma-separated list)
+     */
+    max_duration_ms_in_values?: string;
+    /**
+     * Maximum duration of VALID calls in milliseconds (filter: not_in_values) (comma-separated list)
+     */
+    max_duration_ms_not_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: eq)
+     */
+    avg_gas_used_eq?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: ne)
+     */
+    avg_gas_used_ne?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lt)
+     */
+    avg_gas_used_lt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: lte)
+     */
+    avg_gas_used_lte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gt)
+     */
+    avg_gas_used_gt?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: gte)
+     */
+    avg_gas_used_gte?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_used_between_min?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_used_between_max_value?: number;
+    /**
+     * Average gas used per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_used_in_values?: string;
+    /**
+     * Average gas used per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_used_not_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: eq)
+     */
+    avg_gas_limit_eq?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: ne)
+     */
+    avg_gas_limit_ne?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lt)
+     */
+    avg_gas_limit_lt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: lte)
+     */
+    avg_gas_limit_lte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gt)
+     */
+    avg_gas_limit_gt?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: gte)
+     */
+    avg_gas_limit_gte?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_min)
+     */
+    avg_gas_limit_between_min?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: between_max_value)
+     */
+    avg_gas_limit_between_max_value?: number;
+    /**
+     * Average gas limit per block (VALID status only) (filter: in_values) (comma-separated list)
+     */
+    avg_gas_limit_in_values?: string;
+    /**
+     * Average gas limit per block (VALID status only) (filter: not_in_values) (comma-separated list)
+     */
+    avg_gas_limit_not_in_values?: string;
+    /**
+     * Filter avg_tx_count using value
+     */
+    avg_tx_count_value?: number;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_by_el_client_daily';
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListError =
+  FctEngineNewPayloadByElClientDailyServiceListErrors[keyof FctEngineNewPayloadByElClientDailyServiceListErrors];
+
+export type FctEngineNewPayloadByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadByElClientDailyResponse;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceListResponse =
+  FctEngineNewPayloadByElClientDailyServiceListResponses[keyof FctEngineNewPayloadByElClientDailyServiceListResponses];
+
+export type FctEngineNewPayloadByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_by_el_client_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetError =
+  FctEngineNewPayloadByElClientDailyServiceGetErrors[keyof FctEngineNewPayloadByElClientDailyServiceGetErrors];
+
+export type FctEngineNewPayloadByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadByElClientDailyResponse;
+};
+
+export type FctEngineNewPayloadByElClientDailyServiceGetResponse =
+  FctEngineNewPayloadByElClientDailyServiceGetResponses[keyof FctEngineNewPayloadByElClientDailyServiceGetResponses];
 
 export type FctEngineNewPayloadByElClientHourlyServiceListData = {
   body?: never;
