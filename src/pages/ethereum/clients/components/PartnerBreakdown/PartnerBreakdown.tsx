@@ -18,6 +18,11 @@ function otherLabel(layer: ClientLayer): string {
   return layer === 'consensus' ? 'execution' : 'consensus';
 }
 
+/** Article before the other layer's name */
+function otherArticle(layer: ClientLayer): string {
+  return layer === 'consensus' ? 'an' : 'a';
+}
+
 /**
  * The clients of the other layer that `client` runs with, by proposed blocks over the share window and by IPv4
  * addresses on the latest day of the P2P census.
@@ -51,7 +56,7 @@ function Share({ share, color }: { share: number | null; color: string }): JSX.E
   if (share === null) return <span className="block text-right text-sm/6 text-muted">-</span>;
   return (
     <div className="flex items-center gap-3">
-      <div className="min-w-16 flex-1">
+      <div className="hidden min-w-16 flex-1 sm:block">
         <ShareBar share={share} color={color} showThresholds={false} />
       </div>
       <span className="w-12 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
@@ -86,6 +91,7 @@ export interface PartnerSharesProps {
 export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps): JSX.Element {
   const partners = usePartners(client, layer, shareWindow);
   const other = otherLabel(layer);
+  const article = otherArticle(layer);
 
   return (
     <Card
@@ -96,7 +102,7 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
           <div>
             <dt className="inline font-medium text-foreground">Proposed blocks: </dt>
             <dd className="inline">
-              share of its blocks whose graffiti also names an {other} client, {SHARE_WINDOW_TEXT[shareWindow]}.
+              share of its blocks whose graffiti also names {article} {other} client, {SHARE_WINDOW_TEXT[shareWindow]}.
               {partners.unnamedBlocks > 0 &&
                 ` ${partners.unnamedBlocks.toLocaleString()} blocks named no ${other} client.`}
             </dd>
@@ -117,10 +123,12 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
       {partners.isLoading ? (
         <LoadingContainer className="h-48 rounded-sm" />
       ) : partners.rows.length === 0 ? (
-        <p className="text-sm text-muted">No block or address paired it with an {other} client.</p>
+        <p className="text-sm text-muted">
+          No block or address paired it with {article} {other} client.
+        </p>
       ) : (
         <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full min-w-[36rem] border-collapse">
+          <table className="w-full border-collapse sm:min-w-[36rem]">
             <thead className="border-b border-border">
               <tr>
                 <Th>Client</Th>
@@ -185,6 +193,7 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
   const partners = usePartners(client, layer, shareWindow);
   const pairMetrics = usePairMetrics(client, layer, from);
   const other = otherLabel(layer);
+  const article = otherArticle(layer);
   const partnerKey = layer === 'consensus' ? 'execution_client' : 'consensus_client';
 
   const columns = useMemo(() => {
@@ -232,10 +241,12 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
       {partners.isLoading || pairMetrics.isLoading ? (
         <LoadingContainer className="h-40 rounded-sm" />
       ) : rows.length === 0 ? (
-        <p className="text-sm text-muted">No block in this window named an {other} client alongside it.</p>
+        <p className="text-sm text-muted">
+          No block in this window named {article} {other} client alongside it.
+        </p>
       ) : (
         <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full border-collapse" style={{ minWidth: columns.length > 0 ? '64rem' : '28rem' }}>
+          <table className="w-full border-collapse" style={{ minWidth: columns.length > 0 ? '64rem' : undefined }}>
             <thead className="border-b border-border">
               <tr>
                 <Th>Client</Th>

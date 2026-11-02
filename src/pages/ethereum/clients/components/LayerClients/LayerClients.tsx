@@ -43,7 +43,7 @@ function ShareCell({ share, color }: { share: number | null; color: string }): J
   if (share === null) return <span className="block text-right text-sm/6 text-muted">-</span>;
   return (
     <div className="flex items-center gap-3">
-      <div className="min-w-16 flex-1">
+      <div className="hidden min-w-16 flex-1 sm:block">
         <ShareBar share={share} color={color} />
       </div>
       <span className="w-12 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
@@ -58,7 +58,7 @@ function HeaderCell({ title, note, className }: { title: string; note?: string; 
   return (
     <th scope="col" className={clsx('px-3 py-2 text-left align-bottom font-normal first:pl-0 last:pr-0', className)}>
       <span className="block text-xs/5 font-medium whitespace-nowrap text-foreground">{title}</span>
-      {note && <span className="block text-xs/4 text-muted">{note}</span>}
+      {note && <span className="block text-xs/4 whitespace-nowrap text-muted">{note}</span>}
     </th>
   );
 }
@@ -103,8 +103,8 @@ export function LayerClients({
       <div>
         <dt className="inline font-medium text-foreground">P2P peers: </dt>
         <dd className="inline">
-          share of the {peerTotal.toLocaleString()} {label} peers the tysm P2P crawler saw on {peerDay ?? '-'}
-          that advertised an agent. Agents that are not {label} clients count as Other.
+          share of the {peerTotal.toLocaleString()} {label} peers the tysm P2P crawler saw on {peerDay ?? '-'} that
+          advertised an agent. Agents that are not {label} clients count as Other.
         </dd>
       </div>
       {xatuNodes && (
@@ -131,7 +131,7 @@ export function LayerClients({
         allowContentOverflow
       >
         <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full min-w-[44rem] border-collapse">
+          <table className="w-full border-collapse sm:min-w-[44rem]">
             <thead className="border-b border-border">
               <tr>
                 <HeaderCell title="Client" className="w-44" />

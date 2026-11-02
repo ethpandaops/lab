@@ -23,6 +23,12 @@ function percent(part: number, total: number): string {
   return total > 0 ? `${((part / total) * 100).toFixed(1)}%` : '-';
 }
 
+/** A share (0-100) to one decimal, with tiny non-zero shares as <0.1% */
+function shareText(share: number | null): string {
+  if (share === null) return '-';
+  return share > 0 && share < 0.05 ? '<0.1%' : `${share.toFixed(1)}%`;
+}
+
 type PeerRow = { day_start_date?: string; client?: string; peer_count?: number };
 
 /**
@@ -123,18 +129,21 @@ export function OverviewTab({
         stats={[
           {
             id: 'blocks',
-            name: `Share of proposed blocks, ${windowText}`,
-            value: blockShare === null ? '-' : `${blockShare.toFixed(1)}%`,
+            name: 'Proposed blocks',
+            subtitle: `Share, ${windowText}`,
+            value: shareText(blockShare),
             accentColor: getClientColor(client),
           },
           {
             id: 'peers',
-            name: `Share of P2P peers${peers.day ? `, ${peers.day}` : ''}`,
-            value: peers.isLoading ? '…' : peerShare === null ? '-' : `${peerShare.toFixed(1)}%`,
+            name: 'P2P peers',
+            subtitle: peers.day ? `Share on ${peers.day}` : undefined,
+            value: peers.isLoading ? '…' : shareText(peerShare),
           },
           {
             id: 'latest',
-            name: `Blocks on ${latest?.version ?? 'latest'} or newer, 24h`,
+            name: 'On latest release',
+            subtitle: `Blocks on ${latest?.version ?? 'it'} or newer, 24h`,
             value: percent(onLatest, recentTotal),
           },
           layer === 'consensus'

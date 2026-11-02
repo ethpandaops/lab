@@ -1,5 +1,5 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
-import { getClientColor } from '@/utils/ethereum';
+import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatDailyDate, formatHourlyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 
@@ -372,11 +372,13 @@ export function partnerRows(
     if (partner === UNKNOWN_CLIENT) unnamedBlocks += record.blocks;
     else blocks.set(partner, (blocks.get(partner) ?? 0) + record.blocks);
   }
+  const otherClients: readonly string[] = other === 'consensus' ? CONSENSUS_CLIENTS : EXECUTION_CLIENTS;
   const addresses = new Map<string, number>();
   for (const pair of ipPairs) {
     const own = layer === 'consensus' ? pair.consensus_client : pair.execution_client;
     const partner = layer === 'consensus' ? pair.execution_client : pair.consensus_client;
-    if (own !== client || !partner || partner === UNKNOWN_CLIENT) continue;
+    // Only the other layer's clients; libp2p tools and forks that share an address are not partners
+    if (own !== client || !partner || !otherClients.includes(partner)) continue;
     addresses.set(partner, (addresses.get(partner) ?? 0) + (pair.ip_count ?? 0));
   }
   const blockTotal = [...blocks.values()].reduce((sum, value) => sum + value, 0);

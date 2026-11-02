@@ -196,6 +196,7 @@ describe('partnerRows', () => {
     const pairs = [
       { consensus_client: 'lodestar', execution_client: 'nethermind', ip_count: 30 },
       { consensus_client: 'lodestar', execution_client: 'reth', ip_count: 10 },
+      { consensus_client: 'lodestar', execution_client: 'meganode', ip_count: 50 },
       { consensus_client: 'prysm', execution_client: 'geth', ip_count: 900 },
     ];
     const { rows, unnamedBlocks } = partnerRows('lodestar', 'consensus', records, pairs);
