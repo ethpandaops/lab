@@ -5,6 +5,7 @@ import {
   dimClientCommitServiceList,
   fctAttestationVoteCorrectnessByClientDailyServiceList,
   fctBlockGraffitiClientVersionByEntityDailyServiceList,
+  fctBlockGraffitiClientVersionByEntityHourlyServiceList,
   fctBlockGraffitiClientVersionDailyServiceList,
   fctBlockGraffitiClientVersionHourlyServiceList,
   fctBlockProposalByClientDailyServiceList,
@@ -92,6 +93,8 @@ export const fctBlockGraffitiClientVersionDailyList = fctBlockGraffitiClientVers
 export const fctBlockGraffitiClientVersionByEntityDailyList =
   fctBlockGraffitiClientVersionByEntityDailyServiceList as ListFn;
 export const fctBlockGraffitiClientVersionHourlyList = fctBlockGraffitiClientVersionHourlyServiceList as ListFn;
+export const fctBlockGraffitiClientVersionByEntityHourlyList =
+  fctBlockGraffitiClientVersionByEntityHourlyServiceList as ListFn;
 export const intBlockGraffitiReleaseList = intBlockGraffitiReleaseServiceList as ListFn;
 export const dimClientCommitList = dimClientCommitServiceList as ListFn;
 export const fctBlockProposalByClientDailyList = fctBlockProposalByClientDailyServiceList as ListFn;

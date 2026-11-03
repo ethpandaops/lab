@@ -6,11 +6,12 @@ import { fetchAllPages } from '@/utils/api-pagination';
 import {
   UNRESOLVED_STATUSES,
   fctBlockGraffitiClientVersionByEntityDailyList,
+  fctBlockGraffitiClientVersionByEntityHourlyList,
   fctBlockGraffitiClientVersionDailyList,
   fctBlockGraffitiClientVersionHourlyList,
 } from '../api/client-models';
 import { PAGE_SIZE } from '../constants';
-import type { ClientLayer } from '../utils/client-share';
+import { entityQuery, type ClientLayer } from '../utils/client-share';
 import { toVersionCounts, type VersionCount } from '../utils/client-versions';
 
 const DAY = 86400;
@@ -22,10 +23,11 @@ const MAX_LISTED_DAYS = 120;
 const FIRST_YEAR = 2020;
 
 export interface UseVersionCountsOptions {
-  /** Daily counts, daily counts per entity, or hourly counts */
-  grain: 'daily' | 'entity-daily' | 'hourly';
+  /** Daily or hourly counts, overall or per entity */
+  grain: 'daily' | 'entity-daily' | 'hourly' | 'entity-hourly';
   client?: string;
   layer?: ClientLayer | null;
+  /** An entity, or an entity group; per-entity grains only */
   entity?: string;
   /** Only rows that resolve to no release */
   unresolvedOnly?: boolean;
@@ -59,7 +61,7 @@ function isoDay(seconds: number): string {
 /** The queries a window splits into, each cached on its own so past chunks load once */
 export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number | undefined, to: number): Chunk[] {
   const now = Date.now() / 1000;
-  if (grain === 'hourly') {
+  if (grain === 'hourly' || grain === 'entity-hourly') {
     const start = Math.floor((from ?? to - 30 * DAY) / 3600) * 3600;
     const chunks: Chunk[] = [];
     for (let chunkStart = start; chunkStart < to; chunkStart += HOURLY_CHUNK_DAYS * DAY) {
@@ -115,27 +117,27 @@ export function useVersionCounts({
   const { currentNetwork } = useNetwork();
   // Ten-minute aligned so the window, and the cache keys, stay put while the page is open
   const end = useMemo(() => to ?? Math.ceil(Date.now() / 1000 / 600) * 600, [to]);
-  const dataKey =
-    grain === 'hourly'
-      ? 'fct_block_graffiti_client_version_hourly'
-      : grain === 'entity-daily'
-        ? 'fct_block_graffiti_client_version_by_entity_daily'
-        : 'fct_block_graffiti_client_version_daily';
+  const dataKey = {
+    daily: 'fct_block_graffiti_client_version_daily',
+    'entity-daily': 'fct_block_graffiti_client_version_by_entity_daily',
+    hourly: 'fct_block_graffiti_client_version_hourly',
+    'entity-hourly': 'fct_block_graffiti_client_version_by_entity_hourly',
+  }[grain];
   // Start no earlier than the table's data, which may not reach back to genesis
   const bounds = useTableBounds(dataKey);
   const dataStart = bounds.data?.min;
   const start = from === undefined ? dataStart : dataStart === undefined ? from : Math.max(from, dataStart);
   const chunks = useMemo(() => chunksFor(grain, start, end), [grain, start, end]);
-  const table =
-    grain === 'hourly'
-      ? fctBlockGraffitiClientVersionHourlyList
-      : grain === 'entity-daily'
-        ? fctBlockGraffitiClientVersionByEntityDailyList
-        : fctBlockGraffitiClientVersionDailyList;
+  const table = {
+    daily: fctBlockGraffitiClientVersionDailyList,
+    'entity-daily': fctBlockGraffitiClientVersionByEntityDailyList,
+    hourly: fctBlockGraffitiClientVersionHourlyList,
+    'entity-hourly': fctBlockGraffitiClientVersionByEntityHourlyList,
+  }[grain];
   const filters = {
     ...(client && { client_eq: client }),
     ...(layer && { layer_eq: layer }),
-    ...(entity && { entity_eq: entity }),
+    ...(entity && entityQuery(entity)),
     ...(unresolvedOnly && { release_status_in_values: UNRESOLVED_STATUSES.join(',') }),
   };
 

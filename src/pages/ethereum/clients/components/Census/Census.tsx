@@ -24,6 +24,7 @@ import {
   type FctPeerProtocolByClClientDaily,
 } from '../../api/client-models';
 import { useCensus } from '../../hooks/useCensus';
+import { ANGLE_COLORS } from '../../utils/angle-colors';
 import type { ClientLayer } from '../../utils/client-share';
 import {
   CUSTODY_BUCKETS,
@@ -494,7 +495,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
     groups.filter(group => group.isNext),
     group => group.count
   );
-  const color = getClientColor(client);
+  const color = ANGLE_COLORS.enr;
 
   return (
     <Card

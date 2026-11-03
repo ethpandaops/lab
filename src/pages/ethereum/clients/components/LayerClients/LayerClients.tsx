@@ -8,9 +8,9 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { DimClientRelease } from '@/api/types.gen';
-import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { OTHER_VERSION_COLOR } from '../../utils/client-versions';
+import { ANGLE_COLORS } from '../../utils/angle-colors';
 import { peerShareChart, unifiedClientRows } from '../../utils/census';
 import type { ClientLayer, ClientSummary } from '../../utils/client-share';
 import { ShareBar } from '../ShareBar';
@@ -36,6 +36,15 @@ export interface LayerClientsProps {
   latestReleases: Map<string, DimClientRelease>;
   /** Share of each client's blocks in the last 24 hours on its latest release or newer */
   latestAdoption: Map<string, number>;
+  /**
+   * Why the P2P peers and Xatu nodes columns, their chart and, with `hideLatestAdoption`, the On latest column are
+   * left out: the page's filters narrow the blocks in ways those numbers cannot follow. Shown in their place.
+   */
+  unfilteredNote?: string;
+  /** Leave out On latest, which cannot follow the other layer's client filter */
+  hideLatestAdoption?: boolean;
+  /** Which blocks On latest covers when the page is filtered, e.g. "from coinbase" */
+  adoptionScope?: string;
 }
 
 /** A share as a bar and a percentage, or a dash */
@@ -54,10 +63,24 @@ function ShareCell({ share, color }: { share: number | null; color: string }): J
 }
 
 /** A column header with what the column is weighted by underneath */
-function HeaderCell({ title, note, className }: { title: string; note?: string; className?: string }): JSX.Element {
+function HeaderCell({
+  title,
+  note,
+  color,
+  className,
+}: {
+  title: string;
+  note?: string;
+  /** Swatch of the angle the column shows */
+  color?: string;
+  className?: string;
+}): JSX.Element {
   return (
     <th scope="col" className={clsx('px-3 py-2 text-left align-bottom font-normal first:pl-0 last:pr-0', className)}>
-      <span className="block text-xs/5 font-medium whitespace-nowrap text-foreground">{title}</span>
+      <span className="inline-flex items-center gap-1.5 text-xs/5 font-medium whitespace-nowrap text-foreground">
+        {color && <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
+        {title}
+      </span>
       {note && <span className="block text-xs/4 whitespace-nowrap text-muted">{note}</span>}
     </th>
   );
@@ -81,8 +104,17 @@ export function LayerClients({
   xatuNodes,
   latestReleases,
   latestAdoption,
+  unfilteredNote,
+  hideLatestAdoption = false,
+  adoptionScope,
 }: LayerClientsProps): JSX.Element {
-  const latestPeers = useMemo(() => peerRows.filter(row => row.day_start_date === peerDay), [peerRows, peerDay]);
+  // Every number shown follows the page's filters; those that cannot are left out rather than shown network-wide
+  const showPeers = !unfilteredNote;
+  const showXatu = showPeers && !!xatuNodes;
+  const latestPeers = useMemo(
+    () => (showPeers ? peerRows.filter(row => row.day_start_date === peerDay) : []),
+    [showPeers, peerRows, peerDay]
+  );
   const { rows, other, peerTotal } = useMemo(
     () => unifiedClientRows(layer, blockSummaries, latestPeers),
     [layer, blockSummaries, latestPeers]
@@ -101,14 +133,16 @@ export function LayerClients({
           {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).
         </dd>
       </div>
-      <div>
-        <dt className="inline font-medium text-foreground">P2P peers: </dt>
-        <dd className="inline">
-          share of the {peerTotal.toLocaleString()} {label} P2P peers the tysm crawler saw on {peerDay ?? '-'} that
-          advertised an agent. Agents that are not {label} clients count as Other.
-        </dd>
-      </div>
-      {xatuNodes && (
+      {showPeers && (
+        <div>
+          <dt className="inline font-medium text-foreground">P2P peers: </dt>
+          <dd className="inline">
+            share of the {peerTotal.toLocaleString()} {label} P2P peers the tysm crawler saw on {peerDay ?? '-'} that
+            advertised an agent. Agents that are not {label} clients count as Other.
+          </dd>
+        </div>
+      )}
+      {showXatu && (
         <div>
           <dt className="inline font-medium text-foreground">Xatu nodes: </dt>
           <dd className="inline">
@@ -116,12 +150,15 @@ export function LayerClients({
           </dd>
         </div>
       )}
-      <div>
-        <dt className="inline font-medium text-foreground">On latest: </dt>
-        <dd className="inline">
-          share of the client&apos;s blocks in the last 24 hours on its latest release or newer.
-        </dd>
-      </div>
+      {!hideLatestAdoption && (
+        <div>
+          <dt className="inline font-medium text-foreground">On latest: </dt>
+          <dd className="inline">
+            share of the client&apos;s blocks {adoptionScope ? `${adoptionScope} ` : ''}in the last 24 hours on its
+            latest release or newer.
+          </dd>
+        </div>
+      )}
     </dl>
   );
 
@@ -138,17 +175,23 @@ export function LayerClients({
             <thead className="border-b border-border">
               <tr>
                 <HeaderCell title="Client" className="w-44" />
-                <HeaderCell title="Proposed blocks" note="Stake-weighted" className="w-[26%]" />
-                <HeaderCell title="P2P peers" note="Node-weighted" className="w-[26%]" />
-                {xatuNodes && <HeaderCell title="Xatu nodes" className="text-right" />}
+                <HeaderCell
+                  title="Proposed blocks"
+                  note="Stake-weighted"
+                  color={ANGLE_COLORS.blocks}
+                  className="w-[26%]"
+                />
+                {showPeers && (
+                  <HeaderCell title="P2P peers" note="Node-weighted" color={ANGLE_COLORS.peers} className="w-[26%]" />
+                )}
+                {showXatu && <HeaderCell title="Xatu nodes" color={ANGLE_COLORS.xatu} className="text-right" />}
                 <HeaderCell title="Latest" />
-                <HeaderCell title="On latest" className="text-right" />
+                {!hideLatestAdoption && <HeaderCell title="On latest" className="text-right" />}
                 <th aria-hidden className="w-5" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {rows.map(row => {
-                const color = getClientColor(row.client);
                 const latest = latestReleases.get(row.client)?.version;
                 const adoption = latestAdoption.get(row.client);
                 return (
@@ -164,24 +207,28 @@ export function LayerClients({
                       </Link>
                     </td>
                     <td className="px-3 py-2">
-                      <ShareCell share={row.blockShare} color={color} />
+                      <ShareCell share={row.blockShare} color={ANGLE_COLORS.blocks} />
                     </td>
-                    <td className="px-3 py-2">
-                      {peersLoading ? (
-                        <LoadingContainer className="h-2 rounded-full" />
-                      ) : (
-                        <ShareCell share={row.peerShare} color={color} />
-                      )}
-                    </td>
-                    {xatuNodes && (
+                    {showPeers && (
+                      <td className="px-3 py-2">
+                        {peersLoading ? (
+                          <LoadingContainer className="h-2 rounded-full" />
+                        ) : (
+                          <ShareCell share={row.peerShare} color={ANGLE_COLORS.peers} />
+                        )}
+                      </td>
+                    )}
+                    {showXatu && xatuNodes && (
                       <td className="px-3 py-2 text-right text-sm/6 text-muted tabular-nums">
                         {(xatuNodes.get(row.client) ?? 0).toLocaleString()}
                       </td>
                     )}
                     <td className="px-3 py-2 font-mono text-xs/6 whitespace-nowrap text-muted">{latest ?? '-'}</td>
-                    <td className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums">
-                      {adoption === undefined ? <span className="text-muted">-</span> : `${adoption.toFixed(0)}%`}
-                    </td>
+                    {!hideLatestAdoption && (
+                      <td className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums">
+                        {adoption === undefined ? <span className="text-muted">-</span> : `${adoption.toFixed(0)}%`}
+                      </td>
+                    )}
                     <td className="py-2 pl-1 text-right">
                       <ChevronRightIcon className="inline size-4 text-muted group-hover:text-primary" />
                     </td>
@@ -199,18 +246,19 @@ export function LayerClients({
                   <td className="px-3 py-2">
                     <ShareCell share={other.peerShare} color={OTHER_VERSION_COLOR} />
                   </td>
-                  {xatuNodes && <td />}
+                  {showXatu && <td />}
                   <td />
-                  <td />
+                  {!hideLatestAdoption && <td />}
                   <td />
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        {unfilteredNote && <p className="mt-3 text-xs/5 text-muted">{unfilteredNote}</p>}
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className={clsx('grid grid-cols-1 gap-4', showPeers && 'xl:grid-cols-2')}>
         <PopoutCard
           title="Proposed blocks over time"
           subtitle={`Share of blocks naming ${article} ${label} client ${blockScope}`}
@@ -229,29 +277,31 @@ export function LayerClients({
             />
           )}
         </PopoutCard>
-        <PopoutCard
-          title="P2P peers over time"
-          subtitle={`Daily share of ${label} P2P peers with an agent`}
-          anchorId={`${layer}-peer-share`}
-          modalSize="full"
-        >
-          {({ inModal }) =>
-            peersLoading ? (
-              <LoadingContainer className="h-72 rounded-sm" />
-            ) : peerChart.days.length === 0 ? (
-              <p className="text-sm text-muted">No P2P census for this window yet.</p>
-            ) : (
-              <MultiLineChart
-                series={peerChart.series}
-                xAxis={{ type: 'category', labels: peerChart.labels, name: 'Date' }}
-                yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
-                height={inModal ? 600 : 280}
-                showLegend
-                legendPosition="top"
-              />
-            )
-          }
-        </PopoutCard>
+        {showPeers && (
+          <PopoutCard
+            title="P2P peers over time"
+            subtitle={`Daily share of ${label} P2P peers with an agent`}
+            anchorId={`${layer}-peer-share`}
+            modalSize="full"
+          >
+            {({ inModal }) =>
+              peersLoading ? (
+                <LoadingContainer className="h-72 rounded-sm" />
+              ) : peerChart.days.length === 0 ? (
+                <p className="text-sm text-muted">No P2P census for this window yet.</p>
+              ) : (
+                <MultiLineChart
+                  series={peerChart.series}
+                  xAxis={{ type: 'category', labels: peerChart.labels, name: 'Date' }}
+                  yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
+                  height={inModal ? 600 : 280}
+                  showLegend
+                  legendPosition="top"
+                />
+              )
+            }
+          </PopoutCard>
+        )}
       </div>
     </section>
   );

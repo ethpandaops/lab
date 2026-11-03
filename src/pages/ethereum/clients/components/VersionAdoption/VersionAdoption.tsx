@@ -8,10 +8,10 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease, FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
-import { getClientColor } from '@/utils/ethereum';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
 import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '../../hooks';
+import { ANGLE_COLORS } from '../../utils/angle-colors';
 import { censusVersionCounts, sum } from '../../utils/census';
 import type { ClientLayer } from '../../utils/client-share';
 import {
@@ -214,6 +214,8 @@ interface AngleRow {
 
 interface AngleCardProps {
   title: string;
+  /** The angle's colour from {@link ANGLE_COLORS} */
+  color: string;
   subtitle?: string;
   version: string;
   previous?: string;
@@ -221,14 +223,24 @@ interface AngleCardProps {
   children?: ReactNode;
 }
 
+/** An angle's name after a swatch of its colour, matching its line in the chart */
+function AngleTitle({ title, color }: { title: string; color: string }): JSX.Element {
+  return (
+    <span className="flex items-center gap-2">
+      <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+      {title}
+    </span>
+  );
+}
+
 /**
  * One angle on adoption: metrics down the side, this version and the release before across. A grid rather than a
  * table so three fit side by side: labels and notes wrap instead of scrolling.
  */
-function AngleCard({ title, subtitle, version, previous, rows, children }: AngleCardProps): JSX.Element {
+function AngleCard({ title, color, subtitle, version, previous, rows, children }: AngleCardProps): JSX.Element {
   const cell = 'border-t border-border/60 py-2';
   return (
-    <Card rounded title={title} subtitle={subtitle}>
+    <Card rounded title={<AngleTitle title={title} color={color} />} subtitle={subtitle}>
       <div className="flex flex-col gap-3">
         <div
           className={clsx(
@@ -425,7 +437,6 @@ export function VersionAdoption({
       return share == null ? null : Number(share.toFixed(2));
     });
   };
-  const color = getClientColor(client);
   const releaseDay = release?.release_date ? new Date(release.release_date * 1000).toISOString().slice(0, 10) : null;
   const peerDataNote =
     peers.dataStart !== undefined && peers.dataStart > rangeStart
@@ -461,12 +472,14 @@ export function VersionAdoption({
           {
             id: 'blocks',
             name: 'Proposed blocks',
+            accentColor: ANGLE_COLORS.blocks,
             subtitle: `On ${version} or newer, last 24h`,
             ...shareNowStat(blocksNow?.atLeast, blockPoints, window),
           },
           {
             id: 'peers',
             name: 'P2P peers',
+            accentColor: ANGLE_COLORS.peers,
             subtitle: `On ${version} or newer, ${peers.day ?? '-'}`,
             ...shareNowStat(peersNow?.atLeast, peerPoints, window, peersFromRange),
           },
@@ -475,6 +488,7 @@ export function VersionAdoption({
                 {
                   id: 'nodes',
                   name: 'Xatu nodes',
+                  accentColor: ANGLE_COLORS.xatu,
                   subtitle: `On ${version} or newer, last 24h`,
                   ...shareNowStat(xatuNowFacts?.atLeast, xatuPoints, window),
                 },
@@ -498,13 +512,20 @@ export function VersionAdoption({
               {
                 name: 'Proposed blocks',
                 data: seriesFor(blockPoints),
-                color,
+                color: ANGLE_COLORS.blocks,
                 showArea: true,
                 areaOpacity: 0.12,
               },
-              { name: 'P2P peers', data: seriesFor(peerPoints), color, lineStyle: 'dashed' },
+              { name: 'P2P peers', data: seriesFor(peerPoints), color: ANGLE_COLORS.peers, lineStyle: 'dashed' },
               ...(consensus
-                ? [{ name: 'Xatu nodes', data: seriesFor(xatuPoints), color, lineStyle: 'dotted' as const }]
+                ? [
+                    {
+                      name: 'Xatu nodes',
+                      data: seriesFor(xatuPoints),
+                      color: ANGLE_COLORS.xatu,
+                      lineStyle: 'dotted' as const,
+                    },
+                  ]
                 : []),
             ]}
             xAxis={{ type: 'category', labels: days.map(formatDailyDate), name: 'Date' }}
@@ -525,6 +546,7 @@ export function VersionAdoption({
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <AngleCard
           title="Proposed blocks"
+          color={ANGLE_COLORS.blocks}
           subtitle="Stake-weighted, shares over the last 24 hours"
           version={version}
           previous={previousVersion}
@@ -536,6 +558,7 @@ export function VersionAdoption({
         />
         <AngleCard
           title="P2P peers"
+          color={ANGLE_COLORS.peers}
           subtitle={`Node-weighted, shares on ${peers.day ?? '-'}`}
           version={version}
           previous={previousVersion}
@@ -554,6 +577,7 @@ export function VersionAdoption({
         {consensus ? (
           <AngleCard
             title="Xatu nodes"
+            color={ANGLE_COLORS.xatu}
             subtitle="Shares over the last 24 hours"
             version={version}
             previous={previousVersion}
@@ -563,7 +587,7 @@ export function VersionAdoption({
             ]}
           />
         ) : (
-          <Card rounded title="Xatu nodes">
+          <Card rounded title={<AngleTitle title="Xatu nodes" color={ANGLE_COLORS.xatu} />}>
             <p className="text-sm/6 text-muted">Xatu nodes report their consensus client&apos;s version only.</p>
           </Card>
         )}

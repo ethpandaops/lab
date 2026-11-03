@@ -5,15 +5,18 @@ import { last24hStart } from '../utils/client-versions';
 import { useVersionCounts } from './useVersionCounts';
 
 /**
- * Per client, the share of its resolved blocks in the last 24 hours on its latest release or newer (0-100). Clients
- * without resolved blocks or a known latest release are left out.
+ * Per client, the share of its resolved blocks in the last 24 hours on its latest release or newer (0-100), from
+ * an entity's blocks when one is given. Clients without resolved blocks or a known latest release are left out.
  */
-export function useLatestAdoption(latest: Map<string, DimClientRelease>): {
+export function useLatestAdoption(
+  latest: Map<string, DimClientRelease>,
+  entity?: string
+): {
   adoption: Map<string, number>;
   isLoading: boolean;
 } {
   const from = useMemo(() => last24hStart(), []);
-  const { rows, isLoading } = useVersionCounts({ grain: 'hourly', from });
+  const { rows, isLoading } = useVersionCounts({ grain: entity ? 'entity-hourly' : 'hourly', entity, from });
   const adoption = useMemo(() => {
     const totals = new Map<string, { resolved: number; onLatest: number }>();
     for (const row of rows) {
