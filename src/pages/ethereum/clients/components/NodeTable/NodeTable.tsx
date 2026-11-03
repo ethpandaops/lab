@@ -21,7 +21,7 @@ export interface NodeTableProps {
 export function NodeTable({ client, layer, nodes, releases }: NodeTableProps): JSX.Element {
   const columns: Column<FctNodeActiveLast24h>[] = [
     {
-      header: 'Node',
+      header: 'Xatu node',
       accessor: row =>
         row.node_id ? (
           <Link

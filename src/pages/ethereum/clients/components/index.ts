@@ -1,5 +1,5 @@
 export { AttestationPerformance, PerformanceHeadline, ProposerBehaviour } from './ClientBehaviour';
-export { CustodyCompliance, EnrReadiness, PeerCensus, VersionNetwork } from './Census';
+export { CustodyCompliance, EnrReadiness, PeerCensus, VersionPeers } from './Census';
 export { ClientMetricCompare } from './ClientMetricCompare';
 export { ClientFilter } from './ClientFilter';
 export { ClientHeader } from './ClientHeader';
@@ -17,6 +17,7 @@ export { ReferenceEngine } from './ReferenceEngine';
 export { ReleasesTable } from './ReleasesTable';
 export { ShareBar } from './ShareBar';
 export { ShareTable } from './ShareTable';
+export { VersionAdoption } from './VersionAdoption';
 export { VersionShareChart } from './VersionShareChart';
 export { VersionTable } from './VersionTable';
 export { PartnerPerformance, PartnerShares } from './PartnerBreakdown';

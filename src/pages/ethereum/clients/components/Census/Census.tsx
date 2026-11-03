@@ -139,7 +139,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   if (own.rows.length === 0) {
     return (
       <Card rounded title="P2P peers">
-        <p className="text-sm text-muted">The tysm P2P crawler has not seen peers running this client.</p>
+        <p className="text-sm text-muted">The tysm crawler has not seen P2P peers running this client.</p>
       </Card>
     );
   }
@@ -155,8 +155,8 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Stats
         gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
         stats={[
-          { id: 'peers', name: `Peers, ${own.day}`, value: latestPeers.toLocaleString() },
-          { id: 'share', name: `Share of ${label} peers`, value: percent(latestPeers, allPeers) },
+          { id: 'peers', name: `P2P peers, ${own.day}`, value: latestPeers.toLocaleString() },
+          { id: 'share', name: `Share of ${label} P2P peers`, value: percent(latestPeers, allPeers) },
           {
             id: 'versions',
             name: 'Versions seen',
@@ -168,7 +168,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Card
         rounded
         title="P2P peers"
-        subtitle={`Peers the tysm P2P crawler saw each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
+        subtitle={`P2P peers the tysm crawler saw each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
         actions={windowControl}
       >
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -184,7 +184,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
               },
             ]}
             xAxis={{ type: 'category', labels: days.map(([day]) => formatDailyDate(day)), name: 'Date' }}
-            yAxis={{ name: 'Peers', min: 0 }}
+            yAxis={{ name: 'P2P peers', min: 0 }}
             height={300}
             showLegend
             legendPosition="top"
@@ -193,7 +193,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
             <VersionShareChart days={versionDays} height={300} />
           ) : (
             <p className="self-center text-sm text-muted">
-              {advertised > 0 ? 'No peer runs a published release.' : 'These peers do not advertise a version.'}
+              {advertised > 0 ? 'No P2P peer runs a published release.' : 'These P2P peers do not advertise a version.'}
             </p>
           )}
         </div>
@@ -201,7 +201,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Card
         rounded
         title="Versions on the P2P network"
-        subtitle={`Peers per version their agent states on ${own.day}; Stated only counts peers whose build did not resolve to that release`}
+        subtitle={`P2P peers per version their agent states on ${own.day}; Stated only counts peers whose build did not resolve to that release`}
       >
         <Table
           variant="nested"
@@ -210,7 +210,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
           columns={[
             { header: 'Version', accessor: row => <CensusVersionLabel client={client} version={row} /> },
             {
-              header: 'Peers',
+              header: 'P2P peers',
               accessor: row => row.count.toLocaleString(),
               cellClassName: 'text-right tabular-nums text-foreground',
               headerClassName: 'text-right',
@@ -257,6 +257,57 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   );
 }
 
+/** Custody groups and QUIC of a consensus client's P2P peers, from one day's rows */
+function CustodyBuckets({ client, rows }: { client: string; rows: FctPeerCountByClClientDaily[] }): JSX.Element {
+  const known = sum(rows, row => row.custody_known_peer_count);
+  const color = getClientColor(client);
+  if (known === 0) return <p className="text-sm text-muted">No P2P peer reported its custody.</p>;
+  return (
+    <div className="flex flex-col gap-3">
+      <ShareTable
+        labelHeader="Custody"
+        labelClassName="w-40 sm:w-48"
+        countHeader="P2P peers"
+        rows={CUSTODY_BUCKETS.map(bucket => {
+          const count = sum(rows, row => row[bucket.key]);
+          return {
+            key: bucket.key,
+            label: (
+              <span className="flex flex-col">
+                <span className="text-sm/5 text-foreground">{bucket.label}</span>
+                <span className="text-xs/4 whitespace-normal text-muted">{bucket.meaning}</span>
+              </span>
+            ),
+            share: (count / known) * 100,
+            count,
+            color,
+          };
+        })}
+      />
+      <dl className="grid grid-cols-2 gap-4 border-t border-border pt-3">
+        <div>
+          <dt className="text-xs/5 text-muted">Listening on QUIC</dt>
+          <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+            {percent(
+              sum(rows, row => row.quic_listen_peer_count),
+              sum(rows, row => row.peer_count)
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs/5 text-muted">Dialled over QUIC</dt>
+          <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+            {percent(
+              sum(rows, row => row.quic_connected_peer_count),
+              sum(rows, row => row.dialled_peer_count)
+            )}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 /** Custody groups, QUIC and protocols of a consensus client's peers on one day */
 function ConsensusPeerDetail({
   client,
@@ -268,7 +319,6 @@ function ConsensusPeerDetail({
   day: string | null;
 }): JSX.Element {
   const protocols = useCensus<FctPeerProtocolByClClientDaily>(CENSUS_TABLES.clProtocol, { client_eq: client });
-  const known = sum(rows, row => row.custody_known_peer_count);
   const color = getClientColor(client);
   // Least-supported first: nearly every peer speaks the rest
   const protocolRows = [...protocols.latest]
@@ -281,57 +331,13 @@ function ConsensusPeerDetail({
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Card rounded title="Custody groups" subtitle={`Peers by the column groups they custody on ${day}`}>
-        {known === 0 ? (
-          <p className="text-sm text-muted">No peer reported its custody.</p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <ShareTable
-              labelHeader="Custody"
-              countHeader="Peers"
-              rows={CUSTODY_BUCKETS.map(bucket => {
-                const count = sum(rows, row => row[bucket.key]);
-                return {
-                  key: bucket.key,
-                  label: (
-                    <span className="flex flex-col">
-                      <span className="text-sm/5 text-foreground">{bucket.label}</span>
-                      <span className="text-xs/4 text-muted">{bucket.meaning}</span>
-                    </span>
-                  ),
-                  share: (count / known) * 100,
-                  count,
-                  color,
-                };
-              })}
-            />
-            <dl className="grid grid-cols-2 gap-4 border-t border-border pt-3">
-              <div>
-                <dt className="text-xs/5 text-muted">Listening on QUIC</dt>
-                <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                  {percent(
-                    sum(rows, row => row.quic_listen_peer_count),
-                    sum(rows, row => row.peer_count)
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs/5 text-muted">Dialled over QUIC</dt>
-                <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                  {percent(
-                    sum(rows, row => row.quic_connected_peer_count),
-                    sum(rows, row => row.dialled_peer_count)
-                  )}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        )}
+      <Card rounded title="Custody groups" subtitle={`P2P peers by the column groups they custody on ${day}`}>
+        <CustodyBuckets client={client} rows={rows} />
       </Card>
       <Card
         rounded
         title="Protocols"
-        subtitle={`Share of its peers supporting each protocol on ${protocols.day ?? day}, least supported first`}
+        subtitle={`Share of its P2P peers supporting each protocol on ${protocols.day ?? day}, least supported first`}
       >
         {protocolRows.length === 0 ? (
           <p className="text-sm text-muted">No protocols reported.</p>
@@ -339,7 +345,7 @@ function ConsensusPeerDetail({
           <ShareTable
             labelHeader="Protocol"
             labelClassName="w-44 sm:w-52"
-            countHeader="Peers"
+            countHeader="P2P peers"
             rows={protocolRows.map(row => ({
               key: row.protocol ?? '',
               label: (
@@ -383,11 +389,11 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
       <Card
         rounded
         title="Countries"
-        subtitle={`Peers by country on ${countries.day ?? '-'}; small countries roll into Other`}
+        subtitle={`P2P peers by country on ${countries.day ?? '-'}; small countries roll into Other`}
       >
         <ShareTable
           labelHeader="Country"
-          countHeader="Peers"
+          countHeader="P2P peers"
           rows={topCountries.map(row => ({
             key: row.country_code || row.country || 'other',
             label: (
@@ -405,7 +411,7 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
       <Card
         rounded
         title="Networks"
-        subtitle={`Peers by network on ${networks.day ?? '-'}; small networks roll into Smaller networks`}
+        subtitle={`P2P peers by network on ${networks.day ?? '-'}; small networks roll into Smaller networks`}
         actions={
           <span className="text-sm/6 text-muted">
             Hosting <span className="font-semibold text-foreground tabular-nums">{percent(hosting, networkTotal)}</span>
@@ -450,12 +456,12 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
 export interface EnrReadinessProps {
   client: string;
   layer: ClientLayer;
-  /** Only this version's nodes */
+  /** Only this release's ENR records; those that only state it are counted apart */
   version?: string;
 }
 
 /**
- * Whether the client's nodes found by the ENR crawl advertise the network's next fork, overall and by version.
+ * Whether the client's nodes in the ENR crawl advertise the network's next fork, overall or for one release.
  */
 export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX.Element {
   const { currentNetwork } = useNetwork();
@@ -470,11 +476,19 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
   );
   const next = upcomingFork(currentNetwork, epoch);
   const source = layer === 'consensus' ? cl : el;
-  const rows = version ? source.latest.filter(row => row.version === version) : source.latest;
-  const groups =
+  const isResolved = (row: { release_status?: string }): boolean => RESOLVED_STATUSES.has(row.release_status ?? '');
+  const rows = version ? source.latest.filter(row => row.version === version && isResolved(row)) : source.latest;
+  const statedOnly = version
+    ? sum(
+        source.latest.filter(row => row.version === version && !isResolved(row)),
+        row => row.node_count
+      )
+    : 0;
+  const groups = (
     layer === 'consensus'
       ? groupNextForkDigests(rows as FctPeerForkReadinessByClClientDaily[], next)
-      : groupForkIdNext(rows as FctPeerForkReadinessByElClientDaily[], currentNetwork);
+      : groupForkIdNext(rows as FctPeerForkReadinessByElClientDaily[], currentNetwork)
+  ).filter(group => group.count > 0);
   const total = sum(groups, group => group.count);
   const ready = sum(
     groups.filter(group => group.isNext),
@@ -486,7 +500,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
     <Card
       rounded
       title="Next fork in ENRs"
-      subtitle={`Nodes in the discovery-record (ENR) crawl${source.day ? ` on ${source.day}` : ''}, node-weighted`}
+      subtitle={`Node-weighted, from the ENR crawl${source.day ? ` on ${source.day}` : ''}`}
       actions={
         next && (
           <Link
@@ -503,13 +517,13 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
         <LoadingContainer className="h-40 rounded-sm" />
       ) : total === 0 ? (
         <p className="text-sm text-muted">
-          The crawl found no nodes running {version ? 'this version' : 'this client'}.
+          No ENR record in the crawl runs {version ? 'this version' : 'this client'}.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
           <dl className="grid grid-cols-2 gap-4">
             <div>
-              <dt className="text-xs/5 text-muted">Nodes found</dt>
+              <dt className="text-xs/5 text-muted">Nodes in the ENR crawl</dt>
               <dd className="text-sm/6 font-semibold text-foreground tabular-nums">{total.toLocaleString()}</dd>
             </div>
             <div>
@@ -521,7 +535,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
           </dl>
           <ShareTable
             labelHeader="Next fork"
-            countHeader="Nodes"
+            countHeader="Records"
             rows={groups.map(group => ({
               key: group.label,
               label: (
@@ -535,6 +549,12 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
             }))}
           />
         </div>
+      )}
+      {statedOnly > 0 && (
+        <p className="mt-3 text-xs/5 text-muted">
+          Also stated by {statedOnly.toLocaleString()} ENR {statedOnly === 1 ? 'record' : 'records'} without a matching
+          commit
+        </p>
       )}
     </Card>
   );
@@ -636,98 +656,79 @@ export function CustodyCompliance({ client, from, windowControl }: CustodyCompli
   );
 }
 
-/** Peers on a version and their share of the client's peers on one day's rows */
-function versionPeers(rows: FctPeerCountByElClientDaily[], version: string): { peers: number; share: number | null } {
-  const total = sum(rows, row => row.peer_count);
-  const peers = sum(
-    rows.filter(row => row.version === version),
-    row => row.peer_count
-  );
-  return { peers, share: total > 0 ? (peers / total) * 100 : null };
-}
-
-/**
- * One version on the network: its share of the client's P2P peers on the range's last full day with the change
- * since its first, and whether its ENR nodes advertise the next fork.
- */
-export function VersionNetwork({
-  client,
-  layer,
-  version,
-  from,
-  window,
-}: {
+export interface VersionPeersProps {
   client: string;
   layer: ClientLayer;
   version: string;
-  /** Start of the page's range (unix seconds) */
-  from: number;
-  /** The range as it reads in copy, e.g. 30d */
-  window: string;
-}): JSX.Element {
-  const table = layer === 'consensus' ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers;
-  const own = useCensus<FctPeerCountByElClientDaily>(table, { client_eq: client }, from);
-  const total = sum(own.latest, row => row.peer_count);
-  const { peers: onVersion } = versionPeers(own.latest, version);
-  const change = useMemo(() => {
-    const firstDay = own.rows.reduce<string | null>(
-      (first, row) => (row.day_start_date && (!first || row.day_start_date < first) ? row.day_start_date : first),
-      null
-    );
-    if (!firstDay || firstDay === own.day) return null;
-    const start = versionPeers(
-      own.rows.filter(row => row.day_start_date === firstDay),
-      version
-    );
-    const end = versionPeers(own.latest, version);
-    const points = start.share !== null && end.share !== null ? Math.round((end.share - start.share) * 10) / 10 : null;
-    return { peers: end.peers - start.peers, points };
-  }, [own.rows, own.latest, own.day, version]);
-  const signed = (value: number, digits = 0): string => `${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
+  /** More cards for the grid */
+  children?: ReactNode;
+}
+
+/**
+ * One release on the P2P network on the latest full day: for consensus clients, the custody, QUIC and latency of
+ * the P2P peers whose build resolved to it, and the next fork its ENR records advertise. Countries and networks are
+ * only counted per client, so they link to the client's Network tab.
+ */
+export function VersionPeers({ client, layer, version, children }: VersionPeersProps): JSX.Element {
+  const own = useCensus<FctPeerCountByClClientDaily>(
+    CENSUS_TABLES.clPeers,
+    layer === 'consensus' ? { client_eq: client } : null
+  );
+  const rows = own.latest.filter(row => row.version === version && RESOLVED_STATUSES.has(row.release_status ?? ''));
+  // Percentiles do not add up across rows, so the version's latency is that of its largest row
+  const largest = [...rows].sort((a, b) => (b.peer_count ?? 0) - (a.peer_count ?? 0))[0];
 
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <Card
-        rounded
-        title="P2P peers on this version"
-        subtitle={`Seen by the tysm P2P crawler on ${own.day ?? '-'}, node-weighted`}
-      >
-        {own.isLoading ? (
-          <LoadingContainer className="h-24 rounded-sm" />
-        ) : total === 0 ? (
-          <p className="text-sm text-muted">The tysm P2P crawler has not seen peers running this client.</p>
-        ) : (
-          <dl className="grid grid-cols-2 gap-4">
-            <div>
-              <dt className="text-xs/5 text-muted">Peers</dt>
-              <dd className="flex items-baseline gap-2">
-                <span className="text-2xl/8 font-semibold text-foreground tabular-nums">
-                  {onVersion.toLocaleString()}
-                </span>
-                {change && (
-                  <span className="text-xs text-muted tabular-nums">
-                    {signed(change.peers)} over {window}
-                  </span>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs/5 text-muted">Share of the client&apos;s peers</dt>
-              <dd className="flex items-baseline gap-2">
-                <span className="text-2xl/8 font-semibold text-foreground tabular-nums">
-                  {percent(onVersion, total)}
-                </span>
-                {change?.points != null && (
-                  <span className="text-xs text-muted tabular-nums">
-                    {signed(change.points, 1)} pts over {window}
-                  </span>
-                )}
-              </dd>
-            </div>
-          </dl>
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        {layer === 'consensus' && (
+          <Card
+            rounded
+            title="Custody and connections"
+            subtitle={`P2P peers on this version the tysm crawler saw on ${own.day ?? '-'}`}
+          >
+            {own.isLoading ? (
+              <LoadingContainer className="h-40 rounded-sm" />
+            ) : rows.length === 0 ? (
+              <p className="text-sm text-muted">The tysm crawler saw no P2P peer on this version.</p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <dl className="grid grid-cols-3 gap-4">
+                  <div>
+                    <dt className="text-xs/5 text-muted">P2P peers</dt>
+                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+                      {sum(rows, row => row.peer_count).toLocaleString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs/5 text-muted">Latency p50</dt>
+                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+                      {ms(largest?.latency_p50_ms)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs/5 text-muted">Latency p90</dt>
+                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+                      {ms(largest?.latency_p90_ms)}
+                    </dd>
+                  </div>
+                </dl>
+                <CustodyBuckets client={client} rows={rows} />
+              </div>
+            )}
+          </Card>
         )}
-      </Card>
-      <EnrReadiness client={client} layer={layer} version={version} />
+        <EnrReadiness client={client} layer={layer} version={version} />
+        {children}
+      </div>
+      <Link
+        to="/ethereum/clients/$client"
+        params={{ client }}
+        search={{ tab: 'network' }}
+        className="self-start text-sm text-primary hover:underline"
+      >
+        Countries and networks of all {formatClientName(client)} P2P peers
+      </Link>
     </div>
   );
 }

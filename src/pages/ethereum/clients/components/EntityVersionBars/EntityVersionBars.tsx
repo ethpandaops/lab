@@ -203,9 +203,11 @@ export function EntityVersionBars({
           <p className="text-sm text-muted">No entity matches.</p>
         ) : (
           <div className="flex flex-col gap-1">
-            <div className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem] items-center gap-3 text-xs/5 text-muted">
+            <div className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_3.5rem_4rem] items-center gap-3 text-xs/5 text-muted sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]">
               <span>Entity</span>
-              <span>{scale === 'mix' ? 'Share of its blocks by version' : 'Blocks by version'}</span>
+              <span className="truncate">
+                {scale === 'mix' ? 'Share of its blocks by version' : 'Blocks by version'}
+              </span>
               <span className="text-right">Blocks</span>
               <span className="text-right">
                 {focusVersion && sort === 'focus' ? `On ${focusVersion}` : 'On latest'}
@@ -216,7 +218,7 @@ export function EntityVersionBars({
               return (
                 <div
                   key={row.entity}
-                  className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem] items-center gap-3 rounded-xs py-0.5 hover:bg-muted/10"
+                  className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_3.5rem_4rem] items-center gap-3 rounded-xs py-0.5 hover:bg-muted/10 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]"
                 >
                   <Link
                     to="/ethereum/entities/$entity"

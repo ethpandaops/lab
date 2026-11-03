@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
+import { adoptionByDay, countVersionsByDay } from './client-versions';
 import {
+  censusVersionCounts,
   censusVersions,
   forkIdNextLabel,
   groupForkIdNext,
@@ -47,6 +49,24 @@ describe('censusVersions', () => {
       { version: 'v8.3.2', resolved: true, untagged: 2, statedOnly: 1, count: 8 },
       { version: 'v9.9.9', resolved: false, untagged: 0, statedOnly: 3, count: 3 },
     ]);
+  });
+});
+
+describe('censusVersionCounts', () => {
+  it('should keep peers that only state a release out of its share', () => {
+    const rows = [
+      { day_start_date: '2026-11-02', version: 'v1.16.7', release_status: 'commit_match', peer_count: 40 },
+      { day_start_date: '2026-11-02', version: 'v1.16.7', release_status: 'commit_unmatched', peer_count: 900 },
+      { day_start_date: '2026-11-02', version: 'v1.17.10', release_status: 'commit_match', peer_count: 50 },
+      { day_start_date: '2026-11-02', version: 'v1.17.10', release_status: 'version_match', peer_count: 10 },
+      { day_start_date: '2026-11-02', version: '', release_status: 'none', peer_count: 500 },
+    ];
+    const counts = censusVersionCounts(rows, row => row.peer_count);
+    expect(counts.filter(row => row.stated === 'v1.16.7').map(row => row.count)).toEqual([900]);
+    const [day] = adoptionByDay(countVersionsByDay(counts), 'v1.16.7');
+    // 40 of the 100 resolved peers, not 940 of 1000
+    expect(day.exact).toBeCloseTo(40);
+    expect(day.atLeast).toBeCloseTo(100);
   });
 });
 

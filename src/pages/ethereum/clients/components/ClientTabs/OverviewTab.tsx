@@ -158,7 +158,8 @@ export function OverviewTab({
                   id: 'nodes',
                   name: 'Xatu nodes',
                   value: nodes.length.toLocaleString(),
-                  subtitle: nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest` : undefined,
+                  subtitle:
+                    nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest, last 24h` : 'Last 24h',
                 },
               ]
             : []),

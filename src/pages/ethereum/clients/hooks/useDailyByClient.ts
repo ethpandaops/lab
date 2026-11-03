@@ -26,17 +26,19 @@ function combine<T>(results: Array<UseQueryResult<T[]>>): Omit<UseDailyByClientR
 }
 
 /**
- * Every row of a daily table matching `filters` over a window, or all its history, in cached chunks. Pass null
- * filters to skip loading.
+ * Every row of a daily table matching `filters` over a window, or all its history, in cached chunks. The window
+ * ends now unless `to` (exclusive) is earlier. Pass null filters to skip loading.
  */
 export function useDailyByClient<T extends { day_start_date?: string }>(
   list: ListFn,
   dataKey: string,
   filters: Record<string, unknown> | null,
-  from: number | undefined
+  from: number | undefined,
+  to?: number
 ): UseDailyByClientResult<T> {
   const { currentNetwork } = useNetwork();
-  const end = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const now = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const end = to !== undefined && to < now ? to : now;
   // Start no earlier than the table's data, which may not reach back to genesis
   const bounds = useTableBounds(dataKey);
   const dataStart = bounds.data?.min;

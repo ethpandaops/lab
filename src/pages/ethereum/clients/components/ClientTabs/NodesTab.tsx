@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
+import { InfoBox } from '@/components/Feedback/InfoBox';
 import { getClientColor } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
 import { displayVersion } from '../../utils/client-versions';
@@ -44,10 +45,13 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
 
   return (
     <div className="flex flex-col gap-6">
+      <InfoBox summary="What Xatu nodes are">
+        Nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
+      </InfoBox>
       <Stats
         gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"
         stats={[
-          { id: 'nodes', name: 'Nodes, last 24h', value: nodes.length.toLocaleString() },
+          { id: 'nodes', name: 'Xatu nodes, last 24h', value: nodes.length.toLocaleString() },
           { id: 'contributors', name: 'Contributors', value: contributors.toLocaleString() },
           { id: 'countries', name: 'Countries', value: countries.toLocaleString() },
           {
@@ -71,7 +75,7 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
             <Card rounded title="Versions on Xatu nodes">
               <ShareTable
                 labelHeader="Version"
-                countHeader="Nodes"
+                countHeader="Xatu nodes"
                 rows={versions.map(row => ({
                   key: row.version,
                   label: isReleased(row.version) ? (
@@ -94,10 +98,10 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
           )}
           <Card
             rounded
-            title="Nodes"
+            title="Xatu nodes"
             actions={
               <Link to="/xatu/nodes" className="text-sm text-primary hover:underline">
-                All nodes
+                All Xatu nodes
               </Link>
             }
           >

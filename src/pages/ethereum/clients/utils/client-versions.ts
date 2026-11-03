@@ -248,13 +248,17 @@ export function blocksToVersionCounts(rows: IntBlockGraffitiRelease[], layer: Cl
  */
 export function sinceSuffix(dataStart: number | undefined, from: number | undefined): string {
   if (dataStart === undefined || (from !== undefined && from >= dataStart)) return '';
-  const date = new Date(dataStart * 1000).toLocaleDateString('en-GB', {
+  return `, since ${formatDataDate(dataStart)}`;
+}
+
+/** A table's first day of data as it reads in copy, e.g. "23 Feb 2026" */
+export function formatDataDate(seconds: number): string {
+  return new Date(seconds * 1000).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
     timeZone: 'UTC',
   });
-  return `, since ${date}`;
 }
 
 /** Start (unix seconds, UTC midnight) of a window of `days` whole days ending today */
@@ -583,6 +587,36 @@ export function timeToAdoption(
   return { status: 'not-reached' };
 }
 
+/**
+ * Time from release until `threshold` (0-100) of a day's resolved count ran the release or newer, from daily
+ * counts: the end of the first such day on or after the release day, so it is an upper bound to the day. Days
+ * starting at or after `until` are not checked.
+ */
+export function timeToDailyAdoption(
+  days: VersionDay[],
+  version: string,
+  releaseTime: number,
+  threshold: number,
+  until: number = Infinity
+): AdoptionLag {
+  const counted = days.filter(day => day.resolved > 0);
+  const releaseDay = new Date(releaseTime * 1000).toISOString().slice(0, 10);
+  if (counted.length === 0 || counted[0].day > releaseDay) return { status: 'out-of-window' };
+  for (const day of counted) {
+    const start = Date.parse(`${day.day}T00:00:00Z`) / 1000;
+    if (day.day < releaseDay) continue;
+    if (start >= until) break;
+    let atLeast = 0;
+    for (const [candidate, count] of day.counts) {
+      if (compareVersions(candidate, version) >= 0) atLeast += count;
+    }
+    if ((atLeast / day.resolved) * 100 >= threshold) {
+      return { status: 'reached', seconds: Math.max(0, start + 86400 - releaseTime) };
+    }
+  }
+  return { status: 'not-reached' };
+}
+
 /** Shares of stake at which one client's bug changes what the chain can do, drawn as faint ticks on share bars */
 export const DIVERSITY_THRESHOLDS = [{ share: 100 / 3 }, { share: 50 }, { share: 200 / 3 }] as const;
 
@@ -775,4 +809,12 @@ export function formatLag(seconds: number): string {
   if (hours < 48) return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
   const days = Math.round(seconds / 86400);
   return `${days} days`;
+}
+
+/**
+ * Duration for an adoption lag measured from daily counts, in whole days rounded up, e.g. "1 day" or "6 days".
+ */
+export function formatDayLag(seconds: number): string {
+  const days = Math.max(1, Math.ceil(seconds / 86400));
+  return `${days} ${days === 1 ? 'day' : 'days'}`;
 }

@@ -29,15 +29,16 @@ export function ShareTable({ rows, labelHeader, countHeader, labelClassName = 'w
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-3 text-xs/5 text-muted">
-        <span className={clsx(labelClassName, 'shrink-0')}>{labelHeader}</span>
-        <span className="flex-1" />
+        <span className={clsx(labelClassName, 'min-w-0 truncate')}>{labelHeader}</span>
+        <span className="min-w-12 flex-1" />
         <span className="w-14 shrink-0 text-right">Share</span>
         <span className="w-16 shrink-0 text-right">{countHeader}</span>
       </div>
       {rows.map(row => (
         <div key={row.key} className="flex items-center gap-3">
-          <span className={clsx(labelClassName, 'shrink-0 truncate')}>{row.label}</span>
-          <span className="flex-1">
+          {/* The label gives way before the bar on narrow screens */}
+          <span className={clsx(labelClassName, 'min-w-0 truncate')}>{row.label}</span>
+          <span className="min-w-12 flex-1">
             <ShareBar share={row.share} color={row.color} showThresholds={false} />
           </span>
           <span className="w-14 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">

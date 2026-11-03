@@ -21,6 +21,7 @@ import {
   summariseBuildLines,
   summariseUnresolved,
   timeToAdoption,
+  timeToDailyAdoption,
   type ClientRelease,
   type VersionCount,
   type VersionDay,
@@ -196,6 +197,48 @@ describe('timeToAdoption', () => {
   it('should report out of window when blocks start after the release', () => {
     const late = series(72, 0).filter(b => b.time > releaseTime + 2 * 3600);
     expect(timeToAdoption(late, 'v8.3.1', releaseTime, 50)).toEqual({ status: 'out-of-window' });
+  });
+});
+
+describe('timeToDailyAdoption', () => {
+  const dayOf = (day: string, counts: Record<string, number>): VersionDay => ({
+    day,
+    resolved: Object.values(counts).reduce((total, count) => total + count, 0),
+    unresolved: 0,
+    counts: new Map(Object.entries(counts)),
+  });
+  // Released at 18:00 on 2 Nov
+  const releaseTime = Date.parse('2026-11-02T18:00:00Z') / 1000;
+  const days = [
+    dayOf('2026-11-01', { 'v8.3.1': 100 }),
+    dayOf('2026-11-02', { 'v8.3.1': 90, 'v8.3.2': 10 }),
+    dayOf('2026-11-03', { 'v8.3.1': 60, 'v8.3.2': 30, 'v8.4.0': 10 }),
+    dayOf('2026-11-04', { 'v8.3.1': 5, 'v8.3.2': 95 }),
+  ];
+
+  it('should measure to the end of the first day the share or newer crosses the threshold', () => {
+    // 3 Nov: 40% on it or newer; 4 Nov: 95%, so 50% is reached by the end of 4 Nov
+    expect(timeToDailyAdoption(days, 'v8.3.2', releaseTime, 50)).toEqual({
+      status: 'reached',
+      seconds: Date.parse('2026-11-05T00:00:00Z') / 1000 - releaseTime,
+    });
+    // Newer versions count: 3 Nov has 40% on v8.3.2 or newer, not the 30% on exactly it
+    expect(timeToDailyAdoption(days, 'v8.3.2', releaseTime, 40)).toEqual({
+      status: 'reached',
+      seconds: Date.parse('2026-11-04T00:00:00Z') / 1000 - releaseTime,
+    });
+  });
+
+  it('should skip days before the release and stop at the horizon', () => {
+    // The previous release is on every block before; checked from its release day only
+    expect(timeToDailyAdoption(days, 'v8.3.1', Date.parse('2026-11-01T12:00:00Z') / 1000, 90).status).toBe('reached');
+    expect(timeToDailyAdoption(days, 'v8.3.2', releaseTime, 90, Date.parse('2026-11-04T00:00:00Z') / 1000)).toEqual({
+      status: 'not-reached',
+    });
+  });
+
+  it('should report out of window when the counts start after the release day', () => {
+    expect(timeToDailyAdoption(days.slice(2), 'v8.3.2', releaseTime, 50)).toEqual({ status: 'out-of-window' });
   });
 });
 
