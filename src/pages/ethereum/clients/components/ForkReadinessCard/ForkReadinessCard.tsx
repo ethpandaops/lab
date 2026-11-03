@@ -1,4 +1,4 @@
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
@@ -6,6 +6,7 @@ import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { meetsMinVersion } from '@/utils/version';
 import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
 import { useCensus } from '../../hooks/useCensus';
+import { ANGLE_COLORS } from '../../utils/angle-colors';
 import { sum } from '../../utils/census';
 import type { ClientLayer } from '../../utils/client-share';
 import { displayVersion, type VersionCount } from '../../utils/client-versions';
@@ -24,6 +25,16 @@ export interface ForkReadinessCardProps {
   releases: DimClientRelease[];
   /** Version the page is about, checked against the minimum */
   version?: string;
+}
+
+/** A readiness label after a swatch of its angle's colour */
+function AngleLabel({ color, children }: { color: string; children: ReactNode }): JSX.Element {
+  return (
+    <dt className="flex items-start gap-1.5 text-xs/5 text-muted">
+      <span aria-hidden className="mt-1.5 size-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+      <span>{children}</span>
+    </dt>
+  );
 }
 
 /** Formats a share, or a dash when nothing was counted */
@@ -107,13 +118,15 @@ export function ForkReadinessCard({
           </div>
         )}
         <div>
-          <dt className="text-xs/5 text-muted">Blocks on a ready version, last 24h</dt>
+          <AngleLabel color={ANGLE_COLORS.blocks}>Blocks on a ready version, last 24h</AngleLabel>
           <dd className="text-sm/6 font-medium text-foreground tabular-nums">
             {formatShare(readyBlocks, recentTotal)}
           </dd>
         </div>
         <div>
-          <dt className="text-xs/5 text-muted">P2P peers on a ready version{peers.day ? `, ${peers.day}` : ''}</dt>
+          <AngleLabel color={ANGLE_COLORS.peers}>
+            P2P peers on a ready version{peers.day ? `, ${peers.day}` : ''}
+          </AngleLabel>
           <dd className="text-sm/6 font-medium text-foreground tabular-nums">
             {peers.isLoading
               ? '…'
@@ -124,7 +137,7 @@ export function ForkReadinessCard({
           </dd>
         </div>
         <div>
-          <dt className="text-xs/5 text-muted">Xatu nodes on a ready version, last 24h</dt>
+          <AngleLabel color={ANGLE_COLORS.xatu}>Xatu nodes on a ready version, last 24h</AngleLabel>
           <dd className="text-sm/6 font-medium text-foreground tabular-nums">
             {layer === 'consensus' ? formatShare(readyNodes, countedNodes.length) : '-'}
           </dd>

@@ -37,6 +37,7 @@ import {
   formatClientName,
   summariseClients,
   summarisePairs,
+  unfilteredNote,
   type ClientFilters,
   type ClientLayer,
 } from './utils/client-share';
@@ -95,7 +96,7 @@ export function IndexPage(): JSX.Element {
   const { records, keys, isDaily, since, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
-  const { adoption } = useLatestAdoption(latestReleases);
+  const { adoption } = useLatestAdoption(latestReleases, entity);
   const peerFrom = useMemo(() => {
     const days = TIME_RANGE_CONFIG[timePeriod].days;
     // 0 loads the census from its first day; undefined would load only the latest days
@@ -268,6 +269,9 @@ export function IndexPage(): JSX.Element {
                 xatuNodes={nodeCounts}
                 latestReleases={latestReleases}
                 latestAdoption={adoption}
+                unfilteredNote={unfilteredNote('consensus', entity, filters)}
+                hideLatestAdoption={!!filters.executionClient}
+                adoptionScope={entity ? `from ${entityLabel(entity)}` : undefined}
               />
               <LayerClients
                 layer="execution"
@@ -281,6 +285,9 @@ export function IndexPage(): JSX.Element {
                 peersLoading={elPeers.isLoading}
                 latestReleases={latestReleases}
                 latestAdoption={adoption}
+                unfilteredNote={unfilteredNote('execution', entity, filters)}
+                hideLatestAdoption={!!filters.consensusClient}
+                adoptionScope={entity ? `from ${entityLabel(entity)}` : undefined}
               />
               <ClientPairs
                 pairs={pairs}

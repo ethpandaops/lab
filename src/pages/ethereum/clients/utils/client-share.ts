@@ -394,3 +394,28 @@ export function partnerRows(
     .sort((a, b) => b.blocks - a.blocks || b.addresses - a.addresses || a.client.localeCompare(b.client));
   return { rows, unnamedBlocks };
 }
+
+/**
+ * Why a layer's P2P peers, Xatu nodes and On latest columns are left out under the page's filters, or undefined when
+ * they all follow them. P2P peers and Xatu nodes carry their own client but no entity and no client of the other
+ * layer, and the version counts behind On latest carry no client of the other layer.
+ */
+export function unfilteredNote(
+  layer: ClientLayer,
+  entity: string | undefined,
+  filters: ClientFilters
+): string | undefined {
+  const other = layer === 'consensus' ? filters.executionClient : filters.consensusClient;
+  const otherLabel = layer === 'consensus' ? 'execution client' : 'consensus client';
+  const angles = layer === 'consensus' ? ['P2P peers', 'Xatu nodes'] : ['P2P peers'];
+  const list = (items: string[]): string =>
+    items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0];
+  if (entity && other) {
+    return `${list(angles)} can't be attributed to an entity, and On latest can't be split by ${otherLabel}; clear those filters to compare.`;
+  }
+  if (entity) return `${list(angles)} can't be attributed to an entity; clear the entity filter to compare.`;
+  if (other) {
+    return `${list([...angles, 'On latest'])} can't be split by ${otherLabel}; clear the ${otherLabel} filter to compare.`;
+  }
+  return undefined;
+}

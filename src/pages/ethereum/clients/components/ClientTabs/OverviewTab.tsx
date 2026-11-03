@@ -6,7 +6,6 @@ import { Table } from '@/components/Lists/Table';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
-import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
@@ -14,6 +13,7 @@ import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLI
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useCensus, useClientCounts } from '../../hooks';
 import { CENSUS_TABLES } from '../../api/client-models';
+import { ANGLE_COLORS } from '../../utils/angle-colors';
 import { peerShareChart, unifiedClientRows } from '../../utils/census';
 import { clientOf, summariseClients } from '../../utils/client-share';
 import { displayVersion, windowStart } from '../../utils/client-versions';
@@ -77,11 +77,10 @@ export function OverviewTab({
     const mine = peerDays.series.find(series => series.name === formatClientName(client));
     const peerByDay = new Map(peerDays.days.map((day, i) => [day, mine?.data[i] ?? 0]));
     const days = [...new Set([...counts.keys, ...peerDays.days])].sort();
-    const color = getClientColor(client);
     const series: SeriesData[] = [
       {
         name: 'Proposed blocks',
-        color,
+        color: ANGLE_COLORS.blocks,
         showArea: true,
         areaOpacity: 0.15,
         showSymbol: false,
@@ -94,7 +93,7 @@ export function OverviewTab({
     if (peerByDay.size > 0) {
       series.push({
         name: 'P2P peers',
-        color,
+        color: ANGLE_COLORS.peers,
         lineStyle: 'dashed',
         showSymbol: peerByDay.size < 30,
         data: days.map(day => (peerByDay.has(day) ? Number((peerByDay.get(day) as number).toFixed(2)) : null)),
@@ -138,11 +137,12 @@ export function OverviewTab({
             name: 'Proposed blocks',
             subtitle: `Share, ${windowText}`,
             value: shareText(blockShare),
-            accentColor: getClientColor(client),
+            accentColor: ANGLE_COLORS.blocks,
           },
           {
             id: 'peers',
             name: 'P2P peers',
+            accentColor: ANGLE_COLORS.peers,
             subtitle: peers.day ? `Share on ${peers.day}` : undefined,
             value: peers.isLoading ? '…' : shareText(peerShare),
           },
@@ -157,6 +157,7 @@ export function OverviewTab({
                 {
                   id: 'nodes',
                   name: 'Xatu nodes',
+                  accentColor: ANGLE_COLORS.xatu,
                   value: nodes.length.toLocaleString(),
                   subtitle:
                     nodes.length > 0 ? `${percent(nodesOnLatest, nodes.length)} on latest, last 24h` : 'Last 24h',

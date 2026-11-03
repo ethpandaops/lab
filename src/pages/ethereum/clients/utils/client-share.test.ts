@@ -15,6 +15,7 @@ import {
   toClientCountRecords,
   toEntityOptions,
   type ClientCountRecord,
+  unfilteredNote,
 } from './client-share';
 
 const records: ClientCountRecord[] = [
@@ -216,5 +217,25 @@ describe('partnerRows', () => {
       [{ consensus_client: 'teku', execution_client: 'geth', ip_count: 2 }]
     );
     expect(rows.map(row => [row.client, row.blockShare, row.addressShare])).toEqual([['teku', 100, 100]]);
+  });
+});
+
+describe('unfilteredNote', () => {
+  it('should leave P2P peers and Xatu nodes in only when every filter applies to them', () => {
+    // A layer's own client filter is skipped for its rows, so its peers still match its blocks
+    expect(unfilteredNote('consensus', undefined, { consensusClient: 'lighthouse' })).toBeUndefined();
+    expect(unfilteredNote('execution', undefined, { executionClient: 'geth' })).toBeUndefined();
+    // No peer or Xatu node carries an entity
+    expect(unfilteredNote('consensus', 'coinbase', {})).toBe(
+      "P2P peers and Xatu nodes can't be attributed to an entity; clear the entity filter to compare."
+    );
+    expect(unfilteredNote('execution', 'coinbase', { executionClient: 'geth' })).toBe(
+      "P2P peers can't be attributed to an entity; clear the entity filter to compare."
+    );
+    // Nor a client of the other layer, which On latest's version counts lack too
+    expect(unfilteredNote('consensus', undefined, { executionClient: 'geth' })).toBe(
+      "P2P peers, Xatu nodes and On latest can't be split by execution client; clear the execution client filter to compare."
+    );
+    expect(unfilteredNote('execution', 'coinbase', { consensusClient: 'prysm' })).toMatch(/entity, and On latest/);
   });
 });
