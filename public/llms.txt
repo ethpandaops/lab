@@ -1,0 +1,25 @@
+# The Lab
+
+> The Lab (https://lab.ethpandaops.io) is ethPandaOps' Ethereum network analytics site. Its pages are a client-side app, so fetching a page URL returns no data. Every number on the site comes from a public, read-only HTTP API on the same host, with no key.
+
+The API describes itself. Use these endpoints to find what data exists, what each field means and how to query it.
+
+## Discover
+
+- [Networks](https://lab.ethpandaops.io/api/v1/config): JSON listing every network the API serves (`networks[].name`) with its genesis time and fork schedule. Use the name as `{network}` below.
+- [OpenAPI spec](https://lab.ethpandaops.io/api/v1/mainnet/openapi.yaml): an OpenAPI 3 YAML spec per network, at `/api/v1/{network}/openapi.yaml`. It lists every endpoint with its fields, their descriptions and every filter it accepts. It is large (around 10 MB); download it once and search it rather than reading it whole.
+- [Coverage](https://lab.ethpandaops.io/api/v1/mainnet/bounds): JSON at `/api/v1/{network}/bounds` giving the `min` and `max` processed position of each table. A position is a unix timestamp or a block number, depending on the table. Data outside that range has not been processed yet, which is not the same as it not having happened.
+
+## Query
+
+- Endpoints are `GET /api/v1/{network}/{table}` and return JSON.
+- Filters are query parameters named `<field>_<operator>`, as listed per endpoint in the spec.
+- Parameters marked `x-required-group: primary_key` in the spec are mandatory: send at least one of them, or the API answers `{"code":3,"message":"primary key field <field> is required"}`.
+- `page_size`, `page_token` and `order_by` control paging and order; each response's `next_page_token` fetches the next page.
+- Read the error messages; they say what is missing or invalid.
+- Please keep requests bounded with filters and reasonable page sizes.
+
+## More
+
+- [panda](https://github.com/ethpandaops/panda): ethPandaOps' CLI and MCP server for querying the underlying ClickHouse, Prometheus and Loki data directly, beyond what the Lab API exposes.
+- [Source](https://github.com/ethpandaops/lab): the Lab frontend. The API is served by [cbt-api](https://github.com/ethpandaops/cbt-api) over tables built by [xatu-cbt](https://github.com/ethpandaops/xatu-cbt).
