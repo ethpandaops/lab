@@ -35,7 +35,7 @@ const TAB_LABELS: Record<(typeof CLIENT_TABS)[number], string> = {
   proposers: 'Proposers',
   pairings: 'Pairings',
   network: 'Network',
-  nodes: 'Nodes',
+  nodes: 'Xatu nodes',
   performance: 'Performance',
   releases: 'Releases',
 };
@@ -159,6 +159,7 @@ export function ClientPage(): JSX.Element {
 
         {search.fork && (
           <ForkReadinessCard
+            client={client}
             layer={layer}
             fork={search.fork}
             requirement={requirement}

@@ -104,14 +104,16 @@ export function LayerClients({
       <div>
         <dt className="inline font-medium text-foreground">P2P peers: </dt>
         <dd className="inline">
-          share of the {peerTotal.toLocaleString()} {label} peers the tysm P2P crawler saw on {peerDay ?? '-'} that
+          share of the {peerTotal.toLocaleString()} {label} P2P peers the tysm crawler saw on {peerDay ?? '-'} that
           advertised an agent. Agents that are not {label} clients count as Other.
         </dd>
       </div>
       {xatuNodes && (
         <div>
           <dt className="inline font-medium text-foreground">Xatu nodes: </dt>
-          <dd className="inline">contributor nodes active in the last 24 hours.</dd>
+          <dd className="inline">
+            nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
+          </dd>
         </div>
       )}
       <div>
@@ -229,7 +231,7 @@ export function LayerClients({
         </PopoutCard>
         <PopoutCard
           title="P2P peers over time"
-          subtitle={`Daily share of ${label} peers with an agent`}
+          subtitle={`Daily share of ${label} P2P peers with an agent`}
           anchorId={`${layer}-peer-share`}
           modalSize="full"
         >

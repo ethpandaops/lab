@@ -22,7 +22,7 @@ export interface ReleasesTableProps {
 }
 
 /**
- * Every published release, newest first, with how many blocks and nodes run it.
+ * Every published release, newest first, with how many blocks and Xatu nodes run it.
  */
 export function ReleasesTable({
   client,

@@ -33,7 +33,7 @@ export function ReleasesTab({
     [blockCounts.rows]
   );
   const nodeDays = useNodeVersions(client, days, layer === 'consensus');
-  // Distinct nodes that reported each version on any day of the window
+  // Distinct Xatu nodes that reported each version on any day of the window
   const nodesByVersion = useMemo(() => {
     const nodeIds = new Map<string, Set<string>>();
     for (const row of nodeDays.rows) {

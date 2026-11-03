@@ -4,7 +4,7 @@ import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS, getClientColor } from '@/utils/et
 import { formatClientName } from '@/utils/graffiti';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { OTHER_VERSION_COLOR } from './client-versions';
+import { OTHER_VERSION_COLOR, type VersionCount } from './client-versions';
 import { RESOLVED_STATUSES } from '../api/client-models';
 import type { ClientLayer, ClientSummary } from './client-share';
 
@@ -57,6 +57,29 @@ export function censusVersions<T extends { version?: string; release_status?: st
     byVersion.set(version, entry);
   }
   return [...byVersion.values()].filter(entry => entry.count > 0).sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Census rows as version counts for adoption: a row counts under its release only when its commit or version
+ * string resolved to it. Rows that only state a version keep it as `stated`, outside every release's share.
+ */
+export function censusVersionCounts<T extends { day_start_date?: string; version?: string; release_status?: string }>(
+  rows: T[],
+  count: (row: T) => number | undefined
+): VersionCount[] {
+  return rows
+    .filter(row => row.day_start_date && (count(row) ?? 0) > 0)
+    .map(row => {
+      const resolved = RESOLVED_STATUSES.has(row.release_status ?? '') && !!row.version;
+      return {
+        time: Date.parse(`${row.day_start_date}T00:00:00Z`) / 1000,
+        day: row.day_start_date!,
+        version: resolved ? row.version! : null,
+        status: row.release_status || 'none',
+        stated: resolved ? undefined : row.version || undefined,
+        count: count(row) ?? 0,
+      };
+    });
 }
 
 /** Label of a network_type value */

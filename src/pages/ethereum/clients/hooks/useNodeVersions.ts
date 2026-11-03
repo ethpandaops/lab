@@ -34,19 +34,22 @@ function combine(results: Array<UseQueryResult<FctHeadFirstSeenByNodeDaily[]>>):
 }
 
 /**
- * Consensus versions Xatu nodes running the client reported each day over the last `days` UTC days, or all history
- * when `days` is null. Every node that sees heads is in the daily head table, so it lists the same nodes as the
- * active node list, per day. Long windows load a query per calendar year, and past years stay cached.
+ * Consensus versions Xatu nodes running the client reported each day over the last `days` UTC days, all history
+ * when `days` is null, or the days of `span` when given. Every node that sees heads is in the daily head table, so
+ * it lists the same nodes as the active node list, per day. Long windows load a query per calendar year, and past
+ * years stay cached.
  */
 export function useNodeVersions(
   client: string | undefined,
   days: number | null,
-  enabled: boolean
+  enabled: boolean,
+  span?: { from: number; to: number }
 ): UseNodeVersionsResult {
   const { currentNetwork } = useNetwork();
-  const from = days === null ? undefined : windowStart(days);
+  const from = span ? span.from : days === null ? undefined : windowStart(days);
   // Ten-minute aligned so the chunks, and their cache keys, stay put while the page is open
-  const to = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const now = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const to = span && span.to < now ? span.to : now;
   const chunks = useMemo(() => chunksFor('daily', from, to), [from, to]);
 
   const result = useQueries({
