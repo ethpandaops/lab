@@ -7,19 +7,32 @@ The API describes itself. Use these endpoints to find what data exists, what eac
 ## Discover
 
 - [Networks](https://lab.ethpandaops.io/api/v1/config): JSON listing every network the API serves (`networks[].name`) with its genesis time and fork schedule. Use the name as `{network}` below.
-- [OpenAPI spec](https://lab.ethpandaops.io/api/v1/mainnet/openapi.yaml): an OpenAPI 3 YAML spec per network, at `/api/v1/{network}/openapi.yaml`. It lists every endpoint with its fields, their descriptions and every filter it accepts. It is large (around 10 MB); download it once and search it rather than reading it whole.
-- [Coverage](https://lab.ethpandaops.io/api/v1/mainnet/bounds): JSON at `/api/v1/{network}/bounds` giving the `min` and `max` processed position of each table. A position is a unix timestamp or a block number, depending on the table. Data outside that range has not been processed yet, which is not the same as it not having happened.
+- [Tables](https://lab.ethpandaops.io/api/v1/mainnet/tables): JSON at `/api/v1/{network}/tables` listing every table with its description, its endpoint (`path`), its `primary_key` fields and its coverage (`bounds`). Start here.
+- Table detail: JSON at `/api/v1/{network}/tables/{table}` giving each field's type and description, the filter operators each field accepts (`filters`), and the endpoint's other parameters, such as paging and order.
+- [OpenAPI spec](https://lab.ethpandaops.io/api/v1/mainnet/openapi.yaml): the exhaustive reference, an OpenAPI 3 YAML spec per network at `/api/v1/{network}/openapi.yaml`, from which the two endpoints above are built. It is around 10 MB; download it once and search it rather than reading it whole.
+
+`bounds` gives the `min` and `max` processed position of a table. A position is a unix timestamp or a block number, depending on the table. Data outside that range has not been processed yet, which is not the same as it not having happened.
 
 ## Query
 
-- Endpoints are `GET /api/v1/{network}/{table}` and return JSON.
-- Filters are query parameters named `<field>_<operator>`, as listed per endpoint in the spec.
-- Parameters marked `x-required-group: primary_key` in the spec are mandatory: send at least one of them, or the API answers `{"code":3,"message":"primary key field <field> is required"}`.
+- Each table's endpoint is `GET /api/v1/{network}/{table}`, the `path` in the table list. It returns JSON with the rows in an array named after the table.
+- Filters are query parameters named `<field>_<operator>`, using the operators in the field's `filters`. `in_values` and `not_in_values` take comma-separated lists.
+- Send at least one filter on a `primary_key` field, or the API answers `{"code":3,"message":"primary key field <field> is required"}`.
 - `page_size`, `page_token` and `order_by` control paging and order; each response's `next_page_token` fetches the next page.
 - Read the error messages; they say what is missing or invalid.
 - Please keep requests bounded with filters and reasonable page sizes.
 
+## Raw data
+
+The Lab API serves only the derived tables [xatu-cbt](https://github.com/ethpandaops/xatu-cbt) builds. The raw event tables they are built from are published by [xatu-data](https://github.com/ethpandaops/xatu-data) as public Parquet files, with no key.
+
+- [xatu-data guide](https://raw.githubusercontent.com/ethpandaops/xatu-data/master/llms.txt): xatu-data's own llms.txt, linking its Parquet and ClickHouse guides.
+- [Table config](https://raw.githubusercontent.com/ethpandaops/xatu-data/master/config.yaml): YAML whose `tables[]` lists every published table with its `database`, its `partitioning` (`type`, `column`, `interval`) and, under `networks`, the `from` and `to` of the files published for each network.
+- Files: `https://data.ethpandaops.io/xatu/{network}/databases/{database}/{table}/` followed by `{YYYY}/{M}/{D}.parquet` for daily datetime partitions, `{YYYY}/{M}/{D}/{H}.parquet` for hourly ones, or `{interval}/{start}.parquet` for integer partitions, where `{start}` is a multiple of the interval. Month, day and hour have no leading zero. The host has no directory listing and no wildcards, so build each URL from the config.
+- Schemas: `schema/clickhouse/{database}/{table}.sql` in xatu-data holds each table's `CREATE TABLE` statement with column comments, dumped from the live ClickHouse.
+- Migrations: the raw tables are created by the ClickHouse migrations in [xatu](https://github.com/ethpandaops/xatu/tree/master/deploy/migrations/clickhouse), and the derived tables by the migrations in [xatu-cbt](https://github.com/ethpandaops/xatu-cbt/tree/master/migrations).
+
 ## More
 
 - [panda](https://github.com/ethpandaops/panda): ethPandaOps' CLI and MCP server for querying the underlying ClickHouse, Prometheus and Loki data directly, beyond what the Lab API exposes.
-- [Source](https://github.com/ethpandaops/lab): the Lab frontend. The API is served by [cbt-api](https://github.com/ethpandaops/cbt-api) over tables built by [xatu-cbt](https://github.com/ethpandaops/xatu-cbt).
+- [Source](https://github.com/ethpandaops/lab): the Lab frontend. The API is served by [cbt-api](https://github.com/ethpandaops/cbt-api) through [lab-backend](https://github.com/ethpandaops/lab-backend).
