@@ -9,6 +9,7 @@ import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import { extractClusterFromNodeName, CLUSTER_COLORS } from '@/constants/eip7870';
+import { normalizeClientName } from '@/utils';
 
 /**
  * Get color class for duration value relative to max (green = fast, red = slow)
@@ -379,7 +380,7 @@ export function ClientVersionBreakdown({
     >();
 
     hourlyData.forEach(row => {
-      const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+      const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
       const version = row.meta_execution_version ?? 'unknown';
       const key = `${client}|${version}`;
       const obs = row.observation_count ?? 0;
@@ -473,7 +474,7 @@ export function ClientVersionBreakdown({
     >();
 
     data.forEach(row => {
-      const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+      const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
       const version = row.meta_execution_version ?? 'unknown';
       const key = `${client}|${version}`;
       const obs = row.observation_count ?? 0;
