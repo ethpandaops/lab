@@ -81,6 +81,16 @@ export function toClientCountRecords(
 }
 
 /**
+ * Moves hourly records into the UTC day their hour starts in, for charts whose hours are too sparse to read.
+ */
+export function toDailyRecords(records: ClientCountRecord[]): ClientCountRecord[] {
+  return records.map(record => ({
+    ...record,
+    key: new Date(Number(record.key) * 1000).toISOString().slice(0, 10),
+  }));
+}
+
+/**
  * Returns the client of the given layer for a record.
  */
 export function clientOf(record: ClientCountRecord, layer: ClientLayer): string {
