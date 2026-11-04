@@ -10,10 +10,10 @@ import { BarChart } from '@/components/Charts/Bar';
 import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { formatSlot, getExecutionClientColor } from '@/utils';
+import { formatSlot, getExecutionClientColor, normalizeClientName } from '@/utils';
 import type { FctEngineGetBlobsByElClientHourly, FctEngineGetBlobsByElClientDaily } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface GetBlobsTabProps {
@@ -214,7 +214,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   >();
 
   successBlobsByElClient.forEach(item => {
-    const el = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const el = normalizeClientName(item.meta_execution_implementation ?? 'unknown');
 
     const existing = elClientMetrics.get(el);
     const obs = item.observation_count ?? 0;
@@ -245,7 +245,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const clientSlotData = new Map<string, Map<number, number>>();
 
   successBlobsByElClient.forEach(item => {
-    const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(item.meta_execution_implementation ?? 'unknown');
     const slot = item.slot ?? 0;
     const duration = item.median_duration_ms ?? 0;
 
@@ -283,7 +283,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const trendClients = new Set<string>();
 
   summaryRows.forEach(row => {
-    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
     trendClients.add(client);
 
     const timestampMs = bucketStartMs(row);
@@ -380,7 +380,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const successRateClientData = new Map<string, Map<number, { successCount: number; totalCount: number }>>();
 
   summaryRows.forEach(row => {
-    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
     const timestampMs = bucketStartMs(row);
     const successCount = row.success_count ?? 0;
     const totalCount = row.observation_count ?? 0;
@@ -475,7 +475,12 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       {showPerSlotCharts ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Duration Histogram */}
-          <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="blob-duration" modalSize="full">
+          <PopoutCard
+            title="Duration Distribution (50ms buckets)"
+            subtitle={`Successful engine_getBlobs calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+            anchorId="blob-duration"
+            modalSize="full"
+          >
             <div>
               {histogramData.length > 0 ? (
                 <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
@@ -644,7 +649,12 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       {/* Status Breakdown, plus Blob Count Distribution from per-slot data on short time ranges */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Status Breakdown */}
-        <PopoutCard title="Status Distribution" anchorId="blob-status" modalSize="full">
+        <PopoutCard
+          title="Status Distribution"
+          subtitle={`engine_getBlobs calls by response status, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          anchorId="blob-status"
+          modalSize="full"
+        >
           <div>
             {statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />

@@ -9,7 +9,7 @@ import type { SeriesData } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { formatSlot, getExecutionClientColor } from '@/utils';
+import { formatSlot, getExecutionClientColor, normalizeClientName } from '@/utils';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type {
   FctEngineNewPayloadByElClientHourly,
@@ -19,7 +19,7 @@ import type {
   IntEngineNewPayloadFastestExecutionByNodeClass,
 } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
+import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
@@ -134,7 +134,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   >();
 
   validPayloadByElClient.forEach(item => {
-    const el = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const el = normalizeClientName(item.meta_execution_implementation ?? 'unknown');
 
     const existing = elClientMetrics.get(el);
     const obs = item.observation_count ?? 0;
@@ -165,7 +165,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const clientSlotData = new Map<string, Map<number, number>>();
 
   validPayloadByElClient.forEach(item => {
-    const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(item.meta_execution_implementation ?? 'unknown');
     const slot = item.slot ?? 0;
     const duration = item.median_duration_ms ?? 0;
 
@@ -196,7 +196,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const trendClients = new Set<string>();
 
   summaryRows.forEach(row => {
-    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
     trendClients.add(client);
 
     const timestampMs = bucketStartMs(row);
@@ -300,7 +300,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const validRateClientData = new Map<string, Map<number, { validCount: number; totalCount: number }>>();
 
   summaryRows.forEach(row => {
-    const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
+    const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
     const timestampMs = bucketStartMs(row);
     const validCount = row.valid_count ?? 0;
     const totalCount = row.observation_count ?? 0;
@@ -366,7 +366,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
     for (const r of validPayloadByElClient) {
       const slot = r.slot ?? 0;
-      const client = (r.meta_execution_implementation ?? '').toLowerCase();
+      const client = normalizeClientName(r.meta_execution_implementation ?? '');
       const duration = r.avg_duration_ms ?? 0;
       const obs = r.observation_count ?? 0;
       const timestamp = r.slot_start_date_time ?? 0;
@@ -577,7 +577,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       {/* Duration Histogram (per-slot data, short ranges only) and Status Distribution */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {showPerSlotCharts && (
-          <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="duration-histogram" modalSize="full">
+          <PopoutCard
+            title="Duration Distribution (50ms buckets)"
+            subtitle={`VALID engine_newPayload calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+            anchorId="duration-histogram"
+            modalSize="full"
+          >
             {({ inModal }) =>
               histogramData.length > 0 ? (
                 <BarChart
@@ -593,7 +598,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
           </PopoutCard>
         )}
 
-        <PopoutCard title="Status Distribution" anchorId="status-distribution" modalSize="full">
+        <PopoutCard
+          title="Status Distribution"
+          subtitle={`engine_newPayload calls by response status, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          anchorId="status-distribution"
+          modalSize="full"
+        >
           {({ inModal }) =>
             statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={inModal ? 600 : 300} orientation="horizontal" />
