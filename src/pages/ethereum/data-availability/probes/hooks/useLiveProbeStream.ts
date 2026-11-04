@@ -114,7 +114,7 @@ export function useLiveProbeStream({
             ...(filtersRef.current.result && { result_eq: filtersRef.current.result }),
             ...(filtersRef.current.prober && { meta_client_implementation_eq: filtersRef.current.prober }),
             ...(filtersRef.current.peer && { meta_peer_implementation_eq: filtersRef.current.peer }),
-            ...(filtersRef.current.peerId && { peer_id_unique_key_eq: Number(filtersRef.current.peerId) }),
+            ...(filtersRef.current.peerId && { peer_id_unique_key_in_values: filtersRef.current.peerId }),
             ...(filtersRef.current.nodeId && { node_id_eq: filtersRef.current.nodeId }),
             ...(filtersRef.current.proberCountry && { meta_client_geo_country_eq: filtersRef.current.proberCountry }),
             ...(filtersRef.current.peerCountry && { meta_peer_geo_country_eq: filtersRef.current.peerCountry }),
@@ -128,8 +128,8 @@ export function useLiveProbeStream({
             ...(filtersRef.current.peerAsn && {
               meta_peer_geo_autonomous_system_number_eq: filtersRef.current.peerAsn,
             }),
-            ...(filtersRef.current.slot && { slot_eq: filtersRef.current.slot }),
-            ...(filtersRef.current.column && { column_indices_has: filtersRef.current.column }),
+            ...(filtersRef.current.slot !== undefined && { slot_eq: filtersRef.current.slot }),
+            ...(filtersRef.current.column !== undefined && { column_indices_has: filtersRef.current.column }),
             ...(filtersRef.current.blobPosters?.length && {
               blob_submitters_has_any_values: filtersRef.current.blobPosters,
             }),

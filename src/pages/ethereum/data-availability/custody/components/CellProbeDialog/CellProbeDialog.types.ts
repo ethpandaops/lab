@@ -19,7 +19,7 @@ export interface ParentContext {
  * Can be a specific cell (row + column) or just a column (when clicking column header)
  */
 export interface CellContext {
-  /** Row identifier (date, hour timestamp, epoch, slot, or blob index depending on granularity) - optional for column-only mode */
+  /** Row identifier (date, hour timestamp, epoch, or slot depending on granularity) - optional for column-only mode */
   rowIdentifier?: string;
   /** Column index (0-127) */
   columnIndex: number;

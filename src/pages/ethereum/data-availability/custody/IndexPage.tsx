@@ -8,14 +8,11 @@ import { Header } from '@/components/Layout/Header';
 import { DataAvailabilityHeatmap } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
 import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityLegend';
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
-import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { CellProbeDialog } from './components/CellProbeDialog';
 import type { CellContext, TimeRangeContext } from './components/CellProbeDialog';
-import type {
-  DataAvailabilityGranularity,
-  ViewMode,
-} from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
+import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap';
+import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatEpoch, formatSlot } from '@/utils';
@@ -37,26 +34,17 @@ import {
   fctDataColumnAvailabilityHourlyServiceListOptions,
   intCustodyProbeOrderBySlotServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import {
-  fctDataColumnAvailabilityByEpochServiceList,
-  fctDataColumnAvailabilityBySlotServiceList,
-  fctDataColumnAvailabilityBySlotBlobServiceList,
-} from '@/api/sdk.gen';
-import type {
-  FctDataColumnAvailabilityByEpoch,
-  FctDataColumnAvailabilityBySlot,
-  FctDataColumnAvailabilityBySlotBlob,
-} from '@/api/types.gen';
+import { fctDataColumnAvailabilityByEpochServiceList, fctDataColumnAvailabilityBySlotServiceList } from '@/api/sdk.gen';
+import type { FctDataColumnAvailabilityByEpoch, FctDataColumnAvailabilityBySlot } from '@/api/types.gen';
 import {
   transformDailyToRows,
   transformHourlyToRows,
   transformEpochsToRows,
   transformSlotsToRows,
-  transformBlobsToRows,
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
 import type { CustodySearch } from './IndexPage.types';
-import { validateSearchParamHierarchy, getDefaultThreshold } from './IndexPage.types';
+import { validateSearchParamHierarchy } from './IndexPage.types';
 
 /**
  * Drill-down level state - each level maintains parent context for breadcrumbs
@@ -198,7 +186,7 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
  * Main title = where you are, subtitle = what you're viewing
  * All times are displayed in UTC
  */
-function getLevelTitle(level: DrillDownLevel): { main: string; sub: string } {
+function getLevelTitle(level: DrillDownLevel): { main: string; sub?: string } {
   switch (level.type) {
     case 'window':
       return { main: 'Custody Window', sub: `Last ${WINDOW_DAYS} days (UTC)` };
@@ -231,7 +219,7 @@ function getLevelTitle(level: DrillDownLevel): { main: string; sub: string } {
     case 'epoch':
       return { main: `Epoch ${formatEpoch(level.epoch)}`, sub: 'Slots in this epoch' };
     case 'slot':
-      return { main: `Slot ${formatSlot(level.slot)}`, sub: 'Blobs in this slot' };
+      return { main: `Slot ${formatSlot(level.slot)}` };
   }
 }
 
@@ -249,16 +237,9 @@ export function IndexPage(): JSX.Element {
   // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
   const timezone = 'UTC' as const;
 
-  // Network for default threshold and slot times
+  // Network for slot times
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time ?? 0;
-
-  // View mode from URL (default to 'percentage')
-  const viewMode: ViewMode = search.mode ?? 'percentage';
-
-  // Threshold from URL or network default
-  const defaultThreshold = getDefaultThreshold(currentNetwork?.name);
-  const threshold = search.threshold ?? defaultThreshold;
 
   // Get Fulu activation info for filtering pre-fork data
   // PeerDAS/data columns only exist after Fulu activation
@@ -348,11 +329,11 @@ export function IndexPage(): JSX.Element {
     enabled: currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot',
   });
 
-  // Epoch Level: Slots within a specific epoch (with pagination for safety)
+  // Epoch and Slot Levels: Slots within a specific epoch (with pagination for safety)
   const epochQuery = useQuery({
-    queryKey: ['epochData', currentLevel.type === 'epoch' ? currentLevel.epoch : null],
+    queryKey: ['epochData', currentLevel.type === 'epoch' || currentLevel.type === 'slot' ? currentLevel.epoch : null],
     queryFn: async ({ signal }) => {
-      if (currentLevel.type !== 'epoch') {
+      if (currentLevel.type !== 'epoch' && currentLevel.type !== 'slot') {
         return { fct_data_column_availability_by_slot: [] };
       }
 
@@ -378,31 +359,7 @@ export function IndexPage(): JSX.Element {
         fct_data_column_availability_by_slot: slotData,
       };
     },
-    enabled: currentLevel.type === 'epoch',
-  });
-
-  // Slot Level: Blobs within a specific slot (with pagination for safety)
-  const slotQuery = useQuery({
-    queryKey: ['slotData', currentLevel.type === 'slot' ? currentLevel.slot : null],
-    queryFn: async ({ signal }) => {
-      if (currentLevel.type !== 'slot') return { fct_data_column_availability_by_slot_blob: [] };
-
-      const data = await fetchAllPages<FctDataColumnAvailabilityBySlotBlob>(
-        fctDataColumnAvailabilityBySlotBlobServiceList,
-        {
-          query: {
-            slot_eq: currentLevel.slot,
-            page_size: 10000,
-            order_by: 'blob_index asc',
-          },
-        },
-        'fct_data_column_availability_by_slot_blob',
-        signal
-      );
-
-      return { fct_data_column_availability_by_slot_blob: data };
-    },
-    enabled: currentLevel.type === 'slot',
+    enabled: currentLevel.type === 'epoch' || currentLevel.type === 'slot',
   });
 
   // Fetch blob submitters for the slot (array index = blob index)
@@ -477,12 +434,17 @@ export function IndexPage(): JSX.Element {
   }, [epochQuery.data, fuluActivation]);
 
   /**
-   * Transform Slot data (blobs) to heatmap rows
+   * Slot Level: the slot's own row. A column probe covers every blob in the slot, so there is no per-blob row.
    */
   const slotRows = useMemo(
-    () => transformBlobsToRows(slotQuery.data?.fct_data_column_availability_by_slot_blob, blobSubmitters),
-    [slotQuery.data, blobSubmitters]
+    () => (currentLevel.type === 'slot' ? epochRows.filter(row => row.identifier === String(currentLevel.slot)) : []),
+    [currentLevel, epochRows]
   );
+  const slotBlobCount = useMemo(() => {
+    if (currentLevel.type !== 'slot') return 0;
+    const slotData = epochQuery.data?.fct_data_column_availability_by_slot?.find(d => d.slot === currentLevel.slot);
+    return slotData?.blob_count ?? 0;
+  }, [currentLevel, epochQuery.data]);
 
   // Determine current data based on level
   const { rows, granularity, isLoading, error } = useMemo(() => {
@@ -516,26 +478,15 @@ export function IndexPage(): JSX.Element {
           error: epochQuery.error,
         };
       case 'slot':
+        // Rows are slots, as at the epoch level
         return {
           rows: slotRows,
-          granularity: 'slot' as DataAvailabilityGranularity,
-          isLoading: slotQuery.isLoading,
-          error: slotQuery.error,
+          granularity: 'epoch' as DataAvailabilityGranularity,
+          isLoading: epochQuery.isLoading,
+          error: epochQuery.error,
         };
     }
-  }, [
-    currentLevel,
-    windowRows,
-    dayRows,
-    hourRows,
-    epochRows,
-    slotRows,
-    windowQuery,
-    dayQuery,
-    hourQuery,
-    epochQuery,
-    slotQuery,
-  ]);
+  }, [currentLevel, windowRows, dayRows, hourRows, epochRows, slotRows, windowQuery, dayQuery, hourQuery, epochQuery]);
 
   /**
    * Handle row click to drill down to next level
@@ -546,12 +497,14 @@ export function IndexPage(): JSX.Element {
       case 'window':
         // Drill to day level
         navigate({
+          resetScroll: false,
           search: prev => ({ ...prev, date: identifier }),
         });
         break;
       case 'day':
         // Drill to hour level
         navigate({
+          resetScroll: false,
           search: prev => ({ ...prev, date: currentLevel.date, hour: Number(identifier) }),
         });
         break;
@@ -562,6 +515,7 @@ export function IndexPage(): JSX.Element {
         );
         if (epochData?.epoch !== undefined) {
           navigate({
+            resetScroll: false,
             search: prev => ({
               ...prev,
               date: currentLevel.date,
@@ -581,6 +535,7 @@ export function IndexPage(): JSX.Element {
         }
         // Drill to slot level
         navigate({
+          resetScroll: false,
           search: prev => ({
             ...prev,
             date: currentLevel.date,
@@ -655,7 +610,7 @@ export function IndexPage(): JSX.Element {
           break;
         }
         case 'slot':
-          // Row is a blob index in the current slot
+          // Row is the current slot
           timeRange = levelWindow(currentLevel, genesisTime);
           break;
       }
@@ -740,29 +695,9 @@ export function IndexPage(): JSX.Element {
   );
 
   /**
-   * Handle view mode change
-   * Updates URL search params to switch between percentage and threshold modes
-   */
-  const handleViewModeChange = (mode: ViewMode): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        mode,
-      }),
-    });
-  };
-
-  /**
    * Build breadcrumb path - shows full drill-down hierarchy
-   * Preserves mode and threshold settings across navigation
    */
   const breadcrumbs = useMemo(() => {
-    // Settings to preserve across navigation
-    const preservedSettings = {
-      ...(search.mode && { mode: search.mode }),
-      ...(search.threshold && { threshold: search.threshold }),
-    };
-
     const crumbs: Array<{
       label: string;
       onClick: () => void;
@@ -773,7 +708,8 @@ export function IndexPage(): JSX.Element {
         icon: Squares2X2Icon,
         onClick: () => {
           navigate({
-            search: { ...preservedSettings },
+            resetScroll: false,
+            search: {},
             replace: true,
           });
         },
@@ -799,7 +735,8 @@ export function IndexPage(): JSX.Element {
         icon: CalendarDaysIcon,
         onClick: () =>
           navigate({
-            search: { ...preservedSettings, date: currentLevel.date },
+            resetScroll: false,
+            search: { date: currentLevel.date },
             replace: true,
           }),
       });
@@ -817,7 +754,8 @@ export function IndexPage(): JSX.Element {
         icon: ClockIcon,
         onClick: () =>
           navigate({
-            search: { ...preservedSettings, date: currentLevel.date, hour: currentLevel.hourStartDateTime },
+            resetScroll: false,
+            search: { date: currentLevel.date, hour: currentLevel.hourStartDateTime },
             replace: true,
           }),
       });
@@ -830,8 +768,8 @@ export function IndexPage(): JSX.Element {
         icon: CubeIcon,
         onClick: () =>
           navigate({
+            resetScroll: false,
             search: {
-              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -848,8 +786,8 @@ export function IndexPage(): JSX.Element {
         icon: Square2StackIcon,
         onClick: () =>
           navigate({
+            resetScroll: false,
             search: {
-              ...preservedSettings,
               date: currentLevel.date,
               hour: currentLevel.hourStartDateTime,
               epoch: currentLevel.epoch,
@@ -861,7 +799,7 @@ export function IndexPage(): JSX.Element {
     }
 
     return crumbs;
-  }, [currentLevel, navigate, search.mode, search.threshold]);
+  }, [currentLevel, navigate]);
 
   const levelTitle = getLevelTitle(currentLevel);
 
@@ -912,12 +850,12 @@ export function IndexPage(): JSX.Element {
         <div className="space-y-4 text-sm leading-relaxed text-muted">
           <p>
             Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128
-            columns. Each node commits to storing a subset based on its identity and validator balance.
+            columns. Each P2P peer commits to storing a subset based on its identity and validator balance.
           </p>
           <p>64 distinct columns are required to reconstruct the full blob matrix.</p>
           <p>
-            We continuously sample nodes in the network, validate their responses against KZG commitments, and build a
-            real-time picture of custody compliance across all 128 columns.
+            We continuously sample P2P peers in the network, validate their responses against KZG commitments, and build
+            a real-time picture of custody compliance across all 128 columns.
           </p>
         </div>
       </Dialog>
@@ -950,7 +888,6 @@ export function IndexPage(): JSX.Element {
                 <ArrowTopRightOnSquareIcon className="size-3" />
               </Link>
             )}
-            <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
           </div>
         }
       >
@@ -996,12 +933,7 @@ export function IndexPage(): JSX.Element {
 
           {/* Legend Strip */}
           <div className="rounded-sm bg-muted/30 px-3 py-2">
-            <DataAvailabilityLegend
-              granularity={granularity}
-              viewMode={viewMode}
-              threshold={threshold}
-              orientation="horizontal"
-            />
+            <DataAvailabilityLegend orientation="horizontal" />
           </div>
 
           {/* Heatmap Area */}
@@ -1013,8 +945,6 @@ export function IndexPage(): JSX.Element {
                 rows={rows}
                 granularity={granularity}
                 filters={filters}
-                viewMode={viewMode}
-                threshold={threshold}
                 onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
                 onCellClick={handleCellClick}
                 onColumnClick={handleColumnClick}
@@ -1024,6 +954,24 @@ export function IndexPage(): JSX.Element {
               />
             )}
           </div>
+
+          {currentLevel.type === 'slot' && slotBlobCount > 0 && (
+            <div>
+              <h4 className="mb-2 text-xs/5 font-medium text-muted">Blob submitters</h4>
+              <ol className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4 xl:grid-cols-6">
+                {Array.from({ length: slotBlobCount }, (_, index) => {
+                  const submitter = blobSubmitters[index] ?? 'Unknown';
+                  return (
+                    <li key={index} className="flex min-w-0 items-center gap-2 text-sm/6">
+                      <span className="w-5 shrink-0 text-right font-mono text-xs text-muted tabular-nums">{index}</span>
+                      <BlobPosterLogo poster={submitter} size={16} className="shrink-0" />
+                      <span className="truncate text-foreground">{submitter}</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          )}
         </div>
       </Card>
 

@@ -5,8 +5,8 @@ import { getDataVizColors } from '@/utils/dataVizColors';
  * Props for the PeerIdAvatar component
  */
 interface PeerIdAvatarProps {
-  /** The unique peer ID number to generate the avatar from */
-  peerId: number;
+  /** The unique peer ID key to generate the avatar from (Int64, so the API client returns it as a decimal string) */
+  peerId: number | string;
   /** Size of the avatar in pixels */
   size?: number;
   /** Additional CSS classes */
@@ -82,10 +82,11 @@ function getBackgroundColor(peerId: number): string {
  */
 export function PeerIdAvatar({ peerId, size = 24, className = '' }: PeerIdAvatarProps): JSX.Element {
   const { pattern, color, backgroundColor } = useMemo(() => {
+    const key = Number(peerId);
     return {
-      pattern: generatePattern(peerId),
-      color: getColor(peerId),
-      backgroundColor: getBackgroundColor(peerId),
+      pattern: generatePattern(key),
+      color: getColor(key),
+      backgroundColor: getBackgroundColor(key),
     };
   }, [peerId]);
 

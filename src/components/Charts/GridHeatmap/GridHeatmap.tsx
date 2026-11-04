@@ -109,9 +109,10 @@ export function GridHeatmap<T = unknown>({
   };
 
   // For 3xs, calculate grid columns based on actual column count
-  // Use minmax to ensure cells have a minimum size for usability (6px min)
+  // Use minmax to ensure cells have a minimum size for usability (4px min, so 128 columns fit beside the
+  // row labels in a 1280px viewport)
   const gridStyle =
-    cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, minmax(6px, 1fr))` } : undefined;
+    cellSize === '3xs' ? { gridTemplateColumns: `repeat(${columnIndices.length}, minmax(4px, 1fr))` } : undefined;
 
   // Get first and last column indices for edge alignment
   const firstColumnIndex = columnIndices.length > 0 ? columnIndices[0] : 0;

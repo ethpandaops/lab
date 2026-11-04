@@ -1,14 +1,6 @@
 import clsx from 'clsx';
-import {
-  CalendarDaysIcon,
-  ClockIcon,
-  CubeIcon,
-  Square2StackIcon,
-  CircleStackIcon,
-  ChevronRightIcon,
-} from '@heroicons/react/24/outline';
+import { CalendarDaysIcon, ClockIcon, CubeIcon, Square2StackIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { RowLabelRenderProps } from '@/components/Charts/GridHeatmap';
-import { BlobPosterLogo, getBlobPosterShortName } from '@/components/Ethereum/BlobPosterLogo';
 import type { DataAvailabilityGranularity } from './DataAvailabilityHeatmap.types';
 
 interface DataAvailabilityRowLabelProps extends RowLabelRenderProps {
@@ -34,8 +26,6 @@ function getRowIcon(granularity: DataAvailabilityGranularity): React.ComponentTy
       return CubeIcon; // Epochs
     case 'epoch':
       return Square2StackIcon; // Slots
-    case 'slot':
-      return CircleStackIcon; // Blobs
   }
 }
 
@@ -52,21 +42,7 @@ function getRowTypeLabel(granularity: DataAvailabilityGranularity): string {
       return 'Epoch';
     case 'epoch':
       return 'Slot';
-    case 'slot':
-      return 'Blob';
   }
-}
-
-/**
- * Parse blob label to extract index and submitter
- * Label format: "0 / arbitrum" or just "0"
- */
-function parseBlobLabel(label: string): { index: string; submitter: string | null } {
-  const parts = label.split(' / ');
-  return {
-    index: parts[0],
-    submitter: parts[1] ?? null,
-  };
 }
 
 /**
@@ -74,9 +50,8 @@ function parseBlobLabel(label: string): { index: string; submitter: string | nul
  *
  * Shows:
  * - Type icon (calendar for days, clock for hours, etc.)
- * - Type badge (Day, Hour, Epoch, Slot, Blob)
+ * - Type badge (Day, Hour, Epoch, Slot)
  * - The actual value
- * - For blobs: submitter logo and name
  * - Drill-down chevron (when clickable)
  */
 export function DataAvailabilityRowLabel({
@@ -92,10 +67,6 @@ export function DataAvailabilityRowLabel({
 }: DataAvailabilityRowLabelProps): React.JSX.Element {
   const Icon = getRowIcon(granularity);
   const typeLabel = getRowTypeLabel(granularity);
-
-  // For blobs, parse submitter info
-  const isBlob = granularity === 'slot';
-  const blobInfo = isBlob ? parseBlobLabel(label) : null;
 
   // Disabled rows can't be drilled down into
   const isDisabled = disabled === true;
@@ -144,59 +115,27 @@ export function DataAvailabilityRowLabel({
         {typeLabel}
       </span>
 
-      {/* Value - different layout for blobs with submitters */}
-      {isBlob && blobInfo ? (
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          {/* Blob index - fixed width for alignment */}
-          <span
-            className={clsx(
-              'w-4 shrink-0 text-center font-mono text-2xs transition-colors',
-              isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
-            )}
-          >
-            {blobInfo.index}
-          </span>
+      {/* Value */}
+      <span
+        className={clsx(
+          'flex-1 truncate text-right font-mono text-2xs transition-colors',
+          isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
+        )}
+      >
+        {label}
+      </span>
 
-          {/* Submitter logo and short name */}
-          {blobInfo.submitter && (
-            <>
-              <BlobPosterLogo poster={blobInfo.submitter} size={14} className="shrink-0" />
-              <span
-                className={clsx(
-                  'truncate font-mono text-2xs transition-colors',
-                  isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'
-                )}
-                title={blobInfo.submitter}
-              >
-                {getBlobPosterShortName(blobInfo.submitter)}
-              </span>
-            </>
-          )}
-        </div>
-      ) : (
-        <span
-          className={clsx(
-            'flex-1 truncate text-right font-mono text-2xs transition-colors',
-            isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
-          )}
-        >
-          {label}
-        </span>
-      )}
-
-      {/* Drill-down chevron - reserve space for alignment except at blob level where drill-down is never possible */}
-      {!isBlob && (
-        <ChevronRightIcon
-          className={clsx(
-            'size-3 shrink-0 transition-all',
-            effectiveCanDrillDown
-              ? isHovered
-                ? 'translate-x-0.5 text-accent opacity-100'
-                : 'text-muted opacity-40'
-              : 'invisible'
-          )}
-        />
-      )}
+      {/* Drill-down chevron - reserves space for alignment when drill-down isn't possible */}
+      <ChevronRightIcon
+        className={clsx(
+          'size-3 shrink-0 transition-all',
+          effectiveCanDrillDown
+            ? isHovered
+              ? 'translate-x-0.5 text-accent opacity-100'
+              : 'text-muted opacity-40'
+            : 'invisible'
+        )}
+      />
     </button>
   );
 }

@@ -210,7 +210,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               <Input size="sm">
                 <Input.Field
                   type="number"
-                  value={draftFilters.slot || ''}
+                  value={draftFilters.slot ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateDraft('slot', e.target.value ? Number(e.target.value) : undefined)
                   }
@@ -222,7 +222,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
               <Input size="sm">
                 <Input.Field
                   type="number"
-                  value={draftFilters.column || ''}
+                  value={draftFilters.column ?? ''}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateDraft('column', e.target.value ? Number(e.target.value) : undefined)
                   }

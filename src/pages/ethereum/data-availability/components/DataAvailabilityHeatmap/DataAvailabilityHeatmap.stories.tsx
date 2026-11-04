@@ -7,7 +7,6 @@ import {
   generateDayLevelData,
   generateHourLevelData,
   generateEpochLevelData,
-  generateSlotLevelData,
 } from './mockData';
 
 // Default filters for all stories
@@ -153,37 +152,6 @@ export const EpochLevelWithSelectedColumn: Story = {
   args: {
     rows: generateEpochLevelData('epoch-100000', 100000),
     granularity: 'epoch',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    selectedColumnIndex: 42,
-    showColumnHeader: true,
-    showLegend: true,
-    onClearColumnSelection: () => alert('Clear selection clicked'),
-  },
-};
-
-/**
- * Slot-level view (Level 5) showing blobs × columns.
- * This is the bottom level showing each blob's availability across all columns.
- */
-export const SlotLevel: Story = {
-  args: {
-    rows: generateSlotLevelData('slot-3200000', 3200000, 6),
-    granularity: 'slot',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Slot-level view with a selected column dimmed.
- */
-export const SlotLevelWithSelectedColumn: Story = {
-  args: {
-    rows: generateSlotLevelData('slot-3200000', 3200000, 6),
-    granularity: 'slot',
     filters: defaultFilters,
     cellSize: 'xs',
     selectedColumnIndex: 42,
@@ -363,7 +331,7 @@ export const InteractiveEpochDrillDown: Story = {
         <div className="rounded-sm bg-background p-4">
           <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 3: Epoch View - Slots</h3>
           <p className="mb-4 text-sm/6 text-muted">
-            Click a cell → show slot detail view (blobs) for that slot
+            Click a cell → show slot detail view for that slot
             <br />
             Click a slot label → show all columns for that slot
           </p>
@@ -378,240 +346,15 @@ export const InteractiveEpochDrillDown: Story = {
               const slotNum = slotMatch ? slotMatch[1] : 'unknown';
               console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}?column_index=${columnIndex}`);
               setSelectedColumn(columnIndex);
-              alert(`Would show slot detail view (blobs) for slot ${slotNum}, column ${columnIndex}`);
+              alert(`Would show slot detail view for slot ${slotNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
               const slotMatch = identifier.match(/slot-(\d+)/);
               const slotNum = slotMatch ? slotMatch[1] : 'unknown';
               console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}`);
-              alert(`Would show slot detail view (blobs) for slot ${slotNum} (all columns)`);
+              alert(`Would show slot detail view for slot ${slotNum} (all columns)`);
             }}
             onClearColumnSelection={() => setSelectedColumn(undefined)}
-          />
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Interactive demo showing slot-level (blobs) view with column selection.
- * This is the bottom level where rows represent blob indices.
- */
-export const InteractiveSlotView: Story = {
-  args: {
-    rows: [],
-    granularity: 'slot',
-    filters: defaultFilters,
-  },
-  render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
-    const slotData = generateSlotLevelData('slot-3200000', 3200000, 6);
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 4: Slot View - Blobs × Columns</h3>
-          <p className="mb-4 text-sm/6 text-muted">
-            This is the bottom level. Each row is a blob index, each column is a data column.
-            <br />
-            Click cells to see detailed metrics for that blob and column.
-          </p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={slotData}
-            granularity="slot"
-            cellSize="xs"
-            selectedColumnIndex={selectedColumn}
-            onCellClick={(identifier, columnIndex) => {
-              console.log(`Show details for ${identifier}, column ${columnIndex}`);
-              setSelectedColumn(columnIndex);
-              alert(`Would show detailed metrics for ${identifier}, column ${columnIndex}`);
-            }}
-            onRowClick={identifier => {
-              console.log(`Show details for ${identifier} (all columns)`);
-              alert(`Would show detailed metrics for ${identifier} (all columns)`);
-            }}
-            onClearColumnSelection={() => setSelectedColumn(undefined)}
-          />
-        </div>
-      </div>
-    );
-  },
-};
-
-/**
- * Compact view without legend and column headers for embedding.
- */
-export const CompactView: Story = {
-  args: {
-    rows: generateWindowLevelData(10),
-    granularity: 'window',
-    filters: defaultFilters,
-    showColumnHeader: false,
-    showLegend: false,
-  },
-};
-
-/**
- * Small dataset showing just a few days.
- */
-export const SmallDataset: Story = {
-  args: {
-    rows: generateWindowLevelData(5),
-    granularity: 'window',
-    filters: defaultFilters,
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Extra small cells (12px) - useful for very dense data or small viewports
- */
-export const CellSizeXS: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Small cells (16px) - compact view for dense data
- */
-export const CellSizeSM: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'sm',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Medium cells (24px) - default size with good balance
- */
-export const CellSizeMD: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'md',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Large cells (32px) - easier to see and interact with
- */
-export const CellSizeLG: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'lg',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Extra large cells (40px) - maximum visibility and interaction area
- */
-export const CellSizeXL: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'xl',
-    showColumnHeader: true,
-    showLegend: true,
-  },
-};
-
-/**
- * Side-by-side comparison of all cell sizes
- */
-export const CellSizeComparison: Story = {
-  args: {
-    rows: [],
-    granularity: 'window',
-    filters: defaultFilters,
-  },
-  render: () => {
-    const data = generateWindowLevelData(5); // Smaller dataset for comparison
-
-    return (
-      <div className="flex flex-col gap-8">
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-base/7 font-semibold text-foreground">Extra Small (xs - 12px)</h3>
-          <p className="mb-4 text-sm/6 text-muted">Most compact, useful for very dense data or small viewports</p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={data}
-            granularity="window"
-            cellSize="xs"
-            showColumnHeader={true}
-            showLegend={false}
-          />
-        </div>
-
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-base/7 font-semibold text-foreground">Small (sm - 16px)</h3>
-          <p className="mb-4 text-sm/6 text-muted">Compact view for dense data</p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={data}
-            granularity="window"
-            cellSize="sm"
-            showColumnHeader={true}
-            showLegend={false}
-          />
-        </div>
-
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-base/7 font-semibold text-foreground">Medium (md - 24px) - Default</h3>
-          <p className="mb-4 text-sm/6 text-muted">Good balance between density and readability</p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={data}
-            granularity="window"
-            cellSize="md"
-            showColumnHeader={true}
-            showLegend={false}
-          />
-        </div>
-
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-base/7 font-semibold text-foreground">Large (lg - 32px)</h3>
-          <p className="mb-4 text-sm/6 text-muted">Easier to see and interact with</p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={data}
-            granularity="window"
-            cellSize="lg"
-            showColumnHeader={true}
-            showLegend={false}
-          />
-        </div>
-
-        <div className="rounded-sm bg-background p-4">
-          <h3 className="mb-2 text-base/7 font-semibold text-foreground">Extra Large (xl - 40px)</h3>
-          <p className="mb-4 text-sm/6 text-muted">Maximum visibility and interaction area</p>
-          <DataAvailabilityHeatmap
-            filters={defaultFilters}
-            rows={data}
-            granularity="window"
-            cellSize="xl"
-            showColumnHeader={true}
-            showLegend={false}
           />
         </div>
       </div>

@@ -16,9 +16,9 @@ const SKELETON_ROWS = 12;
  * Matches the GridHeatmap structure with 128 columns and row labels
  */
 export function DataAvailabilitySkeleton(): JSX.Element {
-  // CSS grid style matching the actual heatmap (128 columns, min 6px each)
+  // CSS grid style matching the actual heatmap (128 columns, min 4px each)
   const gridStyle = {
-    gridTemplateColumns: `repeat(${TOTAL_COLUMNS}, minmax(6px, 1fr))`,
+    gridTemplateColumns: `repeat(${TOTAL_COLUMNS}, minmax(4px, 1fr))`,
   };
 
   return (
