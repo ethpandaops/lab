@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
 import { BLOCK_TX_SORT_FIELDS } from './utils/blockTransactionFilters';
 
 /**
@@ -61,33 +60,11 @@ export const gasProfilerTxSearchSchema = z.object({
 });
 
 /**
- * Legacy schema for backwards compatibility
- * @deprecated Use gasProfilerHomeSearchSchema instead
- */
-export const gasProfilerSearchSchema = gasProfilerHomeSearchSchema;
-
-/**
  * TypeScript types inferred from Zod schemas
  */
 export type GasProfilerHomeSearch = z.infer<typeof gasProfilerHomeSearchSchema>;
 export type GasProfilerBlockSearch = z.infer<typeof gasProfilerBlockSearchSchema>;
 export type GasProfilerTxSearch = z.infer<typeof gasProfilerTxSearchSchema>;
-
-/**
- * Legacy type for backwards compatibility
- * @deprecated Use GasProfilerHomeSearch instead
- */
-export type GasProfilerSearch = GasProfilerHomeSearch;
-
-/**
- * Call frame data from the API
- */
-export type CallFrame = IntTransactionCallFrame;
-
-/**
- * Opcode gas data from the API
- */
-export type OpcodeGas = IntTransactionOpcodeGas;
 
 /**
  * Transaction metadata derived from call frames
@@ -140,14 +117,4 @@ export interface OpcodeStats {
   count: number;
   errorCount: number;
   percentage: number;
-}
-
-/**
- * Gas breakdown segments for StackedBar
- */
-export interface GasBreakdownSegment {
-  name: string;
-  value: number;
-  color?: string;
-  description?: string;
 }

@@ -38,7 +38,7 @@ import {
   ResourceGasTable,
   ResourceGasHelp,
 } from './components';
-import type { TopGasItem, CallFrameData } from './components';
+import type { TopGasItem } from './components';
 import { getCallLabel } from './hooks/useTransactionGasData';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useTransactionReceiptSize } from './hooks/useTransactionReceiptSize';
@@ -454,33 +454,6 @@ export function TransactionPage(): JSX.Element {
     return rootFrame?.gas_cumulative ?? 0;
   }, [txData?.callFrames]);
 
-  // Call frame data for the calls table
-  const callFrameData = useMemo((): CallFrameData[] => {
-    if (!txData?.callFrames) return [];
-    return txData.callFrames
-      .filter(f => f.call_type) // Exclude root frame
-      .map(f => {
-        // Get function name if available
-        const funcSelector = f.function_selector?.toLowerCase();
-        const funcSig = funcSelector ? functionSignatures[funcSelector] : undefined;
-        const functionName = funcSig?.name ? funcSig.name.split('(')[0] : null;
-
-        // Get contract name
-        const contractName = contractOwners[f.target_address?.toLowerCase() ?? '']?.contract_name ?? null;
-
-        return {
-          callFrameId: f.call_frame_id ?? 0,
-          callType: f.call_type ?? '',
-          targetAddress: f.target_address ?? '',
-          targetName: contractName,
-          functionName,
-          gasCumulative: f.gas_cumulative ?? 0,
-          gasSelf: f.gas ?? 0,
-          depth: f.depth ?? 0,
-        };
-      });
-  }, [txData?.callFrames, contractOwners, functionSignatures]);
-
   // Handle call selection - navigate to call page
   const handleFrameSelect = useCallback(
     (frame: CallTreeNode) => {
@@ -582,9 +555,8 @@ export function TransactionPage(): JSX.Element {
     setContractPopover(null);
   }, []);
 
-  // Internal call count for header stats
-  // callFrameData already excludes root (filtered by call_type), so use length directly
-  const internalCallCount = callFrameData.length;
+  // Internal call count for header stats (the root frame has no call_type)
+  const internalCallCount = txData?.callFrames?.filter(f => f.call_type).length ?? 0;
 
   // Treemap for contract gas distribution
   const contractTreemapOption = useMemo(() => {

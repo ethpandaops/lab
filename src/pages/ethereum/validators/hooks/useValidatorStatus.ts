@@ -12,38 +12,13 @@ import {
 import { dimValidatorStatusServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { DimValidatorStatus } from '@/api/types.gen';
 
-export type StatusCategory = 'active' | 'pending' | 'exited' | 'withdrawal' | 'unknown';
-
-export interface StatusSummary {
-  total: number;
-  active: number;
-  pending: number;
-  exited: number;
-  withdrawal: number;
-  slashed: number;
-  unknown: number;
-}
-
 interface UseValidatorStatusReturn {
   /** Look up the validator's status at a given point in time */
   getStatusAtTimestamp: (validatorIndex: number, timestamp: number) => string | null;
-  /** Aggregate summary of latest validator statuses */
-  statusSummary: StatusSummary | null;
   /** Validator indices with zero status transitions (nonexistent) */
   unknownValidators: number[];
   isLoading: boolean;
   error: Error | null;
-}
-
-/**
- * Categorize a status string (e.g. "active_ongoing") into a broad category
- */
-function categorizeStatus(status: string): StatusCategory {
-  if (status.startsWith('active')) return 'active';
-  if (status.startsWith('pending')) return 'pending';
-  if (status.startsWith('exited')) return 'exited';
-  if (status.startsWith('withdrawal')) return 'withdrawal';
-  return 'unknown';
 }
 
 /**
@@ -102,8 +77,8 @@ export function getStatusIconConfig(status: string | null): StatusIconConfig {
 
 /**
  * Fetches validator status transitions from `dim_validator_status` and
- * provides helpers to look up a validator's status at any point in time,
- * plus an aggregate summary of current statuses.
+ * provides helpers to look up a validator's status at any point in time
+ * and to find validators with no status transitions.
  */
 export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatusReturn {
   const enabled = resolvedIndices.length > 0;
@@ -166,48 +141,15 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
     };
   }, [transitionsByValidator]);
 
-  // Build summary from latest status per validator
-  const { statusSummary, unknownValidators } = useMemo(() => {
-    if (!enabled || isLoading) {
-      return { statusSummary: null, unknownValidators: [] };
-    }
-
-    const summary: StatusSummary = {
-      total: resolvedIndices.length,
-      active: 0,
-      pending: 0,
-      exited: 0,
-      withdrawal: 0,
-      slashed: 0,
-      unknown: 0,
-    };
-
-    const unknown: number[] = [];
-
-    for (const idx of resolvedIndices) {
-      const arr = transitionsByValidator.get(idx);
-      if (!arr || arr.length === 0) {
-        summary.unknown += 1;
-        unknown.push(idx);
-        continue;
-      }
-
-      const latest = arr[arr.length - 1];
-      const category = categorizeStatus(latest.status ?? '');
-      summary[category] += 1;
-
-      if (latest.slashed) {
-        summary.slashed += 1;
-      }
-    }
-
-    return { statusSummary: summary, unknownValidators: unknown };
+  // Validators with no status transitions at all
+  const unknownValidators = useMemo(() => {
+    if (!enabled || isLoading) return [];
+    return resolvedIndices.filter(idx => !transitionsByValidator.get(idx)?.length);
   }, [resolvedIndices, transitionsByValidator, enabled, isLoading]);
 
   if (!enabled) {
     return {
       getStatusAtTimestamp: () => null,
-      statusSummary: null,
       unknownValidators: [],
       isLoading: false,
       error: null,
@@ -216,7 +158,6 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
 
   return {
     getStatusAtTimestamp,
-    statusSummary,
     unknownValidators,
     isLoading,
     error: (error as Error) ?? null,

@@ -31,8 +31,6 @@ export type {
 } from './useFunctionSignatures';
 export { useBlockResourceGas } from './useBlockResourceGas';
 export type { UseBlockResourceGasOptions, UseBlockResourceGasResult } from './useBlockResourceGas';
-export { useTransactionResourceGas } from './useTransactionResourceGas';
-export type { UseTransactionResourceGasOptions, UseTransactionResourceGasResult } from './useTransactionResourceGas';
 export { useCallFrameResourceGas } from './useCallFrameResourceGas';
 export type { UseCallFrameResourceGasOptions, UseCallFrameResourceGasResult } from './useCallFrameResourceGas';
 export { useBlockReceiptSizes } from './useBlockReceiptSizes';

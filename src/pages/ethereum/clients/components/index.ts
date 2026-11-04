@@ -8,7 +8,6 @@ export { ClientsSkeleton } from './ClientsSkeleton';
 export { EntityFilter } from './EntityFilter';
 export { EntityVersionBars } from './EntityVersionBars';
 export { ForkReadinessCard } from './ForkReadinessCard';
-export { GraffitiBlocksTable } from './GraffitiBlocksTable';
 export { LayerClients } from './LayerClients';
 export { NodeClientVersion } from './NodeClientVersion';
 export { NodeTable } from './NodeTable';
