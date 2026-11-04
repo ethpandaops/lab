@@ -182,8 +182,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted sm:px-5">
-        <span>Uncoloured cells are within 10% of 1× or within noise.</span>
+      <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border px-4 py-3 text-xs text-muted sm:px-5">
         <span className="flex w-full items-center gap-2 whitespace-nowrap sm:w-auto">
           Faster than priced
           <span

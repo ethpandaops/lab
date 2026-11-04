@@ -98,10 +98,10 @@ export function formatTooltipDate(value: number | string, isDaily: boolean): str
 // Gas Band Utilities
 // ============================================================================
 
-/** Gets the chunk index for a gas limit band */
+/** Gets the chunk index for a gas limit band. Bands are half-open: each covers [previous max, max). */
 export function getChunkIndex(gasLimitBand: number): number {
   for (let i = 0; i < GAS_BANDS.length; i++) {
-    if (gasLimitBand <= GAS_BANDS[i].max) {
+    if (gasLimitBand < GAS_BANDS[i].max) {
       return i;
     }
   }
@@ -254,6 +254,16 @@ export function formatBigNum(n: number | bigint | undefined): string {
 // Chart Config Builders
 // ============================================================================
 
+/**
+ * Transactions per second over the whole period: total transactions ÷ total seconds.
+ * `avg_tps` is the unweighted mean of per-block ratios, which overstates TPS when block times vary.
+ */
+export function periodTps(r: FctExecutionTpsHourly | FctExecutionTpsDaily): number | null {
+  const seconds = r.total_seconds ?? 0;
+  if (seconds <= 0) return null;
+  return (r.total_transactions ?? 0) / seconds;
+}
+
 /** Builds chart series config from TPS records aligned to unified time keys */
 export function buildTpsChartConfig(
   records: (FctExecutionTpsHourly | FctExecutionTpsDaily)[],
@@ -296,7 +306,7 @@ export function buildTpsChartConfig(
   });
   const avgValues = unifiedKeys.map(k => {
     const r = byKey.get(k);
-    return r ? Math.max(0, r.avg_tps ?? 0) : null;
+    return r ? periodTps(r) : null;
   });
   const medianValues = unifiedKeys.map(k => {
     const r = byKey.get(k);

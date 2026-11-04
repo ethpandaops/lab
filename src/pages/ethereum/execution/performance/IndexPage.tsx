@@ -111,14 +111,18 @@ export function IndexPage(): JSX.Element {
             label: TIME_RANGE_CONFIG[r].label,
           }))}
           value={timeRange}
-          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true, resetScroll: false })}
           ariaLabel="Time window"
         />
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() =>
-              navigate({ search: prev => ({ ...prev, refNodes: !referenceNodesOnly || undefined }), replace: true })
+              navigate({
+                search: prev => ({ ...prev, refNodes: referenceNodesOnly ? false : undefined }),
+                replace: true,
+                resetScroll: false,
+              })
             }
             className="flex cursor-pointer items-center gap-2"
           >
@@ -423,7 +427,7 @@ function PerformanceSections({
               {/* Distribution */}
               <PopoutCard
                 title="Throughput Distribution"
-                subtitle="Per-block Mgas/s, P5–P95, blocks above 5M gas"
+                subtitle="Per-block Mgas/s, P5–P95"
                 headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
                 anchorId="throughput-distribution"
                 modalSize="full"
@@ -471,6 +475,7 @@ function PerformanceSections({
       <InspectSection
         title="Opcodes"
         meta={opcodeCosts.model && fmtDayWindow(opcodeCosts.model.windowStart, opcodeCosts.model.windowEnd)}
+        note="Always reference nodes, regardless of the filter above."
       >
         {opcodeCosts.model ? (
           <>

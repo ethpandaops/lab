@@ -381,11 +381,7 @@ export function PayloadsView({
     <Container>
       {/* Header with Learn more button */}
       <div className="flex items-start justify-between gap-4">
-        <Header
-          title="Payloads"
-          description={`Individual engine_newPayload observations taking ${durationThreshold}ms+ to validate`}
-          className="mb-0"
-        />
+        <Header title="Payloads" description="Individual engine_newPayload observations" className="mb-0" />
         <button
           type="button"
           onClick={() => setLearnMoreOpen(true)}

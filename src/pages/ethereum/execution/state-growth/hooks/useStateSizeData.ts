@@ -33,10 +33,15 @@ function normalizeDailyData(data: FctExecutionStateSizeDaily[]): NormalizedDataP
       (item): item is FctExecutionStateSizeDaily & { day_start_date: string } => item.day_start_date !== undefined
     )
     .map(item => {
-      const date = new Date(item.day_start_date);
+      const date = new Date(`${item.day_start_date}T00:00:00Z`);
       return {
         date,
-        dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        dateLabel: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
         total_bytes: item.total_bytes ?? 0,
         account_bytes: item.account_bytes ?? 0,
         account_trienode_bytes: item.account_trienode_bytes ?? 0,
@@ -66,8 +71,8 @@ export function useStateSizeData(): UseStateSizeDataResult {
   });
 
   const normalizedData = useMemo((): NormalizedDataPoint[] | null => {
-    if (!dailyQuery.data?.fct_execution_state_size_daily) return null;
-    return normalizeDailyData(dailyQuery.data.fct_execution_state_size_daily);
+    if (!dailyQuery.data) return null;
+    return normalizeDailyData(dailyQuery.data.fct_execution_state_size_daily ?? []);
   }, [dailyQuery.data]);
 
   const latestData = useMemo(() => {

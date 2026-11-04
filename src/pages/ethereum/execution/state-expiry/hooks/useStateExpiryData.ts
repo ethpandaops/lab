@@ -198,7 +198,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
 
     return validDates.map(dateStr => {
       const current = currentMap.get(dateStr)!;
-      const date = new Date(dateStr);
+      const date = new Date(`${dateStr}T00:00:00Z`);
 
       // Build slot expiry data for all policies
       const slotExpiryByPolicy = {} as Record<ExpiryPolicy, SlotExpiryPolicyData>;
@@ -251,7 +251,12 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
 
       return {
         date,
-        dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        dateLabel: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
         activeSlots: currentSlots,
         effectiveBytes: currentSlots * SLOT_KEY_OVERHEAD_BYTES + currentValueBytes,
         slotExpiryData: slotExpiryByPolicy,

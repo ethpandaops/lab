@@ -55,6 +55,7 @@ import {
   buildGasChartConfig,
   buildSignallingChartConfig,
   buildTransactionsChartConfig,
+  periodTps,
   type TooltipItem,
   type TooltipSection,
 } from './overview.utils';
@@ -176,6 +177,21 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
+  // Latest signalling row, to show where its data ends when it stops before the other charts
+  const signallingLatestHourlyQuery = useQuery({
+    ...fctExecutionGasLimitSignallingHourlyServiceListOptions({
+      query: { hour_start_date_time_gte: 0, order_by: 'hour_start_date_time desc', page_size: 1 },
+    }),
+    enabled: !isDaily,
+  });
+
+  const signallingLatestDailyQuery = useQuery({
+    ...fctExecutionGasLimitSignallingDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+    }),
+    enabled: isDaily,
+  });
+
   // Transactions Queries
   const transactionsHourlyQuery = useQuery({
     ...fctExecutionTransactionsHourlyServiceListOptions({
@@ -288,6 +304,33 @@ export function IndexPage(): JSX.Element {
   const error = isDaily
     ? tpsDailyQuery.error || gasDailyQuery.error || gasLimitDailyQuery.error
     : tpsHourlyQuery.error || gasHourlyQuery.error || gasLimitHourlyQuery.error;
+
+  // When signalling data stops more than a day before the other charts, name where it ends
+  const signallingEnd = useMemo(() => {
+    const lastKey = unifiedTimeKeys[unifiedTimeKeys.length - 1];
+    if (!lastKey) return null;
+    if (isDaily) {
+      const latest = signallingLatestDailyQuery.data?.fct_execution_gas_limit_signalling_daily?.[0]?.day_start_date;
+      if (!latest) return null;
+      const lagDays = (Date.parse(lastKey) - Date.parse(latest)) / 86_400_000;
+      return lagDays > 1 ? formatTooltipDate(latest, true) : null;
+    }
+    const latest =
+      signallingLatestHourlyQuery.data?.fct_execution_gas_limit_signalling_hourly?.[0]?.hour_start_date_time;
+    if (!latest) return null;
+    return Number(lastKey) - latest > 86_400 ? formatTooltipDate(latest, false) : null;
+  }, [unifiedTimeKeys, isDaily, signallingLatestDailyQuery.data, signallingLatestHourlyQuery.data]);
+
+  const period = isDaily ? 'UTC day' : 'hour';
+  const movingAvgWindow = isDaily ? '7 days' : '6 hours';
+  const signallingSubtitle = [
+    isDaily
+      ? 'MEV-relay-registered validators only, each at the highest gas limit it registered in the 7 days ending that day, rounded up to 1M.'
+      : 'MEV-relay-registered validators only, each at the highest gas limit it registered that UTC day or the 7 days before, rounded up to 1M.',
+    signallingEnd && `Data ends ${signallingEnd}.`,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // Build chart configs using unified time keys
   const tpsChartConfig = useMemo(() => {
@@ -408,7 +451,7 @@ export function IndexPage(): JSX.Element {
         {
           title: 'STATISTICS',
           items: [
-            { color: DATA_COLORS.emerald, label: 'Average', value: (record.avg_tps ?? 0).toFixed(4) },
+            { color: DATA_COLORS.emerald, label: 'Average', value: periodTps(record)?.toFixed(4) ?? '-' },
             { color: DATA_COLORS.cyan, label: 'Moving Avg', value: (record.moving_avg_tps ?? 0).toFixed(4) },
             { color: DATA_COLORS.purple, label: 'Median', value: (record.p50_tps ?? 0).toFixed(4), style: 'dotted' },
           ],
@@ -719,7 +762,12 @@ export function IndexPage(): JSX.Element {
         <div className="flex flex-col gap-4">
           {/* TPS Chart */}
           {tpsChartConfig && (
-            <PopoutCard title="Transactions Per Second" anchorId="tps-chart" modalSize="full">
+            <PopoutCard
+              title="Transactions Per Second"
+              subtitle={`Canonical blocks per ${period}. Average is transactions ÷ seconds; median and bands are over per-block TPS; moving average over ${movingAvgWindow}.`}
+              anchorId="tps-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={tpsChartConfig.series}
@@ -747,7 +795,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Gas Used Chart */}
           {gasChartConfig && (
-            <PopoutCard title="Gas Used Per Block" anchorId="gas-chart" modalSize="full">
+            <PopoutCard
+              title="Gas Used Per Block"
+              subtitle={`Canonical blocks per ${period}. Average, median and bands are over blocks; moving average over ${movingAvgWindow}.`}
+              anchorId="gas-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={gasChartConfig.series}
@@ -787,7 +840,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Transactions Chart */}
           {transactionsChartConfig && (
-            <PopoutCard title="Transactions Per Block" anchorId="transactions-chart" modalSize="full">
+            <PopoutCard
+              title="Transactions Per Block"
+              subtitle={`Canonical blocks per ${period}. Average, median and bands are over blocks; moving average over ${movingAvgWindow}.`}
+              anchorId="transactions-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={transactionsChartConfig.series}
@@ -823,8 +881,18 @@ export function IndexPage(): JSX.Element {
           )}
 
           {/* Gas Limit Signalling Chart */}
+          {!signallingChartConfig && signallingEnd && (
+            <Card rounded title="Gas Limit Signalling">
+              <p className="text-sm text-muted">Data ends {signallingEnd}.</p>
+            </Card>
+          )}
           {signallingChartConfig && (
-            <PopoutCard title="Gas Limit Signalling" anchorId="gas-signalling-chart" modalSize="full">
+            <PopoutCard
+              title="Gas Limit Signalling"
+              subtitle={signallingSubtitle}
+              anchorId="gas-signalling-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={signallingChartConfig.series}

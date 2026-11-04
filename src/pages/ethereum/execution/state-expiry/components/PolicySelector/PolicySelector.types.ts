@@ -10,6 +10,8 @@ export interface PolicyData {
   afterBytes: number | null;
   /** Resulting slots after expiry (null if no data) */
   afterSlots: number | null;
+  /** Day the cell compares, when it is older than the current state's day */
+  asOf?: string | null;
 }
 
 /** Configuration for a single expiry type (row) */
@@ -82,6 +84,8 @@ export interface PolicySelectorProps<TType extends string, TPolicy extends strin
   currentBytes: number | null;
   /** Current state slots (baseline) */
   currentSlots: number | null;
+  /** Day of the current state values */
+  currentDate?: string | null;
   /** Formatter for bytes display */
   formatBytes: (bytes: number) => string;
   /** Formatter for slots display */

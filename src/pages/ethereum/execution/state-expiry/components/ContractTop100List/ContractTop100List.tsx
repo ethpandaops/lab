@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Card } from '@/components/Layout/Card';
 import { ScrollArea } from '@/components/Layout/ScrollArea';
-import { useContractTop100Data, type ContractTop100Item } from '../../hooks';
+import { expirySavings, storageSize, useContractTop100Data, type ContractTop100Item } from '../../hooks';
 import { ContractRow, ContractCard } from '../ContractRow';
 import { ContractTop100ListSkeleton, ContractTop100ListSkeletonMobile } from './ContractTop100ListSkeleton';
 import { TableColGroup } from './TableColGroup';
@@ -17,41 +17,35 @@ interface ContractTop100ListProps {
   variant?: 'contained' | 'full';
 }
 
-/**
- * Key overhead per storage slot in geth's snapshot structure.
- * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
- */
-const SLOT_KEY_OVERHEAD_BYTES = 65;
-
-/** Calculate savings percentage */
-function calculateSavings(baseBytes: number | undefined, expiryBytes: number | undefined): number | null {
-  if (baseBytes === undefined || expiryBytes === undefined || baseBytes === 0) return null;
-  return ((baseBytes - expiryBytes) / baseBytes) * 100;
-}
-
 /** Sort data by column */
-function sortData(data: ContractTop100Item[], column: SortColumn, direction: SortDirection): ContractTop100Item[] {
+function sortData(
+  data: ContractTop100Item[],
+  column: SortColumn,
+  direction: SortDirection,
+  hideSavings: boolean
+): ContractTop100Item[] {
   return [...data].sort((a, b) => {
     let aVal: number | null = null;
     let bVal: number | null = null;
 
     switch (column) {
       case 'size':
-        // Include key overhead in size calculation
-        aVal = (a.contract.active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (a.contract.effective_bytes ?? 0);
-        bVal = (b.contract.active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (b.contract.effective_bytes ?? 0);
+        aVal = storageSize(a.contract) ?? 0;
+        bVal = storageSize(b.contract) ?? 0;
         break;
       case 'slots':
         aVal = a.contract.active_slots ?? 0;
         bVal = b.contract.active_slots ?? 0;
         break;
       case 'expiry1y':
-        aVal = calculateSavings(a.contract.effective_bytes, a.expiry12m?.effective_bytes);
-        bVal = calculateSavings(b.contract.effective_bytes, b.expiry12m?.effective_bytes);
+        if (hideSavings) break;
+        aVal = expirySavings(a.contract, a.expiry12m);
+        bVal = expirySavings(b.contract, b.expiry12m);
         break;
       case 'expiry2y':
-        aVal = calculateSavings(a.contract.effective_bytes, a.expiry24m?.effective_bytes);
-        bVal = calculateSavings(b.contract.effective_bytes, b.expiry24m?.effective_bytes);
+        if (hideSavings) break;
+        aVal = expirySavings(a.contract, a.expiry24m);
+        bVal = expirySavings(b.contract, b.expiry24m);
         break;
     }
 
@@ -133,7 +127,11 @@ function SortHeader({
  * @param variant - 'contained' (default) wraps in Card with ScrollArea, 'full' renders directly
  */
 export function ContractTop100List({ variant = 'contained' }: ContractTop100ListProps): JSX.Element {
-  const { data, isLoading, error } = useContractTop100Data();
+  const { data, expiryEndDate, isLoading, error } = useContractTop100Data();
+  const hideSavings = expiryEndDate !== null;
+  const expiryNote = expiryEndDate
+    ? `Expiry data ends ${new Date(`${expiryEndDate}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}, so 1y and 2y savings aren't shown.`
+    : undefined;
   const [sortColumn, setSortColumn] = useState<SortColumn>('size');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -149,8 +147,8 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
 
   const sortedData = useMemo(() => {
     if (!data) return null;
-    return sortData(data, sortColumn, sortDirection);
-  }, [data, sortColumn, sortDirection]);
+    return sortData(data, sortColumn, sortDirection, hideSavings);
+  }, [data, sortColumn, sortDirection, hideSavings]);
 
   // Desktop table content
   const tableContent = (
@@ -199,7 +197,12 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
           </thead>
           <tbody className="divide-y divide-border/50">
             {sortedData.map((item, idx) => (
-              <ContractRow key={item.contract.contract_address ?? idx} item={item} index={idx + 1} />
+              <ContractRow
+                key={item.contract.contract_address ?? idx}
+                item={item}
+                index={idx + 1}
+                hideSavings={hideSavings}
+              />
             ))}
           </tbody>
         </table>
@@ -221,7 +224,12 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
       {!isLoading && !error && sortedData && sortedData.length > 0 && (
         <div>
           {sortedData.map((item, idx) => (
-            <ContractCard key={item.contract.contract_address ?? idx} item={item} index={idx + 1} />
+            <ContractCard
+              key={item.contract.contract_address ?? idx}
+              item={item}
+              index={idx + 1}
+              hideSavings={hideSavings}
+            />
           ))}
         </div>
       )}
@@ -231,6 +239,7 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
   if (variant === 'full') {
     return (
       <>
+        {expiryNote && <p className="px-3 pb-2 text-sm text-muted">{expiryNote}</p>}
         {/* Mobile: Card layout */}
         <div className="md:hidden">{mobileContent}</div>
         {/* Desktop: Table layout */}
@@ -240,11 +249,11 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
   }
 
   return (
-    <Card title="Top 100 Contracts" className="h-120 overflow-hidden rounded-sm">
-      {/* Mobile: Card layout */}
-      <ScrollArea orientation="vertical" className="h-[calc(30rem-52px)] md:hidden">
+    <Card title="Top 100 Contracts" subtitle={expiryNote} className="h-120 overflow-hidden rounded-sm">
+      {/* Mobile: Card layout. A plain scroller, since ScrollArea sizes its content to the widest row */}
+      <div className="h-[calc(30rem-52px)] overflow-y-auto md:hidden">
         <div className="pb-10">{mobileContent}</div>
-      </ScrollArea>
+      </div>
 
       {/* Desktop: Table layout */}
       <ScrollArea orientation="both" className="hidden h-[calc(30rem-52px)] md:block">

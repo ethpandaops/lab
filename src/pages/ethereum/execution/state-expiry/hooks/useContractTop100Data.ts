@@ -1,7 +1,34 @@
 import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { fctStorageSlotTop100ByBytesServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import {
+  fctStorageSlotStateByBlockDailyServiceListOptions,
+  fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions,
+  fctStorageSlotTop100ByBytesServiceListOptions,
+} from '@/api/@tanstack/react-query.gen';
 import type { FctStorageSlotTop100ByBytes } from '@/api/types.gen';
+
+/**
+ * Key overhead per storage slot in geth's snapshot structure.
+ * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
+ */
+const SLOT_KEY_OVERHEAD_BYTES = 65;
+
+/** Storage size of a row: value bytes plus the 65-byte key overhead per slot, as on the contract page */
+export function storageSize(row: FctStorageSlotTop100ByBytes | null | undefined): number | undefined {
+  if (!row || row.effective_bytes === undefined) return undefined;
+  return (row.active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + row.effective_bytes;
+}
+
+/** Percentage of storage size an expiry policy removes, on the same size basis as the Size column */
+export function expirySavings(
+  base: FctStorageSlotTop100ByBytes,
+  expiry: FctStorageSlotTop100ByBytes | null
+): number | null {
+  const baseSize = storageSize(base);
+  const expirySize = storageSize(expiry);
+  if (baseSize === undefined || expirySize === undefined || baseSize === 0) return null;
+  return ((baseSize - expirySize) / baseSize) * 100;
+}
 
 /** Grouped contract data with base state and expiry policy data */
 export interface ContractTop100Item {
@@ -15,6 +42,11 @@ export interface ContractTop100Item {
 
 interface UseContractTop100DataResult {
   data: ContractTop100Item[] | null;
+  /**
+   * Last day of slot-expiry data, set when it stops more than a day before the current state.
+   * The expiry rows then describe older state than the base rows, so their savings are not comparable.
+   */
+  expiryEndDate: string | null;
   isLoading: boolean;
   error: Error | null;
 }
@@ -34,6 +66,23 @@ export function useContractTop100Data(): UseContractTop100DataResult {
     }),
     placeholderData: keepPreviousData,
   });
+
+  const latestBaseQuery = useQuery({
+    ...fctStorageSlotStateByBlockDailyServiceListOptions({
+      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+    }),
+  });
+
+  const latestExpiryQuery = useQuery({
+    ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
+      query: { expiry_policy_eq: '12m', day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+    }),
+  });
+
+  const latestBase = latestBaseQuery.data?.fct_storage_slot_state_by_block_daily?.[0]?.day_start_date;
+  const latestExpiry = latestExpiryQuery.data?.fct_storage_slot_state_with_expiry_by_block_daily?.[0]?.day_start_date;
+  const expiryEndDate =
+    latestBase && latestExpiry && Date.parse(latestBase) - Date.parse(latestExpiry) > 86_400_000 ? latestExpiry : null;
 
   const data = query.data?.fct_storage_slot_top_100_by_bytes ?? null;
 
@@ -89,6 +138,7 @@ export function useContractTop100Data(): UseContractTop100DataResult {
 
   return {
     data: groupedData,
+    expiryEndDate,
     isLoading: query.isLoading,
     error: query.error as Error | null,
   };

@@ -235,9 +235,9 @@ export function QuickFilters({
         })}
       </div>
 
-      {/* EL Clients - hidden on mobile */}
-      <div className="hidden items-center gap-1.5 sm:flex">
-        <div className="h-5 w-px bg-border" />
+      {/* EL Clients */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <div className="hidden h-5 w-px bg-border sm:block" />
         {EL_CLIENTS.map(client => {
           const isActive = isClientSelected(client);
           return (
@@ -260,9 +260,9 @@ export function QuickFilters({
         })}
       </div>
 
-      {/* Reference Nodes toggle - hidden on mobile */}
-      <div className="hidden items-center gap-1.5 sm:flex">
-        <div className="h-5 w-px bg-border" />
+      {/* Reference Nodes toggle */}
+      <div className="flex items-center gap-1.5">
+        <div className="hidden h-5 w-px bg-border sm:block" />
         <button
           type="button"
           onClick={handleReferenceNodesToggle}

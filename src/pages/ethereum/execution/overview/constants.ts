@@ -31,17 +31,18 @@ export interface ChartConfig {
 }
 
 /**
- * Gas limit signalling bands (in millions)
- * Index 0: 0-30M, Index 1: 30-36M, Index 2: 36-45M, Index 3: 45-60M, Index 4: 60-75M, Index 5: 75M+
+ * Gas limit signalling bands. Each band is half-open, [previous max, max), so a round target
+ * such as 60M falls in the band that starts at it. Signalled limits are rounded up to whole
+ * millions, so the labels list the inclusive range of values each band holds.
  * Colors go from cool (blue) to hot (red)
  */
 export const GAS_BANDS = [
-  { max: 30_000_000, label: '0-30M', color: DATA_COLORS.blue },
-  { max: 36_000_000, label: '30-36M', color: DATA_COLORS.cyan },
-  { max: 45_000_000, label: '36-45M', color: DATA_COLORS.green },
-  { max: 60_000_000, label: '45-60M', color: DATA_COLORS.orange },
-  { max: 75_000_000, label: '60-75M', color: DATA_COLORS.red },
-  { max: Infinity, label: '75M+', color: DATA_COLORS.rose },
+  { max: 30_000_000, label: '<30M', color: DATA_COLORS.blue },
+  { max: 36_000_000, label: '30–35M', color: DATA_COLORS.cyan },
+  { max: 45_000_000, label: '36–44M', color: DATA_COLORS.green },
+  { max: 60_000_000, label: '45–59M', color: DATA_COLORS.orange },
+  { max: 75_000_000, label: '60–74M', color: DATA_COLORS.red },
+  { max: Infinity, label: '≥75M', color: DATA_COLORS.rose },
 ] as const;
 
 /** Time period selector options for UI rendering */

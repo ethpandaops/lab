@@ -77,7 +77,7 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
   }, [snapshot, themeColors]);
 
   const subtitle = snapshot
-    ? `${new Date(snapshot.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}, ${formatBillions(snapshot.total)} slots`
+    ? `${new Date(`${snapshot.day}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}, ${formatBillions(snapshot.total)} slots`
     : undefined;
 
   return (
