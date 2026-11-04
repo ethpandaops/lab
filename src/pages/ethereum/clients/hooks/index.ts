@@ -2,8 +2,6 @@ export { useClientCounts } from './useClientCounts';
 export type { UseClientCountsResult } from './useClientCounts';
 export { useEntityOptions } from './useEntityOptions';
 export type { UseEntityOptionsResult } from './useEntityOptions';
-export { useGraffitiBlocks } from './useGraffitiBlocks';
-export type { UseGraffitiBlocksResult } from './useGraffitiBlocks';
 export { useClientReleases, useLatestReleases } from './useClientReleases';
 export type { UseClientReleasesResult } from './useClientReleases';
 export { useClientBlocks } from './useClientBlocks';

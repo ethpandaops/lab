@@ -68,12 +68,7 @@ export function useGeographicalData(): UseGeographicalDataReturn {
           totalContinents: 0,
           totalCountries: 0,
           totalCities: 0,
-          lastUpdated: 0,
-          uniqueVersions: 0,
-          byClassification: { individual: 0, corporate: 0, internal: 0 },
           byClientImplementation: [],
-          topCountries: [],
-          topCities: [],
         },
         allNodes: [],
       };
@@ -183,16 +178,7 @@ export function useGeographicalData(): UseGeographicalDataReturn {
       totalContinents: continentsMap.size,
       totalCountries: Array.from(continentsMap.values()).reduce((sum, c) => sum + c.countries.size, 0),
       totalCities: Array.from(continentsMap.values()).reduce((sum, c) => sum + c.totalCities, 0),
-      lastUpdated: Math.max(...processedNodes.map(n => n.last_seen_date_time || 0)),
-      uniqueVersions: 0,
-      byClassification: {
-        individual: processedNodes.filter(n => n.classification === 'individual').length,
-        corporate: processedNodes.filter(n => n.classification === 'corporate').length,
-        internal: processedNodes.filter(n => n.classification === 'internal').length,
-      },
       byClientImplementation,
-      topCountries: [],
-      topCities: [],
     };
 
     return { continents: continentsMap, stats, allNodes: processedNodes };

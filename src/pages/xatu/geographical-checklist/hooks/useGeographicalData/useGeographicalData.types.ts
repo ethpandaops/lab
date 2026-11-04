@@ -56,16 +56,7 @@ export interface GeographicalStats {
   totalContinents: number;
   totalCountries: number;
   totalCities: number;
-  lastUpdated: number;
-  uniqueVersions: number;
-  byClassification: {
-    individual: number;
-    corporate: number;
-    internal: number;
-  };
   byClientImplementation: ClientImplementationStats[];
-  topCountries: LocationStats[];
-  topCities: LocationStats[];
 }
 
 export interface UseGeographicalDataReturn {
