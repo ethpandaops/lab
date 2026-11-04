@@ -67,8 +67,6 @@ export interface TraceSpan {
   depth: number;
   /** Additional details for tooltip */
   details?: string;
-  /** Whether this span arrived late (after attestation deadline) */
-  isLate?: boolean;
   /** Node count for DA items */
   nodeCount?: number;
   /** Parent span ID for collapsible grouping */

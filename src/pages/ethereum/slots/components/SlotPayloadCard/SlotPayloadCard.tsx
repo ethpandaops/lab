@@ -76,14 +76,14 @@ export function SlotPayloadCard({ slot, proposerIndex, hasBlock }: SlotPayloadCa
             <MiniStat
               label="Payload first seen"
               value={firstSeenMs !== undefined && Number.isFinite(firstSeenMs) ? `${firstSeenMs}ms` : '—'}
-              secondaryText={seenByNodes > 0 ? `${seenByNodes} nodes` : undefined}
+              secondaryText={seenByNodes > 0 ? `${seenByNodes} Xatu nodes` : undefined}
             />
             <MiniStat
               label="Verified available"
               value={
                 firstAvailableMs !== undefined && Number.isFinite(firstAvailableMs) ? `${firstAvailableMs}ms` : '—'
               }
-              secondaryText={payloadAvailable.length > 0 ? `${payloadAvailable.length} nodes` : undefined}
+              secondaryText={payloadAvailable.length > 0 ? `${payloadAvailable.length} Xatu nodes` : undefined}
             />
             <MiniStat
               label="PTC present votes"

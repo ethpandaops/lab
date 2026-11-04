@@ -3,6 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BoxPlot, calculateBoxPlotStats } from '@/components/Charts/BoxPlot';
 import type { BoxPlotData, BoxPlotDataItem } from '@/components/Charts/BoxPlot';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
+import { MiniStat } from '@/components/DataDisplay/MiniStat';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlobPropagationChartProps } from './BlobPropagationChart.types';
 
@@ -242,20 +243,26 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
     );
   }
 
-  const itemType = isDataColumns ? 'data column' : 'blob';
-  const itemTypePlural = isDataColumns ? 'data columns' : 'blobs';
+  const itemType = isDataColumns ? 'column' : 'blob';
   const title = isDataColumns ? 'Data Column Propagation' : 'Blob Propagation';
-  const subtitle = `${blobCount} ${blobCount === 1 ? itemType : itemTypePlural} • Median: ${(medianPropagationTime / 1000).toFixed(2)}s • ${totalObservations.toLocaleString()} observations`;
 
   return (
-    <PopoutCard
-      title={title}
-      anchorId="blob-propagation-chart"
-      subtitle={subtitle}
-      modalSize={isDataColumns ? 'full' : 'xl'}
-    >
+    <PopoutCard title={title} anchorId="blob-propagation-chart" modalSize={isDataColumns ? 'full' : 'xl'}>
       {({ inModal }) => (
         <>
+          <div className="mb-4 grid grid-cols-3 items-start gap-4">
+            <MiniStat label={isDataColumns ? 'Columns' : 'Blobs'} value={blobCount.toLocaleString()} />
+            <MiniStat
+              label="Observations"
+              value={totalObservations.toLocaleString()}
+              secondaryText={`One per Xatu node per ${itemType}`}
+            />
+            <MiniStat
+              label="Median first seen"
+              value={`${(medianPropagationTime / 1000).toFixed(2)}s`}
+              secondaryText="All observations pooled"
+            />
+          </div>
           {isDataColumns ? (
             <MultiLineChart
               series={bandChartSeries}

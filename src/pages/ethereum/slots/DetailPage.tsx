@@ -29,6 +29,7 @@ import {
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useSlotPayloadData } from './hooks/useSlotPayloadData';
 import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
+import { useSlotTableCoverage, noDataBefore } from './hooks/useSlotTableCoverage';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { SlotPayloadCard } from './components/SlotPayloadCard';
 import { SlotDownloadModal } from './components/SlotDownloadModal';
@@ -99,11 +100,9 @@ export function DetailPage(): JSX.Element {
   // The chart draws one series per builder, which stops scaling somewhere
   // around a dozen. The strongest bidders keep individual series and the
   // auction frontier table supplies the "best bid" line — bounded by the
-  // 50ms chunk grid no matter how many builders compete. If the by_builder
-  // fetch truncated (unbounded builder count), fall back to frontier only.
+  // 50ms chunk grid no matter how many builders compete.
   const payloadBidRaceData = useMemo(() => {
     const TOP_BUILDERS = 10;
-    const BY_BUILDER_PAGE_SIZE = 10000;
 
     const frontierRows = payloadData.bidFrontier.map(bid => ({
       chunk_slot_start_diff: bid.chunk_slot_start_diff ?? 0,
@@ -111,10 +110,6 @@ export function DetailPage(): JSX.Element {
       builder_pubkey: 'best bid',
       block_hash: bid.block_hash,
     }));
-
-    if (payloadData.bidRace.length >= BY_BUILDER_PAGE_SIZE) {
-      return frontierRows;
-    }
 
     const peakByBuilder = new Map<number, bigint>();
     for (const bid of payloadData.bidRace) {
@@ -181,8 +176,12 @@ export function DetailPage(): JSX.Element {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [slot, navigate]);
 
+  // Which tables cover this slot: settled attestation tables where they reach it, and where each table starts
+  const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
+  const coverage = useSlotTableCoverage(slotTimestamp);
+
   // Fetch all slot data
-  const { data, isLoading, error } = useSlotDetailData(slot);
+  const { data, isLoading, error } = useSlotDetailData(slot, coverage);
 
   const columnCompletion = useSlotColumnCompletion(slot);
 
@@ -193,10 +192,10 @@ export function DetailPage(): JSX.Element {
   });
 
   // Fetch ALL attestation votes (with pagination)
-  const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
   const { data: allAttestationVotes, isLoading: attestationVotesLoading } = useAllAttestationVotes(
     slotTimestamp,
-    !!currentNetwork && slotTimestamp > 0
+    coverage.settled.int_attestation_attested,
+    !!currentNetwork && slotTimestamp > 0 && !coverage.isLoading
   );
 
   // Fetch blob submitters (depends on execution block number from block head)
@@ -360,10 +359,15 @@ export function DetailPage(): JSX.Element {
           meta_client_geo_continent_code: item.meta_client_geo_continent_code,
         }));
 
-  // Calculate total missed attestations for subtitle
-  const totalMissedAttestations = data.missedAttestations.reduce((sum, item) => sum + item.count, 0);
+  // Total across every entity, not just the 10 charted
   const missedAttestationsSubtitle =
-    totalMissedAttestations > 0 ? `${totalMissedAttestations.toLocaleString()} total missed attestations` : undefined;
+    data.totalMissedAttestations > 0
+      ? `${data.totalMissedAttestations.toLocaleString()} missed attestations in total`
+      : undefined;
+  const livenessStart = coverage.dataStart('fct_attestation_liveness_by_entity');
+  const attestedStart = coverage.dataStart('int_attestation_attested');
+  const arrivalsStart = coverage.dataStart('fct_attestation_first_seen_chunked_50ms');
+  const mevStart = coverage.dataStart('fct_block_mev');
 
   // Transform MEV bidding data for chart
   const mevBiddingData = data.mevBidding.map(item => ({
@@ -379,7 +383,7 @@ export function DetailPage(): JSX.Element {
   const winningMevValue = data.blockMev[0]?.value ?? undefined;
   const winningBuilder = data.blockMev[0]?.builder_pubkey ?? undefined;
   const winningRelay = data.blockMev[0]?.relay_names?.[0] ?? undefined;
-  const winningBidTimestamp = data.blockMev[0]?.earliest_bid_date_time ?? undefined;
+  const winningBidMicros = data.blockMev[0]?.earliest_bid_date_time ?? undefined;
 
   // Transform proposed block data for PreparedBlocksComparisonChart
   const proposedBlock =
@@ -486,7 +490,13 @@ export function DetailPage(): JSX.Element {
         />
       )}
 
-      <SlotBasicInfoCard slot={slot} epoch={epoch} data={data} isMissedSlot={isMissedSlot} />
+      <SlotBasicInfoCard
+        slot={slot}
+        epoch={epoch}
+        data={data}
+        isMissedSlot={isMissedSlot}
+        dataStart={coverage.dataStart}
+      />
 
       {/* Tabbed Content */}
       <div className="mt-8">
@@ -818,19 +828,21 @@ export function DetailPage(): JSX.Element {
                   votedForBlocks={data.votedForBlocks}
                   expectedValidatorCount={totalExpectedValidators}
                   isLoading={attestationVotesLoading}
+                  emptyMessage={attestedStart ? noDataBefore(attestedStart) : undefined}
                 />
                 <AttestationArrivalsChart
                   attestationData={attestationData}
                   currentSlot={slot}
                   votedForBlocks={data.votedForBlocks}
                   totalExpectedValidators={totalExpectedValidators}
+                  emptyMessage={arrivalsStart ? noDataBefore(arrivalsStart) : undefined}
                 />
                 <AttestationsByEntity
                   data={data.missedAttestations}
-                  title="Missed Attestations by Entity"
+                  title="Missed Attestations: Top 10 Entities"
                   subtitle={missedAttestationsSubtitle}
                   anchorId="missed-attestations"
-                  emptyMessage="No missed attestations for this slot"
+                  emptyMessage={livenessStart ? noDataBefore(livenessStart) : 'No missed attestations for this slot'}
                 />
               </div>
             </TabPanel>
@@ -1044,7 +1056,9 @@ export function DetailPage(): JSX.Element {
               {!hasMevData ? (
                 <Card>
                   <div className="py-8 text-center">
-                    <p className="text-muted">No MEV data available for this slot</p>
+                    <p className="text-muted">
+                      {mevStart ? noDataBefore(mevStart) : 'No MEV data available for this slot'}
+                    </p>
                   </div>
                 </Card>
               ) : (
@@ -1069,7 +1083,7 @@ export function DetailPage(): JSX.Element {
                       <PreparedBlocksComparisonChart
                         preparedBlocks={data.preparedBlocks}
                         proposedBlock={proposedBlock}
-                        winningBidTimestamp={winningBidTimestamp}
+                        winningBidMicros={winningBidMicros}
                         slotStartTime={effectiveBlockData?.slot_start_date_time}
                       />
                     </div>

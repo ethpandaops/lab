@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ATTESTATION_DEADLINE_MS } from '@/utils';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type {
   FctBlockFirstSeenByNode,
@@ -135,7 +134,7 @@ export function useTraceSpans({
           endMs: Math.max(last, first + 50),
           category: 'execution',
           depth: 1,
-          details: `Envelope seen by ${times.length} nodes (${formatMs(first)} to ${formatMs(last)})`,
+          details: `Envelope seen by ${times.length} Xatu nodes (${formatMs(first)} to ${formatMs(last)})`,
         });
       }
     }
@@ -268,7 +267,6 @@ function buildMevSpans(
     category: 'mev',
     depth: 1,
     details: `${validBids.length} bids from ${bidsByBuilder.size} builder${bidsByBuilder.size !== 1 ? 's' : ''} (${formatMs(firstBidTime)} to ${formatMs(lastBidTime)})`,
-    isLate: false,
     collapsible: bidsByBuilder.size > 1,
     defaultCollapsed: true,
   });
@@ -572,9 +570,8 @@ function buildBlockProposalSpans(
     category: 'propagation',
     depth: 1,
     details: selectedUsername
-      ? `${selectedUsername}: ${filteredTimelines.length} node${filteredTimelines.length !== 1 ? 's' : ''} processed block`
-      : `Block proposal lifecycle across ${filteredTimelines.length} nodes in ${sortedCountries.length} countries`,
-    isLate: lastEventMs > ATTESTATION_DEADLINE_MS,
+      ? `${selectedUsername}: ${filteredTimelines.length} Xatu node${filteredTimelines.length !== 1 ? 's' : ''} processed block`
+      : `Block proposal lifecycle on ${filteredTimelines.length} Xatu nodes`,
     collapsible: sortedCountries.length > 0,
     defaultCollapsed: false,
   });
@@ -599,8 +596,7 @@ function buildBlockProposalSpans(
       endMs: countryLastEvent,
       category: 'country',
       depth: 2,
-      details: `${country}: ${sortedNodes.length} node${sortedNodes.length !== 1 ? 's' : ''}`,
-      isLate: countryLastEvent > ATTESTATION_DEADLINE_MS,
+      details: `${sortedNodes.length} Xatu node${sortedNodes.length !== 1 ? 's' : ''}`,
       parentId: 'block-proposal',
       nodeCount: sortedNodes.length,
       collapsible: true,
@@ -635,7 +631,6 @@ function buildBlockProposalSpans(
         category: classificationToCategory(timeline.classification),
         depth: 3,
         details: `${timeline.username}: ${formatMs(nodeStartMs)} → ${formatMs(nodeEndMs)}`,
-        isLate: nodeEndMs > ATTESTATION_DEADLINE_MS,
         parentId: countryId,
         clientName: timeline.consensusClient,
         clientVersion: timeline.consensusVersion,
@@ -665,7 +660,6 @@ function buildBlockProposalSpans(
         category: 'individual',
         depth: 4,
         details: `Block gossip received at ${formatMs(timeline.blockReceivedMs)}`,
-        isLate: timeline.blockReceivedMs > ATTESTATION_DEADLINE_MS,
         isPointInTime: true,
         parentId: nodeId,
       });
@@ -680,7 +674,6 @@ function buildBlockProposalSpans(
           category: 'execution-node',
           depth: 4,
           details: `newPayload executed in ${formatMs(timeline.execution.durationMs)} by ${timeline.execution.client}`,
-          isLate: timeline.execution.endMs > ATTESTATION_DEADLINE_MS,
           parentId: nodeId,
           // Don't set clientName for execution spans - it's only for CL client
           executionClient: timeline.execution.client,
@@ -700,7 +693,6 @@ function buildBlockProposalSpans(
           category: 'internal',
           depth: 4,
           details: `Chain head updated at ${formatMs(timeline.headUpdatedMs)}`,
-          isLate: timeline.headUpdatedMs > ATTESTATION_DEADLINE_MS,
           isPointInTime: true,
           parentId: nodeId,
         });
@@ -723,7 +715,6 @@ function buildBlockProposalSpans(
           category: 'column',
           depth: 4,
           details: `${timeline.isDataColumns ? 'Data columns' : 'Blobs'}: ${formatMs(daStartMs)} → ${formatMs(timeline.daCompleteMs)} (${columnCount} ${timeline.isDataColumns ? 'columns' : 'blobs'})`,
-          isLate: timeline.daCompleteMs > ATTESTATION_DEADLINE_MS,
           parentId: nodeId,
           collapsible: columnCount > 1,
           defaultCollapsed: true,
@@ -741,7 +732,6 @@ function buildBlockProposalSpans(
               category: 'column',
               depth: 5,
               details: `${timeline.isDataColumns ? 'Column' : 'Blob'} ${colIndex} seen at ${formatMs(colTime)}`,
-              isLate: colTime > ATTESTATION_DEADLINE_MS,
               isPointInTime: true,
               parentId: daSpanId,
             });
@@ -774,7 +764,6 @@ function buildAttestationSpans(result: TraceSpan[], attestations: FctAttestation
       category: 'attestation',
       depth: 1,
       details: `${totalAttestations.toLocaleString()} attestations observed across all nodes (${formatMs(firstAttTime)} → ${formatMs(lastAttTime)})`,
-      isLate: firstAttTime > ATTESTATION_DEADLINE_MS + 1000,
     });
   }
 }

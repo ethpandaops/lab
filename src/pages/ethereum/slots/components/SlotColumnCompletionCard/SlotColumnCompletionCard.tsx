@@ -28,7 +28,7 @@ function columnPaths(column: FctDataColumnCompletionBySlot): Record<CompletionPa
 }
 
 /**
- * How sentry nodes completed the block's data columns: totals by path, cells from the execution layer, timings, and
+ * How Xatu nodes completed the block's data columns: totals by path, cells from the execution layer, timings, and
  * one tile per column split by the paths its nodes used.
  */
 export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps): JSX.Element | null {
@@ -48,7 +48,7 @@ export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps
   return (
     <Card
       title="Column Completion"
-      subtitle={`${block.node_count ?? 0} sentry nodes`}
+      subtitle={`${block.node_count ?? 0} Xatu nodes`}
       actions={
         <Link to="/ethereum/data-availability/partial-columns" className="text-sm text-primary hover:underline">
           Partial columns
@@ -78,9 +78,9 @@ export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps
             secondaryText={`p90 ${formatSeconds(block.p90_completion_slot_start_diff)}`}
           />
           <MiniStat
-            label="Median node done"
+            label="All columns done"
             value={formatSeconds(block.p50_node_last_completion_slot_start_diff)}
-            secondaryText="Last column"
+            secondaryText="Median Xatu node"
           />
           <MiniStat
             label="Header first seen"

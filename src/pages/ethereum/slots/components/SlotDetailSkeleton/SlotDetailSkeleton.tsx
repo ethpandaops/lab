@@ -18,7 +18,7 @@ export interface SlotDetailSkeletonProps {
 
 /**
  * Loading skeleton for the Slot Detail page
- * Matches the layout of the slot detail view with navigation, slot info card, tabs, and overview cards
+ * Matches the layout of the slot detail view with navigation, slot info card and tabs
  */
 export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JSX.Element {
   const navigate = useNavigate();
@@ -68,7 +68,6 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
             <div className="flex-1 space-y-6">
               {/* Status Section */}
               <div className="flex flex-wrap items-center gap-2">
-                <LoadingContainer className="h-6 w-24 rounded-sm" />
                 <LoadingContainer className="h-6 w-20 rounded-sm" />
               </div>
 
@@ -179,64 +178,18 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
       <div className="mt-8">
         <TabGroup selectedIndex={0}>
           <ScrollableTabs>
-            <Tab>Overview</Tab>
-            <Tab>Block</Tab>
-            <Tab>Attestations</Tab>
-            <Tab>Propagation</Tab>
-            <Tab>Execution</Tab>
-            <Tab>MEV</Tab>
+            {['Timeline', 'Block', 'Attestations', 'Propagation', 'Blobs', 'Execution', 'MEV', 'Node Resources'].map(
+              label => (
+                <Tab key={label}>{label}</Tab>
+              )
+            )}
           </ScrollableTabs>
 
-          <TabPanels className="mt-6">
-            {/* Overview Tab Skeleton */}
+          <TabPanels className="mt-6 min-h-screen">
             <TabPanel>
-              <div className="space-y-6">
-                {/* Performance Metrics Card */}
-                <Card title="Performance Metrics">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {['Block First Seen At', 'Gas Used', 'Participation', 'Block Votes'].map(label => (
-                      <div key={label}>
-                        <dt className="text-xs font-medium text-muted">{label}</dt>
-                        <dd className="mt-2 flex items-center gap-3">
-                          <LoadingContainer className="size-12 rounded-full" />
-                          <div>
-                            <LoadingContainer className="h-5 w-16 rounded-sm" />
-                          </div>
-                        </dd>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* Network Propagation Card */}
-                <Card title="Network Propagation">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <dt className="text-xs font-medium text-muted">Block Nodes</dt>
-                      <dd className="mt-1">
-                        <LoadingContainer className="h-6 w-12 rounded-sm" />
-                      </dd>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* MEV Activity Card */}
-                <Card title="MEV Activity">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {['Relays', 'Builders'].map(label => (
-                      <div key={label}>
-                        <dt className="text-xs font-medium text-muted">{label}</dt>
-                        <dd className="mt-2">
-                          <LoadingContainer className="h-6 w-12 rounded-sm" />
-                          <div className="mt-1">
-                            <LoadingContainer className="h-4 w-24 rounded-sm" />
-                          </div>
-                        </dd>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              </div>
+              <Card>
+                <LoadingContainer className="h-72 rounded-sm" />
+              </Card>
             </TabPanel>
           </TabPanels>
         </TabGroup>

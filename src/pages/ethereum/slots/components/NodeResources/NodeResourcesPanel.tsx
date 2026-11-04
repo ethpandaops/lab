@@ -333,7 +333,7 @@ export function NodeResourcesPanel({
             >
               Observoor
             </a>{' '}
-            across {nodeNames.length} nodes
+            on {nodeNames.length} ethPandaOps nodes
           </>
         }
         actions={
@@ -395,7 +395,6 @@ export function NodeResourcesPanel({
           selectedNode={effectiveSelectedNode}
           metric={metric}
           onMetricChange={setMetric}
-          slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
           highlight={highlight}
@@ -406,7 +405,6 @@ export function NodeResourcesPanel({
           selectedNode={effectiveSelectedNode}
           metric={memMetric}
           onMetricChange={setMemMetric}
-          slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
           highlight={highlight}
@@ -415,7 +413,6 @@ export function NodeResourcesPanel({
         <DiskIoChart
           data={filteredDiskData}
           selectedNode={effectiveSelectedNode}
-          slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
           highlight={highlight}
@@ -424,7 +421,6 @@ export function NodeResourcesPanel({
         <NetworkIoChart
           data={filteredNetworkData}
           selectedNode={effectiveSelectedNode}
-          slot={slot}
           annotations={annotations}
           enabledAnnotations={enabledAnnotations}
           highlight={highlight}

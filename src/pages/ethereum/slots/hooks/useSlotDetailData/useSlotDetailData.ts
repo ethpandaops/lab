@@ -1,4 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import {
   fctBlockHeadServiceListOptions,
   fctBlockServiceListOptions,
@@ -10,9 +10,10 @@ import {
   fctBlockBlobFirstSeenByNodeServiceListOptions,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions,
   fctAttestationFirstSeenChunked50MsServiceListOptions,
+  fctAttestationCorrectnessServiceListOptions,
   fctAttestationCorrectnessHeadServiceListOptions,
+  fctAttestationLivenessByEntityServiceListOptions,
   fctAttestationLivenessByEntityHeadServiceListOptions,
-  intAttestationAttestedHeadServiceListOptions,
   fctMevBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctMevBidCountByRelayServiceListOptions,
   fctMevBidCountByBuilderServiceListOptions,
@@ -22,6 +23,7 @@ import {
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
+import type { SlotTableCoverage } from '../useSlotTableCoverage';
 import type {
   FctBlock,
   FctBlockHead,
@@ -33,9 +35,8 @@ import type {
   FctBlockBlobFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
   FctAttestationFirstSeenChunked50Ms,
-  FctAttestationCorrectnessHead,
-  FctAttestationLivenessByEntityHead,
-  IntAttestationAttestedHead,
+  FctAttestationCorrectness,
+  FctAttestationLivenessByEntity,
   FctMevBidHighestValueByBuilderChunked50Ms,
   FctMevBidCountByRelay,
   FctMevBidCountByBuilder,
@@ -64,10 +65,14 @@ export interface SlotDetailData {
   blobPropagation: FctBlockBlobFirstSeenByNode[];
   dataColumnPropagation: FctBlockDataColumnSidecarFirstSeenByNode[];
   attestations: FctAttestationFirstSeenChunked50Ms[];
-  attestationCorrectness: FctAttestationCorrectnessHead[];
-  attestationLiveness: FctAttestationLivenessByEntityHead[];
-  attestationAttested: IntAttestationAttestedHead[];
+  /** From the settled table when it covers the slot, otherwise from head */
+  attestationCorrectness: FctAttestationCorrectness[];
+  /** From the settled table when it covers the slot, otherwise from head */
+  attestationLiveness: FctAttestationLivenessByEntity[];
+  /** The 10 entities with the most missed attestations */
   missedAttestations: MissedAttestationEntity[];
+  /** Missed attestations across every entity */
+  totalMissedAttestations: number;
   mevBidding: FctMevBidHighestValueByBuilderChunked50Ms[];
   relayBids: FctMevBidCountByRelay[];
   builderBids: FctMevBidCountByBuilder[];
@@ -104,13 +109,16 @@ export interface UseSlotDetailDataResult {
  * Fetches data from multiple endpoints in parallel for a given slot.
  *
  * @param slot - The slot number to fetch data for
+ * @param coverage - Which attestation tables to read for the slot, from useSlotTableCoverage
  * @returns Object containing all slot data, loading state, and error state
  */
-export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
+export function useSlotDetailData(slot: number, coverage: SlotTableCoverage): UseSlotDetailDataResult {
   const { currentNetwork } = useNetwork();
 
   // Convert slot to timestamp for querying
   const slotTimestamp = currentNetwork ? slotToTimestamp(slot, currentNetwork.genesis_time) : 0;
+  const attestationEnabled = !!currentNetwork && slotTimestamp > 0 && !coverage.isLoading;
+  const { settled } = coverage;
 
   const queries = useQueries({
     queries: [
@@ -209,24 +217,23 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
         }),
         enabled: !!currentNetwork && slotTimestamp > 0,
       },
-      // Attestation correctness data
+      // Attestation correctness data (settled)
+      {
+        ...fctAttestationCorrectnessServiceListOptions({
+          query: {
+            slot_start_date_time_eq: slotTimestamp,
+          },
+        }),
+        enabled: attestationEnabled && settled.fct_attestation_correctness,
+      },
+      // Attestation correctness data (head, for slots the settled table doesn't cover yet)
       {
         ...fctAttestationCorrectnessHeadServiceListOptions({
           query: {
             slot_start_date_time_eq: slotTimestamp,
           },
         }),
-        enabled: !!currentNetwork && slotTimestamp > 0,
-      },
-      // Attestation attested data (detailed vote breakdown)
-      {
-        ...intAttestationAttestedHeadServiceListOptions({
-          query: {
-            slot_start_date_time_eq: slotTimestamp,
-            page_size: 10000,
-          },
-        }),
-        enabled: !!currentNetwork && slotTimestamp > 0,
+        enabled: attestationEnabled && !settled.fct_attestation_correctness,
       },
       // MEV bidding timeline data
       {
@@ -284,15 +291,15 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
         }),
         enabled: !!currentNetwork && slotTimestamp > 0,
       },
-      // Attestation liveness by entity data
+      // Attestation liveness by entity data (settled)
       {
-        ...fctAttestationLivenessByEntityHeadServiceListOptions({
+        ...fctAttestationLivenessByEntityServiceListOptions({
           query: {
             slot_start_date_time_eq: slotTimestamp,
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && slotTimestamp > 0,
+        enabled: attestationEnabled && settled.fct_attestation_liveness_by_entity,
       },
       // Block head data for voted-for blocks (slot-65 to slot range)
       {
@@ -308,11 +315,23 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     ],
   });
 
+  // Attestation liveness by entity data (head, for slots the settled table doesn't cover yet). Outside useQueries,
+  // whose result types stop resolving past 20 queries.
+  const livenessHeadQuery = useQuery({
+    ...fctAttestationLivenessByEntityHeadServiceListOptions({
+      query: {
+        slot_start_date_time_eq: slotTimestamp,
+        page_size: 10000,
+      },
+    }),
+    enabled: attestationEnabled && !settled.fct_attestation_liveness_by_entity,
+  });
+
   // Check if any query is loading
-  const isLoading = queries.some(query => query.isLoading);
+  const isLoading = coverage.isLoading || livenessHeadQuery.isLoading || queries.some(query => query.isLoading);
 
   // Get first error if any
-  const error = (queries.find(query => query.error)?.error as Error) || null;
+  const error = ((queries.find(query => query.error)?.error ?? livenessHeadQuery.error) as Error) || null;
 
   // If still loading or has error, return early
   if (isLoading || error) {
@@ -325,8 +344,11 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   }
 
   // Process attestation liveness data to get top 10 missed attestations
-  const attestationLivenessData: FctAttestationLivenessByEntityHead[] =
-    queries[18].data?.fct_attestation_liveness_by_entity_head ?? [];
+  const attestationLivenessData: FctAttestationLivenessByEntity[] =
+    (settled.fct_attestation_liveness_by_entity
+      ? queries[18].data?.fct_attestation_liveness_by_entity
+      : livenessHeadQuery.data?.fct_attestation_liveness_by_entity_head) ?? [];
+  const totalMissedAttestations = attestationLivenessData.reduce((sum, record) => sum + (record.missed_count ?? 0), 0);
 
   // Sort by missed_count and get top 10
   const missedAttestations: MissedAttestationEntity[] = attestationLivenessData
@@ -378,15 +400,15 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
   // 7: fct_block_blob_first_seen_by_node (pre-Fulu)
   // 8: fct_block_data_column_sidecar_first_seen_by_node (Fulu+)
   // 9: fct_attestation_first_seen_chunked_50ms
-  // 10: fct_attestation_correctness_head
-  // 11: int_attestation_attested_head
+  // 10: fct_attestation_correctness (settled)
+  // 11: fct_attestation_correctness_head
   // 12: fct_mev_bid_highest_value_by_builder_chunked_50ms
   // 13: int_beacon_committee_head
   // 14: fct_prepared_block
   // 15: fct_mev_bid_count_by_relay
   // 16: fct_mev_bid_count_by_builder
   // 17: fct_block_proposer_entity
-  // 18: fct_attestation_liveness_by_entity_head
+  // 18: fct_attestation_liveness_by_entity (settled)
   // 19: fct_block_head (voted-for blocks)
   const data: SlotDetailData = {
     blockHead: blockHeadData,
@@ -400,10 +422,13 @@ export function useSlotDetailData(slot: number): UseSlotDetailDataResult {
     blobPropagation: queries[7].data?.fct_block_blob_first_seen_by_node ?? [],
     dataColumnPropagation: queries[8].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
     attestations: queries[9].data?.fct_attestation_first_seen_chunked_50ms ?? [],
-    attestationCorrectness: queries[10].data?.fct_attestation_correctness_head ?? [],
-    attestationAttested: queries[11].data?.int_attestation_attested_head ?? [],
+    attestationCorrectness:
+      (settled.fct_attestation_correctness
+        ? queries[10].data?.fct_attestation_correctness
+        : queries[11].data?.fct_attestation_correctness_head) ?? [],
     attestationLiveness: attestationLivenessData,
     missedAttestations,
+    totalMissedAttestations,
     mevBidding: queries[12].data?.fct_mev_bid_highest_value_by_builder_chunked_50ms ?? [],
     committees: queries[13].data?.int_beacon_committee_head ?? [],
     preparedBlocks: queries[14].data?.fct_prepared_block ?? [],

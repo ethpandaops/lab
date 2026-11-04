@@ -1,5 +1,4 @@
 import type { JSX } from 'react';
-import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { formatMs } from './SlotProgressTimeline.utils';
 import type { TraceSpan } from './SlotProgressTimeline.types';
@@ -31,29 +30,22 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
         top: position.y + 16,
       }}
     >
-      {/* Header with label and late badge */}
+      {/* Header with label */}
       <div className="flex items-center gap-2">
         {span.clientName && <ClientLogo client={span.clientName} size={20} noLink />}
         <span className="text-sm font-semibold text-foreground">{span.label}</span>
-        {span.isLate && (
-          <span className="rounded bg-warning/20 px-1.5 py-0.5 text-xs font-medium text-warning">LATE</span>
-        )}
       </div>
 
       {/* Timing row - point-in-time events show just timestamp, not range/delta */}
       <div className="mt-2 flex items-center gap-4 rounded bg-surface/50 px-2 py-1.5 font-mono text-sm">
         {span.isPointInTime ? (
-          <span className={clsx('font-semibold', span.isLate ? 'text-warning' : 'text-foreground')}>
-            @ {formatMs(span.startMs)}
-          </span>
+          <span className="font-semibold text-foreground">@ {formatMs(span.startMs)}</span>
         ) : (
           <>
             <span className="text-muted">
               {formatMs(span.startMs)} → {formatMs(span.endMs)}
             </span>
-            <span className={clsx('font-semibold', span.isLate ? 'text-warning' : 'text-foreground')}>
-              Δ {formatMs(span.endMs - span.startMs)}
-            </span>
+            <span className="font-semibold text-foreground">Δ {formatMs(span.endMs - span.startMs)}</span>
           </>
         )}
       </div>

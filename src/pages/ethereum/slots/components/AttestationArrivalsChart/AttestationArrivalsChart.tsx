@@ -33,6 +33,7 @@ export function AttestationArrivalsChart({
   totalExpectedValidators,
   title = 'Attestation Arrivals by Block Vote',
   anchorId = 'attestation-arrivals',
+  emptyMessage = 'No attestation data available',
 }: AttestationArrivalsChartProps): JSX.Element {
   const themeColors = useThemeColors();
   // Create a map of block_root -> slot for quick lookup
@@ -116,7 +117,7 @@ export function AttestationArrivalsChart({
                 : 'flex h-64 items-center justify-center text-muted'
             }
           >
-            <p>No attestation data available</p>
+            <p>{emptyMessage}</p>
           </div>
         )}
       </PopoutCard>

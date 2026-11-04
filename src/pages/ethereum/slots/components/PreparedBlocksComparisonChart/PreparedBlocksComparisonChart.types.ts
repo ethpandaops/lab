@@ -39,13 +39,13 @@ export interface PreparedBlocksComparisonChartProps {
    */
   proposedBlock?: ProposedBlockData | null;
   /**
-   * The timestamp (in milliseconds) when the winning bid occurred (optional)
+   * When the winning bid arrived, in microseconds: fct_block_mev.earliest_bid_date_time (optional)
    * Used to filter prepared blocks that were built before the winning bid
    */
-  winningBidTimestamp?: number | null;
+  winningBidMicros?: number | null;
   /**
-   * The timestamp (in milliseconds) when the slot started (optional)
-   * Used as fallback filter when winningBidTimestamp is not available
+   * When the slot started, in seconds (optional)
+   * Used as fallback filter when winningBidMicros is not available
    * (simulates local block building at slot start)
    */
   slotStartTime?: number | null;

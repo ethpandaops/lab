@@ -28,7 +28,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
   const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 
   // Process and transform relay data for chart
-  const { chartData, labels, totalBids, processedData } = useMemo(() => {
+  const { chartData, labels, processedData } = useMemo(() => {
     // Transform and sort data by bid count (descending)
     const processed: RelayChartData[] = relayData
       .map(relay => ({
@@ -45,12 +45,10 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
     }));
 
     const relayNames = processed.map(d => d.name);
-    const total = relayData.reduce((sum, relay) => sum + (relay.bid_total || 0), 0);
 
     return {
       chartData: data,
       labels: relayNames,
-      totalBids: total,
       processedData: processed,
     };
   }, [relayData, winningRelay, themeColors.primary, CHART_CATEGORICAL_COLORS]);
@@ -87,7 +85,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
     );
   }
 
-  const subtitle = `${totalBids.toLocaleString()} bids • ${relayData.length} relays`;
+  const subtitle = `${relayData.length} relays`;
 
   return (
     <PopoutCard title="Relay Distribution" anchorId="relay-distribution" subtitle={subtitle} modalSize="xl">

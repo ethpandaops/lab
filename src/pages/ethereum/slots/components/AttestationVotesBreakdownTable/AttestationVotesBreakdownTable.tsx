@@ -15,6 +15,7 @@ export function AttestationVotesBreakdownTable({
   votedForBlocks,
   expectedValidatorCount,
   isLoading = false,
+  emptyMessage = 'No attestation data available',
 }: AttestationVotesBreakdownTableProps): JSX.Element {
   // Create a map of block_root -> block data for quick lookup
   const blockDataMap = useMemo(() => {
@@ -76,7 +77,7 @@ export function AttestationVotesBreakdownTable({
   return (
     <PopoutCard
       title="Attestation Vote Breakdown"
-      subtitle={`Total votes: ${totalVotes.toLocaleString()} • Offline: ${offlineCount.toLocaleString()}`}
+      subtitle={totalVotes > 0 ? `${totalVotes.toLocaleString()} votes` : undefined}
       modalDescription="Shows which blocks validators voted for as the head of the chain."
       noPadding
       modalSize="full"
@@ -84,7 +85,7 @@ export function AttestationVotesBreakdownTable({
       {isLoading ? (
         <div className="px-6 py-8 text-center text-sm text-muted">Loading all attestation votes...</div>
       ) : voteGroups.length === 0 ? (
-        <div className="px-6 py-8 text-center text-sm text-muted">No attestation data available</div>
+        <div className="px-6 py-8 text-center text-sm text-muted">{emptyMessage}</div>
       ) : (
         <Table
           variant="nested"
@@ -134,6 +135,8 @@ export function AttestationVotesBreakdownTable({
                   </span>
                 );
               },
+              headerClassName: 'hidden sm:table-cell',
+              cellClassName: 'hidden text-foreground sm:table-cell',
             },
             {
               header: 'Proposer',
@@ -148,7 +151,8 @@ export function AttestationVotesBreakdownTable({
                   <span className="text-muted">Unknown</span>
                 );
               },
-              cellClassName: 'w-32',
+              headerClassName: 'hidden sm:table-cell',
+              cellClassName: 'hidden w-32 sm:table-cell',
             },
             {
               header: 'Votes',
