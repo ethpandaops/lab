@@ -1,13 +1,12 @@
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { JSX } from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
-import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
@@ -71,10 +70,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   // Hourly data is already filtered to VALID status in the SQL query (via quantileIf)
   // so we can use it directly for the summary table
 
-  // State for scatter chart series visibility
-  const [visibleScatterSeries, setVisibleScatterSeries] = useState<Set<string>>(new Set());
-  const [scatterSeriesInitialized, setScatterSeriesInitialized] = useState(false);
-
   // State for percentile toggle (P50 vs P95) in hourly duration chart
   const [selectedPercentile, setSelectedPercentile] = useState<'p50' | 'p95'>('p50');
 
@@ -125,25 +120,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     { value: statusTotals.syncing, color: themeColors.warning },
     { value: statusTotals.accepted, color: themeColors.muted },
   ];
-
-  // === Block Complexity vs Duration by Client ===
-  // Group scatter data by EL client (VALID status only)
-  const clientGasData = new Map<string, [number, number][]>();
-
-  validPayloadByElClient.forEach(item => {
-    const client = (item.meta_execution_implementation ?? 'unknown').toLowerCase();
-    const gasUsed = item.gas_used;
-    const duration = item.median_duration_ms;
-
-    if (gasUsed !== undefined && duration !== undefined) {
-      if (!clientGasData.has(client)) {
-        clientGasData.set(client, []);
-      }
-      clientGasData.get(client)!.push([gasUsed / 1_000_000, duration]); // Gas in millions
-    }
-  });
-
-  const hasBlockComplexityData = clientGasData.size > 0;
 
   // === EL Client Analysis ===
   // Build a map of EL client -> metrics (VALID status only)
@@ -374,38 +350,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     };
   });
 
-  // Create scatter series for block complexity - using same client order for consistent colors
-  const blockComplexitySeries = elClientList.map((client, index) => ({
-    name: client,
-    data: clientGasData.get(client) ?? [],
-    color: getExecutionClientColor(client, index),
-    symbolSize: 6,
-  }));
-
-  // Initialize scatter series visibility when elClientList changes
-  useEffect(() => {
-    if (elClientList.length > 0 && !scatterSeriesInitialized) {
-      setVisibleScatterSeries(new Set(elClientList));
-      setScatterSeriesInitialized(true);
-    }
-  }, [elClientList, scatterSeriesInitialized]);
-
-  // Toggle scatter series visibility
-  const toggleScatterSeries = (name: string): void => {
-    setVisibleScatterSeries(prev => {
-      const next = new Set(prev);
-      if (next.has(name)) {
-        next.delete(name);
-      } else {
-        next.add(name);
-      }
-      return next;
-    });
-  };
-
-  // Filter scatter series based on visibility
-  const visibleBlockComplexitySeries = blockComplexitySeries.filter(s => visibleScatterSeries.has(s.name));
-
   // Find max median duration for color scaling
   let maxMedianDuration = 0;
   elClientMetrics.forEach(metrics => {
@@ -493,7 +437,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
       {/* Per-slot charts — short time ranges only */}
       {showPerSlotCharts && (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div>
           <PopoutCard
             title="Per-Slot Duration by Client"
             subtitle="Median duration for each slot"
@@ -518,61 +462,6 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                 />
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
-              )
-            }
-          </PopoutCard>
-
-          <PopoutCard title="Block Complexity vs Duration" anchorId="block-complexity" modalSize="full">
-            {({ inModal }) =>
-              hasBlockComplexityData ? (
-                <>
-                  <div className="mb-4 border-b border-border pb-4">
-                    <div className="mb-2">
-                      <span className="text-sm/6 font-medium text-muted">Series:</span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {blockComplexitySeries.map(s => {
-                        const isVisible = visibleScatterSeries.has(s.name);
-                        return (
-                          <button
-                            key={s.name}
-                            onClick={() => toggleScatterSeries(s.name)}
-                            className={clsx(
-                              'flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs/5 transition-colors',
-                              isVisible
-                                ? 'bg-surface-hover text-foreground'
-                                : 'hover:bg-surface-hover/50 bg-surface/50 text-muted/50'
-                            )}
-                          >
-                            <span
-                              className="size-2 rounded-full"
-                              style={{
-                                backgroundColor: isVisible ? s.color : 'transparent',
-                                border: `2px solid ${s.color}`,
-                              }}
-                            />
-                            <ClientLogo client={s.name} size={14} className={clsx(!isVisible && 'opacity-50')} noLink />
-                            <span className="font-medium">{s.name}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <ScatterAndLineChart
-                    key={Array.from(visibleScatterSeries).sort().join(',')}
-                    scatterSeries={visibleBlockComplexitySeries}
-                    xAxisTitle="Gas Used (millions)"
-                    yAxisTitle="Duration (ms)"
-                    height={inModal ? 600 : 300}
-                    showLegend={false}
-                    tooltipFormatter={(params: unknown) => {
-                      const p = params as { seriesName: string; data: [number, number] };
-                      return `<div style="display: flex; align-items: center; gap: 6px;">${clientLogoHtml(p.seriesName)}<strong>${p.seriesName}</strong></div>Gas: ${p.data[0].toFixed(1)}M<br/>Duration: ${p.data[1].toFixed(0)}ms`;
-                    }}
-                  />
-                </>
-              ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No block data available</div>
               )
             }
           </PopoutCard>
