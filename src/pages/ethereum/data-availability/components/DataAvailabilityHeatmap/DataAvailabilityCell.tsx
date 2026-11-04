@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import type { DataAvailabilityCellProps, CellSize } from './DataAvailabilityHeatmap.types';
 
 /**
- * Gets the color class based on availability percentage (percentage mode)
+ * Gets the color class based on availability percentage
  */
 const getPercentageColor = (availability: number, hasData: boolean): string => {
   // No data - show empty cell with inset shadow (doesn't affect sizing)
@@ -19,31 +19,6 @@ const getPercentageColor = (availability: number, hasData: boolean): string => {
   if (availability >= 0.2) return 'bg-danger/50 hover:bg-danger/60';
   // 0-20% availability (including 0%) = red
   return 'bg-danger/70 hover:bg-danger/80';
-};
-
-/**
- * Gets the color class based on success count vs threshold (threshold mode)
- * Uses softer colors for "bad" states since low counts might just be low traffic
- */
-const getThresholdColor = (successCount: number, threshold: number, hasData: boolean): string => {
-  // No data - show empty cell
-  if (!hasData)
-    return 'bg-background shadow-[inset_0_0_0_1px_rgba(128,128,128,0.2)] hover:shadow-[inset_0_0_0_1px_rgba(128,128,128,0.3)]';
-
-  const ratio = successCount / threshold;
-
-  // >= 3x threshold: Very healthy - full green
-  if (ratio >= 3) return 'bg-success/90 hover:bg-success';
-  // >= 2x threshold: Healthy - light green
-  if (ratio >= 2) return 'bg-success/70 hover:bg-success/80';
-  // >= 1x threshold: Meets threshold - yellow-green
-  if (ratio >= 1) return 'bg-success/50 hover:bg-success/60';
-  // >= 0.5x threshold: Borderline - yellow
-  if (ratio >= 0.5) return 'bg-warning/50 hover:bg-warning/60';
-  // >= 0.25x threshold: Concerning - light orange (softer than danger)
-  if (ratio >= 0.25) return 'bg-warning/30 hover:bg-warning/40';
-  // < 0.25x threshold: Low observations - muted orange (not harsh red)
-  return 'bg-warning/20 hover:bg-warning/30';
 };
 
 /**
@@ -75,8 +50,6 @@ const getDisabledColor = (): string => {
 export const DataAvailabilityCell = ({
   data,
   granularity,
-  viewMode = 'percentage',
-  threshold = 30,
   isSelected = false,
   isHighlighted = false,
   isDimmed = false,
@@ -93,25 +66,16 @@ export const DataAvailabilityCell = ({
 
   // Check if this cell has actual data (not a placeholder)
   const hasData = (data.totalCount ?? 0) > 0;
-  const successCount = data.successCount ?? 0;
 
-  // Get color based on view mode - disabled rows always get disabled color
-  const colorClass = isRowDisabled
-    ? getDisabledColor()
-    : viewMode === 'threshold'
-      ? getThresholdColor(successCount, threshold, hasData)
-      : getPercentageColor(data.availability, hasData);
+  // Disabled rows always get the disabled color
+  const colorClass = isRowDisabled ? getDisabledColor() : getPercentageColor(data.availability, hasData);
 
   const availabilityPercent = (data.availability * 100).toFixed(1);
   // Use raw column index (0-127) to match column labels
   const displayColumnIndex = data.columnIndex;
 
-  // Determine response time label based on granularity
-  // Slot/Blob levels use p50 (median), aggregated levels use avg p50
-  const responseTimeLabel = granularity === 'epoch' || granularity === 'slot' ? 'p50' : 'avg p50';
-
-  // Calculate threshold ratio for tooltip in threshold mode
-  const thresholdRatio = threshold > 0 ? successCount / threshold : 0;
+  // Slot rows use p50 (median), aggregated levels use avg p50
+  const responseTimeLabel = granularity === 'epoch' ? 'p50' : 'avg p50';
 
   const sizeClass = getSizeClass(size);
 
@@ -135,37 +99,19 @@ export const DataAvailabilityCell = ({
       {isRowDisabled ? (
         <div className="text-xs/4 text-muted">No blobs in this slot</div>
       ) : hasData ? (
-        viewMode === 'threshold' ? (
-          // Threshold mode tooltip
-          <>
-            <div className="text-muted">
-              {successCount} observations ({thresholdRatio >= 1 ? 'meets' : 'below'} threshold)
-            </div>
+        <>
+          <div className="text-muted">{availabilityPercent}% successful probes</div>
+          {data.successCount !== undefined && data.totalCount !== undefined && (
             <div className="text-xs/4 text-muted">
-              {(thresholdRatio * 100).toFixed(0)}% of threshold ({threshold})
+              {data.successCount}/{data.totalCount} observations
             </div>
-            {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
-              <div className="text-xs/4 text-muted">
-                {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
-              </div>
-            )}
-          </>
-        ) : (
-          // Percentage mode tooltip
-          <>
-            <div className="text-muted">{availabilityPercent}% successful probes</div>
-            {data.successCount !== undefined && data.totalCount !== undefined && (
-              <div className="text-xs/4 text-muted">
-                {data.successCount}/{data.totalCount} observations
-              </div>
-            )}
-            {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
-              <div className="text-xs/4 text-muted">
-                {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
-              </div>
-            )}
-          </>
-        )
+          )}
+          {data.avgResponseTimeMs !== undefined && data.avgResponseTimeMs > 0 && (
+            <div className="text-xs/4 text-muted">
+              {Math.round(data.avgResponseTimeMs)}ms {responseTimeLabel}
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-xs/4 text-muted">No data</div>
       )}

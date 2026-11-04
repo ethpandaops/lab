@@ -14,8 +14,6 @@ export interface DataAvailabilityCellData {
   totalCount?: number;
   /** Optional: Average response time in milliseconds */
   avgResponseTimeMs?: number;
-  /** Optional: Blob index (for slot-level view) */
-  blobIndex?: number;
   /** Optional: Whether the parent row is disabled (e.g., slot with no blobs) */
   rowDisabled?: boolean;
 }
@@ -41,17 +39,9 @@ export interface DataAvailabilityRow {
  * - window: 19-day custody window (top level) - shows days × columns
  * - day: Single day within the window - shows hours × columns
  * - hour: Single hour within a day - shows epochs × columns
- * - epoch: Single epoch within an hour - shows slots × columns
- * - slot: Single slot within an epoch - shows blobs × columns
+ * - epoch: Single epoch or slot - shows slots × columns
  */
-export type DataAvailabilityGranularity = 'window' | 'day' | 'hour' | 'epoch' | 'slot';
-
-/**
- * View mode for data availability visualization
- * - 'percentage': Traditional success rate (successCount / totalCount) - sensitive to outliers
- * - 'threshold': Count-based view showing gradient based on successCount vs threshold - robust to outliers
- */
-export type ViewMode = 'percentage' | 'threshold';
+export type DataAvailabilityGranularity = 'window' | 'day' | 'hour' | 'epoch';
 
 /**
  * Callback when a cell is clicked
@@ -89,10 +79,6 @@ export interface DataAvailabilityHeatmapProps {
   granularity: DataAvailabilityGranularity;
   /** Filter settings */
   filters: import('./DataAvailabilityFilterPanel.types').DataAvailabilityFilters;
-  /** View mode: 'percentage' (default) or 'threshold' */
-  viewMode?: ViewMode;
-  /** Threshold value for threshold mode (default: 30 for mainnet, 10 for others) */
-  threshold?: number;
   /** Callback when a row label is clicked */
   onRowClick?: RowClickHandler;
   /** Callback when a cell is clicked */
@@ -121,10 +107,6 @@ export interface DataAvailabilityCellProps {
   data: DataAvailabilityCellData;
   /** Granularity level (determines response time label) */
   granularity?: DataAvailabilityGranularity;
-  /** View mode: 'percentage' or 'threshold' */
-  viewMode?: ViewMode;
-  /** Threshold value for threshold mode */
-  threshold?: number;
   /** Whether this cell is in the selected column */
   isSelected?: boolean;
   /** Whether this cell is highlighted (hover preview) */
@@ -143,12 +125,6 @@ export interface DataAvailabilityCellProps {
  * Props for the legend component
  */
 export interface DataAvailabilityLegendProps {
-  /** Granularity level for contextual labels (unused, kept for compatibility) */
-  granularity?: DataAvailabilityGranularity;
-  /** View mode: 'percentage' or 'threshold' */
-  viewMode?: ViewMode;
-  /** Threshold value for threshold mode (for display in legend) */
-  threshold?: number;
   /** Optional: Custom class name */
   className?: string;
   /** Optional: Layout orientation (default: 'vertical') */

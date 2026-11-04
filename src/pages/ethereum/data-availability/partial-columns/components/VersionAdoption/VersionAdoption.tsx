@@ -19,8 +19,8 @@ export function VersionAdoption({ versions, isDaily }: VersionAdoptionProps): JS
       title="Client Versions"
       subtitle={
         <>
-          Share of each consensus client version&apos;s subscribing peers that request partial messages, with the
-          average number of peers seen per {isDaily ? 'day' : 'hour'}
+          Share of each consensus client version&apos;s P2P peers, as seen by Xatu sentries, that request partial
+          messages, with the average number of peers seen per {isDaily ? 'day' : 'hour'}
         </>
       }
     >
@@ -48,7 +48,7 @@ export function VersionAdoption({ versions, isDaily }: VersionAdoptionProps): JS
                 </span>
                 <span
                   className="hidden w-20 shrink-0 text-right text-xs/6 text-muted tabular-nums sm:block"
-                  title="Average subscribing peers"
+                  title="Average P2P peers"
                 >
                   {row.subscribed >= 10 ? Math.round(row.subscribed).toLocaleString() : row.subscribed.toFixed(1)} peers
                 </span>

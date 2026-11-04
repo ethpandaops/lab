@@ -129,27 +129,3 @@ export const filterByColumn = (rows: DataAvailabilityRow[], columnIndex: number)
     cells: row.cells.filter(cell => cell.columnIndex === columnIndex),
   }));
 };
-
-/**
- * Generates mock data for slot-level view showing blobs × columns
- * This is the bottom level - each row is a blob index, each column is a data column
- */
-export const generateSlotLevelData = (
-  slotIdentifier: string,
-  _slotNum: number,
-  columnRowsCount: number = 6
-): DataAvailabilityRow[] => {
-  return Array.from({ length: columnRowsCount }, (_, blobIndex) => {
-    const identifier = `${slotIdentifier}-blob-${blobIndex}`;
-    const cells = generateCells(identifier).map(cell => ({
-      ...cell,
-      blobIndex,
-    }));
-
-    return {
-      identifier,
-      label: `Blob ${blobIndex}`,
-      cells,
-    };
-  });
-};

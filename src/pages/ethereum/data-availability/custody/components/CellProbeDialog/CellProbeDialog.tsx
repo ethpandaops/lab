@@ -91,13 +91,6 @@ function buildContextDescription(cellContext: CellContext): string {
       }
       parts.push(`Slot ${formatSlot(Number(rowIdentifier))}`);
       break;
-    case 'slot':
-      // rowIdentifier is blob index, add slot from parent
-      if (parentContext?.slot !== undefined) {
-        parts.push(`Slot ${formatSlot(parentContext.slot)}`);
-      }
-      parts.push(`Blob ${rowLabel}`);
-      break;
     default:
       parts.push(rowLabel ?? 'Unknown');
   }

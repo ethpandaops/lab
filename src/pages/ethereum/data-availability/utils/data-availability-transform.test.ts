@@ -4,14 +4,12 @@ import {
   transformHourlyToRows,
   transformEpochsToRows,
   transformSlotsToRows,
-  transformBlobsToRows,
 } from './data-availability-transform';
 import type {
   FctDataColumnAvailabilityDaily,
   FctDataColumnAvailabilityHourly,
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
-  FctDataColumnAvailabilityBySlotBlob,
 } from '@/api/types.gen';
 
 describe('transformDailyToRows', () => {
@@ -350,129 +348,6 @@ describe('transformSlotsToRows', () => {
     expect(result[0].identifier).toBe('3200');
     expect(result[1].identifier).toBe('3201');
     expect(result[2].identifier).toBe('3202');
-  });
-});
-
-describe('transformBlobsToRows', () => {
-  it('should transform blob data into heatmap rows', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      {
-        blob_index: 0,
-        column_index: 0,
-        availability_pct: 95.5,
-        success_count: 100,
-        probe_count: 105,
-        p50_response_time_ms: 150,
-      },
-      {
-        blob_index: 0,
-        column_index: 1,
-        availability_pct: 98.0,
-        success_count: 98,
-        probe_count: 100,
-      },
-    ];
-
-    const result = transformBlobsToRows(blobData);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].identifier).toBe('0');
-    expect(result[0].label).toBe('0 / UNKNOWN'); // No submitter provided, defaults to UNKNOWN
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].availability).toBe(0.955);
-    expect(result[0].cells[0].blobIndex).toBe(0);
-  });
-
-  it('should include submitter name in label when provided', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      { blob_index: 0, column_index: 0, availability_pct: 95 },
-      { blob_index: 1, column_index: 0, availability_pct: 92 },
-      { blob_index: 2, column_index: 0, availability_pct: 88 },
-    ];
-    const blobSubmitters = ['base', 'optimism', 'Unknown'];
-
-    const result = transformBlobsToRows(blobData, blobSubmitters);
-
-    expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('0 / base');
-    expect(result[1].label).toBe('1 / optimism');
-    expect(result[2].label).toBe('2 / Unknown');
-  });
-
-  it('should handle empty data', () => {
-    const result = transformBlobsToRows([]);
-    expect(result).toEqual([]);
-  });
-
-  it('should handle undefined data', () => {
-    const result = transformBlobsToRows(undefined);
-    expect(result).toEqual([]);
-  });
-
-  it('should skip items without blob_index', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      {
-        blob_index: 0,
-        column_index: 0,
-        availability_pct: 95.0,
-      },
-      {
-        // No blob_index
-        column_index: 1,
-        availability_pct: 98.0,
-      },
-    ];
-
-    const result = transformBlobsToRows(blobData);
-
-    expect(result).toHaveLength(1);
-  });
-
-  it('should sort blobs in ascending order', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      { blob_index: 2, column_index: 0, availability_pct: 90 },
-      { blob_index: 0, column_index: 0, availability_pct: 95 },
-      { blob_index: 1, column_index: 0, availability_pct: 92 },
-    ];
-
-    const result = transformBlobsToRows(blobData);
-
-    expect(result[0].identifier).toBe('0');
-    expect(result[1].identifier).toBe('1');
-    expect(result[2].identifier).toBe('2');
-  });
-
-  it('should include blob index in cell data', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      {
-        blob_index: 3,
-        column_index: 0,
-        availability_pct: 95.0,
-        success_count: 95,
-        probe_count: 100,
-      },
-    ];
-
-    const result = transformBlobsToRows(blobData);
-
-    expect(result[0].cells[0].blobIndex).toBe(3);
-  });
-
-  it('should handle multiple blobs without submitters', () => {
-    const blobData: FctDataColumnAvailabilityBySlotBlob[] = [
-      { blob_index: 0, column_index: 0, availability_pct: 90 },
-      { blob_index: 0, column_index: 1, availability_pct: 92 },
-      { blob_index: 1, column_index: 0, availability_pct: 95 },
-      { blob_index: 1, column_index: 1, availability_pct: 97 },
-      { blob_index: 2, column_index: 0, availability_pct: 88 },
-    ];
-
-    const result = transformBlobsToRows(blobData);
-
-    expect(result).toHaveLength(3);
-    expect(result[0].label).toBe('0 / UNKNOWN');
-    expect(result[1].label).toBe('1 / UNKNOWN');
-    expect(result[2].label).toBe('2 / UNKNOWN');
   });
 });
 

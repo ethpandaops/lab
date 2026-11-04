@@ -1,6 +1,6 @@
 import { type JSX, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import {
   intCustodyProbeServiceListOptions,
@@ -83,7 +83,7 @@ export function IndexPage(): JSX.Element {
     ...(search.result && { result_eq: search.result }),
     ...(search.prober && { meta_client_implementation_eq: search.prober }),
     ...(search.peer && { meta_peer_implementation_eq: search.peer }),
-    ...(search.peerId && { peer_id_unique_key_eq: Number(search.peerId) }),
+    ...(search.peerId && { peer_id_unique_key_in_values: search.peerId }),
     ...(search.nodeId && { node_id_eq: search.nodeId }),
     ...(search.proberCountry && { meta_client_geo_country_eq: search.proberCountry }),
     ...(search.peerCountry && { meta_peer_geo_country_eq: search.peerCountry }),
@@ -93,8 +93,8 @@ export function IndexPage(): JSX.Element {
     ...(search.peerVersion && { meta_peer_version_eq: search.peerVersion }),
     ...(search.proberAsn && { meta_client_geo_autonomous_system_number_eq: search.proberAsn }),
     ...(search.peerAsn && { meta_peer_geo_autonomous_system_number_eq: search.peerAsn }),
-    ...(search.slot && { slot_eq: search.slot }),
-    ...(search.column && { column_indices_has: search.column }),
+    ...(search.slot !== undefined && { slot_eq: search.slot }),
+    ...(search.column !== undefined && { column_indices_has: search.column }),
     ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
   };
   const probeTimeQuery = useQuery({
@@ -108,6 +108,8 @@ export function IndexPage(): JSX.Element {
       },
     }),
     enabled: !!currentNetwork && !!fuluActivation && !isLive && !hasSlotWindow,
+    // Keep the table while a filter or page loads, so the page keeps its height and scroll position
+    placeholderData: keepPreviousData,
   });
   const slotWindowQuery = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
@@ -120,6 +122,7 @@ export function IndexPage(): JSX.Element {
       },
     }),
     enabled: !!currentNetwork && !!fuluActivation && !isLive && hasSlotWindow,
+    placeholderData: keepPreviousData,
   });
   const { isLoading, error } = hasSlotWindow ? slotWindowQuery : probeTimeQuery;
   const nextPageToken = hasSlotWindow ? slotWindowQuery.data?.next_page_token : probeTimeQuery.data?.next_page_token;
@@ -189,14 +192,13 @@ export function IndexPage(): JSX.Element {
   }, [data, search.probeTime, normalizedProbePeerId]);
 
   // Fetch probes for deep-linking (when probeTime and probePeerId are in URL but NOT in current data)
-  // Note: We can't use peer_id_unique_key_eq because Int64 values lose precision in JavaScript.
-  // Instead, query by timestamp and filter client-side by comparing the (equally corrupted) string values.
   const { data: deepLinkedProbeData } = useQuery({
     ...intCustodyProbeServiceListOptions({
       query: {
         probe_date_time_gte: search.probeTime,
         probe_date_time_lte: search.probeTime,
-        page_size: 100, // Fetch enough to find the matching probe
+        ...(normalizedProbePeerId && { peer_id_unique_key_in_values: normalizedProbePeerId }),
+        page_size: 100,
         // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
         ...(fuluActivation && { slot_gte: fuluActivation.slot }),
       },
@@ -213,6 +215,7 @@ export function IndexPage(): JSX.Element {
       const isChangingPageSize = pageSize !== (search.pageSize ?? 25);
 
       navigate({
+        resetScroll: false,
         search: prev => ({
           ...prev,
           page: pageIndex + 1,
@@ -231,6 +234,7 @@ export function IndexPage(): JSX.Element {
       if (sorting.length === 0) {
         // Reset to default sort
         navigate({
+          resetScroll: false,
           search: prev => ({
             ...prev,
             sortBy: undefined,
@@ -241,6 +245,7 @@ export function IndexPage(): JSX.Element {
       } else {
         const { id, desc } = sorting[0];
         navigate({
+          resetScroll: false,
           search: prev => ({
             ...prev,
             sortBy: id,
@@ -287,6 +292,7 @@ export function IndexPage(): JSX.Element {
       }
 
       navigate({
+        resetScroll: false,
         search: prev => ({
           ...prev,
           ...newSearch,
@@ -359,6 +365,7 @@ export function IndexPage(): JSX.Element {
       }
 
       navigate({
+        resetScroll: false,
         search: prev => ({
           ...prev,
           ...newSearch,
@@ -389,6 +396,7 @@ export function IndexPage(): JSX.Element {
   // Handle live mode toggle
   const handleLiveModeToggle = useCallback((): void => {
     navigate({
+      resetScroll: false,
       search: prev => ({
         ...prev,
         isLive: !prev.isLive,
@@ -403,6 +411,7 @@ export function IndexPage(): JSX.Element {
   const handleFiltersChange = useCallback(
     (filters: FilterValues): void => {
       navigate({
+        resetScroll: false,
         search: prev => ({
           ...prev,
           page: 1,
@@ -432,6 +441,7 @@ export function IndexPage(): JSX.Element {
   // Handle clear all filters
   const handleClearFilters = useCallback((): void => {
     navigate({
+      resetScroll: false,
       search: prev => ({
         ...prev,
         page: 1,
@@ -462,6 +472,7 @@ export function IndexPage(): JSX.Element {
     (probe: IntCustodyProbe | null): void => {
       if (probe) {
         navigate({
+          resetScroll: false,
           search: prev => ({
             ...prev,
             probeTime: probe.probe_date_time,
@@ -470,6 +481,7 @@ export function IndexPage(): JSX.Element {
         });
       } else {
         navigate({
+          resetScroll: false,
           search: prev => ({
             ...prev,
             probeTime: undefined,
@@ -489,7 +501,7 @@ export function IndexPage(): JSX.Element {
     // Return probe from current page if found
     if (probeInCurrentData) return probeInCurrentData;
 
-    // Fall back to deep-linked probes (compare peer_id as strings due to Int64 precision issues)
+    // Fall back to deep-linked probes
     const deepLinkedProbes = deepLinkedProbeData?.int_custody_probe ?? [];
     return deepLinkedProbes.find(probe => String(probe.peer_id_unique_key) === normalizedProbePeerId) ?? null;
   }, [search.probeTime, normalizedProbePeerId, probeInCurrentData, deepLinkedProbeData]);

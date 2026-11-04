@@ -4,7 +4,6 @@ import type {
   FctDataColumnAvailabilityHourly,
   FctDataColumnAvailabilityByEpoch,
   FctDataColumnAvailabilityBySlot,
-  FctDataColumnAvailabilityBySlotBlob,
 } from '@/api/types.gen';
 
 /**
@@ -22,7 +21,6 @@ interface HeatmapCell {
   successCount?: number;
   totalCount?: number;
   avgResponseTimeMs?: number;
-  blobIndex?: number;
 }
 
 /**
@@ -252,56 +250,6 @@ export function transformSlotsToRows(data: FctDataColumnAvailabilityBySlot[] | u
         cells: ensureAllColumns(cells, identifier),
         disabled: hasNoBlobs,
         disabledReason: hasNoBlobs ? 'No blobs in this slot' : undefined,
-      };
-    });
-}
-
-/**
- * Transform blob data to heatmap rows
- * @param data - Blob availability data from API
- * @param blobSubmitters - Optional array of blob submitter names where index = blob index
- */
-export function transformBlobsToRows(
-  data: FctDataColumnAvailabilityBySlotBlob[] | undefined,
-  blobSubmitters?: string[]
-): DataAvailabilityRow[] {
-  if (!data) return [];
-
-  // Group by blob_index
-  const byBlob = new Map<number, FctDataColumnAvailabilityBySlotBlob[]>();
-  for (const item of data) {
-    if (item.blob_index === undefined) continue;
-    if (!byBlob.has(item.blob_index)) {
-      byBlob.set(item.blob_index, []);
-    }
-    byBlob.get(item.blob_index)!.push(item);
-  }
-
-  // Convert to rows (sorted by blob_index ascending)
-  return Array.from(byBlob.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([blobIndex, items]) => {
-      const identifier = String(blobIndex);
-      const cells = items
-        .sort((a, b) => (a.column_index ?? 0) - (b.column_index ?? 0))
-        .map(item => ({
-          identifier,
-          columnIndex: item.column_index ?? 0,
-          availability: (item.availability_pct ?? 0) / 100,
-          successCount: item.success_count,
-          totalCount: item.probe_count,
-          avgResponseTimeMs: item.p50_response_time_ms,
-          blobIndex,
-        }));
-
-      // Get submitter name from the array (index = blob index), default to UNKNOWN
-      const submitter = blobSubmitters?.[blobIndex] ?? 'UNKNOWN';
-      const label = `${blobIndex} / ${submitter}`;
-
-      return {
-        identifier,
-        label,
-        cells: ensureAllColumns(cells, identifier),
       };
     });
 }

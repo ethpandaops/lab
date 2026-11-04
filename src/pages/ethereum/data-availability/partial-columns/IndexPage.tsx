@@ -110,6 +110,11 @@ export function IndexPage(): JSX.Element {
     if (config.days === null) return tableBounds?.min ?? 0;
     return Math.floor(Date.now() / 1000) - config.days * 24 * 3600;
   }, [config.days, tableBounds?.min]);
+  // The sentry data starts later than the longer windows reach back, so name where it starts
+  const dataStartLabel =
+    tableBounds && (config.days === null || windowStart < tableBounds.min)
+      ? formatTooltipDate(new Date(tableBounds.min * 1000).toISOString().slice(0, 10), true)
+      : null;
   const blockFilters = pickBlockFilters(search);
   const blockSort: BlockSortKey = search.sort ?? 'slot';
   const blockOrder = search.order ?? 'desc';
@@ -260,6 +265,7 @@ export function IndexPage(): JSX.Element {
               ariaLabel="Time window"
             />
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
+            {dataStartLabel && <span className="text-sm/6 text-muted">Since {dataStartLabel}</span>}
           </div>
 
           <InfoBox summary="How this is measured">
@@ -292,29 +298,50 @@ export function IndexPage(): JSX.Element {
                     id: 'adoption',
                     name: 'Partial adoption',
                     value: adoption ? formatShare(adoption.requestsPartial, adoption.subscribed) : '-',
-                    subtitle: adoption
-                      ? `of ${Math.round(adoption.subscribed).toLocaleString()} subscribing peers request partials, ${formatTooltipDate(isDaily ? adoption.key : Number(adoption.key), isDaily)}`
-                      : 'no subscription flags reported',
+                    subtitle: adoption ? (
+                      <>
+                        <span className="block whitespace-normal">
+                          of {Math.round(adoption.subscribed).toLocaleString()} P2P peers seen by Xatu sentries
+                        </span>
+                        <span className="block">
+                          {formatTooltipDate(isDaily ? adoption.key : Number(adoption.key), isDaily)}
+                        </span>
+                      </>
+                    ) : (
+                      'no subscription flags reported'
+                    ),
                   },
                   {
                     id: 'partial',
                     name: 'From partials',
                     value: formatShare(completion.byPath.PARTIAL_GOSSIP, completion.completions),
-                    subtitle: `of ${completion.completions.toLocaleString()} ${sentryName} sentry column completions`,
+                    subtitle: (
+                      <span className="whitespace-normal">
+                        of {completion.completions.toLocaleString()} {sentryName} sentry column completions
+                      </span>
+                    ),
                   },
                   {
                     id: 'el',
                     name: 'Cells from EL',
                     value: formatShare(completion.cellsFromEl, completion.cellsTotal),
-                    subtitle: `of ${completion.cellsTotal.toLocaleString()} cells in completed columns`,
+                    subtitle: (
+                      <span className="whitespace-normal">
+                        of {completion.cellsTotal.toLocaleString()} cells in completed columns
+                      </span>
+                    ),
                   },
                   {
                     id: 'useful',
                     name: 'Useful cells',
                     value: formatShare(partials.newCells, partials.verdictCells),
-                    subtitle: hasCellVerdicts
-                      ? `new cells of ${partials.verdictCells.toLocaleString()} checked`
-                      : `no cell verdicts from ${sentryName} sentries`,
+                    subtitle: (
+                      <span className="whitespace-normal">
+                        {hasCellVerdicts
+                          ? `new cells of ${partials.verdictCells.toLocaleString()} checked`
+                          : `no cell verdicts from ${sentryName} sentries`}
+                      </span>
+                    ),
                   },
                 ]}
               />
@@ -322,7 +349,7 @@ export function IndexPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                 <PopoutCard
                   title="Peers Requesting Partial Messages"
-                  subtitle={`${periodLabel} share of subscribing peers that request partial messages on data column topics`}
+                  subtitle={`${periodLabel} share of P2P peers seen by Xatu sentries that request partial messages on data column topics`}
                   anchorId="partial-adoption"
                   modalSize="full"
                 >
@@ -338,11 +365,7 @@ export function IndexPage(): JSX.Element {
                         showLegend
                         legendPosition="top"
                         enableDataZoom
-                        tooltipFormatter={shareTooltip(
-                          charts.adoption,
-                          peerKeys,
-                          'Subscribing peers requesting partials'
-                        )}
+                        tooltipFormatter={shareTooltip(charts.adoption, peerKeys, 'P2P peers requesting partials')}
                       />
                     )
                   }
