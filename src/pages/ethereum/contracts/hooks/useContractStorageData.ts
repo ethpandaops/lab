@@ -61,6 +61,14 @@ interface UseContractStorageDataResult {
   error: Error | null;
 }
 
+/** Query for the newest day in a whole table, so a series isn't carried past where its table stops */
+const TABLE_END_QUERY = {
+  address_like: '0x%',
+  day_start_date_like: '20%',
+  order_by: 'day_start_date desc',
+  page_size: 1,
+};
+
 /**
  * Hook that fetches daily storage data for a specific contract address.
  * Uses contract-level endpoints for current state and expiry policies.
@@ -141,6 +149,25 @@ export function useContractStorageData(address: string): UseContractStorageDataR
       },
     }),
     placeholderData: keepPreviousData,
+  });
+
+  // Newest day in each table. Rows are only written on days a contract changes, so a contract's own
+  // rows can't tell a quiet contract from a table that stopped updating.
+  const contractCurrentEndQuery = useQuery({
+    ...fctContractStorageStateByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    select: res => res.fct_contract_storage_state_by_address_daily?.[0]?.day_start_date ?? null,
+  });
+  const contractExpiryEndQuery = useQuery({
+    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    select: res => res.fct_contract_storage_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
+  });
+  const slotCurrentEndQuery = useQuery({
+    ...fctStorageSlotStateByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    select: res => res.fct_storage_slot_state_by_address_daily?.[0]?.day_start_date ?? null,
+  });
+  const slotExpiryEndQuery = useQuery({
+    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    select: res => res.fct_storage_slot_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
   });
 
   // Combine and normalize the data
@@ -262,6 +289,14 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     const globalMaxDateStr = allMaxDates.sort().pop()!;
     const globalMaxDate = new Date(globalMaxDateStr);
 
+    // A series is carried forward to the chart's last date, but never past the last day its table has
+    const fillEnd = (tableEnd: string | null | undefined): string =>
+      tableEnd && tableEnd < globalMaxDateStr ? tableEnd : globalMaxDateStr;
+    const contractCurrentEnd = fillEnd(contractCurrentEndQuery.data);
+    const contractExpiryEnd = fillEnd(contractExpiryEndQuery.data);
+    const slotCurrentEnd = fillEnd(slotCurrentEndQuery.data);
+    const slotExpiryEnd = fillEnd(slotExpiryEndQuery.data);
+
     // === STEP 3: Helper to fill gaps in a dataset within its own min/max range ===
     const fillGaps = (
       dataMap: Map<string, { slots: number; bytes: number }>,
@@ -281,19 +316,18 @@ export function useContractStorageData(address: string): UseContractStorageDataR
           lastValue = existing;
         }
         filled.set(dateStr, lastValue);
-        current.setDate(current.getDate() + 1);
+        current.setUTCDate(current.getUTCDate() + 1);
       }
       return filled;
     };
 
     // === STEP 4: Fill gaps for each dataset ===
-    // For "current" series, extend to global max date (forward-filling last known value)
-    // For "expiry" series, fill within their own range
+    // Each series is forward-filled from its first row to the global max date, capped at its table's end
 
-    // Contract current - fill from min to global max (extends beyond its own max with forward-fill)
-    const filledContractCurrent = fillGaps(contractCurrentMap, contractCurrentRange.min, globalMaxDateStr);
+    // Contract current
+    const filledContractCurrent = fillGaps(contractCurrentMap, contractCurrentRange.min, contractCurrentEnd);
 
-    // Contract expiry - fill each policy from its min to global max (forward-fill to align all series)
+    // Contract expiry
     const filledContractExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
       '12m': new Map(),
       '24m': new Map(),
@@ -301,17 +335,17 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     for (const policy of EXPIRY_POLICIES) {
       const range = getDateRange(contractExpiryMaps[policy]);
       if (range) {
-        filledContractExpiry[policy] = fillGaps(contractExpiryMaps[policy], range.min, globalMaxDateStr);
+        filledContractExpiry[policy] = fillGaps(contractExpiryMaps[policy], range.min, contractExpiryEnd);
       }
     }
 
-    // Slot current - fill from min to global max (extends beyond its own max with forward-fill)
+    // Slot current
     let filledSlotCurrent: Map<string, { slots: number; bytes: number }> | null = null;
     if (slotCurrentRange) {
-      filledSlotCurrent = fillGaps(slotCurrentMap, slotCurrentRange.min, globalMaxDateStr);
+      filledSlotCurrent = fillGaps(slotCurrentMap, slotCurrentRange.min, slotCurrentEnd);
     }
 
-    // Slot expiry - fill each policy from its min to global max (forward-fill to align all series)
+    // Slot expiry
     const filledSlotExpiry: Record<ExpiryPolicy, Map<string, { slots: number; bytes: number }>> = {
       '12m': new Map(),
       '24m': new Map(),
@@ -319,7 +353,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     for (const policy of EXPIRY_POLICIES) {
       const range = getDateRange(slotExpiryMaps[policy]);
       if (range) {
-        filledSlotExpiry[policy] = fillGaps(slotExpiryMaps[policy], range.min, globalMaxDateStr);
+        filledSlotExpiry[policy] = fillGaps(slotExpiryMaps[policy], range.min, slotExpiryEnd);
       }
     }
 
@@ -331,7 +365,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     const current = new Date(startDate);
     while (current <= globalMaxDate) {
       allDates.push(formatDateStr(current));
-      current.setDate(current.getDate() + 1);
+      current.setUTCDate(current.getUTCDate() + 1);
     }
 
     // === STEP 6: Build final result ===
@@ -370,7 +404,12 @@ export function useContractStorageData(address: string): UseContractStorageDataR
 
       return {
         date,
-        dateLabel: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        dateLabel: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }),
         activeSlots: contractCurrent?.slots ?? null,
         effectiveBytes: contractCurrent?.bytes ?? null,
         expiryData: contractExpiry,
@@ -388,6 +427,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     slotCurrentStateQuery.data,
     slotExpiry12mQuery.data,
     slotExpiry24mQuery.data,
+    contractCurrentEndQuery.data,
+    contractExpiryEndQuery.data,
+    slotCurrentEndQuery.data,
+    slotExpiryEndQuery.data,
   ]);
 
   const latestData = useMemo(() => {
@@ -401,7 +444,11 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     expiry24mQuery.isLoading ||
     slotCurrentStateQuery.isLoading ||
     slotExpiry12mQuery.isLoading ||
-    slotExpiry24mQuery.isLoading;
+    slotExpiry24mQuery.isLoading ||
+    contractCurrentEndQuery.isLoading ||
+    contractExpiryEndQuery.isLoading ||
+    slotCurrentEndQuery.isLoading ||
+    slotExpiryEndQuery.isLoading;
 
   const error = (currentStateQuery.error ||
     expiry12mQuery.error ||

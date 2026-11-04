@@ -210,6 +210,7 @@ export function HomePage(): JSX.Element {
   const showAnnotations = true;
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
+  const movingAvgLabel = isDaily ? 'Moving Avg (7d)' : 'Moving Avg (6h)';
 
   // Search input states
   const [searchInput, setSearchInput] = useState('');
@@ -363,33 +364,39 @@ export function HomePage(): JSX.Element {
     enabled: isDaily,
   });
 
+  // First UTC date of a daily window, so an N-day window holds N daily rows including today.
+  // "All" starts where both the opcode and receipt tables have data, so every chart covers the same days.
+  const dailyCutoff = useMemo(() => {
+    if (config.days !== null) return dailyDateValues(config.days).slice(0, 10);
+    const opsData = opcodeOpsDailyQuery.data;
+    const receiptData = receiptSizeDailyQuery.data;
+    if (!opsData?.length || !receiptData?.length) return null;
+    // Both queries are ordered newest first
+    const firstOps = opsData[opsData.length - 1].day_start_date ?? '';
+    const firstReceipt = receiptData[receiptData.length - 1].day_start_date ?? '';
+    return firstOps > firstReceipt ? firstOps : firstReceipt;
+  }, [config.days, opcodeOpsDailyQuery.data, receiptSizeDailyQuery.data]);
+
   // Opcode ops records (fetchAllPages returns array directly)
   // Filter by time period for daily data
   const opcodeOpsRecords = useMemo(() => {
     if (isDaily) {
       const allRecords = [...(opcodeOpsDailyQuery.data ?? [])].reverse();
-      if (config.days === null) return allRecords; // 'all' - no filtering
-      // Filter to last N days
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - config.days);
-      const cutoffStr = cutoffDate.toISOString().split('T')[0]; // YYYY-MM-DD
-      return allRecords.filter(r => (r.day_start_date ?? '') >= cutoffStr);
+      if (dailyCutoff === null) return allRecords;
+      return allRecords.filter(r => (r.day_start_date ?? '') >= dailyCutoff);
     }
     return opcodeOpsHourlyQuery.data;
-  }, [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data, config.days]);
+  }, [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data, dailyCutoff]);
 
   // Receipt size records - hourly/daily switching with client-side date filtering
   const receiptSizeRecords = useMemo(() => {
     if (isDaily) {
       const allRecords = [...(receiptSizeDailyQuery.data ?? [])].reverse();
-      if (config.days === null) return allRecords;
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - config.days);
-      const cutoffStr = cutoffDate.toISOString().split('T')[0];
-      return allRecords.filter(r => (r.day_start_date ?? '') >= cutoffStr);
+      if (dailyCutoff === null) return allRecords;
+      return allRecords.filter(r => (r.day_start_date ?? '') >= dailyCutoff);
     }
     return receiptSizeHourlyQuery.data;
-  }, [isDaily, receiptSizeDailyQuery.data, receiptSizeHourlyQuery.data, config.days]);
+  }, [isDaily, receiptSizeDailyQuery.data, receiptSizeHourlyQuery.data, dailyCutoff]);
 
   // Aggregate opcodes for OpcodeAnalysis component (fetchAllPages returns array directly)
   // Filter by time period for daily data
@@ -399,11 +406,8 @@ export function HomePage(): JSX.Element {
     if (!records?.length) return [];
 
     // Filter daily records by time period
-    if (isDaily && config.days !== null) {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - config.days);
-      const cutoffStr = cutoffDate.toISOString().split('T')[0];
-      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= cutoffStr);
+    if (isDaily && dailyCutoff !== null) {
+      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= dailyCutoff);
     }
 
     // Aggregate gas by opcode across the filtered time period
@@ -425,7 +429,7 @@ export function HomePage(): JSX.Element {
         count: data.totalCount,
       }))
       .sort((a, b) => b.totalGas - a.totalGas);
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, config.days]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, dailyCutoff]);
 
   // Aggregate gas by category across the time period (top 8 + Other for bar chart)
   // Filter by time period for daily data
@@ -435,11 +439,8 @@ export function HomePage(): JSX.Element {
     if (!records?.length) return { labels: [], data: [], total: 0 };
 
     // Filter daily records by time period
-    if (isDaily && config.days !== null) {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - config.days);
-      const cutoffStr = cutoffDate.toISOString().split('T')[0];
-      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= cutoffStr);
+    if (isDaily && dailyCutoff !== null) {
+      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= dailyCutoff);
     }
 
     // Aggregate gas by category
@@ -472,7 +473,7 @@ export function HomePage(): JSX.Element {
       })),
       total,
     };
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, config.days]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, dailyCutoff]);
 
   // Navigate to older/newer blocks
   const handleLoadOlderBlocks = useCallback(() => {
@@ -493,19 +494,19 @@ export function HomePage(): JSX.Element {
   const recentBlockItems = useMemo<CardChainItem[]>(() => {
     if (!recentBlocks.length) return [];
 
-    const maxGasInView = Math.max(...recentBlocks.map(b => b.gasUsed));
-
     return recentBlocks.map((block, index) => {
       const isNewest = index === recentBlocks.length - 1;
       const isActuallyLatest = isNewest && isAtLatest;
-      const gasPercentage = maxGasInView > 0 ? (block.gasUsed / maxGasInView) * 100 : 0;
+      const gasPercentage =
+        block.gasUsed !== null && block.gasLimit ? Math.min(100, (block.gasUsed / block.gasLimit) * 100) : 0;
 
       return {
         id: block.blockNumber,
         label: 'Block',
-        value: block.blockNumber,
+        // A string, so the card doesn't locale-format the block number
+        value: String(block.blockNumber),
         stats: [
-          { label: 'Gas', value: formatCompact(block.gasUsed) },
+          { label: 'Gas', value: block.gasUsed !== null ? formatCompact(block.gasUsed) : '-' },
           { label: 'Opcodes', value: formatCompact(block.opcodeCount) },
         ],
         fillPercentage: gasPercentage,
@@ -537,9 +538,7 @@ export function HomePage(): JSX.Element {
     const blockNum = parseInt(cleanedInput, 10);
     if (bounds) {
       if (blockNum < bounds.min || blockNum > bounds.max) {
-        setSearchError(
-          `Block ${formatGas(blockNum)} is outside indexed range (${formatGas(bounds.min)} - ${formatGas(bounds.max)})`
-        );
+        setSearchError(`Block ${blockNum} is outside indexed range (${bounds.min} - ${bounds.max})`);
         return;
       }
     }
@@ -648,7 +647,7 @@ export function HomePage(): JSX.Element {
           lineWidth: 2.5,
           group: 'Statistics',
         }),
-        createStatisticSeries('Moving Avg', movingAvgValues, {
+        createStatisticSeries(movingAvgLabel, movingAvgValues, {
           color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
@@ -677,7 +676,7 @@ export function HomePage(): JSX.Element {
         }),
       ],
     };
-  }, [opcodeOpsRecords, isDaily, timePeriod]);
+  }, [opcodeOpsRecords, isDaily, timePeriod, movingAvgLabel]);
 
   // Fork annotation mark lines
   const forkMarkLines = useMemo(() => {
@@ -769,7 +768,7 @@ export function HomePage(): JSX.Element {
           title: 'STATISTICS',
           items: [
             { color: DATA_COLORS.emerald, label: 'Average', value: formatCompact(record.avg_ops ?? 0) },
-            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatCompact(record.moving_avg_ops ?? 0) },
+            { color: DATA_COLORS.cyan, label: movingAvgLabel, value: formatCompact(record.moving_avg_ops ?? 0) },
             { color: DATA_COLORS.purple, label: 'Median', value: formatCompact(record.p50_ops ?? 0), style: 'dotted' },
           ],
         },
@@ -800,7 +799,7 @@ export function HomePage(): JSX.Element {
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [opcodeOpsRecords, opcodesPerSecondConfig, isDaily, timePeriod]
+    [opcodeOpsRecords, opcodesPerSecondConfig, isDaily, timePeriod, movingAvgLabel]
   );
 
   // Receipt Size Per Block chart config
@@ -867,7 +866,7 @@ export function HomePage(): JSX.Element {
           lineWidth: 2.5,
           group: 'Statistics',
         }),
-        createStatisticSeries('Moving Avg', movingAvgValues, {
+        createStatisticSeries(movingAvgLabel, movingAvgValues, {
           color: DATA_COLORS.cyan,
           lineWidth: 2,
           group: 'Statistics',
@@ -896,7 +895,7 @@ export function HomePage(): JSX.Element {
         }),
       ],
     };
-  }, [receiptSizeRecords, isDaily, timePeriod]);
+  }, [receiptSizeRecords, isDaily, timePeriod, movingAvgLabel]);
 
   // Receipt Size tooltip formatter
   const receiptTooltipFormatter = useCallback(
@@ -963,7 +962,7 @@ export function HomePage(): JSX.Element {
             },
             {
               color: DATA_COLORS.cyan,
-              label: 'Moving Avg',
+              label: movingAvgLabel,
               value: formatBytes(record.moving_avg_receipt_bytes_per_block ?? 0),
             },
             {
@@ -1004,16 +1003,25 @@ export function HomePage(): JSX.Element {
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [receiptSizeRecords, receiptSizeConfig, isDaily, timePeriod]
+    [receiptSizeRecords, receiptSizeConfig, isDaily, timePeriod, movingAvgLabel]
   );
 
   // Loading states
 
-  const isOpcodeOpsLoading = isDaily ? opcodeOpsDailyQuery.isLoading : opcodeOpsHourlyQuery.isLoading;
+  // "All" waits for both daily tables, since its start depends on both
+  const isAllStartLoading = config.days === null && (opcodeOpsDailyQuery.isLoading || receiptSizeDailyQuery.isLoading);
 
-  const isOpcodeGasLoading = isDaily ? opcodeGasDailyQuery.isLoading : opcodeGasHourlyQuery.isLoading;
+  const isOpcodeOpsLoading = isDaily
+    ? opcodeOpsDailyQuery.isLoading || isAllStartLoading
+    : opcodeOpsHourlyQuery.isLoading;
 
-  const isReceiptSizeLoading = isDaily ? receiptSizeDailyQuery.isLoading : receiptSizeHourlyQuery.isLoading;
+  const isOpcodeGasLoading = isDaily
+    ? opcodeGasDailyQuery.isLoading || isAllStartLoading
+    : opcodeGasHourlyQuery.isLoading;
+
+  const isReceiptSizeLoading = isDaily
+    ? receiptSizeDailyQuery.isLoading || isAllStartLoading
+    : receiptSizeHourlyQuery.isLoading;
 
   if (boundsLoading) {
     return (
@@ -1037,7 +1045,7 @@ export function HomePage(): JSX.Element {
     return (
       <Container>
         <Header title="Gas Profiler" description={PAGE_DESCRIPTION} />
-        <Alert variant="warning" title="No data available" description="Blocks are still being indexed." />
+        <Alert variant="info" title="Gas profiling isn't available on this network" />
       </Container>
     );
   }
@@ -1094,7 +1102,7 @@ export function HomePage(): JSX.Element {
           role={searchError ? 'alert' : 'status'}
           aria-live="polite"
         >
-          {searchError ?? `Indexed range: ${formatGas(bounds.min)} - ${formatGas(bounds.max)}`}
+          {searchError ?? `Indexed range: ${bounds.min} - ${bounds.max}`}
         </p>
       </div>
 
@@ -1119,7 +1127,8 @@ export function HomePage(): JSX.Element {
               params={{ blockNumber: String(item.id) }}
               className={clsx(
                 'group relative flex-1',
-                fromEnd >= 3 && 'hidden lg:block',
+                fromEnd >= 4 && 'hidden xl:block',
+                fromEnd === 3 && 'hidden lg:block',
                 fromEnd >= 1 && fromEnd < 3 && 'hidden sm:block'
               )}
             >
@@ -1209,7 +1218,7 @@ export function HomePage(): JSX.Element {
                   return `${pct.toFixed(1)}%`;
                 }}
                 barWidth="70%"
-                valueAxisLabelFormatter={formatCompact}
+                axisName="Gas"
                 tooltipFormatter={(params: unknown) => {
                   const arr = Array.isArray(params) ? params : [params];
                   const p = arr[0] as { name?: string; value?: number };

@@ -16,6 +16,7 @@ import {
 import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -718,7 +719,7 @@ export function TransactionPage(): JSX.Element {
             className="flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
           >
             <ArrowLeftIcon className="size-4" />
-            Back to Block {formatGas(blockNumber)}
+            Back to Block {blockNumber}
           </Link>
         ) : (
           <Link
@@ -821,14 +822,14 @@ export function TransactionPage(): JSX.Element {
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <div className="mb-6 flex items-center justify-between border-b border-border">
-          <HeadlessTab.List className="flex gap-1">
+        <div className="mb-6 flex items-center gap-2 border-b border-border">
+          <ScrollableTabs className="-mb-px min-w-0 flex-1">
             <Tab hash="overview">Overview</Tab>
             {!isSimpleTransfer && <Tab hash="trace">Trace</Tab>}
             {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
             {!isSimpleTransfer && <Tab hash="resources">Resources</Tab>}
             {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
-          </HeadlessTab.List>
+          </ScrollableTabs>
           {selectedTabIndex === 3 && <ResourceGasHelp />}
         </div>
 

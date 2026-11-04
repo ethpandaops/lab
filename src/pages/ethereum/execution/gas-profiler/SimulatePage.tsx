@@ -382,7 +382,7 @@ export function SimulatePage(): JSX.Element {
           fontSize: 11,
           formatter: (value: number) => {
             const blockNum = simState.results[value]?.blockNumber;
-            return blockNum ? formatGas(blockNum) : '';
+            return blockNum ? String(blockNum) : '';
           },
         },
         axisTick: { show: false },
@@ -420,7 +420,7 @@ export function SimulatePage(): JSX.Element {
           const blockNum = simState.results[index]?.blockNumber;
           const deltaItem = p.find(s => s.seriesName === 'Gas Delta');
           const divergedItem = p.find(s => s.seriesName === 'Diverged Txs');
-          let html = `<b>Block ${formatGas(blockNum)}</b>`;
+          let html = `<b>Block ${blockNum}</b>`;
           if (deltaItem) html += `<br/>Gas Delta: ${formatDelta(deltaItem.data[1])}`;
           if (divergedItem) html += `<br/>Diverged: ${divergedItem.data[1]} txs`;
           return html;
@@ -712,7 +712,7 @@ export function SimulatePage(): JSX.Element {
             </Input>
             {startBlockNumber !== null && !inputError && !isRunning && (
               <p className="mt-1.5 text-xs text-muted">
-                Range: {formatGas(startBlockNumber)} → {formatGas(startBlockNumber + blockCount - 1)}
+                Range: {startBlockNumber} → {startBlockNumber + blockCount - 1}
               </p>
             )}
           </div>
@@ -926,7 +926,7 @@ export function SimulatePage(): JSX.Element {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-foreground">
-                  Block {simState.currentBlock !== null ? formatGas(simState.currentBlock) : '...'}
+                  Block {simState.currentBlock !== null ? simState.currentBlock : '...'}
                 </span>
                 <Badge variant="flat" size="small" dot>
                   Simulating
@@ -1144,7 +1144,7 @@ export function SimulatePage(): JSX.Element {
                         isSelected ? 'font-bold text-foreground' : 'font-semibold text-foreground/80'
                       )}
                     >
-                      {formatGas(result.blockNumber)}
+                      {result.blockNumber}
                     </div>
                   </div>
 
@@ -1218,9 +1218,7 @@ export function SimulatePage(): JSX.Element {
                 <CubeIcon className="size-4 text-primary" />
               </div>
               <div>
-                <h3 className="font-mono text-sm font-semibold text-foreground">
-                  {formatGas(selectedResult.blockNumber)}
-                </h3>
+                <h3 className="font-mono text-sm font-semibold text-foreground">{selectedResult.blockNumber}</h3>
                 {(() => {
                   const delta = blockDeltas[selectedBlockIndex!];
                   return (

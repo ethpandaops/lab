@@ -59,15 +59,15 @@ export function formatEpoch(epoch: number): string {
  * Format byte values to human-readable string
  *
  * @param bytes - Number of bytes to format
- * @returns Formatted string with appropriate unit (B, KB, MB)
+ * @returns Formatted string with the binary unit it divides by (B, KiB, MiB)
  *
  * @example
  * formatBytes(512)       // "512 B"
- * formatBytes(2048)      // "2.0 KB"
- * formatBytes(1572864)   // "1.5 MB"
+ * formatBytes(2048)      // "2.0 KiB"
+ * formatBytes(1572864)   // "1.5 MiB"
  */
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KiB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }

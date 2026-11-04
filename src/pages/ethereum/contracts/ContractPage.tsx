@@ -9,6 +9,7 @@ import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart, type MarkLineConfig } from '@/components/Charts/MultiLine';
 import { PolicySelector, type PolicySelectorConfig } from '@/pages/ethereum/execution/state-expiry/components';
+import type { PolicyData } from '@/pages/ethereum/execution/state-expiry/components/PolicySelector';
 import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -89,19 +90,19 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
 };
 
 /**
- * Format bytes to human-readable format (KB, MB, GB)
+ * Format bytes to human-readable binary units (KiB, MiB, GiB)
  */
 function formatBytes(bytes: number): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1) {
-    return `${gb.toFixed(2)} GB`;
+  const gib = bytes / (1024 * 1024 * 1024);
+  if (gib >= 1) {
+    return `${gib.toFixed(2)} GiB`;
   }
-  const mb = bytes / (1024 * 1024);
-  if (mb >= 1) {
-    return `${mb.toFixed(2)} MB`;
+  const mib = bytes / (1024 * 1024);
+  if (mib >= 1) {
+    return `${mib.toFixed(2)} MiB`;
   }
-  const kb = bytes / 1024;
-  return `${kb.toFixed(2)} KB`;
+  const kib = bytes / 1024;
+  return `${kib.toFixed(2)} KiB`;
 }
 
 /**
@@ -138,70 +139,58 @@ export function ContractPage(): JSX.Element {
   });
   const contractOwner = contractOwnerQuery.data?.dim_contract_owner?.[0];
 
-  // Calculate savings data for the policy selector matrix
+  // Savings for each policy cell, comparing the base and policy values of the same day: the latest
+  // day that has that policy's data. A cell older than the current state shows its own date.
   const savingsData = useMemo(() => {
-    const result: Record<
-      ExpiryType,
-      Record<
-        ExpiryPolicy,
-        {
-          bytesPercent: number | null;
-          slotsPercent: number | null;
-          afterBytes: number | null;
-          afterSlots: number | null;
-        }
-      >
-    > = {
-      slot: {
-        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-      },
-      contract: {
-        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-      },
+    const empty = { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null, asOf: null };
+    const result: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
+      slot: { '12m': { ...empty }, '24m': { ...empty } },
+      contract: { '12m': { ...empty }, '24m': { ...empty } },
     };
 
-    if (!latestData) return result;
+    if (!data || data.length === 0 || !latestData) return result;
 
-    // Use current state for baseline (contract-level)
-    const currentBytes = latestData.effectiveBytes;
-    const currentSlots = latestData.activeSlots;
+    for (const type of EXPIRY_TYPES) {
+      for (const policy of EXPIRY_POLICIES) {
+        const policyOf = (p: (typeof data)[number]): { effectiveBytes: number | null; activeSlots: number | null } =>
+          type === 'slot' ? p.slotExpiryData[policy] : p.expiryData[policy];
+        const point = [...data]
+          .reverse()
+          .find(p => policyOf(p).effectiveBytes !== null && policyOf(p).activeSlots !== null);
+        if (!point || point.effectiveBytes === null || point.activeSlots === null) continue;
+        const baseBytes = point.effectiveBytes;
+        const baseSlots = point.activeSlots;
+        const policyData = policyOf(point);
+        const afterBytes = policyData.effectiveBytes!;
+        const afterSlots = policyData.activeSlots!;
 
-    if (currentBytes === null || currentSlots === null) return result;
-
-    // Slot-based expiry
-    for (const policy of EXPIRY_POLICIES) {
-      const policyData = latestData.slotExpiryData[policy];
-      if (policyData.effectiveBytes !== null && currentBytes > 0) {
-        const bytesSaved = currentBytes - policyData.effectiveBytes;
-        result.slot[policy].bytesPercent = (bytesSaved / currentBytes) * 100;
-        result.slot[policy].afterBytes = policyData.effectiveBytes;
-      }
-      if (policyData.activeSlots !== null && currentSlots > 0) {
-        const slotsSaved = currentSlots - policyData.activeSlots;
-        result.slot[policy].slotsPercent = (slotsSaved / currentSlots) * 100;
-        result.slot[policy].afterSlots = policyData.activeSlots;
-      }
-    }
-
-    // Contract-based expiry - binary: either whole contract expires (100%) or stays active (0%)
-    // For a single contract, contract-based expiry is all-or-nothing
-    for (const policy of EXPIRY_POLICIES) {
-      const policyData = latestData.expiryData[policy];
-      if (policyData.effectiveBytes !== null) {
-        // If any data remains, contract is active (0% savings); if all expired, 100% savings
-        result.contract[policy].bytesPercent = policyData.effectiveBytes === 0 ? 100 : 0;
-        result.contract[policy].afterBytes = policyData.effectiveBytes;
-      }
-      if (policyData.activeSlots !== null) {
-        result.contract[policy].slotsPercent = policyData.activeSlots === 0 ? 100 : 0;
-        result.contract[policy].afterSlots = policyData.activeSlots;
+        result[type][policy] = {
+          // Contract-based expiry is all-or-nothing for a single contract: it either expires whole or stays
+          bytesPercent:
+            type === 'contract'
+              ? afterBytes === 0
+                ? 100
+                : 0
+              : baseBytes > 0
+                ? ((baseBytes - afterBytes) / baseBytes) * 100
+                : null,
+          slotsPercent:
+            type === 'contract'
+              ? afterSlots === 0
+                ? 100
+                : 0
+              : baseSlots > 0
+                ? ((baseSlots - afterSlots) / baseSlots) * 100
+                : null,
+          afterBytes,
+          afterSlots,
+          asOf: point === latestData ? null : point.dateLabel,
+        };
       }
     }
 
     return result;
-  }, [latestData]);
+  }, [data, latestData]);
 
   // Chart data - show all policies with selected one highlighted
   const chartData = useMemo(() => {
@@ -210,8 +199,8 @@ export function ContractPage(): JSX.Element {
     // Determine the unit for display based on the max value
     const validBytes = data.map(d => d.effectiveBytes).filter((b): b is number => b !== null);
     const maxBytes = validBytes.length > 0 ? Math.max(...validBytes) : 0;
-    const bytesUnit = maxBytes < 1024 * 1024 ? 'KB' : maxBytes < 1024 * 1024 * 1024 ? 'MB' : 'GB';
-    const bytesDivisor = bytesUnit === 'KB' ? 1024 : bytesUnit === 'MB' ? 1024 * 1024 : 1024 * 1024 * 1024;
+    const bytesUnit = maxBytes < 1024 * 1024 ? 'KiB' : maxBytes < 1024 * 1024 * 1024 ? 'MiB' : 'GiB';
+    const bytesDivisor = bytesUnit === 'KiB' ? 1024 : bytesUnit === 'MiB' ? 1024 * 1024 : 1024 * 1024 * 1024;
 
     // Convert bytes using the consistent unit determined by max value
     const bytesToDisplay = (bytes: number | null): number | null => {
@@ -264,6 +253,7 @@ export function ContractPage(): JSX.Element {
             const policyData = type === 'slot' ? item.slotExpiryData[policy] : item.expiryData[policy];
             // For contract-based expiry: binary - either 0 (expired) or same as current state (active)
             if (type === 'contract') {
+              if (policyData.effectiveBytes === null) return null;
               return policyData.effectiveBytes === 0 ? 0 : bytesToDisplay(item.effectiveBytes);
             }
             return bytesToDisplay(policyData.effectiveBytes);
@@ -278,6 +268,7 @@ export function ContractPage(): JSX.Element {
             const policyData = type === 'slot' ? item.slotExpiryData[policy] : item.expiryData[policy];
             // For contract-based expiry: binary - either 0 (expired) or same as current state (active)
             if (type === 'contract') {
+              if (policyData.activeSlots === null) return null;
               return policyData.activeSlots === 0 ? 0 : item.activeSlots;
             }
             return policyData.activeSlots;
@@ -288,21 +279,11 @@ export function ContractPage(): JSX.Element {
       }
     }
 
-    // Calculate max values for consistent y-axis headroom (~20% padding)
-    const maxBytesValue = Math.max(...bytesSeries.flatMap(s => s.data.filter((v): v is number => v !== null)));
-    const maxSlotsValue = Math.max(...slotsSeries.flatMap(s => s.data.filter((v): v is number => v !== null)));
-
-    // Add 20% headroom and round to nice numbers
-    const bytesYMax = Math.ceil((maxBytesValue * 1.2) / 10) * 10; // Round to nearest 10
-    const slotsYMax = Math.ceil((maxSlotsValue * 1.2) / 1_000_000) * 1_000_000; // Round to nearest 1M
-
     return {
       labels: data.map(item => item.dateLabel),
       bytesSeries,
       slotsSeries,
       bytesUnit,
-      bytesYMax,
-      slotsYMax,
     };
   }, [data, selectedType, selectedPolicy, themeColors]);
 
@@ -354,7 +335,7 @@ export function ContractPage(): JSX.Element {
         if (p.marker && p.seriesName !== undefined) {
           const yValue = Array.isArray(p.value) ? p.value[1] : p.value;
           if (yValue !== undefined && yValue !== null) {
-            const unit = chartData?.bytesUnit ?? 'MB';
+            const unit = chartData?.bytesUnit ?? 'MiB';
             const isCurrentState = p.seriesName === 'Current State';
             const isSelected = p.seriesName === selectedSeriesName;
             const opacity = isCurrentState || isSelected ? '1' : '0.4';
@@ -492,8 +473,7 @@ export function ContractPage(): JSX.Element {
                     }}
                     yAxis={{
                       name: `Size (${chartData.bytesUnit})`,
-                      max: chartData.bytesYMax,
-                      formatter: (value: number) => value.toFixed(0),
+                      min: 0,
                     }}
                     height={inModal ? 600 : 280}
                     showLegend={false}
@@ -521,10 +501,7 @@ export function ContractPage(): JSX.Element {
                     }}
                     yAxis={{
                       name: 'Slots',
-                      max: chartData.slotsYMax,
-                      formatter: (value: number) => {
-                        return value.toFixed(0);
-                      },
+                      min: 0,
                     }}
                     height={inModal ? 600 : 280}
                     showLegend={false}

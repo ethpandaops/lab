@@ -39,13 +39,6 @@ function formatGas(value: number): string {
   return value.toLocaleString();
 }
 
-function formatCompact(value: number): string {
-  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
-  return value.toString();
-}
-
 /**
  * Opcode distribution chart by gas consumption
  */
@@ -88,7 +81,7 @@ function OpcodeByGasChart({
         return `${pct.toFixed(1)}%`;
       }}
       barWidth="70%"
-      valueAxisLabelFormatter={formatCompact}
+      axisName="Gas"
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';
@@ -148,7 +141,7 @@ function OpcodeByCountChart({
         return `${pct.toFixed(1)}%`;
       }}
       barWidth="70%"
-      valueAxisLabelFormatter={formatCompact}
+      axisName="Executions"
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';

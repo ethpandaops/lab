@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { intBlockOpcodeGasServiceList } from '@/api/sdk.gen';
+import { intBlockCanonicalServiceList, intBlockOpcodeGasServiceList } from '@/api/sdk.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useGasProfilerBounds } from './useGasProfilerBounds';
 
@@ -9,7 +9,10 @@ import { useGasProfilerBounds } from './useGasProfilerBounds';
  */
 export interface BlockSummary {
   blockNumber: number;
-  gasUsed: number;
+  /** Receipt gas used by the block, or null when the block header isn't available */
+  gasUsed: number | null;
+  /** Block gas limit, or null when the block header isn't available */
+  gasLimit: number | null;
   opcodeCount: number;
 }
 
@@ -43,7 +46,8 @@ export interface UseRecentBlocksResult {
 
 /**
  * Hook to fetch lightweight summary data for recent blocks.
- * Uses int_block_opcode_gas for efficient per-block gas totals.
+ * Gas used and gas limit come from the block header (int_block_canonical);
+ * opcode counts come from int_block_opcode_gas.
  *
  * When `anchorBlock` is provided, the view is pinned to that block
  * instead of always following bounds.max. This prevents the view
@@ -64,7 +68,7 @@ export function useRecentBlocks({
   const maxBlock = effectiveMax ? effectiveMax - offset : null;
   const minBlock = maxBlock ? Math.max(bounds?.min ?? 0, maxBlock - count + 1) : null;
 
-  // Fetch opcode gas data for recent blocks
+  // Fetch opcode data for recent blocks
   const {
     data: opcodeGasData,
     isLoading: dataLoading,
@@ -88,26 +92,69 @@ export function useRecentBlocks({
     placeholderData: keepPreviousData, // Keep showing previous data while new data loads
   });
 
-  // Aggregate gas and opcode count by block
+  // The table is keyed by slot time. Each post-merge block takes at least one 12s slot, so a block
+  // can't be older than this lower bound, which keeps the scan small.
+  const mergeAnchor = currentNetwork?.forks?.execution?.paris;
+  const minSlotTime =
+    minBlock === null || !currentNetwork
+      ? null
+      : mergeAnchor
+        ? mergeAnchor.timestamp + 12 * Math.max(0, minBlock - mergeAnchor.block)
+        : currentNetwork.genesis_time;
+
+  // Header gas used and gas limit for the same blocks
+  const {
+    data: headerData,
+    isLoading: headerLoading,
+    isFetching: headerFetching,
+    error: headerError,
+  } = useQuery({
+    queryKey: ['gas-profiler', 'recent-blocks-header', minBlock, maxBlock, minSlotTime],
+    queryFn: async ({ signal }) => {
+      const response = await intBlockCanonicalServiceList({
+        query: {
+          slot_start_date_time_gte: minSlotTime!,
+          execution_payload_block_number_gte: minBlock!,
+          execution_payload_block_number_lte: maxBlock!,
+          page_size: 100,
+        },
+        signal,
+      });
+      return response.data?.int_block_canonical ?? [];
+    },
+    enabled: minBlock !== null && maxBlock !== null && minSlotTime !== null,
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+  });
+
+  // Combine opcode counts with header gas per block
   const blocks = useMemo<BlockSummary[]>(() => {
     if (!opcodeGasData || !maxBlock) return [];
 
-    // Sum gas and count per block
-    const blockMap = new Map<number, { gasUsed: number; opcodeCount: number }>();
+    const opcodeCounts = new Map<number, number>();
     for (const row of opcodeGasData) {
       if (row.block_number === undefined) continue;
-      const current = blockMap.get(row.block_number) ?? { gasUsed: 0, opcodeCount: 0 };
-      blockMap.set(row.block_number, {
-        gasUsed: current.gasUsed + (row.gas ?? 0),
-        opcodeCount: current.opcodeCount + (row.count ?? 0),
+      opcodeCounts.set(row.block_number, (opcodeCounts.get(row.block_number) ?? 0) + (row.count ?? 0));
+    }
+
+    const headers = new Map<number, { gasUsed: number | null; gasLimit: number | null }>();
+    for (const row of headerData ?? []) {
+      if (row.execution_payload_block_number === undefined) continue;
+      headers.set(row.execution_payload_block_number, {
+        gasUsed: row.execution_payload_gas_used ?? null,
+        gasLimit: row.execution_payload_gas_limit ?? null,
       });
     }
 
-    // Convert to sorted array
-    return [...blockMap.entries()]
-      .map(([blockNumber, data]) => ({ blockNumber, gasUsed: data.gasUsed, opcodeCount: data.opcodeCount }))
+    return [...opcodeCounts.entries()]
+      .map(([blockNumber, opcodeCount]) => ({
+        blockNumber,
+        gasUsed: headers.get(blockNumber)?.gasUsed ?? null,
+        gasLimit: headers.get(blockNumber)?.gasLimit ?? null,
+        opcodeCount,
+      }))
       .sort((a, b) => a.blockNumber - b.blockNumber);
-  }, [opcodeGasData, maxBlock]);
+  }, [opcodeGasData, headerData, maxBlock]);
 
   // Calculate navigation availability
   const hasOlderBlocks = bounds?.min !== undefined && minBlock !== null && minBlock > bounds.min;
@@ -118,9 +165,9 @@ export function useRecentBlocks({
 
   return {
     blocks,
-    isLoading: boundsLoading || dataLoading,
-    isFetching: dataFetching,
-    error: error as Error | null,
+    isLoading: boundsLoading || dataLoading || headerLoading,
+    isFetching: dataFetching || headerFetching,
+    error: (error ?? headerError) as Error | null,
     hasOlderBlocks,
     hasNewerBlocks,
     isAtLatest,

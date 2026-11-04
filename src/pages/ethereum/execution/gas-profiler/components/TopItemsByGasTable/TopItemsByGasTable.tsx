@@ -92,13 +92,13 @@ export function TopItemsByGasTable({
     const identifierContent = (
       <>
         {item.name ? (
-          <span className="font-medium text-foreground group-hover:text-primary">{item.name}</span>
+          <span className="truncate font-medium text-foreground group-hover:text-primary">{item.name}</span>
         ) : (
-          <span className="font-mono text-foreground group-hover:text-primary">
+          <span className="truncate font-mono text-foreground group-hover:text-primary">
             {item.identifier.slice(0, 10)}...{item.identifier.slice(-8)}
           </span>
         )}
-        {item.hasError && <span className="size-1.5 rounded-full bg-danger" title="Failed" />}
+        {item.hasError && <span className="size-1.5 shrink-0 rounded-full bg-danger" title="Failed" />}
       </>
     );
 
@@ -121,8 +121,8 @@ export function TopItemsByGasTable({
           )}
         </td>
 
-        {/* Second column: name/identifier with link */}
-        <td className="px-2 py-2">
+        {/* Second column: name/identifier with link; takes the remaining width and truncates */}
+        <td className="w-full max-w-0 px-2 py-2">
           {getLinkProps ? (
             <Link {...getLinkProps(item)} className="group flex items-center gap-1.5">
               {identifierContent}
@@ -142,7 +142,7 @@ export function TopItemsByGasTable({
         {/* Percentage column */}
         <td className="py-2 pl-2 text-right">
           <div className="flex items-center justify-end gap-2">
-            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
+            <div className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-border sm:block">
               <div className="h-full bg-primary" style={{ width: `${Math.min(pct, 100)}%` }} />
             </div>
             <span className="w-10 text-right text-xs text-muted">{pct.toFixed(1)}%</span>

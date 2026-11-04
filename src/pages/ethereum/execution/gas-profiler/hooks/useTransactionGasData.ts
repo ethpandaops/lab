@@ -270,7 +270,8 @@ function extractMetadata(frames: IntTransactionCallFrame[]): TransactionMetadata
   const evmGasUsed = rootFrame?.gas_cumulative ?? 0;
   const intrinsicGas = rootFrame?.intrinsic_gas ?? null;
   const gasRefund = rootFrame?.gas_refund ?? null;
-  const hasErrors = frames.some(f => (f.error_count ?? 0) > 0);
+  // An inner call can revert without failing the transaction; only a root-frame error fails it
+  const hasErrors = (rootFrame?.error_count ?? 0) > 0;
   const maxDepth = Math.max(...frames.map(f => f.depth ?? 0));
 
   // Detect contract creation:
