@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX, useState } from 'react';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
@@ -11,9 +11,6 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { MarkLineConfig, SeriesData } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Toggle } from '@/components/Forms/Toggle';
-import { DataTable } from '@/components/DataTable';
-import type { DataTableColumn } from '@/components/DataTable';
-import { Entity } from '@/components/Ethereum/Entity';
 import { useForks } from '@/hooks/useForks';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -24,7 +21,7 @@ import {
   fctMissedSlotRateDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { Alert } from '@/components/Feedback/Alert';
-import { TableCard, TableSearch, ValidatorsSkeleton } from './components';
+import { ValidatorsSkeleton } from './components';
 import { useOverviewData } from './hooks/useOverviewData';
 import type { OverviewPeriod } from './hooks/useOverviewData';
 import {
@@ -67,13 +64,6 @@ const bar = (stack: string): Partial<SeriesData> => ({ stack, seriesType: 'bar' 
 
 const formatEth = (v: number): string => `${formatCompact(v)} ETH`;
 
-interface EntityRow {
-  entity: string;
-  count: number;
-  effectiveBalanceEth: number;
-  byCredential: Record<CredentialType, { effectiveBalanceEth: number }>;
-}
-
 /** True when the operations table covers the period */
 const hasOps = (d: OverviewPeriod): boolean => Object.keys(d.ops).length > 0;
 
@@ -98,7 +88,6 @@ export function IndexPage(): JSX.Element {
   const [showForks, setShowForks] = useState(true);
   const [ebMode, setEbMode] = useState<'stake' | 'validators'>('stake');
   const [mixMode, setMixMode] = useState<'stake' | 'validators'>('stake');
-  const [entitySearch, setEntitySearch] = useState('');
 
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS: palette, DATA_COLORS } = getDataVizColors();
@@ -199,89 +188,6 @@ export function IndexPage(): JSX.Element {
   );
   const headVoteSeries = byDay(headVote.data?.fct_head_vote_correctness_rate_daily, r => r.avg_head_vote_rate);
   const missedSeries = byDay(missed.data?.fct_missed_slot_rate_daily, r => r.missed_rate);
-
-  // Memoised: DataTable returns to page 1 whenever its data array changes
-  const entities = useMemo(() => {
-    const byEntity = new Map<string, EntityRow>();
-    for (const r of snapshot?.entities ?? []) {
-      const name = r.entity ?? 'unknown';
-      const row =
-        byEntity.get(name) ??
-        ({
-          entity: name,
-          count: 0,
-          effectiveBalanceEth: 0,
-          byCredential: Object.fromEntries(CREDENTIAL_TYPES.map(ct => [ct, { effectiveBalanceEth: 0 }])),
-        } as EntityRow);
-      const stake = (r.active_effective_balance ?? 0) / 1e9;
-      row.count += r.active_validator_count ?? 0;
-      row.effectiveBalanceEth += stake;
-      const ct = r.credential_type as CredentialType;
-      if (row.byCredential[ct]) row.byCredential[ct].effectiveBalanceEth += stake;
-      byEntity.set(name, row);
-    }
-    const query = entitySearch.trim().toLowerCase();
-    return [...byEntity.values()]
-      .filter(e => e.entity.toLowerCase().includes(query))
-      .sort((a, b) => b.effectiveBalanceEth - a.effectiveBalanceEth);
-  }, [snapshot?.entities, entitySearch]);
-
-  const entityColumns: DataTableColumn<EntityRow>[] = [
-    {
-      id: 'entity',
-      header: 'Entity',
-      accessorKey: 'entity',
-      cell: ({ row }) => <Entity entity={row.original.entity} />,
-      meta: { cellClassName: 'text-foreground' },
-    },
-    {
-      id: 'validators',
-      header: 'Validators',
-      accessorKey: 'count',
-      cell: ({ row }) => row.original.count.toLocaleString(),
-      meta: { cellClassName: 'text-foreground tabular-nums' },
-    },
-    {
-      id: 'stake',
-      header: 'Stake',
-      accessorKey: 'effectiveBalanceEth',
-      cell: ({ row }) => formatEth(row.original.effectiveBalanceEth),
-      meta: { cellClassName: 'text-foreground tabular-nums' },
-    },
-    {
-      id: 'share',
-      header: 'Share',
-      accessorFn: e => e.effectiveBalanceEth / activeStake,
-      cell: ({ getValue }) => `${((getValue() as number) * 100).toFixed(2)}%`,
-      meta: { cellClassName: 'tabular-nums' },
-    },
-    {
-      id: 'avg',
-      header: 'Avg balance',
-      accessorFn: e => e.effectiveBalanceEth / e.count,
-      cell: ({ getValue }) => `${(getValue() as number).toFixed(1)} ETH`,
-      meta: { cellClassName: 'tabular-nums' },
-    },
-    {
-      id: 'mix',
-      header: 'Credential mix (stake)',
-      enableSorting: false,
-      cell: ({ row }) => (
-        <div className="flex h-2 w-48 overflow-hidden rounded-full bg-border">
-          {CREDENTIAL_TYPES.map(ct => (
-            <div
-              key={ct}
-              title={`${CREDENTIAL_LABELS[ct]}: ${formatEth(row.original.byCredential[ct].effectiveBalanceEth)}`}
-              style={{
-                width: `${(row.original.byCredential[ct].effectiveBalanceEth / row.original.effectiveBalanceEth) * 100}%`,
-                backgroundColor: credentialColors[ct],
-              }}
-            />
-          ))}
-        </div>
-      ),
-    },
-  ];
 
   return (
     <Container>
@@ -708,21 +614,6 @@ export function IndexPage(): JSX.Element {
               />
             )}
           </PopoutCard>
-
-          <TableCard
-            title="Entities by stake"
-            filters={<TableSearch value={entitySearch} onChange={setEntitySearch} placeholder="Search entities" />}
-          >
-            <DataTable
-              data={entities}
-              columns={entityColumns}
-              pageSize={10}
-              hideGlobalFilter
-              hideColumnVisibility
-              getRowId={e => e.entity}
-              emptyMessage="No entities match this search"
-            />
-          </TableCard>
         </div>
       )}
     </Container>

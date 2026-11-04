@@ -7,7 +7,7 @@ import { useForkReadiness } from './hooks';
 import { ForkSection, ForkReadinessLoading } from './components';
 
 export function IndexPage(): JSX.Element {
-  const { upcomingForks, pastForks, isLoading, error } = useForkReadiness();
+  const { upcomingForks, isLoading, error } = useForkReadiness();
 
   if (isLoading) {
     return (
@@ -47,15 +47,6 @@ export function IndexPage(): JSX.Element {
         ) : (
           <Alert variant="info" title="No upcoming forks" />
         )}
-
-        {pastForks.map(fork => (
-          <Disclosure
-            key={fork.forkName}
-            title={`Past: ${fork.forkName.charAt(0).toUpperCase()}${fork.forkName.slice(1)}`}
-          >
-            <ForkSection fork={fork} />
-          </Disclosure>
-        ))}
       </div>
     </Container>
   );

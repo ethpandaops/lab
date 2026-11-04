@@ -4,7 +4,6 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Route } from '@/routes/xatu/nodes/index';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -88,30 +87,6 @@ export function IndexPage(): JSX.Element {
     detail: formatMs(median(group.timings)),
   }));
 
-  const versionItems: BreakdownItem[] = [
-    ...groupRows(rows, row =>
-      row.node.meta_consensus_implementation
-        ? `${row.node.meta_consensus_implementation.toLowerCase()} ${row.clientVersion}`
-        : undefined
-    ).entries(),
-  ].map(([key, group]) => ({
-    key,
-    label: (
-      <ClientLabel
-        client={group.sample.node.meta_consensus_implementation?.toLowerCase() || 'unknown'}
-        version={group.sample.clientVersion || undefined}
-      />
-    ),
-    count: group.count,
-    detail: group.sample.newerVersion ? (
-      <span className="text-warning">Outdated</span>
-    ) : group.sample.latestVersion ? (
-      'Latest'
-    ) : (
-      '–'
-    ),
-  }));
-
   const countryItems: BreakdownItem[] = [...groupRows(rows, row => row.node.meta_client_geo_country).entries()].map(
     ([country, group]) => ({
       key: country,
@@ -182,8 +157,7 @@ export function IndexPage(): JSX.Element {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <BreakdownList title="Client versions" items={versionItems} detailLabel="Status" limit={6} />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <BreakdownList title="Countries" items={countryItems} detailLabel="Block p50" limit={6} />
           <ArrivalHistogram
             title="Node block arrival"

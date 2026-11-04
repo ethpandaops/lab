@@ -9,7 +9,6 @@ import {
   fctValidatorRewardTotalDailyServiceListOptions,
   fctValidatorRewardTotalWeeklyServiceListOptions,
   fctValidatorEffectiveBalanceByCredentialTypeDailyServiceListOptions,
-  fctValidatorStakeByEntityDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type {
   FctValidatorCountByCredentialTypeDaily,
@@ -17,7 +16,6 @@ import type {
   FctValidatorOperationDaily,
   FctValidatorRewardTotalDaily,
   FctValidatorEffectiveBalanceByCredentialTypeDaily,
-  FctValidatorStakeByEntityDaily,
 } from '@/api/types.gen';
 import { CREDENTIAL_TYPES, type CredentialType, type OverviewWindow } from '../utils/overview';
 import { weekStartOf } from '../utils/week';
@@ -50,7 +48,6 @@ export interface OverviewSnapshot {
   byType: Record<CredentialType, { count: number; stake: number }>;
   queue: FctValidatorQueueDaily | null;
   histogram: FctValidatorEffectiveBalanceByCredentialTypeDaily[];
-  entities: FctValidatorStakeByEntityDaily[];
 }
 
 /** Windows of at most this many days load daily rows; longer ones load weekly rows */
@@ -131,13 +128,6 @@ export function useOverviewData(window: OverviewWindow): {
     }),
     enabled: !!latestDay,
   });
-  const entities = useQuery({
-    ...fctValidatorStakeByEntityDailyServiceListOptions({
-      query: { day_start_date_eq: latestDay, page_size: PAGE },
-    }),
-    enabled: !!latestDay,
-  });
-
   const countRows: FctValidatorCountByCredentialTypeDaily[] =
     counts.data && 'fct_validator_count_by_credential_type_daily' in counts.data
       ? (counts.data.fct_validator_count_by_credential_type_daily ?? [])
@@ -246,11 +236,10 @@ export function useOverviewData(window: OverviewWindow): {
         ) as OverviewSnapshot['byType'],
         queue: latestQueue.data?.fct_validator_queue_daily?.[0] ?? null,
         histogram: histogram.data?.fct_validator_effective_balance_by_credential_type_daily ?? [],
-        entities: entities.data?.fct_validator_stake_by_entity_daily ?? [],
       }
     : null;
 
-  const all = [counts, queues, operations, rewards, latestCounts, latestQueue, histogram, entities];
+  const all = [counts, queues, operations, rewards, latestCounts, latestQueue, histogram];
   return {
     period,
     periods,

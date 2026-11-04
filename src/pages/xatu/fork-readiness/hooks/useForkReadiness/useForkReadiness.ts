@@ -85,19 +85,19 @@ export function useForkReadiness(): UseForkReadinessReturn {
     [pubData, corpData, ethpandaopsData]
   );
 
-  // 5. Process all forks
-  const { upcomingForks, pastForks } = useMemo(() => {
+  // 5. Process the forks still to come; a fork that is live has nothing left to get ready for
+  const upcomingForks = useMemo(() => {
     if (!config || !currentNetwork || allNodes.length === 0) {
-      return { upcomingForks: [], pastForks: [] };
+      return [];
     }
 
     const allForks = getAllForks(currentNetwork);
     const upcoming: ForkReadinessStats[] = [];
-    const past: ForkReadinessStats[] = [];
 
     for (const fork of allForks) {
       const timeData = getTimeToEpoch(fork.epoch, currentNetwork.genesis_time);
       const isPast = timeData.isPast;
+      if (isPast) continue;
       const timeRemaining = formatTimeRemaining(timeData);
 
       const stats = processForkReadiness(
@@ -118,24 +118,17 @@ export function useForkReadiness(): UseForkReadinessReturn {
         isPast,
       };
 
-      if (isPast) {
-        past.push(fullStats);
-      } else {
-        upcoming.push(fullStats);
-      }
+      upcoming.push(fullStats);
     }
 
     // Sort upcoming by epoch (soonest first)
     upcoming.sort((a, b) => a.forkEpoch - b.forkEpoch);
-    // Sort past by epoch (most recent first)
-    past.sort((a, b) => b.forkEpoch - a.forkEpoch);
 
-    return { upcomingForks: upcoming, pastForks: past };
+    return upcoming;
   }, [config, currentNetwork, allNodes]);
 
   return {
     upcomingForks,
-    pastForks,
     isLoading,
     error: configError ?? null,
   };

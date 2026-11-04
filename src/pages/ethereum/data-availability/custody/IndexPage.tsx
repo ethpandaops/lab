@@ -10,7 +10,6 @@ import { DataAvailabilityLegend } from '@/pages/ethereum/data-availability/compo
 import { DataAvailabilitySkeleton } from '@/pages/ethereum/data-availability/components/DataAvailabilitySkeleton';
 import { ViewModeToggle } from '@/pages/ethereum/data-availability/components/ViewModeToggle';
 import { Dialog } from '@/components/Overlays/Dialog';
-import { LiveProbeEvents } from './components/LiveProbeEvents';
 import { CellProbeDialog } from './components/CellProbeDialog';
 import type { CellContext, TimeRangeContext } from './components/CellProbeDialog';
 import type {
@@ -923,127 +922,110 @@ export function IndexPage(): JSX.Element {
         </div>
       </Dialog>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        {/* Main Content: Heatmap (3/4 width) */}
-        <div className="lg:col-span-3">
-          <Card
-            title={levelTitle.main}
-            subtitle={levelTitle.sub}
-            actions={
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Detail page links */}
-                {currentLevel.type === 'epoch' && (
-                  <Link
-                    to="/ethereum/epochs/$epoch"
-                    params={{ epoch: String(currentLevel.epoch) }}
-                    className={SECONDARY_LINK_CLASS}
-                  >
-                    <CubeIcon className="size-3.5" />
-                    <span>Epoch Deep Dive</span>
-                    <ArrowTopRightOnSquareIcon className="size-3" />
-                  </Link>
-                )}
-                {currentLevel.type === 'slot' && (
-                  <Link
-                    to="/ethereum/slots/$slot"
-                    params={{ slot: String(currentLevel.slot) }}
-                    className={SECONDARY_LINK_CLASS}
-                  >
-                    <Square2StackIcon className="size-3.5" />
-                    <span>Slot Deep Dive</span>
-                    <ArrowTopRightOnSquareIcon className="size-3" />
-                  </Link>
-                )}
-                <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
-              </div>
-            }
-          >
-            <div className="space-y-4">
-              {/* Breadcrumb Navigation */}
-              {breadcrumbs.length > 1 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted">Navigate:</span>
-                  <nav className="flex items-center gap-1 text-sm">
-                    {breadcrumbs.slice(0, -1).map((crumb, index) => {
-                      const Icon = crumb.icon;
-                      return (
-                        <div key={index} className="flex items-center">
-                          {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
-                          <button
-                            type="button"
-                            onClick={crumb.onClick}
-                            className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent/10 hover:text-accent"
-                          >
-                            <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
-                            <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
-                              {crumb.label}
-                            </span>
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </nav>
+      <Card
+        title={levelTitle.main}
+        subtitle={levelTitle.sub}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Detail page links */}
+            {currentLevel.type === 'epoch' && (
+              <Link
+                to="/ethereum/epochs/$epoch"
+                params={{ epoch: String(currentLevel.epoch) }}
+                className={SECONDARY_LINK_CLASS}
+              >
+                <CubeIcon className="size-3.5" />
+                <span>Epoch Deep Dive</span>
+                <ArrowTopRightOnSquareIcon className="size-3" />
+              </Link>
+            )}
+            {currentLevel.type === 'slot' && (
+              <Link
+                to="/ethereum/slots/$slot"
+                params={{ slot: String(currentLevel.slot) }}
+                className={SECONDARY_LINK_CLASS}
+              >
+                <Square2StackIcon className="size-3.5" />
+                <span>Slot Deep Dive</span>
+                <ArrowTopRightOnSquareIcon className="size-3" />
+              </Link>
+            )}
+            <ViewModeToggle viewMode={viewMode} onViewModeChange={handleViewModeChange} size="compact" />
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {/* Breadcrumb Navigation */}
+          {breadcrumbs.length > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted">Navigate:</span>
+              <nav className="flex items-center gap-1 text-sm">
+                {breadcrumbs.slice(0, -1).map((crumb, index) => {
+                  const Icon = crumb.icon;
+                  return (
+                    <div key={index} className="flex items-center">
+                      {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
+                      <button
+                        type="button"
+                        onClick={crumb.onClick}
+                        className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                      >
+                        <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
+                        <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                          {crumb.label}
+                        </span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </nav>
 
-                  <div className="flex-1" />
+              <div className="flex-1" />
 
-                  {/* Back button */}
-                  <button
-                    type="button"
-                    onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
-                    className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/10 hover:text-accent"
-                  >
-                    <ArrowLeftIcon className="size-3.5" />
-                    <span>Back</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Legend Strip */}
-              <div className="rounded-sm bg-muted/30 px-3 py-2">
-                <DataAvailabilityLegend
-                  granularity={granularity}
-                  viewMode={viewMode}
-                  threshold={threshold}
-                  orientation="horizontal"
-                />
-              </div>
-
-              {/* Heatmap Area */}
-              <div>
-                {isLoading ? (
-                  <DataAvailabilitySkeleton />
-                ) : (
-                  <DataAvailabilityHeatmap
-                    rows={rows}
-                    granularity={granularity}
-                    filters={filters}
-                    viewMode={viewMode}
-                    threshold={threshold}
-                    onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
-                    onCellClick={handleCellClick}
-                    onColumnClick={handleColumnClick}
-                    cellSize="3xs"
-                    showColumnHeader
-                    showLegend={false}
-                  />
-                )}
-              </div>
+              {/* Back button */}
+              <button
+                type="button"
+                onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
+                className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+              >
+                <ArrowLeftIcon className="size-3.5" />
+                <span>Back</span>
+              </button>
             </div>
-          </Card>
-        </div>
+          )}
 
-        {/* Sidebar: Live Probes (1/4 width) */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-4 space-y-4">
-            {currentNetwork && (
-              <LiveProbeEvents
-                range={levelWindow(currentLevel, genesisTime)}
-                scopeLabel={currentLevel.type === 'window' ? levelTitle.sub : levelTitle.main}
+          {/* Legend Strip */}
+          <div className="rounded-sm bg-muted/30 px-3 py-2">
+            <DataAvailabilityLegend
+              granularity={granularity}
+              viewMode={viewMode}
+              threshold={threshold}
+              orientation="horizontal"
+            />
+          </div>
+
+          {/* Heatmap Area */}
+          <div>
+            {isLoading ? (
+              <DataAvailabilitySkeleton />
+            ) : (
+              <DataAvailabilityHeatmap
+                rows={rows}
+                granularity={granularity}
+                filters={filters}
+                viewMode={viewMode}
+                threshold={threshold}
+                onRowClick={currentLevel.type !== 'slot' ? handleRowClick : undefined}
+                onCellClick={handleCellClick}
+                onColumnClick={handleColumnClick}
+                cellSize="3xs"
+                showColumnHeader
+                showLegend={false}
               />
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Cell Probe Dialog */}
       <CellProbeDialog
