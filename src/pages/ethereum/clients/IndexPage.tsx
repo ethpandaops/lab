@@ -7,7 +7,7 @@ import { Button } from '@/components/Elements/Button';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
-import { buildTooltipHtml, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
+import { buildTooltipHtml, fillTimeKeys, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import {
   ClientFilter,
   ClientPairs,
@@ -37,6 +37,7 @@ import {
   formatClientName,
   summariseClients,
   summarisePairs,
+  toDailyRecords,
   unfilteredNote,
   type ClientFilters,
   type ClientLayer,
@@ -133,13 +134,29 @@ export function IndexPage(): JSX.Element {
   const consensusClients = useMemo(() => summariseClients(records, 'consensus').map(s => s.client), [records]);
   const executionClients = useMemo(() => summariseClients(records, 'execution').map(s => s.client), [records]);
   const pairs = useMemo(() => summarisePairs(filtered), [filtered]);
+  // One entity proposes too rarely for hourly buckets, so its charts count blocks per day over the same window
+  const rebucket = !isDaily && !!entity;
+  const chartDaily = isDaily || rebucket;
+  const consensusChartRecords = useMemo(
+    () => (rebucket ? toDailyRecords(consensusRecords) : consensusRecords),
+    [consensusRecords, rebucket]
+  );
+  const executionChartRecords = useMemo(
+    () => (rebucket ? toDailyRecords(executionRecords) : executionRecords),
+    [executionRecords, rebucket]
+  );
+  const chartKeys = useMemo(
+    () =>
+      rebucket ? fillTimeKeys([...new Set(toDailyRecords(records).map(record => record.key))].sort(), true) : keys,
+    [records, keys, rebucket]
+  );
   const consensusChart = useMemo(
-    () => buildShareChartConfig(consensusRecords, keys, 'consensus', isDaily, true),
-    [consensusRecords, keys, isDaily]
+    () => buildShareChartConfig(consensusChartRecords, chartKeys, 'consensus', chartDaily, true),
+    [consensusChartRecords, chartKeys, chartDaily]
   );
   const executionChart = useMemo(
-    () => buildShareChartConfig(executionRecords, keys, 'execution', isDaily, true),
-    [executionRecords, keys, isDaily]
+    () => buildShareChartConfig(executionChartRecords, chartKeys, 'execution', chartDaily, true),
+    [executionChartRecords, chartKeys, chartDaily]
   );
 
   // Every change here can change the blocks table's rows, so it returns to the table's first page
@@ -159,11 +176,11 @@ export function IndexPage(): JSX.Element {
       (params: unknown): string => {
         const points = (Array.isArray(params) ? params : [params]) as Array<{ dataIndex?: number }>;
         const index = points[0]?.dataIndex;
-        const key = index === undefined ? undefined : keys[index];
+        const key = index === undefined ? undefined : chartKeys[index];
         if (!key) return '';
-        const layerRecords = layer === 'consensus' ? consensusRecords : executionRecords;
+        const layerRecords = layer === 'consensus' ? consensusChartRecords : executionChartRecords;
         const { total, items } = bucketShares(layerRecords, key, layer, true);
-        return buildTooltipHtml(formatTooltipDate(isDaily ? key : Number(key), isDaily), [
+        return buildTooltipHtml(formatTooltipDate(chartDaily ? key : Number(key), chartDaily), [
           {
             title: `${layer === 'consensus' ? 'CONSENSUS' : 'EXECUTION'} CLIENTS (${total} blocks)`,
             items: items.map((item, i) => ({
@@ -175,7 +192,7 @@ export function IndexPage(): JSX.Element {
           },
         ]);
       },
-    [keys, consensusRecords, executionRecords, isDaily]
+    [chartKeys, consensusChartRecords, executionChartRecords, chartDaily]
   );
 
   const isEmpty = !isLoading && !boundsLoading && !error && coverage.total === 0;
@@ -262,6 +279,7 @@ export function IndexPage(): JSX.Element {
                 blockTotal={coverage.total}
                 blockScope={describeBlocks(entity, filters, 'consensus', timePeriod)}
                 blockChart={consensusChart}
+                blockChartDaily={chartDaily}
                 blockTooltip={makeTooltip('consensus')}
                 peerRows={clPeers.rows}
                 peerDay={clPeers.day}
@@ -279,6 +297,7 @@ export function IndexPage(): JSX.Element {
                 blockTotal={coverage.total}
                 blockScope={describeBlocks(entity, filters, 'execution', timePeriod)}
                 blockChart={executionChart}
+                blockChartDaily={chartDaily}
                 blockTooltip={makeTooltip('execution')}
                 peerRows={elPeers.rows}
                 peerDay={elPeers.day}

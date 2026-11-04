@@ -209,7 +209,7 @@ Every client looks the same everywhere. Wherever a client appears — table cell
 
 Chart legends already do this for any series named after a known client (`isKnownClient`): `MultiLineChart` and `StackedBar` render the logo, and native ECharts legends get it through `legendItem` in `chartChrome.ts`. Name client series by the client (`reth`, not `Reth P50`) so they're recognised, and pass `color: getClientColor(name)`.
 
-Angles are not clients. Where Lab's views of adoption are compared side by side (proposed blocks, P2P peers, nodes in the ENR crawl, Xatu nodes), each angle takes its fixed colour from `ANGLE_COLORS` in `src/pages/ethereum/clients/utils/angle-colors.ts`, even when every series is about one client.
+Angles are not clients. Where Lab's views of adoption are compared side by side (proposed blocks, P2P peers, nodes in the ENR crawl, Xatu nodes), a series or column header that represents an angle takes its fixed colour from `ANGLE_COLORS` in `src/pages/ethereum/clients/utils/angle-colors.ts`, even when every series is about one client. Per-client rows keep their client colours: in a table of clients, each row's bars are drawn in that client's colour, and only the column headers carry the angle swatches.
 
 ## Copy
 

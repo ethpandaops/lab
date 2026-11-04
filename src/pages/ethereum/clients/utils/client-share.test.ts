@@ -13,6 +13,7 @@ import {
   summariseClients,
   summarisePairs,
   toClientCountRecords,
+  toDailyRecords,
   toEntityOptions,
   type ClientCountRecord,
   unfilteredNote,
@@ -47,6 +48,20 @@ describe('toClientCountRecords', () => {
     ).toEqual([{ key: '1792382400', consensusClient: 'teku', executionClient: 'besu', blocks: 3 }]);
     expect(toClientCountRecords([{ day_start_date: '2026-10-18', block_count: 5 }], true)).toEqual([
       { key: '2026-10-18', consensusClient: 'unknown', executionClient: 'unknown', blocks: 5 },
+    ]);
+  });
+});
+
+describe('toDailyRecords', () => {
+  it('should key each hourly record by the UTC day its hour starts in', () => {
+    const hourly: ClientCountRecord[] = [
+      // 23:00 UTC is already the next day east of UTC; the bucket follows UTC
+      { key: String(Date.UTC(2026, 9, 17, 23) / 1000), consensusClient: 'teku', executionClient: 'besu', blocks: 2 },
+      { key: String(Date.UTC(2026, 9, 18, 0) / 1000), consensusClient: 'teku', executionClient: 'besu', blocks: 3 },
+    ];
+    expect(toDailyRecords(hourly).map(record => [record.key, record.blocks])).toEqual([
+      ['2026-10-17', 2],
+      ['2026-10-18', 3],
     ]);
   });
 });

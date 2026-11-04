@@ -8,6 +8,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { DimClientRelease } from '@/api/types.gen';
+import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { OTHER_VERSION_COLOR } from '../../utils/client-versions';
 import { ANGLE_COLORS } from '../../utils/angle-colors';
@@ -25,6 +26,8 @@ export interface LayerClientsProps {
   blockScope: string;
   /** The blocks share chart over the window */
   blockChart: { labels: string[]; series: SeriesData[] };
+  /** Whether the blocks share chart has daily buckets rather than hourly */
+  blockChartDaily: boolean;
   blockTooltip: (params: unknown) => string;
   /** P2P census rows of the layer over the window */
   peerRows: Array<{ day_start_date?: string; client?: string; peer_count?: number }>;
@@ -97,6 +100,7 @@ export function LayerClients({
   blockTotal,
   blockScope,
   blockChart,
+  blockChartDaily,
   blockTooltip,
   peerRows,
   peerDay,
@@ -130,7 +134,8 @@ export function LayerClients({
         <dt className="inline font-medium text-foreground">Proposed blocks: </dt>
         <dd className="inline">
           share of the {named.toLocaleString()} blocks {blockScope} whose graffiti names {article} {label} client (
-          {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).
+          {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).{' '}
+          {blockChartDaily ? 'Charted per day.' : 'Charted per hour.'}
         </dd>
       </div>
       {showPeers && (
@@ -207,14 +212,14 @@ export function LayerClients({
                       </Link>
                     </td>
                     <td className="px-3 py-2">
-                      <ShareCell share={row.blockShare} color={ANGLE_COLORS.blocks} />
+                      <ShareCell share={row.blockShare} color={getClientColor(row.client)} />
                     </td>
                     {showPeers && (
                       <td className="px-3 py-2">
                         {peersLoading ? (
                           <LoadingContainer className="h-2 rounded-full" />
                         ) : (
-                          <ShareCell share={row.peerShare} color={ANGLE_COLORS.peers} />
+                          <ShareCell share={row.peerShare} color={getClientColor(row.client)} />
                         )}
                       </td>
                     )}
@@ -261,7 +266,7 @@ export function LayerClients({
       <div className={clsx('grid grid-cols-1 gap-4', showPeers && 'xl:grid-cols-2')}>
         <PopoutCard
           title="Proposed blocks over time"
-          subtitle={`Share of blocks naming ${article} ${label} client ${blockScope}`}
+          subtitle={`${blockChartDaily ? 'Daily' : 'Hourly'} share of blocks naming ${article} ${label} client ${blockScope}`}
           anchorId={`${layer}-block-share`}
           modalSize="full"
         >
