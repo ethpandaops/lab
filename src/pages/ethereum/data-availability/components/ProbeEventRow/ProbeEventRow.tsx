@@ -26,7 +26,7 @@ function ResultIcon({ result }: { result?: string }): JSX.Element {
 
 /**
  * Shared probe event row component
- * Used by LiveProbeEvents and CellProbeDialog for consistent probe display
+ * Used by CellProbeDialog for consistent probe display
  */
 export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEventRowProps): JSX.Element {
   const slot = probe.slot;

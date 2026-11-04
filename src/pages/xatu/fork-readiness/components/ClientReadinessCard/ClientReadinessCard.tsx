@@ -44,29 +44,33 @@ export function ClientReadinessCard({ data, forkName }: ClientReadinessCardProps
         />
       </div>
 
-      {/* Node list - always show all nodes */}
-      <div className="mt-4 space-y-2 border-t border-border pt-4">
-        {nodes.map(node => (
-          <div key={node.nodeName} className="flex items-center gap-3 text-xs/5">
-            {node.nodeId ? (
-              <Link
-                to="/xatu/nodes/$nodeId"
-                params={{ nodeId: node.nodeId }}
-                className="min-w-0 flex-1 truncate pr-8 text-primary hover:underline"
-              >
-                {formatNodeName(node.nodeName)}
-              </Link>
-            ) : (
-              <span className="min-w-0 flex-1 truncate pr-8 text-foreground">{formatNodeName(node.nodeName)}</span>
-            )}
-            <span className="shrink-0">
-              <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
-                {node.version}
-              </Badge>
-            </span>
-          </div>
-        ))}
-      </div>
+      {/* Only the Xatu nodes still to upgrade; the count and bar above cover the rest */}
+      {nodes.some(node => !node.isReady) && (
+        <div className="mt-4 space-y-2 border-t border-border pt-4">
+          {nodes
+            .filter(node => !node.isReady)
+            .map(node => (
+              <div key={node.nodeName} className="flex items-center gap-3 text-xs/5">
+                {node.nodeId ? (
+                  <Link
+                    to="/xatu/nodes/$nodeId"
+                    params={{ nodeId: node.nodeId }}
+                    className="min-w-0 flex-1 truncate pr-8 text-primary hover:underline"
+                  >
+                    {formatNodeName(node.nodeName)}
+                  </Link>
+                ) : (
+                  <span className="min-w-0 flex-1 truncate pr-8 text-foreground">{formatNodeName(node.nodeName)}</span>
+                )}
+                <span className="shrink-0">
+                  <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
+                    {node.version}
+                  </Badge>
+                </span>
+              </div>
+            ))}
+        </div>
+      )}
     </Card>
   );
 }

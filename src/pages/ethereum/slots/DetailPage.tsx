@@ -43,11 +43,9 @@ import { MevBiddingTimelineChart } from './components/MevBiddingTimelineChart';
 import { PreparedBlocksComparisonChart } from './components/PreparedBlocksComparisonChart';
 import { RelayDistributionChart } from './components/RelayDistributionChart';
 import { BuilderCompetitionChart } from './components/BuilderCompetitionChart';
-import { MiniStat } from '@/components/DataDisplay/MiniStat';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { ForkLabel } from '@/components/Ethereum/ForkLabel';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
-import { formatGasToMillions, ATTESTATION_DEADLINE_MS } from '@/utils';
 import type { ForkVersion } from '@/utils/beacon';
 import { SlotDetailSkeleton } from './components/SlotDetailSkeleton';
 import { EngineTimingsCard } from './components/EngineTimingsCard';
@@ -227,7 +225,6 @@ export function DetailPage(): JSX.Element {
 
   // Tab state management with URL search params
   const { selectedIndex, onChange } = useTabState([
-    { id: 'overview' },
     { id: 'timeline' },
     { id: 'block' },
     { id: 'attestations', anchors: ['missed-attestations'] },
@@ -363,41 +360,6 @@ export function DetailPage(): JSX.Element {
           meta_client_geo_continent_code: item.meta_client_geo_continent_code,
         }));
 
-  // Calculate distinct client count for block nodes
-  const distinctBlockClients = new Set(data.blockPropagation.map(item => item.meta_client_name).filter(Boolean)).size;
-
-  // Calculate performance metrics
-  const firstBlockSeen =
-    data.blockPropagation.length > 0
-      ? Math.min(...data.blockPropagation.map(node => node.seen_slot_start_diff ?? Infinity))
-      : null;
-
-  const formatFirstSeen = (ms: number | null): string => {
-    if (ms === null || ms === Infinity) return 'N/A';
-    return `${(ms / 1000).toFixed(2)}s`;
-  };
-
-  const attestationCorrectness = data.attestationCorrectness[0];
-  const attestationStats =
-    attestationCorrectness &&
-    attestationCorrectness.votes_max !== undefined &&
-    attestationCorrectness.votes_max > 0 &&
-    attestationCorrectness.votes_head !== null &&
-    attestationCorrectness.votes_head !== undefined &&
-    attestationCorrectness.votes_other !== null &&
-    attestationCorrectness.votes_other !== undefined
-      ? {
-          totalVotes: attestationCorrectness.votes_head + attestationCorrectness.votes_other,
-          votesHead: attestationCorrectness.votes_head,
-          votesMax: attestationCorrectness.votes_max,
-          participationPercentage:
-            ((attestationCorrectness.votes_head + attestationCorrectness.votes_other) /
-              attestationCorrectness.votes_max) *
-            100,
-          headPercentage: (attestationCorrectness.votes_head / attestationCorrectness.votes_max) * 100,
-        }
-      : null;
-
   // Calculate total missed attestations for subtitle
   const totalMissedAttestations = data.missedAttestations.reduce((sum, item) => sum + item.count, 0);
   const missedAttestationsSubtitle =
@@ -530,7 +492,6 @@ export function DetailPage(): JSX.Element {
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            <Tab>Overview</Tab>
             <Tab>Timeline</Tab>
             <Tab>Block</Tab>
             <Tab>Attestations</Tab>
@@ -544,114 +505,6 @@ export function DetailPage(): JSX.Element {
 
           {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
           <TabPanels className="mt-6 min-h-screen">
-            {/* Overview Tab - Clean, card-based layout with key metrics */}
-            <TabPanel>
-              <div className="space-y-6">
-                {/* Performance Metrics */}
-                <Card title="Performance Metrics">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {/* Block First Seen At */}
-                    {firstBlockSeen !== null && firstBlockSeen !== Infinity && (
-                      <MiniStat
-                        label="Block First Seen At"
-                        value={formatFirstSeen(firstBlockSeen)}
-                        percentage={Math.min((firstBlockSeen / ATTESTATION_DEADLINE_MS) * 100, 100)}
-                        showGauge
-                        color={
-                          firstBlockSeen > ATTESTATION_DEADLINE_MS ? 'var(--color-danger)' : 'var(--color-success)'
-                        }
-                      />
-                    )}
-
-                    {/* Gas Used */}
-                    {effectiveBlockData &&
-                      effectiveBlockData.execution_payload_gas_used !== null &&
-                      effectiveBlockData.execution_payload_gas_used !== undefined &&
-                      effectiveBlockData.execution_payload_gas_limit !== null &&
-                      effectiveBlockData.execution_payload_gas_limit !== undefined &&
-                      effectiveBlockData.execution_payload_gas_limit > 0 && (
-                        <MiniStat
-                          label="Gas Used"
-                          value={formatGasToMillions(effectiveBlockData.execution_payload_gas_used)}
-                          secondaryText={`/ ${formatGasToMillions(effectiveBlockData.execution_payload_gas_limit, 0)}`}
-                          percentage={
-                            (effectiveBlockData.execution_payload_gas_used /
-                              effectiveBlockData.execution_payload_gas_limit) *
-                            100
-                          }
-                          showGauge
-                          color={
-                            (effectiveBlockData.execution_payload_gas_used /
-                              effectiveBlockData.execution_payload_gas_limit) *
-                              100 >
-                            90
-                              ? 'var(--color-danger)'
-                              : 'var(--color-success)'
-                          }
-                        />
-                      )}
-
-                    {/* Attestation Stats */}
-                    {attestationStats && (
-                      <>
-                        <MiniStat
-                          label="Participation"
-                          value={attestationStats.totalVotes.toLocaleString()}
-                          secondaryText={`/ ${attestationStats.votesMax.toLocaleString()} validators`}
-                          percentage={attestationStats.participationPercentage}
-                          showGauge
-                        />
-                        <MiniStat
-                          label="Block Votes"
-                          value={attestationStats.votesHead.toLocaleString()}
-                          secondaryText={`/ ${attestationStats.votesMax.toLocaleString()} validators`}
-                          percentage={attestationStats.headPercentage}
-                          showGauge
-                        />
-                      </>
-                    )}
-                  </div>
-                </Card>
-
-                {/* Network Propagation */}
-                {blockPropagationData.length > 0 && (
-                  <Card title="Network Propagation">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                      <MiniStat label="Block Nodes" value={distinctBlockClients.toLocaleString()} />
-                    </div>
-                  </Card>
-                )}
-
-                {/* MEV Activity */}
-                {(data.blockMev[0]?.value || data.relayBids.length > 0 || data.builderBids.length > 0) && (
-                  <Card title="MEV Activity">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                      {data.blockMev[0]?.value && data.blockMev[0].value !== '0' && (
-                        <MiniStat
-                          label="MEV Value"
-                          value={`${(Number(data.blockMev[0].value) / 1e18).toFixed(4)} ETH`}
-                        />
-                      )}
-                      {data.relayBids.length > 0 && (
-                        <MiniStat
-                          label="Relays"
-                          value={data.relayBids.length.toString()}
-                          secondaryText="Submitted bids"
-                        />
-                      )}
-                      {data.builderBids.length > 0 && (
-                        <MiniStat
-                          label="Builders"
-                          value={data.builderBids.length.toString()}
-                          secondaryText="Submitted bids"
-                        />
-                      )}
-                    </div>
-                  </Card>
-                )}
-              </div>
-            </TabPanel>
-
             {/* Timeline Tab - First-seen timing visualization */}
             <TabPanel>
               <SlotProgressTimeline
@@ -1028,33 +881,6 @@ export function DetailPage(): JSX.Element {
                   </Card>
                 ) : (
                   <>
-                    {/* Blob Metrics - only show if there are actual blobs */}
-                    {blobCount > 0 && (
-                      <Card title="Blob Metrics">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                          <MiniStat label="Blob Count" value={blobCount.toString()} />
-
-                          {effectiveBlockData?.execution_payload_blob_gas_used !== null &&
-                            effectiveBlockData?.execution_payload_blob_gas_used !== undefined &&
-                            effectiveBlockData.execution_payload_blob_gas_used > 0 && (
-                              <MiniStat
-                                label="Blob Gas Used"
-                                value={`${(effectiveBlockData.execution_payload_blob_gas_used / 1e6).toFixed(2)}M`}
-                              />
-                            )}
-
-                          {effectiveBlockData?.execution_payload_excess_blob_gas !== null &&
-                            effectiveBlockData?.execution_payload_excess_blob_gas !== undefined &&
-                            effectiveBlockData.execution_payload_excess_blob_gas > 0 && (
-                              <MiniStat
-                                label="Excess Blob Gas"
-                                value={`${(effectiveBlockData.execution_payload_excess_blob_gas / 1e6).toFixed(2)}M`}
-                              />
-                            )}
-                        </div>
-                      </Card>
-                    )}
-
                     {/* Blobs - one row per blob with its versioned hash + KZG commitment */}
                     {blobDetails.length > 0 && (
                       <Card
@@ -1203,74 +1029,6 @@ export function DetailPage(): JSX.Element {
             {/* Execution Tab - Comprehensive execution layer data */}
             <TabPanel>
               <div className="space-y-6">
-                {!effectiveBlockData ? (
-                  <Card>
-                    <div className="py-8 text-center">
-                      <p className="text-muted">No execution data available for this slot</p>
-                    </div>
-                  </Card>
-                ) : (
-                  <>
-                    {/* Transaction & Gas Metrics */}
-                    <Card title="Transactions & Gas">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        {effectiveBlockData.execution_payload_transactions_count !== null &&
-                          effectiveBlockData.execution_payload_transactions_count !== undefined && (
-                            <MiniStat
-                              label="Transactions"
-                              value={effectiveBlockData.execution_payload_transactions_count.toLocaleString()}
-                            />
-                          )}
-
-                        {effectiveBlockData.execution_payload_gas_used !== null &&
-                          effectiveBlockData.execution_payload_gas_used !== undefined &&
-                          effectiveBlockData.execution_payload_gas_limit !== null &&
-                          effectiveBlockData.execution_payload_gas_limit !== undefined &&
-                          effectiveBlockData.execution_payload_gas_limit > 0 && (
-                            <MiniStat
-                              label="Gas Used"
-                              value={formatGasToMillions(effectiveBlockData.execution_payload_gas_used)}
-                              secondaryText={`/ ${formatGasToMillions(effectiveBlockData.execution_payload_gas_limit, 0)}`}
-                              percentage={
-                                (effectiveBlockData.execution_payload_gas_used /
-                                  effectiveBlockData.execution_payload_gas_limit) *
-                                100
-                              }
-                              showGauge
-                              color={
-                                (effectiveBlockData.execution_payload_gas_used /
-                                  effectiveBlockData.execution_payload_gas_limit) *
-                                  100 >
-                                90
-                                  ? 'var(--color-danger)'
-                                  : 'var(--color-success)'
-                              }
-                            />
-                          )}
-
-                        {effectiveBlockData.execution_payload_base_fee_per_gas && (
-                          <MiniStat
-                            label="Base Fee"
-                            value={`${(Number(effectiveBlockData.execution_payload_base_fee_per_gas) / 1e9).toFixed(2)} Gwei`}
-                          />
-                        )}
-
-                        {effectiveBlockData.execution_payload_transactions_total_bytes !== null &&
-                          effectiveBlockData.execution_payload_transactions_total_bytes !== undefined && (
-                            <MiniStat
-                              label="Total Bytes"
-                              value={
-                                effectiveBlockData.execution_payload_transactions_total_bytes < 1024 * 1024
-                                  ? `${(effectiveBlockData.execution_payload_transactions_total_bytes / 1024).toFixed(2)} KB`
-                                  : `${(effectiveBlockData.execution_payload_transactions_total_bytes / (1024 * 1024)).toFixed(2)} MB`
-                              }
-                            />
-                          )}
-                      </div>
-                    </Card>
-                  </>
-                )}
-
                 {/* Engine API Timings */}
                 <EngineTimingsCard
                   data={engineTimingsData}

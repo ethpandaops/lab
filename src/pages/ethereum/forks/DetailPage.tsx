@@ -311,7 +311,7 @@ function ForkDetailContent({
           />
         )}
 
-        <ForkReadiness fork={fork.name} />
+        {!fork.isActive && <ForkReadiness fork={fork.name} />}
 
         <ForkLinksCard fork={fork} />
       </div>
