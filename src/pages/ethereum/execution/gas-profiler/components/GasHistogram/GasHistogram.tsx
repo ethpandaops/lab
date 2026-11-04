@@ -58,7 +58,7 @@ const CALL_BUCKETS: HistogramBucket[] = [
  * GasHistogram - Reusable histogram showing gas distribution
  *
  * Used for:
- * - BlockPage: Transaction Size Distribution
+ * - BlockPage: Transactions by Gas Used
  * - TransactionPage: Call Size Distribution
  */
 export function GasHistogram({

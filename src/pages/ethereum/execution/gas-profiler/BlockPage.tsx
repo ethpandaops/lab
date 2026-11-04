@@ -17,6 +17,7 @@ import ReactECharts from 'echarts-for-react';
 import clsx from 'clsx';
 import { useQuery } from '@tanstack/react-query';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -49,7 +50,14 @@ import { useBlockResourceGas } from './hooks/useBlockResourceGas';
 import { useBlockReceiptSizes } from './hooks/useBlockReceiptSizes';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
 import { useNetwork } from '@/hooks/useNetwork';
-import { CATEGORY_COLORS, CALL_TYPE_COLORS, getOpcodeCategory, getEtherscanBaseUrl, isMainnet } from './utils';
+import {
+  CATEGORY_COLORS,
+  CALL_TYPE_COLORS,
+  getOpcodeCategory,
+  getEtherscanBaseUrl,
+  getEffectiveGasRefund,
+  isMainnet,
+} from './utils';
 import { formatBytes } from '@/utils';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -459,14 +467,14 @@ export function BlockPage(): JSX.Element {
     for (const tx of data.transactions) {
       totalReceipt += tx.totalGasUsed;
       totalIntrinsic += tx.intrinsicGas ?? 0;
-      totalRefund += tx.gasRefund;
+      totalRefund += getEffectiveGasRefund(tx.gasRefund, tx.totalGasUsed, blockNumber, currentNetwork).effectiveRefund;
     }
 
     // EVM execution = Receipt + Refund - Intrinsic
     const totalEvm = totalReceipt + totalRefund - totalIntrinsic;
 
     return { totalIntrinsic, totalEvm, totalRefund, totalReceipt };
-  }, [data?.transactions]);
+  }, [data?.transactions, blockNumber, currentNetwork]);
 
   // Determine refund cap percentage based on fork (London changed from 50% to 20%)
   const refundCapPercent = useMemo(() => {
@@ -497,7 +505,8 @@ export function BlockPage(): JSX.Element {
 
   // Contract treemap data
   const contractTreemapOption = useMemo(() => {
-    if (!data?.allContractsByGas?.length || !totalBlockGas) return {};
+    const totalContractGas = data?.totalContractGas ?? 0;
+    if (!data?.allContractsByGas?.length || !totalContractGas) return {};
 
     const sortedContracts = [...data.allContractsByGas].sort((a, b) => b.gas - a.gas);
     const topContracts = sortedContracts.slice(0, 30);
@@ -553,7 +562,7 @@ export function BlockPage(): JSX.Element {
           label: {
             show: true,
             formatter: (params: { name: string; value: number }) => {
-              const pct = ((params.value / totalBlockGas) * 100).toFixed(1);
+              const pct = ((params.value / totalContractGas) * 100).toFixed(1);
               return `${params.name}\n${pct}%`;
             },
             color: '#fff',
@@ -573,7 +582,7 @@ export function BlockPage(): JSX.Element {
         show: false,
       },
     };
-  }, [data?.allContractsByGas, colors, totalBlockGas]);
+  }, [data?.allContractsByGas, data?.totalContractGas, colors]);
 
   // Count of flows shown in Sankey
   const sankeyFlowCount = useMemo(() => {
@@ -674,8 +683,8 @@ export function BlockPage(): JSX.Element {
           orient: 'horizontal',
           data: nodes,
           links,
-          left: '5%',
-          right: '12%',
+          left: 8,
+          right: 8,
           top: 15,
           bottom: 15,
           nodeWidth: 14,
@@ -690,14 +699,15 @@ export function BlockPage(): JSX.Element {
             borderWidth: 0,
             borderRadius: 2,
           },
+          // Labels sit inside the diagram, next to their node, so neither edge clips them
           label: {
             show: true,
             color: colors.foreground,
             fontSize: 11,
             fontWeight: 500,
-            position: 'left',
-            align: 'right',
-            distance: 8,
+            distance: 6,
+            width: 150,
+            overflow: 'truncate',
           },
           levels: [
             {
@@ -708,8 +718,8 @@ export function BlockPage(): JSX.Element {
                 shadowColor: 'rgba(0,0,0,0.1)',
               },
               label: {
-                position: 'left',
-                align: 'right',
+                position: 'right',
+                align: 'left',
                 color: colors.foreground,
               },
             },
@@ -721,8 +731,8 @@ export function BlockPage(): JSX.Element {
                 shadowColor: 'rgba(0,0,0,0.1)',
               },
               label: {
-                position: 'right',
-                align: 'left',
+                position: 'left',
+                align: 'right',
                 color: colors.foreground,
               },
             },
@@ -781,7 +791,8 @@ export function BlockPage(): JSX.Element {
     const y = mouseEvent?.clientY ?? 0;
 
     const gas = params.data?.value ?? 0;
-    const percentage = totalBlockGas > 0 ? (gas / totalBlockGas) * 100 : 0;
+    const totalContractGas = data?.totalContractGas ?? 0;
+    const percentage = totalContractGas > 0 ? (gas / totalContractGas) * 100 : 0;
 
     setContractPopover({
       address,
@@ -814,7 +825,7 @@ export function BlockPage(): JSX.Element {
   if (boundsLoading || (isLoading && !data)) {
     return (
       <Container>
-        <Header title={`Block ${formatGas(blockNumber)}`} />
+        <Header title={`Block ${blockNumber}`} />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -824,21 +835,30 @@ export function BlockPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title={`Block ${formatGas(blockNumber)}`} />
+        <Header title={`Block ${blockNumber}`} />
         <Alert variant="error" title="Error loading block data" description={error.message} />
       </Container>
     );
   }
 
-  // Block not found or out of bounds
-  if (!data || !bounds || blockNumber < bounds.min || blockNumber > bounds.max) {
+  if (!bounds) {
     return (
       <Container>
-        <Header title={`Block ${formatGas(blockNumber)}`} />
+        <Header title={`Block ${blockNumber}`} />
+        <Alert variant="info" title="Gas profiling isn't available on this network" />
+      </Container>
+    );
+  }
+
+  // Block not found or out of bounds
+  if (!data || blockNumber < bounds.min || blockNumber > bounds.max) {
+    return (
+      <Container>
+        <Header title={`Block ${blockNumber}`} />
         <Alert
           variant="warning"
           title="Block not available"
-          description={`Block ${formatGas(blockNumber)} is not in the indexed range (${bounds ? formatGas(bounds.min) : '?'} - ${bounds ? formatGas(bounds.max) : '?'})`}
+          description={`Block ${formatGas(blockNumber)} is not in the indexed range (${bounds.min} - ${bounds.max})`}
         />
         <div className="mt-4">
           <Link
@@ -860,7 +880,7 @@ export function BlockPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title={`Block ${formatGas(blockNumber)}`} />
+      <Header title={`Block ${blockNumber}`} />
 
       {/* Back link and block navigation */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -901,7 +921,7 @@ export function BlockPage(): JSX.Element {
               Prev
             </Link>
             <span className="text-xs text-muted">
-              {formatGas(bounds.min)} - {formatGas(bounds.max)}
+              {bounds.min} - {bounds.max}
             </span>
             <Link
               to="/ethereum/execution/gas-profiler/block/$blockNumber"
@@ -966,15 +986,15 @@ export function BlockPage(): JSX.Element {
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <div className="mb-6 flex items-center justify-between border-b border-border">
-          <HeadlessTab.List className="flex gap-1">
+        <div className="mb-6 flex items-center gap-2 border-b border-border">
+          <ScrollableTabs className="-mb-px min-w-0 flex-1">
             <Tab hash="overview">Overview</Tab>
             <Tab hash="opcodes">Opcodes</Tab>
             <Tab hash="resources">Resources</Tab>
             <Tab hash="transactions">Transactions</Tab>
             <Tab hash="calls">Calls</Tab>
-          </HeadlessTab.List>
-          <div className="mb-1 flex items-center gap-2">
+          </ScrollableTabs>
+          <div className="mb-1 flex shrink-0 items-center gap-2">
             {selectedTabIndex === 2 && <ResourceGasHelp />}
             <Link
               to="/ethereum/execution/gas-profiler/simulate"
@@ -1071,7 +1091,7 @@ export function BlockPage(): JSX.Element {
                 }}
               />
               <GasHistogram
-                title="Transaction Size Distribution"
+                title="Transactions by Gas Used"
                 values={transactionGasValues}
                 buckets={TRANSACTION_BUCKETS}
                 yAxisLabel="Transactions"
@@ -1158,7 +1178,7 @@ export function BlockPage(): JSX.Element {
             <div className="space-y-6">
               {/* Gas by Contract Treemap + Calls vs Gas scatter */}
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <PopoutCard title="Gas by Contract" subtitle="Top 30 contracts by gas consumption" modalSize="xl">
+                <PopoutCard title="Gas by Contract" subtitle="Share of EVM gas" modalSize="xl">
                   {({ inModal }) => (
                     <ReactECharts
                       theme={ECHARTS_THEME}
@@ -1232,7 +1252,7 @@ export function BlockPage(): JSX.Element {
                       callTypes: c.callTypes,
                     })
                   )}
-                  totalGas={totalBlockGas}
+                  totalGas={data.totalContractGas}
                   onContractClick={(contract: ContractInteractionItem) => {
                     const contractData = data.allContractsByGas.find(c => c.address === contract.address);
                     if (contractData?.firstTxHash) {
@@ -1243,7 +1263,7 @@ export function BlockPage(): JSX.Element {
                       });
                     }
                   }}
-                  percentLabel="% of Block"
+                  percentLabel="% of EVM Gas"
                 />
               )}
             </div>

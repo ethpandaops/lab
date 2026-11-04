@@ -5,6 +5,7 @@ import { Route } from '@/routes/ethereum/execution/gas-profiler/tx.$txHash_.call
 import { Tab as HeadlessTab } from '@headlessui/react';
 import {
   ArrowLeftIcon,
+  ArrowsPointingOutIcon,
   ClipboardDocumentIcon,
   CodeBracketIcon,
   FireIcon,
@@ -14,6 +15,7 @@ import {
   CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import { Tab } from '@/components/Navigation/Tab';
+import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { GasTooltip } from '@/components/DataDisplay/GasTooltip';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -582,7 +584,7 @@ export function CallPage(): JSX.Element {
       </div>
 
       {/* Quick Stats Row - Always visible */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <BoltIcon className="size-5 text-muted" />
@@ -622,16 +624,26 @@ export function CallPage(): JSX.Element {
             </div>
           </div>
         </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <ArrowsPointingOutIcon className="size-5 text-muted" />
+            <div>
+              <div className="text-xl font-semibold text-foreground">{currentFrame.depth ?? 0}</div>
+              <div className="text-xs text-muted">Depth</div>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {/* Tabbed Content */}
       <HeadlessTab.Group selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
-        <div className="mb-6 flex items-center justify-between border-b border-border">
-          <HeadlessTab.List className="flex gap-1">
+        <div className="mb-6 flex items-center gap-2 border-b border-border">
+          <ScrollableTabs className="-mb-px min-w-0 flex-1">
             <Tab hash="overview">Overview</Tab>
             <Tab hash="opcodes">Opcodes</Tab>
             <Tab hash="resources">Resources</Tab>
-          </HeadlessTab.List>
+          </ScrollableTabs>
           {selectedTabIndex === 2 && <ResourceGasHelp />}
         </div>
 
@@ -642,7 +654,7 @@ export function CallPage(): JSX.Element {
             <Card
               className="mb-6"
               title="Internal Tx Gas Breakdown"
-              subtitle={`Internal Tx #${currentFrame.call_frame_id} • Depth ${currentFrame.depth}`}
+              subtitle={`Internal Tx #${currentFrame.call_frame_id}`}
             >
               {/* Gas Formula */}
               <div className="py-1">

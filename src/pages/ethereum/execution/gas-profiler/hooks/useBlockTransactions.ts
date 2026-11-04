@@ -76,6 +76,8 @@ export interface BlockData {
   topContractsByGas: ContractGasData[];
   /** All contracts by gas consumption (for Contracts tab) */
   allContractsByGas: ContractGasData[];
+  /** EVM gas across all contracts (sum of allContractsByGas), the basis for contract shares */
+  totalContractGas: number;
   /** Transaction to contract flow data for Sankey visualization */
   txContractFlows: TxContractFlow[];
 }
@@ -120,7 +122,8 @@ function createTransactionSummaries(
     // Find root frame (parent_call_frame_id is null)
     const rootFrame = txFrames.find(f => f.parent_call_frame_id === null || f.parent_call_frame_id === undefined);
     const maxDepth = Math.max(...txFrames.map(f => f.depth ?? 0));
-    const hasErrors = txFrames.some(f => (f.error_count ?? 0) > 0);
+    // An inner call can revert without failing the transaction; only a root-frame error fails it
+    const hasErrors = (rootFrame?.error_count ?? 0) > 0;
 
     // Look up contract name from dim_contract_owner
     const targetAddress = rootFrame?.target_address ?? null;
@@ -261,9 +264,8 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       .map(([callType, data]) => ({ callType, count: data.count, gasUsed: data.gasUsed }))
       .sort((a, b) => b.gasUsed - a.gasUsed);
 
-    // Aggregate gas by contract address from ALL call frames
+    // Aggregate gas by contract address from ALL call frames, including root frames
     // Use self gas (frame.gas) not cumulative to avoid double-counting
-    // Skip root frames (no call_type) - these are transaction entry points, not contract calls
     const contractGasMap = new Map<
       string,
       {
@@ -275,16 +277,13 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       }
     >();
     for (const frame of frames) {
-      // Skip root frames (transaction entry points, not internal calls)
-      // Root frames always have call_frame_id = 0
-      if (frame.call_frame_id === 0) continue;
-      if (!frame.call_type) continue;
-
       const addr = frame.target_address;
       if (!addr) continue; // Skip frames without target address
 
+      // Root frames carry the tx target's own execution gas; their call type is empty for a plain call
+      const callType = frame.call_type || (frame.call_frame_id === 0 ? 'CALL' : null);
+      if (!callType) continue;
       const selfGas = frame.gas ?? 0;
-      const callType = frame.call_type;
 
       const existing = contractGasMap.get(addr);
       if (existing) {
@@ -325,10 +324,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
     // Group by (txHash, contractAddress) to get gas flow between each tx and contract
     const txContractFlowMap = new Map<string, TxContractFlow>();
     for (const frame of frames) {
-      // Skip root frames (transaction entry points, not internal calls)
-      // Root frames always have call_frame_id = 0
-      if (frame.call_frame_id === 0) continue;
-      if (!frame.call_type) continue;
+      if (!frame.call_type && frame.call_frame_id !== 0) continue;
       const addr = frame.target_address;
       if (!addr) continue;
 
@@ -365,6 +361,7 @@ export function useBlockTransactions({ blockNumber }: UseBlockTransactionsOption
       totalCallFrames: frames.filter(f => f.call_type).length,
       topContractsByGas,
       allContractsByGas,
+      totalContractGas: allContractsByGas.reduce((sum, c) => sum + c.gas, 0),
       txContractFlows,
     };
   }, [frames, targetBlock, enrichedContractOwners]);
