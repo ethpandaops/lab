@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
-  fctAttestationVoteCorrectnessByValidatorServiceListOptions,
-  fctSyncCommitteeParticipationByValidatorServiceListOptions,
-  fctValidatorBalanceServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
+  fctAttestationVoteCorrectnessByValidatorServiceList,
+  fctSyncCommitteeParticipationByValidatorServiceList,
+  fctValidatorBalanceServiceList,
+} from '@/api/sdk.gen';
+import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import type {
   FctAttestationVoteCorrectnessByValidator,
@@ -117,39 +118,72 @@ export function useSlotData(validatorIndices: number[], hourTimestamp: number | 
   const results = useQueries({
     queries: [
       {
-        ...fctAttestationVoteCorrectnessByValidatorServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            slot_start_date_time_gte: hourTimestamp ?? 0,
-            slot_start_date_time_lt: hourEnd,
-            page_size: 10000,
-            order_by: 'slot_start_date_time',
-          },
-        }),
+        queryKey: [
+          'validators',
+          'fct_attestation_vote_correctness_by_validator',
+          currentNetwork?.name,
+          indicesString,
+          hourTimestamp,
+        ],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctAttestationVoteCorrectnessByValidator>(
+            fctAttestationVoteCorrectnessByValidatorServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                slot_start_date_time_gte: hourTimestamp ?? 0,
+                slot_start_date_time_lt: hourEnd,
+                page_size: 10000,
+                order_by: 'slot_start_date_time',
+              },
+            },
+            'fct_attestation_vote_correctness_by_validator',
+            signal
+          ),
         enabled,
       },
       {
-        ...fctSyncCommitteeParticipationByValidatorServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            slot_start_date_time_gte: hourTimestamp ?? 0,
-            slot_start_date_time_lt: hourEnd,
-            page_size: 10000,
-            order_by: 'slot_start_date_time',
-          },
-        }),
+        queryKey: [
+          'validators',
+          'fct_sync_committee_participation_by_validator',
+          currentNetwork?.name,
+          indicesString,
+          hourTimestamp,
+        ],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctSyncCommitteeParticipationByValidator>(
+            fctSyncCommitteeParticipationByValidatorServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                slot_start_date_time_gte: hourTimestamp ?? 0,
+                slot_start_date_time_lt: hourEnd,
+                page_size: 10000,
+                order_by: 'slot_start_date_time',
+              },
+            },
+            'fct_sync_committee_participation_by_validator',
+            signal
+          ),
         enabled,
       },
       {
-        ...fctValidatorBalanceServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            epoch_start_date_time_gte: hourTimestamp ?? 0,
-            epoch_start_date_time_lt: hourEnd,
-            page_size: 10000,
-            order_by: 'epoch_start_date_time',
-          },
-        }),
+        queryKey: ['validators', 'fct_validator_balance', currentNetwork?.name, indicesString, hourTimestamp],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctValidatorBalance>(
+            fctValidatorBalanceServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                epoch_start_date_time_gte: hourTimestamp ?? 0,
+                epoch_start_date_time_lt: hourEnd,
+                page_size: 10000,
+                order_by: 'epoch_start_date_time',
+              },
+            },
+            'fct_validator_balance',
+            signal
+          ),
         enabled,
       },
     ],
@@ -160,29 +194,9 @@ export function useSlotData(validatorIndices: number[], hourTimestamp: number | 
   const isLoading = attestationQuery.isLoading || syncCommitteeQuery.isLoading || balanceQuery.isLoading;
   const error = attestationQuery.error || syncCommitteeQuery.error || balanceQuery.error;
 
-  type AttestationResponse = {
-    fct_attestation_vote_correctness_by_validator?: FctAttestationVoteCorrectnessByValidator[];
-  };
-  type SyncCommitteeResponse = {
-    fct_sync_committee_participation_by_validator?: FctSyncCommitteeParticipationByValidator[];
-  };
-  type BalanceResponse = { fct_validator_balance?: FctValidatorBalance[] };
-
-  const attestationData = useMemo(
-    () =>
-      (attestationQuery.data as AttestationResponse | undefined)?.fct_attestation_vote_correctness_by_validator ?? [],
-    [attestationQuery.data]
-  );
-  const syncCommitteeData = useMemo(
-    () =>
-      (syncCommitteeQuery.data as SyncCommitteeResponse | undefined)?.fct_sync_committee_participation_by_validator ??
-      [],
-    [syncCommitteeQuery.data]
-  );
-  const balanceData = useMemo(
-    () => (balanceQuery.data as BalanceResponse | undefined)?.fct_validator_balance ?? [],
-    [balanceQuery.data]
-  );
+  const attestationData = useMemo(() => attestationQuery.data ?? [], [attestationQuery.data]);
+  const syncCommitteeData = useMemo(() => syncCommitteeQuery.data ?? [], [syncCommitteeQuery.data]);
+  const balanceData = useMemo(() => balanceQuery.data ?? [], [balanceQuery.data]);
 
   const processedData = useMemo(() => {
     if (!enabled || isLoading) {

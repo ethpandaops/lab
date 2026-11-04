@@ -11,6 +11,7 @@ import { clientLogoHtml } from '@/components/Charts/chartChrome';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
+import type { FctEngineGetBlobsByElClientHourly, FctEngineGetBlobsByElClientDaily } from '@/api/types.gen';
 import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
 import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../../IndexPage.types';
 import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
@@ -67,6 +68,12 @@ const PERCENTILE_OPTIONS = [
   { value: 'p95', label: 'P95' },
 ] as const;
 
+/** Start of an hourly or daily row's bucket in ms (0 when missing) */
+function bucketStartMs(row: { hour_start_date_time?: number; day_start_date?: string }): number {
+  if (row.hour_start_date_time) return row.hour_start_date_time * 1000;
+  return row.day_start_date ? Date.parse(`${row.day_start_date}T00:00:00Z`) : 0;
+}
+
 /**
  * GetBlobs tab showing detailed engine_getBlobs timing analysis
  */
@@ -86,11 +93,13 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
 
-  // Long ranges (90d+) only fetch daily data - hourly trend charts are hidden
+  // Long ranges (90d+) only fetch the daily tables, so trends there have one point per day
   const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
 
-  // Per-client/version rows for the summary stats and client table
-  const summaryRows = showHourlyCharts ? getBlobsByElClientHourly : getBlobsByElClientDaily;
+  // Per-client/version rows covering the whole range (hourly up to 31d, daily beyond)
+  const summaryRows: (FctEngineGetBlobsByElClientHourly | FctEngineGetBlobsByElClientDaily)[] = showHourlyCharts
+    ? getBlobsByElClientHourly
+    : getBlobsByElClientDaily;
 
   // Filter to SUCCESS status only for duration-based charts
   const successBlobsByElClient = getBlobsByElClient.filter(r => r.status?.toUpperCase() === 'SUCCESS');
@@ -100,10 +109,6 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
 
   // Calculate summary stats from hourly/daily data (always available, accurate aggregations)
   const aggregatedStats = (() => {
-    if (summaryRows.length === 0) {
-      return { totalObservations: 0, successRate: '0', avgDuration: '0', avgBlobsPerRequest: '0' };
-    }
-
     let successCount = 0;
     let partialCount = 0;
     let emptyCount = 0;
@@ -130,10 +135,22 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     const avgDuration = totalStatusCount > 0 ? (totalWeightedDuration / totalStatusCount).toFixed(0) : '0';
     const avgBlobsPerRequest = totalStatusCount > 0 ? (totalWeightedBlobs / totalStatusCount).toFixed(1) : '0';
 
-    return { totalObservations: totalStatusCount, successRate, avgDuration, avgBlobsPerRequest };
+    return {
+      totalObservations: totalStatusCount,
+      successRate,
+      avgDuration,
+      avgBlobsPerRequest,
+      statusTotals: {
+        success: successCount,
+        partial: partialCount,
+        empty: emptyCount,
+        error: errorCount,
+        unsupported: unsupportedCount,
+      },
+    };
   })();
 
-  const { totalObservations, successRate, avgDuration, avgBlobsPerRequest } = aggregatedStats;
+  const { totalObservations, successRate, avgDuration, avgBlobsPerRequest, statusTotals } = aggregatedStats;
 
   // Calculate slot bounds from per-EL-client data (which has per-slot granularity)
   const slotBounds = (() => {
@@ -160,30 +177,6 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const histogramBuckets = Array.from(histogramMap.keys()).sort((a, b) => a - b);
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
-
-  // Calculate status breakdown from per-slot data
-  const statusTotals = getBlobsByElClient.reduce(
-    (acc, item) => {
-      const obs = item.observation_count ?? 0;
-      const status = item.status?.toUpperCase() ?? '';
-
-      switch (status) {
-        case 'SUCCESS':
-          return { ...acc, success: acc.success + obs };
-        case 'PARTIAL':
-          return { ...acc, partial: acc.partial + obs };
-        case 'EMPTY':
-          return { ...acc, empty: acc.empty + obs };
-        case 'ERROR':
-          return { ...acc, error: acc.error + obs };
-        case 'UNSUPPORTED':
-          return { ...acc, unsupported: acc.unsupported + obs };
-        default:
-          return acc;
-      }
-    },
-    { success: 0, partial: 0, empty: 0, error: 0, unsupported: 0 }
-  );
 
   const statusLabels = ['SUCCESS', 'PARTIAL', 'EMPTY', 'ERROR', 'UNSUPPORTED'];
   // Use BarDataItem with per-bar colors
@@ -294,27 +287,25 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
 
   const hasClientData = elClientList.length > 0;
 
-  // === Hourly Trend Series (for longer time ranges) ===
-  // Group hourly data by client and hour, aggregating across versions with weighted average
-  const hourlyClientData = new Map<string, Map<number, { totalP50: number; totalP95: number; totalObs: number }>>();
-  const hourlyClients = new Set<string>();
+  // === Trend Series (for longer time ranges) ===
+  // Group hourly/daily data by client and bucket, aggregating across versions with weighted average
+  const trendClientData = new Map<string, Map<number, { totalP50: number; totalP95: number; totalObs: number }>>();
+  const trendClients = new Set<string>();
 
-  getBlobsByElClientHourly.forEach(row => {
+  summaryRows.forEach(row => {
     const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
-    hourlyClients.add(client);
+    trendClients.add(client);
 
-    const timestamp = row.hour_start_date_time ?? 0;
+    const timestampMs = bucketStartMs(row);
     const p50 = row.p50_duration_ms ?? 0;
     const p95 = row.p95_duration_ms ?? 0;
     const obs = row.observation_count ?? 0;
 
-    if (timestamp > 0 && obs > 0 && p50 > 0) {
-      const timestampMs = timestamp * 1000;
-
-      if (!hourlyClientData.has(client)) {
-        hourlyClientData.set(client, new Map());
+    if (timestampMs > 0 && obs > 0 && p50 > 0) {
+      if (!trendClientData.has(client)) {
+        trendClientData.set(client, new Map());
       }
-      const clientHours = hourlyClientData.get(client)!;
+      const clientHours = trendClientData.get(client)!;
 
       // Aggregate by hour - weighted by observation count
       const existing = clientHours.get(timestampMs);
@@ -329,14 +320,14 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   });
 
   // Sort clients for consistent coloring and create series
-  const hourlyClientList = Array.from(hourlyClients).sort();
+  const trendClientList = Array.from(trendClients).sort();
 
   // Calculate time bounds for the hourly chart
-  let hourlyMinTime = Infinity;
-  let hourlyMaxTime = -Infinity;
+  let trendMinTime = Infinity;
+  let trendMaxTime = -Infinity;
 
-  const hourlyP50Series = hourlyClientList.map((client, index) => {
-    const clientHours = hourlyClientData.get(client) ?? new Map();
+  const trendP50Series = trendClientList.map((client, index) => {
+    const clientHours = trendClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
     clientHours.forEach((agg, timestampMs) => {
@@ -344,8 +335,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       dataPoints.push([timestampMs, avgP50]);
 
       // Track min/max for axis bounds
-      if (timestampMs < hourlyMinTime) hourlyMinTime = timestampMs;
-      if (timestampMs > hourlyMaxTime) hourlyMaxTime = timestampMs;
+      if (timestampMs < trendMinTime) trendMinTime = timestampMs;
+      if (timestampMs > trendMaxTime) trendMaxTime = timestampMs;
     });
 
     // Sort by timestamp
@@ -359,8 +350,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   });
 
   // P95 Duration series
-  const hourlyP95Series = hourlyClientList.map((client, index) => {
-    const clientHours = hourlyClientData.get(client) ?? new Map();
+  const trendP95Series = trendClientList.map((client, index) => {
+    const clientHours = trendClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
     clientHours.forEach((agg, timestampMs) => {
@@ -378,28 +369,37 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   });
 
   // Ensure valid bounds (fallback to now if no data)
-  if (hourlyMinTime === Infinity) hourlyMinTime = Date.now() - 3600000;
-  if (hourlyMaxTime === -Infinity) hourlyMaxTime = Date.now();
+  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
+  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
 
-  // Keep hourlyTrendSeries as alias for backward compatibility
-  const hourlyTrendSeries = hourlyP50Series;
+  // Axis and tooltip labels for the trend charts' hourly/daily buckets
+  const formatTrendAxis = (value: number | string): string => {
+    const date = new Date(Number(value));
+    if (timeRange === '24hours') {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+  const formatTrendBucket = (ms: number): string =>
+    showHourlyCharts
+      ? new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : new Date(ms).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
   // === Success Rate Trend Series (for longer time ranges) ===
-  // Group hourly data by client and hour, calculating success rate
+  // Group hourly/daily data by client and bucket, calculating success rate
   const successRateClientData = new Map<string, Map<number, { successCount: number; totalCount: number }>>();
 
-  getBlobsByElClientHourly.forEach(row => {
+  summaryRows.forEach(row => {
     const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
-    const timestamp = row.hour_start_date_time ?? 0;
+    const timestampMs = bucketStartMs(row);
     const successCount = row.success_count ?? 0;
     const totalCount = row.observation_count ?? 0;
 
-    if (timestamp > 0 && totalCount > 0) {
+    if (timestampMs > 0 && totalCount > 0) {
       if (!successRateClientData.has(client)) {
         successRateClientData.set(client, new Map());
       }
       const clientHours = successRateClientData.get(client)!;
-      const timestampMs = timestamp * 1000;
 
       // Aggregate by hour - sum counts
       const existing = clientHours.get(timestampMs);
@@ -412,7 +412,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     }
   });
 
-  const successRateTrendSeries = hourlyClientList.map((client, index) => {
+  const successRateTrendSeries = trendClientList.map((client, index) => {
     const clientHours = successRateClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
@@ -481,93 +481,57 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
         )}
       </PopoutCard>
 
-      {/* Per-slot charts (only for short time ranges) */}
+      {/* Per-slot charts (short time ranges) or hourly/daily trend charts */}
       {showPerSlotCharts ? (
-        <>
-          {/* Duration Histogram and Per-Slot Duration - Side by Side */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Duration Histogram */}
-            <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="blob-duration" modalSize="full">
-              <div>
-                {histogramData.length > 0 ? (
-                  <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
-                ) : (
-                  <div className="flex h-[375px] items-center justify-center text-muted">
-                    No histogram data available
-                  </div>
-                )}
-              </div>
-            </PopoutCard>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Duration Histogram */}
+          <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="blob-duration" modalSize="full">
+            <div>
+              {histogramData.length > 0 ? (
+                <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
+              ) : (
+                <div className="flex h-[375px] items-center justify-center text-muted">No histogram data available</div>
+              )}
+            </div>
+          </PopoutCard>
 
-            {/* Per-Slot Duration by Client Chart */}
-            <PopoutCard
-              title="Per-Slot Duration by Client"
-              subtitle="Median duration for each slot"
-              anchorId="blob-slot-duration"
-              modalSize="full"
-            >
-              <div>
-                {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
-                  <MultiLineChart
-                    series={slotDurationByClientSeries}
-                    xAxis={{
-                      type: 'value',
-                      name: 'Slot',
-                      min: minSlot,
-                      max: maxSlot,
-                      formatter: (value: number | string) => formatSlot(Number(value)),
-                    }}
-                    yAxis={{
-                      name: 'Duration (ms)',
-                    }}
-                    height={300}
-                    showLegend={true}
-                    enableDataZoom={true}
-                  />
-                ) : (
-                  <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
-                )}
-              </div>
-            </PopoutCard>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Status Breakdown */}
-            <PopoutCard title="Status Distribution" anchorId="blob-status" modalSize="full">
-              <div>
-                {statusData.some(d => d.value > 0) ? (
-                  <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
-                ) : (
-                  <div className="flex h-[250px] items-center justify-center text-muted">No status data available</div>
-                )}
-              </div>
-            </PopoutCard>
-
-            {/* Blob Count Distribution */}
-            <PopoutCard
-              title="Blob Count Distribution"
-              subtitle="Number of blobs per request"
-              anchorId="blob-count"
-              modalSize="full"
-            >
-              <div>
-                {blobCountData.length > 0 ? (
-                  <BarChart data={blobCountData} labels={blobCountLabels} color={themeColors.accent} height={250} />
-                ) : (
-                  <div className="flex h-[250px] items-center justify-center text-muted">
-                    No blob count data available
-                  </div>
-                )}
-              </div>
-            </PopoutCard>
-          </div>
-        </>
-      ) : showHourlyCharts ? (
-        /* Hourly trend charts for longer time ranges */
+          {/* Per-Slot Duration by Client Chart */}
+          <PopoutCard
+            title="Per-Slot Duration by Client"
+            subtitle="Median duration for each slot"
+            anchorId="blob-slot-duration"
+            modalSize="full"
+          >
+            <div>
+              {hasClientData && slotDurationByClientSeries.some(s => s.data.length > 0) ? (
+                <MultiLineChart
+                  series={slotDurationByClientSeries}
+                  xAxis={{
+                    type: 'value',
+                    name: 'Slot',
+                    min: minSlot,
+                    max: maxSlot,
+                    formatter: (value: number | string) => formatSlot(Number(value)),
+                  }}
+                  yAxis={{
+                    name: 'Duration (ms)',
+                  }}
+                  height={300}
+                  showLegend={true}
+                  enableDataZoom={true}
+                />
+              ) : (
+                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+              )}
+            </div>
+          </PopoutCard>
+        </div>
+      ) : (
+        /* Hourly (daily for 90d+) trend charts for longer time ranges */
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Hourly Duration (P50/P95 toggle) */}
           <PopoutCard
-            title={`Hourly ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
+            title={`${showHourlyCharts ? 'Hourly' : 'Daily'} ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
             anchorId="blob-hourly-duration"
             modalSize="full"
             headerActions={
@@ -580,24 +544,16 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             }
           >
             <div>
-              {(selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).length > 0 &&
-              (selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series).some(s => s.data.length > 0) ? (
+              {(selectedPercentile === 'p50' ? trendP50Series : trendP95Series).length > 0 &&
+              (selectedPercentile === 'p50' ? trendP50Series : trendP95Series).some(s => s.data.length > 0) ? (
                 <MultiLineChart
-                  series={selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series}
+                  series={selectedPercentile === 'p50' ? trendP50Series : trendP95Series}
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: hourlyMinTime,
-                    max: hourlyMaxTime,
-                    formatter: (value: number | string) => {
-                      const date = new Date(Number(value));
-                      // 7 days: show date only
-                      if (timeRange === '7days' || timeRange === '31days') {
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                      }
-                      // 24 hours or less: show time only
-                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    },
+                    min: trendMinTime,
+                    max: trendMaxTime,
+                    formatter: formatTrendAxis,
                   }}
                   yAxis={{
                     name: `${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration (ms)`,
@@ -612,13 +568,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                     // Get timestamp from first data point
                     const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
                     const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
-                    const date = new Date(timestamp);
-                    const timeStr = date.toLocaleString([], {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const timeStr = formatTrendBucket(timestamp);
 
                     let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
                     dataPoints.forEach((point: unknown) => {
@@ -637,7 +587,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No hourly data available</div>
+                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
@@ -645,7 +595,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
           {/* Success Rate Over Time */}
           <PopoutCard
             title="Success Rate Over Time"
-            subtitle="Percentage of successful getBlobs calls per hour by client"
+            subtitle={`Percentage of successful getBlobs calls per ${showHourlyCharts ? 'hour' : 'day'} by client`}
             anchorId="blob-success-rate"
             modalSize="full"
           >
@@ -656,17 +606,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: hourlyMinTime,
-                    max: hourlyMaxTime,
-                    formatter: (value: number | string) => {
-                      const date = new Date(Number(value));
-                      // 7 days: show date only
-                      if (timeRange === '7days' || timeRange === '31days') {
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                      }
-                      // 24 hours or less: show time only
-                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    },
+                    min: trendMinTime,
+                    max: trendMaxTime,
+                    formatter: formatTrendAxis,
                   }}
                   yAxis={{
                     name: 'Success Rate (%)',
@@ -683,13 +625,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                     // Get timestamp from first data point
                     const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
                     const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
-                    const date = new Date(timestamp);
-                    const timeStr = date.toLocaleString([], {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const timeStr = formatTrendBucket(timestamp);
 
                     let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
                     dataPoints.forEach((point: unknown) => {
@@ -708,12 +644,46 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No hourly data available</div>
+                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
         </div>
-      ) : null}
+      )}
+
+      {/* Status Breakdown, plus Blob Count Distribution from per-slot data on short time ranges */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Status Breakdown */}
+        <PopoutCard title="Status Distribution" anchorId="blob-status" modalSize="full">
+          <div>
+            {statusData.some(d => d.value > 0) ? (
+              <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
+            ) : (
+              <div className="flex h-[250px] items-center justify-center text-muted">No status data available</div>
+            )}
+          </div>
+        </PopoutCard>
+
+        {/* Blob Count Distribution */}
+        {showPerSlotCharts && (
+          <PopoutCard
+            title="Blob Count Distribution"
+            subtitle="Number of blobs per request"
+            anchorId="blob-count"
+            modalSize="full"
+          >
+            <div>
+              {blobCountData.length > 0 ? (
+                <BarChart data={blobCountData} labels={blobCountLabels} color={themeColors.accent} height={250} />
+              ) : (
+                <div className="flex h-[250px] items-center justify-center text-muted">
+                  No blob count data available
+                </div>
+              )}
+            </div>
+          </PopoutCard>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
-  fctAttestationVoteCorrectnessByValidatorHourlyServiceListOptions,
-  fctSyncCommitteeParticipationByValidatorHourlyServiceListOptions,
-  fctValidatorBalanceHourlyServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
+  fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
+  fctSyncCommitteeParticipationByValidatorHourlyServiceList,
+  fctValidatorBalanceHourlyServiceList,
+} from '@/api/sdk.gen';
+import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import type {
   FctAttestationVoteCorrectnessByValidatorHourly,
@@ -127,39 +128,72 @@ export function useHourlyData(validatorIndices: number[], dayTimestamp: number |
   const results = useQueries({
     queries: [
       {
-        ...fctAttestationVoteCorrectnessByValidatorHourlyServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            hour_start_date_time_gte: dayTimestamp ?? 0,
-            hour_start_date_time_lt: dayEnd,
-            page_size: 10000,
-            order_by: 'hour_start_date_time',
-          },
-        }),
+        queryKey: [
+          'validators',
+          'fct_attestation_vote_correctness_by_validator_hourly',
+          currentNetwork?.name,
+          indicesString,
+          dayTimestamp,
+        ],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctAttestationVoteCorrectnessByValidatorHourly>(
+            fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                hour_start_date_time_gte: dayTimestamp ?? 0,
+                hour_start_date_time_lt: dayEnd,
+                page_size: 10000,
+                order_by: 'hour_start_date_time',
+              },
+            },
+            'fct_attestation_vote_correctness_by_validator_hourly',
+            signal
+          ),
         enabled,
       },
       {
-        ...fctSyncCommitteeParticipationByValidatorHourlyServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            hour_start_date_time_gte: dayTimestamp ?? 0,
-            hour_start_date_time_lt: dayEnd,
-            page_size: 10000,
-            order_by: 'hour_start_date_time',
-          },
-        }),
+        queryKey: [
+          'validators',
+          'fct_sync_committee_participation_by_validator_hourly',
+          currentNetwork?.name,
+          indicesString,
+          dayTimestamp,
+        ],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctSyncCommitteeParticipationByValidatorHourly>(
+            fctSyncCommitteeParticipationByValidatorHourlyServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                hour_start_date_time_gte: dayTimestamp ?? 0,
+                hour_start_date_time_lt: dayEnd,
+                page_size: 10000,
+                order_by: 'hour_start_date_time',
+              },
+            },
+            'fct_sync_committee_participation_by_validator_hourly',
+            signal
+          ),
         enabled,
       },
       {
-        ...fctValidatorBalanceHourlyServiceListOptions({
-          query: {
-            validator_index_in_values: indicesString,
-            hour_start_date_time_gte: dayTimestamp ?? 0,
-            hour_start_date_time_lt: dayEnd,
-            page_size: 10000,
-            order_by: 'hour_start_date_time',
-          },
-        }),
+        queryKey: ['validators', 'fct_validator_balance_hourly', currentNetwork?.name, indicesString, dayTimestamp],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctValidatorBalanceHourly>(
+            fctValidatorBalanceHourlyServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                hour_start_date_time_gte: dayTimestamp ?? 0,
+                hour_start_date_time_lt: dayEnd,
+                page_size: 10000,
+                order_by: 'hour_start_date_time',
+              },
+            },
+            'fct_validator_balance_hourly',
+            signal
+          ),
         enabled,
       },
     ],
@@ -170,30 +204,9 @@ export function useHourlyData(validatorIndices: number[], dayTimestamp: number |
   const isLoading = attestationQuery.isLoading || syncCommitteeQuery.isLoading || balanceQuery.isLoading;
   const error = attestationQuery.error || syncCommitteeQuery.error || balanceQuery.error;
 
-  type AttestationResponse = {
-    fct_attestation_vote_correctness_by_validator_hourly?: FctAttestationVoteCorrectnessByValidatorHourly[];
-  };
-  type SyncCommitteeResponse = {
-    fct_sync_committee_participation_by_validator_hourly?: FctSyncCommitteeParticipationByValidatorHourly[];
-  };
-  type BalanceResponse = { fct_validator_balance_hourly?: FctValidatorBalanceHourly[] };
-
-  const attestationData = useMemo(
-    () =>
-      (attestationQuery.data as AttestationResponse | undefined)
-        ?.fct_attestation_vote_correctness_by_validator_hourly ?? [],
-    [attestationQuery.data]
-  );
-  const syncCommitteeData = useMemo(
-    () =>
-      (syncCommitteeQuery.data as SyncCommitteeResponse | undefined)
-        ?.fct_sync_committee_participation_by_validator_hourly ?? [],
-    [syncCommitteeQuery.data]
-  );
-  const balanceData = useMemo(
-    () => (balanceQuery.data as BalanceResponse | undefined)?.fct_validator_balance_hourly ?? [],
-    [balanceQuery.data]
-  );
+  const attestationData = useMemo(() => attestationQuery.data ?? [], [attestationQuery.data]);
+  const syncCommitteeData = useMemo(() => syncCommitteeQuery.data ?? [], [syncCommitteeQuery.data]);
+  const balanceData = useMemo(() => balanceQuery.data ?? [], [balanceQuery.data]);
 
   const processedData = useMemo(() => {
     if (!enabled || isLoading) {

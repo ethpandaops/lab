@@ -10,7 +10,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Table } from '@/components/Lists/Table';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import type { DimClientRelease, FctHeadFirstSeenByNodeDaily, IntCustodyProbe } from '@/api/types.gen';
+import type { DimClientRelease, FctCustodyProbeByClientDaily, FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
@@ -25,15 +25,14 @@ import {
   VersionPeers,
 } from './components';
 import {
-  PROBE_SLICE_SECONDS,
-  PROBE_SLICES,
+  useCensus,
   useClientNodes,
   useClientReleases,
   useNodeVersions,
-  useProbeSample,
   useReferenceEngine,
   useVersionCounts,
 } from './hooks';
+import { CENSUS_TABLES, RESOLVED_STATUSES } from './api/client-models';
 import {
   buildMatchesRelease,
   clientLayerOf,
@@ -96,11 +95,11 @@ export function VersionPage(): JSX.Element {
   const recent24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart(), enabled: !!layer });
   const { nodes } = useClientNodes(client, layer);
   const nodeDays = useNodeVersions(client, windowDays, layer === 'consensus');
-  const probeVersions = useMemo(
-    () => [version, previous?.version].filter((item): item is string => !!item),
-    [version, previous?.version]
+  const probes = useCensus<FctCustodyProbeByClientDaily>(
+    CENSUS_TABLES.custody,
+    layer === 'consensus' ? { client_eq: client } : null,
+    rangeStart
   );
-  const probes = useProbeSample(client, probeVersions, rangeStart, layer === 'consensus');
   const reference = useReferenceEngine(client, layer === 'execution', windowDays);
   const versionNodes = useMemo(() => nodesByVersion(nodeDays.rows, releases), [nodeDays.rows, releases]);
 
@@ -302,9 +301,8 @@ export function VersionPage(): JSX.Element {
               <ProbeCard
                 version={version}
                 previous={previous?.version}
-                probes={probes.probes}
+                rows={probes.rows}
                 isLoading={probes.isLoading}
-                releases={releases}
               />
             )}
           </VersionPeers>
@@ -459,37 +457,38 @@ function ComparisonTable({ rows, version, previous }: ComparisonTableProps): JSX
 interface ProbeCardProps {
   version: string;
   previous?: string;
-  probes: IntCustodyProbe[];
+  rows: FctCustodyProbeByClientDaily[];
   isLoading: boolean;
-  releases: DimClientRelease[];
 }
 
-/** Custody probes of peers on this version and the previous one, sampled across the window */
-function ProbeCard({ version, previous, probes, isLoading, releases }: ProbeCardProps): JSX.Element {
+/** Custody probes of peers on this version and the previous one over the window */
+function ProbeCard({ version, previous, rows, isLoading }: ProbeCardProps): JSX.Element {
   const probeStats = (target: string | undefined): { probes: string; peers: string; success: string } => {
-    const mine = target ? probes.filter(probe => displayVersion(probe.meta_peer_version, releases) === target) : [];
+    const mine = target
+      ? rows.filter(row => row.version === target && RESOLVED_STATUSES.has(row.release_status ?? ''))
+      : [];
+    const probeCount = mine.reduce((total, row) => total + (row.probe_count ?? 0), 0);
+    const success = mine.reduce((total, row) => total + (row.success_count ?? 0), 0);
+    const days = new Set(mine.map(row => row.day_start_date)).size;
+    const peerDays = mine.reduce((total, row) => total + (row.peer_count ?? 0), 0);
     return {
-      probes: mine.length.toLocaleString(),
-      peers: new Set(mine.map(probe => probe.peer_id_unique_key)).size.toLocaleString(),
-      success: percent(mine.filter(probe => probe.result === 'success').length, mine.length),
+      probes: probeCount.toLocaleString(),
+      peers: days > 0 ? Math.round(peerDays / days).toLocaleString() : '-',
+      success: percent(success, probeCount),
     };
   };
   const current = probeStats(version);
   const before = probeStats(previous);
 
   return (
-    <Card
-      rounded
-      title="Custody probes"
-      subtitle={`${PROBE_SLICES} × ${PROBE_SLICE_SECONDS} s spread across the window`}
-    >
+    <Card rounded title="Custody probes">
       {isLoading ? (
         <LoadingContainer className="h-32 rounded-sm" />
       ) : (
         <ComparisonTable
           rows={[
             { metric: 'Probes', current: current.probes, previous: before.probes },
-            { metric: 'P2P peers probed', current: current.peers, previous: before.peers },
+            { metric: 'P2P peers probed per day', current: current.peers, previous: before.peers },
             { metric: 'Probe success', current: current.success, previous: before.success },
           ]}
           version={version}

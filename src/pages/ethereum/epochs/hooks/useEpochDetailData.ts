@@ -11,7 +11,14 @@ import {
   fctBlockMevHeadServiceListOptions,
   fctBlockHeadServiceListOptions,
   intBlockCanonicalServiceListOptions,
+  intBlockProposerCanonicalServiceListOptions,
+  intBlockBlobCountCanonicalServiceListOptions,
+  fctAttestationCorrectnessCanonicalServiceListOptions,
+  fctBlockGraffitiServiceListOptions,
+  fctAttestationLivenessByEntityServiceListOptions,
+  intBlockMevCanonicalServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { useTablesBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 import { epochToTimestamp, getEpochSlotRange, slotToTimestamp, SECONDS_PER_SLOT } from '@/utils/beacon';
 
@@ -35,6 +42,10 @@ import type {
  * - Block first seen times
  * - Attestation liveness by entity
  *
+ * Finalized epochs covered by the canonical tables read proposers, blobs, attestation
+ * correctness, MEV and missed attestations from the canonical/settled tables (which reach
+ * back further than the `*_head` tables); newer epochs read the `*_head` tables.
+ *
  * For live epochs (current epoch), data is automatically refetched every 12 seconds
  * to capture new blocks and attestations as they arrive.
  *
@@ -52,7 +63,28 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
   // For historical epochs, disable auto-refetch (false)
   const refetchInterval = isLive ? SECONDS_PER_SLOT * 1000 : false;
 
-  // Fetch data for all slots in the epoch using range queries (9 total queries)
+  const firstSlotTime = currentNetwork ? slotToTimestamp(firstSlot, currentNetwork.genesis_time) : 0;
+  const lastSlotTime = currentNetwork ? slotToTimestamp(lastSlot, currentNetwork.genesis_time) : 0;
+
+  // Read the canonical tables once they cover the epoch's last slot (i.e. the epoch is finalized)
+  const { data: canonicalBounds, isLoading: boundsLoading } = useTablesBounds([
+    'int_block_proposer_canonical',
+    'fct_attestation_correctness_canonical',
+  ]);
+  const canonicalMax = canonicalBounds?.aggregate.minOfMaxes;
+  const useCanonical = canonicalMax !== undefined && canonicalMax >= lastSlotTime;
+
+  const enabled = !!currentNetwork && firstSlot >= 0 && !boundsLoading;
+  const headEnabled = enabled && !useCanonical;
+  const canonicalEnabled = enabled && useCanonical;
+  const canonicalQuery = {
+    slot_start_date_time_gte: firstSlotTime,
+    slot_start_date_time_lte: lastSlotTime,
+    page_size: 100,
+  };
+
+  // Fetch data for all slots in the epoch using range queries.
+  // Queries 1-3, 6 and 7 read head tables; 10-15 are their canonical counterparts.
   const results = useQueries({
     queries: [
       // 1. Block proposer data
@@ -65,7 +97,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
             order_by: 'slot asc',
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: headEnabled,
         refetchInterval,
       },
       // 2. Blob counts
@@ -77,7 +109,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: headEnabled,
         refetchInterval,
       },
       // 3. Attestation correctness
@@ -89,7 +121,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: headEnabled,
         refetchInterval,
       },
       // 4. Proposer entities
@@ -127,7 +159,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
             page_size: 10000,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: headEnabled,
         refetchInterval,
       },
       // 7. MEV data
@@ -139,7 +171,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
             page_size: 100,
           },
         }),
-        enabled: !!currentNetwork && firstSlot >= 0,
+        enabled: headEnabled,
         refetchInterval,
       },
       // 8. Block head data (for gas, transactions, base fee)
@@ -168,12 +200,44 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
         enabled: !!currentNetwork && firstSlot >= 0,
         refetchInterval,
       },
+      // 10. Block proposer data (finalized)
+      {
+        ...intBlockProposerCanonicalServiceListOptions({ query: { ...canonicalQuery, order_by: 'slot asc' } }),
+        enabled: canonicalEnabled,
+      },
+      // 11. Blob counts (finalized)
+      {
+        ...intBlockBlobCountCanonicalServiceListOptions({ query: canonicalQuery }),
+        enabled: canonicalEnabled,
+      },
+      // 12. Attestation correctness (finalized)
+      {
+        ...fctAttestationCorrectnessCanonicalServiceListOptions({ query: canonicalQuery }),
+        enabled: canonicalEnabled,
+      },
+      // 13. Block graffiti (proposer entity for finalized blocks before fct_block_proposer_entity starts)
+      {
+        ...fctBlockGraffitiServiceListOptions({ query: canonicalQuery }),
+        enabled: canonicalEnabled,
+      },
+      // 14. Attestation liveness by entity (settled)
+      {
+        ...fctAttestationLivenessByEntityServiceListOptions({
+          query: { ...canonicalQuery, missed_count_gt: 0, page_size: 10000 },
+        }),
+        enabled: canonicalEnabled,
+      },
+      // 15. MEV data (finalized)
+      {
+        ...intBlockMevCanonicalServiceListOptions({ query: canonicalQuery }),
+        enabled: canonicalEnabled,
+      },
     ],
   });
 
-  const isLoading = results.some(result => result.isLoading);
-  // Only fail on errors from critical queries (first 7), not the block head/canonical queries (index 7, 8)
-  const error = results.slice(0, 7).find(result => result.error)?.error as Error | null;
+  const isLoading = boundsLoading || results.some(result => result.isLoading);
+  // Only fail on errors from critical queries, not the block head/canonical queries (index 7, 8)
+  const error = results.filter((_, i) => i !== 7 && i !== 8).find(result => result.error)?.error as Error | null;
 
   // Process data
   const data = useMemo<EpochDetailData | null>(() => {
@@ -191,15 +255,32 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
       mevDataResult,
       blockHeadResult,
       blockCanonicalResult,
+      canonicalProposerResult,
+      canonicalBlobCountResult,
+      canonicalAttestationResult,
+      graffitiResult,
+      settledAttestationLivenessResult,
+      canonicalMevResult,
     ] = results;
 
-    const blockProposerData = blockProposerResult.data?.fct_block_proposer_head ?? [];
-    const blobCountData = blobCountResult.data?.fct_block_blob_count_head ?? [];
-    const attestationData = attestationResult.data?.fct_attestation_correctness_head ?? [];
+    const blockProposerData = useCanonical
+      ? (canonicalProposerResult.data?.int_block_proposer_canonical ?? [])
+      : (blockProposerResult.data?.fct_block_proposer_head ?? []);
+    const blobCountData = useCanonical
+      ? (canonicalBlobCountResult.data?.int_block_blob_count_canonical ?? [])
+      : (blobCountResult.data?.fct_block_blob_count_head ?? []);
+    const attestationData = useCanonical
+      ? (canonicalAttestationResult.data?.fct_attestation_correctness_canonical ?? [])
+      : (attestationResult.data?.fct_attestation_correctness_head ?? []);
     const proposerEntityData = proposerEntityResult.data?.fct_block_proposer_entity ?? [];
+    const graffitiData = useCanonical ? (graffitiResult.data?.fct_block_graffiti ?? []) : [];
     const blockFirstSeenData = blockFirstSeenResult.data?.fct_block_first_seen_by_node ?? [];
-    const attestationLivenessData = attestationLivenessResult.data?.fct_attestation_liveness_by_entity_head ?? [];
-    const mevData = mevDataResult.data?.fct_block_mev_head ?? [];
+    const attestationLivenessData = useCanonical
+      ? (settledAttestationLivenessResult.data?.fct_attestation_liveness_by_entity ?? [])
+      : (attestationLivenessResult.data?.fct_attestation_liveness_by_entity_head ?? []);
+    const mevData = useCanonical
+      ? (canonicalMevResult.data?.int_block_mev_canonical ?? [])
+      : (mevDataResult.data?.fct_block_mev_head ?? []);
     const blockHeadData = blockHeadResult.data?.fct_block_head ?? [];
     const blockCanonicalData = blockCanonicalResult.data?.int_block_canonical ?? [];
 
@@ -215,7 +296,11 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
         },
       ])
     );
-    const proposerEntityMap = new Map(proposerEntityData.map(p => [p.slot, p.entity ?? null]));
+    // Graffiti entities first so fct_block_proposer_entity wins where it has data
+    const proposerEntityMap = new Map<number | undefined, string | null>([
+      ...graffitiData.filter(g => g.entity).map(g => [g.slot, g.entity ?? null] as const),
+      ...proposerEntityData.filter(p => p.entity).map(p => [p.slot, p.entity ?? null] as const),
+    ]);
 
     // Track which slots have blocks in head chain and canonical chain
     const slotsInHeadChain = new Set(blockHeadData.map(b => b.slot).filter((s): s is number => s !== undefined));
@@ -474,7 +559,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
       blockSizeTimeSeries,
       blockArrivalTimeSeries,
     };
-  }, [results, isLoading, error, currentNetwork, epoch, epochStartTime, firstSlot]);
+  }, [results, isLoading, error, currentNetwork, epoch, epochStartTime, firstSlot, useCanonical]);
 
   return {
     data,
