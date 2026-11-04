@@ -9,6 +9,12 @@ const callSearchSchema = z.object({
 export const Route = createFileRoute('/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId')({
   validateSearch: callSearchSchema,
   component: CallPage,
+
+  beforeLoad: ({ params }) => ({
+    getBreadcrumb: () => ({ label: `Internal Tx ${params.callId}` }),
+    redirectOnNetworkChange: '/ethereum/execution/gas-profiler',
+  }),
+
   head: () => ({
     meta: [
       { title: `Call Details | ${import.meta.env.VITE_BASE_TITLE}` },

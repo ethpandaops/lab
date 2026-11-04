@@ -1,6 +1,6 @@
 import { type JSX, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatTimeRange } from '@/utils/time';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
@@ -121,6 +121,8 @@ export function IndexPage(): JSX.Element {
       },
     }),
     enabled: !!currentNetwork && !isLive,
+    // Keep the table in place while a filter change loads, so the page keeps its scroll position
+    placeholderData: keepPreviousData,
   });
 
   // Build current filter values from URL for live mode hook
@@ -180,6 +182,7 @@ export function IndexPage(): JSX.Element {
             page: 0,
             pageToken: undefined,
           }),
+          resetScroll: false,
         });
         return;
       }
@@ -192,6 +195,7 @@ export function IndexPage(): JSX.Element {
             page: newPageIndex,
             pageToken: nextPageToken,
           }),
+          resetScroll: false,
         });
         return;
       }
@@ -204,6 +208,7 @@ export function IndexPage(): JSX.Element {
             page: 0,
             pageToken: undefined,
           }),
+          resetScroll: false,
         });
       }
     },
@@ -221,6 +226,7 @@ export function IndexPage(): JSX.Element {
             page: 0,
             pageToken: undefined,
           }),
+          resetScroll: false,
         });
       } else {
         const { id, desc } = sorting[0];
@@ -231,6 +237,7 @@ export function IndexPage(): JSX.Element {
             page: 0,
             pageToken: undefined,
           }),
+          resetScroll: false,
         });
       }
     },
@@ -262,6 +269,7 @@ export function IndexPage(): JSX.Element {
           ...prev,
           ...newSearch,
         }),
+        resetScroll: false,
       });
     },
     [navigate]
@@ -283,6 +291,7 @@ export function IndexPage(): JSX.Element {
         page: 0,
         pageToken: undefined,
       }),
+      resetScroll: false,
     });
   }, [navigate]);
 
@@ -305,6 +314,7 @@ export function IndexPage(): JSX.Element {
           blockNumber: filters.blockNumber,
           referenceNodes: filters.referenceNodes,
         }),
+        resetScroll: false,
       });
     },
     [navigate]
@@ -328,6 +338,7 @@ export function IndexPage(): JSX.Element {
         blockNumber: undefined,
         referenceNodes: undefined, // Will default to true
       }),
+      resetScroll: false,
     });
   }, [navigate]);
 
@@ -341,6 +352,7 @@ export function IndexPage(): JSX.Element {
             detailSlot: block.slot,
             detailNodeName: block.meta_client_name,
           }),
+          resetScroll: false,
         });
       } else {
         navigate({
@@ -349,6 +361,7 @@ export function IndexPage(): JSX.Element {
             detailSlot: undefined,
             detailNodeName: undefined,
           }),
+          resetScroll: false,
         });
       }
     },

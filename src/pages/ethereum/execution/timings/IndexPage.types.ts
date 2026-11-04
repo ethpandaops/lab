@@ -32,11 +32,6 @@ export const PER_SLOT_CHART_RANGES: TimeRange[] = ['1hour', '6hours'];
 export const HOURLY_CHART_RANGES: TimeRange[] = ['1hour', '6hours', '24hours', '7days', '31days'];
 
 /**
- * Tab identifiers for the timings page
- */
-export type TimingsTab = 'overview' | 'newPayload' | 'getBlobs' | 'clients';
-
-/**
  * Zod schema for timings page search parameters
  * Validates tab state and time range selection in URL
  */

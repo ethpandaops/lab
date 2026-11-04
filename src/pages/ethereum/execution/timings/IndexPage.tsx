@@ -35,7 +35,7 @@ export function IndexPage(): JSX.Element {
 
   // Tab state management with URL search params
   const { selectedIndex, onChange } = useTabState([
-    { id: 'newPayload', anchors: ['duration-histogram', 'slot-duration', 'client-matrix'] },
+    { id: 'newPayload', anchors: ['duration-histogram', 'slot-duration'] },
     { id: 'getBlobs', anchors: ['blob-duration'] },
   ]);
 
