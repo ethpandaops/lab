@@ -14,7 +14,8 @@ import type { ClientTabProps } from './ClientTabs.types';
 export function NetworkTab({ client, layer, releases, shareWindow, onShareWindowChange }: ClientTabProps): JSX.Element {
   const peers = usePeerSupport(client, layer === 'consensus');
   const days = SHARE_WINDOW_DAYS[shareWindow];
-  const from = days === null ? undefined : windowStart(days);
+  // 0 loads the census from its first day; undefined would load only the latest days
+  const from = days === null ? 0 : windowStart(days);
   const windowControl = (
     <SegmentedControl
       options={SHARE_WINDOW_OPTIONS}

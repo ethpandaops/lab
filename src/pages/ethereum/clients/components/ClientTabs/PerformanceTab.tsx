@@ -21,8 +21,8 @@ export function PerformanceTab({
   shareWindow,
   onShareWindowChange,
 }: ClientTabProps): JSX.Element {
-  const reference = useReferenceEngine(client, layer === 'execution');
   const days = SHARE_WINDOW_DAYS[shareWindow];
+  const reference = useReferenceEngine(client, layer === 'execution', days ?? undefined);
   const from = days === null ? undefined : windowStart(days);
   const label = layer === 'consensus' ? 'consensus' : 'execution';
 

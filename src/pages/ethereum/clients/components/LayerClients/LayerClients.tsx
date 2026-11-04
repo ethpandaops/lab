@@ -10,9 +10,9 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { DimClientRelease } from '@/api/types.gen';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { OTHER_VERSION_COLOR } from '../../utils/client-versions';
+import { OTHER_VERSION_COLOR, type LatestAdoption } from '../../utils/client-versions';
 import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { peerShareChart, unifiedClientRows } from '../../utils/census';
+import { PEER_SOURCE, peerShareChart, unifiedClientRows } from '../../utils/census';
 import type { ClientLayer, ClientSummary } from '../../utils/client-share';
 import { ShareBar } from '../ShareBar';
 
@@ -37,16 +37,16 @@ export interface LayerClientsProps {
   /** Xatu nodes per client; consensus only */
   xatuNodes?: Map<string, number>;
   latestReleases: Map<string, DimClientRelease>;
-  /** Share of each client's blocks in the last 24 hours on its latest release or newer */
-  latestAdoption: Map<string, number>;
+  /** Each client's blocks in the last 24 hours against its latest release */
+  latestAdoption: Map<string, LatestAdoption>;
   /**
-   * Why the P2P peers and Xatu nodes columns, their chart and, with `hideLatestAdoption`, the On latest column are
+   * Why the P2P peers and Xatu nodes columns, their chart and, with `hideLatestAdoption`, the release columns are
    * left out: the page's filters narrow the blocks in ways those numbers cannot follow. Shown in their place.
    */
   unfilteredNote?: string;
-  /** Leave out On latest, which cannot follow the other layer's client filter */
+  /** Leave out Known release and On latest, which cannot follow the other layer's client filter */
   hideLatestAdoption?: boolean;
-  /** Which blocks On latest covers when the page is filtered, e.g. "from coinbase" */
+  /** Which blocks Known release and On latest cover when the page is filtered, e.g. "from coinbase" */
   adoptionScope?: string;
 }
 
@@ -124,6 +124,13 @@ export function LayerClients({
     [layer, blockSummaries, latestPeers]
   );
   const peerChart = useMemo(() => peerShareChart(layer, peerRows), [layer, peerRows]);
+  // The census is daily and may start inside the page's window, so the chart names the days it holds
+  const peerSpan =
+    peerChart.days.length === 0
+      ? ''
+      : peerChart.days.length === 1
+        ? `, ${peerChart.days[0]}`
+        : `, ${peerChart.days[0]} to ${peerChart.days[peerChart.days.length - 1]}`;
   const named = blockSummaries.filter(summary => summary.identifiedShare !== null).reduce((n, s) => n + s.blocks, 0);
   const label = layer === 'consensus' ? 'consensus' : 'execution';
   const article = layer === 'consensus' ? 'a' : 'an';
@@ -134,15 +141,14 @@ export function LayerClients({
         <dt className="inline font-medium text-foreground">Proposed blocks: </dt>
         <dd className="inline">
           share of the {named.toLocaleString()} blocks {blockScope} whose graffiti names {article} {label} client (
-          {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).{' '}
-          {blockChartDaily ? 'Charted per day.' : 'Charted per hour.'}
+          {blockTotal > 0 ? ((named / blockTotal) * 100).toFixed(0) : 0}% of {blockTotal.toLocaleString()}).
         </dd>
       </div>
       {showPeers && (
         <div>
           <dt className="inline font-medium text-foreground">P2P peers: </dt>
           <dd className="inline">
-            share of the {peerTotal.toLocaleString()} {label} P2P peers the tysm crawler saw on {peerDay ?? '-'} that
+            share of the {peerTotal.toLocaleString()} {label} P2P peers {PEER_SOURCE[layer]} on {peerDay ?? '-'} that
             advertised an agent. Agents that are not {label} clients count as Other.
           </dd>
         </div>
@@ -156,13 +162,19 @@ export function LayerClients({
         </div>
       )}
       {!hideLatestAdoption && (
-        <div>
-          <dt className="inline font-medium text-foreground">On latest: </dt>
-          <dd className="inline">
-            share of the client&apos;s blocks {adoptionScope ? `${adoptionScope} ` : ''}in the last 24 hours on its
-            latest release or newer.
-          </dd>
-        </div>
+        <>
+          <div>
+            <dt className="inline font-medium text-foreground">Known release: </dt>
+            <dd className="inline">
+              share of the client&apos;s blocks {adoptionScope ? `${adoptionScope} ` : ''}in the last 24 hours whose
+              graffiti resolves to one of its releases.
+            </dd>
+          </div>
+          <div>
+            <dt className="inline font-medium text-foreground">On latest: </dt>
+            <dd className="inline">share of those blocks with a known release on its latest release or newer.</dd>
+          </div>
+        </>
       )}
     </dl>
   );
@@ -191,7 +203,12 @@ export function LayerClients({
                 )}
                 {showXatu && <HeaderCell title="Xatu nodes" color={ANGLE_COLORS.xatu} className="text-right" />}
                 <HeaderCell title="Latest" />
-                {!hideLatestAdoption && <HeaderCell title="On latest" className="text-right" />}
+                {!hideLatestAdoption && (
+                  <>
+                    <HeaderCell title="Known release" className="text-right" />
+                    <HeaderCell title="On latest" note="Of known-release blocks" className="text-right" />
+                  </>
+                )}
                 <th aria-hidden className="w-5" />
               </tr>
             </thead>
@@ -230,9 +247,18 @@ export function LayerClients({
                     )}
                     <td className="px-3 py-2 font-mono text-xs/6 whitespace-nowrap text-muted">{latest ?? '-'}</td>
                     {!hideLatestAdoption && (
-                      <td className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums">
-                        {adoption === undefined ? <span className="text-muted">-</span> : `${adoption.toFixed(0)}%`}
-                      </td>
+                      <>
+                        <td className="px-3 py-2 text-right text-sm/6 text-muted tabular-nums">
+                          {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
+                        </td>
+                        <td className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums">
+                          {adoption === undefined ? (
+                            <span className="text-muted">-</span>
+                          ) : (
+                            `${adoption.share.toFixed(0)}%`
+                          )}
+                        </td>
+                      </>
                     )}
                     <td className="py-2 pl-1 text-right">
                       <ChevronRightIcon className="inline size-4 text-muted group-hover:text-primary" />
@@ -253,7 +279,12 @@ export function LayerClients({
                   </td>
                   {showXatu && <td />}
                   <td />
-                  {!hideLatestAdoption && <td />}
+                  {!hideLatestAdoption && (
+                    <>
+                      <td />
+                      <td />
+                    </>
+                  )}
                   <td />
                 </tr>
               )}
@@ -285,7 +316,7 @@ export function LayerClients({
         {showPeers && (
           <PopoutCard
             title="P2P peers over time"
-            subtitle={`Daily share of ${label} P2P peers with an agent`}
+            subtitle={`Daily share of ${label} P2P peers with an agent${peerSpan}`}
             anchorId={`${layer}-peer-share`}
             modalSize="full"
           >

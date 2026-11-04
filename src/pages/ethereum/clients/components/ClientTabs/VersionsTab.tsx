@@ -55,10 +55,18 @@ export function VersionsTab({
     [blocks]
   );
   const blocksLoading = history.isLoading;
-  const onLatest = useMemo(
-    () => (latest?.version ? shareStat(adoptionByDay(days, latest.version), 'atLeast', shareWindow) : { value: '-' }),
-    [days, latest?.version, shareWindow]
-  );
+  // Today is still filling, so the stat reads the latest full day
+  const latestPoints = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return latest?.version
+      ? adoptionByDay(
+          days.filter(day => day.day < today),
+          latest.version
+        )
+      : [];
+  }, [days, latest?.version]);
+  const latestDay = [...latestPoints].reverse().find(point => point.atLeast !== null)?.day;
+  const onLatest = shareStat(latestPoints, 'atLeast', SHARE_WINDOW_TEXT[shareWindow]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -90,7 +98,7 @@ export function VersionsTab({
               { id: 'versions', name: 'Versions seen', value: versions.length.toLocaleString() },
               {
                 id: 'latest',
-                name: `On ${latest?.version ?? 'latest'} or newer, today`,
+                name: `On ${latest?.version ?? 'latest'} or newer${latestDay ? `, ${latestDay}` : ''}`,
                 ...onLatest,
               },
             ]}

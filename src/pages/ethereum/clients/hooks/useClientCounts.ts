@@ -38,11 +38,9 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 
-  // Hour aligned so the window always starts on a whole bucket.
-  const hourlyStart = useMemo(() => {
-    const hourNow = Math.floor(Date.now() / 1000 / 3600) * 3600;
-    return hourNow - (config.days ?? 0) * 24 * 3600;
-  }, [config.days]);
+  // Whole hours only: the window ends where the current, still-filling hour starts
+  const hourlyEnd = useMemo(() => Math.floor(Date.now() / 1000 / 3600) * 3600, []);
+  const hourlyStart = hourlyEnd - (config.days ?? 0) * 24 * 3600;
 
   const query = useQuery({
     queryKey: [
@@ -57,6 +55,7 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
       if (!isDaily) {
         const query = {
           hour_start_date_time_gte: hourlyStart,
+          hour_start_date_time_lt: hourlyEnd,
           order_by: 'hour_start_date_time asc',
           page_size: PAGE_SIZE,
         };

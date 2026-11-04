@@ -2,34 +2,32 @@ import type { JSX } from 'react';
 import { clsx } from 'clsx';
 import type { NetworkIconProps } from './NetworkIcon.types';
 
-/**
- * Network icon type definitions
- */
-type ImageIcon = { type: 'img'; content: string; lightContent?: string };
-type EmojiIcon = { type: 'emoji'; content: string };
-type NetworkIcon = ImageIcon | EmojiIcon;
+/** An icon image, with a different one for light mode when set */
+type NetworkIconImage = { src: string; lightSrc?: string };
 
 /**
- * Network icon mapping - emojis and custom icons per network
- * Icons are defined without classNames so they can be applied dynamically
- * Mainnet uses theme-specific logos: dark grayscale for light mode, colorful for dark/star modes
+ * Icon per network, as bundled images so they render without a colour emoji font. Mainnet uses theme-specific
+ * logos: dark grayscale for light mode, colourful for dark/star modes. The others are Noto Emoji SVGs.
  */
-const NETWORK_ICONS: Record<string, NetworkIcon> = {
-  mainnet: { type: 'img', content: '/images/ethereum-dark.svg', lightContent: '/images/ethereum-light.svg' },
-  holesky: { type: 'emoji', content: '🦊' },
-  sepolia: { type: 'emoji', content: '🐬' },
-  hoodi: { type: 'emoji', content: '🦚' },
+const NETWORK_ICONS: Record<string, NetworkIconImage> = {
+  mainnet: { src: '/images/ethereum-dark.svg', lightSrc: '/images/ethereum-light.svg' },
+  holesky: { src: '/images/networks/holesky.svg' },
+  sepolia: { src: '/images/networks/sepolia.svg' },
+  hoodi: { src: '/images/networks/hoodi.svg' },
 };
+
+/** Icon for networks without their own, such as devnets */
+const FALLBACK_ICON: NetworkIconImage = { src: '/images/networks/devnet.svg' };
 
 /**
  * NetworkIcon component displays an icon for a given network.
  *
  * Shows network-specific icons:
  * - Mainnet: Ethereum logo (theme-aware: dark grayscale in light mode, colorful in dark/star modes)
- * - Holesky: 🦊
- * - Sepolia: 🐬
- * - Hoodi: 🦚
- * - Unknown networks: 🧪 (fallback)
+ * - Holesky: fox
+ * - Sepolia: dolphin
+ * - Hoodi: peacock
+ * - Unknown networks: test tube (fallback)
  *
  * @example
  * ```tsx
@@ -41,49 +39,28 @@ const NETWORK_ICONS: Record<string, NetworkIcon> = {
  * ```
  */
 export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.Element {
-  const icon = NETWORK_ICONS[networkName];
+  const icon = NETWORK_ICONS[networkName] ?? FALLBACK_ICON;
 
-  // Mainnet: render img with theme-specific source
-  if (icon?.type === 'img') {
+  if (icon.lightSrc) {
     return (
       <>
-        {/* Light mode: dark grayscale logo */}
+        {/* Light mode */}
         <img
-          src={icon.lightContent || icon.content}
-          alt="Ethereum"
+          src={icon.lightSrc}
+          alt=""
           className={clsx('dark:hidden star:hidden', className || 'size-6')}
-          aria-hidden="true"
+          aria-hidden
         />
-        {/* Dark/star mode: colorful logo */}
+        {/* Dark/star mode */}
         <img
-          src={icon.content}
-          alt="Ethereum"
+          src={icon.src}
+          alt=""
           className={clsx('hidden dark:block star:block', className || 'size-6')}
-          aria-hidden="true"
+          aria-hidden
         />
       </>
     );
   }
 
-  // Emoji icons: @container lets the emoji scale with the container via cqw units
-  if (icon?.type === 'emoji') {
-    return (
-      <span
-        className={clsx('@container inline-flex items-center justify-center', className || 'size-6')}
-        aria-hidden="true"
-      >
-        <span className="text-[70cqw] leading-none">{icon.content}</span>
-      </span>
-    );
-  }
-
-  // Fallback for unknown networks
-  return (
-    <span
-      className={clsx('@container inline-flex items-center justify-center', className || 'size-6')}
-      aria-hidden="true"
-    >
-      <span className="text-[70cqw] leading-none">🧪</span>
-    </span>
-  );
+  return <img src={icon.src} alt="" className={clsx('object-contain', className || 'size-6')} aria-hidden />;
 }

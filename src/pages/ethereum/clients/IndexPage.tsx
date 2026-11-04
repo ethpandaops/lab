@@ -294,6 +294,7 @@ export function IndexPage(): JSX.Element {
               />
               <ClientPairs
                 pairs={pairs}
+                scope={describeBlocks(entity, {}, 'consensus', timePeriod)}
                 onSelect={pair => setSearch({ cl: pair.consensusClient, el: pair.executionClient })}
               />
             </>

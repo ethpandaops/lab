@@ -57,12 +57,12 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
     return { entities: sorted.length, top1: top(1), top5: top(5), upgraded, withResolved };
   }, [blocks, latest?.version]);
 
-  const windowControl = (
-    <SegmentedControl options={CLIENT_WINDOW_OPTIONS} value={window} onChange={onWindowChange} ariaLabel="Window" />
-  );
-
   return (
     <div className="flex flex-col gap-6">
+      {/* Every section below covers this window */}
+      <div className="self-start">
+        <SegmentedControl options={CLIENT_WINDOW_OPTIONS} value={window} onChange={onWindowChange} ariaLabel="Window" />
+      </div>
       {blocksLoading ? (
         <LoadingContainer className="h-96 rounded-sm" />
       ) : (
@@ -94,7 +94,6 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
             latestVersion={latest?.version}
             title="Entities by version"
             subtitle="Blocks each entity proposed with this client, split by the version they ran"
-            windowControl={windowControl}
           />
         </>
       )}

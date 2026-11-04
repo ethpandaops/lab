@@ -7,7 +7,7 @@
 export const ANGLE_COLORS = {
   /** Proposed blocks, stake-weighted, from graffiti */
   blocks: '#10b981',
-  /** P2P peers, node-weighted, from the tysm crawler */
+  /** P2P peers, node-weighted, from the libp2p sentries (consensus) or the discovery crawler (execution) */
   peers: '#d946ef',
   /** Nodes in the ENR crawl */
   enr: '#84cc16',
