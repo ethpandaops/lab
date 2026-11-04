@@ -1,1 +1,0 @@
-export { MissedAttestationsTable } from './MissedAttestationsTable';

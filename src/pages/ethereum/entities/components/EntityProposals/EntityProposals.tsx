@@ -56,7 +56,7 @@ const statusColumns = [
     header: 'Time',
     cell: info => <Timestamp timestamp={info.getValue()} format="relative" className="text-muted" />,
   }),
-  columnHelper.accessor('proposer_index', {
+  columnHelper.accessor('proposer_validator_index', {
     header: 'Proposer',
     cell: info => <Validator index={info.getValue()} />,
     meta: { cellClassName: 'text-muted' },
@@ -84,7 +84,15 @@ function StatusBlocksTable({
   const hasFilters = fields.some(key => search[key] !== undefined);
 
   return (
-    <Card rounded title="Blocks">
+    <Card
+      rounded
+      title="Blocks"
+      subtitle={
+        status === 'missed'
+          ? 'Slots its scheduled proposers left empty, finalized chain'
+          : 'Blocks its proposers produced that did not make the finalized chain'
+      }
+    >
       <div
         className={clsx(
           'flex flex-col gap-4 [&>:last-child]:transition-opacity',
