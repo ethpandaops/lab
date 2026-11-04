@@ -346,7 +346,8 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
       if (slotsInCanonicalChain.has(slot)) {
         status = 'canonical';
       } else if (slotsInHeadChain.has(slot)) {
-        status = 'proposed';
+        // A finalized epoch's block that reached the head chain but not the canonical chain was orphaned
+        status = useCanonical ? 'orphaned' : 'proposed';
       } else {
         status = 'missed';
       }
@@ -376,7 +377,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
 
     const canonicalBlockCount = slotsWithBlocks.size;
     const missedBlockCount = SLOTS_PER_EPOCH - canonicalBlockCount;
-    const orphanedBlockCount = 0; // Only head chain, no orphans
+    const orphanedBlockCount = slots.filter(s => s.status === 'orphaned').length;
 
     const totalAttestations = slots.reduce((sum, s) => sum + s.attestationHead + s.attestationOther, 0);
     const expectedAttestations = slots.reduce((sum, s) => sum + s.attestationMax, 0);

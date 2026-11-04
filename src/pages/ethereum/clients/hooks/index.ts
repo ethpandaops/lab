@@ -4,8 +4,6 @@ export { useEntityOptions } from './useEntityOptions';
 export type { UseEntityOptionsResult } from './useEntityOptions';
 export { useClientReleases, useLatestReleases } from './useClientReleases';
 export type { UseClientReleasesResult } from './useClientReleases';
-export { useClientBlocks } from './useClientBlocks';
-export type { UseClientBlocksResult } from './useClientBlocks';
 export { useClientNodes } from './useClientNodes';
 export type { UseClientNodesResult } from './useClientNodes';
 export { useReferenceEngine } from './useReferenceEngine';

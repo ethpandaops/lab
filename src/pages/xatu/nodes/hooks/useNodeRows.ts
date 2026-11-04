@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import type { FctNodeActiveLast24h } from '@/api/types.gen';
+import type { FctNodeLastSeen } from '@/api/types.gen';
 import type { NodeRange } from '../constants';
 import { summarizeByNode } from '../utils/history';
 import { isNodeOnline, median } from '../utils/node-stats';
-import { useActiveNodes } from './useActiveNodes';
+import { useLastSeenNodes } from './useLastSeenNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 
 /** One node's typical timings over the selected range */
@@ -18,10 +18,10 @@ export interface NodeObservation {
 export interface NodeRow {
   nodeId: string;
   /**
-   * The node's fct_node_active_last_24h row, or for a node only active earlier in the range the identity its
-   * latest rollup row carries, without location or last seen
+   * The node's fct_node_last_seen row, or for a node missing from it the contributor and client its latest rollup
+   * row carries, without location or last seen
    */
-  node: FctNodeActiveLast24h;
+  node: FctNodeLastSeen;
   online: boolean;
   observation: NodeObservation | null;
 }
@@ -39,12 +39,11 @@ export interface UseNodeRowsResult {
 /**
  * Every node that reported in the range, with its timings over the range, most recently seen first.
  *
- * A node reported in the range if it has block or attestation rollup rows in it, or an active row, since the
- * last 24 hours sit inside every range. Identity comes from the active row when there is one, otherwise from the
- * node's latest rollup row.
+ * A node reported in the range if it has a fct_node_last_seen row last seen inside it, or block or attestation
+ * rollup rows in it. Identity, location and last seen come from the fct_node_last_seen row.
  */
 export function buildNodeRows(
-  nodes: FctNodeActiveLast24h[],
+  nodes: FctNodeLastSeen[],
   block: HistoryRow[],
   attestation: HistoryRow[],
   nowSeconds: number
@@ -52,16 +51,26 @@ export function buildNodeRows(
   const blockSummaries = summarizeByNode(block);
   const attestationSummaries = summarizeByNode(attestation);
 
-  const identities = new Map<string, FctNodeActiveLast24h>();
+  const identities = new Map<string, FctNodeLastSeen>();
   const newestStart = new Map<string, number>();
   [...block, ...attestation].forEach(row => {
-    if (!row.nodeId || !row.node || row.start < (newestStart.get(row.nodeId) ?? -Infinity)) return;
+    if (!row.nodeId || row.start < (newestStart.get(row.nodeId) ?? -Infinity)) return;
     newestStart.set(row.nodeId, row.start);
-    identities.set(row.nodeId, row.node);
+    identities.set(row.nodeId, {
+      node_id: row.nodeId,
+      username: row.username,
+      meta_consensus_implementation: row.client,
+    });
   });
+  // A node that changed its privacy setting reports under two client names; keep the one seen last
+  const lastSeen = new Map<string, FctNodeLastSeen>();
   nodes.forEach(node => {
-    if (node.node_id) identities.set(node.node_id, node);
+    const current = node.node_id ? lastSeen.get(node.node_id) : undefined;
+    if (node.node_id && (!current || (node.last_seen_date_time ?? 0) > (current.last_seen_date_time ?? 0))) {
+      lastSeen.set(node.node_id, node);
+    }
   });
+  lastSeen.forEach((node, nodeId) => identities.set(nodeId, node));
 
   return [...identities.entries()]
     .map(([nodeId, node]) => {
@@ -92,12 +101,12 @@ export function buildNodeRows(
  * Every node that reported in the range, with its block and attestation timings over the range.
  */
 export function useNodeRows(range: NodeRange): UseNodeRowsResult {
-  const active = useActiveNodes();
+  const lastSeen = useLastSeenNodes(range);
   const block = useNodeHistory('block', range, {});
   const attestation = useNodeHistory('attestation', range, {});
 
   const { rows, network } = useMemo(() => {
-    const rows = buildNodeRows(active.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000);
+    const rows = buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000);
     return {
       rows,
       network: {
@@ -107,14 +116,14 @@ export function useNodeRows(range: NodeRange): UseNodeRowsResult {
         ),
       },
     };
-  }, [active.nodes, block.data, attestation.data]);
+  }, [lastSeen.nodes, block.data, attestation.data]);
 
   return {
     rows,
     network,
     block: block.data,
     // The node list depends on the range's rollups, so wait for them before listing nodes
-    isLoading: active.isLoading || block.isLoading || attestation.isLoading,
-    error: active.error,
+    isLoading: lastSeen.isLoading || block.isLoading || attestation.isLoading,
+    error: lastSeen.error,
   };
 }

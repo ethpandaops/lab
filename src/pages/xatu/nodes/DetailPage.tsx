@@ -21,8 +21,8 @@ import {
   VsNetworkChart,
 } from './components';
 import { DEFAULT_NODE_RANGE, NETWORK_WINDOW_SLOTS, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
-import { useActiveNodes } from './hooks/useActiveNodes';
 import { useBlockSlots } from './hooks/useBlockSlots';
+import { useLastSeenNodes } from './hooks/useLastSeenNodes';
 import { useNetworkObservations } from './hooks/useNetworkObservations';
 import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
@@ -65,12 +65,11 @@ export function DetailPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
 
-  const { nodes, isLoading, error } = useActiveNodes();
+  const { nodes, isLoading, error } = useLastSeenNodes(range, nodeId);
   const filter = { nodeId };
   const block = useNodeHistory('block', range, filter);
   const head = useNodeHistory('head', range, filter);
   const attestation = useNodeHistory('attestation', range, filter);
-  // A node absent from the last 24 hours takes its identity from its rollup rows
   const row = buildNodeRows(
     nodes.filter(node => node.node_id === nodeId),
     block.data?.rows ?? [],

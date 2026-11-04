@@ -3,6 +3,7 @@ import {
   fctAttestationCorrectnessHeadServiceList,
   fctAttestationLivenessByEntityHeadServiceList,
   fctBlockProposerHeadServiceList,
+  fctEpochSummaryCanonicalServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctAttestationCorrectnessHead,
@@ -18,18 +19,22 @@ import type { EpochFilters } from '../IndexPage.types';
 import {
   encodeEpochCursor,
   epochBounds,
+  epochRowFromSummary,
   hasEpochPredicate,
+  hasParticipationFilter,
   matchesEpoch,
   parseEpochCursor,
   summariseEpochs,
+  summaryQuery,
   type EpochRow,
 } from '../utils/epoch-query';
 import type { MissedAttestationByEntity } from './useEpochsData.types';
 
-/** Epochs read per request while participation or missed-slot filters are checked */
-const SCAN_CHUNK = 64;
-/** Chunks per page before a short page is returned with a cursor to keep searching */
-const MAX_CHUNKS = 4;
+/**
+ * Extra finalized epochs read with a participation range, for those the server keeps by basis points that fall just
+ * outside the exact range
+ */
+const PARTICIPATION_MARGIN = 2;
 
 export interface EpochsPageArgs {
   filters: EpochFilters;
@@ -41,142 +46,135 @@ export interface EpochsPageResult {
   rows: EpochRow[];
   nextCursor?: string;
   prevCursor?: string;
-  /** The page stopped short of `pageSize` before the earliest epoch; the next page keeps searching */
-  partial?: boolean;
-  /** For a partial page, the last epoch searched */
-  searchedTo?: number;
 }
 
-interface EpochSources {
-  proposers: FctBlockProposerHead[];
-  correctness: FctAttestationCorrectnessHead[];
+/** Epochs held by fct_epoch_summary_canonical; later epochs are not finalized yet */
+export interface SummaryEpochs {
+  earliest: number;
+  latest: number;
 }
 
-/**
- * Per-slot proposer and attestation rows for `epochs`, read as one slot range. Only the sources asked for are
- * read; the others come back empty.
- */
-async function readSources(
-  epochs: number[],
-  want: { proposers: boolean; correctness: boolean },
-  genesisTime: number,
-  signal?: AbortSignal
-): Promise<EpochSources> {
-  if (epochs.length === 0) return { proposers: [], correctness: [] };
-  const lo = Math.min(...epochs);
-  const hi = Math.max(...epochs);
+/** Epoch rows for the consecutive `epochs`, from per-slot proposer and attestation rows of the head tables */
+async function readHeadEpochs(epochs: number[], genesisTime: number, signal?: AbortSignal): Promise<EpochRow[]> {
+  if (epochs.length === 0) return [];
   const query = {
-    slot_start_date_time_gte: slotToTimestamp(lo * SLOTS_PER_EPOCH, genesisTime),
-    slot_start_date_time_lte: slotToTimestamp((hi + 1) * SLOTS_PER_EPOCH - 1, genesisTime),
-    // Sparse epochs from a filtered scan would otherwise pull every epoch in between
-    ...(hi - lo + 1 > epochs.length && { epoch_in_values: epochs.join(',') }),
+    slot_start_date_time_gte: slotToTimestamp(Math.min(...epochs) * SLOTS_PER_EPOCH, genesisTime),
+    slot_start_date_time_lte: slotToTimestamp((Math.max(...epochs) + 1) * SLOTS_PER_EPOCH - 1, genesisTime),
     page_size: 10_000,
   };
   const [proposers, correctness] = await Promise.all([
-    want.proposers
-      ? fetchAllPages<FctBlockProposerHead>(
-          fctBlockProposerHeadServiceList,
-          { query },
-          'fct_block_proposer_head',
-          signal
-        )
-      : [],
-    want.correctness
-      ? fetchAllPages<FctAttestationCorrectnessHead>(
-          fctAttestationCorrectnessHeadServiceList,
-          { query },
-          'fct_attestation_correctness_head',
-          signal
-        )
-      : [],
+    fetchAllPages<FctBlockProposerHead>(fctBlockProposerHeadServiceList, { query }, 'fct_block_proposer_head', signal),
+    fetchAllPages<FctAttestationCorrectnessHead>(
+      fctAttestationCorrectnessHeadServiceList,
+      { query },
+      'fct_attestation_correctness_head',
+      signal
+    ),
   ]);
-  return { proposers, correctness };
+  return summariseEpochs(epochs, proposers, correctness, genesisTime);
 }
 
+/** Epochs from `from` to `to` inclusive, in either direction */
+const epochRange = (from: number, to: number): number[] =>
+  Array.from({ length: Math.abs(to - from) + 1 }, (_, i) => (from <= to ? from + i : from - i));
+
 /**
- * One page of epochs, newest first. Without figure filters the page is the next `pageSize` epochs; with them,
- * epochs are read in chunks and checked until the page fills, the earliest epoch is reached, or `MAX_CHUNKS`
- * chunks have been read.
+ * One page of epochs, newest first. Finalized epochs come from fct_epoch_summary_canonical, filtered, ordered and
+ * paged by the server; the unfinalized epochs after it are summed from the per-slot head tables and filtered here.
  */
 export async function fetchEpochsPage(
   { filters, pageSize, cursor: cursorParam }: EpochsPageArgs,
   genesisTime: number,
-  earliest: number,
+  summary: SummaryEpochs,
   currentEpoch: number,
   signal?: AbortSignal
 ): Promise<EpochsPageResult> {
-  const predicate = hasEpochPredicate(filters);
+  const participation = hasParticipationFilter(filters);
   const bounds = epochBounds(filters, genesisTime);
   const cursor = parseEpochCursor(cursorParam);
   // The current epoch is still filling up, so only finished epochs are checked against figures
-  let lo = Math.max(earliest, bounds.min ?? 0);
-  let hi = Math.min(predicate ? currentEpoch - 1 : currentEpoch, bounds.max ?? Number.POSITIVE_INFINITY);
+  let lo = Math.max(summary.earliest, bounds.min ?? 0);
+  let hi = Math.min(
+    hasEpochPredicate(filters) ? currentEpoch - 1 : currentEpoch,
+    bounds.max ?? Number.POSITIVE_INFINITY
+  );
   const ascending = cursor?.kind === 'after';
   if (cursor?.kind === 'before') hi = Math.min(hi, cursor.epoch - 1);
   if (cursor?.kind === 'after') lo = Math.max(lo, cursor.epoch + 1);
   const start = ascending ? lo : hi;
-  const chunk = predicate ? SCAN_CHUNK : pageSize;
+  const finalized = { lo, hi: Math.min(hi, summary.latest) };
+  const tail = { lo: Math.max(lo, summary.latest + 1), hi };
 
-  // A filtered scan reads only what its filters check, then fills in the rest for the epochs it keeps
-  const scanWant = predicate
-    ? {
-        proposers: filters.missedMin !== undefined || filters.missedMax !== undefined,
-        correctness: filters.participationMin !== undefined || filters.participationMax !== undefined,
-      }
-    : { proposers: true, correctness: true };
-  const read: EpochSources = { proposers: [], correctness: [] };
-  const matched: EpochRow[] = [];
-  let last: number | undefined;
-  let scannedEnd: number | undefined;
-  for (let chunks = 0; chunks < (predicate ? MAX_CHUNKS : 1) && matched.length < pageSize && lo <= hi; chunks++) {
-    const chunkLo = ascending ? lo : Math.max(lo, hi - chunk + 1);
-    const chunkHi = ascending ? Math.min(hi, lo + chunk - 1) : hi;
-    const epochs = Array.from({ length: chunkHi - chunkLo + 1 }, (_, i) => (ascending ? chunkLo + i : chunkHi - i));
-    const sources = await readSources(epochs, scanWant, genesisTime, signal);
-    read.proposers.push(...sources.proposers);
-    read.correctness.push(...sources.correctness);
-    for (const row of summariseEpochs(epochs, sources.proposers, sources.correctness, genesisTime)) {
-      last = row.epoch;
-      if (matchesEpoch(row, filters)) matched.push(row);
-      if (matched.length === pageSize) break;
+  const rows: EpochRow[] = [];
+  /** Epochs past the page are left to look at */
+  let more = false;
+  /** The last epoch looked at */
+  let scannedTo: number | undefined;
+
+  /** Unfinalized epochs, one past what the page still needs unless their figures are filtered */
+  async function* tailRows(): AsyncGenerator<EpochRow> {
+    if (tail.lo > tail.hi) return;
+    if (rows.length === pageSize) {
+      more = true;
+      return;
     }
-    scannedEnd = ascending ? chunkHi : chunkLo;
-    if (ascending) lo = chunkHi + 1;
-    else hi = chunkLo - 1;
+    const epochs = ascending ? epochRange(tail.lo, tail.hi) : epochRange(tail.hi, tail.lo);
+    const wanted = hasEpochPredicate(filters) ? epochs : epochs.slice(0, pageSize - rows.length + 1);
+    yield* await readHeadEpochs(wanted, genesisTime, signal);
   }
 
-  const kept = matched.map(row => row.epoch);
-  const rest = await readSources(
-    kept,
-    { proposers: !scanWant.proposers, correctness: !scanWant.correctness },
-    genesisTime,
-    signal
-  );
-  const rows = summariseEpochs(
-    kept,
-    [...read.proposers, ...rest.proposers],
-    [...read.correctness, ...rest.correctness],
-    genesisTime
-  );
+  /**
+   * Finalized epochs, one past what the page still needs. Should the exact participation check drop more than the
+   * margin, the next batch picks up where this one ended.
+   */
+  async function* finalizedRows(): AsyncGenerator<EpochRow> {
+    const range = { ...finalized };
+    while (range.lo <= range.hi) {
+      if (rows.length === pageSize) {
+        more = true;
+        return;
+      }
+      const limit = pageSize - rows.length + 1 + (participation ? PARTICIPATION_MARGIN : 0);
+      const response = await fctEpochSummaryCanonicalServiceList({
+        query: summaryQuery(range, filters, ascending, limit, genesisTime),
+        signal,
+        throwOnError: true,
+      });
+      const batch = (response.data.fct_epoch_summary_canonical ?? []).map(row => epochRowFromSummary(row, genesisTime));
+      yield* batch;
+      const last = batch.at(-1)?.epoch;
+      if (batch.length < limit || last === undefined) return;
+      if (ascending) range.lo = last + 1;
+      else range.hi = last - 1;
+    }
+  }
+
+  for (const source of ascending ? [finalizedRows, tailRows] : [tailRows, finalizedRows]) {
+    for await (const row of source()) {
+      if (rows.length === pageSize) {
+        more = true;
+        break;
+      }
+      scannedTo = row.epoch;
+      if (matchesEpoch(row, filters)) rows.push(row);
+    }
+    if (more) break;
+  }
 
   const full = rows.length === pageSize;
-  // Nothing left to read, and the page did not stop part-way through the last chunk
-  const exhausted = lo > hi && (!full || last === scannedEnd);
   const first = rows[0]?.epoch;
   if (ascending) {
     rows.reverse();
     return {
       rows,
       nextCursor: encodeEpochCursor({ kind: 'before', epoch: first ?? start }),
-      prevCursor: !full && exhausted ? undefined : encodeEpochCursor({ kind: 'after', epoch: last ?? start }),
+      prevCursor: !full && !more ? undefined : encodeEpochCursor({ kind: 'after', epoch: scannedTo ?? start }),
     };
   }
   return {
     rows,
-    nextCursor: exhausted || last === undefined ? undefined : encodeEpochCursor({ kind: 'before', epoch: last }),
+    nextCursor: more ? encodeEpochCursor({ kind: 'before', epoch: scannedTo ?? start }) : undefined,
     prevCursor: encodeEpochCursor({ kind: 'after', epoch: first ?? (Number.isFinite(start) ? start : 0) }),
-    partial: !full && !exhausted,
-    searchedTo: !full && !exhausted ? last : undefined,
   };
 }
 
@@ -228,17 +226,20 @@ export interface UseEpochsDataReturn {
 export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
-  const { data: proposerBounds } = useTableBounds('fct_block_proposer_head');
+  const { data: summaryBounds } = useTableBounds('fct_epoch_summary_canonical');
   const genesisTime = currentNetwork?.genesis_time;
-  const earliest =
-    proposerBounds && genesisTime !== undefined
-      ? slotToEpoch(timestampToSlot(proposerBounds.min, genesisTime)) + 1
+  const summary: SummaryEpochs | undefined =
+    summaryBounds && genesisTime !== undefined
+      ? {
+          earliest: slotToEpoch(timestampToSlot(summaryBounds.min, genesisTime)),
+          latest: slotToEpoch(timestampToSlot(summaryBounds.max, genesisTime)),
+        }
       : undefined;
 
   const page = useQuery({
-    queryKey: ['epochs-list', currentNetwork?.name, args, earliest, currentEpoch],
-    queryFn: ({ signal }) => fetchEpochsPage(args, genesisTime!, earliest!, currentEpoch, signal),
-    enabled: genesisTime !== undefined && earliest !== undefined && currentEpoch > 0,
+    queryKey: ['epochs-list', currentNetwork?.name, args, summary, currentEpoch],
+    queryFn: ({ signal }) => fetchEpochsPage(args, genesisTime!, summary!, currentEpoch, signal),
+    enabled: genesisTime !== undefined && summary !== undefined && currentEpoch > 0,
     placeholderData: keepPreviousData,
   });
 
@@ -253,7 +254,7 @@ export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
   return {
     data: page.data,
     missedAttestationsByEntity: offline.data ?? [],
-    isLoading: page.isLoading || (genesisTime !== undefined && earliest === undefined),
+    isLoading: page.isLoading || (genesisTime !== undefined && summary === undefined),
     isPlaceholderData: page.isPlaceholderData,
     error: page.error ?? offline.error,
     currentEpoch,

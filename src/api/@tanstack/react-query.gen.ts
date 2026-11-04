@@ -70,6 +70,8 @@ import {
   fctAttestationRewardByValidatorWeeklyServiceList,
   fctAttestationVoteCorrectnessByClientDailyServiceGet,
   fctAttestationVoteCorrectnessByClientDailyServiceList,
+  fctAttestationVoteCorrectnessByClientPairDailyServiceGet,
+  fctAttestationVoteCorrectnessByClientPairDailyServiceList,
   fctAttestationVoteCorrectnessByValidatorDailyServiceGet,
   fctAttestationVoteCorrectnessByValidatorDailyServiceList,
   fctAttestationVoteCorrectnessByValidatorHourlyServiceGet,
@@ -122,6 +124,8 @@ import {
   fctBlockGraffitiClientVersionDailyServiceList,
   fctBlockGraffitiClientVersionHourlyServiceGet,
   fctBlockGraffitiClientVersionHourlyServiceList,
+  fctBlockGraffitiClientVersionPairDailyServiceGet,
+  fctBlockGraffitiClientVersionPairDailyServiceList,
   fctBlockGraffitiServiceGet,
   fctBlockGraffitiServiceList,
   fctBlockHeadServiceGet,
@@ -144,10 +148,14 @@ import {
   fctBlockPayloadPtcVoteServiceList,
   fctBlockPayloadServiceGet,
   fctBlockPayloadServiceList,
+  fctBlockPayloadStatusDailyServiceGet,
+  fctBlockPayloadStatusDailyServiceList,
   fctBlockPayloadStatusHourlyServiceGet,
   fctBlockPayloadStatusHourlyServiceList,
   fctBlockProposalByClientDailyServiceGet,
   fctBlockProposalByClientDailyServiceList,
+  fctBlockProposalByClientPairDailyServiceGet,
+  fctBlockProposalByClientPairDailyServiceList,
   fctBlockProposalStatusDailyServiceGet,
   fctBlockProposalStatusDailyServiceList,
   fctBlockProposalStatusHourlyServiceGet,
@@ -218,6 +226,10 @@ import {
   fctEngineGetBlobsByNodeHourlyServiceList,
   fctEngineGetBlobsBySlotServiceGet,
   fctEngineGetBlobsBySlotServiceList,
+  fctEngineGetBlobsDurationChunked50MsDailyServiceGet,
+  fctEngineGetBlobsDurationChunked50MsDailyServiceList,
+  fctEngineGetBlobsDurationChunked50MsHourlyServiceGet,
+  fctEngineGetBlobsDurationChunked50MsHourlyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceGet,
   fctEngineGetBlobsDurationChunked50MsServiceList,
   fctEngineNewPayloadByElClientDailyServiceGet,
@@ -232,12 +244,18 @@ import {
   fctEngineNewPayloadByNodeHourlyServiceList,
   fctEngineNewPayloadBySlotServiceGet,
   fctEngineNewPayloadBySlotServiceList,
+  fctEngineNewPayloadDurationChunked50MsDailyServiceGet,
+  fctEngineNewPayloadDurationChunked50MsDailyServiceList,
+  fctEngineNewPayloadDurationChunked50MsHourlyServiceGet,
+  fctEngineNewPayloadDurationChunked50MsHourlyServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceGet,
   fctEngineNewPayloadDurationChunked50MsServiceList,
   fctEngineNewPayloadWinrateDailyServiceGet,
   fctEngineNewPayloadWinrateDailyServiceList,
   fctEngineNewPayloadWinrateHourlyServiceGet,
   fctEngineNewPayloadWinrateHourlyServiceList,
+  fctEpochSummaryCanonicalServiceGet,
+  fctEpochSummaryCanonicalServiceList,
   fctExecutionGasLimitDailyServiceGet,
   fctExecutionGasLimitDailyServiceList,
   fctExecutionGasLimitHourlyServiceGet,
@@ -292,6 +310,8 @@ import {
   fctNodeCpuUtilizationByProcessServiceList,
   fctNodeDiskIoByProcessServiceGet,
   fctNodeDiskIoByProcessServiceList,
+  fctNodeLastSeenServiceGet,
+  fctNodeLastSeenServiceList,
   fctNodeMemoryUsageByProcessServiceGet,
   fctNodeMemoryUsageByProcessServiceList,
   fctNodeNetworkIoByProcessServiceGet,
@@ -773,6 +793,12 @@ import type {
   FctAttestationVoteCorrectnessByClientDailyServiceListData,
   FctAttestationVoteCorrectnessByClientDailyServiceListError,
   FctAttestationVoteCorrectnessByClientDailyServiceListResponse,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetData,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetError,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListData,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListError,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetError,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
@@ -929,6 +955,12 @@ import type {
   FctBlockGraffitiClientVersionHourlyServiceListData,
   FctBlockGraffitiClientVersionHourlyServiceListError,
   FctBlockGraffitiClientVersionHourlyServiceListResponse,
+  FctBlockGraffitiClientVersionPairDailyServiceGetData,
+  FctBlockGraffitiClientVersionPairDailyServiceGetError,
+  FctBlockGraffitiClientVersionPairDailyServiceGetResponse,
+  FctBlockGraffitiClientVersionPairDailyServiceListData,
+  FctBlockGraffitiClientVersionPairDailyServiceListError,
+  FctBlockGraffitiClientVersionPairDailyServiceListResponse,
   FctBlockGraffitiServiceGetData,
   FctBlockGraffitiServiceGetError,
   FctBlockGraffitiServiceGetResponse,
@@ -995,6 +1027,12 @@ import type {
   FctBlockPayloadServiceListData,
   FctBlockPayloadServiceListError,
   FctBlockPayloadServiceListResponse,
+  FctBlockPayloadStatusDailyServiceGetData,
+  FctBlockPayloadStatusDailyServiceGetError,
+  FctBlockPayloadStatusDailyServiceGetResponse,
+  FctBlockPayloadStatusDailyServiceListData,
+  FctBlockPayloadStatusDailyServiceListError,
+  FctBlockPayloadStatusDailyServiceListResponse,
   FctBlockPayloadStatusHourlyServiceGetData,
   FctBlockPayloadStatusHourlyServiceGetError,
   FctBlockPayloadStatusHourlyServiceGetResponse,
@@ -1007,6 +1045,12 @@ import type {
   FctBlockProposalByClientDailyServiceListData,
   FctBlockProposalByClientDailyServiceListError,
   FctBlockProposalByClientDailyServiceListResponse,
+  FctBlockProposalByClientPairDailyServiceGetData,
+  FctBlockProposalByClientPairDailyServiceGetError,
+  FctBlockProposalByClientPairDailyServiceGetResponse,
+  FctBlockProposalByClientPairDailyServiceListData,
+  FctBlockProposalByClientPairDailyServiceListError,
+  FctBlockProposalByClientPairDailyServiceListResponse,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetError,
   FctBlockProposalStatusDailyServiceGetResponse,
@@ -1217,6 +1261,18 @@ import type {
   FctEngineGetBlobsBySlotServiceListData,
   FctEngineGetBlobsBySlotServiceListError,
   FctEngineGetBlobsBySlotServiceListResponse,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetData,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetError,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListData,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListError,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListResponse,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetError,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListData,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListError,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse,
   FctEngineGetBlobsDurationChunked50MsServiceGetData,
   FctEngineGetBlobsDurationChunked50MsServiceGetError,
   FctEngineGetBlobsDurationChunked50MsServiceGetResponse,
@@ -1259,6 +1315,18 @@ import type {
   FctEngineNewPayloadBySlotServiceListData,
   FctEngineNewPayloadBySlotServiceListError,
   FctEngineNewPayloadBySlotServiceListResponse,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetData,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetError,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListData,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListError,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListResponse,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetError,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListData,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListError,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse,
   FctEngineNewPayloadDurationChunked50MsServiceGetData,
   FctEngineNewPayloadDurationChunked50MsServiceGetError,
   FctEngineNewPayloadDurationChunked50MsServiceGetResponse,
@@ -1277,6 +1345,12 @@ import type {
   FctEngineNewPayloadWinrateHourlyServiceListData,
   FctEngineNewPayloadWinrateHourlyServiceListError,
   FctEngineNewPayloadWinrateHourlyServiceListResponse,
+  FctEpochSummaryCanonicalServiceGetData,
+  FctEpochSummaryCanonicalServiceGetError,
+  FctEpochSummaryCanonicalServiceGetResponse,
+  FctEpochSummaryCanonicalServiceListData,
+  FctEpochSummaryCanonicalServiceListError,
+  FctEpochSummaryCanonicalServiceListResponse,
   FctExecutionGasLimitDailyServiceGetData,
   FctExecutionGasLimitDailyServiceGetError,
   FctExecutionGasLimitDailyServiceGetResponse,
@@ -1439,6 +1513,12 @@ import type {
   FctNodeDiskIoByProcessServiceListData,
   FctNodeDiskIoByProcessServiceListError,
   FctNodeDiskIoByProcessServiceListResponse,
+  FctNodeLastSeenServiceGetData,
+  FctNodeLastSeenServiceGetError,
+  FctNodeLastSeenServiceGetResponse,
+  FctNodeLastSeenServiceListData,
+  FctNodeLastSeenServiceListError,
+  FctNodeLastSeenServiceListResponse,
   FctNodeMemoryUsageByProcessServiceGetData,
   FctNodeMemoryUsageByProcessServiceGetError,
   FctNodeMemoryUsageByProcessServiceGetResponse,
@@ -2326,7 +2406,7 @@ export const adminCbtIncrementalServiceListQueryKey = (options?: Options<AdminCb
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * CBT bookkeeping for incremental transformation models: one row per interval CBT has processed, with the model database and table, the interval starting position and its size. A model has processed the union of its rows. Positions are in the model interval units, such as Unix seconds or block numbers
  */
 export const adminCbtIncrementalServiceListOptions = (options?: Options<AdminCbtIncrementalServiceListData>) =>
   queryOptions<
@@ -2380,7 +2460,7 @@ export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBl
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob transaction to submitter name mapping.
  */
 export const dimBlockBlobSubmitterServiceListOptions = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
   queryOptions<
@@ -2434,7 +2514,7 @@ export const dimClientCommitServiceListQueryKey = (options?: Options<DimClientCo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Commits on each client default and release branches since 2020, with the release each builds on, so graffiti commits from builds between tags resolve to a version
  */
 export const dimClientCommitServiceListOptions = (options?: Options<DimClientCommitServiceListData>) =>
   queryOptions<
@@ -2488,7 +2568,7 @@ export const dimClientReleaseServiceListQueryKey = (options?: Options<DimClientR
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus and execution client release tags and the commits they point at, for resolving graffiti commit prefixes to versions
  */
 export const dimClientReleaseServiceListOptions = (options?: Options<DimClientReleaseServiceListData>) =>
   queryOptions<
@@ -2542,7 +2622,7 @@ export const dimContractOwnerServiceListQueryKey = (options?: Options<DimContrac
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract owner information from Dune Analytics, growthepie, and eth-labels for top storage slot contracts
  */
 export const dimContractOwnerServiceListOptions = (options?: Options<DimContractOwnerServiceListData>) =>
   queryOptions<
@@ -2596,7 +2676,7 @@ export const dimFunctionSignatureServiceListQueryKey = (options?: Options<DimFun
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Function signature lookup table populated from Sourcify signature database.
  */
 export const dimFunctionSignatureServiceListOptions = (options?: Options<DimFunctionSignatureServiceListData>) =>
   queryOptions<
@@ -2650,7 +2730,7 @@ export const dimNodeServiceListQueryKey = (options?: Options<DimNodeServiceListD
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node information for validators
  */
 export const dimNodeServiceListOptions = (options?: Options<DimNodeServiceListData>) =>
   queryOptions<
@@ -2704,7 +2784,7 @@ export const dimRocketpoolNodeServiceListQueryKey = (options?: Options<DimRocket
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node operators with timezone, RPL stake, smoothing pool membership and minipool/validator counts
  */
 export const dimRocketpoolNodeServiceListOptions = (options?: Options<DimRocketpoolNodeServiceListData>) =>
   queryOptions<
@@ -2758,7 +2838,7 @@ export const dimTokenContractServiceListQueryKey = (options?: Options<DimTokenCo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contracts that have emitted ERC20/ERC721 Transfer events, classified into a single token_standard by their first transfer
  */
 export const dimTokenContractServiceListOptions = (options?: Options<DimTokenContractServiceListData>) =>
   queryOptions<
@@ -2812,7 +2892,7 @@ export const dimValidatorServiceListQueryKey = (options?: Options<DimValidatorSe
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Current identity and state of every validator, refreshed from the latest epoch
  */
 export const dimValidatorServiceListOptions = (options?: Options<DimValidatorServiceListData>) =>
   queryOptions<
@@ -2866,7 +2946,7 @@ export const dimValidatorPubkeyServiceListQueryKey = (options?: Options<DimValid
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator index to pubkey mapping — one row per validator with the latest pubkey
  */
 export const dimValidatorPubkeyServiceListOptions = (options?: Options<DimValidatorPubkeyServiceListData>) =>
   queryOptions<
@@ -2920,7 +3000,7 @@ export const dimValidatorStatusServiceListQueryKey = (options?: Options<DimValid
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator lifecycle status transitions — one row per (validator_index, status) with the first epoch observed
  */
 export const dimValidatorStatusServiceListOptions = (options?: Options<DimValidatorStatusServiceListData>) =>
   queryOptions<
@@ -2975,7 +3055,7 @@ export const fctAttestationCorrectnessServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block, preferring finalized canonical data and falling back to real-time head data for slots not yet finalized. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessServiceListOptions = (
   options?: Options<FctAttestationCorrectnessServiceListData>
@@ -3033,7 +3113,7 @@ export const fctAttestationCorrectnessByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator, canonical-preferred merge of the canonical and head sources
  */
 export const fctAttestationCorrectnessByValidatorServiceListOptions = (
   options?: Options<FctAttestationCorrectnessByValidatorServiceListData>
@@ -3093,7 +3173,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator for the finalized chain
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceListOptions = (
   options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData>
@@ -3153,7 +3233,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceListOptions = (
   options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData>
@@ -3213,7 +3293,7 @@ export const fctAttestationCorrectnessCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block for the finalized chain
  */
 export const fctAttestationCorrectnessCanonicalServiceListOptions = (
   options?: Options<FctAttestationCorrectnessCanonicalServiceListData>
@@ -3273,7 +3353,7 @@ export const fctAttestationCorrectnessHeadServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessHeadServiceListOptions = (
   options?: Options<FctAttestationCorrectnessHeadServiceListData>
@@ -3333,7 +3413,7 @@ export const fctAttestationFirstSeenByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * One row per (slot, validator, vote) carrying raw and aggregate first-seen times. ORDER BY includes vote fields so slashable double votes stay as separate rows instead of being collapsed by the ReplacingMergeTree.
  */
 export const fctAttestationFirstSeenByValidatorServiceListOptions = (
   options?: Options<FctAttestationFirstSeenByValidatorServiceListData>
@@ -3393,7 +3473,7 @@ export const fctAttestationFirstSeenChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestations first seen on the unfinalized chain broken down by 50ms chunks. Only includes attestations that were seen within 12000ms of the slot start time. There can be multiple block roots + chunk_slot_start_diff for the same slot, it most likely means votes for prior slot blocks
  */
 export const fctAttestationFirstSeenChunked50MsServiceListOptions = (
   options?: Options<FctAttestationFirstSeenChunked50MsServiceListData>
@@ -3453,7 +3533,7 @@ export const fctAttestationInclusionDelayDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationInclusionDelayDailyServiceListOptions = (
   options?: Options<FctAttestationInclusionDelayDailyServiceListData>
@@ -3513,7 +3593,7 @@ export const fctAttestationInclusionDelayHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationInclusionDelayHourlyServiceListOptions = (
   options?: Options<FctAttestationInclusionDelayHourlyServiceListData>
@@ -3573,7 +3653,7 @@ export const fctAttestationLivenessByEntityServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation liveness aggregated by entity, preferring settled canonical participation over the real-time head view. One row per (slot, entity) with counts for both attested and missed attestations.
  */
 export const fctAttestationLivenessByEntityServiceListOptions = (
   options?: Options<FctAttestationLivenessByEntityServiceListData>
@@ -3633,7 +3713,7 @@ export const fctAttestationLivenessByEntityHeadServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation liveness aggregated by entity for the head chain. One row per (slot, entity) with counts for both attested and missed attestations.
  */
 export const fctAttestationLivenessByEntityHeadServiceListOptions = (
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData>
@@ -3693,7 +3773,7 @@ export const fctAttestationObservationByNodeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation observations by contributor nodes, aggregated per slot per node for performance
  */
 export const fctAttestationObservationByNodeServiceListOptions = (
   options?: Options<FctAttestationObservationByNodeServiceListData>
@@ -3753,7 +3833,7 @@ export const fctAttestationObservationByNodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily attestation arrival per node
  */
 export const fctAttestationObservationByNodeDailyServiceListOptions = (
   options?: Options<FctAttestationObservationByNodeDailyServiceListData>
@@ -3813,7 +3893,7 @@ export const fctAttestationObservationByNodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly attestation arrival per node
  */
 export const fctAttestationObservationByNodeHourlyServiceListOptions = (
   options?: Options<FctAttestationObservationByNodeHourlyServiceListData>
@@ -3873,7 +3953,7 @@ export const fctAttestationParticipationRateDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationParticipationRateDailyServiceListOptions = (
   options?: Options<FctAttestationParticipationRateDailyServiceListData>
@@ -3933,7 +4013,7 @@ export const fctAttestationParticipationRateHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationParticipationRateHourlyServiceListOptions = (
   options?: Options<FctAttestationParticipationRateHourlyServiceListData>
@@ -3993,7 +4073,7 @@ export const fctAttestationRewardByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation reward of each validator in each epoch. Rows never change, so there is no version column
  */
 export const fctAttestationRewardByValidatorServiceListOptions = (
   options?: Options<FctAttestationRewardByValidatorServiceListData>
@@ -4053,7 +4133,7 @@ export const fctAttestationRewardByValidatorDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation rewards and penalties per validator per day
  */
 export const fctAttestationRewardByValidatorDailyServiceListOptions = (
   options?: Options<FctAttestationRewardByValidatorDailyServiceListData>
@@ -4113,7 +4193,7 @@ export const fctAttestationRewardByValidatorWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation rewards and penalties per validator per week
  */
 export const fctAttestationRewardByValidatorWeeklyServiceListOptions = (
   options?: Options<FctAttestationRewardByValidatorWeeklyServiceListData>
@@ -4173,7 +4253,7 @@ export const fctAttestationVoteCorrectnessByClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily attestation vote correctness and inclusion per consensus and execution client. Validators map to the clients of their most recent identifying graffiti (a proposed block naming the client) in the 365 days before the end of the day. Only validators that proposed with identifying graffiti are covered, the rest are the unknown client.
  */
 export const fctAttestationVoteCorrectnessByClientDailyServiceListOptions = (
   options?: Options<FctAttestationVoteCorrectnessByClientDailyServiceListData>
@@ -4226,6 +4306,66 @@ export const fctAttestationVoteCorrectnessByClientDailyServiceGetOptions = (
     queryKey: fctAttestationVoteCorrectnessByClientDailyServiceGetQueryKey(options),
   });
 
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByClientPairDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily attestation vote correctness and inclusion per consensus and execution client pair. Validators map to the pair of their most recent graffiti naming either client in the 365 days before the end of the day, a side it does not name being unknown. Validators that never proposed with identifying graffiti are unknown/unknown.
+ */
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceListError,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByClientPairDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByClientPairDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByClientPairDailyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByClientPairDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceGetError,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByClientPairDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByClientPairDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByClientPairDailyServiceGetQueryKey(options),
+  });
+
 export const fctAttestationVoteCorrectnessByValidatorServiceListQueryKey = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData>
 ) => createQueryKey('fctAttestationVoteCorrectnessByValidatorServiceList', options);
@@ -4233,7 +4373,7 @@ export const fctAttestationVoteCorrectnessByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-slot attestation vote correctness by validator
  */
 export const fctAttestationVoteCorrectnessByValidatorServiceListOptions = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData>
@@ -4293,7 +4433,7 @@ export const fctAttestationVoteCorrectnessByValidatorDailyServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData>
@@ -4353,7 +4493,7 @@ export const fctAttestationVoteCorrectnessByValidatorHourlyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorHourlyServiceListOptions = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData>
@@ -4413,7 +4553,7 @@ export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData>
@@ -4472,7 +4612,7 @@ export const fctBlobCountDailyServiceListQueryKey = (options?: Options<FctBlobCo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctBlobCountDailyServiceListOptions = (options?: Options<FctBlobCountDailyServiceListData>) =>
   queryOptions<
@@ -4526,7 +4666,7 @@ export const fctBlobCountHourlyServiceListQueryKey = (options?: Options<FctBlobC
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctBlobCountHourlyServiceListOptions = (options?: Options<FctBlobCountHourlyServiceListData>) =>
   queryOptions<
@@ -4580,7 +4720,7 @@ export const fctBlockServiceListQueryKey = (options?: Options<FctBlockServiceLis
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block details for the finalized chain including orphaned blocks
  */
 export const fctBlockServiceListOptions = (options?: Options<FctBlockServiceListData>) =>
   queryOptions<
@@ -4634,7 +4774,7 @@ export const fctBlockBlobCountServiceListQueryKey = (options?: Options<FctBlockB
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the finalized chain
  */
 export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBlobCountServiceListData>) =>
   queryOptions<
@@ -4688,7 +4828,7 @@ export const fctBlockBlobCountHeadServiceListQueryKey = (options?: Options<FctBl
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctBlockBlobCountHeadServiceListOptions = (options?: Options<FctBlockBlobCountHeadServiceListData>) =>
   queryOptions<
@@ -4743,7 +4883,7 @@ export const fctBlockBlobFirstSeenByNodeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the block was first seen on the network by a sentry node
  */
 export const fctBlockBlobFirstSeenByNodeServiceListOptions = (
   options?: Options<FctBlockBlobFirstSeenByNodeServiceListData>
@@ -4802,7 +4942,7 @@ export const fctBlockBlobHeadServiceListQueryKey = (options?: Options<FctBlockBl
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * One row per (slot, block root, blob index) carrying the blob versioned hash and KZG commitment, sourced from the head beacon blob sidecar event stream. Available at head without waiting for finalization.
  */
 export const fctBlockBlobHeadServiceListOptions = (options?: Options<FctBlockBlobHeadServiceListData>) =>
   queryOptions<
@@ -4857,7 +4997,7 @@ export const fctBlockDataColumnCompletionServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * How sentry nodes completed the data columns of each block: completions by path, cells from gossip and the execution layer, and completion times
  */
 export const fctBlockDataColumnCompletionServiceListOptions = (
   options?: Options<FctBlockDataColumnCompletionServiceListData>
@@ -4917,7 +5057,7 @@ export const fctBlockDataColumnSidecarFirstSeenServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the data column was first seen on the network by any sentry node
  */
 export const fctBlockDataColumnSidecarFirstSeenServiceListOptions = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData>
@@ -4977,7 +5117,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the data column was first seen on the network by a sentry node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceListOptions = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData>
@@ -5037,7 +5177,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column arrival per node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListOptions = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData>
@@ -5097,7 +5237,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly data column arrival per node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListOptions = (
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData>
@@ -5156,7 +5296,7 @@ export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the block was first seen on the network by a sentry node
  */
 export const fctBlockFirstSeenByNodeServiceListOptions = (options?: Options<FctBlockFirstSeenByNodeServiceListData>) =>
   queryOptions<
@@ -5211,7 +5351,7 @@ export const fctBlockFirstSeenByNodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block arrival per node
  */
 export const fctBlockFirstSeenByNodeDailyServiceListOptions = (
   options?: Options<FctBlockFirstSeenByNodeDailyServiceListData>
@@ -5271,7 +5411,7 @@ export const fctBlockFirstSeenByNodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly block arrival per node
  */
 export const fctBlockFirstSeenByNodeHourlyServiceListOptions = (
   options?: Options<FctBlockFirstSeenByNodeHourlyServiceListData>
@@ -5330,7 +5470,7 @@ export const fctBlockGraffitiServiceListQueryKey = (options?: Options<FctBlockGr
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical beacon block graffiti with the consensus and execution clients it names, parsed from the engine API client version codes or client default graffiti
  */
 export const fctBlockGraffitiServiceListOptions = (options?: Options<FctBlockGraffitiServiceListData>) =>
   queryOptions<
@@ -5385,7 +5525,7 @@ export const fctBlockGraffitiClientByEntityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export const fctBlockGraffitiClientByEntityDailyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientByEntityDailyServiceListData>
@@ -5445,7 +5585,7 @@ export const fctBlockGraffitiClientByEntityHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export const fctBlockGraffitiClientByEntityHourlyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData>
@@ -5505,7 +5645,7 @@ export const fctBlockGraffitiClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per consensus and execution client pair named by block graffiti, including unknown
  */
 export const fctBlockGraffitiClientDailyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientDailyServiceListData>
@@ -5565,7 +5705,7 @@ export const fctBlockGraffitiClientHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per consensus and execution client pair named by block graffiti, including unknown
  */
 export const fctBlockGraffitiClientHourlyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientHourlyServiceListData>
@@ -5625,7 +5765,7 @@ export const fctBlockGraffitiClientVersionByEntityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionByEntityDailyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientVersionByEntityDailyServiceListData>
@@ -5685,7 +5825,7 @@ export const fctBlockGraffitiClientVersionByEntityHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionByEntityHourlyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientVersionByEntityHourlyServiceListData>
@@ -5745,7 +5885,7 @@ export const fctBlockGraffitiClientVersionDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionDailyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientVersionDailyServiceListData>
@@ -5805,7 +5945,7 @@ export const fctBlockGraffitiClientVersionHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionHourlyServiceListOptions = (
   options?: Options<FctBlockGraffitiClientVersionHourlyServiceListData>
@@ -5858,13 +5998,73 @@ export const fctBlockGraffitiClientVersionHourlyServiceGetOptions = (
     queryKey: fctBlockGraffitiClientVersionHourlyServiceGetQueryKey(options),
   });
 
+export const fctBlockGraffitiClientVersionPairDailyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientVersionPairDailyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientVersionPairDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily canonical block counts per consensus and execution client release pair resolved from block graffiti, each block counted once, with builds of one version from different commits together. release_status: commit_match (the graffiti commit is a release tag commit), commit_untagged (a default or release branch commit between tags, version is the release it builds on), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). An unresolved side keeps the version its graffiti states, or is empty when it states none
+ */
+export const fctBlockGraffitiClientVersionPairDailyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientVersionPairDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionPairDailyServiceListResponse,
+    FctBlockGraffitiClientVersionPairDailyServiceListError,
+    FctBlockGraffitiClientVersionPairDailyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionPairDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionPairDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionPairDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientVersionPairDailyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientVersionPairDailyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientVersionPairDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionPairDailyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientVersionPairDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionPairDailyServiceGetResponse,
+    FctBlockGraffitiClientVersionPairDailyServiceGetError,
+    FctBlockGraffitiClientVersionPairDailyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionPairDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionPairDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionPairDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadServiceListData>) =>
   createQueryKey('fctBlockHeadServiceList', options);
 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctBlockHeadServiceListOptions = (options?: Options<FctBlockHeadServiceListData>) =>
   queryOptions<
@@ -5918,7 +6118,7 @@ export const fctBlockMevServiceListQueryKey = (options?: Options<FctBlockMevServ
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the finalized chain including orphaned blocks
  */
 export const fctBlockMevServiceListOptions = (options?: Options<FctBlockMevServiceListData>) =>
   queryOptions<
@@ -5972,7 +6172,7 @@ export const fctBlockMevHeadServiceListQueryKey = (options?: Options<FctBlockMev
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the unfinalized chain
  */
 export const fctBlockMevHeadServiceListOptions = (options?: Options<FctBlockMevHeadServiceListData>) =>
   queryOptions<
@@ -6027,7 +6227,7 @@ export const fctBlockPartialDataColumnHeaderFirstSeenServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When sentry nodes first received the gossipsub partial data column header for a Fulu block, the eager push that lets peers verify cells before the full column arrives
  */
 export const fctBlockPartialDataColumnHeaderFirstSeenServiceListOptions = (
   options?: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceListData>
@@ -6086,7 +6286,7 @@ export const fctBlockPayloadServiceListQueryKey = (options?: Options<FctBlockPay
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) per-block execution payload facts: the winning bid commitment joined with what the revealed envelope actually contained, replacing the pre-gloas execution columns that no longer exist on the beacon block
  */
 export const fctBlockPayloadServiceListOptions = (options?: Options<FctBlockPayloadServiceListData>) =>
   queryOptions<
@@ -6141,7 +6341,7 @@ export const fctBlockPayloadAvailableByNodeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When each sentry node had the gloas (ePBS) execution payload and its blobs locally verified (PTC vote readiness)
  */
 export const fctBlockPayloadAvailableByNodeServiceListOptions = (
   options?: Options<FctBlockPayloadAvailableByNodeServiceListData>
@@ -6200,7 +6400,7 @@ export const fctBlockPayloadBidServiceListQueryKey = (options?: Options<FctBlock
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * The winning gloas (ePBS) execution payload bid committed in each canonical beacon block, one per block
  */
 export const fctBlockPayloadBidServiceListOptions = (options?: Options<FctBlockPayloadBidServiceListData>) =>
   queryOptions<
@@ -6255,7 +6455,7 @@ export const fctBlockPayloadFirstSeenByNodeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the gloas (ePBS) execution payload envelope was first seen by each sentry node, across the beacon API event stream and libp2p gossip
  */
 export const fctBlockPayloadFirstSeenByNodeServiceListOptions = (
   options?: Options<FctBlockPayloadFirstSeenByNodeServiceListData>
@@ -6314,7 +6514,7 @@ export const fctBlockPayloadPtcVoteServiceListQueryKey = (options?: Options<FctB
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee verdict per attested block: canonical on-chain aggregates unioned with orphaned blocks only seen on the live stream
  */
 export const fctBlockPayloadPtcVoteServiceListOptions = (options?: Options<FctBlockPayloadPtcVoteServiceListData>) =>
   queryOptions<
@@ -6369,7 +6569,7 @@ export const fctBlockPayloadPtcVoteHeadServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, observed on the live beacon API event stream. Available at head without waiting for finalization.
  */
 export const fctBlockPayloadPtcVoteHeadServiceListOptions = (
   options?: Options<FctBlockPayloadPtcVoteHeadServiceListData>
@@ -6422,6 +6622,66 @@ export const fctBlockPayloadPtcVoteHeadServiceGetOptions = (
     queryKey: fctBlockPayloadPtcVoteHeadServiceGetQueryKey(options),
   });
 
+export const fctBlockPayloadStatusDailyServiceListQueryKey = (
+  options?: Options<FctBlockPayloadStatusDailyServiceListData>
+) => createQueryKey('fctBlockPayloadStatusDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Gloas (ePBS) daily payload delivery outcomes judged by the PTC, the daily twin of fct_block_payload_status_hourly. A block counts as delivered when a majority of observed PTC votes said the payload was present, absent otherwise
+ */
+export const fctBlockPayloadStatusDailyServiceListOptions = (
+  options?: Options<FctBlockPayloadStatusDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockPayloadStatusDailyServiceListResponse,
+    FctBlockPayloadStatusDailyServiceListError,
+    FctBlockPayloadStatusDailyServiceListResponse,
+    ReturnType<typeof fctBlockPayloadStatusDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPayloadStatusDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPayloadStatusDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockPayloadStatusDailyServiceGetQueryKey = (
+  options: Options<FctBlockPayloadStatusDailyServiceGetData>
+) => createQueryKey('fctBlockPayloadStatusDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockPayloadStatusDailyServiceGetOptions = (
+  options: Options<FctBlockPayloadStatusDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockPayloadStatusDailyServiceGetResponse,
+    FctBlockPayloadStatusDailyServiceGetError,
+    FctBlockPayloadStatusDailyServiceGetResponse,
+    ReturnType<typeof fctBlockPayloadStatusDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockPayloadStatusDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockPayloadStatusDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockPayloadStatusHourlyServiceListQueryKey = (
   options?: Options<FctBlockPayloadStatusHourlyServiceListData>
 ) => createQueryKey('fctBlockPayloadStatusHourlyServiceList', options);
@@ -6429,7 +6689,7 @@ export const fctBlockPayloadStatusHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) hourly payload delivery outcomes judged by the PTC, for delivery-rate charts
  */
 export const fctBlockPayloadStatusHourlyServiceListOptions = (
   options?: Options<FctBlockPayloadStatusHourlyServiceListData>
@@ -6489,7 +6749,7 @@ export const fctBlockProposalByClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block proposals per consensus and execution client: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the proposer most recent identifying graffiti from the previous 365 days.
  */
 export const fctBlockProposalByClientDailyServiceListOptions = (
   options?: Options<FctBlockProposalByClientDailyServiceListData>
@@ -6542,6 +6802,66 @@ export const fctBlockProposalByClientDailyServiceGetOptions = (
     queryKey: fctBlockProposalByClientDailyServiceGetQueryKey(options),
   });
 
+export const fctBlockProposalByClientPairDailyServiceListQueryKey = (
+  options?: Options<FctBlockProposalByClientPairDailyServiceListData>
+) => createQueryKey('fctBlockProposalByClientPairDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily block proposals per consensus and execution client pair: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the pair of the proposer most recent graffiti naming either client from the previous 365 days. A side the graffiti does not name is unknown.
+ */
+export const fctBlockProposalByClientPairDailyServiceListOptions = (
+  options?: Options<FctBlockProposalByClientPairDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockProposalByClientPairDailyServiceListResponse,
+    FctBlockProposalByClientPairDailyServiceListError,
+    FctBlockProposalByClientPairDailyServiceListResponse,
+    ReturnType<typeof fctBlockProposalByClientPairDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByClientPairDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByClientPairDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockProposalByClientPairDailyServiceGetQueryKey = (
+  options: Options<FctBlockProposalByClientPairDailyServiceGetData>
+) => createQueryKey('fctBlockProposalByClientPairDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByClientPairDailyServiceGetOptions = (
+  options: Options<FctBlockProposalByClientPairDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockProposalByClientPairDailyServiceGetResponse,
+    FctBlockProposalByClientPairDailyServiceGetError,
+    FctBlockProposalByClientPairDailyServiceGetResponse,
+    ReturnType<typeof fctBlockProposalByClientPairDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByClientPairDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByClientPairDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockProposalStatusDailyServiceListQueryKey = (
   options?: Options<FctBlockProposalStatusDailyServiceListData>
 ) => createQueryKey('fctBlockProposalStatusDailyServiceList', options);
@@ -6549,7 +6869,7 @@ export const fctBlockProposalStatusDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block proposal status counts by status type
  */
 export const fctBlockProposalStatusDailyServiceListOptions = (
   options?: Options<FctBlockProposalStatusDailyServiceListData>
@@ -6609,7 +6929,7 @@ export const fctBlockProposalStatusHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly block proposal status counts by status type
  */
 export const fctBlockProposalStatusHourlyServiceListOptions = (
   options?: Options<FctBlockProposalStatusHourlyServiceListData>
@@ -6668,7 +6988,7 @@ export const fctBlockProposerServiceListQueryKey = (options?: Options<FctBlockPr
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the finalized chain including orphaned blocks
  */
 export const fctBlockProposerServiceListOptions = (options?: Options<FctBlockProposerServiceListData>) =>
   queryOptions<
@@ -6723,7 +7043,7 @@ export const fctBlockProposerByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers re-indexed by validator for efficient validator lookups
  */
 export const fctBlockProposerByValidatorServiceListOptions = (
   options?: Options<FctBlockProposerByValidatorServiceListData>
@@ -6782,7 +7102,7 @@ export const fctBlockProposerEntityServiceListQueryKey = (options?: Options<FctB
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposer entity for the unfinalized chain
  */
 export const fctBlockProposerEntityServiceListOptions = (options?: Options<FctBlockProposerEntityServiceListData>) =>
   queryOptions<
@@ -6836,7 +7156,7 @@ export const fctBlockProposerHeadServiceListQueryKey = (options?: Options<FctBlo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the unfinalized chain
  */
 export const fctBlockProposerHeadServiceListOptions = (options?: Options<FctBlockProposerHeadServiceListData>) =>
   queryOptions<
@@ -6890,7 +7210,7 @@ export const fctBlockProposerRewardServiceListQueryKey = (options?: Options<FctB
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer reward of each canonical block's proposer
  */
 export const fctBlockProposerRewardServiceListOptions = (options?: Options<FctBlockProposerRewardServiceListData>) =>
   queryOptions<
@@ -6945,7 +7265,7 @@ export const fctBlockProposerRewardByValidatorDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer proposer rewards per proposer per day
  */
 export const fctBlockProposerRewardByValidatorDailyServiceListOptions = (
   options?: Options<FctBlockProposerRewardByValidatorDailyServiceListData>
@@ -7005,7 +7325,7 @@ export const fctBlockProposerRewardByValidatorWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer proposer rewards per proposer per week
  */
 export const fctBlockProposerRewardByValidatorWeeklyServiceListOptions = (
   options?: Options<FctBlockProposerRewardByValidatorWeeklyServiceListData>
@@ -7065,7 +7385,7 @@ export const fctContractStorageStateByAddressDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics per address aggregated by day
  */
 export const fctContractStorageStateByAddressDailyServiceListOptions = (
   options?: Options<FctContractStorageStateByAddressDailyServiceListData>
@@ -7125,7 +7445,7 @@ export const fctContractStorageStateByAddressHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics per address aggregated by hour
  */
 export const fctContractStorageStateByAddressHourlyServiceListOptions = (
   options?: Options<FctContractStorageStateByAddressHourlyServiceListData>
@@ -7185,7 +7505,7 @@ export const fctContractStorageStateByBlockDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics aggregated by day
  */
 export const fctContractStorageStateByBlockDailyServiceListOptions = (
   options?: Options<FctContractStorageStateByBlockDailyServiceListData>
@@ -7245,7 +7565,7 @@ export const fctContractStorageStateByBlockHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics aggregated by hour
  */
 export const fctContractStorageStateByBlockHourlyServiceListOptions = (
   options?: Options<FctContractStorageStateByBlockHourlyServiceListData>
@@ -7305,7 +7625,7 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceListQueryKey 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics per address aggregated by day
  */
 export const fctContractStorageStateWithExpiryByAddressDailyServiceListOptions = (
   options?: Options<FctContractStorageStateWithExpiryByAddressDailyServiceListData>
@@ -7365,7 +7685,7 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceListQueryKey
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics per address aggregated by hour
  */
 export const fctContractStorageStateWithExpiryByAddressHourlyServiceListOptions = (
   options?: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceListData>
@@ -7425,7 +7745,7 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics aggregated by day
  */
 export const fctContractStorageStateWithExpiryByBlockDailyServiceListOptions = (
   options?: Options<FctContractStorageStateWithExpiryByBlockDailyServiceListData>
@@ -7485,7 +7805,7 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics aggregated by hour
  */
 export const fctContractStorageStateWithExpiryByBlockHourlyServiceListOptions = (
   options?: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceListData>
@@ -7545,7 +7865,7 @@ export const fctCustodyProbeByClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column custody probe outcomes by the probed peer client and release (its latest agent in the day), from int_custody_probe. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctCustodyProbeByClientDailyServiceListOptions = (
   options?: Options<FctCustodyProbeByClientDailyServiceListData>
@@ -7605,7 +7925,7 @@ export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityByEpochServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
@@ -7665,7 +7985,7 @@ export const fctDataColumnAvailabilityBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
  */
 export const fctDataColumnAvailabilityBySlotServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
@@ -7725,7 +8045,7 @@ export const fctDataColumnAvailabilityBySlotBlobServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
@@ -7785,7 +8105,7 @@ export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityDailyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityDailyServiceListData>
@@ -7845,7 +8165,7 @@ export const fctDataColumnAvailabilityHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityHourlyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
@@ -7905,7 +8225,7 @@ export const fctDataColumnCompletionByPathDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
  */
 export const fctDataColumnCompletionByPathDailyServiceListOptions = (
   options?: Options<FctDataColumnCompletionByPathDailyServiceListData>
@@ -7965,7 +8285,7 @@ export const fctDataColumnCompletionByPathHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
  */
 export const fctDataColumnCompletionByPathHourlyServiceListOptions = (
   options?: Options<FctDataColumnCompletionByPathHourlyServiceListData>
@@ -8025,7 +8345,7 @@ export const fctDataColumnCompletionBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * How each data column of a block became available across sentry nodes: completions by path, cells from gossip and the execution layer, and gossipsub partial message traffic
  */
 export const fctDataColumnCompletionBySlotServiceListOptions = (
   options?: Options<FctDataColumnCompletionBySlotServiceListData>
@@ -8085,7 +8405,7 @@ export const fctDataColumnPartialMessageDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
  */
 export const fctDataColumnPartialMessageDailyServiceListOptions = (
   options?: Options<FctDataColumnPartialMessageDailyServiceListData>
@@ -8145,7 +8465,7 @@ export const fctDataColumnPartialMessageHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
  */
 export const fctDataColumnPartialMessageHourlyServiceListOptions = (
   options?: Options<FctDataColumnPartialMessageHourlyServiceListData>
@@ -8205,7 +8525,7 @@ export const fctEngineGetBlobsByElClientServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * engine_getBlobs observations aggregated by execution client and status for EL comparison
  */
 export const fctEngineGetBlobsByElClientServiceListOptions = (
   options?: Options<FctEngineGetBlobsByElClientServiceListData>
@@ -8265,7 +8585,7 @@ export const fctEngineGetBlobsByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated engine_getBlobs statistics by execution client with true percentiles
  */
 export const fctEngineGetBlobsByElClientDailyServiceListOptions = (
   options?: Options<FctEngineGetBlobsByElClientDailyServiceListData>
@@ -8325,7 +8645,7 @@ export const fctEngineGetBlobsByElClientHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated engine_getBlobs statistics by execution client with true percentiles
  */
 export const fctEngineGetBlobsByElClientHourlyServiceListOptions = (
   options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData>
@@ -8385,7 +8705,7 @@ export const fctEngineGetBlobsByNodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_getBlobs duration per node
  */
 export const fctEngineGetBlobsByNodeDailyServiceListOptions = (
   options?: Options<FctEngineGetBlobsByNodeDailyServiceListData>
@@ -8445,7 +8765,7 @@ export const fctEngineGetBlobsByNodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly engine_getBlobs duration per node
  */
 export const fctEngineGetBlobsByNodeHourlyServiceListOptions = (
   options?: Options<FctEngineGetBlobsByNodeHourlyServiceListData>
@@ -8504,7 +8824,7 @@ export const fctEngineGetBlobsBySlotServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Slot-level aggregated engine_getBlobs observations grouped by status with duration statistics
  */
 export const fctEngineGetBlobsBySlotServiceListOptions = (options?: Options<FctEngineGetBlobsBySlotServiceListData>) =>
   queryOptions<
@@ -8559,7 +8879,7 @@ export const fctEngineGetBlobsDurationChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fine-grained engine_getBlobs duration distribution in 50ms chunks for latency histogram analysis
  */
 export const fctEngineGetBlobsDurationChunked50MsServiceListOptions = (
   options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData>
@@ -8612,6 +8932,126 @@ export const fctEngineGetBlobsDurationChunked50MsServiceGetOptions = (
     queryKey: fctEngineGetBlobsDurationChunked50MsServiceGetQueryKey(options),
   });
 
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceListQueryKey = (
+  options?: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceListData>
+) => createQueryKey('fctEngineGetBlobsDurationChunked50MsDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceListOptions = (
+  options?: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsDurationChunked50MsDailyServiceListResponse,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceListError,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceListResponse,
+    ReturnType<typeof fctEngineGetBlobsDurationChunked50MsDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsDurationChunked50MsDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsDurationChunked50MsDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceGetQueryKey = (
+  options: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceGetData>
+) => createQueryKey('fctEngineGetBlobsDurationChunked50MsDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceGetOptions = (
+  options: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceGetError,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse,
+    ReturnType<typeof fctEngineGetBlobsDurationChunked50MsDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsDurationChunked50MsDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsDurationChunked50MsDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceListQueryKey = (
+  options?: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceListData>
+) => createQueryKey('fctEngineGetBlobsDurationChunked50MsHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceListOptions = (
+  options?: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceListError,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse,
+    ReturnType<typeof fctEngineGetBlobsDurationChunked50MsHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsDurationChunked50MsHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsDurationChunked50MsHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceGetQueryKey = (
+  options: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData>
+) => createQueryKey('fctEngineGetBlobsDurationChunked50MsHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceGetOptions = (
+  options: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceGetError,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineGetBlobsDurationChunked50MsHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineGetBlobsDurationChunked50MsHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineGetBlobsDurationChunked50MsHourlyServiceGetQueryKey(options),
+  });
+
 export const fctEngineNewPayloadByElClientServiceListQueryKey = (
   options?: Options<FctEngineNewPayloadByElClientServiceListData>
 ) => createQueryKey('fctEngineNewPayloadByElClientServiceList', options);
@@ -8619,7 +9059,7 @@ export const fctEngineNewPayloadByElClientServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * engine_newPayload observations aggregated by execution client and status for EL comparison
  */
 export const fctEngineNewPayloadByElClientServiceListOptions = (
   options?: Options<FctEngineNewPayloadByElClientServiceListData>
@@ -8679,7 +9119,7 @@ export const fctEngineNewPayloadByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated engine_newPayload statistics by execution client with true percentiles
  */
 export const fctEngineNewPayloadByElClientDailyServiceListOptions = (
   options?: Options<FctEngineNewPayloadByElClientDailyServiceListData>
@@ -8739,7 +9179,7 @@ export const fctEngineNewPayloadByElClientHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated engine_newPayload statistics by execution client with true percentiles
  */
 export const fctEngineNewPayloadByElClientHourlyServiceListOptions = (
   options?: Options<FctEngineNewPayloadByElClientHourlyServiceListData>
@@ -8799,7 +9239,7 @@ export const fctEngineNewPayloadByNodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_newPayload duration per node
  */
 export const fctEngineNewPayloadByNodeDailyServiceListOptions = (
   options?: Options<FctEngineNewPayloadByNodeDailyServiceListData>
@@ -8859,7 +9299,7 @@ export const fctEngineNewPayloadByNodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly engine_newPayload duration per node
  */
 export const fctEngineNewPayloadByNodeHourlyServiceListOptions = (
   options?: Options<FctEngineNewPayloadByNodeHourlyServiceListData>
@@ -8919,7 +9359,7 @@ export const fctEngineNewPayloadBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Slot-level aggregated engine_newPayload observations grouped by status with duration statistics
  */
 export const fctEngineNewPayloadBySlotServiceListOptions = (
   options?: Options<FctEngineNewPayloadBySlotServiceListData>
@@ -8977,7 +9417,7 @@ export const fctEngineNewPayloadDurationChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fine-grained engine_newPayload duration distribution in 50ms chunks for latency histogram analysis
  */
 export const fctEngineNewPayloadDurationChunked50MsServiceListOptions = (
   options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData>
@@ -9030,6 +9470,126 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGetOptions = (
     queryKey: fctEngineNewPayloadDurationChunked50MsServiceGetQueryKey(options),
   });
 
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationChunked50MsDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationChunked50MsDailyServiceListResponse,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceListError,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationChunked50MsDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationChunked50MsDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationChunked50MsDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationChunked50MsDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceGetError,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationChunked50MsDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationChunked50MsDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationChunked50MsDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationChunked50MsHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceListError,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationChunked50MsHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationChunked50MsHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationChunked50MsHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationChunked50MsHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceGetError,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationChunked50MsHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationChunked50MsHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationChunked50MsHourlyServiceGetQueryKey(options),
+  });
+
 export const fctEngineNewPayloadWinrateDailyServiceListQueryKey = (
   options?: Options<FctEngineNewPayloadWinrateDailyServiceListData>
 ) => createQueryKey('fctEngineNewPayloadWinrateDailyServiceList', options);
@@ -9037,7 +9597,7 @@ export const fctEngineNewPayloadWinrateDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution client winrate based on fastest engine_newPayload duration per slot
  */
 export const fctEngineNewPayloadWinrateDailyServiceListOptions = (
   options?: Options<FctEngineNewPayloadWinrateDailyServiceListData>
@@ -9097,7 +9657,7 @@ export const fctEngineNewPayloadWinrateHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly execution client winrate based on fastest engine_newPayload duration per slot
  */
 export const fctEngineNewPayloadWinrateHourlyServiceListOptions = (
   options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData>
@@ -9150,6 +9710,63 @@ export const fctEngineNewPayloadWinrateHourlyServiceGetOptions = (
     queryKey: fctEngineNewPayloadWinrateHourlyServiceGetQueryKey(options),
   });
 
+export const fctEpochSummaryCanonicalServiceListQueryKey = (
+  options?: Options<FctEpochSummaryCanonicalServiceListData>
+) => createQueryKey('fctEpochSummaryCanonicalServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per epoch of the finalized chain with its proposer duties, canonical blocks, slots without a canonical block and attestation participation, from int_block_proposer_canonical and fct_attestation_correctness_canonical
+ */
+export const fctEpochSummaryCanonicalServiceListOptions = (
+  options?: Options<FctEpochSummaryCanonicalServiceListData>
+) =>
+  queryOptions<
+    FctEpochSummaryCanonicalServiceListResponse,
+    FctEpochSummaryCanonicalServiceListError,
+    FctEpochSummaryCanonicalServiceListResponse,
+    ReturnType<typeof fctEpochSummaryCanonicalServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEpochSummaryCanonicalServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEpochSummaryCanonicalServiceListQueryKey(options),
+  });
+
+export const fctEpochSummaryCanonicalServiceGetQueryKey = (options: Options<FctEpochSummaryCanonicalServiceGetData>) =>
+  createQueryKey('fctEpochSummaryCanonicalServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by epoch_start_date_time
+ */
+export const fctEpochSummaryCanonicalServiceGetOptions = (options: Options<FctEpochSummaryCanonicalServiceGetData>) =>
+  queryOptions<
+    FctEpochSummaryCanonicalServiceGetResponse,
+    FctEpochSummaryCanonicalServiceGetError,
+    FctEpochSummaryCanonicalServiceGetResponse,
+    ReturnType<typeof fctEpochSummaryCanonicalServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEpochSummaryCanonicalServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEpochSummaryCanonicalServiceGetQueryKey(options),
+  });
+
 export const fctExecutionGasLimitDailyServiceListQueryKey = (
   options?: Options<FctExecutionGasLimitDailyServiceListData>
 ) => createQueryKey('fctExecutionGasLimitDailyServiceList', options);
@@ -9157,7 +9774,7 @@ export const fctExecutionGasLimitDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasLimitDailyServiceListOptions = (
   options?: Options<FctExecutionGasLimitDailyServiceListData>
@@ -9215,7 +9832,7 @@ export const fctExecutionGasLimitHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasLimitHourlyServiceListOptions = (
   options?: Options<FctExecutionGasLimitHourlyServiceListData>
@@ -9275,7 +9892,7 @@ export const fctExecutionGasLimitSignallingDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gas limit signalling by validators, from their MEV relay validator registrations. For each UTC day, each validator counts once at the highest gas limit it registered in the 7 days ending that day, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
  */
 export const fctExecutionGasLimitSignallingDailyServiceListOptions = (
   options?: Options<FctExecutionGasLimitSignallingDailyServiceListData>
@@ -9335,7 +9952,7 @@ export const fctExecutionGasLimitSignallingHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gas limit signalling by validators, from their MEV relay validator registrations. For each hour, each validator counts once at the highest gas limit it registered on that UTC day or the 7 days before, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
  */
 export const fctExecutionGasLimitSignallingHourlyServiceListOptions = (
   options?: Options<FctExecutionGasLimitSignallingHourlyServiceListData>
@@ -9395,7 +10012,7 @@ export const fctExecutionGasUsedDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasUsedDailyServiceListOptions = (
   options?: Options<FctExecutionGasUsedDailyServiceListData>
@@ -9452,7 +10069,7 @@ export const fctExecutionGasUsedHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasUsedHourlyServiceListOptions = (
   options?: Options<FctExecutionGasUsedHourlyServiceListData>
@@ -9510,7 +10127,7 @@ export const fctExecutionReceiptSizeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of receipt size with standard statistics.
  */
 export const fctExecutionReceiptSizeDailyServiceListOptions = (
   options?: Options<FctExecutionReceiptSizeDailyServiceListData>
@@ -9570,7 +10187,7 @@ export const fctExecutionReceiptSizeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of receipt size with standard statistics.
  */
 export const fctExecutionReceiptSizeHourlyServiceListOptions = (
   options?: Options<FctExecutionReceiptSizeHourlyServiceListData>
@@ -9630,7 +10247,7 @@ export const fctExecutionStateSizeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution layer state size metrics aggregated by day
  */
 export const fctExecutionStateSizeDailyServiceListOptions = (
   options?: Options<FctExecutionStateSizeDailyServiceListData>
@@ -9690,7 +10307,7 @@ export const fctExecutionStateSizeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution layer state size metrics aggregated by hour
  */
 export const fctExecutionStateSizeHourlyServiceListOptions = (
   options?: Options<FctExecutionStateSizeHourlyServiceListData>
@@ -9749,7 +10366,7 @@ export const fctExecutionTpsDailyServiceListQueryKey = (options?: Options<FctExe
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the UTC day
  */
 export const fctExecutionTpsDailyServiceListOptions = (options?: Options<FctExecutionTpsDailyServiceListData>) =>
   queryOptions<
@@ -9803,7 +10420,7 @@ export const fctExecutionTpsHourlyServiceListQueryKey = (options?: Options<FctEx
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the hour
  */
 export const fctExecutionTpsHourlyServiceListOptions = (options?: Options<FctExecutionTpsHourlyServiceListData>) =>
   queryOptions<
@@ -9858,7 +10475,7 @@ export const fctExecutionTransactionsDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
  */
 export const fctExecutionTransactionsDailyServiceListOptions = (
   options?: Options<FctExecutionTransactionsDailyServiceListData>
@@ -9918,7 +10535,7 @@ export const fctExecutionTransactionsHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
  */
 export const fctExecutionTransactionsHourlyServiceListOptions = (
   options?: Options<FctExecutionTransactionsHourlyServiceListData>
@@ -9977,7 +10594,7 @@ export const fctHeadFirstSeenByNodeServiceListQueryKey = (options?: Options<FctH
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the head event was first seen on the network by a sentry node
  */
 export const fctHeadFirstSeenByNodeServiceListOptions = (options?: Options<FctHeadFirstSeenByNodeServiceListData>) =>
   queryOptions<
@@ -10032,7 +10649,7 @@ export const fctHeadFirstSeenByNodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily head event arrival per node
  */
 export const fctHeadFirstSeenByNodeDailyServiceListOptions = (
   options?: Options<FctHeadFirstSeenByNodeDailyServiceListData>
@@ -10092,7 +10709,7 @@ export const fctHeadFirstSeenByNodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly head event arrival per node
  */
 export const fctHeadFirstSeenByNodeHourlyServiceListOptions = (
   options?: Options<FctHeadFirstSeenByNodeHourlyServiceListData>
@@ -10152,7 +10769,7 @@ export const fctHeadVoteCorrectnessRateDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated head vote correctness rate statistics
  */
 export const fctHeadVoteCorrectnessRateDailyServiceListOptions = (
   options?: Options<FctHeadVoteCorrectnessRateDailyServiceListData>
@@ -10212,7 +10829,7 @@ export const fctHeadVoteCorrectnessRateHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated head vote correctness rate statistics
  */
 export const fctHeadVoteCorrectnessRateHourlyServiceListOptions = (
   options?: Options<FctHeadVoteCorrectnessRateHourlyServiceListData>
@@ -10271,7 +10888,7 @@ export const fctMevBidCountByBuilderServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Total number of MEV builder bids for a slot
  */
 export const fctMevBidCountByBuilderServiceListOptions = (options?: Options<FctMevBidCountByBuilderServiceListData>) =>
   queryOptions<
@@ -10325,7 +10942,7 @@ export const fctMevBidCountByRelayServiceListQueryKey = (options?: Options<FctMe
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Total number of MEV relay bids for a slot by relay
  */
 export const fctMevBidCountByRelayServiceListOptions = (options?: Options<FctMevBidCountByRelayServiceListData>) =>
   queryOptions<
@@ -10380,7 +10997,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Highest value bid from each builder per slot broken down by 50ms chunks. Each block_hash appears in the chunk determined by its earliest bid timestamp. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceListOptions = (
   options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData>
@@ -10439,7 +11056,7 @@ export const fctMissedSlotRateDailyServiceListQueryKey = (options?: Options<FctM
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
  */
 export const fctMissedSlotRateDailyServiceListOptions = (options?: Options<FctMissedSlotRateDailyServiceListData>) =>
   queryOptions<
@@ -10493,7 +11110,7 @@ export const fctMissedSlotRateHourlyServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
  */
 export const fctMissedSlotRateHourlyServiceListOptions = (options?: Options<FctMissedSlotRateHourlyServiceListData>) =>
   queryOptions<
@@ -10547,7 +11164,7 @@ export const fctNodeActiveLast24hServiceListQueryKey = (options?: Options<FctNod
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Xatu nodes that sent beacon API block events in the last 24 hours, one row per meta_client_name with its latest client, version and location. Nodes that only report through libp2p, such as the ethPandaOps libp2p sentries, are not included
  */
 export const fctNodeActiveLast24hServiceListOptions = (options?: Options<FctNodeActiveLast24hServiceListData>) =>
   queryOptions<
@@ -10602,7 +11219,7 @@ export const fctNodeCpuUtilizationByProcessServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node CPU utilization per sub-slot window enriched with node classification
  */
 export const fctNodeCpuUtilizationByProcessServiceListOptions = (
   options?: Options<FctNodeCpuUtilizationByProcessServiceListData>
@@ -10661,7 +11278,7 @@ export const fctNodeDiskIoByProcessServiceListQueryKey = (options?: Options<FctN
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node disk I/O per sub-slot window aggregated across devices with node classification
  */
 export const fctNodeDiskIoByProcessServiceListOptions = (options?: Options<FctNodeDiskIoByProcessServiceListData>) =>
   queryOptions<
@@ -10709,6 +11326,60 @@ export const fctNodeDiskIoByProcessServiceGetOptions = (options: Options<FctNode
     queryKey: fctNodeDiskIoByProcessServiceGetQueryKey(options),
   });
 
+export const fctNodeLastSeenServiceListQueryKey = (options?: Options<FctNodeLastSeenServiceListData>) =>
+  createQueryKey('fctNodeLastSeenServiceList', options);
+
+/**
+ * List records
+ *
+ * Every Xatu node that has reported a block, with its latest identity, client and location, from fct_block_first_seen_by_node. The row with the latest last_seen_date_time wins, so a node reported in a range ending now has last_seen_date_time inside it
+ */
+export const fctNodeLastSeenServiceListOptions = (options?: Options<FctNodeLastSeenServiceListData>) =>
+  queryOptions<
+    FctNodeLastSeenServiceListResponse,
+    FctNodeLastSeenServiceListError,
+    FctNodeLastSeenServiceListResponse,
+    ReturnType<typeof fctNodeLastSeenServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeLastSeenServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeLastSeenServiceListQueryKey(options),
+  });
+
+export const fctNodeLastSeenServiceGetQueryKey = (options: Options<FctNodeLastSeenServiceGetData>) =>
+  createQueryKey('fctNodeLastSeenServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by meta_client_name
+ */
+export const fctNodeLastSeenServiceGetOptions = (options: Options<FctNodeLastSeenServiceGetData>) =>
+  queryOptions<
+    FctNodeLastSeenServiceGetResponse,
+    FctNodeLastSeenServiceGetError,
+    FctNodeLastSeenServiceGetResponse,
+    ReturnType<typeof fctNodeLastSeenServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeLastSeenServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeLastSeenServiceGetQueryKey(options),
+  });
+
 export const fctNodeMemoryUsageByProcessServiceListQueryKey = (
   options?: Options<FctNodeMemoryUsageByProcessServiceListData>
 ) => createQueryKey('fctNodeMemoryUsageByProcessServiceList', options);
@@ -10716,7 +11387,7 @@ export const fctNodeMemoryUsageByProcessServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node memory usage per sub-slot window enriched with node classification
  */
 export const fctNodeMemoryUsageByProcessServiceListOptions = (
   options?: Options<FctNodeMemoryUsageByProcessServiceListData>
@@ -10776,7 +11447,7 @@ export const fctNodeNetworkIoByProcessServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node network I/O per port per sub-slot window with node classification
  */
 export const fctNodeNetworkIoByProcessServiceListOptions = (
   options?: Options<FctNodeNetworkIoByProcessServiceListData>
@@ -10834,7 +11505,7 @@ export const fctOpcodeCostByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution cost per opcode group by execution client, fitted from engine_newPayload durations
  */
 export const fctOpcodeCostByElClientDailyServiceListOptions = (
   options?: Options<FctOpcodeCostByElClientDailyServiceListData>
@@ -10894,7 +11565,7 @@ export const fctOpcodeCostByElClientVersionServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution cost per opcode group for each execution client version, fitted over every hour the version ran
  */
 export const fctOpcodeCostByElClientVersionServiceListOptions = (
   options?: Options<FctOpcodeCostByElClientVersionServiceListData>
@@ -10954,7 +11625,7 @@ export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export const fctOpcodeGasByOpcodeDailyServiceListOptions = (
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData>
@@ -11012,7 +11683,7 @@ export const fctOpcodeGasByOpcodeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export const fctOpcodeGasByOpcodeHourlyServiceListOptions = (
   options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData>
@@ -11071,7 +11742,7 @@ export const fctOpcodeOpsDailyServiceListQueryKey = (options?: Options<FctOpcode
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctOpcodeOpsDailyServiceListOptions = (options?: Options<FctOpcodeOpsDailyServiceListData>) =>
   queryOptions<
@@ -11125,7 +11796,7 @@ export const fctOpcodeOpsHourlyServiceListQueryKey = (options?: Options<FctOpcod
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctOpcodeOpsHourlyServiceListOptions = (options?: Options<FctOpcodeOpsHourlyServiceListData>) =>
   queryOptions<
@@ -11180,7 +11851,7 @@ export const fctPayloadAttestationFirstSeenChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) PTC payload attestation arrivals broken down by 50ms chunks, deduplicated per validator at earliest observation across sentries. Only includes messages seen within 12000ms of the slot start time
  */
 export const fctPayloadAttestationFirstSeenChunked50MsServiceListOptions = (
   options?: Options<FctPayloadAttestationFirstSeenChunked50MsServiceListData>
@@ -11240,7 +11911,7 @@ export const fctPayloadBidHighestValueByBuilderChunked50MsServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Highest value gloas (ePBS) builder bid per slot broken down by 50ms chunks, sourced from builder bids observed on the beacon API event stream across sentries. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions = (
   options?: Options<FctPayloadBidHighestValueByBuilderChunked50MsServiceListData>
@@ -11300,7 +11971,7 @@ export const fctPayloadBidHighestValueChunked50MsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) auction frontier: the single best builder bid per slot per 50ms chunk across all builders. Bounded by the chunk grid regardless of builder count. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctPayloadBidHighestValueChunked50MsServiceListOptions = (
   options?: Options<FctPayloadBidHighestValueChunked50MsServiceListData>
@@ -11360,7 +12031,7 @@ export const fctPeerCountByClClientAsnDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and autonomous system. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Autonomous systems under 3 peers roll into an other bucket per network type.
  */
 export const fctPeerCountByClClientAsnDailyServiceListOptions = (
   options?: Options<FctPeerCountByClClientAsnDailyServiceListData>
@@ -11420,7 +12091,7 @@ export const fctPeerCountByClClientCountryDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and country. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Countries under 3 peers roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByClClientCountryDailyServiceListOptions = (
   options?: Options<FctPeerCountByClClientCountryDailyServiceListData>
@@ -11480,7 +12151,7 @@ export const fctPeerCountByClClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and release. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Custody group counts come from metadata responses to our outbound requests. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByClClientDailyServiceListOptions = (
   options?: Options<FctPeerCountByClClientDailyServiceListData>
@@ -11540,7 +12211,7 @@ export const fctPeerCountByClientPairDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
  */
 export const fctPeerCountByClientPairDailyServiceListOptions = (
   options?: Options<FctPeerCountByClientPairDailyServiceListData>
@@ -11600,7 +12271,7 @@ export const fctPeerCountByElClientAsnDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
  */
 export const fctPeerCountByElClientAsnDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientAsnDailyServiceListData>
@@ -11660,7 +12331,7 @@ export const fctPeerCountByElClientCountryDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByElClientCountryDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientCountryDailyServiceListData>
@@ -11720,7 +12391,7 @@ export const fctPeerCountByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByElClientDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientDailyServiceListData>
@@ -11780,7 +12451,7 @@ export const fctPeerForkReadinessByClClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus nodes from discovery (ENRs) by client, release, fork digest and next fork digest. A next fork digest of 0x00000000 or equal to the current digest means no next fork and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerForkReadinessByClClientDailyServiceListOptions = (
   options?: Options<FctPeerForkReadinessByClClientDailyServiceListData>
@@ -11840,7 +12511,7 @@ export const fctPeerForkReadinessByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution nodes from discovery by client, release and EIP-2124 fork id. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). A next fork of 0 means none and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerForkReadinessByElClientDailyServiceListOptions = (
   options?: Options<FctPeerForkReadinessByElClientDailyServiceListData>
@@ -11900,7 +12571,7 @@ export const fctPeerPartialMessageSupportByClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gossipsub partial messages adoption by peer client and version, as averages of the hourly peer counts
  */
 export const fctPeerPartialMessageSupportByClientDailyServiceListOptions = (
   options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData>
@@ -11960,7 +12631,7 @@ export const fctPeerPartialMessageSupportByClientHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gossipsub partial messages adoption by peer client and version: connected peers, gossipsub v1.3 support and the partial flags peers set when subscribing to data column topics
  */
 export const fctPeerPartialMessageSupportByClientHourlyServiceListOptions = (
   options?: Options<FctPeerPartialMessageSupportByClientHourlyServiceListData>
@@ -12020,7 +12691,7 @@ export const fctPeerProtocolByClClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily libp2p protocol support by consensus client. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Protocols fewer than 3 of the client peers support are excluded.
  */
 export const fctPeerProtocolByClClientDailyServiceListOptions = (
   options?: Options<FctPeerProtocolByClClientDailyServiceListData>
@@ -12079,7 +12750,7 @@ export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPrepare
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blocks that Xatu nodes built locally each slot by asking their beacon node for a block proposal, showing what that node would have proposed
  */
 export const fctPreparedBlockServiceListOptions = (options?: Options<FctPreparedBlockServiceListData>) =>
   queryOptions<
@@ -12133,7 +12804,7 @@ export const fctProposerRewardDailyServiceListQueryKey = (options?: Options<FctP
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctProposerRewardDailyServiceListOptions = (options?: Options<FctProposerRewardDailyServiceListData>) =>
   queryOptions<
@@ -12187,7 +12858,7 @@ export const fctProposerRewardHourlyServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctProposerRewardHourlyServiceListOptions = (options?: Options<FctProposerRewardHourlyServiceListData>) =>
   queryOptions<
@@ -12241,7 +12912,7 @@ export const fctReorgDailyServiceListQueryKey = (options?: Options<FctReorgDaily
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily reorg event counts by depth
  */
 export const fctReorgDailyServiceListOptions = (options?: Options<FctReorgDailyServiceListData>) =>
   queryOptions<
@@ -12295,7 +12966,7 @@ export const fctReorgHourlyServiceListQueryKey = (options?: Options<FctReorgHour
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly reorg event counts by depth
  */
 export const fctReorgHourlyServiceListOptions = (options?: Options<FctReorgHourlyServiceListData>) =>
   queryOptions<
@@ -12349,7 +13020,7 @@ export const fctRocketpoolValidatorServiceListQueryKey = (options?: Options<FctR
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon chain validators operated via Rocket Pool (minipool and megapool), linked to their node operator
  */
 export const fctRocketpoolValidatorServiceListOptions = (options?: Options<FctRocketpoolValidatorServiceListData>) =>
   queryOptions<
@@ -12404,7 +13075,7 @@ export const fctStorageSlotStateByAddressDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address aggregated by day
  */
 export const fctStorageSlotStateByAddressDailyServiceListOptions = (
   options?: Options<FctStorageSlotStateByAddressDailyServiceListData>
@@ -12464,7 +13135,7 @@ export const fctStorageSlotStateByAddressHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address aggregated by hour
  */
 export const fctStorageSlotStateByAddressHourlyServiceListOptions = (
   options?: Options<FctStorageSlotStateByAddressHourlyServiceListData>
@@ -12524,7 +13195,7 @@ export const fctStorageSlotStateByBlockDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics aggregated by day
  */
 export const fctStorageSlotStateByBlockDailyServiceListOptions = (
   options?: Options<FctStorageSlotStateByBlockDailyServiceListData>
@@ -12584,7 +13255,7 @@ export const fctStorageSlotStateByBlockHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics aggregated by hour
  */
 export const fctStorageSlotStateByBlockHourlyServiceListOptions = (
   options?: Options<FctStorageSlotStateByBlockHourlyServiceListData>
@@ -12644,7 +13315,7 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address with expiry policies aggregated by day
  */
 export const fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions = (
   options?: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceListData>
@@ -12704,7 +13375,7 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address with expiry policies aggregated by hour
  */
 export const fctStorageSlotStateWithExpiryByAddressHourlyServiceListOptions = (
   options?: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceListData>
@@ -12764,7 +13435,7 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics with expiry policies aggregated by day
  */
 export const fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions = (
   options?: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceListData>
@@ -12824,7 +13495,7 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics with expiry policies aggregated by hour
  */
 export const fctStorageSlotStateWithExpiryByBlockHourlyServiceListOptions = (
   options?: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceListData>
@@ -12884,7 +13555,7 @@ export const fctStorageSlotTop100ByBytesServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Top 100 contracts by effective storage bytes with expiry policies applied
  */
 export const fctStorageSlotTop100ByBytesServiceListOptions = (
   options?: Options<FctStorageSlotTop100ByBytesServiceListData>
@@ -12944,7 +13615,7 @@ export const fctStorageSlotTop100BySlotsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Top 100 contracts by active storage slot count with expiry policies applied
  */
 export const fctStorageSlotTop100BySlotsServiceListOptions = (
   options?: Options<FctStorageSlotTop100BySlotsServiceListData>
@@ -13004,7 +13675,7 @@ export const fctSyncCommitteeParticipationByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-slot sync committee participation by validator
  */
 export const fctSyncCommitteeParticipationByValidatorServiceListOptions = (
   options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData>
@@ -13064,7 +13735,7 @@ export const fctSyncCommitteeParticipationByValidatorDailyServiceListQueryKey = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorDailyServiceListOptions = (
   options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData>
@@ -13124,7 +13795,7 @@ export const fctSyncCommitteeParticipationByValidatorHourlyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorHourlyServiceListOptions = (
   options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData>
@@ -13184,7 +13855,7 @@ export const fctSyncCommitteeParticipationByValidatorWeeklyServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions = (
   options?: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceListData>
@@ -13244,7 +13915,7 @@ export const fctSyncCommitteeRewardByValidatorServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee reward of each validator in each block
  */
 export const fctSyncCommitteeRewardByValidatorServiceListOptions = (
   options?: Options<FctSyncCommitteeRewardByValidatorServiceListData>
@@ -13304,7 +13975,7 @@ export const fctSyncCommitteeRewardByValidatorDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee rewards and penalties per validator per day
  */
 export const fctSyncCommitteeRewardByValidatorDailyServiceListOptions = (
   options?: Options<FctSyncCommitteeRewardByValidatorDailyServiceListData>
@@ -13364,7 +14035,7 @@ export const fctSyncCommitteeRewardByValidatorWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee rewards and penalties per validator per week
  */
 export const fctSyncCommitteeRewardByValidatorWeeklyServiceListOptions = (
   options?: Options<FctSyncCommitteeRewardByValidatorWeeklyServiceListData>
@@ -13424,7 +14095,7 @@ export const fctTokenContractStorageStateByBlockDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily live storage slots owned by ERC20/ERC721 contracts, by token_standard
  */
 export const fctTokenContractStorageStateByBlockDailyServiceListOptions = (
   options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData>
@@ -13483,7 +14154,7 @@ export const fctValidatorBalanceServiceListQueryKey = (options?: Options<FctVali
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-epoch validator balance and status
  */
 export const fctValidatorBalanceServiceListOptions = (options?: Options<FctValidatorBalanceServiceListData>) =>
   queryOptions<
@@ -13538,7 +14209,7 @@ export const fctValidatorBalanceDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily validator balance snapshots aggregated from per-epoch data
  */
 export const fctValidatorBalanceDailyServiceListOptions = (
   options?: Options<FctValidatorBalanceDailyServiceListData>
@@ -13595,7 +14266,7 @@ export const fctValidatorBalanceHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly validator balance snapshots aggregated from per-epoch data
  */
 export const fctValidatorBalanceHourlyServiceListOptions = (
   options?: Options<FctValidatorBalanceHourlyServiceListData>
@@ -13653,7 +14324,7 @@ export const fctValidatorBalanceWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly validator balance snapshots aggregated from daily data
  */
 export const fctValidatorBalanceWeeklyServiceListOptions = (
   options?: Options<FctValidatorBalanceWeeklyServiceListData>
@@ -13711,7 +14382,7 @@ export const fctValidatorCountByCredentialTypeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validators and stake by withdrawal credential type, one snapshot per day
  */
 export const fctValidatorCountByCredentialTypeDailyServiceListOptions = (
   options?: Options<FctValidatorCountByCredentialTypeDailyServiceListData>
@@ -13771,7 +14442,7 @@ export const fctValidatorCountByCredentialTypeWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validators and stake by withdrawal credential type, one snapshot per week
  */
 export const fctValidatorCountByCredentialTypeWeeklyServiceListOptions = (
   options?: Options<FctValidatorCountByCredentialTypeWeeklyServiceListData>
@@ -13831,7 +14502,7 @@ export const fctValidatorCountByEntityByStatusDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily validator count by entity and status, derived from canonical_beacon_validators joined with dim_node
  */
 export const fctValidatorCountByEntityByStatusDailyServiceListOptions = (
   options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData>
@@ -13891,7 +14562,7 @@ export const fctValidatorEffectiveBalanceByCredentialTypeDailyServiceListQueryKe
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Histogram of active validators' effective balance by withdrawal credential type, one snapshot per day
  */
 export const fctValidatorEffectiveBalanceByCredentialTypeDailyServiceListOptions = (
   options?: Options<FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListData>
@@ -13950,7 +14621,7 @@ export const fctValidatorEventServiceListQueryKey = (options?: Options<FctValida
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator lifecycle events: deposits, top-ups, credential changes, consolidations, withdrawals, exit and withdrawal requests, voluntary exits and slashings. Only operations that took effect on chain are included
  */
 export const fctValidatorEventServiceListOptions = (options?: Options<FctValidatorEventServiceListData>) =>
   queryOptions<
@@ -14005,7 +14676,7 @@ export const fctValidatorOperationDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily counts and amounts of validator operations that took effect
  */
 export const fctValidatorOperationDailyServiceListOptions = (
   options?: Options<FctValidatorOperationDailyServiceListData>
@@ -14065,7 +14736,7 @@ export const fctValidatorOperationWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly counts and amounts of validator operations that took effect
  */
 export const fctValidatorOperationWeeklyServiceListOptions = (
   options?: Options<FctValidatorOperationWeeklyServiceListData>
@@ -14124,7 +14795,7 @@ export const fctValidatorQueueDailyServiceListQueryKey = (options?: Options<FctV
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Activation and exit queues and the Electra pending queues, one snapshot per day
  */
 export const fctValidatorQueueDailyServiceListOptions = (options?: Options<FctValidatorQueueDailyServiceListData>) =>
   queryOptions<
@@ -14178,7 +14849,7 @@ export const fctValidatorQueueWeeklyServiceListQueryKey = (options?: Options<Fct
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Activation and exit queues and the Electra pending queues, one snapshot per week
  */
 export const fctValidatorQueueWeeklyServiceListOptions = (options?: Options<FctValidatorQueueWeeklyServiceListData>) =>
   queryOptions<
@@ -14233,7 +14904,7 @@ export const fctValidatorRewardTotalDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Network-wide consensus layer rewards and penalties per day
  */
 export const fctValidatorRewardTotalDailyServiceListOptions = (
   options?: Options<FctValidatorRewardTotalDailyServiceListData>
@@ -14293,7 +14964,7 @@ export const fctValidatorRewardTotalWeeklyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Network-wide consensus layer rewards and penalties per week
  */
 export const fctValidatorRewardTotalWeeklyServiceListOptions = (
   options?: Options<FctValidatorRewardTotalWeeklyServiceListData>
@@ -14353,7 +15024,7 @@ export const fctValidatorStakeByEntityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Active validators and stake by entity and withdrawal credential type, one snapshot per day
  */
 export const fctValidatorStakeByEntityDailyServiceListOptions = (
   options?: Options<FctValidatorStakeByEntityDailyServiceListData>
@@ -14412,7 +15083,7 @@ export const intAttestationAttestedServiceListQueryKey = (options?: Options<IntA
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical-preferred merge of attested head and canonical attestations. Prefers finalized canonical values per validator and slot, falling back to real-time head.
  */
 export const intAttestationAttestedServiceListOptions = (options?: Options<IntAttestationAttestedServiceListData>) =>
   queryOptions<
@@ -14467,7 +15138,7 @@ export const intAttestationAttestedCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attested head of a block for the finalized chain.
  */
 export const intAttestationAttestedCanonicalServiceListOptions = (
   options?: Options<IntAttestationAttestedCanonicalServiceListData>
@@ -14527,7 +15198,7 @@ export const intAttestationAttestedHeadServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attested head of a block for the unfinalized chain.
  */
 export const intAttestationAttestedHeadServiceListOptions = (
   options?: Options<IntAttestationAttestedHeadServiceListData>
@@ -14586,7 +15257,7 @@ export const intAttestationFirstSeenServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the attestation was first seen on the network by a sentry node
  */
 export const intAttestationFirstSeenServiceListOptions = (options?: Options<IntAttestationFirstSeenServiceListData>) =>
   queryOptions<
@@ -14641,7 +15312,7 @@ export const intAttestationFirstSeenAggregateServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Each row is one (slot, validator, vote) pair seen inside an aggregate attestation. Two rows for the same (slot, validator) indicate slashable double attestation.
  */
 export const intAttestationFirstSeenAggregateServiceListOptions = (
   options?: Options<IntAttestationFirstSeenAggregateServiceListData>
@@ -14700,7 +15371,7 @@ export const intBeaconCommitteeServiceListQueryKey = (options?: Options<IntBeaco
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon committee, canonical-preferred merge of the head-event stream and the canonical table
  */
 export const intBeaconCommitteeServiceListOptions = (options?: Options<IntBeaconCommitteeServiceListData>) =>
   queryOptions<
@@ -14754,7 +15425,7 @@ export const intBeaconCommitteeHeadServiceListQueryKey = (options?: Options<IntB
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon committee head for the unfinalized chain
  */
 export const intBeaconCommitteeHeadServiceListOptions = (options?: Options<IntBeaconCommitteeHeadServiceListData>) =>
   queryOptions<
@@ -14809,7 +15480,7 @@ export const intBlockBlobCountCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the finalized chain
  */
 export const intBlockBlobCountCanonicalServiceListOptions = (
   options?: Options<IntBlockBlobCountCanonicalServiceListData>
@@ -14868,7 +15539,7 @@ export const intBlockCanonicalServiceListQueryKey = (options?: Options<IntBlockC
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block details for the finalized chain
  */
 export const intBlockCanonicalServiceListOptions = (options?: Options<IntBlockCanonicalServiceListData>) =>
   queryOptions<
@@ -14922,7 +15593,7 @@ export const intBlockGraffitiReleaseServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical blocks with the client releases their graffiti resolves to, resolved like the Lab slot page. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const intBlockGraffitiReleaseServiceListOptions = (options?: Options<IntBlockGraffitiReleaseServiceListData>) =>
   queryOptions<
@@ -14976,7 +15647,7 @@ export const intBlockMevCanonicalServiceListQueryKey = (options?: Options<IntBlo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the finalized chain
  */
 export const intBlockMevCanonicalServiceListOptions = (options?: Options<IntBlockMevCanonicalServiceListData>) =>
   queryOptions<
@@ -15030,7 +15701,7 @@ export const intBlockOpcodeGasServiceListQueryKey = (options?: Options<IntBlockO
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per block. Derived from int_transaction_opcode_gas.
  */
 export const intBlockOpcodeGasServiceListOptions = (options?: Options<IntBlockOpcodeGasServiceListData>) =>
   queryOptions<
@@ -15085,7 +15756,7 @@ export const intBlockPayloadPtcVoteCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, from aggregates included in canonical beacon blocks
  */
 export const intBlockPayloadPtcVoteCanonicalServiceListOptions = (
   options?: Options<IntBlockPayloadPtcVoteCanonicalServiceListData>
@@ -15145,7 +15816,7 @@ export const intBlockProposerCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the finalized chain
  */
 export const intBlockProposerCanonicalServiceListOptions = (
   options?: Options<IntBlockProposerCanonicalServiceListData>
@@ -15202,7 +15873,7 @@ export const intBlockReceiptSizeServiceListQueryKey = (options?: Options<IntBloc
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-block receipt size totals. Derived from int_transaction_receipt_size.
  */
 export const intBlockReceiptSizeServiceListOptions = (options?: Options<IntBlockReceiptSizeServiceListData>) =>
   queryOptions<
@@ -15256,7 +15927,7 @@ export const intBlockResourceGasServiceListQueryKey = (options?: Options<IntBloc
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-block resource gas totals. Derived from int_transaction_resource_gas.
  */
 export const intBlockResourceGasServiceListOptions = (options?: Options<IntBlockResourceGasServiceListData>) =>
   queryOptions<
@@ -15310,7 +15981,7 @@ export const intContractCreationServiceListQueryKey = (options?: Options<IntCont
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract creation events with projection for efficient address lookups
  */
 export const intContractCreationServiceListOptions = (options?: Options<IntContractCreationServiceListData>) =>
   queryOptions<
@@ -15364,7 +16035,7 @@ export const intContractSelfdestructServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * SELFDESTRUCT operations with EIP-6780 storage clearing implications
  */
 export const intContractSelfdestructServiceListOptions = (options?: Options<IntContractSelfdestructServiceListData>) =>
   queryOptions<
@@ -15419,7 +16090,7 @@ export const intContractStorageExpiry1mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 1-month expiries - base tier of waterfall chain
  */
 export const intContractStorageExpiry1mServiceListOptions = (
   options?: Options<IntContractStorageExpiry1mServiceListData>
@@ -15479,7 +16150,7 @@ export const intContractStorageExpiry6mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 6-month expiries - waterfalls from 1m tier
  */
 export const intContractStorageExpiry6mServiceListOptions = (
   options?: Options<IntContractStorageExpiry6mServiceListData>
@@ -15539,7 +16210,7 @@ export const intContractStorageExpiry12mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 12-month expiries - waterfalls from 6m tier
  */
 export const intContractStorageExpiry12mServiceListOptions = (
   options?: Options<IntContractStorageExpiry12mServiceListData>
@@ -15599,7 +16270,7 @@ export const intContractStorageExpiry18mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 18-month expiries - waterfalls from 12m tier
  */
 export const intContractStorageExpiry18mServiceListOptions = (
   options?: Options<IntContractStorageExpiry18mServiceListData>
@@ -15659,7 +16330,7 @@ export const intContractStorageExpiry24mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 24-month expiries - waterfalls from 18m tier
  */
 export const intContractStorageExpiry24mServiceListOptions = (
   options?: Options<IntContractStorageExpiry24mServiceListData>
@@ -15719,7 +16390,7 @@ export const intContractStorageNextTouchServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level touches with precomputed next touch block - a touch is any slot read or write on the contract
  */
 export const intContractStorageNextTouchServiceListOptions = (
   options?: Options<IntContractStorageNextTouchServiceListData>
@@ -15779,7 +16450,7 @@ export const intContractStorageReactivation1mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 1-month reactivations - contracts touched after 1m expiry
  */
 export const intContractStorageReactivation1mServiceListOptions = (
   options?: Options<IntContractStorageReactivation1mServiceListData>
@@ -15839,7 +16510,7 @@ export const intContractStorageReactivation6mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 6-month reactivations - contracts touched after 6m expiry
  */
 export const intContractStorageReactivation6mServiceListOptions = (
   options?: Options<IntContractStorageReactivation6mServiceListData>
@@ -15899,7 +16570,7 @@ export const intContractStorageReactivation12mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 12-month reactivations - contracts touched after 12m expiry
  */
 export const intContractStorageReactivation12mServiceListOptions = (
   options?: Options<IntContractStorageReactivation12mServiceListData>
@@ -15959,7 +16630,7 @@ export const intContractStorageReactivation18mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 18-month reactivations - contracts touched after 18m expiry
  */
 export const intContractStorageReactivation18mServiceListOptions = (
   options?: Options<IntContractStorageReactivation18mServiceListData>
@@ -16019,7 +16690,7 @@ export const intContractStorageReactivation24mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 24-month reactivations - contracts touched after 24m expiry
  */
 export const intContractStorageReactivation24mServiceListOptions = (
   options?: Options<IntContractStorageReactivation24mServiceListData>
@@ -16078,7 +16749,7 @@ export const intContractStorageStateServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block per address - tracks active slots and effective bytes with per-block deltas
  */
 export const intContractStorageStateServiceListOptions = (options?: Options<IntContractStorageStateServiceListData>) =>
   queryOptions<
@@ -16133,7 +16804,7 @@ export const intContractStorageStateByAddressServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block per address - ordered by address for efficient address-based queries
  */
 export const intContractStorageStateByAddressServiceListOptions = (
   options?: Options<IntContractStorageStateByAddressServiceListData>
@@ -16193,7 +16864,7 @@ export const intContractStorageStateByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block - tracks active slots, effective bytes, and active contracts with per-block deltas
  */
 export const intContractStorageStateByBlockServiceListOptions = (
   options?: Options<IntContractStorageStateByBlockServiceListData>
@@ -16253,7 +16924,7 @@ export const intContractStorageStateWithExpiryServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state base table - tracks deltas and cumulative adjustments per address per policy
  */
 export const intContractStorageStateWithExpiryServiceListOptions = (
   options?: Options<IntContractStorageStateWithExpiryServiceListData>
@@ -16313,7 +16984,7 @@ export const intContractStorageStateWithExpiryByAddressServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state ordered by address - tracks active_slots and effective_bytes per contract
  */
 export const intContractStorageStateWithExpiryByAddressServiceListOptions = (
   options?: Options<IntContractStorageStateWithExpiryByAddressServiceListData>
@@ -16373,7 +17044,7 @@ export const intContractStorageStateWithExpiryByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state per block network-wide - totals for slots, bytes, and active contracts
  */
 export const intContractStorageStateWithExpiryByBlockServiceListOptions = (
   options?: Options<IntContractStorageStateWithExpiryByBlockServiceListData>
@@ -16432,7 +17103,7 @@ export const intCustodyProbeServiceListQueryKey = (options?: Options<IntCustodyP
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Custody probe results with aggregated column indices, ordered by probe time. A probe usually runs hours after the slot it asks about
  */
 export const intCustodyProbeServiceListOptions = (options?: Options<IntCustodyProbeServiceListData>) =>
   queryOptions<
@@ -16487,7 +17158,7 @@ export const intCustodyProbeOrderBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
  */
 export const intCustodyProbeOrderBySlotServiceListOptions = (
   options?: Options<IntCustodyProbeOrderBySlotServiceListData>
@@ -16546,7 +17217,7 @@ export const intEngineGetBlobsServiceListQueryKey = (options?: Options<IntEngine
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Individual engine_getBlobs observations enriched with slot context from beacon blob sidecar data
  */
 export const intEngineGetBlobsServiceListOptions = (options?: Options<IntEngineGetBlobsServiceListData>) =>
   queryOptions<
@@ -16600,7 +17271,7 @@ export const intEngineNewPayloadServiceListQueryKey = (options?: Options<IntEngi
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Individual engine_newPayload observations enriched with block size from fct_block_head
  */
 export const intEngineNewPayloadServiceListOptions = (options?: Options<IntEngineNewPayloadServiceListData>) =>
   queryOptions<
@@ -16655,7 +17326,7 @@ export const intEngineNewPayloadFastestExecutionByNodeClassServiceListQueryKey =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fastest valid engine_newPayload observations per slot per node_class with one row per implementation tied at the minimum duration
  */
 export const intEngineNewPayloadFastestExecutionByNodeClassServiceListOptions = (
   options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData>
@@ -16715,7 +17386,7 @@ export const intEngineNewPayloadOpcodeGramHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly least-squares sufficient statistics for regressing engine_newPayload duration on gas per opcode group, by execution client version
  */
 export const intEngineNewPayloadOpcodeGramHourlyServiceListOptions = (
   options?: Options<IntEngineNewPayloadOpcodeGramHourlyServiceListData>
@@ -16774,7 +17445,7 @@ export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution blocks ordered by timestamp for efficient date range lookups
  */
 export const intExecutionBlockByDateServiceListOptions = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
   queryOptions<
@@ -16829,7 +17500,7 @@ export const intExecutionStateSizeByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative execution layer state size per block, reconstructed from execution_state_size_delta. Drop-in replacement for the deprecated execution_state_size snapshot table.
  */
 export const intExecutionStateSizeByBlockServiceListOptions = (
   options?: Options<IntExecutionStateSizeByBlockServiceListData>
@@ -16888,7 +17559,7 @@ export const intRocketpoolMegapoolServiceListQueryKey = (options?: Options<IntRo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool Saturn megapool contracts mapped to their node operator
  */
 export const intRocketpoolMegapoolServiceListOptions = (options?: Options<IntRocketpoolMegapoolServiceListData>) =>
   queryOptions<
@@ -16942,7 +17613,7 @@ export const intRocketpoolMinipoolServiceListQueryKey = (options?: Options<IntRo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool minipool lifecycle events (created/destroyed) decoded from execution layer logs
  */
 export const intRocketpoolMinipoolServiceListOptions = (options?: Options<IntRocketpoolMinipoolServiceListData>) =>
   queryOptions<
@@ -16996,7 +17667,7 @@ export const intRocketpoolNodeEventServiceListQueryKey = (options?: Options<IntR
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node lifecycle events (registration, RPL stake/withdraw, smoothing pool) decoded from execution layer logs
  */
 export const intRocketpoolNodeEventServiceListOptions = (options?: Options<IntRocketpoolNodeEventServiceListData>) =>
   queryOptions<
@@ -17051,7 +17722,7 @@ export const intRocketpoolNodeTimezoneServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node timezone locations decoded from registerNode/setTimezoneLocation calldata
  */
 export const intRocketpoolNodeTimezoneServiceListOptions = (
   options?: Options<IntRocketpoolNodeTimezoneServiceListData>
@@ -17109,7 +17780,7 @@ export const intStorageSelfdestructDiffsServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Synthetic storage diffs for selfdestructs that clear all storage slots
  */
 export const intStorageSelfdestructDiffsServiceListOptions = (
   options?: Options<IntStorageSelfdestructDiffsServiceListData>
@@ -17168,7 +17839,7 @@ export const intStorageSlotDiffServiceListQueryKey = (options?: Options<IntStora
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
  */
 export const intStorageSlotDiffServiceListOptions = (options?: Options<IntStorageSlotDiffServiceListData>) =>
   queryOptions<
@@ -17223,7 +17894,7 @@ export const intStorageSlotDiffByAddressSlotServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
  */
 export const intStorageSlotDiffByAddressSlotServiceListOptions = (
   options?: Options<IntStorageSlotDiffByAddressSlotServiceListData>
@@ -17282,7 +17953,7 @@ export const intStorageSlotExpiry1mServiceListQueryKey = (options?: Options<IntS
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 1-month expiries - base tier of waterfall chain
  */
 export const intStorageSlotExpiry1mServiceListOptions = (options?: Options<IntStorageSlotExpiry1mServiceListData>) =>
   queryOptions<
@@ -17336,7 +18007,7 @@ export const intStorageSlotExpiry6mServiceListQueryKey = (options?: Options<IntS
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 6-month expiries - waterfalls from 1m tier
  */
 export const intStorageSlotExpiry6mServiceListOptions = (options?: Options<IntStorageSlotExpiry6mServiceListData>) =>
   queryOptions<
@@ -17390,7 +18061,7 @@ export const intStorageSlotExpiry12mServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 12-month expiries - waterfalls from 6m tier
  */
 export const intStorageSlotExpiry12mServiceListOptions = (options?: Options<IntStorageSlotExpiry12mServiceListData>) =>
   queryOptions<
@@ -17444,7 +18115,7 @@ export const intStorageSlotExpiry18mServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 18-month expiries - waterfalls from 12m tier
  */
 export const intStorageSlotExpiry18mServiceListOptions = (options?: Options<IntStorageSlotExpiry18mServiceListData>) =>
   queryOptions<
@@ -17498,7 +18169,7 @@ export const intStorageSlotExpiry24mServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 24-month expiries - waterfalls from 18m tier
  */
 export const intStorageSlotExpiry24mServiceListOptions = (options?: Options<IntStorageSlotExpiry24mServiceListData>) =>
   queryOptions<
@@ -17552,7 +18223,7 @@ export const intStorageSlotLifecycleServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-slot lifecycle metrics: birth/death blocks, touch counts, and touch-to-touch interval statistics. A lifecycle starts when a slot transitions from zero to non-zero (birth) and ends at the reverse (death). A slot can have multiple lifecycles.
  */
 export const intStorageSlotLifecycleServiceListOptions = (options?: Options<IntStorageSlotLifecycleServiceListData>) =>
   queryOptions<
@@ -17607,7 +18278,7 @@ export const intStorageSlotLifecycleBoundaryServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Lifecycle boundaries per storage slot: birth (0→non-zero) and death (non-zero→0) blocks with effective bytes at each transition.
  */
 export const intStorageSlotLifecycleBoundaryServiceListOptions = (
   options?: Options<IntStorageSlotLifecycleBoundaryServiceListData>
@@ -17666,7 +18337,7 @@ export const intStorageSlotNextTouchServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot touches with precomputed next touch block - ordered by block_number for efficient range queries
  */
 export const intStorageSlotNextTouchServiceListOptions = (options?: Options<IntStorageSlotNextTouchServiceListData>) =>
   queryOptions<
@@ -17721,7 +18392,7 @@ export const intStorageSlotReactivation1mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 1-month reactivations - slots touched after 1m expiry
  */
 export const intStorageSlotReactivation1mServiceListOptions = (
   options?: Options<IntStorageSlotReactivation1mServiceListData>
@@ -17781,7 +18452,7 @@ export const intStorageSlotReactivation6mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 6-month reactivations - slots touched after 6m expiry
  */
 export const intStorageSlotReactivation6mServiceListOptions = (
   options?: Options<IntStorageSlotReactivation6mServiceListData>
@@ -17841,7 +18512,7 @@ export const intStorageSlotReactivation12mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 12-month reactivations - slots touched after 12m expiry
  */
 export const intStorageSlotReactivation12mServiceListOptions = (
   options?: Options<IntStorageSlotReactivation12mServiceListData>
@@ -17901,7 +18572,7 @@ export const intStorageSlotReactivation18mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 18-month reactivations - slots touched after 18m expiry
  */
 export const intStorageSlotReactivation18mServiceListOptions = (
   options?: Options<IntStorageSlotReactivation18mServiceListData>
@@ -17961,7 +18632,7 @@ export const intStorageSlotReactivation24mServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 24-month reactivations - slots touched after 24m expiry
  */
 export const intStorageSlotReactivation24mServiceListOptions = (
   options?: Options<IntStorageSlotReactivation24mServiceListData>
@@ -18020,7 +18691,7 @@ export const intStorageSlotReadServiceListQueryKey = (options?: Options<IntStora
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot reads aggregated per block - tracks which slots were read per address
  */
 export const intStorageSlotReadServiceListOptions = (options?: Options<IntStorageSlotReadServiceListData>) =>
   queryOptions<
@@ -18074,7 +18745,7 @@ export const intStorageSlotStateServiceListQueryKey = (options?: Options<IntStor
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address - tracks active slots and effective bytes with per-block deltas
  */
 export const intStorageSlotStateServiceListOptions = (options?: Options<IntStorageSlotStateServiceListData>) =>
   queryOptions<
@@ -18129,7 +18800,7 @@ export const intStorageSlotStateByAddressServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address - ordered by address for efficient address-based queries
  */
 export const intStorageSlotStateByAddressServiceListOptions = (
   options?: Options<IntStorageSlotStateByAddressServiceListData>
@@ -18189,7 +18860,7 @@ export const intStorageSlotStateByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block - tracks active slots and effective bytes with per-block deltas
  */
 export const intStorageSlotStateByBlockServiceListOptions = (
   options?: Options<IntStorageSlotStateByBlockServiceListData>
@@ -18249,7 +18920,7 @@ export const intStorageSlotStateWithExpiryServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
  */
 export const intStorageSlotStateWithExpiryServiceListOptions = (
   options?: Options<IntStorageSlotStateWithExpiryServiceListData>
@@ -18309,7 +18980,7 @@ export const intStorageSlotStateWithExpiryByAddressServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address with expiry policies - ordered by address for efficient address lookups
  */
 export const intStorageSlotStateWithExpiryByAddressServiceListOptions = (
   options?: Options<IntStorageSlotStateWithExpiryByAddressServiceListData>
@@ -18369,7 +19040,7 @@ export const intStorageSlotStateWithExpiryByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
  */
 export const intStorageSlotStateWithExpiryByBlockServiceListOptions = (
   options?: Options<IntStorageSlotStateWithExpiryByBlockServiceListData>
@@ -18429,7 +19100,7 @@ export const intTokenContractStorageStateByBlockServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative live storage slots owned by ERC20/ERC721 contracts per block, split by token_standard
  */
 export const intTokenContractStorageStateByBlockServiceListOptions = (
   options?: Options<IntTokenContractStorageStateByBlockServiceListData>
@@ -18488,7 +19159,7 @@ export const intTransactionCallFrameServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated call frame activity per transaction for call tree analysis
  */
 export const intTransactionCallFrameServiceListOptions = (options?: Options<IntTransactionCallFrameServiceListData>) =>
   queryOptions<
@@ -18543,7 +19214,7 @@ export const intTransactionCallFrameOpcodeGasServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per call frame. Enables per-frame opcode analysis.
  */
 export const intTransactionCallFrameOpcodeGasServiceListOptions = (
   options?: Options<IntTransactionCallFrameOpcodeGasServiceListData>
@@ -18603,7 +19274,7 @@ export const intTransactionCallFrameOpcodeResourceGasServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-frame per-opcode resource gas decomposition into 7 categories.
  */
 export const intTransactionCallFrameOpcodeResourceGasServiceListOptions = (
   options?: Options<IntTransactionCallFrameOpcodeResourceGasServiceListData>
@@ -18662,7 +19333,7 @@ export const intTransactionOpcodeGasServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per transaction. Source: canonical_execution_transaction_structlog
  */
 export const intTransactionOpcodeGasServiceListOptions = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>
   queryOptions<
@@ -18717,7 +19388,7 @@ export const intTransactionReceiptSizeServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
  */
 export const intTransactionReceiptSizeServiceListOptions = (
   options?: Options<IntTransactionReceiptSizeServiceListData>
@@ -18775,7 +19446,7 @@ export const intTransactionResourceGasServiceListQueryKey = (
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-transaction resource gas totals including intrinsic gas decomposition.
  */
 export const intTransactionResourceGasServiceListOptions = (
   options?: Options<IntTransactionResourceGasServiceListData>

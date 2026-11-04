@@ -178,6 +178,29 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
+  const histogramCard = (
+    <PopoutCard
+      title="Duration Distribution (50ms buckets)"
+      subtitle={`Successful engine_getBlobs calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+      anchorId="blob-duration"
+      modalSize="full"
+    >
+      <div>
+        {histogramData.length > 0 ? (
+          <BarChart
+            data={histogramData}
+            labels={histogramLabels}
+            showLabel={false}
+            color={themeColors.accent}
+            height={375}
+          />
+        ) : (
+          <div className="flex h-[375px] items-center justify-center text-muted">No histogram data available</div>
+        )}
+      </div>
+    </PopoutCard>
+  );
+
   const statusLabels = ['SUCCESS', 'PARTIAL', 'EMPTY', 'ERROR', 'UNSUPPORTED'];
   // Use BarDataItem with per-bar colors
   const statusData = [
@@ -474,21 +497,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       {/* Per-slot charts (short time ranges) or hourly/daily trend charts */}
       {showPerSlotCharts ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Duration Histogram */}
-          <PopoutCard
-            title="Duration Distribution (50ms buckets)"
-            subtitle={`Successful engine_getBlobs calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
-            anchorId="blob-duration"
-            modalSize="full"
-          >
-            <div>
-              {histogramData.length > 0 ? (
-                <BarChart data={histogramData} labels={histogramLabels} color={themeColors.accent} height={375} />
-              ) : (
-                <div className="flex h-[375px] items-center justify-center text-muted">No histogram data available</div>
-              )}
-            </div>
-          </PopoutCard>
+          {histogramCard}
 
           {/* Per-Slot Duration by Client Chart */}
           <PopoutCard
@@ -649,6 +658,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
       {/* Status Breakdown, plus Blob Count Distribution from per-slot data on short time ranges */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Status Breakdown */}
+        {!showPerSlotCharts && histogramCard}
         <PopoutCard
           title="Status Distribution"
           subtitle={`engine_getBlobs calls by response status, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildReorgChartConfig, dailyWindowStartDate, rollUpHourlyToDaily, trimDailyRecords } from './overview.utils';
+import { buildReorgChartConfig, dailyWindowStartDate, trimDailyRecords } from './overview.utils';
 
 describe('dailyWindowStartDate', () => {
   // 2026-07-13T12:00:00Z
@@ -47,28 +47,6 @@ describe('trimDailyRecords', () => {
   it('treats a missing day_start_date as excluded', () => {
     const withMissing = [{ value: 9 }, ...records];
     expect(trimDailyRecords(withMissing, '2025-01-01')).toEqual(records);
-  });
-});
-
-describe('rollUpHourlyToDaily', () => {
-  it('sums slot counts per status within each UTC day', () => {
-    const lastHourOfJul12 = Date.UTC(2026, 6, 12, 23) / 1000;
-    const firstHourOfJul13 = Date.UTC(2026, 6, 13, 0) / 1000;
-    const secondHourOfJul13 = Date.UTC(2026, 6, 13, 1) / 1000;
-    const result = rollUpHourlyToDaily([
-      { hour_start_date_time: lastHourOfJul12, status: 'delivered', slot_count: 290 },
-      { hour_start_date_time: firstHourOfJul13, status: 'delivered', slot_count: 280 },
-      { hour_start_date_time: firstHourOfJul13, status: 'absent', slot_count: 20 },
-      { hour_start_date_time: secondHourOfJul13, status: 'delivered', slot_count: 299 },
-    ]);
-    expect(result).toEqual(
-      expect.arrayContaining([
-        { day_start_date: '2026-07-12', status: 'delivered', slot_count: 290 },
-        { day_start_date: '2026-07-13', status: 'delivered', slot_count: 579 },
-        { day_start_date: '2026-07-13', status: 'absent', slot_count: 20 },
-      ])
-    );
-    expect(result).toHaveLength(3);
   });
 });
 

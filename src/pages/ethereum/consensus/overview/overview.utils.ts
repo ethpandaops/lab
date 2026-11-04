@@ -67,25 +67,6 @@ export function trimDailyRecords<T extends { day_start_date?: string }>(
   return records.filter(r => (r.day_start_date ?? '') >= startDate);
 }
 
-/**
- * Sums hourly (status, slot_count) records into UTC days, for tables that have no daily rollup.
- */
-export function rollUpHourlyToDaily(
-  records: { hour_start_date_time?: number; status?: string; slot_count?: number }[]
-): Required<Pick<FctBlockProposalStatusDaily, 'day_start_date' | 'status' | 'slot_count'>>[] {
-  const counts = new Map<string, number>();
-  for (const r of records) {
-    if (r.hour_start_date_time === undefined) continue;
-    const day = new Date(r.hour_start_date_time * 1000).toISOString().slice(0, 10);
-    const key = `${day}|${r.status ?? 'unknown'}`;
-    counts.set(key, (counts.get(key) ?? 0) + (r.slot_count ?? 0));
-  }
-  return [...counts].map(([key, slot_count]) => {
-    const [day_start_date, status] = key.split('|');
-    return { day_start_date, status, slot_count };
-  });
-}
-
 /** @deprecated Use formatBand instead */
 export const formatBlobBand = formatBand;
 

@@ -6,12 +6,14 @@ import type { NodeRow } from '../../hooks/useNodeRows';
 
 export interface NodeMapProps {
   rows: NodeRow[];
+  /** The range the rows cover, e.g. "Last 7d" */
+  rangeLabel: string;
 }
 
 /**
- * Node locations, one point per city sized by node count. Only the last 24 hours' active rows carry a location.
+ * Node locations, one point per city sized by node count. Every Xatu node that reported in the range carries its latest location.
  */
-export function NodeMap({ rows }: NodeMapProps): JSX.Element {
+export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
   const points = useMemo(() => {
     const byLocation = new Map<string, PointData>();
 
@@ -39,7 +41,7 @@ export function NodeMap({ rows }: NodeMapProps): JSX.Element {
   }, [rows]);
 
   return (
-    <PopoutCard title="Xatu node locations" subtitle="Last 24h" anchorId="node-map" modalSize="full">
+    <PopoutCard title="Xatu node locations" subtitle={rangeLabel} anchorId="node-map" modalSize="full">
       {({ inModal }) => (
         <div style={{ height: inModal ? 720 : 440 }}>
           <Map2DChart points={points} height={inModal ? 720 : 440} pointSizeMultiplier={3} />

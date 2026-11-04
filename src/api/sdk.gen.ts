@@ -201,6 +201,12 @@ import type {
   FctAttestationVoteCorrectnessByClientDailyServiceListData,
   FctAttestationVoteCorrectnessByClientDailyServiceListErrors,
   FctAttestationVoteCorrectnessByClientDailyServiceListResponses,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetData,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetErrors,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListData,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors,
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
@@ -357,6 +363,12 @@ import type {
   FctBlockGraffitiClientVersionHourlyServiceListData,
   FctBlockGraffitiClientVersionHourlyServiceListErrors,
   FctBlockGraffitiClientVersionHourlyServiceListResponses,
+  FctBlockGraffitiClientVersionPairDailyServiceGetData,
+  FctBlockGraffitiClientVersionPairDailyServiceGetErrors,
+  FctBlockGraffitiClientVersionPairDailyServiceGetResponses,
+  FctBlockGraffitiClientVersionPairDailyServiceListData,
+  FctBlockGraffitiClientVersionPairDailyServiceListErrors,
+  FctBlockGraffitiClientVersionPairDailyServiceListResponses,
   FctBlockGraffitiServiceGetData,
   FctBlockGraffitiServiceGetErrors,
   FctBlockGraffitiServiceGetResponses,
@@ -423,6 +435,12 @@ import type {
   FctBlockPayloadServiceListData,
   FctBlockPayloadServiceListErrors,
   FctBlockPayloadServiceListResponses,
+  FctBlockPayloadStatusDailyServiceGetData,
+  FctBlockPayloadStatusDailyServiceGetErrors,
+  FctBlockPayloadStatusDailyServiceGetResponses,
+  FctBlockPayloadStatusDailyServiceListData,
+  FctBlockPayloadStatusDailyServiceListErrors,
+  FctBlockPayloadStatusDailyServiceListResponses,
   FctBlockPayloadStatusHourlyServiceGetData,
   FctBlockPayloadStatusHourlyServiceGetErrors,
   FctBlockPayloadStatusHourlyServiceGetResponses,
@@ -435,6 +453,12 @@ import type {
   FctBlockProposalByClientDailyServiceListData,
   FctBlockProposalByClientDailyServiceListErrors,
   FctBlockProposalByClientDailyServiceListResponses,
+  FctBlockProposalByClientPairDailyServiceGetData,
+  FctBlockProposalByClientPairDailyServiceGetErrors,
+  FctBlockProposalByClientPairDailyServiceGetResponses,
+  FctBlockProposalByClientPairDailyServiceListData,
+  FctBlockProposalByClientPairDailyServiceListErrors,
+  FctBlockProposalByClientPairDailyServiceListResponses,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetErrors,
   FctBlockProposalStatusDailyServiceGetResponses,
@@ -645,6 +669,18 @@ import type {
   FctEngineGetBlobsBySlotServiceListData,
   FctEngineGetBlobsBySlotServiceListErrors,
   FctEngineGetBlobsBySlotServiceListResponses,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetData,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetErrors,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponses,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListData,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListErrors,
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListResponses,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetErrors,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponses,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListData,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListErrors,
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponses,
   FctEngineGetBlobsDurationChunked50MsServiceGetData,
   FctEngineGetBlobsDurationChunked50MsServiceGetErrors,
   FctEngineGetBlobsDurationChunked50MsServiceGetResponses,
@@ -687,6 +723,18 @@ import type {
   FctEngineNewPayloadBySlotServiceListData,
   FctEngineNewPayloadBySlotServiceListErrors,
   FctEngineNewPayloadBySlotServiceListResponses,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetData,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetErrors,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponses,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListData,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListErrors,
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListResponses,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetErrors,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListData,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListErrors,
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponses,
   FctEngineNewPayloadDurationChunked50MsServiceGetData,
   FctEngineNewPayloadDurationChunked50MsServiceGetErrors,
   FctEngineNewPayloadDurationChunked50MsServiceGetResponses,
@@ -705,6 +753,12 @@ import type {
   FctEngineNewPayloadWinrateHourlyServiceListData,
   FctEngineNewPayloadWinrateHourlyServiceListErrors,
   FctEngineNewPayloadWinrateHourlyServiceListResponses,
+  FctEpochSummaryCanonicalServiceGetData,
+  FctEpochSummaryCanonicalServiceGetErrors,
+  FctEpochSummaryCanonicalServiceGetResponses,
+  FctEpochSummaryCanonicalServiceListData,
+  FctEpochSummaryCanonicalServiceListErrors,
+  FctEpochSummaryCanonicalServiceListResponses,
   FctExecutionGasLimitDailyServiceGetData,
   FctExecutionGasLimitDailyServiceGetErrors,
   FctExecutionGasLimitDailyServiceGetResponses,
@@ -867,6 +921,12 @@ import type {
   FctNodeDiskIoByProcessServiceListData,
   FctNodeDiskIoByProcessServiceListErrors,
   FctNodeDiskIoByProcessServiceListResponses,
+  FctNodeLastSeenServiceGetData,
+  FctNodeLastSeenServiceGetErrors,
+  FctNodeLastSeenServiceGetResponses,
+  FctNodeLastSeenServiceListData,
+  FctNodeLastSeenServiceListErrors,
+  FctNodeLastSeenServiceListResponses,
   FctNodeMemoryUsageByProcessServiceGetData,
   FctNodeMemoryUsageByProcessServiceGetErrors,
   FctNodeMemoryUsageByProcessServiceGetResponses,
@@ -1841,6 +1901,10 @@ import {
   zFctAttestationVoteCorrectnessByClientDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByClientDailyServiceListData,
   zFctAttestationVoteCorrectnessByClientDailyServiceListResponse,
+  zFctAttestationVoteCorrectnessByClientPairDailyServiceGetData,
+  zFctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByClientPairDailyServiceListData,
+  zFctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceListData,
@@ -1945,6 +2009,10 @@ import {
   zFctBlockGraffitiClientVersionHourlyServiceGetResponse,
   zFctBlockGraffitiClientVersionHourlyServiceListData,
   zFctBlockGraffitiClientVersionHourlyServiceListResponse,
+  zFctBlockGraffitiClientVersionPairDailyServiceGetData,
+  zFctBlockGraffitiClientVersionPairDailyServiceGetResponse,
+  zFctBlockGraffitiClientVersionPairDailyServiceListData,
+  zFctBlockGraffitiClientVersionPairDailyServiceListResponse,
   zFctBlockGraffitiServiceGetData,
   zFctBlockGraffitiServiceGetResponse,
   zFctBlockGraffitiServiceListData,
@@ -1989,6 +2057,10 @@ import {
   zFctBlockPayloadServiceGetResponse,
   zFctBlockPayloadServiceListData,
   zFctBlockPayloadServiceListResponse,
+  zFctBlockPayloadStatusDailyServiceGetData,
+  zFctBlockPayloadStatusDailyServiceGetResponse,
+  zFctBlockPayloadStatusDailyServiceListData,
+  zFctBlockPayloadStatusDailyServiceListResponse,
   zFctBlockPayloadStatusHourlyServiceGetData,
   zFctBlockPayloadStatusHourlyServiceGetResponse,
   zFctBlockPayloadStatusHourlyServiceListData,
@@ -1997,6 +2069,10 @@ import {
   zFctBlockProposalByClientDailyServiceGetResponse,
   zFctBlockProposalByClientDailyServiceListData,
   zFctBlockProposalByClientDailyServiceListResponse,
+  zFctBlockProposalByClientPairDailyServiceGetData,
+  zFctBlockProposalByClientPairDailyServiceGetResponse,
+  zFctBlockProposalByClientPairDailyServiceListData,
+  zFctBlockProposalByClientPairDailyServiceListResponse,
   zFctBlockProposalStatusDailyServiceGetData,
   zFctBlockProposalStatusDailyServiceGetResponse,
   zFctBlockProposalStatusDailyServiceListData,
@@ -2137,6 +2213,14 @@ import {
   zFctEngineGetBlobsBySlotServiceGetResponse,
   zFctEngineGetBlobsBySlotServiceListData,
   zFctEngineGetBlobsBySlotServiceListResponse,
+  zFctEngineGetBlobsDurationChunked50MsDailyServiceGetData,
+  zFctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse,
+  zFctEngineGetBlobsDurationChunked50MsDailyServiceListData,
+  zFctEngineGetBlobsDurationChunked50MsDailyServiceListResponse,
+  zFctEngineGetBlobsDurationChunked50MsHourlyServiceGetData,
+  zFctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse,
+  zFctEngineGetBlobsDurationChunked50MsHourlyServiceListData,
+  zFctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse,
   zFctEngineGetBlobsDurationChunked50MsServiceGetData,
   zFctEngineGetBlobsDurationChunked50MsServiceGetResponse,
   zFctEngineGetBlobsDurationChunked50MsServiceListData,
@@ -2165,6 +2249,14 @@ import {
   zFctEngineNewPayloadBySlotServiceGetResponse,
   zFctEngineNewPayloadBySlotServiceListData,
   zFctEngineNewPayloadBySlotServiceListResponse,
+  zFctEngineNewPayloadDurationChunked50MsDailyServiceGetData,
+  zFctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse,
+  zFctEngineNewPayloadDurationChunked50MsDailyServiceListData,
+  zFctEngineNewPayloadDurationChunked50MsDailyServiceListResponse,
+  zFctEngineNewPayloadDurationChunked50MsHourlyServiceGetData,
+  zFctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse,
+  zFctEngineNewPayloadDurationChunked50MsHourlyServiceListData,
+  zFctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse,
   zFctEngineNewPayloadDurationChunked50MsServiceGetData,
   zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
   zFctEngineNewPayloadDurationChunked50MsServiceListData,
@@ -2177,6 +2269,10 @@ import {
   zFctEngineNewPayloadWinrateHourlyServiceGetResponse,
   zFctEngineNewPayloadWinrateHourlyServiceListData,
   zFctEngineNewPayloadWinrateHourlyServiceListResponse,
+  zFctEpochSummaryCanonicalServiceGetData,
+  zFctEpochSummaryCanonicalServiceGetResponse,
+  zFctEpochSummaryCanonicalServiceListData,
+  zFctEpochSummaryCanonicalServiceListResponse,
   zFctExecutionGasLimitDailyServiceGetData,
   zFctExecutionGasLimitDailyServiceGetResponse,
   zFctExecutionGasLimitDailyServiceListData,
@@ -2285,6 +2381,10 @@ import {
   zFctNodeDiskIoByProcessServiceGetResponse,
   zFctNodeDiskIoByProcessServiceListData,
   zFctNodeDiskIoByProcessServiceListResponse,
+  zFctNodeLastSeenServiceGetData,
+  zFctNodeLastSeenServiceGetResponse,
+  zFctNodeLastSeenServiceListData,
+  zFctNodeLastSeenServiceListResponse,
   zFctNodeMemoryUsageByProcessServiceGetData,
   zFctNodeMemoryUsageByProcessServiceGetResponse,
   zFctNodeMemoryUsageByProcessServiceListData,
@@ -2867,7 +2967,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * CBT bookkeeping for incremental transformation models: one row per interval CBT has processed, with the model database and table, the interval starting position and its size. A model has processed the union of its rows. Positions are in the model interval units, such as Unix seconds or block numbers
  */
 export const adminCbtIncrementalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<AdminCbtIncrementalServiceListData, ThrowOnError>
@@ -2905,7 +3005,7 @@ export const adminCbtIncrementalServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob transaction to submitter name mapping.
  */
 export const dimBlockBlobSubmitterServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimBlockBlobSubmitterServiceListData, ThrowOnError>
@@ -2943,7 +3043,7 @@ export const dimBlockBlobSubmitterServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Commits on each client default and release branches since 2020, with the release each builds on, so graffiti commits from builds between tags resolve to a version
  */
 export const dimClientCommitServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimClientCommitServiceListData, ThrowOnError>
@@ -2973,7 +3073,7 @@ export const dimClientCommitServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus and execution client release tags and the commits they point at, for resolving graffiti commit prefixes to versions
  */
 export const dimClientReleaseServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimClientReleaseServiceListData, ThrowOnError>
@@ -3007,7 +3107,7 @@ export const dimClientReleaseServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract owner information from Dune Analytics, growthepie, and eth-labels for top storage slot contracts
  */
 export const dimContractOwnerServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimContractOwnerServiceListData, ThrowOnError>
@@ -3041,7 +3141,7 @@ export const dimContractOwnerServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Function signature lookup table populated from Sourcify signature database.
  */
 export const dimFunctionSignatureServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimFunctionSignatureServiceListData, ThrowOnError>
@@ -3079,7 +3179,7 @@ export const dimFunctionSignatureServiceGet = <ThrowOnError extends boolean = fa
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node information for validators
  */
 export const dimNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimNodeServiceListData, ThrowOnError>
@@ -3109,7 +3209,7 @@ export const dimNodeServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node operators with timezone, RPL stake, smoothing pool membership and minipool/validator counts
  */
 export const dimRocketpoolNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimRocketpoolNodeServiceListData, ThrowOnError>
@@ -3145,7 +3245,7 @@ export const dimRocketpoolNodeServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contracts that have emitted ERC20/ERC721 Transfer events, classified into a single token_standard by their first transfer
  */
 export const dimTokenContractServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimTokenContractServiceListData, ThrowOnError>
@@ -3179,7 +3279,7 @@ export const dimTokenContractServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Current identity and state of every validator, refreshed from the latest epoch
  */
 export const dimValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimValidatorServiceListData, ThrowOnError>
@@ -3209,7 +3309,7 @@ export const dimValidatorServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator index to pubkey mapping — one row per validator with the latest pubkey
  */
 export const dimValidatorPubkeyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimValidatorPubkeyServiceListData, ThrowOnError>
@@ -3247,7 +3347,7 @@ export const dimValidatorPubkeyServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator lifecycle status transitions — one row per (validator_index, status) with the first epoch observed
  */
 export const dimValidatorStatusServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<DimValidatorStatusServiceListData, ThrowOnError>
@@ -3285,7 +3385,7 @@ export const dimValidatorStatusServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block, preferring finalized canonical data and falling back to real-time head data for slots not yet finalized. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessServiceListData, ThrowOnError>
@@ -3323,7 +3423,7 @@ export const fctAttestationCorrectnessServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator, canonical-preferred merge of the canonical and head sources
  */
 export const fctAttestationCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessByValidatorServiceListData, ThrowOnError>
@@ -3361,7 +3461,7 @@ export const fctAttestationCorrectnessByValidatorServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator for the finalized chain
  */
 export const fctAttestationCorrectnessByValidatorCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessByValidatorCanonicalServiceListData, ThrowOnError>
@@ -3402,7 +3502,7 @@ export const fctAttestationCorrectnessByValidatorCanonicalServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness by validator for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessByValidatorHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessByValidatorHeadServiceListData, ThrowOnError>
@@ -3441,7 +3541,7 @@ export const fctAttestationCorrectnessByValidatorHeadServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block for the finalized chain
  */
 export const fctAttestationCorrectnessCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessCanonicalServiceListData, ThrowOnError>
@@ -3479,7 +3579,7 @@ export const fctAttestationCorrectnessCanonicalServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation correctness of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctAttestationCorrectnessHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationCorrectnessHeadServiceListData, ThrowOnError>
@@ -3517,7 +3617,7 @@ export const fctAttestationCorrectnessHeadServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * One row per (slot, validator, vote) carrying raw and aggregate first-seen times. ORDER BY includes vote fields so slashable double votes stay as separate rows instead of being collapsed by the ReplacingMergeTree.
  */
 export const fctAttestationFirstSeenByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationFirstSeenByValidatorServiceListData, ThrowOnError>
@@ -3555,7 +3655,7 @@ export const fctAttestationFirstSeenByValidatorServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestations first seen on the unfinalized chain broken down by 50ms chunks. Only includes attestations that were seen within 12000ms of the slot start time. There can be multiple block roots + chunk_slot_start_diff for the same slot, it most likely means votes for prior slot blocks
  */
 export const fctAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>
@@ -3593,7 +3693,7 @@ export const fctAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationInclusionDelayDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationInclusionDelayDailyServiceListData, ThrowOnError>
@@ -3631,7 +3731,7 @@ export const fctAttestationInclusionDelayDailyServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationInclusionDelayHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationInclusionDelayHourlyServiceListData, ThrowOnError>
@@ -3669,7 +3769,7 @@ export const fctAttestationInclusionDelayHourlyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation liveness aggregated by entity, preferring settled canonical participation over the real-time head view. One row per (slot, entity) with counts for both attested and missed attestations.
  */
 export const fctAttestationLivenessByEntityServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationLivenessByEntityServiceListData, ThrowOnError>
@@ -3707,7 +3807,7 @@ export const fctAttestationLivenessByEntityServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation liveness aggregated by entity for the head chain. One row per (slot, entity) with counts for both attested and missed attestations.
  */
 export const fctAttestationLivenessByEntityHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationLivenessByEntityHeadServiceListData, ThrowOnError>
@@ -3745,7 +3845,7 @@ export const fctAttestationLivenessByEntityHeadServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation observations by contributor nodes, aggregated per slot per node for performance
  */
 export const fctAttestationObservationByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationObservationByNodeServiceListData, ThrowOnError>
@@ -3783,7 +3883,7 @@ export const fctAttestationObservationByNodeServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily attestation arrival per node
  */
 export const fctAttestationObservationByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationObservationByNodeDailyServiceListData, ThrowOnError>
@@ -3821,7 +3921,7 @@ export const fctAttestationObservationByNodeDailyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly attestation arrival per node
  */
 export const fctAttestationObservationByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationObservationByNodeHourlyServiceListData, ThrowOnError>
@@ -3859,7 +3959,7 @@ export const fctAttestationObservationByNodeHourlyServiceGet = <ThrowOnError ext
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationParticipationRateDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationParticipationRateDailyServiceListData, ThrowOnError>
@@ -3897,7 +3997,7 @@ export const fctAttestationParticipationRateDailyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationParticipationRateHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationParticipationRateHourlyServiceListData, ThrowOnError>
@@ -3935,7 +4035,7 @@ export const fctAttestationParticipationRateHourlyServiceGet = <ThrowOnError ext
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation reward of each validator in each epoch. Rows never change, so there is no version column
  */
 export const fctAttestationRewardByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationRewardByValidatorServiceListData, ThrowOnError>
@@ -3973,7 +4073,7 @@ export const fctAttestationRewardByValidatorServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation rewards and penalties per validator per day
  */
 export const fctAttestationRewardByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationRewardByValidatorDailyServiceListData, ThrowOnError>
@@ -4011,7 +4111,7 @@ export const fctAttestationRewardByValidatorDailyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attestation rewards and penalties per validator per week
  */
 export const fctAttestationRewardByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationRewardByValidatorWeeklyServiceListData, ThrowOnError>
@@ -4049,7 +4149,7 @@ export const fctAttestationRewardByValidatorWeeklyServiceGet = <ThrowOnError ext
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily attestation vote correctness and inclusion per consensus and execution client. Validators map to the clients of their most recent identifying graffiti (a proposed block naming the client) in the 365 days before the end of the day. Only validators that proposed with identifying graffiti are covered, the rest are the unknown client.
  */
 export const fctAttestationVoteCorrectnessByClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByClientDailyServiceListData, ThrowOnError>
@@ -4089,7 +4189,49 @@ export const fctAttestationVoteCorrectnessByClientDailyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily attestation vote correctness and inclusion per consensus and execution client pair. Validators map to the pair of their most recent graffiti naming either client in the 365 days before the end of the day, a side it does not name being unknown. Validators that never proposed with identifying graffiti are unknown/unknown.
+ */
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientPairDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientPairDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_client_pair_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByClientPairDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByClientPairDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses,
+    FctAttestationVoteCorrectnessByClientPairDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientPairDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_client_pair_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Per-slot attestation vote correctness by validator
  */
 export const fctAttestationVoteCorrectnessByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData, ThrowOnError>
@@ -4128,7 +4270,7 @@ export const fctAttestationVoteCorrectnessByValidatorServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByValidatorDailyServiceListData, ThrowOnError>
@@ -4169,7 +4311,7 @@ export const fctAttestationVoteCorrectnessByValidatorDailyServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByValidatorHourlyServiceListData, ThrowOnError>
@@ -4211,7 +4353,7 @@ export const fctAttestationVoteCorrectnessByValidatorHourlyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly aggregation of per-validator attestation vote correctness
  */
 export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData, ThrowOnError>
@@ -4253,7 +4395,7 @@ export const fctAttestationVoteCorrectnessByValidatorWeeklyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctBlobCountDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlobCountDailyServiceListData, ThrowOnError>
@@ -4289,7 +4431,7 @@ export const fctBlobCountDailyServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctBlobCountHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlobCountHourlyServiceListData, ThrowOnError>
@@ -4327,7 +4469,7 @@ export const fctBlobCountHourlyServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block details for the finalized chain including orphaned blocks
  */
 export const fctBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockServiceListData, ThrowOnError>
@@ -4357,7 +4499,7 @@ export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the finalized chain
  */
 export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobCountServiceListData, ThrowOnError>
@@ -4393,7 +4535,7 @@ export const fctBlockBlobCountServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctBlockBlobCountHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobCountHeadServiceListData, ThrowOnError>
@@ -4431,7 +4573,7 @@ export const fctBlockBlobCountHeadServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the block was first seen on the network by a sentry node
  */
 export const fctBlockBlobFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobFirstSeenByNodeServiceListData, ThrowOnError>
@@ -4469,7 +4611,7 @@ export const fctBlockBlobFirstSeenByNodeServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * One row per (slot, block root, blob index) carrying the blob versioned hash and KZG commitment, sourced from the head beacon blob sidecar event stream. Available at head without waiting for finalization.
  */
 export const fctBlockBlobHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobHeadServiceListData, ThrowOnError>
@@ -4503,7 +4645,7 @@ export const fctBlockBlobHeadServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * How sentry nodes completed the data columns of each block: completions by path, cells from gossip and the execution layer, and completion times
  */
 export const fctBlockDataColumnCompletionServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnCompletionServiceListData, ThrowOnError>
@@ -4541,7 +4683,7 @@ export const fctBlockDataColumnCompletionServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the data column was first seen on the network by any sentry node
  */
 export const fctBlockDataColumnSidecarFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenServiceListData, ThrowOnError>
@@ -4579,7 +4721,7 @@ export const fctBlockDataColumnSidecarFirstSeenServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the data column was first seen on the network by a sentry node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeServiceListData, ThrowOnError>
@@ -4618,7 +4760,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column arrival per node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeDailyServiceListData, ThrowOnError>
@@ -4659,7 +4801,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly data column arrival per node
  */
 export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceListData, ThrowOnError>
@@ -4701,7 +4843,7 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the block was first seen on the network by a sentry node
  */
 export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockFirstSeenByNodeServiceListData, ThrowOnError>
@@ -4739,7 +4881,7 @@ export const fctBlockFirstSeenByNodeServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block arrival per node
  */
 export const fctBlockFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockFirstSeenByNodeDailyServiceListData, ThrowOnError>
@@ -4777,7 +4919,7 @@ export const fctBlockFirstSeenByNodeDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly block arrival per node
  */
 export const fctBlockFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockFirstSeenByNodeHourlyServiceListData, ThrowOnError>
@@ -4815,7 +4957,7 @@ export const fctBlockFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical beacon block graffiti with the consensus and execution clients it names, parsed from the engine API client version codes or client default graffiti
  */
 export const fctBlockGraffitiServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiServiceListData, ThrowOnError>
@@ -4849,7 +4991,7 @@ export const fctBlockGraffitiServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export const fctBlockGraffitiClientByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientByEntityDailyServiceListData, ThrowOnError>
@@ -4887,7 +5029,7 @@ export const fctBlockGraffitiClientByEntityDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export const fctBlockGraffitiClientByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData, ThrowOnError>
@@ -4925,7 +5067,7 @@ export const fctBlockGraffitiClientByEntityHourlyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per consensus and execution client pair named by block graffiti, including unknown
  */
 export const fctBlockGraffitiClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientDailyServiceListData, ThrowOnError>
@@ -4963,7 +5105,7 @@ export const fctBlockGraffitiClientDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per consensus and execution client pair named by block graffiti, including unknown
  */
 export const fctBlockGraffitiClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientHourlyServiceListData, ThrowOnError>
@@ -5001,7 +5143,7 @@ export const fctBlockGraffitiClientHourlyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientVersionByEntityDailyServiceListData, ThrowOnError>
@@ -5041,7 +5183,7 @@ export const fctBlockGraffitiClientVersionByEntityDailyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientVersionByEntityHourlyServiceListData, ThrowOnError>
@@ -5081,7 +5223,7 @@ export const fctBlockGraffitiClientVersionByEntityHourlyServiceGet = <ThrowOnErr
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientVersionDailyServiceListData, ThrowOnError>
@@ -5119,7 +5261,7 @@ export const fctBlockGraffitiClientVersionDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockGraffitiClientVersionHourlyServiceListData, ThrowOnError>
@@ -5157,7 +5299,45 @@ export const fctBlockGraffitiClientVersionHourlyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily canonical block counts per consensus and execution client release pair resolved from block graffiti, each block counted once, with builds of one version from different commits together. release_status: commit_match (the graffiti commit is a release tag commit), commit_untagged (a default or release branch commit between tags, version is the release it builds on), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). An unresolved side keeps the version its graffiti states, or is empty when it states none
+ */
+export const fctBlockGraffitiClientVersionPairDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionPairDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionPairDailyServiceListResponses,
+    FctBlockGraffitiClientVersionPairDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionPairDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionPairDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_pair_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionPairDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionPairDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionPairDailyServiceGetResponses,
+    FctBlockGraffitiClientVersionPairDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionPairDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientVersionPairDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_pair_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockHeadServiceListData, ThrowOnError>
@@ -5187,7 +5367,7 @@ export const fctBlockHeadServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the finalized chain including orphaned blocks
  */
 export const fctBlockMevServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockMevServiceListData, ThrowOnError>
@@ -5217,7 +5397,7 @@ export const fctBlockMevServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the unfinalized chain
  */
 export const fctBlockMevHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockMevHeadServiceListData, ThrowOnError>
@@ -5247,7 +5427,7 @@ export const fctBlockMevHeadServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When sentry nodes first received the gossipsub partial data column header for a Fulu block, the eager push that lets peers verify cells before the full column arrives
  */
 export const fctBlockPartialDataColumnHeaderFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPartialDataColumnHeaderFirstSeenServiceListData, ThrowOnError>
@@ -5286,7 +5466,7 @@ export const fctBlockPartialDataColumnHeaderFirstSeenServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) per-block execution payload facts: the winning bid commitment joined with what the revealed envelope actually contained, replacing the pre-gloas execution columns that no longer exist on the beacon block
  */
 export const fctBlockPayloadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadServiceListData, ThrowOnError>
@@ -5316,7 +5496,7 @@ export const fctBlockPayloadServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When each sentry node had the gloas (ePBS) execution payload and its blobs locally verified (PTC vote readiness)
  */
 export const fctBlockPayloadAvailableByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadAvailableByNodeServiceListData, ThrowOnError>
@@ -5354,7 +5534,7 @@ export const fctBlockPayloadAvailableByNodeServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * The winning gloas (ePBS) execution payload bid committed in each canonical beacon block, one per block
  */
 export const fctBlockPayloadBidServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadBidServiceListData, ThrowOnError>
@@ -5392,7 +5572,7 @@ export const fctBlockPayloadBidServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the gloas (ePBS) execution payload envelope was first seen by each sentry node, across the beacon API event stream and libp2p gossip
  */
 export const fctBlockPayloadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadFirstSeenByNodeServiceListData, ThrowOnError>
@@ -5430,7 +5610,7 @@ export const fctBlockPayloadFirstSeenByNodeServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee verdict per attested block: canonical on-chain aggregates unioned with orphaned blocks only seen on the live stream
  */
 export const fctBlockPayloadPtcVoteServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadPtcVoteServiceListData, ThrowOnError>
@@ -5468,7 +5648,7 @@ export const fctBlockPayloadPtcVoteServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, observed on the live beacon API event stream. Available at head without waiting for finalization.
  */
 export const fctBlockPayloadPtcVoteHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadPtcVoteHeadServiceListData, ThrowOnError>
@@ -5506,7 +5686,45 @@ export const fctBlockPayloadPtcVoteHeadServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) daily payload delivery outcomes judged by the PTC, the daily twin of fct_block_payload_status_hourly. A block counts as delivered when a majority of observed PTC votes said the payload was present, absent otherwise
+ */
+export const fctBlockPayloadStatusDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockPayloadStatusDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockPayloadStatusDailyServiceListResponses,
+    FctBlockPayloadStatusDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPayloadStatusDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadStatusDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload_status_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockPayloadStatusDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockPayloadStatusDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockPayloadStatusDailyServiceGetResponses,
+    FctBlockPayloadStatusDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockPayloadStatusDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockPayloadStatusDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_payload_status_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Gloas (ePBS) hourly payload delivery outcomes judged by the PTC, for delivery-rate charts
  */
 export const fctBlockPayloadStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockPayloadStatusHourlyServiceListData, ThrowOnError>
@@ -5544,7 +5762,7 @@ export const fctBlockPayloadStatusHourlyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block proposals per consensus and execution client: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the proposer most recent identifying graffiti from the previous 365 days.
  */
 export const fctBlockProposalByClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposalByClientDailyServiceListData, ThrowOnError>
@@ -5582,7 +5800,45 @@ export const fctBlockProposalByClientDailyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily block proposals per consensus and execution client pair: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the pair of the proposer most recent graffiti naming either client from the previous 365 days. A side the graffiti does not name is unknown.
+ */
+export const fctBlockProposalByClientPairDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalByClientPairDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalByClientPairDailyServiceListResponses,
+    FctBlockProposalByClientPairDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByClientPairDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByClientPairDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_client_pair_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByClientPairDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalByClientPairDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalByClientPairDailyServiceGetResponses,
+    FctBlockProposalByClientPairDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByClientPairDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByClientPairDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_client_pair_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily block proposal status counts by status type
  */
 export const fctBlockProposalStatusDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposalStatusDailyServiceListData, ThrowOnError>
@@ -5620,7 +5876,7 @@ export const fctBlockProposalStatusDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly block proposal status counts by status type
  */
 export const fctBlockProposalStatusHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposalStatusHourlyServiceListData, ThrowOnError>
@@ -5658,7 +5914,7 @@ export const fctBlockProposalStatusHourlyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the finalized chain including orphaned blocks
  */
 export const fctBlockProposerServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerServiceListData, ThrowOnError>
@@ -5692,7 +5948,7 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers re-indexed by validator for efficient validator lookups
  */
 export const fctBlockProposerByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerByValidatorServiceListData, ThrowOnError>
@@ -5730,7 +5986,7 @@ export const fctBlockProposerByValidatorServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposer entity for the unfinalized chain
  */
 export const fctBlockProposerEntityServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerEntityServiceListData, ThrowOnError>
@@ -5768,7 +6024,7 @@ export const fctBlockProposerEntityServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the unfinalized chain
  */
 export const fctBlockProposerHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerHeadServiceListData, ThrowOnError>
@@ -5806,7 +6062,7 @@ export const fctBlockProposerHeadServiceGet = <ThrowOnError extends boolean = fa
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer reward of each canonical block's proposer
  */
 export const fctBlockProposerRewardServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerRewardServiceListData, ThrowOnError>
@@ -5844,7 +6100,7 @@ export const fctBlockProposerRewardServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer proposer rewards per proposer per day
  */
 export const fctBlockProposerRewardByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerRewardByValidatorDailyServiceListData, ThrowOnError>
@@ -5882,7 +6138,7 @@ export const fctBlockProposerRewardByValidatorDailyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Consensus layer proposer rewards per proposer per week
  */
 export const fctBlockProposerRewardByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockProposerRewardByValidatorWeeklyServiceListData, ThrowOnError>
@@ -5920,7 +6176,7 @@ export const fctBlockProposerRewardByValidatorWeeklyServiceGet = <ThrowOnError e
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics per address aggregated by day
  */
 export const fctContractStorageStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByAddressDailyServiceListData, ThrowOnError>
@@ -5958,7 +6214,7 @@ export const fctContractStorageStateByAddressDailyServiceGet = <ThrowOnError ext
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics per address aggregated by hour
  */
 export const fctContractStorageStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByAddressHourlyServiceListData, ThrowOnError>
@@ -5996,7 +6252,7 @@ export const fctContractStorageStateByAddressHourlyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics aggregated by day
  */
 export const fctContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByBlockDailyServiceListData, ThrowOnError>
@@ -6034,7 +6290,7 @@ export const fctContractStorageStateByBlockDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract storage state metrics aggregated by hour
  */
 export const fctContractStorageStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateByBlockHourlyServiceListData, ThrowOnError>
@@ -6072,7 +6328,7 @@ export const fctContractStorageStateByBlockHourlyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics per address aggregated by day
  */
 export const fctContractStorageStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
@@ -6114,7 +6370,7 @@ export const fctContractStorageStateWithExpiryByAddressDailyServiceGet = <ThrowO
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics per address aggregated by hour
  */
 export const fctContractStorageStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
@@ -6156,7 +6412,7 @@ export const fctContractStorageStateWithExpiryByAddressHourlyServiceGet = <Throw
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics aggregated by day
  */
 export const fctContractStorageStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
@@ -6197,7 +6453,7 @@ export const fctContractStorageStateWithExpiryByBlockDailyServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state metrics aggregated by hour
  */
 export const fctContractStorageStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctContractStorageStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
@@ -6239,7 +6495,7 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column custody probe outcomes by the probed peer client and release (its latest agent in the day), from int_custody_probe. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctCustodyProbeByClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctCustodyProbeByClientDailyServiceListData, ThrowOnError>
@@ -6277,7 +6533,7 @@ export const fctCustodyProbeByClientDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>
@@ -6315,7 +6571,7 @@ export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
  */
 export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>
@@ -6353,7 +6609,7 @@ export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>
@@ -6391,7 +6647,7 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
@@ -6429,7 +6685,7 @@ export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>
@@ -6467,7 +6723,7 @@ export const fctDataColumnAvailabilityHourlyServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
  */
 export const fctDataColumnCompletionByPathDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnCompletionByPathDailyServiceListData, ThrowOnError>
@@ -6505,7 +6761,7 @@ export const fctDataColumnCompletionByPathDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
  */
 export const fctDataColumnCompletionByPathHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnCompletionByPathHourlyServiceListData, ThrowOnError>
@@ -6543,7 +6799,7 @@ export const fctDataColumnCompletionByPathHourlyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * How each data column of a block became available across sentry nodes: completions by path, cells from gossip and the execution layer, and gossipsub partial message traffic
  */
 export const fctDataColumnCompletionBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnCompletionBySlotServiceListData, ThrowOnError>
@@ -6581,7 +6837,7 @@ export const fctDataColumnCompletionBySlotServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
  */
 export const fctDataColumnPartialMessageDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnPartialMessageDailyServiceListData, ThrowOnError>
@@ -6619,7 +6875,7 @@ export const fctDataColumnPartialMessageDailyServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
  */
 export const fctDataColumnPartialMessageHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnPartialMessageHourlyServiceListData, ThrowOnError>
@@ -6657,7 +6913,7 @@ export const fctDataColumnPartialMessageHourlyServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * engine_getBlobs observations aggregated by execution client and status for EL comparison
  */
 export const fctEngineGetBlobsByElClientServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientServiceListData, ThrowOnError>
@@ -6695,7 +6951,7 @@ export const fctEngineGetBlobsByElClientServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated engine_getBlobs statistics by execution client with true percentiles
  */
 export const fctEngineGetBlobsByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientDailyServiceListData, ThrowOnError>
@@ -6733,7 +6989,7 @@ export const fctEngineGetBlobsByElClientDailyServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated engine_getBlobs statistics by execution client with true percentiles
  */
 export const fctEngineGetBlobsByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByElClientHourlyServiceListData, ThrowOnError>
@@ -6771,7 +7027,7 @@ export const fctEngineGetBlobsByElClientHourlyServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_getBlobs duration per node
  */
 export const fctEngineGetBlobsByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByNodeDailyServiceListData, ThrowOnError>
@@ -6809,7 +7065,7 @@ export const fctEngineGetBlobsByNodeDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly engine_getBlobs duration per node
  */
 export const fctEngineGetBlobsByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsByNodeHourlyServiceListData, ThrowOnError>
@@ -6847,7 +7103,7 @@ export const fctEngineGetBlobsByNodeHourlyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Slot-level aggregated engine_getBlobs observations grouped by status with duration statistics
  */
 export const fctEngineGetBlobsBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsBySlotServiceListData, ThrowOnError>
@@ -6885,7 +7141,7 @@ export const fctEngineGetBlobsBySlotServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fine-grained engine_getBlobs duration distribution in 50ms chunks for latency histogram analysis
  */
 export const fctEngineGetBlobsDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineGetBlobsDurationChunked50MsServiceListData, ThrowOnError>
@@ -6923,7 +7179,87 @@ export const fctEngineGetBlobsDurationChunked50MsServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsDailyServiceListResponses,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineGetBlobsDurationChunked50MsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineGetBlobsDurationChunked50MsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsDurationChunked50MsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponses,
+    FctEngineGetBlobsDurationChunked50MsDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponses,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineGetBlobsDurationChunked50MsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponses,
+    FctEngineGetBlobsDurationChunked50MsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineGetBlobsDurationChunked50MsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload observations aggregated by execution client and status for EL comparison
  */
 export const fctEngineNewPayloadByElClientServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByElClientServiceListData, ThrowOnError>
@@ -6961,7 +7297,7 @@ export const fctEngineNewPayloadByElClientServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated engine_newPayload statistics by execution client with true percentiles
  */
 export const fctEngineNewPayloadByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByElClientDailyServiceListData, ThrowOnError>
@@ -6999,7 +7335,7 @@ export const fctEngineNewPayloadByElClientDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated engine_newPayload statistics by execution client with true percentiles
  */
 export const fctEngineNewPayloadByElClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByElClientHourlyServiceListData, ThrowOnError>
@@ -7037,7 +7373,7 @@ export const fctEngineNewPayloadByElClientHourlyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_newPayload duration per node
  */
 export const fctEngineNewPayloadByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByNodeDailyServiceListData, ThrowOnError>
@@ -7075,7 +7411,7 @@ export const fctEngineNewPayloadByNodeDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly engine_newPayload duration per node
  */
 export const fctEngineNewPayloadByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadByNodeHourlyServiceListData, ThrowOnError>
@@ -7113,7 +7449,7 @@ export const fctEngineNewPayloadByNodeHourlyServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Slot-level aggregated engine_newPayload observations grouped by status with duration statistics
  */
 export const fctEngineNewPayloadBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadBySlotServiceListData, ThrowOnError>
@@ -7151,7 +7487,7 @@ export const fctEngineNewPayloadBySlotServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fine-grained engine_newPayload duration distribution in 50ms chunks for latency histogram analysis
  */
 export const fctEngineNewPayloadDurationChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadDurationChunked50MsServiceListData, ThrowOnError>
@@ -7189,7 +7525,87 @@ export const fctEngineNewPayloadDurationChunked50MsServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsDailyServiceListResponses,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationChunked50MsDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationChunked50MsDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationChunked50MsDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponses,
+    FctEngineNewPayloadDurationChunked50MsDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponses,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadDurationChunked50MsHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses,
+    FctEngineNewPayloadDurationChunked50MsHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationChunked50MsHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily execution client winrate based on fastest engine_newPayload duration per slot
  */
 export const fctEngineNewPayloadWinrateDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadWinrateDailyServiceListData, ThrowOnError>
@@ -7227,7 +7643,7 @@ export const fctEngineNewPayloadWinrateDailyServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly execution client winrate based on fastest engine_newPayload duration per slot
  */
 export const fctEngineNewPayloadWinrateHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadWinrateHourlyServiceListData, ThrowOnError>
@@ -7265,7 +7681,45 @@ export const fctEngineNewPayloadWinrateHourlyServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * One row per epoch of the finalized chain with its proposer duties, canonical blocks, slots without a canonical block and attestation participation, from int_block_proposer_canonical and fct_attestation_correctness_canonical
+ */
+export const fctEpochSummaryCanonicalServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEpochSummaryCanonicalServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEpochSummaryCanonicalServiceListResponses,
+    FctEpochSummaryCanonicalServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEpochSummaryCanonicalServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEpochSummaryCanonicalServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_epoch_summary_canonical',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by epoch_start_date_time
+ */
+export const fctEpochSummaryCanonicalServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEpochSummaryCanonicalServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEpochSummaryCanonicalServiceGetResponses,
+    FctEpochSummaryCanonicalServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEpochSummaryCanonicalServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEpochSummaryCanonicalServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_epoch_summary_canonical/{epoch_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasLimitDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitDailyServiceListData, ThrowOnError>
@@ -7303,7 +7757,7 @@ export const fctExecutionGasLimitDailyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasLimitHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitHourlyServiceListData, ThrowOnError>
@@ -7341,7 +7795,7 @@ export const fctExecutionGasLimitHourlyServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gas limit signalling by validators, from their MEV relay validator registrations. For each UTC day, each validator counts once at the highest gas limit it registered in the 7 days ending that day, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
  */
 export const fctExecutionGasLimitSignallingDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitSignallingDailyServiceListData, ThrowOnError>
@@ -7379,7 +7833,7 @@ export const fctExecutionGasLimitSignallingDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gas limit signalling by validators, from their MEV relay validator registrations. For each hour, each validator counts once at the highest gas limit it registered on that UTC day or the 7 days before, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
  */
 export const fctExecutionGasLimitSignallingHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitSignallingHourlyServiceListData, ThrowOnError>
@@ -7417,7 +7871,7 @@ export const fctExecutionGasLimitSignallingHourlyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasUsedDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasUsedDailyServiceListData, ThrowOnError>
@@ -7455,7 +7909,7 @@ export const fctExecutionGasUsedDailyServiceGet = <ThrowOnError extends boolean 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctExecutionGasUsedHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasUsedHourlyServiceListData, ThrowOnError>
@@ -7493,7 +7947,7 @@ export const fctExecutionGasUsedHourlyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of receipt size with standard statistics.
  */
 export const fctExecutionReceiptSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionReceiptSizeDailyServiceListData, ThrowOnError>
@@ -7531,7 +7985,7 @@ export const fctExecutionReceiptSizeDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of receipt size with standard statistics.
  */
 export const fctExecutionReceiptSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionReceiptSizeHourlyServiceListData, ThrowOnError>
@@ -7569,7 +8023,7 @@ export const fctExecutionReceiptSizeHourlyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution layer state size metrics aggregated by day
  */
 export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
@@ -7607,7 +8061,7 @@ export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution layer state size metrics aggregated by hour
  */
 export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeHourlyServiceListData, ThrowOnError>
@@ -7645,7 +8099,7 @@ export const fctExecutionStateSizeHourlyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the UTC day
  */
 export const fctExecutionTpsDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTpsDailyServiceListData, ThrowOnError>
@@ -7683,7 +8137,7 @@ export const fctExecutionTpsDailyServiceGet = <ThrowOnError extends boolean = fa
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the hour
  */
 export const fctExecutionTpsHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTpsHourlyServiceListData, ThrowOnError>
@@ -7721,7 +8175,7 @@ export const fctExecutionTpsHourlyServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
  */
 export const fctExecutionTransactionsDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTransactionsDailyServiceListData, ThrowOnError>
@@ -7759,7 +8213,7 @@ export const fctExecutionTransactionsDailyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
  */
 export const fctExecutionTransactionsHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTransactionsHourlyServiceListData, ThrowOnError>
@@ -7797,7 +8251,7 @@ export const fctExecutionTransactionsHourlyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the head event was first seen on the network by a sentry node
  */
 export const fctHeadFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadFirstSeenByNodeServiceListData, ThrowOnError>
@@ -7835,7 +8289,7 @@ export const fctHeadFirstSeenByNodeServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily head event arrival per node
  */
 export const fctHeadFirstSeenByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadFirstSeenByNodeDailyServiceListData, ThrowOnError>
@@ -7873,7 +8327,7 @@ export const fctHeadFirstSeenByNodeDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly head event arrival per node
  */
 export const fctHeadFirstSeenByNodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadFirstSeenByNodeHourlyServiceListData, ThrowOnError>
@@ -7911,7 +8365,7 @@ export const fctHeadFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated head vote correctness rate statistics
  */
 export const fctHeadVoteCorrectnessRateDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadVoteCorrectnessRateDailyServiceListData, ThrowOnError>
@@ -7949,7 +8403,7 @@ export const fctHeadVoteCorrectnessRateDailyServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated head vote correctness rate statistics
  */
 export const fctHeadVoteCorrectnessRateHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctHeadVoteCorrectnessRateHourlyServiceListData, ThrowOnError>
@@ -7987,7 +8441,7 @@ export const fctHeadVoteCorrectnessRateHourlyServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Total number of MEV builder bids for a slot
  */
 export const fctMevBidCountByBuilderServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidCountByBuilderServiceListData, ThrowOnError>
@@ -8025,7 +8479,7 @@ export const fctMevBidCountByBuilderServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Total number of MEV relay bids for a slot by relay
  */
 export const fctMevBidCountByRelayServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidCountByRelayServiceListData, ThrowOnError>
@@ -8063,7 +8517,7 @@ export const fctMevBidCountByRelayServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Highest value bid from each builder per slot broken down by 50ms chunks. Each block_hash appears in the chunk determined by its earliest bid timestamp. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctMevBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMevBidHighestValueByBuilderChunked50MsServiceListData, ThrowOnError>
@@ -8103,7 +8557,7 @@ export const fctMevBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnError
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
  */
 export const fctMissedSlotRateDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMissedSlotRateDailyServiceListData, ThrowOnError>
@@ -8141,7 +8595,7 @@ export const fctMissedSlotRateDailyServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
  */
 export const fctMissedSlotRateHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctMissedSlotRateHourlyServiceListData, ThrowOnError>
@@ -8179,7 +8633,7 @@ export const fctMissedSlotRateHourlyServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Xatu nodes that sent beacon API block events in the last 24 hours, one row per meta_client_name with its latest client, version and location. Nodes that only report through libp2p, such as the ethPandaOps libp2p sentries, are not included
  */
 export const fctNodeActiveLast24hServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeActiveLast24hServiceListData, ThrowOnError>
@@ -8217,7 +8671,7 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node CPU utilization per sub-slot window enriched with node classification
  */
 export const fctNodeCpuUtilizationByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeCpuUtilizationByProcessServiceListData, ThrowOnError>
@@ -8255,7 +8709,7 @@ export const fctNodeCpuUtilizationByProcessServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node disk I/O per sub-slot window aggregated across devices with node classification
  */
 export const fctNodeDiskIoByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeDiskIoByProcessServiceListData, ThrowOnError>
@@ -8293,7 +8747,37 @@ export const fctNodeDiskIoByProcessServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Every Xatu node that has reported a block, with its latest identity, client and location, from fct_block_first_seen_by_node. The row with the latest last_seen_date_time wins, so a node reported in a range ending now has last_seen_date_time inside it
+ */
+export const fctNodeLastSeenServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeLastSeenServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<FctNodeLastSeenServiceListResponses, FctNodeLastSeenServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zFctNodeLastSeenServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeLastSeenServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_last_seen',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by meta_client_name
+ */
+export const fctNodeLastSeenServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeLastSeenServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctNodeLastSeenServiceGetResponses, FctNodeLastSeenServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zFctNodeLastSeenServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeLastSeenServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_last_seen/{meta_client_name}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Node memory usage per sub-slot window enriched with node classification
  */
 export const fctNodeMemoryUsageByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeMemoryUsageByProcessServiceListData, ThrowOnError>
@@ -8331,7 +8815,7 @@ export const fctNodeMemoryUsageByProcessServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Node network I/O per port per sub-slot window with node classification
  */
 export const fctNodeNetworkIoByProcessServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctNodeNetworkIoByProcessServiceListData, ThrowOnError>
@@ -8369,7 +8853,7 @@ export const fctNodeNetworkIoByProcessServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution cost per opcode group by execution client, fitted from engine_newPayload durations
  */
 export const fctOpcodeCostByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeCostByElClientDailyServiceListData, ThrowOnError>
@@ -8407,7 +8891,7 @@ export const fctOpcodeCostByElClientDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution cost per opcode group for each execution client version, fitted over every hour the version ran
  */
 export const fctOpcodeCostByElClientVersionServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeCostByElClientVersionServiceListData, ThrowOnError>
@@ -8445,7 +8929,7 @@ export const fctOpcodeCostByElClientVersionServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData, ThrowOnError>
@@ -8483,7 +8967,7 @@ export const fctOpcodeGasByOpcodeDailyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export const fctOpcodeGasByOpcodeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeGasByOpcodeHourlyServiceListData, ThrowOnError>
@@ -8521,7 +9005,7 @@ export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctOpcodeOpsDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeOpsDailyServiceListData, ThrowOnError>
@@ -8557,7 +9041,7 @@ export const fctOpcodeOpsDailyServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctOpcodeOpsHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctOpcodeOpsHourlyServiceListData, ThrowOnError>
@@ -8595,7 +9079,7 @@ export const fctOpcodeOpsHourlyServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) PTC payload attestation arrivals broken down by 50ms chunks, deduplicated per validator at earliest observation across sentries. Only includes messages seen within 12000ms of the slot start time
  */
 export const fctPayloadAttestationFirstSeenChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPayloadAttestationFirstSeenChunked50MsServiceListData, ThrowOnError>
@@ -8635,7 +9119,7 @@ export const fctPayloadAttestationFirstSeenChunked50MsServiceGet = <ThrowOnError
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Highest value gloas (ePBS) builder bid per slot broken down by 50ms chunks, sourced from builder bids observed on the beacon API event stream across sentries. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctPayloadBidHighestValueByBuilderChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPayloadBidHighestValueByBuilderChunked50MsServiceListData, ThrowOnError>
@@ -8676,7 +9160,7 @@ export const fctPayloadBidHighestValueByBuilderChunked50MsServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) auction frontier: the single best builder bid per slot per 50ms chunk across all builders. Bounded by the chunk grid regardless of builder count. Only includes bids within -12000ms to +12000ms of slot start time
  */
 export const fctPayloadBidHighestValueChunked50MsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPayloadBidHighestValueChunked50MsServiceListData, ThrowOnError>
@@ -8714,7 +9198,7 @@ export const fctPayloadBidHighestValueChunked50MsServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and autonomous system. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Autonomous systems under 3 peers roll into an other bucket per network type.
  */
 export const fctPeerCountByClClientAsnDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByClClientAsnDailyServiceListData, ThrowOnError>
@@ -8752,7 +9236,7 @@ export const fctPeerCountByClClientAsnDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and country. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Countries under 3 peers roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByClClientCountryDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByClClientCountryDailyServiceListData, ThrowOnError>
@@ -8790,7 +9274,7 @@ export const fctPeerCountByClClientCountryDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus peer census by client and release. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Custody group counts come from metadata responses to our outbound requests. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByClClientDailyServiceListData, ThrowOnError>
@@ -8828,7 +9312,7 @@ export const fctPeerCountByClClientDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
  */
 export const fctPeerCountByClientPairDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByClientPairDailyServiceListData, ThrowOnError>
@@ -8866,7 +9350,7 @@ export const fctPeerCountByClientPairDailyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
  */
 export const fctPeerCountByElClientAsnDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientAsnDailyServiceListData, ThrowOnError>
@@ -8904,7 +9388,7 @@ export const fctPeerCountByElClientAsnDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByElClientCountryDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientCountryDailyServiceListData, ThrowOnError>
@@ -8942,7 +9426,7 @@ export const fctPeerCountByElClientCountryDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientDailyServiceListData, ThrowOnError>
@@ -8980,7 +9464,7 @@ export const fctPeerCountByElClientDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily consensus nodes from discovery (ENRs) by client, release, fork digest and next fork digest. A next fork digest of 0x00000000 or equal to the current digest means no next fork and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerForkReadinessByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerForkReadinessByClClientDailyServiceListData, ThrowOnError>
@@ -9018,7 +9502,7 @@ export const fctPeerForkReadinessByClClientDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily execution nodes from discovery by client, release and EIP-2124 fork id. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). A next fork of 0 means none and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerForkReadinessByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerForkReadinessByElClientDailyServiceListData, ThrowOnError>
@@ -9056,7 +9540,7 @@ export const fctPeerForkReadinessByElClientDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily gossipsub partial messages adoption by peer client and version, as averages of the hourly peer counts
  */
 export const fctPeerPartialMessageSupportByClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerPartialMessageSupportByClientDailyServiceListData, ThrowOnError>
@@ -9096,7 +9580,7 @@ export const fctPeerPartialMessageSupportByClientDailyServiceGet = <ThrowOnError
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly gossipsub partial messages adoption by peer client and version: connected peers, gossipsub v1.3 support and the partial flags peers set when subscribing to data column topics
  */
 export const fctPeerPartialMessageSupportByClientHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerPartialMessageSupportByClientHourlyServiceListData, ThrowOnError>
@@ -9136,7 +9620,7 @@ export const fctPeerPartialMessageSupportByClientHourlyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily libp2p protocol support by consensus client. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Protocols fewer than 3 of the client peers support are excluded.
  */
 export const fctPeerProtocolByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerProtocolByClClientDailyServiceListData, ThrowOnError>
@@ -9174,7 +9658,7 @@ export const fctPeerProtocolByClClientDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blocks that Xatu nodes built locally each slot by asking their beacon node for a block proposal, showing what that node would have proposed
  */
 export const fctPreparedBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPreparedBlockServiceListData, ThrowOnError>
@@ -9208,7 +9692,7 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctProposerRewardDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctProposerRewardDailyServiceListData, ThrowOnError>
@@ -9246,7 +9730,7 @@ export const fctProposerRewardDailyServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctProposerRewardHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctProposerRewardHourlyServiceListData, ThrowOnError>
@@ -9284,7 +9768,7 @@ export const fctProposerRewardHourlyServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily reorg event counts by depth
  */
 export const fctReorgDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctReorgDailyServiceListData, ThrowOnError>
@@ -9314,7 +9798,7 @@ export const fctReorgDailyServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly reorg event counts by depth
  */
 export const fctReorgHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctReorgHourlyServiceListData, ThrowOnError>
@@ -9344,7 +9828,7 @@ export const fctReorgHourlyServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon chain validators operated via Rocket Pool (minipool and megapool), linked to their node operator
  */
 export const fctRocketpoolValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctRocketpoolValidatorServiceListData, ThrowOnError>
@@ -9382,7 +9866,7 @@ export const fctRocketpoolValidatorServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address aggregated by day
  */
 export const fctStorageSlotStateByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByAddressDailyServiceListData, ThrowOnError>
@@ -9420,7 +9904,7 @@ export const fctStorageSlotStateByAddressDailyServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address aggregated by hour
  */
 export const fctStorageSlotStateByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByAddressHourlyServiceListData, ThrowOnError>
@@ -9458,7 +9942,7 @@ export const fctStorageSlotStateByAddressHourlyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics aggregated by day
  */
 export const fctStorageSlotStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByBlockDailyServiceListData, ThrowOnError>
@@ -9496,7 +9980,7 @@ export const fctStorageSlotStateByBlockDailyServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics aggregated by hour
  */
 export const fctStorageSlotStateByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateByBlockHourlyServiceListData, ThrowOnError>
@@ -9534,7 +10018,7 @@ export const fctStorageSlotStateByBlockHourlyServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address with expiry policies aggregated by day
  */
 export const fctStorageSlotStateWithExpiryByAddressDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByAddressDailyServiceListData, ThrowOnError>
@@ -9574,7 +10058,7 @@ export const fctStorageSlotStateWithExpiryByAddressDailyServiceGet = <ThrowOnErr
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics per address with expiry policies aggregated by hour
  */
 export const fctStorageSlotStateWithExpiryByAddressHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByAddressHourlyServiceListData, ThrowOnError>
@@ -9614,7 +10098,7 @@ export const fctStorageSlotStateWithExpiryByAddressHourlyServiceGet = <ThrowOnEr
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics with expiry policies aggregated by day
  */
 export const fctStorageSlotStateWithExpiryByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByBlockDailyServiceListData, ThrowOnError>
@@ -9654,7 +10138,7 @@ export const fctStorageSlotStateWithExpiryByBlockDailyServiceGet = <ThrowOnError
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot state metrics with expiry policies aggregated by hour
  */
 export const fctStorageSlotStateWithExpiryByBlockHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotStateWithExpiryByBlockHourlyServiceListData, ThrowOnError>
@@ -9694,7 +10178,7 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Top 100 contracts by effective storage bytes with expiry policies applied
  */
 export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100ByBytesServiceListData, ThrowOnError>
@@ -9732,7 +10216,7 @@ export const fctStorageSlotTop100ByBytesServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Top 100 contracts by active storage slot count with expiry policies applied
  */
 export const fctStorageSlotTop100BySlotsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100BySlotsServiceListData, ThrowOnError>
@@ -9770,7 +10254,7 @@ export const fctStorageSlotTop100BySlotsServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-slot sync committee participation by validator
  */
 export const fctSyncCommitteeParticipationByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeParticipationByValidatorServiceListData, ThrowOnError>
@@ -9809,7 +10293,7 @@ export const fctSyncCommitteeParticipationByValidatorServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeParticipationByValidatorDailyServiceListData, ThrowOnError>
@@ -9850,7 +10334,7 @@ export const fctSyncCommitteeParticipationByValidatorDailyServiceGet = <ThrowOnE
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeParticipationByValidatorHourlyServiceListData, ThrowOnError>
@@ -9892,7 +10376,7 @@ export const fctSyncCommitteeParticipationByValidatorHourlyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly aggregation of per-validator sync committee participation
  */
 export const fctSyncCommitteeParticipationByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeParticipationByValidatorWeeklyServiceListData, ThrowOnError>
@@ -9934,7 +10418,7 @@ export const fctSyncCommitteeParticipationByValidatorWeeklyServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee reward of each validator in each block
  */
 export const fctSyncCommitteeRewardByValidatorServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeRewardByValidatorServiceListData, ThrowOnError>
@@ -9972,7 +10456,7 @@ export const fctSyncCommitteeRewardByValidatorServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee rewards and penalties per validator per day
  */
 export const fctSyncCommitteeRewardByValidatorDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeRewardByValidatorDailyServiceListData, ThrowOnError>
@@ -10010,7 +10494,7 @@ export const fctSyncCommitteeRewardByValidatorDailyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Sync committee rewards and penalties per validator per week
  */
 export const fctSyncCommitteeRewardByValidatorWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctSyncCommitteeRewardByValidatorWeeklyServiceListData, ThrowOnError>
@@ -10048,7 +10532,7 @@ export const fctSyncCommitteeRewardByValidatorWeeklyServiceGet = <ThrowOnError e
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily live storage slots owned by ERC20/ERC721 contracts, by token_standard
  */
 export const fctTokenContractStorageStateByBlockDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctTokenContractStorageStateByBlockDailyServiceListData, ThrowOnError>
@@ -10087,7 +10571,7 @@ export const fctTokenContractStorageStateByBlockDailyServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-epoch validator balance and status
  */
 export const fctValidatorBalanceServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorBalanceServiceListData, ThrowOnError>
@@ -10125,7 +10609,7 @@ export const fctValidatorBalanceServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily validator balance snapshots aggregated from per-epoch data
  */
 export const fctValidatorBalanceDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorBalanceDailyServiceListData, ThrowOnError>
@@ -10163,7 +10647,7 @@ export const fctValidatorBalanceDailyServiceGet = <ThrowOnError extends boolean 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly validator balance snapshots aggregated from per-epoch data
  */
 export const fctValidatorBalanceHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorBalanceHourlyServiceListData, ThrowOnError>
@@ -10201,7 +10685,7 @@ export const fctValidatorBalanceHourlyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly validator balance snapshots aggregated from daily data
  */
 export const fctValidatorBalanceWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorBalanceWeeklyServiceListData, ThrowOnError>
@@ -10239,7 +10723,7 @@ export const fctValidatorBalanceWeeklyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validators and stake by withdrawal credential type, one snapshot per day
  */
 export const fctValidatorCountByCredentialTypeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorCountByCredentialTypeDailyServiceListData, ThrowOnError>
@@ -10277,7 +10761,7 @@ export const fctValidatorCountByCredentialTypeDailyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validators and stake by withdrawal credential type, one snapshot per week
  */
 export const fctValidatorCountByCredentialTypeWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorCountByCredentialTypeWeeklyServiceListData, ThrowOnError>
@@ -10315,7 +10799,7 @@ export const fctValidatorCountByCredentialTypeWeeklyServiceGet = <ThrowOnError e
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily validator count by entity and status, derived from canonical_beacon_validators joined with dim_node
  */
 export const fctValidatorCountByEntityByStatusDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorCountByEntityByStatusDailyServiceListData, ThrowOnError>
@@ -10353,7 +10837,7 @@ export const fctValidatorCountByEntityByStatusDailyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Histogram of active validators' effective balance by withdrawal credential type, one snapshot per day
  */
 export const fctValidatorEffectiveBalanceByCredentialTypeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorEffectiveBalanceByCredentialTypeDailyServiceListData, ThrowOnError>
@@ -10395,7 +10879,7 @@ export const fctValidatorEffectiveBalanceByCredentialTypeDailyServiceGet = <Thro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Validator lifecycle events: deposits, top-ups, credential changes, consolidations, withdrawals, exit and withdrawal requests, voluntary exits and slashings. Only operations that took effect on chain are included
  */
 export const fctValidatorEventServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorEventServiceListData, ThrowOnError>
@@ -10431,7 +10915,7 @@ export const fctValidatorEventServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Daily counts and amounts of validator operations that took effect
  */
 export const fctValidatorOperationDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorOperationDailyServiceListData, ThrowOnError>
@@ -10469,7 +10953,7 @@ export const fctValidatorOperationDailyServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Weekly counts and amounts of validator operations that took effect
  */
 export const fctValidatorOperationWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorOperationWeeklyServiceListData, ThrowOnError>
@@ -10507,7 +10991,7 @@ export const fctValidatorOperationWeeklyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Activation and exit queues and the Electra pending queues, one snapshot per day
  */
 export const fctValidatorQueueDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorQueueDailyServiceListData, ThrowOnError>
@@ -10545,7 +11029,7 @@ export const fctValidatorQueueDailyServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Activation and exit queues and the Electra pending queues, one snapshot per week
  */
 export const fctValidatorQueueWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorQueueWeeklyServiceListData, ThrowOnError>
@@ -10583,7 +11067,7 @@ export const fctValidatorQueueWeeklyServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Network-wide consensus layer rewards and penalties per day
  */
 export const fctValidatorRewardTotalDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorRewardTotalDailyServiceListData, ThrowOnError>
@@ -10621,7 +11105,7 @@ export const fctValidatorRewardTotalDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Network-wide consensus layer rewards and penalties per week
  */
 export const fctValidatorRewardTotalWeeklyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorRewardTotalWeeklyServiceListData, ThrowOnError>
@@ -10659,7 +11143,7 @@ export const fctValidatorRewardTotalWeeklyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Active validators and stake by entity and withdrawal credential type, one snapshot per day
  */
 export const fctValidatorStakeByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctValidatorStakeByEntityDailyServiceListData, ThrowOnError>
@@ -10697,7 +11181,7 @@ export const fctValidatorStakeByEntityDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical-preferred merge of attested head and canonical attestations. Prefers finalized canonical values per validator and slot, falling back to real-time head.
  */
 export const intAttestationAttestedServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationAttestedServiceListData, ThrowOnError>
@@ -10735,7 +11219,7 @@ export const intAttestationAttestedServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attested head of a block for the finalized chain.
  */
 export const intAttestationAttestedCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationAttestedCanonicalServiceListData, ThrowOnError>
@@ -10773,7 +11257,7 @@ export const intAttestationAttestedCanonicalServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Attested head of a block for the unfinalized chain.
  */
 export const intAttestationAttestedHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationAttestedHeadServiceListData, ThrowOnError>
@@ -10811,7 +11295,7 @@ export const intAttestationAttestedHeadServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * When the attestation was first seen on the network by a sentry node
  */
 export const intAttestationFirstSeenServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationFirstSeenServiceListData, ThrowOnError>
@@ -10849,7 +11333,7 @@ export const intAttestationFirstSeenServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Each row is one (slot, validator, vote) pair seen inside an aggregate attestation. Two rows for the same (slot, validator) indicate slashable double attestation.
  */
 export const intAttestationFirstSeenAggregateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntAttestationFirstSeenAggregateServiceListData, ThrowOnError>
@@ -10887,7 +11371,7 @@ export const intAttestationFirstSeenAggregateServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon committee, canonical-preferred merge of the head-event stream and the canonical table
  */
 export const intBeaconCommitteeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBeaconCommitteeServiceListData, ThrowOnError>
@@ -10925,7 +11409,7 @@ export const intBeaconCommitteeServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Beacon committee head for the unfinalized chain
  */
 export const intBeaconCommitteeHeadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBeaconCommitteeHeadServiceListData, ThrowOnError>
@@ -10963,7 +11447,7 @@ export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Blob count of a block for the finalized chain
  */
 export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>
@@ -11001,7 +11485,7 @@ export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block details for the finalized chain
  */
 export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockCanonicalServiceListData, ThrowOnError>
@@ -11037,7 +11521,7 @@ export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Canonical blocks with the client releases their graffiti resolves to, resolved like the Lab slot page. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const intBlockGraffitiReleaseServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockGraffitiReleaseServiceListData, ThrowOnError>
@@ -11075,7 +11559,7 @@ export const intBlockGraffitiReleaseServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * MEV relay proposer payload delivered for a block on the finalized chain
  */
 export const intBlockMevCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockMevCanonicalServiceListData, ThrowOnError>
@@ -11113,7 +11597,7 @@ export const intBlockMevCanonicalServiceGet = <ThrowOnError extends boolean = fa
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per block. Derived from int_transaction_opcode_gas.
  */
 export const intBlockOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockOpcodeGasServiceListData, ThrowOnError>
@@ -11149,7 +11633,7 @@ export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, from aggregates included in canonical beacon blocks
  */
 export const intBlockPayloadPtcVoteCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockPayloadPtcVoteCanonicalServiceListData, ThrowOnError>
@@ -11187,7 +11671,7 @@ export const intBlockPayloadPtcVoteCanonicalServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Block proposers for the finalized chain
  */
 export const intBlockProposerCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockProposerCanonicalServiceListData, ThrowOnError>
@@ -11225,7 +11709,7 @@ export const intBlockProposerCanonicalServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-block receipt size totals. Derived from int_transaction_receipt_size.
  */
 export const intBlockReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockReceiptSizeServiceListData, ThrowOnError>
@@ -11263,7 +11747,7 @@ export const intBlockReceiptSizeServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-block resource gas totals. Derived from int_transaction_resource_gas.
  */
 export const intBlockResourceGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockResourceGasServiceListData, ThrowOnError>
@@ -11301,7 +11785,7 @@ export const intBlockResourceGasServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract creation events with projection for efficient address lookups
  */
 export const intContractCreationServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractCreationServiceListData, ThrowOnError>
@@ -11339,7 +11823,7 @@ export const intContractCreationServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * SELFDESTRUCT operations with EIP-6780 storage clearing implications
  */
 export const intContractSelfdestructServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractSelfdestructServiceListData, ThrowOnError>
@@ -11377,7 +11861,7 @@ export const intContractSelfdestructServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 1-month expiries - base tier of waterfall chain
  */
 export const intContractStorageExpiry1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry1mServiceListData, ThrowOnError>
@@ -11415,7 +11899,7 @@ export const intContractStorageExpiry1mServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 6-month expiries - waterfalls from 1m tier
  */
 export const intContractStorageExpiry6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry6mServiceListData, ThrowOnError>
@@ -11453,7 +11937,7 @@ export const intContractStorageExpiry6mServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 12-month expiries - waterfalls from 6m tier
  */
 export const intContractStorageExpiry12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry12mServiceListData, ThrowOnError>
@@ -11491,7 +11975,7 @@ export const intContractStorageExpiry12mServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 18-month expiries - waterfalls from 12m tier
  */
 export const intContractStorageExpiry18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry18mServiceListData, ThrowOnError>
@@ -11529,7 +12013,7 @@ export const intContractStorageExpiry18mServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 24-month expiries - waterfalls from 18m tier
  */
 export const intContractStorageExpiry24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageExpiry24mServiceListData, ThrowOnError>
@@ -11567,7 +12051,7 @@ export const intContractStorageExpiry24mServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level touches with precomputed next touch block - a touch is any slot read or write on the contract
  */
 export const intContractStorageNextTouchServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageNextTouchServiceListData, ThrowOnError>
@@ -11605,7 +12089,7 @@ export const intContractStorageNextTouchServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 1-month reactivations - contracts touched after 1m expiry
  */
 export const intContractStorageReactivation1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation1mServiceListData, ThrowOnError>
@@ -11643,7 +12127,7 @@ export const intContractStorageReactivation1mServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 6-month reactivations - contracts touched after 6m expiry
  */
 export const intContractStorageReactivation6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation6mServiceListData, ThrowOnError>
@@ -11681,7 +12165,7 @@ export const intContractStorageReactivation6mServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 12-month reactivations - contracts touched after 12m expiry
  */
 export const intContractStorageReactivation12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation12mServiceListData, ThrowOnError>
@@ -11719,7 +12203,7 @@ export const intContractStorageReactivation12mServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 18-month reactivations - contracts touched after 18m expiry
  */
 export const intContractStorageReactivation18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation18mServiceListData, ThrowOnError>
@@ -11757,7 +12241,7 @@ export const intContractStorageReactivation18mServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level 24-month reactivations - contracts touched after 24m expiry
  */
 export const intContractStorageReactivation24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageReactivation24mServiceListData, ThrowOnError>
@@ -11795,7 +12279,7 @@ export const intContractStorageReactivation24mServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block per address - tracks active slots and effective bytes with per-block deltas
  */
 export const intContractStorageStateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateServiceListData, ThrowOnError>
@@ -11833,7 +12317,7 @@ export const intContractStorageStateServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block per address - ordered by address for efficient address-based queries
  */
 export const intContractStorageStateByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateByAddressServiceListData, ThrowOnError>
@@ -11871,7 +12355,7 @@ export const intContractStorageStateByAddressServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative contract storage state per block - tracks active slots, effective bytes, and active contracts with per-block deltas
  */
 export const intContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateByBlockServiceListData, ThrowOnError>
@@ -11909,7 +12393,7 @@ export const intContractStorageStateByBlockServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state base table - tracks deltas and cumulative adjustments per address per policy
  */
 export const intContractStorageStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryServiceListData, ThrowOnError>
@@ -11947,7 +12431,7 @@ export const intContractStorageStateWithExpiryServiceGet = <ThrowOnError extends
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state ordered by address - tracks active_slots and effective_bytes per contract
  */
 export const intContractStorageStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryByAddressServiceListData, ThrowOnError>
@@ -11987,7 +12471,7 @@ export const intContractStorageStateWithExpiryByAddressServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Contract-level expiry state per block network-wide - totals for slots, bytes, and active contracts
  */
 export const intContractStorageStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntContractStorageStateWithExpiryByBlockServiceListData, ThrowOnError>
@@ -12026,7 +12510,7 @@ export const intContractStorageStateWithExpiryByBlockServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Custody probe results with aggregated column indices, ordered by probe time. A probe usually runs hours after the slot it asks about
  */
 export const intCustodyProbeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntCustodyProbeServiceListData, ThrowOnError>
@@ -12056,7 +12540,7 @@ export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
  */
 export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
@@ -12094,7 +12578,7 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Individual engine_getBlobs observations enriched with slot context from beacon blob sidecar data
  */
 export const intEngineGetBlobsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntEngineGetBlobsServiceListData, ThrowOnError>
@@ -12130,7 +12614,7 @@ export const intEngineGetBlobsServiceGet = <ThrowOnError extends boolean = false
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Individual engine_newPayload observations enriched with block size from fct_block_head
  */
 export const intEngineNewPayloadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntEngineNewPayloadServiceListData, ThrowOnError>
@@ -12168,7 +12652,7 @@ export const intEngineNewPayloadServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Fastest valid engine_newPayload observations per slot per node_class with one row per implementation tied at the minimum duration
  */
 export const intEngineNewPayloadFastestExecutionByNodeClassServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntEngineNewPayloadFastestExecutionByNodeClassServiceListData, ThrowOnError>
@@ -12210,7 +12694,7 @@ export const intEngineNewPayloadFastestExecutionByNodeClassServiceGet = <ThrowOn
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Hourly least-squares sufficient statistics for regressing engine_newPayload duration on gas per opcode group, by execution client version
  */
 export const intEngineNewPayloadOpcodeGramHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntEngineNewPayloadOpcodeGramHourlyServiceListData, ThrowOnError>
@@ -12248,7 +12732,7 @@ export const intEngineNewPayloadOpcodeGramHourlyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Execution blocks ordered by timestamp for efficient date range lookups
  */
 export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntExecutionBlockByDateServiceListData, ThrowOnError>
@@ -12286,7 +12770,7 @@ export const intExecutionBlockByDateServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative execution layer state size per block, reconstructed from execution_state_size_delta. Drop-in replacement for the deprecated execution_state_size snapshot table.
  */
 export const intExecutionStateSizeByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntExecutionStateSizeByBlockServiceListData, ThrowOnError>
@@ -12324,7 +12808,7 @@ export const intExecutionStateSizeByBlockServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool Saturn megapool contracts mapped to their node operator
  */
 export const intRocketpoolMegapoolServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntRocketpoolMegapoolServiceListData, ThrowOnError>
@@ -12362,7 +12846,7 @@ export const intRocketpoolMegapoolServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool minipool lifecycle events (created/destroyed) decoded from execution layer logs
  */
 export const intRocketpoolMinipoolServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntRocketpoolMinipoolServiceListData, ThrowOnError>
@@ -12400,7 +12884,7 @@ export const intRocketpoolMinipoolServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node lifecycle events (registration, RPL stake/withdraw, smoothing pool) decoded from execution layer logs
  */
 export const intRocketpoolNodeEventServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntRocketpoolNodeEventServiceListData, ThrowOnError>
@@ -12438,7 +12922,7 @@ export const intRocketpoolNodeEventServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Rocket Pool node timezone locations decoded from registerNode/setTimezoneLocation calldata
  */
 export const intRocketpoolNodeTimezoneServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntRocketpoolNodeTimezoneServiceListData, ThrowOnError>
@@ -12476,7 +12960,7 @@ export const intRocketpoolNodeTimezoneServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Synthetic storage diffs for selfdestructs that clear all storage slots
  */
 export const intStorageSelfdestructDiffsServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSelfdestructDiffsServiceListData, ThrowOnError>
@@ -12514,7 +12998,7 @@ export const intStorageSelfdestructDiffsServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
  */
 export const intStorageSlotDiffServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotDiffServiceListData, ThrowOnError>
@@ -12552,7 +13036,7 @@ export const intStorageSlotDiffServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
  */
 export const intStorageSlotDiffByAddressSlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotDiffByAddressSlotServiceListData, ThrowOnError>
@@ -12590,7 +13074,7 @@ export const intStorageSlotDiffByAddressSlotServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 1-month expiries - base tier of waterfall chain
  */
 export const intStorageSlotExpiry1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry1mServiceListData, ThrowOnError>
@@ -12628,7 +13112,7 @@ export const intStorageSlotExpiry1mServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 6-month expiries - waterfalls from 1m tier
  */
 export const intStorageSlotExpiry6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry6mServiceListData, ThrowOnError>
@@ -12666,7 +13150,7 @@ export const intStorageSlotExpiry6mServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 12-month expiries - waterfalls from 6m tier
  */
 export const intStorageSlotExpiry12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry12mServiceListData, ThrowOnError>
@@ -12704,7 +13188,7 @@ export const intStorageSlotExpiry12mServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 18-month expiries - waterfalls from 12m tier
  */
 export const intStorageSlotExpiry18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry18mServiceListData, ThrowOnError>
@@ -12742,7 +13226,7 @@ export const intStorageSlotExpiry18mServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 24-month expiries - waterfalls from 18m tier
  */
 export const intStorageSlotExpiry24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotExpiry24mServiceListData, ThrowOnError>
@@ -12780,7 +13264,7 @@ export const intStorageSlotExpiry24mServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-slot lifecycle metrics: birth/death blocks, touch counts, and touch-to-touch interval statistics. A lifecycle starts when a slot transitions from zero to non-zero (birth) and ends at the reverse (death). A slot can have multiple lifecycles.
  */
 export const intStorageSlotLifecycleServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotLifecycleServiceListData, ThrowOnError>
@@ -12818,7 +13302,7 @@ export const intStorageSlotLifecycleServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Lifecycle boundaries per storage slot: birth (0→non-zero) and death (non-zero→0) blocks with effective bytes at each transition.
  */
 export const intStorageSlotLifecycleBoundaryServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotLifecycleBoundaryServiceListData, ThrowOnError>
@@ -12856,7 +13340,7 @@ export const intStorageSlotLifecycleBoundaryServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot touches with precomputed next touch block - ordered by block_number for efficient range queries
  */
 export const intStorageSlotNextTouchServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotNextTouchServiceListData, ThrowOnError>
@@ -12894,7 +13378,7 @@ export const intStorageSlotNextTouchServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 1-month reactivations - slots touched after 1m expiry
  */
 export const intStorageSlotReactivation1mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation1mServiceListData, ThrowOnError>
@@ -12932,7 +13416,7 @@ export const intStorageSlotReactivation1mServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 6-month reactivations - slots touched after 6m expiry
  */
 export const intStorageSlotReactivation6mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation6mServiceListData, ThrowOnError>
@@ -12970,7 +13454,7 @@ export const intStorageSlotReactivation6mServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 12-month reactivations - slots touched after 12m expiry
  */
 export const intStorageSlotReactivation12mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation12mServiceListData, ThrowOnError>
@@ -13008,7 +13492,7 @@ export const intStorageSlotReactivation12mServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 18-month reactivations - slots touched after 18m expiry
  */
 export const intStorageSlotReactivation18mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation18mServiceListData, ThrowOnError>
@@ -13046,7 +13530,7 @@ export const intStorageSlotReactivation18mServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot 24-month reactivations - slots touched after 24m expiry
  */
 export const intStorageSlotReactivation24mServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReactivation24mServiceListData, ThrowOnError>
@@ -13084,7 +13568,7 @@ export const intStorageSlotReactivation24mServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Storage slot reads aggregated per block - tracks which slots were read per address
  */
 export const intStorageSlotReadServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotReadServiceListData, ThrowOnError>
@@ -13122,7 +13606,7 @@ export const intStorageSlotReadServiceGet = <ThrowOnError extends boolean = fals
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address - tracks active slots and effective bytes with per-block deltas
  */
 export const intStorageSlotStateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateServiceListData, ThrowOnError>
@@ -13160,7 +13644,7 @@ export const intStorageSlotStateServiceGet = <ThrowOnError extends boolean = fal
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address - ordered by address for efficient address-based queries
  */
 export const intStorageSlotStateByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateByAddressServiceListData, ThrowOnError>
@@ -13198,7 +13682,7 @@ export const intStorageSlotStateByAddressServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block - tracks active slots and effective bytes with per-block deltas
  */
 export const intStorageSlotStateByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateByBlockServiceListData, ThrowOnError>
@@ -13236,7 +13720,7 @@ export const intStorageSlotStateByBlockServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
  */
 export const intStorageSlotStateWithExpiryServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryServiceListData, ThrowOnError>
@@ -13274,7 +13758,7 @@ export const intStorageSlotStateWithExpiryServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block per address with expiry policies - ordered by address for efficient address lookups
  */
 export const intStorageSlotStateWithExpiryByAddressServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryByAddressServiceListData, ThrowOnError>
@@ -13312,7 +13796,7 @@ export const intStorageSlotStateWithExpiryByAddressServiceGet = <ThrowOnError ex
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative storage slot state per block with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
  */
 export const intStorageSlotStateWithExpiryByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntStorageSlotStateWithExpiryByBlockServiceListData, ThrowOnError>
@@ -13350,7 +13834,7 @@ export const intStorageSlotStateWithExpiryByBlockServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Cumulative live storage slots owned by ERC20/ERC721 contracts per block, split by token_standard
  */
 export const intTokenContractStorageStateByBlockServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTokenContractStorageStateByBlockServiceListData, ThrowOnError>
@@ -13388,7 +13872,7 @@ export const intTokenContractStorageStateByBlockServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated call frame activity per transaction for call tree analysis
  */
 export const intTransactionCallFrameServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionCallFrameServiceListData, ThrowOnError>
@@ -13426,7 +13910,7 @@ export const intTransactionCallFrameServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per call frame. Enables per-frame opcode analysis.
  */
 export const intTransactionCallFrameOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionCallFrameOpcodeGasServiceListData, ThrowOnError>
@@ -13464,7 +13948,7 @@ export const intTransactionCallFrameOpcodeGasServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-frame per-opcode resource gas decomposition into 7 categories.
  */
 export const intTransactionCallFrameOpcodeResourceGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionCallFrameOpcodeResourceGasServiceListData, ThrowOnError>
@@ -13503,7 +13987,7 @@ export const intTransactionCallFrameOpcodeResourceGasServiceGet = <ThrowOnError 
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Aggregated opcode-level gas usage per transaction. Source: canonical_execution_transaction_structlog
  */
 export const intTransactionOpcodeGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionOpcodeGasServiceListData, ThrowOnError>
@@ -13541,7 +14025,7 @@ export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
  */
 export const intTransactionReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionReceiptSizeServiceListData, ThrowOnError>
@@ -13579,7 +14063,7 @@ export const intTransactionReceiptSizeServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Retrieve paginated results with optional filtering
+ * Per-transaction resource gas totals including intrinsic gas decomposition.
  */
 export const intTransactionResourceGasServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionResourceGasServiceListData, ThrowOnError>

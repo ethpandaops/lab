@@ -4,6 +4,9 @@ export type ClientOptions = {
   baseUrl: 'https://cbt-api-mainnet.analytics.production.platform.ethpandaops.io' | (string & {});
 };
 
+/**
+ * CBT bookkeeping for incremental transformation models: one row per interval CBT has processed, with the model database and table, the interval starting position and its size. A model has processed the union of its rows. Positions are in the model interval units, such as Unix seconds or block numbers
+ */
 export type AdminCbtIncremental = {
   /**
    * The database name
@@ -24,6 +27,9 @@ export type AdminCbtIncremental = {
   updated_date_time?: number;
 };
 
+/**
+ * Blob transaction to submitter name mapping.
+ */
 export type DimBlockBlobSubmitter = {
   /**
    * The blob submitter address
@@ -55,9 +61,12 @@ export type DimBlockBlobSubmitter = {
   versioned_hashes?: Array<string>;
 };
 
+/**
+ * Commits on each client default and release branches since 2020, with the release each builds on, so graffiti commits from builds between tags resolve to a version
+ */
 export type DimClientCommit = {
   /**
-   * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag
+   * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main)
    */
   base_tag?: string;
   /**
@@ -98,6 +107,9 @@ export type DimClientCommit = {
   updated_date_time?: number;
 };
 
+/**
+ * Consensus and execution client release tags and the commits they point at, for resolving graffiti commit prefixes to versions
+ */
 export type DimClientRelease = {
   /**
    * Client name as used by fct_block_graffiti, e.g. lighthouse or geth
@@ -149,6 +161,9 @@ export type DimClientRelease = {
   version?: string;
 };
 
+/**
+ * Contract owner information from Dune Analytics, growthepie, and eth-labels for top storage slot contracts
+ */
 export type DimContractOwner = {
   /**
    * Account owner of the contract
@@ -184,6 +199,9 @@ export type DimContractOwner = {
   updated_date_time?: number;
 };
 
+/**
+ * Function signature lookup table populated from Sourcify signature database.
+ */
 export type DimFunctionSignature = {
   /**
    * Whether this signature comes from a verified contract source
@@ -203,6 +221,9 @@ export type DimFunctionSignature = {
   updated_date_time?: number;
 };
 
+/**
+ * Node information for validators
+ */
 export type DimNode = {
   /**
    * Additional attributes of the node
@@ -236,6 +257,9 @@ export type DimNode = {
   validator_index?: number;
 };
 
+/**
+ * Rocket Pool node operators with timezone, RPL stake, smoothing pool membership and minipool/validator counts
+ */
 export type DimRocketpoolNode = {
   /**
    * Number of minipools created minus destroyed for this node operator
@@ -287,6 +311,9 @@ export type DimRocketpoolNode = {
   validator_count?: number;
 };
 
+/**
+ * Contracts that have emitted ERC20/ERC721 Transfer events, classified into a single token_standard by their first transfer
+ */
 export type DimTokenContract = {
   /**
    * The token contract address
@@ -302,6 +329,9 @@ export type DimTokenContract = {
   updated_date_time?: number;
 };
 
+/**
+ * Current identity and state of every validator, refreshed from the latest epoch
+ */
 export type DimValidator = {
   /**
    * Epoch the validator became eligible for activation. NULL if not yet set
@@ -369,6 +399,9 @@ export type DimValidator = {
   withdrawal_credentials?: string;
 };
 
+/**
+ * Validator index to pubkey mapping — one row per validator with the latest pubkey
+ */
 export type DimValidatorPubkey = {
   /**
    * The public key of the validator
@@ -384,6 +417,9 @@ export type DimValidatorPubkey = {
   validator_index?: number;
 };
 
+/**
+ * Validator lifecycle status transitions — one row per (validator_index, status) with the first epoch observed
+ */
 export type DimValidatorStatus = {
   /**
    * Epoch when validator became eligible for activation
@@ -435,6 +471,9 @@ export type DimValidatorStatus = {
   withdrawable_epoch?: number | null;
 };
 
+/**
+ * Attestation correctness of a block, preferring finalized canonical data and falling back to real-time head data for slots not yet finalized. Forks in the chain may cause multiple block roots for the same slot to be present
+ */
 export type FctAttestationCorrectness = {
   /**
    * The beacon block root hash
@@ -474,6 +513,9 @@ export type FctAttestationCorrectness = {
   votes_other?: number | null;
 };
 
+/**
+ * Attestation correctness by validator, canonical-preferred merge of the canonical and head sources
+ */
 export type FctAttestationCorrectnessByValidator = {
   /**
    * The index of the validator attesting
@@ -521,6 +563,9 @@ export type FctAttestationCorrectnessByValidator = {
   updated_date_time?: number;
 };
 
+/**
+ * Attestation correctness by validator for the finalized chain
+ */
 export type FctAttestationCorrectnessByValidatorCanonical = {
   /**
    * The index of the validator attesting
@@ -564,6 +609,9 @@ export type FctAttestationCorrectnessByValidatorCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Attestation correctness by validator for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+ */
 export type FctAttestationCorrectnessByValidatorHead = {
   /**
    * The index of the validator attesting
@@ -603,6 +651,9 @@ export type FctAttestationCorrectnessByValidatorHead = {
   updated_date_time?: number;
 };
 
+/**
+ * Attestation correctness of a block for the finalized chain
+ */
 export type FctAttestationCorrectnessCanonical = {
   /**
    * The beacon block root hash
@@ -642,6 +693,9 @@ export type FctAttestationCorrectnessCanonical = {
   votes_other?: number | null;
 };
 
+/**
+ * Attestation correctness of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+ */
 export type FctAttestationCorrectnessHead = {
   /**
    * The beacon block root hash
@@ -681,6 +735,9 @@ export type FctAttestationCorrectnessHead = {
   votes_other?: number | null;
 };
 
+/**
+ * One row per (slot, validator, vote) carrying raw and aggregate first-seen times. ORDER BY includes vote fields so slashable double votes stay as separate rows instead of being collapsed by the ReplacingMergeTree.
+ */
 export type FctAttestationFirstSeenByValidator = {
   /**
    * Earliest time (ms after slot start) this (validator, vote) was seen inside an aggregate. NULL if never seen in an aggregate.
@@ -748,6 +805,9 @@ export type FctAttestationFirstSeenByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Attestations first seen on the unfinalized chain broken down by 50ms chunks. Only includes attestations that were seen within 12000ms of the slot start time. There can be multiple block roots + chunk_slot_start_diff for the same slot, it most likely means votes for prior slot blocks
+ */
 export type FctAttestationFirstSeenChunked50Ms = {
   /**
    * The number of attestations in this chunk
@@ -783,6 +843,9 @@ export type FctAttestationFirstSeenChunked50Ms = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctAttestationInclusionDelayDaily = {
   /**
    * Average inclusion delay (slots)
@@ -838,6 +901,9 @@ export type FctAttestationInclusionDelayDaily = {
   upper_band_inclusion_delay?: number;
 };
 
+/**
+ * Hourly aggregated attestation inclusion delay statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctAttestationInclusionDelayHourly = {
   /**
    * Average inclusion delay (slots)
@@ -893,6 +959,9 @@ export type FctAttestationInclusionDelayHourly = {
   upper_band_inclusion_delay?: number;
 };
 
+/**
+ * Attestation liveness aggregated by entity, preferring settled canonical participation over the real-time head view. One row per (slot, entity) with counts for both attested and missed attestations.
+ */
 export type FctAttestationLivenessByEntity = {
   /**
    * Number of attestations for this entity
@@ -928,6 +997,9 @@ export type FctAttestationLivenessByEntity = {
   updated_date_time?: number;
 };
 
+/**
+ * Attestation liveness aggregated by entity for the head chain. One row per (slot, entity) with counts for both attested and missed attestations.
+ */
 export type FctAttestationLivenessByEntityHead = {
   /**
    * Number of attestations for this entity
@@ -963,6 +1035,9 @@ export type FctAttestationLivenessByEntityHead = {
   updated_date_time?: number;
 };
 
+/**
+ * Attestation observations by contributor nodes, aggregated per slot per node for performance
+ */
 export type FctAttestationObservationByNode = {
   /**
    * Number of attestations observed by this node in this slot
@@ -1074,6 +1149,9 @@ export type FctAttestationObservationByNode = {
   username?: string;
 };
 
+/**
+ * Daily attestation arrival per node
+ */
 export type FctAttestationObservationByNodeDaily = {
   /**
    * Attestations the node saw
@@ -1145,6 +1223,9 @@ export type FctAttestationObservationByNodeDaily = {
   username?: string;
 };
 
+/**
+ * Hourly attestation arrival per node
+ */
 export type FctAttestationObservationByNodeHourly = {
   /**
    * Attestations the node saw
@@ -1216,6 +1297,9 @@ export type FctAttestationObservationByNodeHourly = {
   username?: string;
 };
 
+/**
+ * Daily aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctAttestationParticipationRateDaily = {
   /**
    * Average participation rate (%)
@@ -1271,6 +1355,9 @@ export type FctAttestationParticipationRateDaily = {
   upper_band_participation_rate?: number;
 };
 
+/**
+ * Hourly aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctAttestationParticipationRateHourly = {
   /**
    * Average participation rate (%)
@@ -1326,6 +1413,9 @@ export type FctAttestationParticipationRateHourly = {
   upper_band_participation_rate?: number;
 };
 
+/**
+ * Attestation reward of each validator in each epoch. Rows never change, so there is no version column
+ */
 export type FctAttestationRewardByValidator = {
   /**
    * The epoch number
@@ -1365,6 +1455,9 @@ export type FctAttestationRewardByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Attestation rewards and penalties per validator per day
+ */
 export type FctAttestationRewardByValidatorDaily = {
   /**
    * The day (UTC)
@@ -1416,6 +1509,9 @@ export type FctAttestationRewardByValidatorDaily = {
   validator_index?: number;
 };
 
+/**
+ * Attestation rewards and penalties per validator per week
+ */
 export type FctAttestationRewardByValidatorWeekly = {
   /**
    * Epochs of the week the validator was active (had an attestation reward)
@@ -1467,6 +1563,9 @@ export type FctAttestationRewardByValidatorWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Daily attestation vote correctness and inclusion per consensus and execution client. Validators map to the clients of their most recent identifying graffiti (a proposed block naming the client) in the 365 days before the end of the day. Only validators that proposed with identifying graffiti are covered, the rest are the unknown client.
+ */
 export type FctAttestationVoteCorrectnessByClientDaily = {
   /**
    * Attestations included on chain
@@ -1518,6 +1617,63 @@ export type FctAttestationVoteCorrectnessByClientDaily = {
   validator_count?: number;
 };
 
+/**
+ * Daily attestation vote correctness and inclusion per consensus and execution client pair. Validators map to the pair of their most recent graffiti naming either client in the 365 days before the end of the day, a side it does not name being unknown. Validators that never proposed with identifying graffiti are unknown/unknown.
+ */
+export type FctAttestationVoteCorrectnessByClientPairDaily = {
+  /**
+   * Attestations included on chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Consensus client named by the graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Execution client named by the graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Attestations missed
+   */
+  missed_count?: number;
+  /**
+   * Source votes that were correct
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Validators with attestation duties in the day mapped to this client
+   */
+  validator_count?: number;
+};
+
+/**
+ * Per-slot attestation vote correctness by validator
+ */
 export type FctAttestationVoteCorrectnessByValidator = {
   /**
    * Whether the validator attested in this slot
@@ -1557,6 +1713,9 @@ export type FctAttestationVoteCorrectnessByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Daily aggregation of per-validator attestation vote correctness
+ */
 export type FctAttestationVoteCorrectnessByValidatorDaily = {
   /**
    * Number of attestations made
@@ -1600,6 +1759,9 @@ export type FctAttestationVoteCorrectnessByValidatorDaily = {
   validator_index?: number;
 };
 
+/**
+ * Hourly aggregation of per-validator attestation vote correctness
+ */
 export type FctAttestationVoteCorrectnessByValidatorHourly = {
   /**
    * Number of attestations made
@@ -1643,6 +1805,9 @@ export type FctAttestationVoteCorrectnessByValidatorHourly = {
   validator_index?: number;
 };
 
+/**
+ * Weekly aggregation of per-validator attestation vote correctness
+ */
 export type FctAttestationVoteCorrectnessByValidatorWeekly = {
   /**
    * Number of attestations made
@@ -1686,6 +1851,9 @@ export type FctAttestationVoteCorrectnessByValidatorWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Daily aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctBlobCountDaily = {
   /**
    * Average blob count per slot
@@ -1745,6 +1913,9 @@ export type FctBlobCountDaily = {
   upper_band_blob_count?: number;
 };
 
+/**
+ * Hourly aggregated consensus layer blob count statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctBlobCountHourly = {
   /**
    * Average blob count per slot
@@ -1804,6 +1975,9 @@ export type FctBlobCountHourly = {
   upper_band_blob_count?: number;
 };
 
+/**
+ * Block details for the finalized chain including orphaned blocks
+ */
 export type FctBlock = {
   /**
    * The root hash of the beacon block
@@ -1919,6 +2093,9 @@ export type FctBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Blob count of a block for the finalized chain
+ */
 export type FctBlockBlobCount = {
   /**
    * The number of blobs in the block
@@ -1954,6 +2131,9 @@ export type FctBlockBlobCount = {
   updated_date_time?: number;
 };
 
+/**
+ * Blob count of a block for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+ */
 export type FctBlockBlobCountHead = {
   /**
    * The number of blobs in the block
@@ -1985,6 +2165,9 @@ export type FctBlockBlobCountHead = {
   updated_date_time?: number;
 };
 
+/**
+ * When the block was first seen on the network by a sentry node
+ */
 export type FctBlockBlobFirstSeenByNode = {
   /**
    * The blob index
@@ -2088,6 +2271,9 @@ export type FctBlockBlobFirstSeenByNode = {
   username?: string;
 };
 
+/**
+ * One row per (slot, block root, blob index) carrying the blob versioned hash and KZG commitment, sourced from the head beacon blob sidecar event stream. Available at head without waiting for finalization.
+ */
 export type FctBlockBlobHead = {
   /**
    * The index of the blob within the block
@@ -2127,6 +2313,9 @@ export type FctBlockBlobHead = {
   versioned_hash?: string;
 };
 
+/**
+ * How sentry nodes completed the data columns of each block: completions by path, cells from gossip and the execution layer, and completion times
+ */
 export type FctBlockDataColumnCompletion = {
   /**
    * Number of blobs in the block, the number of cells in each column
@@ -2226,6 +2415,9 @@ export type FctBlockDataColumnCompletion = {
   updated_date_time?: number;
 };
 
+/**
+ * When the data column was first seen on the network by any sentry node
+ */
 export type FctBlockDataColumnSidecarFirstSeen = {
   /**
    * The beacon block root hash
@@ -2337,6 +2529,9 @@ export type FctBlockDataColumnSidecarFirstSeen = {
   username?: string;
 };
 
+/**
+ * When the data column was first seen on the network by a sentry node
+ */
 export type FctBlockDataColumnSidecarFirstSeenByNode = {
   /**
    * The beacon block root hash
@@ -2448,6 +2643,9 @@ export type FctBlockDataColumnSidecarFirstSeenByNode = {
   username?: string;
 };
 
+/**
+ * Daily data column arrival per node
+ */
 export type FctBlockDataColumnSidecarFirstSeenByNodeDaily = {
   /**
    * Average columns the node saw per slot
@@ -2527,6 +2725,9 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeDaily = {
   username?: string;
 };
 
+/**
+ * Hourly data column arrival per node
+ */
 export type FctBlockDataColumnSidecarFirstSeenByNodeHourly = {
   /**
    * Average columns the node saw per slot
@@ -2606,6 +2807,9 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeHourly = {
   username?: string;
 };
 
+/**
+ * When the block was first seen on the network by a sentry node
+ */
 export type FctBlockFirstSeenByNode = {
   /**
    * The beacon block root hash
@@ -2705,6 +2909,9 @@ export type FctBlockFirstSeenByNode = {
   username?: string;
 };
 
+/**
+ * Daily block arrival per node
+ */
 export type FctBlockFirstSeenByNodeDaily = {
   /**
    * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
@@ -2776,6 +2983,9 @@ export type FctBlockFirstSeenByNodeDaily = {
   username?: string;
 };
 
+/**
+ * Hourly block arrival per node
+ */
 export type FctBlockFirstSeenByNodeHourly = {
   /**
    * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
@@ -2847,6 +3057,9 @@ export type FctBlockFirstSeenByNodeHourly = {
   username?: string;
 };
 
+/**
+ * Canonical beacon block graffiti with the consensus and execution clients it names, parsed from the engine API client version codes or client default graffiti
+ */
 export type FctBlockGraffiti = {
   /**
    * The root of the canonical beacon block
@@ -2910,6 +3123,9 @@ export type FctBlockGraffiti = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
+ */
 export type FctBlockGraffitiClientByEntityDaily = {
   /**
    * Number of canonical blocks in the day from this entity with this consensus and execution client pair
@@ -2937,6 +3153,9 @@ export type FctBlockGraffitiClientByEntityDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
+ */
 export type FctBlockGraffitiClientByEntityHourly = {
   /**
    * Number of canonical blocks in the hour from this entity with this consensus and execution client pair
@@ -2964,6 +3183,9 @@ export type FctBlockGraffitiClientByEntityHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily canonical block counts per consensus and execution client pair named by block graffiti, including unknown
+ */
 export type FctBlockGraffitiClientDaily = {
   /**
    * Number of canonical blocks in the day with this consensus and execution client pair
@@ -2987,6 +3209,9 @@ export type FctBlockGraffitiClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly canonical block counts per consensus and execution client pair named by block graffiti, including unknown
+ */
 export type FctBlockGraffitiClientHourly = {
   /**
    * Number of canonical blocks in the hour with this consensus and execution client pair
@@ -3010,6 +3235,9 @@ export type FctBlockGraffitiClientHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
 export type FctBlockGraffitiClientVersionByEntityDaily = {
   /**
    * Number of canonical blocks with this client, version and release status
@@ -3044,11 +3272,14 @@ export type FctBlockGraffitiClientVersionByEntityDaily = {
    */
   updated_date_time?: number;
   /**
-   * Release version the graffiti resolves to, empty when unresolved
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
    */
   version?: string;
 };
 
+/**
+ * Hourly canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
 export type FctBlockGraffitiClientVersionByEntityHourly = {
   /**
    * Number of canonical blocks with this client, version and release status
@@ -3083,11 +3314,14 @@ export type FctBlockGraffitiClientVersionByEntityHourly = {
    */
   updated_date_time?: number;
   /**
-   * Release version the graffiti resolves to, empty when unresolved
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
    */
   version?: string;
 };
 
+/**
+ * Daily canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
 export type FctBlockGraffitiClientVersionDaily = {
   /**
    * Number of canonical blocks with this client, version and release status
@@ -3118,11 +3352,14 @@ export type FctBlockGraffitiClientVersionDaily = {
    */
   updated_date_time?: number;
   /**
-   * Release version the graffiti resolves to, empty when unresolved
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
    */
   version?: string;
 };
 
+/**
+ * Hourly canonical block counts per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
 export type FctBlockGraffitiClientVersionHourly = {
   /**
    * Number of canonical blocks with this client, version and release status
@@ -3153,11 +3390,56 @@ export type FctBlockGraffitiClientVersionHourly = {
    */
   updated_date_time?: number;
   /**
-   * Release version the graffiti resolves to, empty when unresolved
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
    */
   version?: string;
 };
 
+/**
+ * Daily canonical block counts per consensus and execution client release pair resolved from block graffiti, each block counted once, with builds of one version from different commits together. release_status: commit_match (the graffiti commit is a release tag commit), commit_untagged (a default or release branch commit between tags, version is the release it builds on), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). An unresolved side keeps the version its graffiti states, or is empty when it states none
+ */
+export type FctBlockGraffitiClientVersionPairDaily = {
+  /**
+   * Number of canonical blocks with this consensus and execution client release pair
+   */
+  block_count?: number;
+  /**
+   * Consensus client named by the block graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * How the consensus client version was resolved, see the table comment for values
+   */
+  consensus_release_status?: string;
+  /**
+   * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none
+   */
+  consensus_version?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Execution client named by the block graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * How the execution client version was resolved, see the table comment for values
+   */
+  execution_release_status?: string;
+  /**
+   * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none
+   */
+  execution_version?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
+ */
 export type FctBlockHead = {
   /**
    * The root hash of the beacon block
@@ -3269,6 +3551,9 @@ export type FctBlockHead = {
   updated_date_time?: number;
 };
 
+/**
+ * MEV relay proposer payload delivered for a block on the finalized chain including orphaned blocks
+ */
 export type FctBlockMev = {
   /**
    * The block hash of the proposer payload
@@ -3348,6 +3633,9 @@ export type FctBlockMev = {
   value?: string | null;
 };
 
+/**
+ * MEV relay proposer payload delivered for a block on the unfinalized chain
+ */
 export type FctBlockMevHead = {
   /**
    * The block hash of the proposer payload
@@ -3423,6 +3711,9 @@ export type FctBlockMevHead = {
   value?: string | null;
 };
 
+/**
+ * When sentry nodes first received the gossipsub partial data column header for a Fulu block, the eager push that lets peers verify cells before the full column arrives
+ */
 export type FctBlockPartialDataColumnHeaderFirstSeen = {
   /**
    * Number of KZG commitments in the header
@@ -3482,6 +3773,9 @@ export type FctBlockPartialDataColumnHeaderFirstSeen = {
   updated_date_time?: number;
 };
 
+/**
+ * Gloas (ePBS) per-block execution payload facts: the winning bid commitment joined with what the revealed envelope actually contained, replacing the pre-gloas execution columns that no longer exist on the beacon block
+ */
 export type FctBlockPayload = {
   /**
    * Number of blob KZG commitments in the bid
@@ -3553,6 +3847,9 @@ export type FctBlockPayload = {
   value?: string;
 };
 
+/**
+ * When each sentry node had the gloas (ePBS) execution payload and its blobs locally verified (PTC vote readiness)
+ */
 export type FctBlockPayloadAvailableByNode = {
   /**
    * The time from slot start for the node to have the payload and its blobs locally verified
@@ -3648,6 +3945,9 @@ export type FctBlockPayloadAvailableByNode = {
   username?: string;
 };
 
+/**
+ * The winning gloas (ePBS) execution payload bid committed in each canonical beacon block, one per block
+ */
 export type FctBlockPayloadBid = {
   /**
    * Number of blob KZG commitments in the bid
@@ -3715,6 +4015,9 @@ export type FctBlockPayloadBid = {
   value?: string;
 };
 
+/**
+ * When the gloas (ePBS) execution payload envelope was first seen by each sentry node, across the beacon API event stream and libp2p gossip
+ */
 export type FctBlockPayloadFirstSeenByNode = {
   /**
    * The execution block hash of the payload
@@ -3822,6 +4125,9 @@ export type FctBlockPayloadFirstSeenByNode = {
   username?: string;
 };
 
+/**
+ * Gloas (ePBS) Payload Timeliness Committee verdict per attested block: canonical on-chain aggregates unioned with orphaned blocks only seen on the live stream
+ */
 export type FctBlockPayloadPtcVote = {
   /**
    * PTC validators attesting blob data was available
@@ -3877,6 +4183,9 @@ export type FctBlockPayloadPtcVote = {
   updated_date_time?: number;
 };
 
+/**
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, observed on the live beacon API event stream. Available at head without waiting for finalization.
+ */
 export type FctBlockPayloadPtcVoteHead = {
   /**
    * Distinct PTC validators attesting blob data was available
@@ -3924,6 +4233,31 @@ export type FctBlockPayloadPtcVoteHead = {
   updated_date_time?: number;
 };
 
+/**
+ * Gloas (ePBS) daily payload delivery outcomes judged by the PTC, the daily twin of fct_block_payload_status_hourly. A block counts as delivered when a majority of observed PTC votes said the payload was present, absent otherwise
+ */
+export type FctBlockPayloadStatusDaily = {
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Number of blocks with this payload outcome in the day
+   */
+  slot_count?: number;
+  /**
+   * PTC verdict bucket: delivered or absent
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Gloas (ePBS) hourly payload delivery outcomes judged by the PTC, for delivery-rate charts
+ */
 export type FctBlockPayloadStatusHourly = {
   /**
    * The wall clock time at the start of the hour
@@ -3943,6 +4277,9 @@ export type FctBlockPayloadStatusHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily block proposals per consensus and execution client: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the proposer most recent identifying graffiti from the previous 365 days.
+ */
 export type FctBlockProposalByClientDaily = {
   /**
    * Mean blobs per canonical block
@@ -4002,6 +4339,71 @@ export type FctBlockProposalByClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily block proposals per consensus and execution client pair: blocks, MEV share and value, gas, blobs, first-seen propagation, orphaned blocks and missed slots. Canonical blocks use their own graffiti. Orphaned and missed proposals use the pair of the proposer most recent graffiti naming either client from the previous 365 days. A side the graffiti does not name is unknown.
+ */
+export type FctBlockProposalByClientPairDaily = {
+  /**
+   * Mean blobs per canonical block
+   */
+  avg_blob_count?: number | null;
+  /**
+   * Mean execution gas used per canonical block
+   */
+  avg_gas_used?: number | null;
+  /**
+   * Mean relay-reported value of the MEV blocks in ETH, NULL when there were none
+   */
+  avg_mev_value_eth?: number | null;
+  /**
+   * Blobs in the canonical blocks
+   */
+  blob_count?: number;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * Median over blocks of the median time sentry nodes first saw the block, in ms from slot start
+   */
+  block_first_seen_p50_ms?: number | null;
+  /**
+   * 90th percentile over blocks of the median time sentry nodes first saw the block, in ms from slot start
+   */
+  block_first_seen_p90_ms?: number | null;
+  /**
+   * Consensus client named by the graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Execution client named by the graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Canonical blocks delivered by an MEV relay, the rest were built locally
+   */
+  mev_block_count?: number;
+  /**
+   * Missed slots, attributed through the scheduled proposer most recent identifying graffiti
+   */
+  missed_slot_count?: number;
+  /**
+   * Orphaned blocks, attributed through the proposer most recent identifying graffiti
+   */
+  orphaned_block_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily block proposal status counts by status type
+ */
 export type FctBlockProposalStatusDaily = {
   /**
    * Start of the day period
@@ -4021,6 +4423,9 @@ export type FctBlockProposalStatusDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly block proposal status counts by status type
+ */
 export type FctBlockProposalStatusHourly = {
   /**
    * Start of the hour period
@@ -4040,6 +4445,9 @@ export type FctBlockProposalStatusHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Block proposers for the finalized chain including orphaned blocks
+ */
 export type FctBlockProposer = {
   /**
    * The beacon block root hash. Null if a block was never seen by a sentry, aka "missed"
@@ -4079,6 +4487,9 @@ export type FctBlockProposer = {
   updated_date_time?: number;
 };
 
+/**
+ * Block proposers re-indexed by validator for efficient validator lookups
+ */
 export type FctBlockProposerByValidator = {
   /**
    * The beacon block root hash. NULL if missed
@@ -4118,6 +4529,9 @@ export type FctBlockProposerByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Block proposer entity for the unfinalized chain
+ */
 export type FctBlockProposerEntity = {
   /**
    * The entity that proposed the block
@@ -4145,6 +4559,9 @@ export type FctBlockProposerEntity = {
   updated_date_time?: number;
 };
 
+/**
+ * Block proposers for the unfinalized chain
+ */
 export type FctBlockProposerHead = {
   /**
    * The beacon block root hash. Null if a block was never seen by a sentry
@@ -4180,6 +4597,9 @@ export type FctBlockProposerHead = {
   updated_date_time?: number;
 };
 
+/**
+ * Consensus layer reward of each canonical block's proposer
+ */
 export type FctBlockProposerReward = {
   /**
    * Reward for included attestations in Gwei
@@ -4231,6 +4651,9 @@ export type FctBlockProposerReward = {
   updated_date_time?: number;
 };
 
+/**
+ * Consensus layer proposer rewards per proposer per day
+ */
 export type FctBlockProposerRewardByValidatorDaily = {
   /**
    * Reward for included attestations in Gwei
@@ -4270,6 +4693,9 @@ export type FctBlockProposerRewardByValidatorDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Consensus layer proposer rewards per proposer per week
+ */
 export type FctBlockProposerRewardByValidatorWeekly = {
   /**
    * Reward for included attestations in Gwei
@@ -4309,6 +4735,9 @@ export type FctBlockProposerRewardByValidatorWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Contract storage state metrics per address aggregated by day
+ */
 export type FctContractStorageStateByAddressDaily = {
   /**
    * Cumulative count of active storage slots at end of day
@@ -4332,6 +4761,9 @@ export type FctContractStorageStateByAddressDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract storage state metrics per address aggregated by hour
+ */
 export type FctContractStorageStateByAddressHourly = {
   /**
    * Cumulative count of active storage slots at end of hour
@@ -4355,6 +4787,9 @@ export type FctContractStorageStateByAddressHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract storage state metrics aggregated by day
+ */
 export type FctContractStorageStateByBlockDaily = {
   /**
    * Cumulative count of contracts with at least one active slot at end of day
@@ -4378,6 +4813,9 @@ export type FctContractStorageStateByBlockDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract storage state metrics aggregated by hour
+ */
 export type FctContractStorageStateByBlockHourly = {
   /**
    * Cumulative count of contracts with at least one active slot at end of hour
@@ -4401,6 +4839,9 @@ export type FctContractStorageStateByBlockHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state metrics per address aggregated by day
+ */
 export type FctContractStorageStateWithExpiryByAddressDaily = {
   /**
    * Active storage slots in this contract at end of day (0 if expired)
@@ -4428,6 +4869,9 @@ export type FctContractStorageStateWithExpiryByAddressDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state metrics per address aggregated by hour
+ */
 export type FctContractStorageStateWithExpiryByAddressHourly = {
   /**
    * Active storage slots in this contract at end of hour (0 if expired)
@@ -4455,6 +4899,9 @@ export type FctContractStorageStateWithExpiryByAddressHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state metrics aggregated by day
+ */
 export type FctContractStorageStateWithExpiryByBlockDaily = {
   /**
    * Count of contracts with active_slots > 0 at end of day
@@ -4482,6 +4929,9 @@ export type FctContractStorageStateWithExpiryByBlockDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state metrics aggregated by hour
+ */
 export type FctContractStorageStateWithExpiryByBlockHourly = {
   /**
    * Count of contracts with active_slots > 0 at end of hour
@@ -4509,6 +4959,9 @@ export type FctContractStorageStateWithExpiryByBlockHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily data column custody probe outcomes by the probed peer client and release (its latest agent in the day), from int_custody_probe. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ */
 export type FctCustodyProbeByClientDaily = {
   /**
    * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
@@ -4539,7 +4992,7 @@ export type FctCustodyProbeByClientDaily = {
    */
   probe_count?: number;
   /**
-   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
    */
   release_status?: string;
   /**
@@ -4564,6 +5017,9 @@ export type FctCustodyProbeByClientDaily = {
   version?: string;
 };
 
+/**
+ * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
+ */
 export type FctDataColumnAvailabilityByEpoch = {
   /**
    * Availability percentage calculated from total counts (total_success_count / total_probe_count * 100, rounded to 2 decimal places)
@@ -4643,6 +5099,9 @@ export type FctDataColumnAvailabilityByEpoch = {
   updated_date_time?: number;
 };
 
+/**
+ * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
+ */
 export type FctDataColumnAvailabilityBySlot = {
   /**
    * Availability percentage (success / total * 100) rounded to 2 decimal places
@@ -4758,6 +5217,9 @@ export type FctDataColumnAvailabilityBySlot = {
   wallclock_request_slot_start_date_time?: number;
 };
 
+/**
+ * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
+ */
 export type FctDataColumnAvailabilityBySlotBlob = {
   /**
    * Availability percentage (success / total * 100) rounded to 2 decimal places - same for all blobs in column
@@ -4861,6 +5323,9 @@ export type FctDataColumnAvailabilityBySlotBlob = {
   wallclock_request_slot_start_date_time?: number;
 };
 
+/**
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ */
 export type FctDataColumnAvailabilityDaily = {
   /**
    * Availability percentage calculated from total counts (total_success_count / total_probe_count * 100, rounded to 2 decimal places)
@@ -4932,6 +5397,9 @@ export type FctDataColumnAvailabilityDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
+ */
 export type FctDataColumnAvailabilityHourly = {
   /**
    * Availability percentage calculated from total counts (total_success_count / total_probe_count * 100, rounded to 2 decimal places)
@@ -5003,6 +5471,9 @@ export type FctDataColumnAvailabilityHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
+ */
 export type FctDataColumnCompletionByPathDaily = {
   /**
    * Average number of distinct peers that contributed cells to a completion
@@ -5070,6 +5541,9 @@ export type FctDataColumnCompletionByPathDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly data column completions on sentry nodes by consensus client and completion path, with cells by source and completion time percentiles
+ */
 export type FctDataColumnCompletionByPathHourly = {
   /**
    * Average number of distinct peers that contributed cells to a completion
@@ -5137,6 +5611,9 @@ export type FctDataColumnCompletionByPathHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * How each data column of a block became available across sentry nodes: completions by path, cells from gossip and the execution layer, and gossipsub partial message traffic
+ */
 export type FctDataColumnCompletionBySlot = {
   /**
    * Average number of distinct peers that contributed cells to a PARTIAL_GOSSIP completion, 0 when there was none
@@ -5276,6 +5753,9 @@ export type FctDataColumnCompletionBySlot = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
+ */
 export type FctDataColumnPartialMessageDaily = {
   /**
    * Distinct peers that sent a sentry node at least one cell
@@ -5383,6 +5863,9 @@ export type FctDataColumnPartialMessageDaily = {
   verdict_cells?: number;
 };
 
+/**
+ * Hourly gossipsub partial data column traffic on sentry nodes by consensus client: messages and cells sent and received, validation verdicts, useful cells and header push timing
+ */
 export type FctDataColumnPartialMessageHourly = {
   /**
    * Distinct peers that sent a sentry node at least one cell
@@ -5490,6 +5973,9 @@ export type FctDataColumnPartialMessageHourly = {
   verdict_cells?: number;
 };
 
+/**
+ * engine_getBlobs observations aggregated by execution client and status for EL comparison
+ */
 export type FctEngineGetBlobsByElClient = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -5569,6 +6055,9 @@ export type FctEngineGetBlobsByElClient = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated engine_getBlobs statistics by execution client with true percentiles
+ */
 export type FctEngineGetBlobsByElClientDaily = {
   /**
    * Average duration of SUCCESS engine_getBlobs calls in milliseconds
@@ -5648,6 +6137,9 @@ export type FctEngineGetBlobsByElClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly aggregated engine_getBlobs statistics by execution client with true percentiles
+ */
 export type FctEngineGetBlobsByElClientHourly = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -5727,6 +6219,9 @@ export type FctEngineGetBlobsByElClientHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily engine_getBlobs duration per node
+ */
 export type FctEngineGetBlobsByNodeDaily = {
   /**
    * engine_getBlobs calls
@@ -5802,6 +6297,9 @@ export type FctEngineGetBlobsByNodeDaily = {
   username?: string;
 };
 
+/**
+ * Hourly engine_getBlobs duration per node
+ */
 export type FctEngineGetBlobsByNodeHourly = {
   /**
    * engine_getBlobs calls
@@ -5877,6 +6375,9 @@ export type FctEngineGetBlobsByNodeHourly = {
   username?: string;
 };
 
+/**
+ * Slot-level aggregated engine_getBlobs observations grouped by status with duration statistics
+ */
 export type FctEngineGetBlobsBySlot = {
   /**
    * Average duration of engine_getBlobs calls in milliseconds
@@ -5960,6 +6461,9 @@ export type FctEngineGetBlobsBySlot = {
   updated_date_time?: number;
 };
 
+/**
+ * Fine-grained engine_getBlobs duration distribution in 50ms chunks for latency histogram analysis
+ */
 export type FctEngineGetBlobsDurationChunked50Ms = {
   /**
    * Root of the beacon block (hex encoded with 0x prefix)
@@ -6015,6 +6519,109 @@ export type FctEngineGetBlobsDurationChunked50Ms = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export type FctEngineGetBlobsDurationChunked50MsDaily = {
+  /**
+   * Duration bucket in 50ms chunks (0, 50, 100, 150, ...)
+   */
+  chunk_duration_ms?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of EMPTY status observations in this chunk
+   */
+  empty_count?: number;
+  /**
+   * Number of ERROR or UNSUPPORTED status observations in this chunk
+   */
+  error_count?: number;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_getBlobs observations in this duration chunk
+   */
+  observation_count?: number;
+  /**
+   * Number of PARTIAL status observations in this chunk
+   */
+  partial_count?: number;
+  /**
+   * Number of SUCCESS status observations in this chunk
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Hourly engine_getBlobs duration distribution in 50ms chunks per node class and execution client version, from int_engine_get_blobs, for latency histograms and percentiles over long ranges
+ */
+export type FctEngineGetBlobsDurationChunked50MsHourly = {
+  /**
+   * Duration bucket in 50ms chunks (0, 50, 100, 150, ...)
+   */
+  chunk_duration_ms?: number;
+  /**
+   * Number of EMPTY status observations in this chunk
+   */
+  empty_count?: number;
+  /**
+   * Number of ERROR or UNSUPPORTED status observations in this chunk
+   */
+  error_count?: number;
+  /**
+   * The wall clock time at the start of the hour, by slot
+   */
+  hour_start_date_time?: number;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_getBlobs observations in this duration chunk
+   */
+  observation_count?: number;
+  /**
+   * Number of PARTIAL status observations in this chunk
+   */
+  partial_count?: number;
+  /**
+   * Number of SUCCESS status observations in this chunk
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload observations aggregated by execution client and status for EL comparison
+ */
 export type FctEngineNewPayloadByElClient = {
   /**
    * Average duration of engine_newPayload calls in milliseconds
@@ -6106,6 +6713,9 @@ export type FctEngineNewPayloadByElClient = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated engine_newPayload statistics by execution client with true percentiles
+ */
 export type FctEngineNewPayloadByElClientDaily = {
   /**
    * Number of observations with ACCEPTED status
@@ -6193,6 +6803,9 @@ export type FctEngineNewPayloadByElClientDaily = {
   valid_count?: number;
 };
 
+/**
+ * Hourly aggregated engine_newPayload statistics by execution client with true percentiles
+ */
 export type FctEngineNewPayloadByElClientHourly = {
   /**
    * Number of observations with ACCEPTED status
@@ -6280,6 +6893,9 @@ export type FctEngineNewPayloadByElClientHourly = {
   valid_count?: number;
 };
 
+/**
+ * Daily engine_newPayload duration per node
+ */
 export type FctEngineNewPayloadByNodeDaily = {
   /**
    * Calls that returned ACCEPTED
@@ -6363,6 +6979,9 @@ export type FctEngineNewPayloadByNodeDaily = {
   valid_count?: number;
 };
 
+/**
+ * Hourly engine_newPayload duration per node
+ */
 export type FctEngineNewPayloadByNodeHourly = {
   /**
    * Calls that returned ACCEPTED
@@ -6446,6 +7065,9 @@ export type FctEngineNewPayloadByNodeHourly = {
   valid_count?: number;
 };
 
+/**
+ * Slot-level aggregated engine_newPayload observations grouped by status with duration statistics
+ */
 export type FctEngineNewPayloadBySlot = {
   /**
    * Average duration of engine_newPayload calls in milliseconds
@@ -6549,6 +7171,9 @@ export type FctEngineNewPayloadBySlot = {
   updated_date_time?: number;
 };
 
+/**
+ * Fine-grained engine_newPayload duration distribution in 50ms chunks for latency histogram analysis
+ */
 export type FctEngineNewPayloadDurationChunked50Ms = {
   /**
    * Execution block hash (hex encoded with 0x prefix)
@@ -6596,6 +7221,93 @@ export type FctEngineNewPayloadDurationChunked50Ms = {
   valid_count?: number;
 };
 
+/**
+ * Daily engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export type FctEngineNewPayloadDurationChunked50MsDaily = {
+  /**
+   * Duration bucket in 50ms chunks (0, 50, 100, 150, ...)
+   */
+  chunk_duration_ms?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk
+   */
+  invalid_count?: number;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload observations in this duration chunk
+   */
+  observation_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of VALID status observations in this chunk
+   */
+  valid_count?: number;
+};
+
+/**
+ * Hourly engine_newPayload duration distribution in 50ms chunks per node class and execution client version, from int_engine_new_payload, for latency histograms and percentiles over long ranges
+ */
+export type FctEngineNewPayloadDurationChunked50MsHourly = {
+  /**
+   * Duration bucket in 50ms chunks (0, 50, 100, 150, ...)
+   */
+  chunk_duration_ms?: number;
+  /**
+   * The wall clock time at the start of the hour, by slot
+   */
+  hour_start_date_time?: number;
+  /**
+   * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk
+   */
+  invalid_count?: number;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload observations in this duration chunk
+   */
+  observation_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Number of VALID status observations in this chunk
+   */
+  valid_count?: number;
+};
+
+/**
+ * Daily execution client winrate based on fastest engine_newPayload duration per slot
+ */
 export type FctEngineNewPayloadWinrateDaily = {
   /**
    * Start of the day period
@@ -6619,6 +7331,9 @@ export type FctEngineNewPayloadWinrateDaily = {
   win_count?: number;
 };
 
+/**
+ * Hourly execution client winrate based on fastest engine_newPayload duration per slot
+ */
 export type FctEngineNewPayloadWinrateHourly = {
   /**
    * Start of the hour period
@@ -6642,6 +7357,59 @@ export type FctEngineNewPayloadWinrateHourly = {
   win_count?: number;
 };
 
+/**
+ * One row per epoch of the finalized chain with its proposer duties, canonical blocks, slots without a canonical block and attestation participation, from int_block_proposer_canonical and fct_attestation_correctness_canonical
+ */
+export type FctEpochSummaryCanonical = {
+  /**
+   * Slots with a block on the finalized chain
+   */
+  canonical_block_count?: number;
+  /**
+   * The epoch number
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned
+   */
+  missed_slot_count?: number;
+  /**
+   * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it
+   */
+  participation_bps?: number;
+  /**
+   * Share of scheduled attestations included on chain, (votes_head + votes_other) / votes_max from 0 to 1, NULL when none were scheduled
+   */
+  participation_rate?: number | null;
+  /**
+   * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Attestations included on chain that voted for the block of their own slot
+   */
+  votes_head?: number;
+  /**
+   * Attestations scheduled across the epoch slots
+   */
+  votes_max?: number;
+  /**
+   * Attestations included on chain that voted for another block
+   */
+  votes_other?: number;
+};
+
+/**
+ * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctExecutionGasLimitDaily = {
   /**
    * Average gas limit per block
@@ -6701,6 +7469,9 @@ export type FctExecutionGasLimitDaily = {
   upper_band_gas_limit?: number;
 };
 
+/**
+ * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctExecutionGasLimitHourly = {
   /**
    * Average gas limit per block
@@ -6760,6 +7531,9 @@ export type FctExecutionGasLimitHourly = {
   upper_band_gas_limit?: number;
 };
 
+/**
+ * Daily gas limit signalling by validators, from their MEV relay validator registrations. For each UTC day, each validator counts once at the highest gas limit it registered in the 7 days ending that day, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
+ */
 export type FctExecutionGasLimitSignallingDaily = {
   day_start_date?: string;
   gas_limit_band_counts?: {
@@ -6768,6 +7542,9 @@ export type FctExecutionGasLimitSignallingDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly gas limit signalling by validators, from their MEV relay validator registrations. For each hour, each validator counts once at the highest gas limit it registered on that UTC day or the 7 days before, rounded up to a multiple of 1M gas. gas_limit_band_counts maps each band to its validator count. Validators that do not register with the relays xatu polls are not counted
+ */
 export type FctExecutionGasLimitSignallingHourly = {
   gas_limit_band_counts?: {
     [key: string]: number;
@@ -6776,6 +7553,9 @@ export type FctExecutionGasLimitSignallingHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctExecutionGasUsedDaily = {
   /**
    * Average gas used per block
@@ -6839,6 +7619,9 @@ export type FctExecutionGasUsedDaily = {
   upper_band_gas_used?: number;
 };
 
+/**
+ * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctExecutionGasUsedHourly = {
   /**
    * Average gas used per block
@@ -6902,6 +7685,9 @@ export type FctExecutionGasUsedHourly = {
   upper_band_gas_used?: number;
 };
 
+/**
+ * Daily aggregation of receipt size with standard statistics.
+ */
 export type FctExecutionReceiptSizeDaily = {
   /**
    * Average logs per transaction
@@ -6989,6 +7775,9 @@ export type FctExecutionReceiptSizeDaily = {
   upper_band_receipt_bytes_per_block?: number;
 };
 
+/**
+ * Hourly aggregation of receipt size with standard statistics.
+ */
 export type FctExecutionReceiptSizeHourly = {
   /**
    * Average logs per transaction
@@ -7076,6 +7865,9 @@ export type FctExecutionReceiptSizeHourly = {
   upper_band_receipt_bytes_per_block?: number;
 };
 
+/**
+ * Execution layer state size metrics aggregated by day
+ */
 export type FctExecutionStateSizeDaily = {
   /**
    * Account bytes at end of day
@@ -7131,6 +7923,9 @@ export type FctExecutionStateSizeDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Execution layer state size metrics aggregated by hour
+ */
 export type FctExecutionStateSizeHourly = {
   /**
    * Account bytes at end of hour
@@ -7186,9 +7981,12 @@ export type FctExecutionStateSizeHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the UTC day
+ */
 export type FctExecutionTpsDaily = {
   /**
-   * Average TPS using actual block time gaps
+   * Unweighted mean of per-block TPS over the day's blocks. Short block gaps inflate it. total_transactions / total_seconds is the TPS over the day
    */
   avg_tps?: number;
   /**
@@ -7249,9 +8047,12 @@ export type FctExecutionTpsDaily = {
   upper_band_tps?: number;
 };
 
+/**
+ * Hourly execution layer TPS statistics. Per-block TPS is the block's transaction count divided by the seconds since the previous block. avg_tps, the percentiles and the bands are taken over blocks, and total_transactions / total_seconds is the TPS over the hour
+ */
 export type FctExecutionTpsHourly = {
   /**
-   * Average TPS using actual block time gaps
+   * Unweighted mean of per-block TPS over the hour's blocks. Short block gaps inflate it. total_transactions / total_seconds is the TPS over the hour
    */
   avg_tps?: number;
   /**
@@ -7312,6 +8113,9 @@ export type FctExecutionTpsHourly = {
   upper_band_tps?: number;
 };
 
+/**
+ * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ */
 export type FctExecutionTransactionsDaily = {
   /**
    * Average transactions per block
@@ -7375,6 +8179,9 @@ export type FctExecutionTransactionsDaily = {
   upper_band_txn_per_block?: number;
 };
 
+/**
+ * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ */
 export type FctExecutionTransactionsHourly = {
   /**
    * Average transactions per block
@@ -7438,6 +8245,9 @@ export type FctExecutionTransactionsHourly = {
   upper_band_txn_per_block?: number;
 };
 
+/**
+ * When the head event was first seen on the network by a sentry node
+ */
 export type FctHeadFirstSeenByNode = {
   /**
    * The head block root hash
@@ -7537,6 +8347,9 @@ export type FctHeadFirstSeenByNode = {
   username?: string;
 };
 
+/**
+ * Daily head event arrival per node
+ */
 export type FctHeadFirstSeenByNodeDaily = {
   /**
    * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
@@ -7608,6 +8421,9 @@ export type FctHeadFirstSeenByNodeDaily = {
   username?: string;
 };
 
+/**
+ * Hourly head event arrival per node
+ */
 export type FctHeadFirstSeenByNodeHourly = {
   /**
    * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
@@ -7679,6 +8495,9 @@ export type FctHeadFirstSeenByNodeHourly = {
   username?: string;
 };
 
+/**
+ * Daily aggregated head vote correctness rate statistics
+ */
 export type FctHeadVoteCorrectnessRateDaily = {
   /**
    * Average head vote correctness rate (%)
@@ -7734,6 +8553,9 @@ export type FctHeadVoteCorrectnessRateDaily = {
   upper_band_head_vote_rate?: number;
 };
 
+/**
+ * Hourly aggregated head vote correctness rate statistics
+ */
 export type FctHeadVoteCorrectnessRateHourly = {
   /**
    * Average head vote correctness rate (%)
@@ -7789,6 +8611,9 @@ export type FctHeadVoteCorrectnessRateHourly = {
   upper_band_head_vote_rate?: number;
 };
 
+/**
+ * Total number of MEV builder bids for a slot
+ */
 export type FctMevBidCountByBuilder = {
   /**
    * The total number of bids from the builder
@@ -7820,6 +8645,9 @@ export type FctMevBidCountByBuilder = {
   updated_date_time?: number;
 };
 
+/**
+ * Total number of MEV relay bids for a slot by relay
+ */
 export type FctMevBidCountByRelay = {
   /**
    * The total number of bids for the relay
@@ -7851,6 +8679,9 @@ export type FctMevBidCountByRelay = {
   updated_date_time?: number;
 };
 
+/**
+ * Highest value bid from each builder per slot broken down by 50ms chunks. Each block_hash appears in the chunk determined by its earliest bid timestamp. Only includes bids within -12000ms to +12000ms of slot start time
+ */
 export type FctMevBidHighestValueByBuilderChunked50Ms = {
   /**
    * The execution block hash of the bid
@@ -7898,6 +8729,9 @@ export type FctMevBidHighestValueByBuilderChunked50Ms = {
   value?: string;
 };
 
+/**
+ * Daily rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
+ */
 export type FctMissedSlotRateDaily = {
   /**
    * Start of the day period
@@ -7925,6 +8759,9 @@ export type FctMissedSlotRateDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly rate of slots without a canonical block. Missed slots and slots whose block was orphaned both count as missed
+ */
 export type FctMissedSlotRateHourly = {
   /**
    * Start of the hour period
@@ -7952,6 +8789,9 @@ export type FctMissedSlotRateHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Xatu nodes that sent beacon API block events in the last 24 hours, one row per meta_client_name with its latest client, version and location. Nodes that only report through libp2p, such as the ethPandaOps libp2p sentries, are not included
+ */
 export type FctNodeActiveLast24h = {
   /**
    * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
@@ -8014,7 +8854,7 @@ export type FctNodeActiveLast24h = {
    */
   meta_consensus_version?: string;
   /**
-   * ID of the node
+   * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time
    */
   node_id?: string;
   /**
@@ -8027,6 +8867,9 @@ export type FctNodeActiveLast24h = {
   username?: string;
 };
 
+/**
+ * Node CPU utilization per sub-slot window enriched with node classification
+ */
 export type FctNodeCpuUtilizationByProcess = {
   /**
    * Client type: CL or EL
@@ -8082,6 +8925,9 @@ export type FctNodeCpuUtilizationByProcess = {
   window_start?: number;
 };
 
+/**
+ * Node disk I/O per sub-slot window aggregated across devices with node classification
+ */
 export type FctNodeDiskIoByProcess = {
   /**
    * Client type: CL or EL
@@ -8133,6 +8979,87 @@ export type FctNodeDiskIoByProcess = {
   window_start?: number;
 };
 
+/**
+ * Every Xatu node that has reported a block, with its latest identity, client and location, from fct_block_first_seen_by_node. The row with the latest last_seen_date_time wins, so a node reported in a range ending now has last_seen_date_time inside it
+ */
+export type FctNodeLastSeen = {
+  /**
+   * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * Start of the latest slot the Xatu node reported a block in
+   */
+  last_seen_date_time?: number;
+  /**
+   * Autonomous system number of the Xatu node at the latest observation
+   */
+  meta_client_geo_autonomous_system_number?: number | null;
+  /**
+   * Autonomous system organization of the Xatu node at the latest observation
+   */
+  meta_client_geo_autonomous_system_organization?: string | null;
+  /**
+   * City of the Xatu node at the latest observation
+   */
+  meta_client_geo_city?: string;
+  /**
+   * Continent code of the Xatu node at the latest observation
+   */
+  meta_client_geo_continent_code?: string;
+  /**
+   * Country of the Xatu node at the latest observation
+   */
+  meta_client_geo_country?: string;
+  /**
+   * Country code of the Xatu node at the latest observation
+   */
+  meta_client_geo_country_code?: string;
+  /**
+   * Latitude of the Xatu node at the latest observation
+   */
+  meta_client_geo_latitude?: number | null;
+  /**
+   * Longitude of the Xatu node at the latest observation
+   */
+  meta_client_geo_longitude?: number | null;
+  /**
+   * Implementation of the collector at the latest observation
+   */
+  meta_client_implementation?: string;
+  /**
+   * Name of the Xatu node
+   */
+  meta_client_name?: string;
+  /**
+   * Version of the collector at the latest observation
+   */
+  meta_client_version?: string;
+  /**
+   * Consensus client implementation of the Xatu node at the latest observation
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Consensus client version of the Xatu node at the latest observation
+   */
+  meta_consensus_version?: string;
+  /**
+   * ID of the Xatu node
+   */
+  node_id?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the Xatu node
+   */
+  username?: string;
+};
+
+/**
+ * Node memory usage per sub-slot window enriched with node classification
+ */
 export type FctNodeMemoryUsageByProcess = {
   /**
    * Client type: CL or EL
@@ -8188,6 +9115,9 @@ export type FctNodeMemoryUsageByProcess = {
   window_start?: number;
 };
 
+/**
+ * Node network I/O per port per sub-slot window with node classification
+ */
 export type FctNodeNetworkIoByProcess = {
   /**
    * Client type: CL or EL
@@ -8243,6 +9173,9 @@ export type FctNodeNetworkIoByProcess = {
   window_start?: number;
 };
 
+/**
+ * Daily execution cost per opcode group by execution client, fitted from engine_newPayload durations
+ */
 export type FctOpcodeCostByElClientDaily = {
   /**
    * Block observations in the fit
@@ -8330,6 +9263,9 @@ export type FctOpcodeCostByElClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Execution cost per opcode group for each execution client version, fitted over every hour the version ran
+ */
 export type FctOpcodeCostByElClientVersion = {
   /**
    * Block observations in the fit
@@ -8421,6 +9357,9 @@ export type FctOpcodeCostByElClientVersion = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily per-opcode gas consumption for Top Opcodes by Gas charts
+ */
 export type FctOpcodeGasByOpcodeDaily = {
   /**
    * Average executions per block
@@ -8464,6 +9403,9 @@ export type FctOpcodeGasByOpcodeDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly per-opcode gas consumption for Top Opcodes by Gas charts
+ */
 export type FctOpcodeGasByOpcodeHourly = {
   /**
    * Average executions per block
@@ -8507,6 +9449,9 @@ export type FctOpcodeGasByOpcodeHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctOpcodeOpsDaily = {
   /**
    * Average opcodes per second using actual block time gaps
@@ -8574,6 +9519,9 @@ export type FctOpcodeOpsDaily = {
   upper_band_ops?: number;
 };
 
+/**
+ * Hourly aggregated opcode execution rate statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctOpcodeOpsHourly = {
   /**
    * Average opcodes per second using actual block time gaps
@@ -8641,6 +9589,9 @@ export type FctOpcodeOpsHourly = {
   upper_band_ops?: number;
 };
 
+/**
+ * Gloas (ePBS) PTC payload attestation arrivals broken down by 50ms chunks, deduplicated per validator at earliest observation across sentries. Only includes messages seen within 12000ms of the slot start time
+ */
 export type FctPayloadAttestationFirstSeenChunked50Ms = {
   /**
    * The number of PTC validators first seen in this chunk
@@ -8676,6 +9627,9 @@ export type FctPayloadAttestationFirstSeenChunked50Ms = {
   updated_date_time?: number;
 };
 
+/**
+ * Highest value gloas (ePBS) builder bid per slot broken down by 50ms chunks, sourced from builder bids observed on the beacon API event stream across sentries. Only includes bids within -12000ms to +12000ms of slot start time
+ */
 export type FctPayloadBidHighestValueByBuilderChunked50Ms = {
   /**
    * The execution block hash committed to in the bid
@@ -8727,6 +9681,9 @@ export type FctPayloadBidHighestValueByBuilderChunked50Ms = {
   value?: string;
 };
 
+/**
+ * Gloas (ePBS) auction frontier: the single best builder bid per slot per 50ms chunk across all builders. Bounded by the chunk grid regardless of builder count. Only includes bids within -12000ms to +12000ms of slot start time
+ */
 export type FctPayloadBidHighestValueChunked50Ms = {
   /**
    * The execution block hash committed to in the leading bid
@@ -8770,6 +9727,9 @@ export type FctPayloadBidHighestValueChunked50Ms = {
   value?: string;
 };
 
+/**
+ * Daily consensus peer census by client and autonomous system. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Autonomous systems under 3 peers roll into an other bucket per network type.
+ */
 export type FctPeerCountByClClientAsnDaily = {
   /**
    * Autonomous system number of the address, 0 for other and unknown
@@ -8801,6 +9761,9 @@ export type FctPeerCountByClClientAsnDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily consensus peer census by client and country. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Countries under 3 peers roll into their continent other bucket, and continents still under 3 into a global other bucket.
+ */
 export type FctPeerCountByClClientCountryDaily = {
   /**
    * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
@@ -8832,6 +9795,9 @@ export type FctPeerCountByClClientCountryDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily consensus peer census by client and release. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Custody group counts come from metadata responses to our outbound requests. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ */
 export type FctPeerCountByClClientDaily = {
   /**
    * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
@@ -8890,7 +9856,7 @@ export type FctPeerCountByClClientDaily = {
    */
   quic_listen_peer_count?: number;
   /**
-   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
    */
   release_status?: string;
   /**
@@ -8903,6 +9869,9 @@ export type FctPeerCountByClClientDaily = {
   version?: string;
 };
 
+/**
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
+ */
 export type FctPeerCountByClientPairDaily = {
   /**
    * Addresses in the day with a consensus client
@@ -8942,6 +9911,9 @@ export type FctPeerCountByClientPairDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
+ */
 export type FctPeerCountByElClientAsnDaily = {
   /**
    * Autonomous system number of the address, 0 for other and unknown
@@ -8973,6 +9945,9 @@ export type FctPeerCountByElClientAsnDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
+ */
 export type FctPeerCountByElClientCountryDaily = {
   /**
    * Execution client from the node devp2p name (nimbus reported as nimbusel)
@@ -9004,6 +9979,9 @@ export type FctPeerCountByElClientCountryDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ */
 export type FctPeerCountByElClientDaily = {
   /**
    * Execution client from the node devp2p name (nimbus reported as nimbusel)
@@ -9018,7 +9996,7 @@ export type FctPeerCountByElClientDaily = {
    */
   peer_count?: number;
   /**
-   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
    */
   release_status?: string;
   /**
@@ -9031,6 +10009,9 @@ export type FctPeerCountByElClientDaily = {
   version?: string;
 };
 
+/**
+ * Daily consensus nodes from discovery (ENRs) by client, release, fork digest and next fork digest. A next fork digest of 0x00000000 or equal to the current digest means no next fork and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ */
 export type FctPeerForkReadinessByClClientDaily = {
   /**
    * Consensus client from the ENR client name (erigon reported as caplin)
@@ -9053,7 +10034,7 @@ export type FctPeerForkReadinessByClClientDaily = {
    */
   node_count?: number;
   /**
-   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
    */
   release_status?: string;
   /**
@@ -9066,6 +10047,9 @@ export type FctPeerForkReadinessByClClientDaily = {
   version?: string;
 };
 
+/**
+ * Daily execution nodes from discovery by client, release and EIP-2124 fork id. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). A next fork of 0 means none and is stored as empty. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ */
 export type FctPeerForkReadinessByElClientDaily = {
   /**
    * Execution client from the node devp2p name (nimbus reported as nimbusel)
@@ -9088,7 +10072,7 @@ export type FctPeerForkReadinessByElClientDaily = {
    */
   node_count?: number;
   /**
-   * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none
+   * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
    */
   release_status?: string;
   /**
@@ -9101,6 +10085,9 @@ export type FctPeerForkReadinessByElClientDaily = {
   version?: string;
 };
 
+/**
+ * Daily gossipsub partial messages adoption by peer client and version, as averages of the hourly peer counts
+ */
 export type FctPeerPartialMessageSupportByClientDaily = {
   /**
    * Hourly distinct connected peers, averaged over the hours of the day
@@ -9144,6 +10131,9 @@ export type FctPeerPartialMessageSupportByClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly gossipsub partial messages adoption by peer client and version: connected peers, gossipsub v1.3 support and the partial flags peers set when subscribing to data column topics
+ */
 export type FctPeerPartialMessageSupportByClientHourly = {
   /**
    * Distinct peers connected to a sentry node during the hour, from heartbeats
@@ -9183,6 +10173,9 @@ export type FctPeerPartialMessageSupportByClientHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily libp2p protocol support by consensus client. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Protocols fewer than 3 of the client peers support are excluded.
+ */
 export type FctPeerProtocolByClClientDaily = {
   /**
    * Consensus client from the peer agent (erigon reported as caplin), unknown when the agent was never seen, other for unparseable names
@@ -9210,6 +10203,9 @@ export type FctPeerProtocolByClClientDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Blocks that Xatu nodes built locally each slot by asking their beacon node for a block proposal, showing what that node would have proposed
+ */
 export type FctPreparedBlock = {
   /**
    * The total bytes of the beacon block payload
@@ -9280,11 +10276,11 @@ export type FctPreparedBlock = {
    */
   meta_client_version?: string;
   /**
-   * Consensus implementation of the validator
+   * Consensus client implementation of the node that built the block
    */
   meta_consensus_implementation?: string;
   /**
-   * Consensus version of the validator
+   * Consensus client version of the node that built the block
    */
   meta_consensus_version?: string;
   /**
@@ -9301,6 +10297,9 @@ export type FctPreparedBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Daily aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctProposerRewardDaily = {
   /**
    * Average proposer reward in ETH
@@ -9360,6 +10359,9 @@ export type FctProposerRewardDaily = {
   upper_band_reward_eth?: number;
 };
 
+/**
+ * Hourly aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
+ */
 export type FctProposerRewardHourly = {
   /**
    * Average proposer reward in ETH
@@ -9419,6 +10421,9 @@ export type FctProposerRewardHourly = {
   upper_band_reward_eth?: number;
 };
 
+/**
+ * Daily reorg event counts by depth
+ */
 export type FctReorgDaily = {
   /**
    * Start of the day period
@@ -9438,6 +10443,9 @@ export type FctReorgDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly reorg event counts by depth
+ */
 export type FctReorgHourly = {
   /**
    * Reorg depth (number of consecutive orphaned slots)
@@ -9457,6 +10465,9 @@ export type FctReorgHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Beacon chain validators operated via Rocket Pool (minipool and megapool), linked to their node operator
+ */
 export type FctRocketpoolValidator = {
   /**
    * Wall clock time the backing minipool was created or the megapool deposit was made
@@ -9488,6 +10499,9 @@ export type FctRocketpoolValidator = {
   validator_index?: number;
 };
 
+/**
+ * Storage slot state metrics per address aggregated by day
+ */
 export type FctStorageSlotStateByAddressDaily = {
   /**
    * Cumulative count of active storage slots at end of day
@@ -9511,6 +10525,9 @@ export type FctStorageSlotStateByAddressDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics per address aggregated by hour
+ */
 export type FctStorageSlotStateByAddressHourly = {
   /**
    * Cumulative count of active storage slots at end of hour
@@ -9534,6 +10551,9 @@ export type FctStorageSlotStateByAddressHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics aggregated by day
+ */
 export type FctStorageSlotStateByBlockDaily = {
   /**
    * Cumulative count of active storage slots at end of day
@@ -9553,6 +10573,9 @@ export type FctStorageSlotStateByBlockDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics aggregated by hour
+ */
 export type FctStorageSlotStateByBlockHourly = {
   /**
    * Cumulative count of active storage slots at end of hour
@@ -9572,6 +10595,9 @@ export type FctStorageSlotStateByBlockHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics per address with expiry policies aggregated by day
+ */
 export type FctStorageSlotStateWithExpiryByAddressDaily = {
   /**
    * Cumulative count of active storage slots at end of day (with expiry applied)
@@ -9599,6 +10625,9 @@ export type FctStorageSlotStateWithExpiryByAddressDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics per address with expiry policies aggregated by hour
+ */
 export type FctStorageSlotStateWithExpiryByAddressHourly = {
   /**
    * Cumulative count of active storage slots at end of hour (with expiry applied)
@@ -9626,6 +10655,9 @@ export type FctStorageSlotStateWithExpiryByAddressHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics with expiry policies aggregated by day
+ */
 export type FctStorageSlotStateWithExpiryByBlockDaily = {
   /**
    * Cumulative count of active storage slots at end of day (with expiry applied)
@@ -9649,6 +10681,9 @@ export type FctStorageSlotStateWithExpiryByBlockDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot state metrics with expiry policies aggregated by hour
+ */
 export type FctStorageSlotStateWithExpiryByBlockHourly = {
   /**
    * Cumulative count of active storage slots at end of hour (with expiry applied)
@@ -9672,6 +10707,9 @@ export type FctStorageSlotStateWithExpiryByBlockHourly = {
   updated_date_time?: number;
 };
 
+/**
+ * Top 100 contracts by effective storage bytes with expiry policies applied
+ */
 export type FctStorageSlotTop100ByBytes = {
   /**
    * Account owner of the contract
@@ -9719,6 +10757,9 @@ export type FctStorageSlotTop100ByBytes = {
   updated_date_time?: number;
 };
 
+/**
+ * Top 100 contracts by active storage slot count with expiry policies applied
+ */
 export type FctStorageSlotTop100BySlots = {
   /**
    * Account owner of the contract
@@ -9766,6 +10807,9 @@ export type FctStorageSlotTop100BySlots = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-slot sync committee participation by validator
+ */
 export type FctSyncCommitteeParticipationByValidator = {
   /**
    * Whether the validator participated in sync committee for this slot
@@ -9789,6 +10833,9 @@ export type FctSyncCommitteeParticipationByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Daily aggregation of per-validator sync committee participation
+ */
 export type FctSyncCommitteeParticipationByValidatorDaily = {
   /**
    * The start of the day for this aggregation
@@ -9816,6 +10863,9 @@ export type FctSyncCommitteeParticipationByValidatorDaily = {
   validator_index?: number;
 };
 
+/**
+ * Hourly aggregation of per-validator sync committee participation
+ */
 export type FctSyncCommitteeParticipationByValidatorHourly = {
   /**
    * The start of the hour for this aggregation
@@ -9843,6 +10893,9 @@ export type FctSyncCommitteeParticipationByValidatorHourly = {
   validator_index?: number;
 };
 
+/**
+ * Weekly aggregation of per-validator sync committee participation
+ */
 export type FctSyncCommitteeParticipationByValidatorWeekly = {
   /**
    * Number of slots where validator missed
@@ -9870,6 +10923,9 @@ export type FctSyncCommitteeParticipationByValidatorWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Sync committee reward of each validator in each block
+ */
 export type FctSyncCommitteeRewardByValidator = {
   /**
    * The epoch number containing the slot
@@ -9897,6 +10953,9 @@ export type FctSyncCommitteeRewardByValidator = {
   validator_index?: number;
 };
 
+/**
+ * Sync committee rewards and penalties per validator per day
+ */
 export type FctSyncCommitteeRewardByValidatorDaily = {
   /**
    * The day (UTC)
@@ -9932,6 +10991,9 @@ export type FctSyncCommitteeRewardByValidatorDaily = {
   validator_index?: number;
 };
 
+/**
+ * Sync committee rewards and penalties per validator per week
+ */
 export type FctSyncCommitteeRewardByValidatorWeekly = {
   /**
    * Blocks with a negative reward
@@ -9967,6 +11029,9 @@ export type FctSyncCommitteeRewardByValidatorWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Daily live storage slots owned by ERC20/ERC721 contracts, by token_standard
+ */
 export type FctTokenContractStorageStateByBlockDaily = {
   /**
    * Cumulative active storage slots owned by contracts of this standard at end of day
@@ -9986,6 +11051,9 @@ export type FctTokenContractStorageStateByBlockDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-epoch validator balance and status
+ */
 export type FctValidatorBalance = {
   /**
    * Validator balance at this epoch in Gwei
@@ -10021,6 +11089,9 @@ export type FctValidatorBalance = {
   validator_index?: number;
 };
 
+/**
+ * Daily validator balance snapshots aggregated from per-epoch data
+ */
 export type FctValidatorBalanceDaily = {
   /**
    * The start of the day for this aggregation
@@ -10072,6 +11143,9 @@ export type FctValidatorBalanceDaily = {
   validator_index?: number;
 };
 
+/**
+ * Hourly validator balance snapshots aggregated from per-epoch data
+ */
 export type FctValidatorBalanceHourly = {
   /**
    * Effective balance at end of hour in Gwei
@@ -10123,6 +11197,9 @@ export type FctValidatorBalanceHourly = {
   validator_index?: number;
 };
 
+/**
+ * Weekly validator balance snapshots aggregated from daily data
+ */
 export type FctValidatorBalanceWeekly = {
   /**
    * Effective balance at end of week in Gwei
@@ -10174,6 +11251,9 @@ export type FctValidatorBalanceWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Validators and stake by withdrawal credential type, one snapshot per day
+ */
 export type FctValidatorCountByCredentialTypeDaily = {
   /**
    * Sum of active validators' balance in Gwei
@@ -10225,6 +11305,9 @@ export type FctValidatorCountByCredentialTypeDaily = {
   validator_count?: number;
 };
 
+/**
+ * Validators and stake by withdrawal credential type, one snapshot per week
+ */
 export type FctValidatorCountByCredentialTypeWeekly = {
   /**
    * Sum of active validators' balance in Gwei
@@ -10276,6 +11359,9 @@ export type FctValidatorCountByCredentialTypeWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Daily validator count by entity and status, derived from canonical_beacon_validators joined with dim_node
+ */
 export type FctValidatorCountByEntityByStatusDaily = {
   /**
    * Start of the day period
@@ -10299,6 +11385,9 @@ export type FctValidatorCountByEntityByStatusDaily = {
   validator_count?: number;
 };
 
+/**
+ * Histogram of active validators' effective balance by withdrawal credential type, one snapshot per day
+ */
 export type FctValidatorEffectiveBalanceByCredentialTypeDaily = {
   /**
    * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
@@ -10330,6 +11419,9 @@ export type FctValidatorEffectiveBalanceByCredentialTypeDaily = {
   validator_count?: number;
 };
 
+/**
+ * Validator lifecycle events: deposits, top-ups, credential changes, consolidations, withdrawals, exit and withdrawal requests, voluntary exits and slashings. Only operations that took effect on chain are included
+ */
 export type FctValidatorEvent = {
   /**
    * Deposit withdrawal credentials, new execution address of a BLS change, withdrawal recipient address, or source address of an execution request
@@ -10385,6 +11477,9 @@ export type FctValidatorEvent = {
   version?: number;
 };
 
+/**
+ * Daily counts and amounts of validator operations that took effect
+ */
 export type FctValidatorOperationDaily = {
   /**
    * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount
@@ -10412,6 +11507,9 @@ export type FctValidatorOperationDaily = {
   validator_count?: number;
 };
 
+/**
+ * Weekly counts and amounts of validator operations that took effect
+ */
 export type FctValidatorOperationWeekly = {
   /**
    * Gwei deposited, withdrawn, or accepted into the partial withdrawal queue. NULL for operations without an amount
@@ -10439,6 +11537,9 @@ export type FctValidatorOperationWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Activation and exit queues and the Electra pending queues, one snapshot per day
+ */
 export type FctValidatorQueueDaily = {
   /**
    * Validators with status pending_queued (eligible, waiting for activation)
@@ -10506,6 +11607,9 @@ export type FctValidatorQueueDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Activation and exit queues and the Electra pending queues, one snapshot per week
+ */
 export type FctValidatorQueueWeekly = {
   /**
    * Validators with status pending_queued (eligible, waiting for activation)
@@ -10573,6 +11677,9 @@ export type FctValidatorQueueWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Network-wide consensus layer rewards and penalties per day
+ */
 export type FctValidatorRewardTotalDaily = {
   /**
    * Head vote rewards in Gwei
@@ -10644,6 +11751,9 @@ export type FctValidatorRewardTotalDaily = {
   updated_date_time?: number;
 };
 
+/**
+ * Network-wide consensus layer rewards and penalties per week
+ */
 export type FctValidatorRewardTotalWeekly = {
   /**
    * Head vote rewards in Gwei
@@ -10715,6 +11825,9 @@ export type FctValidatorRewardTotalWeekly = {
   week_start_date?: string;
 };
 
+/**
+ * Active validators and stake by entity and withdrawal credential type, one snapshot per day
+ */
 export type FctValidatorStakeByEntityDaily = {
   /**
    * Sum of active validators' balance in Gwei
@@ -10986,6 +12099,13 @@ export type GetFctAttestationVoteCorrectnessByClientDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_attestation_vote_correctness_by_client_pair_daily record
+ */
+export type GetFctAttestationVoteCorrectnessByClientPairDailyResponse = {
+  item?: FctAttestationVoteCorrectnessByClientPairDaily;
+};
+
+/**
  * Response for getting a single fct_attestation_vote_correctness_by_validator_daily record
  */
 export type GetFctAttestationVoteCorrectnessByValidatorDailyResponse = {
@@ -11168,6 +12288,13 @@ export type GetFctBlockGraffitiClientVersionHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_client_version_pair_daily record
+ */
+export type GetFctBlockGraffitiClientVersionPairDailyResponse = {
+  item?: FctBlockGraffitiClientVersionPairDaily;
+};
+
+/**
  * Response for getting a single fct_block_graffiti record
  */
 export type GetFctBlockGraffitiResponse = {
@@ -11245,6 +12372,13 @@ export type GetFctBlockPayloadResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_payload_status_daily record
+ */
+export type GetFctBlockPayloadStatusDailyResponse = {
+  item?: FctBlockPayloadStatusDaily;
+};
+
+/**
  * Response for getting a single fct_block_payload_status_hourly record
  */
 export type GetFctBlockPayloadStatusHourlyResponse = {
@@ -11256,6 +12390,13 @@ export type GetFctBlockPayloadStatusHourlyResponse = {
  */
 export type GetFctBlockProposalByClientDailyResponse = {
   item?: FctBlockProposalByClientDaily;
+};
+
+/**
+ * Response for getting a single fct_block_proposal_by_client_pair_daily record
+ */
+export type GetFctBlockProposalByClientPairDailyResponse = {
+  item?: FctBlockProposalByClientPairDaily;
 };
 
 /**
@@ -11504,6 +12645,20 @@ export type GetFctEngineGetBlobsBySlotResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_get_blobs_duration_chunked_50ms_daily record
+ */
+export type GetFctEngineGetBlobsDurationChunked50MsDailyResponse = {
+  item?: FctEngineGetBlobsDurationChunked50MsDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_get_blobs_duration_chunked_50ms_hourly record
+ */
+export type GetFctEngineGetBlobsDurationChunked50MsHourlyResponse = {
+  item?: FctEngineGetBlobsDurationChunked50MsHourly;
+};
+
+/**
  * Response for getting a single fct_engine_get_blobs_duration_chunked_50ms record
  */
 export type GetFctEngineGetBlobsDurationChunked50MsResponse = {
@@ -11553,6 +12708,20 @@ export type GetFctEngineNewPayloadBySlotResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_new_payload_duration_chunked_50ms_daily record
+ */
+export type GetFctEngineNewPayloadDurationChunked50MsDailyResponse = {
+  item?: FctEngineNewPayloadDurationChunked50MsDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_duration_chunked_50ms_hourly record
+ */
+export type GetFctEngineNewPayloadDurationChunked50MsHourlyResponse = {
+  item?: FctEngineNewPayloadDurationChunked50MsHourly;
+};
+
+/**
  * Response for getting a single fct_engine_new_payload_duration_chunked_50ms record
  */
 export type GetFctEngineNewPayloadDurationChunked50MsResponse = {
@@ -11571,6 +12740,13 @@ export type GetFctEngineNewPayloadWinrateDailyResponse = {
  */
 export type GetFctEngineNewPayloadWinrateHourlyResponse = {
   item?: FctEngineNewPayloadWinrateHourly;
+};
+
+/**
+ * Response for getting a single fct_epoch_summary_canonical record
+ */
+export type GetFctEpochSummaryCanonicalResponse = {
+  item?: FctEpochSummaryCanonical;
 };
 
 /**
@@ -11760,6 +12936,13 @@ export type GetFctNodeCpuUtilizationByProcessResponse = {
  */
 export type GetFctNodeDiskIoByProcessResponse = {
   item?: FctNodeDiskIoByProcess;
+};
+
+/**
+ * Response for getting a single fct_node_last_seen record
+ */
+export type GetFctNodeLastSeenResponse = {
+  item?: FctNodeLastSeen;
 };
 
 /**
@@ -12753,6 +13936,9 @@ export type GoogleProtobufAny = {
   [key: string]: unknown | string | undefined;
 };
 
+/**
+ * Canonical-preferred merge of attested head and canonical attestations. Prefers finalized canonical values per validator and slot, falling back to real-time head.
+ */
 export type IntAttestationAttested = {
   /**
    * The index of the validator attesting
@@ -12816,6 +14002,9 @@ export type IntAttestationAttested = {
   updated_date_time?: number;
 };
 
+/**
+ * Attested head of a block for the finalized chain.
+ */
 export type IntAttestationAttestedCanonical = {
   /**
    * The index of the validator attesting
@@ -12875,6 +14064,9 @@ export type IntAttestationAttestedCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Attested head of a block for the unfinalized chain.
+ */
 export type IntAttestationAttestedHead = {
   /**
    * The index of the validator attesting
@@ -12934,6 +14126,9 @@ export type IntAttestationAttestedHead = {
   updated_date_time?: number;
 };
 
+/**
+ * When the attestation was first seen on the network by a sentry node
+ */
 export type IntAttestationFirstSeen = {
   /**
    * The committee index of the attesting validator
@@ -13057,6 +14252,9 @@ export type IntAttestationFirstSeen = {
   username?: string;
 };
 
+/**
+ * Each row is one (slot, validator, vote) pair seen inside an aggregate attestation. Two rows for the same (slot, validator) indicate slashable double attestation.
+ */
 export type IntAttestationFirstSeenAggregate = {
   /**
    * The index of the validator attesting
@@ -13116,6 +14314,9 @@ export type IntAttestationFirstSeenAggregate = {
   updated_date_time?: number;
 };
 
+/**
+ * Beacon committee, canonical-preferred merge of the head-event stream and the canonical table
+ */
 export type IntBeaconCommittee = {
   /**
    * The committee index in the beacon API committee payload
@@ -13147,6 +14348,9 @@ export type IntBeaconCommittee = {
   validators?: Array<number>;
 };
 
+/**
+ * Beacon committee head for the unfinalized chain
+ */
 export type IntBeaconCommitteeHead = {
   /**
    * The committee index in the beacon API committee payload
@@ -13178,6 +14382,9 @@ export type IntBeaconCommitteeHead = {
   validators?: Array<number>;
 };
 
+/**
+ * Blob count of a block for the finalized chain
+ */
 export type IntBlockBlobCountCanonical = {
   /**
    * The number of blobs in the block
@@ -13209,6 +14416,9 @@ export type IntBlockBlobCountCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Block details for the finalized chain
+ */
 export type IntBlockCanonical = {
   /**
    * The root hash of the beacon block
@@ -13320,6 +14530,9 @@ export type IntBlockCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Canonical blocks with the client releases their graffiti resolves to, resolved like the Lab slot page. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
 export type IntBlockGraffitiRelease = {
   /**
    * The root of the canonical beacon block
@@ -13338,7 +14551,7 @@ export type IntBlockGraffitiRelease = {
    */
   consensus_client_release_status?: string;
   /**
-   * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved
+   * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved
    */
   consensus_client_version?: string;
   /**
@@ -13391,6 +14604,9 @@ export type IntBlockGraffitiRelease = {
   updated_date_time?: number;
 };
 
+/**
+ * MEV relay proposer payload delivered for a block on the finalized chain
+ */
 export type IntBlockMevCanonical = {
   /**
    * The block hash of the proposer payload
@@ -13466,6 +14682,9 @@ export type IntBlockMevCanonical = {
   value?: string | null;
 };
 
+/**
+ * Aggregated opcode-level gas usage per block. Derived from int_transaction_opcode_gas.
+ */
 export type IntBlockOpcodeGas = {
   /**
    * The block number
@@ -13497,6 +14716,9 @@ export type IntBlockOpcodeGas = {
   updated_date_time?: number;
 };
 
+/**
+ * Gloas (ePBS) Payload Timeliness Committee votes per attested block, from aggregates included in canonical beacon blocks
+ */
 export type IntBlockPayloadPtcVoteCanonical = {
   /**
    * PTC validators attesting blob data was available
@@ -13548,6 +14770,9 @@ export type IntBlockPayloadPtcVoteCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Block proposers for the finalized chain
+ */
 export type IntBlockProposerCanonical = {
   /**
    * The beacon block root hash. Null if a slot was missed
@@ -13583,6 +14808,9 @@ export type IntBlockProposerCanonical = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-block receipt size totals. Derived from int_transaction_receipt_size.
+ */
 export type IntBlockReceiptSize = {
   /**
    * Average receipt bytes per transaction in this block
@@ -13634,6 +14862,9 @@ export type IntBlockReceiptSize = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-block resource gas totals. Derived from int_transaction_resource_gas.
+ */
 export type IntBlockResourceGas = {
   /**
    * The block number
@@ -13681,6 +14912,9 @@ export type IntBlockResourceGas = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract creation events with projection for efficient address lookups
+ */
 export type IntContractCreation = {
   /**
    * Block where contract was created
@@ -13720,6 +14954,9 @@ export type IntContractCreation = {
   updated_date_time?: number;
 };
 
+/**
+ * SELFDESTRUCT operations with EIP-6780 storage clearing implications
+ */
 export type IntContractSelfdestruct = {
   /**
    * Contract that was destroyed
@@ -13771,6 +15008,9 @@ export type IntContractSelfdestruct = {
   value_transferred?: string;
 };
 
+/**
+ * Contract-level 1-month expiries - base tier of waterfall chain
+ */
 export type IntContractStorageExpiry1m = {
   /**
    * Count of slots in the contract at expiry time
@@ -13798,6 +15038,9 @@ export type IntContractStorageExpiry1m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 6-month expiries - waterfalls from 1m tier
+ */
 export type IntContractStorageExpiry6m = {
   /**
    * Count of slots in the contract at expiry time
@@ -13825,6 +15068,9 @@ export type IntContractStorageExpiry6m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 12-month expiries - waterfalls from 6m tier
+ */
 export type IntContractStorageExpiry12m = {
   /**
    * Count of slots in the contract at expiry time
@@ -13852,6 +15098,9 @@ export type IntContractStorageExpiry12m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 18-month expiries - waterfalls from 12m tier
+ */
 export type IntContractStorageExpiry18m = {
   /**
    * Count of slots in the contract at expiry time
@@ -13879,6 +15128,9 @@ export type IntContractStorageExpiry18m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 24-month expiries - waterfalls from 18m tier
+ */
 export type IntContractStorageExpiry24m = {
   /**
    * Count of slots in the contract at expiry time
@@ -13906,6 +15158,9 @@ export type IntContractStorageExpiry24m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level touches with precomputed next touch block - a touch is any slot read or write on the contract
+ */
 export type IntContractStorageNextTouch = {
   /**
    * The contract address
@@ -13925,6 +15180,9 @@ export type IntContractStorageNextTouch = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 1-month reactivations - contracts touched after 1m expiry
+ */
 export type IntContractStorageReactivation1m = {
   /**
    * Count of slots being reactivated
@@ -13952,6 +15210,9 @@ export type IntContractStorageReactivation1m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 6-month reactivations - contracts touched after 6m expiry
+ */
 export type IntContractStorageReactivation6m = {
   /**
    * Count of slots being reactivated
@@ -13979,6 +15240,9 @@ export type IntContractStorageReactivation6m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 12-month reactivations - contracts touched after 12m expiry
+ */
 export type IntContractStorageReactivation12m = {
   /**
    * Count of slots being reactivated
@@ -14006,6 +15270,9 @@ export type IntContractStorageReactivation12m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 18-month reactivations - contracts touched after 18m expiry
+ */
 export type IntContractStorageReactivation18m = {
   /**
    * Count of slots being reactivated
@@ -14033,6 +15300,9 @@ export type IntContractStorageReactivation18m = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level 24-month reactivations - contracts touched after 24m expiry
+ */
 export type IntContractStorageReactivation24m = {
   /**
    * Count of slots being reactivated
@@ -14060,6 +15330,9 @@ export type IntContractStorageReactivation24m = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative contract storage state per block per address - tracks active slots and effective bytes with per-block deltas
+ */
 export type IntContractStorageState = {
   /**
    * Cumulative count of active storage slots for this contract at this block
@@ -14091,6 +15364,9 @@ export type IntContractStorageState = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative contract storage state per block per address - ordered by address for efficient address-based queries
+ */
 export type IntContractStorageStateByAddress = {
   /**
    * Cumulative count of active storage slots for this contract at this block
@@ -14122,6 +15398,9 @@ export type IntContractStorageStateByAddress = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative contract storage state per block - tracks active slots, effective bytes, and active contracts with per-block deltas
+ */
 export type IntContractStorageStateByBlock = {
   /**
    * Cumulative count of contracts with at least one active slot at this block
@@ -14157,6 +15436,9 @@ export type IntContractStorageStateByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state base table - tracks deltas and cumulative adjustments per address per policy
+ */
 export type IntContractStorageStateWithExpiry = {
   /**
    * Number of active storage slots in this contract (with expiry applied)
@@ -14208,6 +15490,9 @@ export type IntContractStorageStateWithExpiry = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state ordered by address - tracks active_slots and effective_bytes per contract
+ */
 export type IntContractStorageStateWithExpiryByAddress = {
   /**
    * Number of active storage slots in this contract (0 if expired)
@@ -14235,6 +15520,9 @@ export type IntContractStorageStateWithExpiryByAddress = {
   updated_date_time?: number;
 };
 
+/**
+ * Contract-level expiry state per block network-wide - totals for slots, bytes, and active contracts
+ */
 export type IntContractStorageStateWithExpiryByBlock = {
   /**
    * Count of contracts with active_slots > 0 (with expiry applied)
@@ -14262,6 +15550,9 @@ export type IntContractStorageStateWithExpiryByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Custody probe results with aggregated column indices, ordered by probe time. A probe usually runs hours after the slot it asks about
+ */
 export type IntCustodyProbe = {
   /**
    * Array of blob submitter names for this slot (Unknown if not found)
@@ -14405,6 +15696,9 @@ export type IntCustodyProbe = {
   username?: string;
 };
 
+/**
+ * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
+ */
 export type IntCustodyProbeOrderBySlot = {
   /**
    * Array of blob submitter names for this slot (Unknown if not found)
@@ -14548,6 +15842,9 @@ export type IntCustodyProbeOrderBySlot = {
   username?: string;
 };
 
+/**
+ * Individual engine_getBlobs observations enriched with slot context from beacon blob sidecar data
+ */
 export type IntEngineGetBlobs = {
   /**
    * Root of the parent beacon block (hex encoded with 0x prefix)
@@ -14683,6 +15980,9 @@ export type IntEngineGetBlobs = {
   versioned_hashes?: Array<string>;
 };
 
+/**
+ * Individual engine_newPayload observations enriched with block size from fct_block_head
+ */
 export type IntEngineNewPayload = {
   /**
    * Number of blobs in the block
@@ -14842,6 +16142,9 @@ export type IntEngineNewPayload = {
   validation_error?: string | null;
 };
 
+/**
+ * Fastest valid engine_newPayload observations per slot per node_class with one row per implementation tied at the minimum duration
+ */
 export type IntEngineNewPayloadFastestExecutionByNodeClass = {
   /**
    * Execution block hash (hex encoded with 0x prefix)
@@ -14889,6 +16192,9 @@ export type IntEngineNewPayloadFastestExecutionByNodeClass = {
   updated_date_time?: number;
 };
 
+/**
+ * Hourly least-squares sufficient statistics for regressing engine_newPayload duration on gas per opcode group, by execution client version
+ */
 export type IntEngineNewPayloadOpcodeGramHourly = {
   /**
    * Blocks in the regression after trimming outliers
@@ -14948,6 +16254,9 @@ export type IntEngineNewPayloadOpcodeGramHourly = {
   yty?: number;
 };
 
+/**
+ * Execution blocks ordered by timestamp for efficient date range lookups
+ */
 export type IntExecutionBlockByDate = {
   /**
    * The block timestamp
@@ -14963,6 +16272,9 @@ export type IntExecutionBlockByDate = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative execution layer state size per block, reconstructed from execution_state_size_delta. Drop-in replacement for the deprecated execution_state_size snapshot table.
+ */
 export type IntExecutionStateSizeByBlock = {
   /**
    * Cumulative total bytes used by account data
@@ -15014,6 +16326,9 @@ export type IntExecutionStateSizeByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Rocket Pool Saturn megapool contracts mapped to their node operator
+ */
 export type IntRocketpoolMegapool = {
   /**
    * Execution block number the megapool was deployed in
@@ -15041,6 +16356,9 @@ export type IntRocketpoolMegapool = {
   updated_date_time?: number;
 };
 
+/**
+ * Rocket Pool minipool lifecycle events (created/destroyed) decoded from execution layer logs
+ */
 export type IntRocketpoolMinipool = {
   /**
    * Execution block number the event was emitted in
@@ -15076,6 +16394,9 @@ export type IntRocketpoolMinipool = {
   updated_date_time?: number;
 };
 
+/**
+ * Rocket Pool node lifecycle events (registration, RPL stake/withdraw, smoothing pool) decoded from execution layer logs
+ */
 export type IntRocketpoolNodeEvent = {
   /**
    * Execution block number the event was emitted in
@@ -15111,6 +16432,9 @@ export type IntRocketpoolNodeEvent = {
   updated_date_time?: number;
 };
 
+/**
+ * Rocket Pool node timezone locations decoded from registerNode/setTimezoneLocation calldata
+ */
 export type IntRocketpoolNodeTimezone = {
   /**
    * The Rocket Pool node operator address, lowercase 0x-prefixed
@@ -15134,6 +16458,9 @@ export type IntRocketpoolNodeTimezone = {
   updated_date_time?: number;
 };
 
+/**
+ * Synthetic storage diffs for selfdestructs that clear all storage slots
+ */
 export type IntStorageSelfdestructDiffs = {
   /**
    * Contract address that was selfdestructed
@@ -15173,6 +16500,9 @@ export type IntStorageSelfdestructDiffs = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
+ */
 export type IntStorageSlotDiff = {
   /**
    * The contract address
@@ -15200,6 +16530,9 @@ export type IntStorageSlotDiff = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot diffs aggregated per block - stores effective bytes from first and last value per address/slot
+ */
 export type IntStorageSlotDiffByAddressSlot = {
   /**
    * The contract address
@@ -15227,6 +16560,9 @@ export type IntStorageSlotDiffByAddressSlot = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 1-month expiries - base tier of waterfall chain
+ */
 export type IntStorageSlotExpiry1m = {
   /**
    * The contract address
@@ -15254,6 +16590,9 @@ export type IntStorageSlotExpiry1m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 6-month expiries - waterfalls from 1m tier
+ */
 export type IntStorageSlotExpiry6m = {
   /**
    * The contract address
@@ -15281,6 +16620,9 @@ export type IntStorageSlotExpiry6m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 12-month expiries - waterfalls from 6m tier
+ */
 export type IntStorageSlotExpiry12m = {
   /**
    * The contract address
@@ -15308,6 +16650,9 @@ export type IntStorageSlotExpiry12m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 18-month expiries - waterfalls from 12m tier
+ */
 export type IntStorageSlotExpiry18m = {
   /**
    * The contract address
@@ -15335,6 +16680,9 @@ export type IntStorageSlotExpiry18m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 24-month expiries - waterfalls from 18m tier
+ */
 export type IntStorageSlotExpiry24m = {
   /**
    * The contract address
@@ -15362,6 +16710,9 @@ export type IntStorageSlotExpiry24m = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-slot lifecycle metrics: birth/death blocks, touch counts, and touch-to-touch interval statistics. A lifecycle starts when a slot transitions from zero to non-zero (birth) and ends at the reverse (death). A slot can have multiple lifecycles.
+ */
 export type IntStorageSlotLifecycle = {
   /**
    * The contract address
@@ -15425,6 +16776,9 @@ export type IntStorageSlotLifecycle = {
   updated_date_time?: number;
 };
 
+/**
+ * Lifecycle boundaries per storage slot: birth (0→non-zero) and death (non-zero→0) blocks with effective bytes at each transition.
+ */
 export type IntStorageSlotLifecycleBoundary = {
   /**
    * The contract address
@@ -15460,6 +16814,9 @@ export type IntStorageSlotLifecycleBoundary = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot touches with precomputed next touch block - ordered by block_number for efficient range queries
+ */
 export type IntStorageSlotNextTouch = {
   /**
    * The contract address
@@ -15483,6 +16840,9 @@ export type IntStorageSlotNextTouch = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 1-month reactivations - slots touched after 1m expiry
+ */
 export type IntStorageSlotReactivation1m = {
   /**
    * The contract address
@@ -15510,6 +16870,9 @@ export type IntStorageSlotReactivation1m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 6-month reactivations - slots touched after 6m expiry
+ */
 export type IntStorageSlotReactivation6m = {
   /**
    * The contract address
@@ -15537,6 +16900,9 @@ export type IntStorageSlotReactivation6m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 12-month reactivations - slots touched after 12m expiry
+ */
 export type IntStorageSlotReactivation12m = {
   /**
    * The contract address
@@ -15564,6 +16930,9 @@ export type IntStorageSlotReactivation12m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 18-month reactivations - slots touched after 18m expiry
+ */
 export type IntStorageSlotReactivation18m = {
   /**
    * The contract address
@@ -15591,6 +16960,9 @@ export type IntStorageSlotReactivation18m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot 24-month reactivations - slots touched after 24m expiry
+ */
 export type IntStorageSlotReactivation24m = {
   /**
    * The contract address
@@ -15618,6 +16990,9 @@ export type IntStorageSlotReactivation24m = {
   updated_date_time?: number;
 };
 
+/**
+ * Storage slot reads aggregated per block - tracks which slots were read per address
+ */
 export type IntStorageSlotRead = {
   /**
    * The contract address
@@ -15637,6 +17012,9 @@ export type IntStorageSlotRead = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block per address - tracks active slots and effective bytes with per-block deltas
+ */
 export type IntStorageSlotState = {
   /**
    * Cumulative count of active storage slots for this address at this block
@@ -15668,6 +17046,9 @@ export type IntStorageSlotState = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block per address - ordered by address for efficient address-based queries
+ */
 export type IntStorageSlotStateByAddress = {
   /**
    * Cumulative count of active storage slots for this address at this block
@@ -15699,6 +17080,9 @@ export type IntStorageSlotStateByAddress = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block - tracks active slots and effective bytes with per-block deltas
+ */
 export type IntStorageSlotStateByBlock = {
   /**
    * Cumulative count of active storage slots at this block
@@ -15726,6 +17110,9 @@ export type IntStorageSlotStateByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block per address with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
+ */
 export type IntStorageSlotStateWithExpiry = {
   /**
    * Cumulative count of active storage slots for this address at this block (with expiry applied)
@@ -15769,6 +17156,9 @@ export type IntStorageSlotStateWithExpiry = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block per address with expiry policies - ordered by address for efficient address lookups
+ */
 export type IntStorageSlotStateWithExpiryByAddress = {
   /**
    * Cumulative count of active storage slots for this address at this block (with expiry applied)
@@ -15812,6 +17202,9 @@ export type IntStorageSlotStateWithExpiryByAddress = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative storage slot state per block with expiry policies - supports 1m, 6m, 12m, 18m, 24m waterfall
+ */
 export type IntStorageSlotStateWithExpiryByBlock = {
   /**
    * Cumulative count of active storage slots at this block (with expiry applied)
@@ -15851,6 +17244,9 @@ export type IntStorageSlotStateWithExpiryByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Cumulative live storage slots owned by ERC20/ERC721 contracts per block, split by token_standard
+ */
 export type IntTokenContractStorageStateByBlock = {
   /**
    * Cumulative active storage slots owned by contracts of this standard at this block
@@ -15874,6 +17270,9 @@ export type IntTokenContractStorageStateByBlock = {
   updated_date_time?: number;
 };
 
+/**
+ * Aggregated call frame activity per transaction for call tree analysis
+ */
 export type IntTransactionCallFrame = {
   /**
    * The block number containing this transaction
@@ -15945,6 +17344,9 @@ export type IntTransactionCallFrame = {
   updated_date_time?: number;
 };
 
+/**
+ * Aggregated opcode-level gas usage per call frame. Enables per-frame opcode analysis.
+ */
 export type IntTransactionCallFrameOpcodeGas = {
   /**
    * The block number containing the transaction
@@ -16016,6 +17418,9 @@ export type IntTransactionCallFrameOpcodeGas = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-frame per-opcode resource gas decomposition into 7 categories.
+ */
 export type IntTransactionCallFrameOpcodeResourceGas = {
   /**
    * The block number containing the transaction
@@ -16083,6 +17488,9 @@ export type IntTransactionCallFrameOpcodeResourceGas = {
   updated_date_time?: number;
 };
 
+/**
+ * Aggregated opcode-level gas usage per transaction. Source: canonical_execution_transaction_structlog
+ */
 export type IntTransactionOpcodeGas = {
   /**
    * The block number containing the transaction
@@ -16126,6 +17534,9 @@ export type IntTransactionOpcodeGas = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
+ */
 export type IntTransactionReceiptSize = {
   /**
    * The block number containing the transaction
@@ -16165,6 +17576,9 @@ export type IntTransactionReceiptSize = {
   updated_date_time?: number;
 };
 
+/**
+ * Per-transaction resource gas totals including intrinsic gas decomposition.
+ */
 export type IntTransactionResourceGas = {
   /**
    * The block number containing the transaction
@@ -16683,6 +18097,20 @@ export type ListFctAttestationVoteCorrectnessByClientDailyResponse = {
 };
 
 /**
+ * Response for listing fct_attestation_vote_correctness_by_client_pair_daily records
+ */
+export type ListFctAttestationVoteCorrectnessByClientPairDailyResponse = {
+  /**
+   * The list of fct_attestation_vote_correctness_by_client_pair_daily.
+   */
+  fct_attestation_vote_correctness_by_client_pair_daily?: Array<FctAttestationVoteCorrectnessByClientPairDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_attestation_vote_correctness_by_validator_daily records
  */
 export type ListFctAttestationVoteCorrectnessByValidatorDailyResponse = {
@@ -17047,6 +18475,20 @@ export type ListFctBlockGraffitiClientVersionHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_client_version_pair_daily records
+ */
+export type ListFctBlockGraffitiClientVersionPairDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_pair_daily.
+   */
+  fct_block_graffiti_client_version_pair_daily?: Array<FctBlockGraffitiClientVersionPairDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti records
  */
 export type ListFctBlockGraffitiResponse = {
@@ -17201,6 +18643,20 @@ export type ListFctBlockPayloadResponse = {
 };
 
 /**
+ * Response for listing fct_block_payload_status_daily records
+ */
+export type ListFctBlockPayloadStatusDailyResponse = {
+  /**
+   * The list of fct_block_payload_status_daily.
+   */
+  fct_block_payload_status_daily?: Array<FctBlockPayloadStatusDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_payload_status_hourly records
  */
 export type ListFctBlockPayloadStatusHourlyResponse = {
@@ -17222,6 +18678,20 @@ export type ListFctBlockProposalByClientDailyResponse = {
    * The list of fct_block_proposal_by_client_daily.
    */
   fct_block_proposal_by_client_daily?: Array<FctBlockProposalByClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposal_by_client_pair_daily records
+ */
+export type ListFctBlockProposalByClientPairDailyResponse = {
+  /**
+   * The list of fct_block_proposal_by_client_pair_daily.
+   */
+  fct_block_proposal_by_client_pair_daily?: Array<FctBlockProposalByClientPairDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -17719,6 +19189,34 @@ export type ListFctEngineGetBlobsBySlotResponse = {
 };
 
 /**
+ * Response for listing fct_engine_get_blobs_duration_chunked_50ms_daily records
+ */
+export type ListFctEngineGetBlobsDurationChunked50MsDailyResponse = {
+  /**
+   * The list of fct_engine_get_blobs_duration_chunked_50ms_daily.
+   */
+  fct_engine_get_blobs_duration_chunked_50ms_daily?: Array<FctEngineGetBlobsDurationChunked50MsDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_get_blobs_duration_chunked_50ms_hourly records
+ */
+export type ListFctEngineGetBlobsDurationChunked50MsHourlyResponse = {
+  /**
+   * The list of fct_engine_get_blobs_duration_chunked_50ms_hourly.
+   */
+  fct_engine_get_blobs_duration_chunked_50ms_hourly?: Array<FctEngineGetBlobsDurationChunked50MsHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_get_blobs_duration_chunked_50ms records
  */
 export type ListFctEngineGetBlobsDurationChunked50MsResponse = {
@@ -17817,6 +19315,34 @@ export type ListFctEngineNewPayloadBySlotResponse = {
 };
 
 /**
+ * Response for listing fct_engine_new_payload_duration_chunked_50ms_daily records
+ */
+export type ListFctEngineNewPayloadDurationChunked50MsDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_chunked_50ms_daily.
+   */
+  fct_engine_new_payload_duration_chunked_50ms_daily?: Array<FctEngineNewPayloadDurationChunked50MsDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_duration_chunked_50ms_hourly records
+ */
+export type ListFctEngineNewPayloadDurationChunked50MsHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_chunked_50ms_hourly.
+   */
+  fct_engine_new_payload_duration_chunked_50ms_hourly?: Array<FctEngineNewPayloadDurationChunked50MsHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_new_payload_duration_chunked_50ms records
  */
 export type ListFctEngineNewPayloadDurationChunked50MsResponse = {
@@ -17852,6 +19378,20 @@ export type ListFctEngineNewPayloadWinrateHourlyResponse = {
    * The list of fct_engine_new_payload_winrate_hourly.
    */
   fct_engine_new_payload_winrate_hourly?: Array<FctEngineNewPayloadWinrateHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_epoch_summary_canonical records
+ */
+export type ListFctEpochSummaryCanonicalResponse = {
+  /**
+   * The list of fct_epoch_summary_canonical.
+   */
+  fct_epoch_summary_canonical?: Array<FctEpochSummaryCanonical>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18230,6 +19770,20 @@ export type ListFctNodeDiskIoByProcessResponse = {
    * The list of fct_node_disk_io_by_process.
    */
   fct_node_disk_io_by_process?: Array<FctNodeDiskIoByProcess>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_last_seen records
+ */
+export type ListFctNodeLastSeenResponse = {
+  /**
+   * The list of fct_node_last_seen.
+   */
+  fct_node_last_seen?: Array<FctNodeLastSeen>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -21039,39 +22593,39 @@ export type DimClientCommitServiceListData = {
      */
     commit_date_not_in_values?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: eq)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: eq)
      */
     base_tag_eq?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: ne)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: ne)
      */
     base_tag_ne?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: contains)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: contains)
      */
     base_tag_contains?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: starts_with)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: starts_with)
      */
     base_tag_starts_with?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: ends_with)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: ends_with)
      */
     base_tag_ends_with?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: like)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: like)
      */
     base_tag_like?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: not_like)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: not_like)
      */
     base_tag_not_like?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: in_values) (comma-separated list)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: in_values) (comma-separated list)
      */
     base_tag_in_values?: string;
     /**
-     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag (filter: not_in_values) (comma-separated list)
+     * Release tag the commit builds on: the tag reachable in the fewest parent steps, as git describe picks it, empty before the first tag or when that tag was committed over 120 days before the commit (a branch without recent tags, e.g. erigon main) (filter: not_in_values) (comma-separated list)
      */
     base_tag_not_in_values?: string;
     /**
@@ -34556,6 +36110,510 @@ export type FctAttestationVoteCorrectnessByClientDailyServiceGetResponses = {
 
 export type FctAttestationVoteCorrectnessByClientDailyServiceGetResponse =
   FctAttestationVoteCorrectnessByClientDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByClientDailyServiceGetResponses];
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Validators with attestation duties in the day mapped to this client (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * The maximum number of fct_attestation_vote_correctness_by_client_pair_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteCorrectnessByClientPairDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_correctness_by_client_pair_daily';
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceListError =
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors[keyof FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors];
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteCorrectnessByClientPairDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceListResponse =
+  FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses[keyof FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses];
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_correctness_by_client_pair_daily/{day_start_date}';
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetError =
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetErrors[keyof FctAttestationVoteCorrectnessByClientPairDailyServiceGetErrors];
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteCorrectnessByClientPairDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse =
+  FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses];
 
 export type FctAttestationVoteCorrectnessByValidatorServiceListData = {
   body?: never;
@@ -48900,39 +50958,39 @@ export type FctBlockGraffitiClientVersionByEntityDailyServiceListData = {
      */
     client_not_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
      */
     version_eq?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
      */
     version_ne?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
      */
     version_contains?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
      */
     version_starts_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
      */
     version_ends_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
      */
     version_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
      */
     version_not_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
      */
     version_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
      */
     version_not_in_values?: string;
     /**
@@ -49308,39 +51366,39 @@ export type FctBlockGraffitiClientVersionByEntityHourlyServiceListData = {
      */
     client_not_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
      */
     version_eq?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
      */
     version_ne?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
      */
     version_contains?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
      */
     version_starts_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
      */
     version_ends_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
      */
     version_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
      */
     version_not_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
      */
     version_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
      */
     version_not_in_values?: string;
     /**
@@ -49676,39 +51734,39 @@ export type FctBlockGraffitiClientVersionDailyServiceListData = {
      */
     client_not_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
      */
     version_eq?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
      */
     version_ne?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
      */
     version_contains?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
      */
     version_starts_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
      */
     version_ends_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
      */
     version_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
      */
     version_not_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
      */
     version_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
      */
     version_not_in_values?: string;
     /**
@@ -50048,39 +52106,39 @@ export type FctBlockGraffitiClientVersionHourlyServiceListData = {
      */
     client_not_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: eq)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
      */
     version_eq?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ne)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
      */
     version_ne?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: contains)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
      */
     version_contains?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: starts_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
      */
     version_starts_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: ends_with)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
      */
     version_ends_with?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
      */
     version_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_like)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
      */
     version_not_like?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
      */
     version_in_values?: string;
     /**
-     * Release version the graffiti resolves to, empty when unresolved (filter: not_in_values) (comma-separated list)
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
      */
     version_not_in_values?: string;
     /**
@@ -50302,6 +52360,410 @@ export type FctBlockGraffitiClientVersionHourlyServiceGetResponses = {
 
 export type FctBlockGraffitiClientVersionHourlyServiceGetResponse =
   FctBlockGraffitiClientVersionHourlyServiceGetResponses[keyof FctBlockGraffitiClientVersionHourlyServiceGetResponses];
+
+export type FctBlockGraffitiClientVersionPairDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: eq)
+     */
+    consensus_version_eq?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: ne)
+     */
+    consensus_version_ne?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: contains)
+     */
+    consensus_version_contains?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: starts_with)
+     */
+    consensus_version_starts_with?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: ends_with)
+     */
+    consensus_version_ends_with?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: like)
+     */
+    consensus_version_like?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: not_like)
+     */
+    consensus_version_not_like?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    consensus_version_in_values?: string;
+    /**
+     * Consensus client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    consensus_version_not_in_values?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: eq)
+     */
+    execution_version_eq?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: ne)
+     */
+    execution_version_ne?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: contains)
+     */
+    execution_version_contains?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: starts_with)
+     */
+    execution_version_starts_with?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: ends_with)
+     */
+    execution_version_ends_with?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: like)
+     */
+    execution_version_like?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: not_like)
+     */
+    execution_version_not_like?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    execution_version_in_values?: string;
+    /**
+     * Execution client release version the graffiti resolves to, or the version it states when unresolved, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    execution_version_not_in_values?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: eq)
+     */
+    consensus_release_status_eq?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: ne)
+     */
+    consensus_release_status_ne?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: contains)
+     */
+    consensus_release_status_contains?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: starts_with)
+     */
+    consensus_release_status_starts_with?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: ends_with)
+     */
+    consensus_release_status_ends_with?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: like)
+     */
+    consensus_release_status_like?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: not_like)
+     */
+    consensus_release_status_not_like?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    consensus_release_status_in_values?: string;
+    /**
+     * How the consensus client version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    consensus_release_status_not_in_values?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: eq)
+     */
+    execution_release_status_eq?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: ne)
+     */
+    execution_release_status_ne?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: contains)
+     */
+    execution_release_status_contains?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: starts_with)
+     */
+    execution_release_status_starts_with?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: ends_with)
+     */
+    execution_release_status_ends_with?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: like)
+     */
+    execution_release_status_like?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: not_like)
+     */
+    execution_release_status_not_like?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    execution_release_status_in_values?: string;
+    /**
+     * How the execution client version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    execution_release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this consensus and execution client release pair (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_pair_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionPairDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_pair_daily';
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceListError =
+  FctBlockGraffitiClientVersionPairDailyServiceListErrors[keyof FctBlockGraffitiClientVersionPairDailyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionPairDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionPairDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceListResponse =
+  FctBlockGraffitiClientVersionPairDailyServiceListResponses[keyof FctBlockGraffitiClientVersionPairDailyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionPairDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_pair_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceGetError =
+  FctBlockGraffitiClientVersionPairDailyServiceGetErrors[keyof FctBlockGraffitiClientVersionPairDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionPairDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionPairDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionPairDailyServiceGetResponse =
+  FctBlockGraffitiClientVersionPairDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionPairDailyServiceGetResponses];
 
 export type FctBlockHeadServiceListData = {
   body?: never;
@@ -57907,6 +60369,230 @@ export type FctBlockPayloadPtcVoteHeadServiceGetResponses = {
 export type FctBlockPayloadPtcVoteHeadServiceGetResponse =
   FctBlockPayloadPtcVoteHeadServiceGetResponses[keyof FctBlockPayloadPtcVoteHeadServiceGetResponses];
 
+export type FctBlockPayloadStatusDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: like)
+     */
+    status_like?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * PTC verdict bucket: delivered or absent (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Number of blocks with this payload outcome in the day (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_payload_status_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockPayloadStatusDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_payload_status_daily';
+};
+
+export type FctBlockPayloadStatusDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadStatusDailyServiceListError =
+  FctBlockPayloadStatusDailyServiceListErrors[keyof FctBlockPayloadStatusDailyServiceListErrors];
+
+export type FctBlockPayloadStatusDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockPayloadStatusDailyResponse;
+};
+
+export type FctBlockPayloadStatusDailyServiceListResponse =
+  FctBlockPayloadStatusDailyServiceListResponses[keyof FctBlockPayloadStatusDailyServiceListResponses];
+
+export type FctBlockPayloadStatusDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_payload_status_daily/{day_start_date}';
+};
+
+export type FctBlockPayloadStatusDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockPayloadStatusDailyServiceGetError =
+  FctBlockPayloadStatusDailyServiceGetErrors[keyof FctBlockPayloadStatusDailyServiceGetErrors];
+
+export type FctBlockPayloadStatusDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockPayloadStatusDailyResponse;
+};
+
+export type FctBlockPayloadStatusDailyServiceGetResponse =
+  FctBlockPayloadStatusDailyServiceGetResponses[keyof FctBlockPayloadStatusDailyServiceGetResponses];
+
 export type FctBlockPayloadStatusHourlyServiceListData = {
   body?: never;
   path?: never;
@@ -58574,6 +61260,446 @@ export type FctBlockProposalByClientDailyServiceGetResponses = {
 
 export type FctBlockProposalByClientDailyServiceGetResponse =
   FctBlockProposalByClientDailyServiceGetResponses[keyof FctBlockProposalByClientDailyServiceGetResponses];
+
+export type FctBlockProposalByClientPairDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: eq)
+     */
+    mev_block_count_eq?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: ne)
+     */
+    mev_block_count_ne?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lt)
+     */
+    mev_block_count_lt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lte)
+     */
+    mev_block_count_lte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gt)
+     */
+    mev_block_count_gt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gte)
+     */
+    mev_block_count_gte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_min)
+     */
+    mev_block_count_between_min?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_max_value)
+     */
+    mev_block_count_between_max_value?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: in_values) (comma-separated list)
+     */
+    mev_block_count_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: not_in_values) (comma-separated list)
+     */
+    mev_block_count_not_in_values?: string;
+    /**
+     * Filter avg_mev_value_eth using value
+     */
+    avg_mev_value_eth_value?: number;
+    /**
+     * Filter avg_gas_used using value
+     */
+    avg_gas_used_value?: number;
+    /**
+     * Filter avg_blob_count using value
+     */
+    avg_blob_count_value?: number;
+    /**
+     * Blobs in the canonical blocks (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Blobs in the canonical blocks (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Blobs in the canonical blocks (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Blobs in the canonical blocks (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Blobs in the canonical blocks (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Blobs in the canonical blocks (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Blobs in the canonical blocks (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Blobs in the canonical blocks (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Blobs in the canonical blocks (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Blobs in the canonical blocks (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Filter block_first_seen_p50_ms using value
+     */
+    block_first_seen_p50_ms_value?: number;
+    /**
+     * Filter block_first_seen_p90_ms using value
+     */
+    block_first_seen_p90_ms_value?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: eq)
+     */
+    orphaned_block_count_eq?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: ne)
+     */
+    orphaned_block_count_ne?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: lt)
+     */
+    orphaned_block_count_lt?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: lte)
+     */
+    orphaned_block_count_lte?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: gt)
+     */
+    orphaned_block_count_gt?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: gte)
+     */
+    orphaned_block_count_gte?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: between_min)
+     */
+    orphaned_block_count_between_min?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: between_max_value)
+     */
+    orphaned_block_count_between_max_value?: number;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: in_values) (comma-separated list)
+     */
+    orphaned_block_count_in_values?: string;
+    /**
+     * Orphaned blocks, attributed through the proposer most recent identifying graffiti (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_block_count_not_in_values?: string;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Missed slots, attributed through the scheduled proposer most recent identifying graffiti (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposal_by_client_pair_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposalByClientPairDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposal_by_client_pair_daily';
+};
+
+export type FctBlockProposalByClientPairDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByClientPairDailyServiceListError =
+  FctBlockProposalByClientPairDailyServiceListErrors[keyof FctBlockProposalByClientPairDailyServiceListErrors];
+
+export type FctBlockProposalByClientPairDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposalByClientPairDailyResponse;
+};
+
+export type FctBlockProposalByClientPairDailyServiceListResponse =
+  FctBlockProposalByClientPairDailyServiceListResponses[keyof FctBlockProposalByClientPairDailyServiceListResponses];
+
+export type FctBlockProposalByClientPairDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposal_by_client_pair_daily/{day_start_date}';
+};
+
+export type FctBlockProposalByClientPairDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByClientPairDailyServiceGetError =
+  FctBlockProposalByClientPairDailyServiceGetErrors[keyof FctBlockProposalByClientPairDailyServiceGetErrors];
+
+export type FctBlockProposalByClientPairDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposalByClientPairDailyResponse;
+};
+
+export type FctBlockProposalByClientPairDailyServiceGetResponse =
+  FctBlockProposalByClientPairDailyServiceGetResponses[keyof FctBlockProposalByClientPairDailyServiceGetResponses];
 
 export type FctBlockProposalStatusDailyServiceListData = {
   body?: never;
@@ -64363,39 +67489,39 @@ export type FctCustodyProbeByClientDailyServiceListData = {
      */
     version_not_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: eq)
      */
     release_status_eq?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ne)
      */
     release_status_ne?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: contains)
      */
     release_status_contains?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: starts_with)
      */
     release_status_starts_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ends_with)
      */
     release_status_ends_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: like)
      */
     release_status_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_like)
      */
     release_status_not_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: in_values) (comma-separated list)
      */
     release_status_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_in_values) (comma-separated list)
      */
     release_status_not_in_values?: string;
     /**
@@ -79114,6 +82240,1002 @@ export type FctEngineGetBlobsDurationChunked50MsServiceGetResponses = {
 export type FctEngineGetBlobsDurationChunked50MsServiceGetResponse =
   FctEngineGetBlobsDurationChunked50MsServiceGetResponses[keyof FctEngineGetBlobsDurationChunked50MsServiceGetResponses];
 
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
+     */
+    chunk_duration_ms_eq?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: ne)
+     */
+    chunk_duration_ms_ne?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lt)
+     */
+    chunk_duration_ms_lt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lte)
+     */
+    chunk_duration_ms_lte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gt)
+     */
+    chunk_duration_ms_gt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gte)
+     */
+    chunk_duration_ms_gte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_min)
+     */
+    chunk_duration_ms_between_min?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_max_value)
+     */
+    chunk_duration_ms_between_max_value?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: in_values) (comma-separated list)
+     */
+    chunk_duration_ms_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: not_in_values) (comma-separated list)
+     */
+    chunk_duration_ms_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: eq)
+     */
+    partial_count_eq?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: ne)
+     */
+    partial_count_ne?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: lt)
+     */
+    partial_count_lt?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: lte)
+     */
+    partial_count_lte?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: gt)
+     */
+    partial_count_gt?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: gte)
+     */
+    partial_count_gte?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: between_min)
+     */
+    partial_count_between_min?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: between_max_value)
+     */
+    partial_count_between_max_value?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    partial_count_in_values?: string;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    partial_count_not_in_values?: string;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: eq)
+     */
+    empty_count_eq?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: ne)
+     */
+    empty_count_ne?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: lt)
+     */
+    empty_count_lt?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: lte)
+     */
+    empty_count_lte?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: gt)
+     */
+    empty_count_gt?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: gte)
+     */
+    empty_count_gte?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: between_min)
+     */
+    empty_count_between_min?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: between_max_value)
+     */
+    empty_count_between_max_value?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    empty_count_in_values?: string;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    empty_count_not_in_values?: string;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_get_blobs_duration_chunked_50ms_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineGetBlobsDurationChunked50msDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_daily';
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceListError =
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListErrors[keyof FctEngineGetBlobsDurationChunked50MsDailyServiceListErrors];
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineGetBlobsDurationChunked50MsDailyResponse;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceListResponse =
+  FctEngineGetBlobsDurationChunked50MsDailyServiceListResponses[keyof FctEngineGetBlobsDurationChunked50MsDailyServiceListResponses];
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_daily/{day_start_date}';
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceGetError =
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetErrors[keyof FctEngineGetBlobsDurationChunked50MsDailyServiceGetErrors];
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineGetBlobsDurationChunked50MsDailyResponse;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponse =
+  FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponses[keyof FctEngineGetBlobsDurationChunked50MsDailyServiceGetResponses];
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
+     */
+    chunk_duration_ms_eq?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: ne)
+     */
+    chunk_duration_ms_ne?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lt)
+     */
+    chunk_duration_ms_lt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lte)
+     */
+    chunk_duration_ms_lte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gt)
+     */
+    chunk_duration_ms_gt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gte)
+     */
+    chunk_duration_ms_gte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_min)
+     */
+    chunk_duration_ms_between_min?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_max_value)
+     */
+    chunk_duration_ms_between_max_value?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: in_values) (comma-separated list)
+     */
+    chunk_duration_ms_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: not_in_values) (comma-separated list)
+     */
+    chunk_duration_ms_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_getBlobs observations in this duration chunk (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Number of SUCCESS status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: eq)
+     */
+    partial_count_eq?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: ne)
+     */
+    partial_count_ne?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: lt)
+     */
+    partial_count_lt?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: lte)
+     */
+    partial_count_lte?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: gt)
+     */
+    partial_count_gt?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: gte)
+     */
+    partial_count_gte?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: between_min)
+     */
+    partial_count_between_min?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: between_max_value)
+     */
+    partial_count_between_max_value?: number;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    partial_count_in_values?: string;
+    /**
+     * Number of PARTIAL status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    partial_count_not_in_values?: string;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: eq)
+     */
+    empty_count_eq?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: ne)
+     */
+    empty_count_ne?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: lt)
+     */
+    empty_count_lt?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: lte)
+     */
+    empty_count_lte?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: gt)
+     */
+    empty_count_gt?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: gte)
+     */
+    empty_count_gte?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: between_min)
+     */
+    empty_count_between_min?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: between_max_value)
+     */
+    empty_count_between_max_value?: number;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    empty_count_in_values?: string;
+    /**
+     * Number of EMPTY status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    empty_count_not_in_values?: string;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: eq)
+     */
+    error_count_eq?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: ne)
+     */
+    error_count_ne?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: lt)
+     */
+    error_count_lt?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: lte)
+     */
+    error_count_lte?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: gt)
+     */
+    error_count_gt?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: gte)
+     */
+    error_count_gte?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: between_min)
+     */
+    error_count_between_min?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: between_max_value)
+     */
+    error_count_between_max_value?: number;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    error_count_in_values?: string;
+    /**
+     * Number of ERROR or UNSUPPORTED status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    error_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_get_blobs_duration_chunked_50ms_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineGetBlobsDurationChunked50msHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_hourly';
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceListError =
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListErrors[keyof FctEngineGetBlobsDurationChunked50MsHourlyServiceListErrors];
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineGetBlobsDurationChunked50MsHourlyResponse;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponse =
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponses[keyof FctEngineGetBlobsDurationChunked50MsHourlyServiceListResponses];
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour, by slot
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_get_blobs_duration_chunked_50ms_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceGetError =
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetErrors[keyof FctEngineGetBlobsDurationChunked50MsHourlyServiceGetErrors];
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineGetBlobsDurationChunked50MsHourlyResponse;
+};
+
+export type FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponse =
+  FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponses[keyof FctEngineGetBlobsDurationChunked50MsHourlyServiceGetResponses];
+
 export type FctEngineNewPayloadByElClientServiceListData = {
   body?: never;
   path?: never;
@@ -84930,6 +89052,842 @@ export type FctEngineNewPayloadDurationChunked50MsServiceGetResponses = {
 export type FctEngineNewPayloadDurationChunked50MsServiceGetResponse =
   FctEngineNewPayloadDurationChunked50MsServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsServiceGetResponses];
 
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
+     */
+    chunk_duration_ms_eq?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: ne)
+     */
+    chunk_duration_ms_ne?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lt)
+     */
+    chunk_duration_ms_lt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lte)
+     */
+    chunk_duration_ms_lte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gt)
+     */
+    chunk_duration_ms_gt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gte)
+     */
+    chunk_duration_ms_gte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_min)
+     */
+    chunk_duration_ms_between_min?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_max_value)
+     */
+    chunk_duration_ms_between_max_value?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: in_values) (comma-separated list)
+     */
+    chunk_duration_ms_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: not_in_values) (comma-separated list)
+     */
+    chunk_duration_ms_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of VALID status observations in this chunk (filter: eq)
+     */
+    valid_count_eq?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: ne)
+     */
+    valid_count_ne?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: lt)
+     */
+    valid_count_lt?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: lte)
+     */
+    valid_count_lte?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: gt)
+     */
+    valid_count_gt?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: gte)
+     */
+    valid_count_gte?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: between_min)
+     */
+    valid_count_between_min?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: between_max_value)
+     */
+    valid_count_between_max_value?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    valid_count_in_values?: string;
+    /**
+     * Number of VALID status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    valid_count_not_in_values?: string;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: eq)
+     */
+    invalid_count_eq?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: ne)
+     */
+    invalid_count_ne?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: lt)
+     */
+    invalid_count_lt?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: lte)
+     */
+    invalid_count_lte?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: gt)
+     */
+    invalid_count_gt?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: gte)
+     */
+    invalid_count_gte?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: between_min)
+     */
+    invalid_count_between_min?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: between_max_value)
+     */
+    invalid_count_between_max_value?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    invalid_count_in_values?: string;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    invalid_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_chunked_50ms_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationChunked50msDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_daily';
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceListError =
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListErrors[keyof FctEngineNewPayloadDurationChunked50MsDailyServiceListErrors];
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationChunked50MsDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceListResponse =
+  FctEngineNewPayloadDurationChunked50MsDailyServiceListResponses[keyof FctEngineNewPayloadDurationChunked50MsDailyServiceListResponses];
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceGetError =
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetErrors[keyof FctEngineNewPayloadDurationChunked50MsDailyServiceGetErrors];
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationChunked50MsDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponse =
+  FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsDailyServiceGetResponses];
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification for grouping observations (e.g., eip7870-block-builder, or empty for general nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: eq)
+     */
+    chunk_duration_ms_eq?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: ne)
+     */
+    chunk_duration_ms_ne?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lt)
+     */
+    chunk_duration_ms_lt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: lte)
+     */
+    chunk_duration_ms_lte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gt)
+     */
+    chunk_duration_ms_gt?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: gte)
+     */
+    chunk_duration_ms_gte?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_min)
+     */
+    chunk_duration_ms_between_min?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: between_max_value)
+     */
+    chunk_duration_ms_between_max_value?: number;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: in_values) (comma-separated list)
+     */
+    chunk_duration_ms_in_values?: string;
+    /**
+     * Duration bucket in 50ms chunks (0, 50, 100, 150, ...) (filter: not_in_values) (comma-separated list)
+     */
+    chunk_duration_ms_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload observations in this duration chunk (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Number of VALID status observations in this chunk (filter: eq)
+     */
+    valid_count_eq?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: ne)
+     */
+    valid_count_ne?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: lt)
+     */
+    valid_count_lt?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: lte)
+     */
+    valid_count_lte?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: gt)
+     */
+    valid_count_gt?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: gte)
+     */
+    valid_count_gte?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: between_min)
+     */
+    valid_count_between_min?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: between_max_value)
+     */
+    valid_count_between_max_value?: number;
+    /**
+     * Number of VALID status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    valid_count_in_values?: string;
+    /**
+     * Number of VALID status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    valid_count_not_in_values?: string;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: eq)
+     */
+    invalid_count_eq?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: ne)
+     */
+    invalid_count_ne?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: lt)
+     */
+    invalid_count_lt?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: lte)
+     */
+    invalid_count_lte?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: gt)
+     */
+    invalid_count_gt?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: gte)
+     */
+    invalid_count_gte?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: between_min)
+     */
+    invalid_count_between_min?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: between_max_value)
+     */
+    invalid_count_between_max_value?: number;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: in_values) (comma-separated list)
+     */
+    invalid_count_in_values?: string;
+    /**
+     * Number of INVALID or INVALID_BLOCK_HASH status observations in this chunk (filter: not_in_values) (comma-separated list)
+     */
+    invalid_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_chunked_50ms_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationChunked50msHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_hourly';
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceListError =
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListErrors[keyof FctEngineNewPayloadDurationChunked50MsHourlyServiceListErrors];
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationChunked50MsHourlyResponse;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponse =
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponses[keyof FctEngineNewPayloadDurationChunked50MsHourlyServiceListResponses];
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour, by slot
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetError =
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetErrors[keyof FctEngineNewPayloadDurationChunked50MsHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationChunked50MsHourlyResponse;
+};
+
+export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse =
+  FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses];
+
 export type FctEngineNewPayloadWinrateDailyServiceListData = {
   body?: never;
   path?: never;
@@ -85453,6 +90411,482 @@ export type FctEngineNewPayloadWinrateHourlyServiceGetResponses = {
 
 export type FctEngineNewPayloadWinrateHourlyServiceGetResponse =
   FctEngineNewPayloadWinrateHourlyServiceGetResponses[keyof FctEngineNewPayloadWinrateHourlyServiceGetResponses];
+
+export type FctEpochSummaryCanonicalServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The epoch number (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots of the epoch with a proposer duty or block, 32 once the epoch is complete (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Slots with a block on the finalized chain (filter: eq)
+     */
+    canonical_block_count_eq?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: ne)
+     */
+    canonical_block_count_ne?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: lt)
+     */
+    canonical_block_count_lt?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: lte)
+     */
+    canonical_block_count_lte?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: gt)
+     */
+    canonical_block_count_gt?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: gte)
+     */
+    canonical_block_count_gte?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: between_min)
+     */
+    canonical_block_count_between_min?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: between_max_value)
+     */
+    canonical_block_count_between_max_value?: number;
+    /**
+     * Slots with a block on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    canonical_block_count_in_values?: string;
+    /**
+     * Slots with a block on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    canonical_block_count_not_in_values?: string;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Slots without a block on the finalized chain, whether the proposer missed or the block was orphaned (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * Attestations scheduled across the epoch slots (filter: eq)
+     */
+    votes_max_eq?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: ne)
+     */
+    votes_max_ne?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: lt)
+     */
+    votes_max_lt?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: lte)
+     */
+    votes_max_lte?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: gt)
+     */
+    votes_max_gt?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: gte)
+     */
+    votes_max_gte?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: between_min)
+     */
+    votes_max_between_min?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: between_max_value)
+     */
+    votes_max_between_max_value?: number;
+    /**
+     * Attestations scheduled across the epoch slots (filter: in_values) (comma-separated list)
+     */
+    votes_max_in_values?: string;
+    /**
+     * Attestations scheduled across the epoch slots (filter: not_in_values) (comma-separated list)
+     */
+    votes_max_not_in_values?: string;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: eq)
+     */
+    votes_head_eq?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: ne)
+     */
+    votes_head_ne?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: lt)
+     */
+    votes_head_lt?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: lte)
+     */
+    votes_head_lte?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: gt)
+     */
+    votes_head_gt?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: gte)
+     */
+    votes_head_gte?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: between_min)
+     */
+    votes_head_between_min?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: between_max_value)
+     */
+    votes_head_between_max_value?: number;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: in_values) (comma-separated list)
+     */
+    votes_head_in_values?: string;
+    /**
+     * Attestations included on chain that voted for the block of their own slot (filter: not_in_values) (comma-separated list)
+     */
+    votes_head_not_in_values?: string;
+    /**
+     * Attestations included on chain that voted for another block (filter: eq)
+     */
+    votes_other_eq?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: ne)
+     */
+    votes_other_ne?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: lt)
+     */
+    votes_other_lt?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: lte)
+     */
+    votes_other_lte?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: gt)
+     */
+    votes_other_gt?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: gte)
+     */
+    votes_other_gte?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: between_min)
+     */
+    votes_other_between_min?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: between_max_value)
+     */
+    votes_other_between_max_value?: number;
+    /**
+     * Attestations included on chain that voted for another block (filter: in_values) (comma-separated list)
+     */
+    votes_other_in_values?: string;
+    /**
+     * Attestations included on chain that voted for another block (filter: not_in_values) (comma-separated list)
+     */
+    votes_other_not_in_values?: string;
+    /**
+     * Filter participation_rate using value
+     */
+    participation_rate_value?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: eq)
+     */
+    participation_bps_eq?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: ne)
+     */
+    participation_bps_ne?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: lt)
+     */
+    participation_bps_lt?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: lte)
+     */
+    participation_bps_lte?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: gt)
+     */
+    participation_bps_gt?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: gte)
+     */
+    participation_bps_gte?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: between_min)
+     */
+    participation_bps_between_min?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: between_max_value)
+     */
+    participation_bps_between_max_value?: number;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: in_values) (comma-separated list)
+     */
+    participation_bps_in_values?: string;
+    /**
+     * participation_rate in basis points from 0 to 10000, rounded down, 0 when none were scheduled. Integer so the API can filter on it (filter: not_in_values) (comma-separated list)
+     */
+    participation_bps_not_in_values?: string;
+    /**
+     * The maximum number of fct_epoch_summary_canonical to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEpochSummaryCanonical` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_epoch_summary_canonical';
+};
+
+export type FctEpochSummaryCanonicalServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEpochSummaryCanonicalServiceListError =
+  FctEpochSummaryCanonicalServiceListErrors[keyof FctEpochSummaryCanonicalServiceListErrors];
+
+export type FctEpochSummaryCanonicalServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEpochSummaryCanonicalResponse;
+};
+
+export type FctEpochSummaryCanonicalServiceListResponse =
+  FctEpochSummaryCanonicalServiceListResponses[keyof FctEpochSummaryCanonicalServiceListResponses];
+
+export type FctEpochSummaryCanonicalServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the epoch started
+     */
+    epoch_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_epoch_summary_canonical/{epoch_start_date_time}';
+};
+
+export type FctEpochSummaryCanonicalServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEpochSummaryCanonicalServiceGetError =
+  FctEpochSummaryCanonicalServiceGetErrors[keyof FctEpochSummaryCanonicalServiceGetErrors];
+
+export type FctEpochSummaryCanonicalServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEpochSummaryCanonicalResponse;
+};
+
+export type FctEpochSummaryCanonicalServiceGetResponse =
+  FctEpochSummaryCanonicalServiceGetResponses[keyof FctEpochSummaryCanonicalServiceGetResponses];
 
 export type FctExecutionGasLimitDailyServiceListData = {
   body?: never;
@@ -97181,39 +102615,39 @@ export type FctNodeActiveLast24hServiceListData = {
      */
     username_not_in_values?: string;
     /**
-     * ID of the node (filter: eq)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: eq)
      */
     node_id_eq?: string;
     /**
-     * ID of the node (filter: ne)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: ne)
      */
     node_id_ne?: string;
     /**
-     * ID of the node (filter: contains)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: contains)
      */
     node_id_contains?: string;
     /**
-     * ID of the node (filter: starts_with)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: starts_with)
      */
     node_id_starts_with?: string;
     /**
-     * ID of the node (filter: ends_with)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: ends_with)
      */
     node_id_ends_with?: string;
     /**
-     * ID of the node (filter: like)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: like)
      */
     node_id_like?: string;
     /**
-     * ID of the node (filter: not_like)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: not_like)
      */
     node_id_not_like?: string;
     /**
-     * ID of the node (filter: in_values) (comma-separated list)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: in_values) (comma-separated list)
      */
     node_id_in_values?: string;
     /**
-     * ID of the node (filter: not_in_values) (comma-separated list)
+     * Hashed node segment of meta_client_name. It changes when the node restarts under a new name, so one machine can have several node_ids over time (filter: not_in_values) (comma-separated list)
      */
     node_id_not_in_values?: string;
     /**
@@ -98655,6 +104089,672 @@ export type FctNodeDiskIoByProcessServiceGetResponses = {
 
 export type FctNodeDiskIoByProcessServiceGetResponse =
   FctNodeDiskIoByProcessServiceGetResponses[keyof FctNodeDiskIoByProcessServiceGetResponses];
+
+export type FctNodeLastSeenServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Name of the Xatu node (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the Xatu node (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the Xatu node (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the Xatu node (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the Xatu node (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the Xatu node (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the Xatu node (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the Xatu node (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: eq)
+     */
+    last_seen_date_time_eq?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: ne)
+     */
+    last_seen_date_time_ne?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: lt)
+     */
+    last_seen_date_time_lt?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: lte)
+     */
+    last_seen_date_time_lte?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: gt)
+     */
+    last_seen_date_time_gt?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: gte)
+     */
+    last_seen_date_time_gte?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: between_min)
+     */
+    last_seen_date_time_between_min?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: between_max_value)
+     */
+    last_seen_date_time_between_max_value?: number;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_time_in_values?: string;
+    /**
+     * Start of the latest slot the Xatu node reported a block in (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_time_not_in_values?: string;
+    /**
+     * Username of the Xatu node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the Xatu node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the Xatu node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the Xatu node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the Xatu node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the Xatu node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the Xatu node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the Xatu node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * ID of the Xatu node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the Xatu node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the Xatu node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the Xatu node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the Xatu node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the Xatu node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the Xatu node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the Xatu node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Version of the collector at the latest observation (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Version of the collector at the latest observation (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Version of the collector at the latest observation (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Version of the collector at the latest observation (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Version of the collector at the latest observation (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Version of the collector at the latest observation (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Version of the collector at the latest observation (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Version of the collector at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Version of the collector at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Implementation of the collector at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_city_eq?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_city_ne?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_client_geo_city_contains?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_client_geo_city_starts_with?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_client_geo_city_ends_with?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: like)
+     */
+    meta_client_geo_city_like?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_client_geo_city_not_like?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_city_in_values?: string;
+    /**
+     * City of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_city_not_in_values?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_country_eq?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_country_ne?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_client_geo_country_contains?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_client_geo_country_starts_with?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_client_geo_country_ends_with?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: like)
+     */
+    meta_client_geo_country_like?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_client_geo_country_not_like?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_in_values?: string;
+    /**
+     * Country of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_not_in_values?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_country_code_eq?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_country_code_ne?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_client_geo_country_code_contains?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_client_geo_country_code_starts_with?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_client_geo_country_code_ends_with?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: like)
+     */
+    meta_client_geo_country_code_like?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_client_geo_country_code_not_like?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_in_values?: string;
+    /**
+     * Country code of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_country_code_not_in_values?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_continent_code_eq?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_continent_code_ne?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_client_geo_continent_code_contains?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_client_geo_continent_code_starts_with?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_client_geo_continent_code_ends_with?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: like)
+     */
+    meta_client_geo_continent_code_like?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_client_geo_continent_code_not_like?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_in_values?: string;
+    /**
+     * Continent code of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_continent_code_not_in_values?: string;
+    /**
+     * Filter meta_client_geo_longitude using value
+     */
+    meta_client_geo_longitude_value?: number;
+    /**
+     * Filter meta_client_geo_latitude using value
+     */
+    meta_client_geo_latitude_value?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: lt)
+     */
+    meta_client_geo_autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: lte)
+     */
+    meta_client_geo_autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: gt)
+     */
+    meta_client_geo_autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: gte)
+     */
+    meta_client_geo_autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: between_min)
+     */
+    meta_client_geo_autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: between_max_value)
+     */
+    meta_client_geo_autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_client_geo_autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_client_geo_autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_client_geo_autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_client_geo_autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_client_geo_autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: like)
+     */
+    meta_client_geo_autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_client_geo_autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organization of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_geo_autonomous_system_organization_not_in_values?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Consensus client version of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client implementation of the Xatu node at the latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_last_seen to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeLastSeen` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_last_seen';
+};
+
+export type FctNodeLastSeenServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeLastSeenServiceListError = FctNodeLastSeenServiceListErrors[keyof FctNodeLastSeenServiceListErrors];
+
+export type FctNodeLastSeenServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeLastSeenResponse;
+};
+
+export type FctNodeLastSeenServiceListResponse =
+  FctNodeLastSeenServiceListResponses[keyof FctNodeLastSeenServiceListResponses];
+
+export type FctNodeLastSeenServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Name of the Xatu node
+     */
+    meta_client_name: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_last_seen/{meta_client_name}';
+};
+
+export type FctNodeLastSeenServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeLastSeenServiceGetError = FctNodeLastSeenServiceGetErrors[keyof FctNodeLastSeenServiceGetErrors];
+
+export type FctNodeLastSeenServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeLastSeenResponse;
+};
+
+export type FctNodeLastSeenServiceGetResponse =
+  FctNodeLastSeenServiceGetResponses[keyof FctNodeLastSeenServiceGetResponses];
 
 export type FctNodeMemoryUsageByProcessServiceListData = {
   body?: never;
@@ -104237,39 +110337,39 @@ export type FctPeerCountByClClientDailyServiceListData = {
      */
     version_not_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: eq)
      */
     release_status_eq?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ne)
      */
     release_status_ne?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: contains)
      */
     release_status_contains?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: starts_with)
      */
     release_status_starts_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ends_with)
      */
     release_status_ends_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: like)
      */
     release_status_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_like)
      */
     release_status_not_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: in_values) (comma-separated list)
      */
     release_status_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_in_values) (comma-separated list)
      */
     release_status_not_in_values?: string;
     /**
@@ -105953,39 +112053,39 @@ export type FctPeerCountByElClientDailyServiceListData = {
      */
     version_not_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: eq)
      */
     release_status_eq?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ne)
      */
     release_status_ne?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: contains)
      */
     release_status_contains?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: starts_with)
      */
     release_status_starts_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ends_with)
      */
     release_status_ends_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: like)
      */
     release_status_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_like)
      */
     release_status_not_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: in_values) (comma-separated list)
      */
     release_status_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_in_values) (comma-separated list)
      */
     release_status_not_in_values?: string;
     /**
@@ -106249,39 +112349,39 @@ export type FctPeerForkReadinessByClClientDailyServiceListData = {
      */
     version_not_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: eq)
      */
     release_status_eq?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ne)
      */
     release_status_ne?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: contains)
      */
     release_status_contains?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: starts_with)
      */
     release_status_starts_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ends_with)
      */
     release_status_ends_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: like)
      */
     release_status_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_like)
      */
     release_status_not_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: in_values) (comma-separated list)
      */
     release_status_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_in_values) (comma-separated list)
      */
     release_status_not_in_values?: string;
     /**
@@ -106617,39 +112717,39 @@ export type FctPeerForkReadinessByElClientDailyServiceListData = {
      */
     version_not_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: eq)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: eq)
      */
     release_status_eq?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ne)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ne)
      */
     release_status_ne?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: contains)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: contains)
      */
     release_status_contains?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: starts_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: starts_with)
      */
     release_status_starts_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: ends_with)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: ends_with)
      */
     release_status_ends_with?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: like)
      */
     release_status_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_like)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_like)
      */
     release_status_not_like?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: in_values) (comma-separated list)
      */
     release_status_in_values?: string;
     /**
-     * How the version was resolved: commit_match (a release tag commit), commit_untagged (a default or release branch commit, version is the release it builds on), commit_ambiguous, commit_unmatched (a custom or fork build), commit_zero, version_match, version_unmatched or none (filter: not_in_values) (comma-separated list)
+     * How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states (filter: not_in_values) (comma-separated list)
      */
     release_status_not_in_values?: string;
     /**
@@ -108149,75 +114249,75 @@ export type FctPreparedBlockServiceListData = {
      */
     meta_client_implementation_not_in_values?: string;
     /**
-     * Consensus implementation of the validator (filter: eq)
+     * Consensus client implementation of the node that built the block (filter: eq)
      */
     meta_consensus_implementation_eq?: string;
     /**
-     * Consensus implementation of the validator (filter: ne)
+     * Consensus client implementation of the node that built the block (filter: ne)
      */
     meta_consensus_implementation_ne?: string;
     /**
-     * Consensus implementation of the validator (filter: contains)
+     * Consensus client implementation of the node that built the block (filter: contains)
      */
     meta_consensus_implementation_contains?: string;
     /**
-     * Consensus implementation of the validator (filter: starts_with)
+     * Consensus client implementation of the node that built the block (filter: starts_with)
      */
     meta_consensus_implementation_starts_with?: string;
     /**
-     * Consensus implementation of the validator (filter: ends_with)
+     * Consensus client implementation of the node that built the block (filter: ends_with)
      */
     meta_consensus_implementation_ends_with?: string;
     /**
-     * Consensus implementation of the validator (filter: like)
+     * Consensus client implementation of the node that built the block (filter: like)
      */
     meta_consensus_implementation_like?: string;
     /**
-     * Consensus implementation of the validator (filter: not_like)
+     * Consensus client implementation of the node that built the block (filter: not_like)
      */
     meta_consensus_implementation_not_like?: string;
     /**
-     * Consensus implementation of the validator (filter: in_values) (comma-separated list)
+     * Consensus client implementation of the node that built the block (filter: in_values) (comma-separated list)
      */
     meta_consensus_implementation_in_values?: string;
     /**
-     * Consensus implementation of the validator (filter: not_in_values) (comma-separated list)
+     * Consensus client implementation of the node that built the block (filter: not_in_values) (comma-separated list)
      */
     meta_consensus_implementation_not_in_values?: string;
     /**
-     * Consensus version of the validator (filter: eq)
+     * Consensus client version of the node that built the block (filter: eq)
      */
     meta_consensus_version_eq?: string;
     /**
-     * Consensus version of the validator (filter: ne)
+     * Consensus client version of the node that built the block (filter: ne)
      */
     meta_consensus_version_ne?: string;
     /**
-     * Consensus version of the validator (filter: contains)
+     * Consensus client version of the node that built the block (filter: contains)
      */
     meta_consensus_version_contains?: string;
     /**
-     * Consensus version of the validator (filter: starts_with)
+     * Consensus client version of the node that built the block (filter: starts_with)
      */
     meta_consensus_version_starts_with?: string;
     /**
-     * Consensus version of the validator (filter: ends_with)
+     * Consensus client version of the node that built the block (filter: ends_with)
      */
     meta_consensus_version_ends_with?: string;
     /**
-     * Consensus version of the validator (filter: like)
+     * Consensus client version of the node that built the block (filter: like)
      */
     meta_consensus_version_like?: string;
     /**
-     * Consensus version of the validator (filter: not_like)
+     * Consensus client version of the node that built the block (filter: not_like)
      */
     meta_consensus_version_not_like?: string;
     /**
-     * Consensus version of the validator (filter: in_values) (comma-separated list)
+     * Consensus client version of the node that built the block (filter: in_values) (comma-separated list)
      */
     meta_consensus_version_in_values?: string;
     /**
-     * Consensus version of the validator (filter: not_in_values) (comma-separated list)
+     * Consensus client version of the node that built the block (filter: not_in_values) (comma-separated list)
      */
     meta_consensus_version_not_in_values?: string;
     /**
@@ -129883,39 +135983,39 @@ export type IntBlockGraffitiReleaseServiceListData = {
      */
     consensus_client_not_in_values?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: eq)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: eq)
      */
     consensus_client_version_eq?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ne)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: ne)
      */
     consensus_client_version_ne?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: contains)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: contains)
      */
     consensus_client_version_contains?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: starts_with)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: starts_with)
      */
     consensus_client_version_starts_with?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: ends_with)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: ends_with)
      */
     consensus_client_version_ends_with?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: like)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: like)
      */
     consensus_client_version_like?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_like)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: not_like)
      */
     consensus_client_version_not_like?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: in_values) (comma-separated list)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: in_values) (comma-separated list)
      */
     consensus_client_version_in_values?: string;
     /**
-     * Consensus client release version from dim_client_release (or the release a branch commit builds on), empty when unresolved (filter: not_in_values) (comma-separated list)
+     * Consensus client release version from dim_client_release (or the release a branch commit builds on), else the version the graffiti states, empty when unresolved (filter: not_in_values) (comma-separated list)
      */
     consensus_client_version_not_in_values?: string;
     /**

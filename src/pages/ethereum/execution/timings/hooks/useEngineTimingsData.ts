@@ -5,10 +5,14 @@ import {
   fctEngineNewPayloadByElClientHourlyServiceList,
   fctEngineNewPayloadByElClientDailyServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceList,
+  fctEngineNewPayloadDurationChunked50MsHourlyServiceList,
+  fctEngineNewPayloadDurationChunked50MsDailyServiceList,
   fctEngineGetBlobsByElClientServiceList,
   fctEngineGetBlobsByElClientHourlyServiceList,
   fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineGetBlobsDurationChunked50MsServiceList,
+  fctEngineGetBlobsDurationChunked50MsHourlyServiceList,
+  fctEngineGetBlobsDurationChunked50MsDailyServiceList,
   fctEngineNewPayloadWinrateHourlyServiceList,
   fctEngineNewPayloadWinrateDailyServiceList,
   intEngineNewPayloadFastestExecutionByNodeClassServiceList,
@@ -40,8 +44,8 @@ export interface EngineTimingsData {
   // newPayload daily aggregations with true percentiles (for long time ranges)
   newPayloadByElClientDaily: FctEngineNewPayloadByElClientDaily[];
 
-  // newPayload duration histogram
-  newPayloadDurationHistogram: FctEngineNewPayloadDurationChunked50Ms[];
+  // newPayload duration histogram over the range, from the per-slot, hourly or daily chunk table
+  newPayloadDurationHistogram: Pick<FctEngineNewPayloadDurationChunked50Ms, 'chunk_duration_ms' | 'valid_count'>[];
 
   // getBlobs per-EL-client aggregations (includes per-slot granularity)
   getBlobsByElClient: FctEngineGetBlobsByElClient[];
@@ -52,8 +56,8 @@ export interface EngineTimingsData {
   // getBlobs daily aggregations with true percentiles (for long time ranges)
   getBlobsByElClientDaily: FctEngineGetBlobsByElClientDaily[];
 
-  // getBlobs duration histogram
-  getBlobsDurationHistogram: FctEngineGetBlobsDurationChunked50Ms[];
+  // getBlobs duration histogram over the range, from the per-slot, hourly or daily chunk table
+  getBlobsDurationHistogram: Pick<FctEngineGetBlobsDurationChunked50Ms, 'chunk_duration_ms' | 'success_count'>[];
 
   // newPayload winrate (hourly aggregated)
   winrateHourly: FctEngineNewPayloadWinrateHourly[];
@@ -124,6 +128,48 @@ export function generateDateRange(startTs: number, endTs: number): string {
   return dates.join(',');
 }
 
+type HistogramGrain = 'slot' | 'hourly' | 'daily';
+
+/** Which chunk table covers the range: per-slot rows for the shortest ranges, hourly for 24h, daily beyond */
+function histogramGrain(range: TimeRange): HistogramGrain {
+  if (PER_SLOT_CHART_RANGES.includes(range)) return 'slot';
+  return range === '24hours' ? 'hourly' : 'daily';
+}
+
+/** Time filter for a chunk table of the grain, covering the range */
+function histogramQuery(
+  grain: HistogramGrain,
+  hourlyStart: number,
+  hourlyEnd: number,
+  days: string
+): Record<string, string | number> {
+  if (grain === 'slot') return { slot_start_date_time_gte: hourlyStart, slot_start_date_time_lt: hourlyEnd };
+  if (grain === 'hourly') return { hour_start_date_time_gte: hourlyStart, hour_start_date_time_lt: hourlyEnd };
+  return { day_start_date_in_values: days };
+}
+
+const HISTOGRAM_TABLES = {
+  newPayload: {
+    slot: [fctEngineNewPayloadDurationChunked50MsServiceList, 'fct_engine_new_payload_duration_chunked_50ms'],
+    hourly: [
+      fctEngineNewPayloadDurationChunked50MsHourlyServiceList,
+      'fct_engine_new_payload_duration_chunked_50ms_hourly',
+    ],
+    daily: [
+      fctEngineNewPayloadDurationChunked50MsDailyServiceList,
+      'fct_engine_new_payload_duration_chunked_50ms_daily',
+    ],
+  },
+  getBlobs: {
+    slot: [fctEngineGetBlobsDurationChunked50MsServiceList, 'fct_engine_get_blobs_duration_chunked_50ms'],
+    hourly: [
+      fctEngineGetBlobsDurationChunked50MsHourlyServiceList,
+      'fct_engine_get_blobs_duration_chunked_50ms_hourly',
+    ],
+    daily: [fctEngineGetBlobsDurationChunked50MsDailyServiceList, 'fct_engine_get_blobs_duration_chunked_50ms_daily'],
+  },
+} as const;
+
 /**
  * Hook to fetch all engine timing data based on time range.
  * Uses fetchAllPages to handle pagination automatically for all endpoints.
@@ -153,6 +199,8 @@ export function useEngineTimingsData({
   // Hourly and per-slot tables are too heavy for long ranges (90d+),
   // which use the daily aggregations instead
   const fetchHourlyData = HOURLY_CHART_RANGES.includes(timeRange);
+
+  const histogram = histogramGrain(timeRange);
 
   const queries = useQueries({
     queries: [
@@ -201,27 +249,33 @@ export function useEngineTimingsData({
         enabled: !!currentNetwork && fetchHourlyData,
         placeholderData: keepPreviousData,
       },
-      // newPayload duration histogram
-      // Only fetched for short time ranges (histogram based on per-slot data)
-      // Use hour-aligned timestamps to match hourly data
+      // newPayload duration histogram over the range
       {
-        queryKey: ['engine-timings', 'newPayload-duration-histogram', hourlyStart, hourlyEnd, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineNewPayloadDurationChunked50Ms>(
-            fctEngineNewPayloadDurationChunked50MsServiceList,
+        queryKey: [
+          'engine-timings',
+          'newPayload-duration-histogram',
+          histogram,
+          hourlyStart,
+          hourlyEnd,
+          referenceNodesOnly,
+        ],
+        queryFn: ({ signal }) => {
+          const [list, table] = HISTOGRAM_TABLES.newPayload[histogram];
+          return fetchAllPages<Pick<FctEngineNewPayloadDurationChunked50Ms, 'chunk_duration_ms' | 'valid_count'>>(
+            list,
             {
               query: {
-                slot_start_date_time_gte: hourlyStart,
-                slot_start_date_time_lt: hourlyEnd,
+                ...histogramQuery(histogram, hourlyStart, hourlyEnd, days),
                 order_by: 'chunk_duration_ms ASC',
                 page_size: 10000,
                 ...refNodeFilter,
               },
             },
-            'fct_engine_new_payload_duration_chunked_50ms',
+            table,
             signal
-          ),
-        enabled: !!currentNetwork && fetchPerSlotData,
+          );
+        },
+        enabled: !!currentNetwork,
         placeholderData: keepPreviousData,
       },
       // getBlobs per-EL-client aggregations (includes per-slot data)
@@ -269,27 +323,33 @@ export function useEngineTimingsData({
         enabled: !!currentNetwork && fetchBlobs && fetchHourlyData,
         placeholderData: keepPreviousData,
       },
-      // getBlobs duration histogram
-      // Only fetched for short time ranges (histogram based on per-slot data)
-      // Use hour-aligned timestamps to match hourly data
+      // getBlobs duration histogram over the range
       {
-        queryKey: ['engine-timings', 'getBlobs-duration-histogram', hourlyStart, hourlyEnd, referenceNodesOnly],
-        queryFn: ({ signal }) =>
-          fetchAllPages<FctEngineGetBlobsDurationChunked50Ms>(
-            fctEngineGetBlobsDurationChunked50MsServiceList,
+        queryKey: [
+          'engine-timings',
+          'getBlobs-duration-histogram',
+          histogram,
+          hourlyStart,
+          hourlyEnd,
+          referenceNodesOnly,
+        ],
+        queryFn: ({ signal }) => {
+          const [list, table] = HISTOGRAM_TABLES.getBlobs[histogram];
+          return fetchAllPages<Pick<FctEngineGetBlobsDurationChunked50Ms, 'chunk_duration_ms' | 'success_count'>>(
+            list,
             {
               query: {
-                slot_start_date_time_gte: hourlyStart,
-                slot_start_date_time_lt: hourlyEnd,
+                ...histogramQuery(histogram, hourlyStart, hourlyEnd, days),
                 order_by: 'chunk_duration_ms ASC',
                 page_size: 10000,
                 ...refNodeFilter,
               },
             },
-            'fct_engine_get_blobs_duration_chunked_50ms',
+            table,
             signal
-          ),
-        enabled: !!currentNetwork && fetchBlobs && fetchPerSlotData,
+          );
+        },
+        enabled: !!currentNetwork && fetchBlobs,
         placeholderData: keepPreviousData,
       },
       // newPayload winrate (hourly) - which EL client had fastest newPayload per slot

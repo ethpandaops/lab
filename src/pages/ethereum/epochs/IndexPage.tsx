@@ -4,14 +4,12 @@ import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
-import { Button } from '@/components/Elements/Button';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { formatEpoch } from '@/utils';
 
 import { useEpochsData } from './hooks';
 import { EpochsFilters } from './components/EpochsFilters';
@@ -133,11 +131,6 @@ export function IndexPage(): JSX.Element {
     [currentEpoch]
   );
 
-  const emptyMessage =
-    data?.searchedTo !== undefined
-      ? `No matches down to epoch ${formatEpoch(data.searchedTo)}`
-      : 'No epochs match these filters';
-
   return (
     <Container>
       <Header title="Epochs" />
@@ -165,22 +158,11 @@ export function IndexPage(): JSX.Element {
             manualPagination
             onRowClick={row => navigate({ to: '/ethereum/epochs/$epoch', params: { epoch: String(row.epoch) } })}
             getRowId={row => String(row.epoch)}
-            emptyMessage={emptyMessage}
+            emptyMessage="No epochs match these filters"
             hideGlobalFilter
             hideColumnVisibility
             paginationPosition="both"
           />
-
-          {data?.partial && data.nextCursor && (
-            <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-sm text-muted">
-              {data.searchedTo !== undefined && rows.length > 0 && (
-                <span className="tabular-nums">Searched down to epoch {formatEpoch(data.searchedTo)}</span>
-              )}
-              <Button variant="secondary" size="sm" onClick={() => goToPage(pageIndex + 1, data.nextCursor)}>
-                Keep searching
-              </Button>
-            </div>
-          )}
         </div>
 
         {epochs.length > 0 && (
