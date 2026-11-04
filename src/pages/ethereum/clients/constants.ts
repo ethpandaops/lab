@@ -7,8 +7,10 @@ export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 
 /** Zod schema for the proposer clients page search params */
 export const clientsSearchSchema = z.object({
-  /** Blocks table filters, sort and page; cl, el and entity also filter the rest of the page */
-  ...blockSearchShape,
+  /** Filters for the whole page; same params as the block tables */
+  cl: blockSearchShape.cl,
+  el: blockSearchShape.el,
+  entity: blockSearchShape.entity,
   /** Time period */
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
 });

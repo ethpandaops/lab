@@ -8,14 +8,7 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, fillTimeKeys, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import {
-  ClientFilter,
-  ClientPairs,
-  ClientsSkeleton,
-  EntityFilter,
-  GraffitiBlocksTable,
-  LayerClients,
-} from './components';
+import { ClientFilter, ClientPairs, ClientsSkeleton, EntityFilter, LayerClients } from './components';
 import { useCensus, useClientCounts, useEntityOptions, useLatestAdoption, useLatestReleases } from './hooks';
 import { CENSUS_TABLES } from './api/client-models';
 import { windowStart } from './utils/client-versions';
@@ -42,10 +35,6 @@ import {
   type ClientFilters,
   type ClientLayer,
 } from './utils/client-share';
-import { BLOCK_FILTER_KEYS, type BlockSearch } from './utils/block-filters';
-
-/** Blocks table filters; the filter bar above owns the clients and entity */
-const INDEX_BLOCK_FIELDS = BLOCK_FILTER_KEYS.filter(key => key !== 'cl' && key !== 'el' && key !== 'entity');
 
 /** Window text for subtitles, e.g. "in the last 7 days" */
 const WINDOW_TEXT: Record<TimePeriod, string> = {
@@ -77,7 +66,7 @@ function describeBlocks(
 
 /**
  * Clients overview: per layer, every client by share of proposed blocks and of P2P peers, Xatu nodes and adoption of
- * its latest release, with both shares over time, the most common pairs and a per-block drill-down.
+ * its latest release, with both shares over time and the most common pairs.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/clients/' });
@@ -94,7 +83,7 @@ export function IndexPage(): JSX.Element {
   );
   const hasFilters = !!entity || !!filters.consensusClient || !!filters.executionClient;
 
-  const { records, keys, isDaily, since, isLoading, error } = useClientCounts(timePeriod, entity);
+  const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
   const { adoption } = useLatestAdoption(latestReleases, entity);
@@ -159,14 +148,9 @@ export function IndexPage(): JSX.Element {
     [executionChartRecords, chartKeys, chartDaily]
   );
 
-  // Every change here can change the blocks table's rows, so it returns to the table's first page
   const setSearch = useCallback(
     (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string }) =>
-      navigate({ search: prev => ({ ...prev, ...update, page: undefined }), replace: true }),
-    [navigate]
-  );
-  const setBlockSearch = useCallback(
-    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }) }),
+      navigate({ search: prev => ({ ...prev, ...update }), replace: true, resetScroll: false }),
     [navigate]
   );
   const clearFilters = useCallback(() => setSearch({ cl: undefined, el: undefined, entity: undefined }), [setSearch]);
@@ -313,15 +297,6 @@ export function IndexPage(): JSX.Element {
                 onSelect={pair => setSearch({ cl: pair.consensusClient, el: pair.executionClient })}
               />
             </>
-          )}
-
-          {!isEmpty && (
-            <GraffitiBlocksTable
-              search={search}
-              fields={INDEX_BLOCK_FIELDS}
-              onSearchChange={setBlockSearch}
-              since={since ?? undefined}
-            />
           )}
         </div>
       )}
