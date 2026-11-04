@@ -7,6 +7,7 @@ import {
   countVersionsByDay,
   findRelease,
   groupVersionLines,
+  latestAdoption,
   latestRelease,
   matchReleaseVersion,
   opcodeCosts,
@@ -134,6 +135,23 @@ describe('adoptionByDay', () => {
       block(day + 4, null),
     ]);
     expect(adoptionByDay(days, 'v8.3.1')).toEqual([{ day: '2026-10-01', exact: 50, atLeast: 75 }]);
+  });
+});
+
+describe('latestAdoption', () => {
+  it('should divide by blocks with a known release and report how many blocks have one', () => {
+    const rows = [
+      { client: 'lighthouse', version: 'v8.3.2', count: 30 },
+      { client: 'lighthouse', version: 'v8.3.1', count: 20 },
+      // Graffiti that resolves to no release
+      { client: 'lighthouse', version: null, count: 150 },
+      { client: 'teku', version: '26.10.3', count: 10 },
+    ];
+    const latest = new Map([['lighthouse', release('v8.3.2', 1)]]);
+    const result = latestAdoption(rows, latest);
+    expect(result.get('lighthouse')).toEqual({ share: 60, known: 25 });
+    // No known latest release
+    expect(result.has('teku')).toBe(false);
   });
 });
 

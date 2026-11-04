@@ -33,7 +33,7 @@ export interface UseVersionCountsOptions {
   unresolvedOnly?: boolean;
   /** Window start (unix seconds); all history when omitted */
   from?: number;
-  /** Window end (unix seconds, exclusive); now when omitted */
+  /** Window end (unix seconds, exclusive); when omitted, the current hour's start for hourly grains, else now */
   to?: number;
   enabled?: boolean;
 }
@@ -115,8 +115,13 @@ export function useVersionCounts({
   enabled = true,
 }: UseVersionCountsOptions): UseVersionCountsResult {
   const { currentNetwork } = useNetwork();
-  // Ten-minute aligned so the window, and the cache keys, stay put while the page is open
-  const end = useMemo(() => to ?? Math.ceil(Date.now() / 1000 / 600) * 600, [to]);
+  const hourly = grain === 'hourly' || grain === 'entity-hourly';
+  // Hourly windows end where the current, still-filling hour starts; daily ones ten-minute aligned so the window,
+  // and the cache keys, stay put while the page is open
+  const end = useMemo(
+    () => to ?? (hourly ? Math.floor(Date.now() / 1000 / 3600) * 3600 : Math.ceil(Date.now() / 1000 / 600) * 600),
+    [to, hourly]
+  );
   const dataKey = {
     daily: 'fct_block_graffiti_client_version_daily',
     'entity-daily': 'fct_block_graffiti_client_version_by_entity_daily',

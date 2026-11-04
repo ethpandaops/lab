@@ -271,6 +271,43 @@ export function last24hStart(now: number = Date.now()): number {
   return Math.floor(now / 1000 / 3600) * 3600 - 24 * 3600;
 }
 
+/** A client's blocks over a window against its latest release */
+export interface LatestAdoption {
+  /** Share of its blocks with a known release that ran its latest release or newer (0-100) */
+  share: number;
+  /** Share of all its blocks whose graffiti resolves to a known release (0-100) */
+  known: number;
+}
+
+/**
+ * Per client: the share of its blocks with a known release on its latest release or newer, and how many of its
+ * blocks have a known release. Clients without such blocks or a known latest release are left out.
+ */
+export function latestAdoption(
+  rows: Array<Pick<VersionCount, 'client' | 'version' | 'count'>>,
+  latest: Map<string, DimClientRelease>
+): Map<string, LatestAdoption> {
+  const totals = new Map<string, { all: number; resolved: number; onLatest: number }>();
+  for (const row of rows) {
+    if (!row.client) continue;
+    const entry = totals.get(row.client) ?? { all: 0, resolved: 0, onLatest: 0 };
+    entry.all += row.count;
+    if (row.version) {
+      entry.resolved += row.count;
+      const release = latest.get(row.client)?.version;
+      if (release && compareVersions(row.version, release) >= 0) entry.onLatest += row.count;
+    }
+    totals.set(row.client, entry);
+  }
+  const result = new Map<string, LatestAdoption>();
+  for (const [client, entry] of totals) {
+    if (entry.resolved > 0 && latest.has(client)) {
+      result.set(client, { share: (entry.onLatest / entry.resolved) * 100, known: (entry.resolved / entry.all) * 100 });
+    }
+  }
+  return result;
+}
+
 /** Blocks per version over a window */
 export interface VersionSummary {
   version: string;

@@ -8,6 +8,8 @@ import type { ClientPairSummary } from '../../utils/client-share';
 export interface ClientPairsProps {
   /** Pair totals, largest first */
   pairs: ClientPairSummary[];
+  /** Which blocks the pairs count, e.g. "in the last 7 days" or "from coinbase in the last 7 days" */
+  scope: string;
   /** How many pairs to show */
   limit?: number;
   /** Called with a pair to filter the page by */
@@ -34,9 +36,13 @@ const columns: Column<ClientPairSummary>[] = [
 /**
  * Most common consensus and execution client pairs over the selected window.
  */
-export function ClientPairs({ pairs, limit = 10, onSelect }: ClientPairsProps): JSX.Element {
+export function ClientPairs({ pairs, scope, limit = 10, onSelect }: ClientPairsProps): JSX.Element {
   return (
-    <Card rounded title="Client pairs">
+    <Card
+      rounded
+      title="Client pairs"
+      subtitle={`Proposed blocks ${scope} by the clients their graffiti names, stake-weighted`}
+    >
       <Table
         variant="nested"
         data={pairs.slice(0, limit)}

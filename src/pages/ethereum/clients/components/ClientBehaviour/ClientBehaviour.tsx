@@ -8,6 +8,7 @@ import type {
 } from '../../api/client-models';
 import type { ClientLayer } from '../../utils/client-share';
 import { UNKNOWN_CLIENT } from '../../constants';
+import { latestFullDay } from '../../utils/census';
 import { sinceSuffix } from '../../utils/client-versions';
 import { ClientMetricCompare } from '../ClientMetricCompare';
 import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
@@ -25,7 +26,7 @@ export interface ClientBehaviourProps {
 const percent = (value: number): string => `${value.toFixed(2)}%`;
 
 /**
- * How blocks proposed with each client of a layer fared: MEV, blobs, gas, propagation, missed and orphaned slots.
+ * How blocks proposed with each client of a layer fared: MEV, blobs, gas, missed and orphaned slots.
  */
 export function ProposerBehaviour({ client, layer, from, windowControl }: ClientBehaviourProps): JSX.Element {
   const { rows, dataStart, isLoading } = useProposalRows(layer, from);
@@ -87,11 +88,6 @@ const PROPOSAL_HEADLINES: Array<Headline<FctBlockProposalByClientDaily>> = [
   { metric: byId(PROPOSAL_METRICS, 'mev-share'), delta: pts, epsilon: 0.05, neutral: true },
   { metric: byId(PROPOSAL_METRICS, 'missed'), delta: pts, epsilon: 0.01 },
   { metric: byId(PROPOSAL_METRICS, 'orphaned'), delta: pts, epsilon: 0.01 },
-  {
-    metric: byId(PROPOSAL_METRICS, 'seen-p50'),
-    delta: d => `${sign(d)}${Math.abs(Math.round(d)).toLocaleString()} ms`,
-    epsilon: 1,
-  },
 ];
 
 const ATTESTATION_HEADLINES: Array<Headline<FctAttestationVoteCorrectnessByClientDaily>> = [
@@ -154,10 +150,8 @@ export function PerformanceHeadline({
     const knownDuties = attestations.rows
       .filter(row => row.client && row.client !== UNKNOWN_CLIENT)
       .reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
-    const latestDay = attestations.rows.reduce(
-      (day, row) => ((row.day_start_date ?? '') > day ? (row.day_start_date ?? '') : day),
-      ''
-    );
+    // Today is still filling, so the count is the latest full day's
+    const latestDay = latestFullDay(attestations.rows);
     const validators = attestations.rows
       .filter(row => row.client === client && row.day_start_date === latestDay)
       .reduce((sum, row) => sum + (row.validator_count ?? 0), 0);

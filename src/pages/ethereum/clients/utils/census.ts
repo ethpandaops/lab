@@ -8,6 +8,15 @@ import { OTHER_VERSION_COLOR, type VersionCount } from './client-versions';
 import { RESOLVED_STATUSES } from '../api/client-models';
 import type { ClientLayer, ClientSummary } from './client-share';
 
+/**
+ * Who counts each layer's P2P peers, as it reads after "P2P peers": consensus peers come from libp2p heartbeats and
+ * identify exchanges, execution nodes from discovery records.
+ */
+export const PEER_SOURCE: Record<ClientLayer, string> = {
+  consensus: 'our libp2p sentries saw',
+  execution: 'our discovery crawler found',
+};
+
 /** Census rows carry a day and a client */
 type DayRow = { day_start_date?: string; client?: string };
 

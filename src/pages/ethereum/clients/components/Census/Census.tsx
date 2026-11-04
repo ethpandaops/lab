@@ -32,6 +32,7 @@ import {
   groupForkIdNext,
   groupNextForkDigests,
   networkTypeLabel,
+  PEER_SOURCE,
   sum,
   upcomingFork,
   type CensusVersion,
@@ -50,11 +51,6 @@ function percent(part: number, total: number): string {
 /** A req/resp protocol without its shared prefix and encoding, e.g. beacon_blocks_by_range/2 */
 function protocolLabel(protocol: string): string {
   return protocol.replace(/^\/eth2\/beacon_chain\/req\//, '').replace(/\/ssz_snappy$/, '');
-}
-
-/** Formats milliseconds, or a dash */
-function ms(value: number | null | undefined): string {
-  return value == null ? '-' : `${Math.round(value).toLocaleString()} ms`;
 }
 
 /** A census version: linked to its version page when it is a release */
@@ -102,7 +98,7 @@ function toVersionCounts<T extends { day_start_date?: string; version?: string; 
 export interface PeerCensusProps {
   client: string;
   layer: ClientLayer;
-  /** Window start for the trends (unix seconds); all history when omitted */
+  /** Window start for the trends (unix seconds); 0 for all history, the latest days when omitted */
   from?: number;
   windowControl?: ReactNode;
 }
@@ -140,16 +136,10 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
   if (own.rows.length === 0) {
     return (
       <Card rounded title="P2P peers">
-        <p className="text-sm text-muted">The tysm crawler has not seen P2P peers running this client.</p>
+        <p className="text-sm text-muted">No P2P peer {PEER_SOURCE[layer]} runs this client.</p>
       </Card>
     );
   }
-
-  // Latency of a version is that of its largest row, since percentiles do not add up across rows
-  const latencyByVersion = (version: CensusVersion): FctPeerCountByClClientDaily | undefined =>
-    own.latest
-      .filter(row => (row.version ?? '') === version.version)
-      .sort((a, b) => (b.peer_count ?? 0) - (a.peer_count ?? 0))[0];
 
   return (
     <div className="flex flex-col gap-4">
@@ -169,7 +159,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Card
         rounded
         title="P2P peers"
-        subtitle={`P2P peers the tysm crawler saw each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
+        subtitle={`P2P peers ${PEER_SOURCE[layer]} each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
         actions={windowControl}
       >
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -228,22 +218,6 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
                     header: 'Stated only',
                     accessor: (row: CensusVersion) =>
                       row.resolved && row.statedOnly > 0 ? row.statedOnly.toLocaleString() : '-',
-                    cellClassName: 'text-right tabular-nums text-muted',
-                    headerClassName: 'text-right',
-                  },
-                ]
-              : []),
-            ...(layer === 'consensus'
-              ? [
-                  {
-                    header: 'Latency p50',
-                    accessor: (row: CensusVersion) => ms(latencyByVersion(row)?.latency_p50_ms),
-                    cellClassName: 'text-right tabular-nums text-muted',
-                    headerClassName: 'text-right',
-                  },
-                  {
-                    header: 'Latency p90',
-                    accessor: (row: CensusVersion) => ms(latencyByVersion(row)?.latency_p90_ms),
                     cellClassName: 'text-right tabular-nums text-muted',
                     headerClassName: 'text-right',
                   },
@@ -563,6 +537,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
 
 export interface CustodyComplianceProps {
   client: string;
+  /** Window start (unix seconds); 0 for all history, the latest days when omitted */
   from?: number;
   windowControl?: ReactNode;
 }
@@ -666,8 +641,8 @@ export interface VersionPeersProps {
 }
 
 /**
- * One release on the P2P network on the latest full day: for consensus clients, the custody, QUIC and latency of
- * the P2P peers whose build resolved to it, and the next fork its ENR records advertise. Countries and networks are
+ * One release on the P2P network on the latest full day: for consensus clients, the custody and QUIC of the P2P
+ * peers whose build resolved to it, and the next fork its ENR records advertise. Countries and networks are
  * only counted per client, so they link to the client's Network tab.
  */
 export function VersionPeers({ client, layer, version, children }: VersionPeersProps): JSX.Element {
@@ -676,8 +651,6 @@ export function VersionPeers({ client, layer, version, children }: VersionPeersP
     layer === 'consensus' ? { client_eq: client } : null
   );
   const rows = own.latest.filter(row => row.version === version && RESOLVED_STATUSES.has(row.release_status ?? ''));
-  // Percentiles do not add up across rows, so the version's latency is that of its largest row
-  const largest = [...rows].sort((a, b) => (b.peer_count ?? 0) - (a.peer_count ?? 0))[0];
 
   return (
     <div className="flex flex-col gap-4">
@@ -686,33 +659,19 @@ export function VersionPeers({ client, layer, version, children }: VersionPeersP
           <Card
             rounded
             title="Custody and connections"
-            subtitle={`P2P peers on this version the tysm crawler saw on ${own.day ?? '-'}`}
+            subtitle={`P2P peers on this version ${PEER_SOURCE.consensus} on ${own.day ?? '-'}`}
           >
             {own.isLoading ? (
               <LoadingContainer className="h-40 rounded-sm" />
             ) : rows.length === 0 ? (
-              <p className="text-sm text-muted">The tysm crawler saw no P2P peer on this version.</p>
+              <p className="text-sm text-muted">No P2P peer {PEER_SOURCE.consensus} runs this version.</p>
             ) : (
               <div className="flex flex-col gap-4">
-                <dl className="grid grid-cols-3 gap-4">
-                  <div>
-                    <dt className="text-xs/5 text-muted">P2P peers</dt>
-                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                      {sum(rows, row => row.peer_count).toLocaleString()}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs/5 text-muted">Latency p50</dt>
-                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                      {ms(largest?.latency_p50_ms)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs/5 text-muted">Latency p90</dt>
-                    <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
-                      {ms(largest?.latency_p90_ms)}
-                    </dd>
-                  </div>
+                <dl>
+                  <dt className="text-xs/5 text-muted">P2P peers</dt>
+                  <dd className="text-sm/6 font-semibold text-foreground tabular-nums">
+                    {sum(rows, row => row.peer_count).toLocaleString()}
+                  </dd>
                 </dl>
                 <CustodyBuckets client={client} rows={rows} />
               </div>

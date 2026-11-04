@@ -8,11 +8,12 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease, FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
+import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
 import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '../../hooks';
 import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { censusVersionCounts, sum } from '../../utils/census';
+import { censusVersionCounts, PEER_SOURCE, sum } from '../../utils/census';
 import type { ClientLayer } from '../../utils/client-share';
 import {
   adoptionByDay,
@@ -310,7 +311,7 @@ export function VersionAdoption({
   // Time to adoption reads the days after each release, whatever the range
   const releaseCounts = useReleaseCounts(client, layer, release?.release_date, releases);
   const previousCounts = useReleaseCounts(client, layer, previous?.release_date, releases);
-  // P2P peers: the tysm crawler's daily census
+  // P2P peers: the daily census
   const peers = useCensus<FctPeerCountByElClientDaily>(
     consensus ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers,
     { client_eq: client },
@@ -420,6 +421,9 @@ export function VersionAdoption({
     peers.latest.filter(row => row.version === version && !isResolved(row)),
     row => row.peer_count
   );
+  const knownShare = blocksNowDay
+    ? shareText((blocksNowDay.resolved / (blocksNowDay.resolved + blocksNowDay.unresolved)) * 100)
+    : '-';
   const xatuCount = (target?: string): string => (target ? (xatuNow?.counts.get(target) ?? 0).toLocaleString() : '-');
 
   // A P2P census that starts inside the range has no change over the whole range to show
@@ -451,7 +455,7 @@ export function VersionAdoption({
           against the client&apos;s releases, and blocks that match none are left out of the shares.
         </p>
         <p>
-          <strong>P2P peers</strong> are node-weighted: the peers the tysm crawler saw each day, by the version their
+          <strong>P2P peers</strong> are node-weighted: the peers {PEER_SOURCE[layer]} each day, by the version their
           agent states and the commit it resolves to. Peers stating a version without a matching commit are counted
           apart, outside its share.
         </p>
@@ -473,7 +477,7 @@ export function VersionAdoption({
             id: 'blocks',
             name: 'Proposed blocks',
             accentColor: ANGLE_COLORS.blocks,
-            subtitle: `On ${version} or newer, last 24h`,
+            subtitle: `On ${version} or newer, known-release blocks, 24h`,
             ...shareNowStat(blocksNow?.atLeast, blockPoints, window),
           },
           {
@@ -547,7 +551,7 @@ export function VersionAdoption({
         <AngleCard
           title="Proposed blocks"
           color={ANGLE_COLORS.blocks}
-          subtitle="Stake-weighted, shares over the last 24 hours"
+          subtitle="Stake-weighted, shares of blocks with a known release over the last 24 hours"
           version={version}
           previous={previousVersion}
           rows={[
@@ -555,7 +559,12 @@ export function VersionAdoption({
             { metric: `Blocks, ${window}`, current: blockCount(version), previous: blockCount(previousVersion) },
             { metric: `Entities, ${window}`, current: entityCount(version), previous: entityCount(previousVersion) },
           ]}
-        />
+        >
+          <dl className="flex items-baseline justify-between gap-4 border-t border-border/60 pt-2 text-sm/5">
+            <dt className="text-muted">{formatClientName(client)} blocks with a known release, last 24h</dt>
+            <dd className="font-medium text-foreground tabular-nums">{knownShare}</dd>
+          </dl>
+        </AngleCard>
         <AngleCard
           title="P2P peers"
           color={ANGLE_COLORS.peers}

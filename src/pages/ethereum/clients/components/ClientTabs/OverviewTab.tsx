@@ -102,6 +102,7 @@ export function OverviewTab({
     return { labels: days.map(formatDailyDate), series };
   }, [counts.records, counts.keys, peers.rows, layer, client]);
 
+  const allRecent = last24h.reduce((sum, row) => sum + row.count, 0);
   const recent = last24h.filter(block => block.version);
   const recentTotal = recent.reduce((sum, row) => sum + row.count, 0);
   const onLatest = latest?.version
@@ -128,8 +129,8 @@ export function OverviewTab({
         gridClassName={clsx(
           'grid grid-cols-2 gap-4',
           layer === 'consensus'
-            ? 'lg:grid-cols-4'
-            : 'lg:grid-cols-3 [&>:last-child]:col-span-2 lg:[&>:last-child]:col-span-1'
+            ? 'lg:grid-cols-5 [&>:last-child]:col-span-2 lg:[&>:last-child]:col-span-1'
+            : 'lg:grid-cols-4'
         )}
         stats={[
           {
@@ -147,9 +148,15 @@ export function OverviewTab({
             value: peers.isLoading ? '…' : shareText(peerShare),
           },
           {
+            id: 'known',
+            name: 'Known release',
+            subtitle: 'Share of its blocks, 24h',
+            value: percent(recentTotal, allRecent),
+          },
+          {
             id: 'latest',
-            name: 'On latest release',
-            subtitle: `Blocks on ${latest?.version ?? 'it'} or newer, 24h`,
+            name: `On ${latest?.version ?? 'latest'} or newer`,
+            subtitle: 'Known-release blocks, 24h',
             value: percent(onLatest, recentTotal),
           },
           ...(layer === 'consensus'

@@ -82,15 +82,18 @@ function Th({
   children,
   right = false,
   compact = false,
+  wrap = false,
 }: {
   children: ReactNode;
   right?: boolean;
   compact?: boolean;
+  /** Let the header wrap below sm, so a narrow table fits a phone */
+  wrap?: boolean;
 }): JSX.Element {
   return (
     <th
       scope="col"
-      className={`${compact ? 'px-2.5' : 'px-3'} py-2 align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground first:pl-0 last:pr-0 ${right ? 'text-right' : 'text-left'}`}
+      className={`${compact ? 'px-2.5' : 'px-3'} py-2 align-bottom text-xs/5 font-medium ${wrap ? 'sm:whitespace-nowrap' : 'whitespace-nowrap'} text-foreground first:pl-0 last:pr-0 ${right ? 'text-right' : 'text-left'}`}
     >
       {children}
     </th>
@@ -151,9 +154,19 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
             <thead className="border-b border-border">
               <tr>
                 <Th>Client</Th>
-                <Th>Proposed blocks</Th>
-                <Th>P2P addresses</Th>
-                <th aria-hidden className="w-28" />
+                <Th wrap>
+                  Proposed blocks
+                  <span className="block font-normal text-muted first-letter:uppercase">
+                    {SHARE_WINDOW_TEXT[shareWindow]}
+                  </span>
+                </Th>
+                <Th wrap>
+                  P2P addresses
+                  {partners.pairDay && (
+                    <span className="block font-normal whitespace-nowrap text-muted">On {partners.pairDay}</span>
+                  )}
+                </Th>
+                <th aria-hidden className="sm:w-28" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -176,7 +189,7 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
                       hash={`partner-${row.client}`}
                       className="inline-flex items-center gap-0.5 text-sm/6 whitespace-nowrap text-muted hover:text-primary"
                     >
-                      Performance
+                      <span className="sr-only sm:not-sr-only">Performance</span>
                       <ChevronRightIcon className="size-4" />
                     </Link>
                   </td>
@@ -234,14 +247,12 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
     type Column = PartnerMetric<ProposalPairRow> | PartnerMetric<AttestationPairRow>;
     return {
       headline: [
-        ...(hasProposals
-          ? [proposal('mev-share'), proposal('missed'), proposal('orphaned'), proposal('seen-p50')]
-          : []),
+        ...(hasProposals ? [proposal('mev-share'), proposal('missed'), proposal('orphaned')] : []),
         ...(hasAttestations ? [attestation('attested'), attestation('head')] : []),
       ] as Column[],
       // Shown when a row is expanded, so the table fits its card
       detail: [
-        ...(hasProposals ? [proposal('seen-p90'), proposal('mev-value'), proposal('blobs')] : []),
+        ...(hasProposals ? [proposal('mev-value'), proposal('blobs')] : []),
         ...(hasAttestations ? [attestation('target'), attestation('source'), attestation('inclusion')] : []),
       ] as Column[],
     };

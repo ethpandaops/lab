@@ -79,7 +79,12 @@ export function NetworksTable({ group, now }: NetworksTableProps): JSX.Element {
         </span>
       ),
     },
-    { header: 'Fork', accessor: row => row.fork, headerClassName: 'w-[18%]', cellClassName: 'text-muted capitalize' },
+    {
+      header: 'Fork',
+      accessor: row => row.fork,
+      headerClassName: 'hidden w-[18%] sm:table-cell',
+      cellClassName: 'hidden text-muted capitalize sm:table-cell',
+    },
     {
       header: 'Head slot',
       accessor: row => String(row.headSlot),
@@ -89,8 +94,8 @@ export function NetworksTable({ group, now }: NetworksTableProps): JSX.Element {
     {
       header: 'Epoch',
       accessor: row => String(row.headEpoch),
-      headerClassName: 'w-[14%] text-right',
-      cellClassName: 'text-right text-muted',
+      headerClassName: 'hidden w-[14%] text-right sm:table-cell',
+      cellClassName: 'hidden text-right text-muted sm:table-cell',
     },
     {
       header: 'Indexed to',
