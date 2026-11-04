@@ -27,7 +27,7 @@ export const PER_SLOT_CHART_RANGES: TimeRange[] = ['1hour', '6hours'];
 
 /**
  * Time ranges backed by hourly aggregated data (per-slot or hourly charts)
- * Longer ranges only fetch daily aggregations and hide hourly-based sections
+ * Longer ranges use the daily aggregations instead
  */
 export const HOURLY_CHART_RANGES: TimeRange[] = ['1hour', '6hours', '24hours', '7days', '31days'];
 

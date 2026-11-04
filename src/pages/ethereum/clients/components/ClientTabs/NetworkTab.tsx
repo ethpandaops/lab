@@ -9,7 +9,7 @@ import type { ClientTabProps } from './ClientTabs.types';
 
 /**
  * The client on the network: its P2P peers, the next fork its ENRs advertise, and for consensus clients, whether its
- * peers serve the columns they custody.
+ * peers serve the columns they custody and send partial columns.
  */
 export function NetworkTab({ client, layer, releases, shareWindow, onShareWindowChange }: ClientTabProps): JSX.Element {
   const peers = usePeerSupport(client, layer === 'consensus');
@@ -36,7 +36,6 @@ export function NetworkTab({ client, layer, releases, shareWindow, onShareWindow
             releases={releases}
             partial={peers.partial}
             partialDay={peers.partialDay}
-            probes={peers.probes}
             isLoading={peers.isLoading}
           />
         </>

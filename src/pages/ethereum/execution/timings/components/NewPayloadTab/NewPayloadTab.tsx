@@ -13,6 +13,8 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor } from '@/utils';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type {
+  FctEngineNewPayloadByElClientHourly,
+  FctEngineNewPayloadByElClientDaily,
   FctEngineNewPayloadWinrateHourly,
   FctEngineNewPayloadWinrateDaily,
   IntEngineNewPayloadFastestExecutionByNodeClass,
@@ -30,6 +32,12 @@ const PERCENTILE_OPTIONS = [
   { value: 'p50', label: 'P50' },
   { value: 'p95', label: 'P95' },
 ] as const;
+
+/** Start of an hourly or daily row's bucket in ms (0 when missing) */
+function bucketStartMs(row: { hour_start_date_time?: number; day_start_date?: string }): number {
+  if (row.hour_start_date_time) return row.hour_start_date_time * 1000;
+  return row.day_start_date ? Date.parse(`${row.day_start_date}T00:00:00Z`) : 0;
+}
 
 /**
  * NewPayload tab showing detailed engine_newPayload timing analysis
@@ -49,8 +57,13 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   // Check if we should show per-slot charts (only for short time ranges)
   const showPerSlotCharts = PER_SLOT_CHART_RANGES.includes(timeRange);
 
-  // Long ranges (90d+) only fetch daily winrate data - hourly-based sections are unavailable
+  // Long ranges (90d+) only fetch the daily tables, so trends there have one point per day
   const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
+
+  // Per-client/version rows covering the whole range (hourly up to 31d, daily beyond)
+  const summaryRows: (FctEngineNewPayloadByElClientHourly | FctEngineNewPayloadByElClientDaily)[] = showHourlyCharts
+    ? newPayloadByElClientHourly
+    : newPayloadByElClientDaily;
 
   // Filter to VALID status only for duration-based charts
   const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
@@ -93,41 +106,24 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const histogramLabels = histogramBuckets.map(bucket => `${bucket}ms`);
   const histogramData = histogramBuckets.map(bucket => histogramMap.get(bucket) ?? 0);
 
-  // Calculate status breakdown from per-slot data
-  const statusTotals = newPayloadByElClient.reduce(
-    (acc, item) => {
-      const obs = item.observation_count ?? 0;
-      const status = item.status?.toUpperCase() ?? '';
-
-      switch (status) {
-        case 'VALID':
-          return { ...acc, valid: acc.valid + obs };
-        case 'INVALID':
-          return { ...acc, invalid: acc.invalid + obs };
-        case 'SYNCING':
-          return { ...acc, syncing: acc.syncing + obs };
-        case 'ACCEPTED':
-          return { ...acc, accepted: acc.accepted + obs };
-        case 'INVALID_BLOCK_HASH':
-          return { ...acc, invalidBlockHash: acc.invalidBlockHash + obs };
-        case 'ERROR':
-          return { ...acc, error: acc.error + obs };
-        default:
-          return acc;
-      }
-    },
-    { valid: 0, invalid: 0, syncing: 0, accepted: 0, invalidBlockHash: 0, error: 0 }
+  // Calculate status breakdown from the hourly/daily rows covering the whole range
+  const statusTotals = summaryRows.reduce(
+    (acc, row) => ({
+      valid: acc.valid + (row.valid_count ?? 0),
+      invalid: acc.invalid + (row.invalid_count ?? 0),
+      syncing: acc.syncing + (row.syncing_count ?? 0),
+      accepted: acc.accepted + (row.accepted_count ?? 0),
+    }),
+    { valid: 0, invalid: 0, syncing: 0, accepted: 0 }
   );
 
-  const statusLabels = ['VALID', 'INVALID', 'SYNCING', 'ACCEPTED', 'INVALID_BLOCK_HASH', 'ERROR'];
+  const statusLabels = ['VALID', 'INVALID', 'SYNCING', 'ACCEPTED'];
   // Use BarDataItem with per-bar colors
   const statusData = [
     { value: statusTotals.valid, color: themeColors.success },
     { value: statusTotals.invalid, color: themeColors.danger },
     { value: statusTotals.syncing, color: themeColors.warning },
     { value: statusTotals.accepted, color: themeColors.muted },
-    { value: statusTotals.invalidBlockHash, color: themeColors.danger },
-    { value: statusTotals.error, color: themeColors.danger },
   ];
 
   // === Block Complexity vs Duration by Client ===
@@ -225,31 +221,29 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     };
   });
 
-  // === Hourly Trend Series (for longer time ranges) ===
-  // Group hourly data by client and hour, aggregating across versions with weighted average
-  const hourlyClientData = new Map<
+  // === Trend Series (for longer time ranges) ===
+  // Group hourly/daily data by client and bucket, aggregating across versions with weighted average
+  const trendClientData = new Map<
     string,
     Map<number, { totalP50: number; totalP95: number; totalGasUsed: number; totalObs: number }>
   >();
-  const hourlyClients = new Set<string>();
+  const trendClients = new Set<string>();
 
-  newPayloadByElClientHourly.forEach(row => {
+  summaryRows.forEach(row => {
     const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
-    hourlyClients.add(client);
+    trendClients.add(client);
 
-    const timestamp = row.hour_start_date_time ?? 0;
+    const timestampMs = bucketStartMs(row);
     const p50 = row.p50_duration_ms ?? 0;
     const p95 = row.p95_duration_ms ?? 0;
     const gasUsed = row.avg_gas_used ?? 0;
     const obs = row.observation_count ?? 0;
 
-    if (timestamp > 0 && obs > 0 && p50 > 0) {
-      const timestampMs = timestamp * 1000;
-
-      if (!hourlyClientData.has(client)) {
-        hourlyClientData.set(client, new Map());
+    if (timestampMs > 0 && obs > 0 && p50 > 0) {
+      if (!trendClientData.has(client)) {
+        trendClientData.set(client, new Map());
       }
-      const clientHours = hourlyClientData.get(client)!;
+      const clientHours = trendClientData.get(client)!;
 
       // Aggregate by hour - weighted by observation count
       const existing = clientHours.get(timestampMs);
@@ -270,14 +264,14 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   });
 
   // Sort clients for consistent coloring and create series
-  const hourlyClientList = Array.from(hourlyClients).sort();
+  const trendClientList = Array.from(trendClients).sort();
 
   // Calculate time bounds for the hourly chart
-  let hourlyMinTime = Infinity;
-  let hourlyMaxTime = -Infinity;
+  let trendMinTime = Infinity;
+  let trendMaxTime = -Infinity;
 
-  const hourlyP50Series = hourlyClientList.map((client, index) => {
-    const clientHours = hourlyClientData.get(client) ?? new Map();
+  const trendP50Series = trendClientList.map((client, index) => {
+    const clientHours = trendClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
     clientHours.forEach((agg, timestampMs) => {
@@ -285,8 +279,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       dataPoints.push([timestampMs, avgP50]);
 
       // Track min/max for axis bounds
-      if (timestampMs < hourlyMinTime) hourlyMinTime = timestampMs;
-      if (timestampMs > hourlyMaxTime) hourlyMaxTime = timestampMs;
+      if (timestampMs < trendMinTime) trendMinTime = timestampMs;
+      if (timestampMs > trendMaxTime) trendMaxTime = timestampMs;
     });
 
     // Sort by timestamp
@@ -300,8 +294,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   });
 
   // P95 Duration series
-  const hourlyP95Series = hourlyClientList.map((client, index) => {
-    const clientHours = hourlyClientData.get(client) ?? new Map();
+  const trendP95Series = trendClientList.map((client, index) => {
+    const clientHours = trendClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
     clientHours.forEach((agg, timestampMs) => {
@@ -319,28 +313,37 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   });
 
   // Ensure valid bounds (fallback to now if no data)
-  if (hourlyMinTime === Infinity) hourlyMinTime = Date.now() - 3600000;
-  if (hourlyMaxTime === -Infinity) hourlyMaxTime = Date.now();
+  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
+  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
 
-  // Keep hourlyTrendSeries as alias for backward compatibility
-  const hourlyTrendSeries = hourlyP50Series;
+  // Axis and tooltip labels for the trend charts' hourly/daily buckets
+  const formatTrendAxis = (value: number | string): string => {
+    const date = new Date(Number(value));
+    if (timeRange === '24hours') {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+  const formatTrendBucket = (ms: number): string =>
+    showHourlyCharts
+      ? new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : new Date(ms).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
   // === Valid Rate Trend Series (for longer time ranges) ===
-  // Calculate valid rate per client per hour
+  // Calculate valid rate per client per hour (per day for 90d+)
   const validRateClientData = new Map<string, Map<number, { validCount: number; totalCount: number }>>();
 
-  newPayloadByElClientHourly.forEach(row => {
+  summaryRows.forEach(row => {
     const client = (row.meta_execution_implementation ?? 'unknown').toLowerCase();
-    const timestamp = row.hour_start_date_time ?? 0;
+    const timestampMs = bucketStartMs(row);
     const validCount = row.valid_count ?? 0;
     const totalCount = row.observation_count ?? 0;
 
-    if (timestamp > 0 && totalCount > 0) {
+    if (timestampMs > 0 && totalCount > 0) {
       if (!validRateClientData.has(client)) {
         validRateClientData.set(client, new Map());
       }
       const clientHours = validRateClientData.get(client)!;
-      const timestampMs = timestamp * 1000;
 
       // Aggregate by hour
       const existing = clientHours.get(timestampMs);
@@ -353,7 +356,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     }
   });
 
-  const validRateTrendSeries = hourlyClientList.map((client, index) => {
+  const validRateTrendSeries = trendClientList.map((client, index) => {
     const clientHours = validRateClientData.get(client) ?? new Map();
     const dataPoints: [number, number][] = [];
 
@@ -472,7 +475,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         hourlyRecords={winrateHourly}
         dailyRecords={winrateDaily}
         perSlotRecords={computedWinratePerSlot}
-        allClients={[...new Set([...hourlyClientList, ...elClientList])]}
+        allClients={[...new Set([...trendClientList, ...elClientList])]}
         timeRange={timeRange}
         showPerSlot={showPerSlotCharts}
         showDaily={!showHourlyCharts}
@@ -485,14 +488,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         anchorId="client-duration"
         modalSize="full"
       >
-        {() => (
-          <ClientVersionBreakdown
-            data={validPayloadByElClient}
-            hourlyData={showHourlyCharts ? newPayloadByElClientHourly : newPayloadByElClientDaily}
-            hideRange
-            noCard
-          />
-        )}
+        {() => <ClientVersionBreakdown data={validPayloadByElClient} hourlyData={summaryRows} hideRange noCard />}
       </PopoutCard>
 
       {/* Per-slot charts — short time ranges only */}
@@ -583,12 +579,12 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         </div>
       )}
 
-      {/* Hourly charts — longer time ranges */}
-      {!showPerSlotCharts && showHourlyCharts && (
+      {/* Hourly (daily for 90d+) charts — longer time ranges */}
+      {!showPerSlotCharts && (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          {hourlyTrendSeries.length > 0 && hourlyTrendSeries.some(s => s.data.length > 0) && (
+          {trendP50Series.length > 0 && trendP50Series.some(s => s.data.length > 0) && (
             <PopoutCard
-              title={`Hourly ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
+              title={`${showHourlyCharts ? 'Hourly' : 'Daily'} ${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration by Client`}
               anchorId="hourly-duration"
               modalSize="full"
               headerActions={
@@ -602,19 +598,13 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={selectedPercentile === 'p50' ? hourlyTrendSeries : hourlyP95Series}
+                  series={selectedPercentile === 'p50' ? trendP50Series : trendP95Series}
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: hourlyMinTime,
-                    max: hourlyMaxTime,
-                    formatter: (value: number | string) => {
-                      const date = new Date(Number(value));
-                      if (timeRange === '7days' || timeRange === '31days') {
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                      }
-                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    },
+                    min: trendMinTime,
+                    max: trendMaxTime,
+                    formatter: formatTrendAxis,
                   }}
                   yAxis={{
                     name: `${selectedPercentile === 'p50' ? 'P50' : 'P95'} Duration (ms)`,
@@ -628,13 +618,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
                     const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
                     const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
-                    const date = new Date(timestamp);
-                    const timeStr = date.toLocaleString([], {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const timeStr = formatTrendBucket(timestamp);
 
                     let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
                     dataPoints.forEach((point: unknown) => {
@@ -659,7 +643,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
           {validRateTrendSeries.length > 0 && validRateTrendSeries.some(s => s.data.length > 0) && (
             <PopoutCard
               title="Valid Rate Over Time"
-              subtitle="Percentage of VALID responses per hour by client"
+              subtitle={`Percentage of VALID responses per ${showHourlyCharts ? 'hour' : 'day'} by client`}
               anchorId="valid-rate"
               modalSize="full"
             >
@@ -669,15 +653,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: hourlyMinTime,
-                    max: hourlyMaxTime,
-                    formatter: (value: number | string) => {
-                      const date = new Date(Number(value));
-                      if (timeRange === '7days' || timeRange === '31days') {
-                        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                      }
-                      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    },
+                    min: trendMinTime,
+                    max: trendMaxTime,
+                    formatter: formatTrendAxis,
                   }}
                   yAxis={{
                     name: 'Valid Rate (%)',
@@ -693,13 +671,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
                     const firstPoint = dataPoints[0] as { value?: [number, number]; axisValue?: number };
                     const timestamp = firstPoint.value?.[0] ?? firstPoint.axisValue ?? 0;
-                    const date = new Date(timestamp);
-                    const timeStr = date.toLocaleString([], {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const timeStr = formatTrendBucket(timestamp);
 
                     let html = `<div style="font-weight: 600; margin-bottom: 8px;">${timeStr}</div>`;
                     dataPoints.forEach((point: unknown) => {
@@ -723,9 +695,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         </div>
       )}
 
-      {/* Duration Histogram and Status Distribution — per-slot data */}
-      {showPerSlotCharts && (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      {/* Duration Histogram (per-slot data, short ranges only) and Status Distribution */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {showPerSlotCharts && (
           <PopoutCard title="Duration Distribution (50ms buckets)" anchorId="duration-histogram" modalSize="full">
             {({ inModal }) =>
               histogramData.length > 0 ? (
@@ -740,23 +712,18 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
               )
             }
           </PopoutCard>
+        )}
 
-          <PopoutCard title="Status Distribution" anchorId="status-distribution" modalSize="full">
-            {({ inModal }) =>
-              statusData.some(d => d.value > 0) ? (
-                <BarChart
-                  data={statusData}
-                  labels={statusLabels}
-                  height={inModal ? 600 : 300}
-                  orientation="horizontal"
-                />
-              ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
-              )
-            }
-          </PopoutCard>
-        </div>
-      )}
+        <PopoutCard title="Status Distribution" anchorId="status-distribution" modalSize="full">
+          {({ inModal }) =>
+            statusData.some(d => d.value > 0) ? (
+              <BarChart data={statusData} labels={statusLabels} height={inModal ? 600 : 300} orientation="horizontal" />
+            ) : (
+              <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
+            )
+          }
+        </PopoutCard>
+      </div>
     </div>
   );
 }
