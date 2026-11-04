@@ -84,10 +84,10 @@ export function IndexPage(): JSX.Element {
     color: getConsensusClientColor(client, index),
   }));
 
-  // Only the last 24 hours' active rows carry a location
-  const activeRows = rows.filter(row => row.node.last_seen_date_time !== undefined);
+  // Xatu nodes missing from fct_node_last_seen carry no location
+  const locatedRows = rows.filter(row => row.node.last_seen_date_time !== undefined);
   const countryItems: BreakdownItem[] = [
-    ...groupRows(activeRows, row => row.node.meta_client_geo_country).entries(),
+    ...groupRows(locatedRows, row => row.node.meta_client_geo_country).entries(),
   ].map(([country, group]) => ({
     key: country,
     label: country === 'unknown' ? 'Unknown' : country,
@@ -119,8 +119,8 @@ export function IndexPage(): JSX.Element {
             { id: 'nodes', name: 'Xatu nodes', value: rows.length, subtitle: rangeLabel },
             { id: 'online', name: 'Online now', value: online, subtitle: 'Xatu nodes' },
             { id: 'contributors', name: 'Contributors', value: contributors, subtitle: rangeLabel },
-            { id: 'countries', name: 'Countries', value: countries, subtitle: 'Last 24h' },
-            { id: 'asns', name: 'ASNs', value: asns, subtitle: 'Last 24h' },
+            { id: 'countries', name: 'Countries', value: countries, subtitle: rangeLabel },
+            { id: 'asns', name: 'ASNs', value: asns, subtitle: rangeLabel },
             {
               id: 'block',
               name: 'Block arrival',
@@ -138,7 +138,7 @@ export function IndexPage(): JSX.Element {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <NodeMap rows={rows} />
+            <NodeMap rows={rows} rangeLabel={rangeLabel} />
           </div>
           <BreakdownList title="Consensus clients" subtitle={rangeLabel} items={clientItems} />
         </div>
@@ -157,7 +157,7 @@ export function IndexPage(): JSX.Element {
         )}
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <BreakdownList title="Countries" subtitle="Last 24h" items={countryItems} limit={6} />
+          <BreakdownList title="Countries" subtitle={rangeLabel} items={countryItems} limit={6} />
           <ArrivalHistogram
             title="Block arrival by Xatu node"
             subtitle={`Each node's median, ${rangeLabel.toLowerCase()}`}

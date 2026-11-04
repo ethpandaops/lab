@@ -574,29 +574,28 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         </div>
       )}
 
-      {/* Duration Histogram (per-slot data, short ranges only) and Status Distribution */}
+      {/* Duration Histogram and Status Distribution */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {showPerSlotCharts && (
-          <PopoutCard
-            title="Duration Distribution (50ms buckets)"
-            subtitle={`VALID engine_newPayload calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
-            anchorId="duration-histogram"
-            modalSize="full"
-          >
-            {({ inModal }) =>
-              histogramData.length > 0 ? (
-                <BarChart
-                  data={histogramData}
-                  labels={histogramLabels}
-                  color={themeColors.primary}
-                  height={inModal ? 600 : 300}
-                />
-              ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
-              )
-            }
-          </PopoutCard>
-        )}
+        <PopoutCard
+          title="Duration Distribution (50ms buckets)"
+          subtitle={`VALID engine_newPayload calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          anchorId="duration-histogram"
+          modalSize="full"
+        >
+          {({ inModal }) =>
+            histogramData.length > 0 ? (
+              <BarChart
+                data={histogramData}
+                labels={histogramLabels}
+                showLabel={false}
+                color={themeColors.primary}
+                height={inModal ? 600 : 300}
+              />
+            ) : (
+              <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
+            )
+          }
+        </PopoutCard>
 
         <PopoutCard
           title="Status Distribution"

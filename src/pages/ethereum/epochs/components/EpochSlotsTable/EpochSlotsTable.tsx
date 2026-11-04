@@ -160,6 +160,13 @@ export function EpochSlotsTable({
               </Badge>
             );
           }
+          if (row.status === 'orphaned') {
+            return (
+              <Badge color="yellow" variant="border">
+                Orphaned
+              </Badge>
+            );
+          }
 
           // Only show "Missed" if we're confident the datasource has processed this slot
           // If maxProcessedSlot is undefined or the slot hasn't been processed yet, show "Pending"
@@ -194,15 +201,20 @@ export function EpochSlotsTable({
       },
       {
         header: 'Head votes',
-        accessor: row => (
-          <span className="text-muted">
-            {row.attestationHead} / {row.attestationMax}
-          </span>
-        ),
+        // A slot without a canonical block has no block of its own to vote for
+        accessor: row =>
+          row.status === 'orphaned' || row.status === 'missed' ? (
+            <span className="text-muted">–</span>
+          ) : (
+            <span className="text-muted">
+              {row.attestationHead} / {row.attestationMax}
+            </span>
+          ),
       },
       {
         header: 'Head vote %',
         accessor: row => {
+          if (row.status === 'orphaned' || row.status === 'missed') return <span className="text-muted">–</span>;
           const headVoteRate = row.attestationMax > 0 ? (row.attestationHead / row.attestationMax) * 100 : 0;
           return <span className="text-muted">{headVoteRate.toFixed(2)}%</span>;
         },

@@ -14,7 +14,6 @@ import {
   fctHeadFirstSeenByNodeHourlyServiceList,
 } from '@/api/sdk.gen';
 import type {
-  FctNodeActiveLast24h,
   FctAttestationObservationByNodeHourly,
   FctBlockDataColumnSidecarFirstSeenByNodeHourly,
   FctBlockFirstSeenByNodeHourly,
@@ -37,8 +36,6 @@ export interface HistoryRow {
   /** Consensus client, or execution client for engine metrics */
   client: string;
   clientVersion?: string;
-  /** Consensus metrics: the identity fields the rollup carries, in the shape of an active-node row */
-  node?: NodeIdentity;
   /** Slots (or engine calls) the summary covers */
   count: number;
   p10: number | null;
@@ -141,36 +138,18 @@ const SOURCES: Record<
   },
 } as never;
 
-/** Identity fields every consensus rollup shares with fct_node_active_last_24h; location and last seen are not among them */
-export type NodeIdentity = Pick<
-  FctNodeActiveLast24h,
-  | 'node_id'
-  | 'username'
-  | 'classification'
-  | 'meta_client_name'
-  | 'meta_client_implementation'
-  | 'meta_client_version'
-  | 'meta_consensus_implementation'
-  | 'meta_consensus_version'
->;
-
-function identity(row: NodeIdentity): { nodeId: string; username: string; client: string; node: NodeIdentity } {
-  // Rows from libp2p gossip name tysm sentries "prysm"; the active-node table and every other page call them tysm
+function identity(
+  row: Pick<
+    FctBlockFirstSeenByNodeHourly,
+    'node_id' | 'username' | 'meta_client_implementation' | 'meta_consensus_implementation'
+  >
+): Pick<HistoryRow, 'nodeId' | 'username' | 'client'> {
+  // Rows from libp2p gossip name tysm sentries "prysm"; the Xatu node tables and every other page call them tysm
   const consensus = row.meta_client_implementation === 'tysm' ? 'tysm' : row.meta_consensus_implementation;
   return {
     nodeId: row.node_id ?? '',
     username: row.username ?? '',
     client: consensus ?? '',
-    node: {
-      node_id: row.node_id,
-      username: row.username,
-      classification: row.classification,
-      meta_client_name: row.meta_client_name,
-      meta_client_implementation: row.meta_client_implementation,
-      meta_client_version: row.meta_client_version,
-      meta_consensus_implementation: consensus,
-      meta_consensus_version: row.meta_consensus_version,
-    },
   };
 }
 

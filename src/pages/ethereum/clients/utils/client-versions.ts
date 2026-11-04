@@ -6,8 +6,8 @@ import type {
 } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
-import { UNKNOWN_CLIENT, findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
-import { RESOLVED_STATUSES, type IntBlockGraffitiRelease, type ReleaseStatus } from '../api/client-models';
+import { findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
+import { RESOLVED_STATUSES, type ReleaseStatus } from '../api/client-models';
 
 export { releaseName, releaseUrl, type ClientRelease } from '@/utils/graffiti';
 import type { ClientLayer } from './client-share';
@@ -151,12 +151,6 @@ export interface VersionCount {
   /** Commit prefix the graffiti carried */
   commit?: string;
   entity?: string;
-  /** Client of the other layer, on per-block rows */
-  partner?: string;
-  /** Release of the other layer's client, on per-block rows */
-  partnerVersion?: string;
-  /** Commit of the other layer's client when it names no release, on per-block rows */
-  partnerCommit?: string;
   count: number;
 }
 
@@ -213,34 +207,6 @@ export function toVersionCounts(rows: AggregateRow[]): VersionCount[] {
         count: row.block_count ?? 0,
       };
     });
-}
-
-/**
- * Canonical blocks from int_block_graffiti_release as {@link VersionCount}s for one layer's client, with the other
- * layer's client and release.
- */
-export function blocksToVersionCounts(rows: IntBlockGraffitiRelease[], layer: ClientLayer): VersionCount[] {
-  const other = layer === 'consensus' ? 'execution' : 'consensus';
-  return rows.map(row => {
-    const time = row.slot_start_date_time ?? 0;
-    const status = row[`${layer}_client_release_status`] || 'none';
-    const version = row[`${layer}_client_version`];
-    const partnerStatus = row[`${other}_client_release_status`] ?? '';
-    const partnerVersion = row[`${other}_client_version`];
-    const partnerResolved = RESOLVED_STATUSES.has(partnerStatus) && !!partnerVersion;
-    return {
-      time,
-      day: new Date(time * 1000).toISOString().slice(0, 10),
-      version: RESOLVED_STATUSES.has(status) && version ? version : null,
-      status,
-      commit: row[`${layer}_client_commit`] || undefined,
-      entity: row.entity || undefined,
-      partner: (row[`${other}_client`] ?? '').trim().toLowerCase() || UNKNOWN_CLIENT,
-      partnerVersion: partnerResolved ? partnerVersion : undefined,
-      partnerCommit: partnerResolved ? undefined : row[`${other}_client_commit`] || undefined,
-      count: 1,
-    };
-  });
 }
 
 /**
