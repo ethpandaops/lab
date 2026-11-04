@@ -1,1 +1,0 @@
-export { ActiveValidatorsChart } from './ActiveValidatorsChart';

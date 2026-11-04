@@ -1,22 +1,2 @@
-export { EntityBasicInfoCard } from './EntityBasicInfoCard';
-export type { EntityBasicInfoCardProps } from './EntityBasicInfoCard';
-
-export { AttestationRateChart } from './AttestationRateChart';
-export type { AttestationRateChartProps } from './AttestationRateChart';
-
-export { AttestationVolumeChart } from './AttestationVolumeChart';
-export type { AttestationVolumeChartProps } from './AttestationVolumeChart';
-
-export { BlockProposalChart } from './BlockProposalChart';
-export type { BlockProposalChartProps } from './BlockProposalChart';
-
-export { RecentActivityTable } from './RecentActivityTable';
-export type { RecentActivityTableProps } from './RecentActivityTable';
-
-export { BlockProposalsTable } from './BlockProposalsTable';
-export type { BlockProposalsTableProps } from './BlockProposalsTable';
-
-export { ValidatorStatusChart } from './ValidatorStatusChart';
-export type { ValidatorStatusChartProps } from './ValidatorStatusChart';
-
-export { ActiveValidatorsChart } from './ActiveValidatorsChart';
+export { EntityStakeChart } from './EntityStakeChart';
+export type { EntityStakeChartProps } from './EntityStakeChart';

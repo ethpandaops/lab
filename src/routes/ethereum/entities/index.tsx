@@ -15,7 +15,7 @@ export const Route = createFileRoute('/ethereum/entities/')({
       {
         name: 'description',
         content:
-          'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
+          'Who runs Ethereum validators and how well they perform: stake, attestations and block proposals per staking entity against the network.',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/entities` },
       { property: 'og:type', content: 'website' },
@@ -23,14 +23,14 @@ export const Route = createFileRoute('/ethereum/entities/')({
       {
         property: 'og:description',
         content:
-          'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
+          'Who runs Ethereum validators and how well they perform: stake, attestations and block proposals per staking entity against the network.',
       },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/entities` },
       { name: 'twitter:title', content: `Entities | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
         content:
-          'Explore Ethereum validator entities. View entity attestation performance, block proposals, and activity.',
+          'Who runs Ethereum validators and how well they perform: stake, attestations and block proposals per staking entity against the network.',
       },
     ],
   }),

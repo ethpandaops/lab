@@ -12,14 +12,16 @@ interface TableCardProps {
   filters?: ReactNode;
   /** A DataTable; inside a card it runs edge to edge on its own */
   children: ReactNode;
+  /** Source, weighting and window of the rows */
+  footer?: ReactNode;
 }
 
 /**
  * Card holding a filter row and an edge-to-edge DataTable.
  */
-export function TableCard({ title, actions, filters, children }: TableCardProps): JSX.Element {
+export function TableCard({ title, actions, filters, children, footer }: TableCardProps): JSX.Element {
   return (
-    <Card title={title} actions={actions} allowContentOverflow>
+    <Card title={title} actions={actions} footer={footer} allowContentOverflow>
       {filters && <div className="mb-4 flex flex-wrap items-center gap-2">{filters}</div>}
       {children}
     </Card>

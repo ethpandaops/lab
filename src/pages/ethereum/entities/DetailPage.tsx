@@ -1,32 +1,44 @@
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 
+import { Stats } from '@/components/DataDisplay/Stats';
 import { Alert } from '@/components/Feedback/Alert';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { Card } from '@/components/Layout/Card';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
-import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { Tab } from '@/components/Navigation/Tab';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { useTabState } from '@/hooks/useTabState';
+import { formatCompact, formatDayLabel } from '@/pages/ethereum/validators/utils/overview';
 import { Route } from '@/routes/ethereum/entities/$entity';
 
-import {
-  ActiveValidatorsChart,
-  AttestationRateChart,
-  AttestationVolumeChart,
-  EntityBasicInfoCard,
-  RecentActivityTable,
-  ValidatorStatusChart,
-} from './components';
-import { useEntityDetailData, useEntityValidatorStatusData } from './hooks';
-import { EntityProposals } from './components/EntityProposals';
 import { EntityClients } from './components/EntityClients';
-import { TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, type TimePeriod } from './constants';
+import { EntityProposals } from './components/EntityProposals';
+import { EntityStakeChart } from './components';
+import { PerformanceStats } from './components/PerformanceStats';
+import { PerformanceTrend } from './components/PerformanceTrend';
+import { DETAIL_WINDOW_DAYS, DETAIL_WINDOW_OPTIONS, type DetailWindow } from './constants';
+import { useEntityPerformance, useEntityPerformanceHistory, useEntityStakeHistory } from './hooks';
+import { formatPeriod, formatShare } from './utils/performance';
 
-export function DetailPage(): React.JSX.Element {
+/** The window as text, for subtitles */
+const WINDOW_TEXT: Record<DetailWindow, string> = {
+  '7d': 'last 7 days',
+  '30d': 'last 30 days',
+  '90d': 'last 90 days',
+  '1y': 'last year',
+  all: 'all history',
+};
+
+/**
+ * One entity: its size up top; then how it performs against the network, its stake over time, the blocks it
+ * proposed and the clients it runs.
+ */
+export function DetailPage(): JSX.Element {
   const params = useParams({ from: '/ethereum/entities/$entity' });
   const { t } = Route.useSearch();
   const navigate = useNavigate({ from: '/ethereum/entities/$entity' });
@@ -41,31 +53,54 @@ export function DetailPage(): React.JSX.Element {
       return null;
     }
   }, [params.entity]);
+  const entity = entityName ?? '';
 
-  const timePeriod: TimePeriod = t ?? 'all';
-  const config = TIME_RANGE_CONFIG[timePeriod];
+  const window: DetailWindow = t ?? '30d';
+  const windowDays = DETAIL_WINDOW_DAYS[window];
 
-  const { data, isLoading, error } = useEntityDetailData(entityName ?? '');
-  const validatorStatus = useEntityValidatorStatusData(entityName ?? '', config.days);
+  const stake = useEntityStakeHistory(entity);
+  const performance = useEntityPerformance(window);
+  const own = performance.entities.get(entity);
+  const history = useEntityPerformanceHistory(entity, performance.start, performance.end);
+  const performanceWindow =
+    performance.start !== undefined && performance.end !== undefined
+      ? formatPeriod(performance.start, performance.end)
+      : '';
+
+  const stakeDays = useMemo(() => {
+    if (windowDays === null || stake.days.length === 0) return stake.days;
+    const cutoff = new Date(Date.parse(`${stake.days[stake.days.length - 1].day}T00:00:00Z`) - windowDays * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    return stake.days.filter(d => d.day > cutoff);
+  }, [stake.days, windowDays]);
 
   const { selectedIndex, onChange } = useTabState([
-    { id: 'validators', anchors: ['active-validators-chart', 'validator-status-chart'] },
-    { id: 'recent', anchors: ['recent-activity'] },
-    { id: 'attestations', anchors: ['attestation-rate-chart', 'attestation-volume-chart'] },
+    { id: 'performance' },
+    { id: 'stake', anchors: ['entity-stake-chart'] },
     { id: 'blocks', anchors: ['block-proposals'] },
     { id: 'clients' },
   ]);
 
+  const windowControl = (
+    <SegmentedControl
+      options={DETAIL_WINDOW_OPTIONS}
+      value={window}
+      onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
+      ariaLabel="Window"
+    />
+  );
+
   if (entityName === null) {
     return (
       <Container>
-        <Header title="Invalid Entity" />
-        <Alert variant="error" title="Invalid Entity" description={`"${params.entity}" is not a valid entity name.`} />
+        <Header title="Invalid entity" />
+        <Alert variant="error" title="Invalid entity" description={`"${params.entity}" is not a valid entity name.`} />
       </Container>
     );
   }
 
-  if (isLoading) {
+  if (stake.isLoading) {
     return (
       <Container>
         <Header title={entityName} />
@@ -74,91 +109,92 @@ export function DetailPage(): React.JSX.Element {
     );
   }
 
-  if (error) {
+  if (stake.error) {
     return (
       <Container>
         <Header title={entityName} />
-        <Alert variant="error" title="Error Loading Entity Data" description={error.message} />
+        <Alert variant="error" title="Could not load the entity" description={stake.error.message} />
       </Container>
     );
   }
 
-  if (!data) {
+  if (stake.days.length === 0) {
     return (
       <Container>
         <Header title={entityName} />
-        <Alert variant="info" title="No Data Available" description="This entity may not exist." />
+        <Alert variant="info" title="No validators for this entity" />
       </Container>
     );
   }
+
+  const latest = stake.latest;
 
   return (
     <Container>
-      {/* Unified entity header with stats */}
-      <div>
-        <EntityBasicInfoCard
-          stats={data.stats}
-          activeValidatorCount={validatorStatus.data?.latestActiveCount}
-          totalValidatorCount={validatorStatus.data?.latestTotalCount}
+      <Card title={entityName} subtitle={latest ? `On ${formatDayLabel(latest.day)}` : undefined}>
+        <Stats
+          gridClassName="grid grid-cols-2"
+          stats={[
+            { id: 'validators', name: 'Active validators', value: (latest?.validators ?? 0).toLocaleString() },
+            {
+              id: 'stake',
+              name: 'Stake',
+              value: latest ? `${formatCompact(latest.stakeEth)} ETH` : '-',
+              subtitle: latest?.share != null ? `${formatShare(latest.share)} of all stake` : undefined,
+            },
+          ]}
         />
-      </div>
+      </Card>
 
-      {/* Tabbed content */}
       <div className="mt-8">
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            <Tab>Validators</Tab>
-            <Tab>Recent</Tab>
-            <Tab>Attestations</Tab>
+            <Tab>Performance</Tab>
+            <Tab>Stake</Tab>
             <Tab>Blocks</Tab>
             <Tab>Clients</Tab>
           </ScrollableTabs>
 
           {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
           <TabPanels className="mt-6 min-h-screen">
-            {/* Validators Tab */}
-            <TabPanel>
-              <SegmentedControl
-                options={TIME_PERIOD_OPTIONS}
-                value={timePeriod}
-                onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
-                ariaLabel="Time window"
-                className="mb-6"
-              />
-              {validatorStatus.isLoading ? (
-                <LoadingContainer className="h-96" />
-              ) : validatorStatus.error ? (
-                <Alert variant="error" title="Error" description={validatorStatus.error.message} />
+            <TabPanel className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {windowControl}
+                {performanceWindow && <span className="text-sm text-muted">Finalized chain, {performanceWindow}</span>}
+              </div>
+              {performance.error ? (
+                <Alert variant="error" title="Could not load performance" description={performance.error.message} />
+              ) : performance.isLoading ? (
+                <LoadingContainer className="h-48 rounded-sm" />
+              ) : !own ? (
+                <Alert variant="info" title="No attestation duties or proposals in this window" />
               ) : (
-                <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 3xl:grid-cols-3 4xl:grid-cols-4">
-                  <ActiveValidatorsChart data={validatorStatus.data} timePeriod={timePeriod} />
-                  <ValidatorStatusChart data={validatorStatus.data} timePeriod={timePeriod} />
-                </div>
+                <PerformanceStats own={own} network={performance.network} />
+              )}
+              {own && (
+                <PerformanceTrend
+                  entity={entityName}
+                  days={history.days}
+                  own={history.entity}
+                  network={history.network}
+                  window={performanceWindow}
+                  isLoading={history.isLoading}
+                />
               )}
             </TabPanel>
 
-            {/* Recent Tab */}
-            <TabPanel>
-              <h3 className="mb-3 text-sm/6 font-semibold text-foreground">Last 10 epochs</h3>
-              <RecentActivityTable epochs={data.epochData.slice(0, 10)} />
+            <TabPanel className="flex flex-col gap-4">
+              <div className="self-start">{windowControl}</div>
+              <EntityStakeChart days={stakeDays} window={WINDOW_TEXT[window]} />
             </TabPanel>
 
-            {/* Attestations Tab */}
-            <TabPanel>
-              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 3xl:grid-cols-3 4xl:grid-cols-4">
-                <AttestationRateChart data={data.epochData} />
-                <AttestationVolumeChart data={data.epochData} />
-              </div>
-            </TabPanel>
-
-            {/* Blocks Tab */}
             <TabPanel>
               <EntityProposals entity={entityName} />
             </TabPanel>
 
-            {/* Clients Tab */}
-            <TabPanel>
-              <EntityClients entity={entityName} />
+            <TabPanel className="flex flex-col gap-4">
+              <div className="self-start">{windowControl}</div>
+              <EntityClients entity={entityName} days={windowDays} window={WINDOW_TEXT[window]} />
             </TabPanel>
           </TabPanels>
         </TabGroup>

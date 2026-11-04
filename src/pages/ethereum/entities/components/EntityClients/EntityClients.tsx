@@ -22,13 +22,13 @@ import { useVersionCounts } from '@/pages/ethereum/clients/hooks/useVersionCount
 
 export interface EntityClientsProps {
   entity: string;
+  /** Days the window spans; all history when null */
+  days: number | null;
+  /** The window as text, e.g. "last 30 days" */
+  window: string;
 }
 
-/** Days of per-block graffiti for the versions */
-const VERSION_DAYS = 30;
-
 interface VersionRow {
-  layer: ClientLayer;
   client: string;
   version: string;
   blocks: number;
@@ -36,35 +36,88 @@ interface VersionRow {
   share: number;
 }
 
-/** Ranked client shares for one layer */
-function ShareList({ title, summaries }: { title: string; summaries: ClientSummary[] }): JSX.Element {
+/** Versions shown per layer */
+const VERSION_ROWS = 10;
+
+/** One layer: the share of its blocks each client has, then the releases behind them */
+function LayerCard({
+  layer,
+  summaries,
+  versions,
+  versionsLoading,
+  window,
+}: {
+  layer: ClientLayer;
+  summaries: ClientSummary[];
+  versions: VersionRow[];
+  versionsLoading: boolean;
+  window: string;
+}): JSX.Element {
   return (
-    <Card rounded title={title} subtitle="Share of its proposed blocks whose graffiti names a client, all time">
-      {summaries.length === 0 ? (
-        <p className="text-sm text-muted">No block named a client.</p>
-      ) : (
-        <ShareTable
-          labelHeader="Client"
-          countHeader="Blocks"
-          rows={summaries.map(summary => ({
-            key: summary.client,
-            label: <ClientLabel client={summary.client} />,
-            share: summary.identifiedShare ?? 0,
-            count: summary.blocks,
-            color: getClientColor(summary.client),
-          }))}
-        />
-      )}
+    <Card
+      rounded
+      title={layer === 'consensus' ? 'Consensus clients' : 'Execution clients'}
+      subtitle={`Share of its canonical blocks whose graffiti names a client, ${window}`}
+    >
+      <div className="flex flex-col gap-6">
+        {summaries.length === 0 ? (
+          <p className="text-sm text-muted">No block named a client.</p>
+        ) : (
+          <ShareTable
+            labelHeader="Client"
+            countHeader="Blocks"
+            rows={summaries.map(summary => ({
+              key: summary.client,
+              label: <ClientLabel client={summary.client} />,
+              share: summary.identifiedShare ?? 0,
+              count: summary.blocks,
+              color: getClientColor(summary.client),
+            }))}
+          />
+        )}
+        {versionsLoading ? (
+          <LoadingContainer className="h-32 rounded-sm" />
+        ) : (
+          versions.length > 0 && (
+            <Table
+              variant="nested"
+              data={versions.slice(0, VERSION_ROWS)}
+              getRowKey={row => `${row.client}-${row.version}`}
+              columns={[
+                { header: 'Release', accessor: row => <ClientLabel client={row.client} version={row.version} /> },
+                {
+                  header: 'Blocks',
+                  accessor: row => row.blocks.toLocaleString(),
+                  cellClassName: 'text-right tabular-nums text-muted',
+                  headerClassName: 'text-right',
+                },
+                {
+                  header: 'Share of its blocks',
+                  accessor: row => `${row.share.toFixed(1)}%`,
+                  cellClassName: 'text-right tabular-nums font-medium text-foreground',
+                  headerClassName: 'text-right',
+                },
+              ]}
+            />
+          )
+        )}
+      </div>
     </Card>
   );
 }
 
 /**
- * Which clients and versions an entity proposes with, from block graffiti, linked to the client and version pages.
+ * Which clients and releases an entity proposes with over the window, from block graffiti, linked to the client and
+ * version pages.
  */
-export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
+export function EntityClients({ entity, days, window }: EntityClientsProps): JSX.Element {
   const { currentNetwork } = useNetwork();
-  const since = useMemo(() => Math.floor(Date.now() / 1000 / 86400) * 86400 - (VERSION_DAYS - 1) * 86400, []);
+  // Whole UTC days, the newest included
+  const since = useMemo(
+    () => (days === null ? undefined : Math.floor(Date.now() / 1000 / 86400) * 86400 - (days - 1) * 86400),
+    [days]
+  );
+  const sinceDay = since === undefined ? '' : new Date(since * 1000).toISOString().slice(0, 10);
 
   const counts = useQuery({
     queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity],
@@ -81,80 +134,52 @@ export function EntityClients({ entity }: EntityClientsProps): JSX.Element {
   const blocks = useVersionCounts({ grain: 'entity-daily', entity, from: since });
 
   const shares = useMemo(() => {
-    const records = toClientCountRecords(counts.data ?? [], true);
+    const inWindow = (counts.data ?? []).filter(row => (row.day_start_date ?? '') >= sinceDay);
+    const records = toClientCountRecords(inWindow, true);
     const identified = (layer: ClientLayer): ClientSummary[] =>
       summariseClients(records, layer).filter(summary => summary.client !== UNKNOWN_CLIENT);
     return { consensus: identified('consensus'), execution: identified('execution') };
-  }, [counts.data]);
+  }, [counts.data, sinceDay]);
 
-  const versions = useMemo((): VersionRow[] => {
+  const versions = useMemo(() => {
     const named = { consensus: 0, execution: 0 };
-    const byVersion = new Map<string, VersionRow>();
+    const byVersion = { consensus: new Map<string, VersionRow>(), execution: new Map<string, VersionRow>() };
     for (const row of blocks.rows) {
       const layer = row.layer === 'execution' ? 'execution' : 'consensus';
       if (!row.client || row.client === UNKNOWN_CLIENT) continue;
       named[layer] += row.count;
       if (!row.version) continue;
-      const key = `${layer}|${row.client}|${row.version}`;
-      const entry = byVersion.get(key) ?? { layer, client: row.client, version: row.version, blocks: 0, share: 0 };
+      const key = `${row.client}|${row.version}`;
+      const entry = byVersion[layer].get(key) ?? { client: row.client, version: row.version, blocks: 0, share: 0 };
       entry.blocks += row.count;
-      byVersion.set(key, entry);
+      byVersion[layer].set(key, entry);
     }
-    return [...byVersion.values()]
-      .map(row => ({ ...row, share: named[row.layer] > 0 ? (row.blocks / named[row.layer]) * 100 : 0 }))
-      .sort((a, b) => b.blocks - a.blocks);
+    const ranked = (layer: ClientLayer): VersionRow[] =>
+      [...byVersion[layer].values()]
+        .map(row => ({ ...row, share: named[layer] > 0 ? (row.blocks / named[layer]) * 100 : 0 }))
+        .sort((a, b) => b.blocks - a.blocks);
+    return { consensus: ranked('consensus'), execution: ranked('execution') };
   }, [blocks.rows]);
 
   if (counts.isLoading) return <LoadingContainer className="h-96 rounded-sm" />;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3">
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <ShareList title="Consensus clients" summaries={shares.consensus} />
-        <ShareList title="Execution clients" summaries={shares.execution} />
-      </div>
-      <Card
-        rounded
-        title="Versions"
-        subtitle={`Blocks per release in the last ${VERSION_DAYS} days`}
-        actions={
-          <Link to="/ethereum/clients" search={{ entity }} className="text-sm text-primary hover:underline">
-            Client shares over time
-          </Link>
-        }
-      >
-        {blocks.isLoading ? (
-          <LoadingContainer className="h-48 rounded-sm" />
-        ) : versions.length === 0 ? (
-          <p className="text-sm text-muted">No block resolved to a client release.</p>
-        ) : (
-          <Table
-            variant="nested"
-            data={versions.slice(0, 25)}
-            getRowKey={row => `${row.layer}-${row.client}-${row.version}`}
-            columns={[
-              { header: 'Client', accessor: row => <ClientLabel client={row.client} version={row.version} /> },
-              {
-                header: 'Layer',
-                accessor: row => (row.layer === 'consensus' ? 'Consensus' : 'Execution'),
-                cellClassName: 'text-muted',
-              },
-              {
-                header: 'Blocks',
-                accessor: row => row.blocks.toLocaleString(),
-                cellClassName: 'text-right tabular-nums text-muted',
-                headerClassName: 'text-right',
-              },
-              {
-                header: 'Share of its blocks',
-                accessor: row => `${row.share.toFixed(1)}%`,
-                cellClassName: 'text-right tabular-nums font-medium text-foreground',
-                headerClassName: 'text-right',
-              },
-            ]}
+        {(['consensus', 'execution'] as const).map(layer => (
+          <LayerCard
+            key={layer}
+            layer={layer}
+            summaries={shares[layer]}
+            versions={versions[layer]}
+            versionsLoading={blocks.isLoading}
+            window={window}
           />
-        )}
-      </Card>
+        ))}
+      </div>
+      <Link to="/ethereum/clients" search={{ entity }} className="self-start text-sm text-primary hover:underline">
+        Client shares over time
+      </Link>
     </div>
   );
 }

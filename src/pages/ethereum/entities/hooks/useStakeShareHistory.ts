@@ -10,8 +10,8 @@ import { daysBack } from '../utils/overview';
 
 const GWEI = 1e9;
 const PAGE_SIZE = 10_000;
-/** Spans up to this many days plot every day; longer ones plot every seventh */
-const DAILY_SPAN_DAYS = 90;
+/** Windows longer than this match every day instead of listing them */
+const MAX_LISTED_DAYS = 400;
 
 export interface UseStakeShareHistoryResult {
   /** Plotted days, oldest first */
@@ -34,10 +34,11 @@ export function useStakeShareHistory(
 ): UseStakeShareHistoryResult {
   const { currentNetwork } = useNetwork();
 
-  const spanDays =
-    firstDay && latestDay ? (Date.parse(`${latestDay}T00:00:00Z`) - Date.parse(`${firstDay}T00:00:00Z`)) / 864e5 : 0;
-  const days = firstDay && latestDay ? daysBack(firstDay, latestDay, spanDays <= DAILY_SPAN_DAYS ? 1 : 7) : [];
+  const days = firstDay && latestDay ? daysBack(firstDay, latestDay, 1) : [];
   const dayValues = days.join(',');
+  // Long windows match every day instead of listing them, to keep the URL short; rows outside are dropped below
+  const dayFilter =
+    days.length > MAX_LISTED_DAYS ? { day_start_date_like: '20%' } : { day_start_date_in_values: dayValues };
 
   const stake = useQuery({
     queryKey: ['entities', 'stake-history', currentNetwork?.name, entities.join(','), dayValues],
@@ -45,7 +46,7 @@ export function useStakeShareHistory(
       fetchAllPages<FctValidatorStakeByEntityDaily>(
         fctValidatorStakeByEntityDailyServiceList,
         {
-          query: { day_start_date_in_values: dayValues, entity_in_values: entities.join(','), page_size: PAGE_SIZE },
+          query: { ...dayFilter, entity_in_values: entities.join(','), page_size: PAGE_SIZE },
         },
         'fct_validator_stake_by_entity_daily',
         signal
@@ -55,7 +56,7 @@ export function useStakeShareHistory(
 
   const totalsQuery = useQuery({
     ...fctValidatorCountByCredentialTypeDailyServiceListOptions({
-      query: { day_start_date_in_values: dayValues, page_size: PAGE_SIZE },
+      query: { ...dayFilter, page_size: PAGE_SIZE },
     }),
     enabled: days.length > 0,
   });

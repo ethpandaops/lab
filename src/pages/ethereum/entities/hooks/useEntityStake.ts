@@ -12,8 +12,8 @@ import { addDays, dayOf, sampleDays } from '../utils/overview';
 
 const GWEI = 1e9;
 const PAGE_SIZE = 10_000;
-/** Sample days per window: enough for a trend line without loading every day for every entity */
-const SAMPLE_POINTS = 13;
+/** The window's first and last day: the change between them is all the overview shows per entity */
+const SAMPLE_POINTS = 2;
 
 export interface EntityStake {
   entity: string;
@@ -23,7 +23,7 @@ export interface EntityStake {
   stakeEth: number;
   /** Part of `stakeEth` behind compounding (0x02) credentials */
   compoundingEth: number;
-  /** Stake on each sample day, in ETH; null for a day the table has no rows for */
+  /** Stake on the window's first and last day, in ETH; null for a day the table has no rows for */
   series: (number | null)[];
   /** Stake on `startDay`, in ETH */
   startEth: number;
@@ -48,8 +48,7 @@ export interface UseEntityStakeResult {
 }
 
 /**
- * Stake and validator counts per entity on the latest day, plus each entity's stake on evenly spaced days
- * across the window.
+ * Stake and validator counts per entity on the latest day, and each entity's stake on the window's first day.
  */
 export function useEntityStake(window: EntitiesWindow): UseEntityStakeResult {
   const { currentNetwork } = useNetwork();
