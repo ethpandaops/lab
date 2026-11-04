@@ -15,6 +15,8 @@ export interface DataTableColumnMeta {
   filterPlaceholder?: string;
   headerIcon?: ReactNode;
   cellClassName?: string;
+  /** Classes on the column's header and body cells alike, such as `hidden sm:table-cell` */
+  columnClassName?: string;
   enableHiding?: boolean;
 }
 

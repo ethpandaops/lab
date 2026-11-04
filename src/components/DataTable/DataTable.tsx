@@ -264,7 +264,8 @@ export function DataTable<TData>({
                             ? `${gap.right} pl-(--table-inset)`
                             : headerIndex === headerGroup.headers.length - 1
                               ? `pr-(--table-inset) ${gap.left}`
-                              : gap.both
+                              : gap.both,
+                          (header.column.columnDef.meta as DataTableColumnMeta | undefined)?.columnClassName
                         )}
                       >
                         <div className="flex flex-col gap-2">
@@ -349,7 +350,9 @@ export function DataTable<TData>({
                             : cellIndex === row.getVisibleCells().length - 1
                               ? `pr-(--table-inset) ${gap.left}`
                               : gap.both,
-                          (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName || 'text-muted'
+                          (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName ||
+                            'text-muted',
+                          (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.columnClassName
                         )}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from '@tanstack/react-router';
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { ChevronLeftIcon, ChevronRightIcon, EyeIcon } from '@heroicons/react/24/outline';
 
@@ -112,14 +112,6 @@ export function DetailPage(): React.JSX.Element {
     },
   ]);
 
-  // Calculate p95 block arrival time
-  const p95BlockArrivalTime = useMemo(() => {
-    if (!data) return null;
-    const p90Values = data.blockArrivalTimeSeries.filter(d => d.p90 !== null).map(d => d.p90!);
-    if (p90Values.length === 0) return null;
-    return p90Values.reduce((sum, val) => sum + val, 0) / p90Values.length / 1000; // Convert to seconds
-  }, [data]);
-
   // Handle invalid epoch
   if (epoch === null) {
     return (
@@ -154,7 +146,7 @@ export function DetailPage(): React.JSX.Element {
     return (
       <Container>
         <Header title={`Epoch ${formatEpoch(epoch)}`} />
-        <Alert variant="info" title="No Data Available" description="This epoch may not have occurred yet." />
+        <Alert variant="info" title="No data for this epoch" />
       </Container>
     );
   }
@@ -204,12 +196,7 @@ export function DetailPage(): React.JSX.Element {
       </div>
 
       {/* Unified Header with all stats integrated */}
-      <EpochHeader
-        epoch={epoch}
-        stats={data.stats}
-        timestamp={data.stats.epochStartDateTime}
-        p95BlockArrivalTime={p95BlockArrivalTime}
-      />
+      <EpochHeader epoch={epoch} stats={data.stats} timestamp={data.stats.epochStartDateTime} />
 
       {/* Tabbed Content */}
       <div className="mt-8">
@@ -314,7 +301,9 @@ export function DetailPage(): React.JSX.Element {
             <TabPanel>
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <MevAdoptionChart
-                  data={data.mevTimeSeries.map(d => ({ hasMev: d.hasMev }))}
+                  data={data.mevTimeSeries
+                    .filter(d => data.slots.some(s => s.slot === d.slot && s.status !== 'missed'))
+                    .map(d => ({ hasMev: d.hasMev }))}
                   anchorId="mev-adoption-chart"
                 />
                 <BlockValueChart

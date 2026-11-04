@@ -18,6 +18,8 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 import { Toggle } from '@/components/Forms/Toggle';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { epochToTimestamp } from '@/utils/beacon';
+import { fetchAllPages } from '@/utils/api-pagination';
+import { useTableBounds } from '@/hooks/useBounds';
 import {
   fctBlobCountHourlyServiceListOptions,
   fctBlobCountDailyServiceListOptions,
@@ -25,8 +27,6 @@ import {
   fctAttestationParticipationRateDailyServiceListOptions,
   fctHeadVoteCorrectnessRateHourlyServiceListOptions,
   fctHeadVoteCorrectnessRateDailyServiceListOptions,
-  fctReorgHourlyServiceListOptions,
-  fctReorgDailyServiceListOptions,
   fctMissedSlotRateHourlyServiceListOptions,
   fctMissedSlotRateDailyServiceListOptions,
   fctBlockProposalStatusHourlyServiceListOptions,
@@ -37,6 +37,7 @@ import {
   fctProposerRewardHourlyServiceListOptions,
   fctProposerRewardDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { fctReorgDailyServiceList, fctReorgHourlyServiceList } from '@/api/sdk.gen';
 import type {
   FctBlobCountHourly,
   FctBlobCountDaily,
@@ -69,6 +70,7 @@ import {
   buildAttestationParticipationChartConfig,
   buildHeadVoteCorrectnessChartConfig,
   buildReorgChartConfig,
+  isBucketCovered,
   buildMissedSlotRateChartConfig,
   buildBlockProposalStatusChartConfig,
   buildAttestationInclusionDelayChartConfig,
@@ -161,22 +163,45 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
+  // Reorg tables write a zero row for every depth in every bucket, so only non-zero rows are read, across
+  // every page: their count grows with reorgs, not with time.
   const reorgHourlyQuery = useQuery({
-    ...fctReorgHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        order_by: 'hour_start_date_time asc',
-        page_size: PAGE_SIZE,
-      },
-    }),
+    queryKey: ['consensus-overview', 'reorg-hourly', currentNetwork?.name, startTimestamp],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctReorgHourly>(
+        fctReorgHourlyServiceList,
+        {
+          query: {
+            hour_start_date_time_gte: startTimestamp,
+            reorg_count_gt: 0,
+            order_by: 'hour_start_date_time asc',
+            page_size: PAGE_SIZE,
+          },
+        },
+        'fct_reorg_hourly',
+        signal
+      ),
     enabled: !isDaily,
   });
   const reorgDailyQuery = useQuery({
-    ...fctReorgDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
-    }),
+    queryKey: ['consensus-overview', 'reorg-daily', currentNetwork?.name],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctReorgDaily>(
+        fctReorgDailyServiceList,
+        {
+          query: {
+            day_start_date_like: '20%',
+            reorg_count_gt: 0,
+            order_by: 'day_start_date desc',
+            page_size: PAGE_SIZE,
+          },
+        },
+        'fct_reorg_daily',
+        signal
+      ),
     enabled: isDaily,
   });
+  const reorgBounds = useTableBounds(isDaily ? 'fct_reorg_daily' : 'fct_reorg_hourly');
 
   const missedSlotHourlyQuery = useQuery({
     ...fctMissedSlotRateHourlyServiceListOptions({
@@ -305,9 +330,7 @@ export function IndexPage(): JSX.Element {
 
   const reorgRecords = useMemo(
     () =>
-      isDaily
-        ? trimDailyRecords([...(reorgDailyQuery.data?.fct_reorg_daily ?? [])].reverse(), dailyStartDate)
-        : reorgHourlyQuery.data?.fct_reorg_hourly,
+      isDaily ? trimDailyRecords([...(reorgDailyQuery.data ?? [])].reverse(), dailyStartDate) : reorgHourlyQuery.data,
     [isDaily, reorgDailyQuery.data, reorgHourlyQuery.data, dailyStartDate]
   );
 
@@ -406,6 +429,7 @@ export function IndexPage(): JSX.Element {
     attnHourlyQuery.isLoading ||
     hvHourlyQuery.isLoading ||
     reorgHourlyQuery.isLoading ||
+    reorgBounds.isLoading ||
     missedSlotHourlyQuery.isLoading ||
     proposalStatusHourlyQuery.isLoading ||
     inclusionDelayHourlyQuery.isLoading ||
@@ -415,6 +439,7 @@ export function IndexPage(): JSX.Element {
     attnDailyQuery.isLoading ||
     hvDailyQuery.isLoading ||
     reorgDailyQuery.isLoading ||
+    reorgBounds.isLoading ||
     missedSlotDailyQuery.isLoading ||
     proposalStatusDailyQuery.isLoading ||
     inclusionDelayDailyQuery.isLoading ||
@@ -503,9 +528,9 @@ export function IndexPage(): JSX.Element {
   }, [hvRecords, unifiedTimeKeys, isDaily]);
 
   const reorgChartConfig = useMemo(() => {
-    if (!reorgRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildReorgChartConfig(reorgRecords, unifiedTimeKeys, isDaily);
-  }, [reorgRecords, unifiedTimeKeys, isDaily]);
+    if (!reorgRecords || !unifiedTimeKeys.length) return null;
+    return buildReorgChartConfig(reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data);
+  }, [reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data]);
 
   const missedSlotChartConfig = useMemo(() => {
     if (!missedSlotRecords?.length || !unifiedTimeKeys.length) return null;
@@ -731,14 +756,14 @@ export function IndexPage(): JSX.Element {
 
   const reorgTooltipFormatter = useCallback(
     (params: unknown): string => {
-      if (!reorgRecords?.length || !unifiedTimeKeys.length) return '';
+      if (!reorgRecords || !unifiedTimeKeys.length) return '';
 
       const dataPoints = Array.isArray(params) ? params : [params];
       if (!dataPoints.length) return '';
       const firstPoint = dataPoints[0] as { dataIndex?: number };
       if (firstPoint.dataIndex === undefined) return '';
       const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
+      if (!timeKey || !isBucketCovered(timeKey, isDaily, reorgBounds.data)) return '';
 
       const dateValue = isDaily ? timeKey : Number(timeKey);
       const dateStr = formatTooltipDate(dateValue, isDaily);
@@ -771,7 +796,7 @@ export function IndexPage(): JSX.Element {
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [reorgRecords, unifiedTimeKeys, isDaily]
+    [reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data]
   );
 
   const missedSlotTooltipFormatter = useCallback(
@@ -800,14 +825,21 @@ export function IndexPage(): JSX.Element {
 
       const sections: TooltipSection[] = [
         {
-          title: `MISSED SLOTS (${record.missed_count ?? 0} / ${record.slot_count ?? 0})`,
+          title: 'SLOTS WITHOUT A CANONICAL BLOCK',
           items: [
-            { color: DATA_COLORS.rose, label: 'Missed Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
+            { color: DATA_COLORS.rose, label: 'Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
             {
               color: DATA_COLORS.cyan,
               label: 'Moving Avg',
               value: `${(record.moving_avg_missed_rate ?? 0).toFixed(2)}%`,
             },
+          ],
+        },
+        {
+          title: 'SLOTS',
+          items: [
+            { color: DATA_COLORS.rose, label: 'Without a block', value: String(record.missed_count ?? 0) },
+            { color: DATA_COLORS.slate, label: 'Total', value: String(record.slot_count ?? 0) },
           ],
         },
       ];
@@ -903,6 +935,9 @@ export function IndexPage(): JSX.Element {
     [makeStatsTooltipFormatter, proposerRewardRecords]
   );
 
+  const bucket = isDaily ? 'UTC days' : 'UTC hours';
+  const movingAvg = isDaily ? '7d moving average' : '6h moving average';
+
   return (
     <Container>
       <Header title="Consensus Overview" />
@@ -937,6 +972,7 @@ export function IndexPage(): JSX.Element {
           {attnChartConfig && (
             <PopoutCard
               title="Attestation Participation Rate"
+              subtitle={`Per slot, canonical chain, ${bucket}, ${movingAvg}`}
               anchorId="attestation-participation-chart"
               modalSize="full"
             >
@@ -958,14 +994,19 @@ export function IndexPage(): JSX.Element {
             </PopoutCard>
           )}
 
-          {/* Missed Slot Rate */}
+          {/* Slots without a canonical block: missed and orphaned slots alike */}
           {missedSlotChartConfig && (
-            <PopoutCard title="Missed Slot Rate" anchorId="missed-slot-rate-chart" modalSize="full">
+            <PopoutCard
+              title="Slots Without a Canonical Block"
+              subtitle={`Share of slots, missed or orphaned, ${bucket}, ${movingAvg}`}
+              anchorId="missed-slot-rate-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={missedSlotChartConfig.series}
                   xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Missed Rate (%)', min: 'dataMin' }}
+                  yAxis={{ name: 'Slots (%)', min: 'dataMin' }}
                   height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
@@ -981,7 +1022,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Head Vote Correctness Rate */}
           {hvChartConfig && (
-            <PopoutCard title="Head Vote Correctness" anchorId="head-vote-correctness-chart" modalSize="full">
+            <PopoutCard
+              title="Head Vote Correctness"
+              subtitle={`Per slot, canonical chain, ${bucket}, ${movingAvg}`}
+              anchorId="head-vote-correctness-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={hvChartConfig.series}
@@ -1002,7 +1048,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Reorgs */}
           {reorgChartConfig && (
-            <PopoutCard title="Reorgs" anchorId="reorg-chart" modalSize="full">
+            <PopoutCard
+              title="Reorgs"
+              subtitle={`Runs of orphaned slots by depth, ${bucket}`}
+              anchorId="reorg-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={reorgChartConfig.series}
@@ -1023,7 +1074,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Block Proposal Status */}
           {proposalStatusChartConfig && (
-            <PopoutCard title="Block Proposal Status" anchorId="block-proposal-status-chart" modalSize="full">
+            <PopoutCard
+              title="Block Proposal Status"
+              subtitle={`Share of slots, ${bucket}`}
+              anchorId="block-proposal-status-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={proposalStatusChartConfig.series}
@@ -1044,7 +1100,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Attestation Inclusion Delay */}
           {inclusionDelayChartConfig && (
-            <PopoutCard title="Attestation Inclusion Delay" anchorId="inclusion-delay-chart" modalSize="full">
+            <PopoutCard
+              title="Attestation Inclusion Delay"
+              subtitle={`Per slot, mean over its validators, canonical chain, ${bucket}, ${movingAvg}`}
+              anchorId="inclusion-delay-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={inclusionDelayChartConfig.series}
@@ -1065,7 +1126,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Blob Count */}
           {blobChartConfig && (
-            <PopoutCard title="Blob Count" anchorId="blob-count-chart" modalSize="full">
+            <PopoutCard
+              title="Blob Count"
+              subtitle={`Per canonical block, ${bucket}, ${movingAvg}`}
+              anchorId="blob-count-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={blobChartConfig.series}
@@ -1086,7 +1152,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Gloas (ePBS): payload delivery rate judged by the PTC */}
           {payloadStatusChartConfig && payloadWindow.followsRange && (
-            <PopoutCard title="Payload Delivery (ePBS)" anchorId="payload-delivery-chart" modalSize="full">
+            <PopoutCard
+              title="Payload Delivery (ePBS)"
+              subtitle={`Share of blocks by PTC vote, ${bucket}`}
+              anchorId="payload-delivery-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={payloadStatusChartConfig.series}
@@ -1106,7 +1177,12 @@ export function IndexPage(): JSX.Element {
 
           {/* Proposer Reward (MEV Relay) */}
           {proposerRewardChartConfig && (
-            <PopoutCard title="Proposer Reward (MEV Relay)" anchorId="proposer-reward-chart" modalSize="full">
+            <PopoutCard
+              title="Proposer Reward (MEV Relay)"
+              subtitle={`Per canonical MEV block, ${bucket}, ${movingAvg}`}
+              anchorId="proposer-reward-chart"
+              modalSize="full"
+            >
               {({ inModal }) => (
                 <MultiLineChart
                   series={proposerRewardChartConfig.series}
@@ -1130,7 +1206,7 @@ export function IndexPage(): JSX.Element {
       {!isLoading && payloadStatusChartConfig && !payloadWindow.followsRange && (
         <PopoutCard
           title="Payload Delivery (ePBS)"
-          subtitle={`Last ${PAYLOAD_STATUS_MAX_DAYS} days`}
+          subtitle={`Last ${PAYLOAD_STATUS_MAX_DAYS} days, share of blocks by PTC vote, UTC days`}
           anchorId="payload-delivery-chart"
           modalSize="full"
           className="mt-8"

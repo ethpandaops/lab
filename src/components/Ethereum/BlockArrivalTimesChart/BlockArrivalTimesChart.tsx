@@ -39,7 +39,7 @@ export function BlockArrivalTimesChart({
   data,
   xAxis,
   title = 'Block Arrival Times',
-  subtitle = 'Time from slot start when nodes first see blocks',
+  subtitle = 'Time from slot start when Xatu nodes first see blocks',
   height,
   anchorId,
   inModal = false,

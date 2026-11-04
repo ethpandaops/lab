@@ -49,11 +49,7 @@ interface Preset {
   patch: Partial<EpochFilters>;
 }
 
-const PRESETS: Preset[] = [
-  { label: 'Missed slots', dot: 'bg-danger', patch: { missedMin: 1 } },
-  { label: '≤ 99% participation', dot: 'bg-warning', patch: { participationMax: 99 } },
-  { label: '≤ 95% participation', dot: 'bg-danger', patch: { participationMax: 95 } },
-];
+const PRESETS: Preset[] = [{ label: 'Missed slots', dot: 'bg-danger', patch: { missedMin: 1 } }];
 
 function isActive(preset: Preset, filters: EpochFilters): boolean {
   return Object.entries(preset.patch).every(([key, value]) => filters[key as keyof EpochFilters] === value);

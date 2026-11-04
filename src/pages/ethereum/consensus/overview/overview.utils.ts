@@ -354,17 +354,37 @@ export const DEPTH_COLORS = [
   DATA_COLORS.pink,
 ];
 
-/** Builds stacked area chart config from reorg records grouped by depth */
+/**
+ * Whether a time key's bucket (an hour's unix seconds, or a YYYY-MM-DD UTC day) overlaps a table's bounds
+ * (unix seconds). Without bounds nothing counts as covered.
+ */
+export function isBucketCovered(
+  key: string,
+  isDaily: boolean,
+  bounds: { min: number; max: number } | undefined
+): boolean {
+  if (!bounds) return false;
+  const start = isDaily ? Date.parse(`${key}T00:00:00Z`) / 1000 : Number(key);
+  const end = start + (isDaily ? 86400 : 3600);
+  return end > bounds.min && start <= bounds.max;
+}
+
+/**
+ * Builds stacked bar chart config from reorg records grouped by depth. Records hold only non-zero counts, so a
+ * bucket inside the table's bounds without a record is 0, and one outside them has no data (null).
+ */
 export function buildReorgChartConfig(
   records: (FctReorgHourly | FctReorgDaily)[],
   unifiedKeys: string[],
-  isDaily: boolean
+  isDaily: boolean,
+  bounds: { min: number; max: number } | undefined
 ): ChartConfig {
   const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
 
   // Group records by time key, then by depth
   const byKeyAndDepth = new Map<string, Map<number, number>>();
-  const allDepths = new Set<number>();
+  // Depth 1 always has a series, so a window without reorgs still draws its zeros
+  const allDepths = new Set<number>([1]);
 
   for (const r of records) {
     const key = isDaily
@@ -382,7 +402,7 @@ export function buildReorgChartConfig(
 
   const series: SeriesData[] = sortedDepths.map((depth, i) => ({
     name: `Depth ${depth}`,
-    data: unifiedKeys.map(k => byKeyAndDepth.get(k)?.get(depth) ?? 0),
+    data: unifiedKeys.map(k => byKeyAndDepth.get(k)?.get(depth) ?? (isBucketCovered(k, isDaily, bounds) ? 0 : null)),
     color: DEPTH_COLORS[i % DEPTH_COLORS.length],
     seriesType: 'bar' as const,
     stack: 'reorgs',
@@ -392,7 +412,7 @@ export function buildReorgChartConfig(
   return { labels, series };
 }
 
-/** Builds chart config for missed slot rate (simple: rate + moving avg) */
+/** Builds chart config for the share of slots without a canonical block (missed or orphaned): rate + moving avg */
 export function buildMissedSlotRateChartConfig(
   records: (FctMissedSlotRateHourly | FctMissedSlotRateDaily)[],
   unifiedKeys: string[],
@@ -420,7 +440,7 @@ export function buildMissedSlotRateChartConfig(
   return {
     labels,
     series: [
-      createStatisticSeries('Missed Rate', rateValues, {
+      createStatisticSeries('Rate', rateValues, {
         color: DATA_COLORS.rose,
         lineWidth: 2.5,
         group: 'Statistics',

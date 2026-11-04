@@ -88,8 +88,12 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
       const epochsSinceActivation = activeFork.epoch - previousFork.epoch;
       const daysSinceActivation = Math.floor((epochsSinceActivation * 32 * 12) / 86400);
 
-      if (daysSinceActivation === 0) {
+      if (activeFork.epoch === 0) {
         timeSinceActivation = 'Activated at genesis';
+      } else if (epochsSinceActivation === 0) {
+        timeSinceActivation = `Activated with ${previousFork.displayName}`;
+      } else if (daysSinceActivation === 0) {
+        timeSinceActivation = `Activated ${epochsSinceActivation} ${epochsSinceActivation === 1 ? 'epoch' : 'epochs'} after ${previousFork.displayName}`;
       } else if (daysSinceActivation < 60) {
         timeSinceActivation = `Activated ${daysSinceActivation} days after ${previousFork.displayName}`;
       } else if (daysSinceActivation < 730) {

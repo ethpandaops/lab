@@ -21,13 +21,6 @@ import { DEFAULT_PAGE_SIZE, EPOCH_FILTER_KEYS, type EpochFilters, type EpochsSea
 
 const column = createColumnHelper<EpochRow>();
 
-function participationClass(rate: number): string {
-  if (rate < 2 / 3) return 'text-danger';
-  if (rate < 0.95) return 'text-warning';
-  if (rate >= 0.99) return 'text-success';
-  return 'text-muted';
-}
-
 /**
  * Epochs list: the latest epochs by default, narrowed by range, participation and missed-slot filters that live
  * in the URL, with the offline validators for the epochs on the page.
@@ -108,6 +101,8 @@ export function IndexPage(): JSX.Element {
         header: 'Start time',
         enableSorting: false,
         cell: info => <Timestamp timestamp={info.getValue()} format="short" />,
+        // Age gives the same time in less width
+        meta: { columnClassName: 'hidden sm:table-cell' },
       }),
       column.accessor('startTime', {
         id: 'age',
@@ -131,7 +126,7 @@ export function IndexPage(): JSX.Element {
         cell: info => {
           const rate = info.getValue();
           if (rate === null) return <span className="text-muted">-</span>;
-          return <span className={participationClass(rate)}>{(rate * 100).toFixed(2)}%</span>;
+          return `${(rate * 100).toFixed(2)}%`;
         },
       }),
     ],

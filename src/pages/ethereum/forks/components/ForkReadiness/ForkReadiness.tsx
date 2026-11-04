@@ -25,7 +25,10 @@ interface ReadinessRow {
   client: string;
   minVersion: string;
   blocksReady: number;
+  /** Blocks whose graffiti reveals a version */
   blocksCounted: number;
+  /** All of the client's blocks, with a version or not */
+  blocksTotal: number;
   nodesReady: number;
   nodesCounted: number;
 }
@@ -72,7 +75,8 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
     const allReleases = releases.data ?? [];
     return requirements.map(({ client, minVersion }) => {
       const clientReleases = allReleases.filter(release => release.client === client);
-      const clientBlocks = blocks.rows.filter(row => row.client === client && row.version);
+      const allClientBlocks = blocks.rows.filter(row => row.client === client);
+      const clientBlocks = allClientBlocks.filter(row => row.version);
       const sum = (rows: VersionCount[]): number => rows.reduce((total, row) => total + row.count, 0);
       const nodeVersions = nodes
         .filter(node => normalizeClientName(node.meta_consensus_implementation ?? '') === client)
@@ -83,6 +87,7 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
         minVersion,
         blocksReady: sum(clientBlocks.filter(block => meetsMinVersion(block.version!, minVersion))),
         blocksCounted: sum(clientBlocks),
+        blocksTotal: sum(allClientBlocks),
         nodesReady: nodeVersions.filter(version => meetsMinVersion(version, minVersion)).length,
         nodesCounted: nodeVersions.length,
       };
@@ -126,6 +131,15 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
             {
               header: 'Minimum',
               accessor: row => <span className="font-mono text-xs/6">{row.minVersion}</span>,
+            },
+            {
+              header: 'Blocks with a version',
+              accessor: row =>
+                row.blocksTotal > 0
+                  ? `${row.blocksCounted.toLocaleString()} of ${row.blocksTotal.toLocaleString()}`
+                  : '-',
+              cellClassName: 'text-right tabular-nums text-muted',
+              headerClassName: 'text-right',
             },
             {
               header: 'Blocks ready',
