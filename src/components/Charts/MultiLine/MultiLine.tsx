@@ -547,6 +547,11 @@ export function MultiLineChart({
       categoryLabels && new Set(categoryLabels).size < categoryLabels.length
         ? (index: number, value: string): boolean => index === 0 || categoryLabels[index - 1] !== value
         : undefined;
+    const everyCategoryLabel = categoryLabels !== undefined && !dateTicks && xAxis.interval === 0;
+    // Labels too wide for their category alternate between two rows (about 6.6px per character at 11px)
+    const categoryWidth = ((chartWidth || 800) - 52 - (secondaryYAxis ? 56 : 16)) / (categoryLabels?.length || 1);
+    const staggerLabels =
+      everyCategoryLabel && Math.max(...categoryLabels.map(l => l.length)) * 6.6 > categoryWidth - 4;
 
     const xAxisConfig = {
       type: isTimeAxis ? ('value' as const) : xAxis.type,
@@ -565,11 +570,16 @@ export function MultiLineChart({
       axisLabel: {
         color: themeColors.muted,
         fontSize: 11,
-        hideOverlap: true,
+        hideOverlap: !everyCategoryLabel,
         // Hourly series repeat each day's label; show only the first point of each run
-        interval: dateTicks ? (index: number): boolean => dateTicks.has(index) : categoryLabelInterval,
+        interval: dateTicks
+          ? (index: number): boolean => dateTicks.has(index)
+          : everyCategoryLabel
+            ? 0
+            : categoryLabelInterval,
         formatter:
           xAxis.formatter ||
+          (staggerLabels ? (value: string, index: number) => (index % 2 ? `\n${value}` : value) : undefined) ||
           (dateTicks ? (value: string, index: number) => dateTicks.get(index) ?? value : undefined) ||
           (isTimeAxis ? defaultTimeFormatter : undefined) ||
           (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
@@ -923,7 +933,7 @@ export function MultiLineChart({
 
     // Calculate grid padding - just basic padding, let ECharts handle the rest
     // Add extra bottom padding for dataZoom slider when enabled
-    const baseBottom = xAxisHasName ? 48 : 28;
+    const baseBottom = (xAxisHasName ? 48 : 28) + (staggerLabels ? 14 : 0);
     const legendBottom = useNativeLegend && showLegend && legendPosition === 'bottom' ? 40 : 0;
     // The range track is chrome until the chart is zoomed; at full range it shows nothing
     const sliderVisible = enableDataZoom && showDataZoomSlider && (zoomRange.start > 0.01 || zoomRange.end < 99.99);

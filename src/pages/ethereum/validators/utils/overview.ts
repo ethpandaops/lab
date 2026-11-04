@@ -1,5 +1,3 @@
-import type { OverviewPeriod } from '../hooks/useOverviewData';
-
 export type CredentialType = '0x00' | '0x01' | '0x02';
 export const CREDENTIAL_TYPES: CredentialType[] = ['0x00', '0x01', '0x02'];
 
@@ -29,14 +27,12 @@ export function formatCompact(value: number, digits = 1): string {
 }
 
 /**
- * The most recent earlier period whose value was at or below the latest one, i.e. the latest is the
- * lowest since the period after it. Returns null when the latest is not a low.
+ * The most recent earlier point at or below `latest`, i.e. `latest` is the lowest since the point after
+ * it. Returns null when `latest` is not a low, or is lower than every point.
  */
-export function lowestSince(periods: OverviewPeriod[], pick: (p: OverviewPeriod) => number): string | null {
-  if (periods.length < 2) return null;
-  const latest = pick(periods[periods.length - 1]);
-  for (let i = periods.length - 2; i >= 0; i--) {
-    if (pick(periods[i]) <= latest) return i < periods.length - 2 ? periods[i].day : null;
+export function lowestSince(points: { day: string; value: number }[], latest: number): string | null {
+  for (let i = points.length - 1; i >= 0; i--) {
+    if (points[i].value <= latest) return i < points.length - 1 ? points[i].day : null;
   }
   // Lower than everything loaded: the data doesn't say since when
   return null;

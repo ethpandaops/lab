@@ -59,11 +59,9 @@ function gweiToEth(gwei: number | null | undefined): number | null {
   return gwei / 1_000_000_000;
 }
 
-/**
- * Calculate percentage safely
- */
-function safePercentage(numerator: number, denominator: number): number {
-  if (denominator === 0) return 0;
+/** Percentage, or null when there is nothing to divide by (no duties, no attestations) */
+function safePercentage(numerator: number, denominator: number): number | null {
+  if (denominator === 0) return null;
   return (numerator / denominator) * 100;
 }
 
@@ -99,47 +97,48 @@ function aggregateAttestationByValidator(
   data: FctAttestationVoteCorrectnessByValidatorDaily[]
 ): Map<number, ValidatorAttestationMetrics> {
   const byValidator = new Map<number, ValidatorAttestationMetrics>();
+  // Σ(avg inclusion distance × attested) per validator, so the average weighs each attestation once
+  const distanceSums = new Map<number, number>();
+  const distanceCounts = new Map<number, number>();
 
   for (const record of data) {
     const validatorIndex = record.validator_index ?? 0;
-    const existing = byValidator.get(validatorIndex);
-
-    if (existing) {
-      existing.totalDuties += record.total_duties ?? 0;
-      existing.attestedCount += record.attested_count ?? 0;
-      existing.missedCount += record.missed_count ?? 0;
-      existing.headCorrectCount += record.head_correct_count ?? 0;
-      existing.targetCorrectCount += record.target_correct_count ?? 0;
-      existing.sourceCorrectCount += record.source_correct_count ?? 0;
-      // For average inclusion distance, we need to track count and sum
-      if (record.avg_inclusion_distance !== null && record.avg_inclusion_distance !== undefined) {
-        if (existing.avgInclusionDistance === null) {
-          existing.avgInclusionDistance = record.avg_inclusion_distance;
-        } else {
-          // Simple averaging - could be weighted by attested count for more accuracy
-          existing.avgInclusionDistance = (existing.avgInclusionDistance + record.avg_inclusion_distance) / 2;
-        }
-      }
-    } else {
-      byValidator.set(validatorIndex, {
+    const metrics =
+      byValidator.get(validatorIndex) ??
+      ({
         validatorIndex,
-        totalDuties: record.total_duties ?? 0,
-        attestedCount: record.attested_count ?? 0,
-        missedCount: record.missed_count ?? 0,
-        headCorrectCount: record.head_correct_count ?? 0,
-        targetCorrectCount: record.target_correct_count ?? 0,
-        sourceCorrectCount: record.source_correct_count ?? 0,
-        avgInclusionDistance: record.avg_inclusion_distance ?? null,
-        inclusionRate: 0,
-        headCorrectRate: 0,
-        targetCorrectRate: 0,
-        sourceCorrectRate: 0,
-      });
+        totalDuties: 0,
+        attestedCount: 0,
+        missedCount: 0,
+        headCorrectCount: 0,
+        targetCorrectCount: 0,
+        sourceCorrectCount: 0,
+        avgInclusionDistance: null,
+        inclusionRate: null,
+        headCorrectRate: null,
+        targetCorrectRate: null,
+        sourceCorrectRate: null,
+      } satisfies ValidatorAttestationMetrics);
+    metrics.totalDuties += record.total_duties ?? 0;
+    metrics.attestedCount += record.attested_count ?? 0;
+    metrics.missedCount += record.missed_count ?? 0;
+    metrics.headCorrectCount += record.head_correct_count ?? 0;
+    metrics.targetCorrectCount += record.target_correct_count ?? 0;
+    metrics.sourceCorrectCount += record.source_correct_count ?? 0;
+    const attested = record.attested_count ?? 0;
+    if (record.avg_inclusion_distance != null && attested > 0) {
+      distanceSums.set(
+        validatorIndex,
+        (distanceSums.get(validatorIndex) ?? 0) + record.avg_inclusion_distance * attested
+      );
+      distanceCounts.set(validatorIndex, (distanceCounts.get(validatorIndex) ?? 0) + attested);
     }
+    byValidator.set(validatorIndex, metrics);
   }
 
-  // Calculate rates
   for (const metrics of byValidator.values()) {
+    const count = distanceCounts.get(metrics.validatorIndex);
+    metrics.avgInclusionDistance = count ? (distanceSums.get(metrics.validatorIndex) ?? 0) / count : null;
     metrics.inclusionRate = safePercentage(metrics.attestedCount, metrics.totalDuties);
     metrics.headCorrectRate = safePercentage(metrics.headCorrectCount, metrics.attestedCount);
     metrics.targetCorrectRate = safePercentage(metrics.targetCorrectCount, metrics.attestedCount);
@@ -171,7 +170,7 @@ function aggregateSyncCommitteeByValidator(
         totalSlots: record.total_slots ?? 0,
         participatedCount: record.participated_count ?? 0,
         missedCount: record.missed_count ?? 0,
-        participationRate: 0,
+        participationRate: null,
       });
     }
   }
@@ -264,7 +263,7 @@ function aggregateBlockProposalByValidator(
         canonicalCount: status === 'canonical' ? 1 : 0,
         missedCount: status === 'missed' ? 1 : 0,
         orphanedCount: status === 'orphaned' ? 1 : 0,
-        proposalRate: 0,
+        proposalRate: null,
       });
     }
   }
@@ -649,10 +648,10 @@ export function useValidatorsData(
           targetCorrectCount: 0,
           sourceCorrectCount: 0,
           avgInclusionDistance: null,
-          inclusionRate: 0,
-          headCorrectRate: 0,
-          targetCorrectRate: 0,
-          sourceCorrectRate: 0,
+          inclusionRate: null,
+          headCorrectRate: null,
+          targetCorrectRate: null,
+          sourceCorrectRate: null,
         };
 
         const syncCommittee = syncCommitteeByValidator.get(validatorIndex) ?? null;

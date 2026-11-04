@@ -90,6 +90,9 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
         order_by: 'epoch',
         page_size: 10000,
       },
+      // Unset epochs are 2^64 - 1, which JSON parsing rounds up past the generated schema's uint64 maximum.
+      // Validating would fail every validator that has one; this hook reads only status and time.
+      responseValidator: undefined,
     }),
     enabled,
   });

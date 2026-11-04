@@ -21,16 +21,16 @@ interface HourlyDataPoint {
 
 /** Attestation hourly data point */
 export interface AttestationHourlyDataPoint extends HourlyDataPoint {
-  inclusionRate: number;
-  headCorrectRate: number;
-  targetCorrectRate: number;
-  sourceCorrectRate: number;
+  inclusionRate: number | null;
+  headCorrectRate: number | null;
+  targetCorrectRate: number | null;
+  sourceCorrectRate: number | null;
   avgInclusionDistance: number | null;
 }
 
 /** Sync committee hourly data point */
 export interface SyncCommitteeHourlyDataPoint extends HourlyDataPoint {
-  participationRate: number;
+  participationRate: number | null;
 }
 
 /** Balance hourly data point */
@@ -50,11 +50,9 @@ interface UseHourlyDataReturn {
   hasData: boolean;
 }
 
-/**
- * Calculate percentage safely
- */
-function safePercentage(numerator: number, denominator: number): number {
-  if (denominator === 0) return 0;
+/** Percentage, or null when there is nothing to divide by (no duties, no attestations) */
+function safePercentage(numerator: number, denominator: number): number | null {
+  if (denominator === 0) return null;
   return (numerator / denominator) * 100;
 }
 

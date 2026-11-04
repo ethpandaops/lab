@@ -17,10 +17,11 @@ export interface ValidatorAttestationMetrics {
   targetCorrectCount: number;
   sourceCorrectCount: number;
   avgInclusionDistance: number | null;
-  inclusionRate: number;
-  headCorrectRate: number;
-  targetCorrectRate: number;
-  sourceCorrectRate: number;
+  /** Rates are null when there is nothing to divide by: no duties, or no attestations for head/target/source */
+  inclusionRate: number | null;
+  headCorrectRate: number | null;
+  targetCorrectRate: number | null;
+  sourceCorrectRate: number | null;
 }
 
 /**
@@ -31,7 +32,7 @@ export interface ValidatorSyncCommitteeMetrics {
   totalSlots: number;
   participatedCount: number;
   missedCount: number;
-  participationRate: number;
+  participationRate: number | null;
 }
 
 /**
@@ -57,7 +58,7 @@ export interface ValidatorBlockProposalMetrics {
   canonicalCount: number;
   missedCount: number;
   orphanedCount: number;
-  proposalRate: number;
+  proposalRate: number | null;
 }
 
 /**
@@ -93,10 +94,10 @@ export interface DailyDataPoint {
  * Attestation data point for charts
  */
 export interface AttestationDailyDataPoint extends DailyDataPoint {
-  inclusionRate: number;
-  headCorrectRate: number;
-  targetCorrectRate: number;
-  sourceCorrectRate: number;
+  inclusionRate: number | null;
+  headCorrectRate: number | null;
+  targetCorrectRate: number | null;
+  sourceCorrectRate: number | null;
   avgInclusionDistance: number | null;
 }
 
@@ -104,7 +105,7 @@ export interface AttestationDailyDataPoint extends DailyDataPoint {
  * Sync committee data point for charts
  */
 export interface SyncCommitteeDailyDataPoint extends DailyDataPoint {
-  participationRate: number;
+  participationRate: number | null;
 }
 
 /**
@@ -128,16 +129,16 @@ export interface AggregateSummary {
     headCorrectCount: number;
     targetCorrectCount: number;
     sourceCorrectCount: number;
-    inclusionRate: number;
-    headCorrectRate: number;
-    targetCorrectRate: number;
-    sourceCorrectRate: number;
+    inclusionRate: number | null;
+    headCorrectRate: number | null;
+    targetCorrectRate: number | null;
+    sourceCorrectRate: number | null;
   };
   syncCommittee: {
     totalSlots: number;
     participatedCount: number;
     missedCount: number;
-    participationRate: number;
+    participationRate: number | null;
     validatorsWithDuties: number;
   };
   blockProposal: {
@@ -145,7 +146,7 @@ export interface AggregateSummary {
     canonicalCount: number;
     missedCount: number;
     orphanedCount: number;
-    proposalRate: number;
+    proposalRate: number | null;
     validatorsWithDuties: number;
   };
   balance: {

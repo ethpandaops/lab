@@ -71,19 +71,20 @@ function columnTimestamps(from: number, to: number, stepDays: number): number[] 
   return out;
 }
 
-/** Shape shared by both daily and hourly attestation data points */
+/** Shape shared by both daily and hourly attestation data points; null rates mean no duties to rate */
 interface AttestationDataShape {
-  inclusionRate: number;
-  headCorrectRate: number;
-  targetCorrectRate: number;
-  sourceCorrectRate: number;
+  inclusionRate: number | null;
+  headCorrectRate: number | null;
+  targetCorrectRate: number | null;
+  sourceCorrectRate: number | null;
   avgInclusionDistance: number | null;
 }
 
 /** Metric configuration */
 interface MetricConfig {
   label: string;
-  getValue: (point: AttestationDataShape) => number;
+  /** The cell's value; null draws the cell as no data */
+  getValue: (point: AttestationDataShape) => number | null;
   formatValue: (value: number) => string;
   colorGradient: string[];
   min: number;
@@ -131,7 +132,7 @@ const METRIC_CONFIGS: Record<HeatmapMetric, MetricConfig> = {
   },
   delay: {
     label: 'Delay',
-    getValue: point => point.avgInclusionDistance ?? 1,
+    getValue: point => point.avgInclusionDistance,
     formatValue: value => `${value.toFixed(1)} slots`,
     colorGradient: [colors.green[500], colors.lime[400], colors.yellow[400], colors.orange[500], colors.red[600]],
     min: 1,
@@ -153,7 +154,8 @@ const METRIC_CONFIGS: Record<HeatmapMetric, MetricConfig> = {
 const SLOT_METRIC_GETTERS: Record<
   HeatmapMetric,
   {
-    getValue: (p: AttestationSlotDataPoint) => number;
+    /** The cell's value; null draws the cell as no data */
+    getValue: (p: AttestationSlotDataPoint) => number | null;
     formatValue: (v: number) => string;
   }
 > = {
@@ -162,19 +164,19 @@ const SLOT_METRIC_GETTERS: Record<
     formatValue: v => (v >= 100 ? 'Attested' : 'Missed'),
   },
   head: {
-    getValue: p => (p.headCorrect === true ? 100 : 0),
+    getValue: p => (p.headCorrect === null ? null : p.headCorrect ? 100 : 0),
     formatValue: v => (v >= 100 ? 'Correct' : 'Incorrect'),
   },
   target: {
-    getValue: p => (p.targetCorrect === true ? 100 : 0),
+    getValue: p => (p.targetCorrect === null ? null : p.targetCorrect ? 100 : 0),
     formatValue: v => (v >= 100 ? 'Correct' : 'Incorrect'),
   },
   source: {
-    getValue: p => (p.sourceCorrect === true ? 100 : 0),
+    getValue: p => (p.sourceCorrect === null ? null : p.sourceCorrect ? 100 : 0),
     formatValue: v => (v >= 100 ? 'Correct' : 'Incorrect'),
   },
   delay: {
-    getValue: p => p.inclusionDistance ?? 4,
+    getValue: p => p.inclusionDistance,
     formatValue: v => `${v} slot${v !== 1 ? 's' : ''}`,
   },
   proposals: {
@@ -226,7 +228,7 @@ function fillGridGaps(data: [number, number, number][], xCount: number, yCount: 
  */
 function formatDayLabel(timestamp: number): string {
   const date = new Date(timestamp * 1000);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
 /**
@@ -239,6 +241,7 @@ function formatFullDate(timestamp: number): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
@@ -341,14 +344,13 @@ export function ValidatorHeatmap({
     const timestampToIndex = new Map(allTimestamps.map((t, i) => [t, i]));
     const validatorToIndex = new Map(uniqueValidators.map((v, i) => [v, i]));
 
-    const chartData: [number, number, number][] = data
-      .filter(point => timestampToIndex.has(point.timestamp))
-      .map(point => {
-        const dayIndex = timestampToIndex.get(point.timestamp) ?? 0;
-        const validatorIndex = validatorToIndex.get(point.validatorIndex) ?? 0;
-        const value = config.getValue(point);
-        return [dayIndex, validatorIndex, value];
-      });
+    // Cells without a value are left out, so they fill as no data
+    const chartData: [number, number, number][] = data.flatMap(point => {
+      const dayIndex = timestampToIndex.get(point.timestamp);
+      const value = config.getValue(point);
+      if (dayIndex === undefined || value === null) return [];
+      return [[dayIndex, validatorToIndex.get(point.validatorIndex) ?? 0, value]];
+    });
 
     return {
       heatmapData: fillGridGaps(chartData, allTimestamps.length, uniqueValidators.length),
@@ -376,11 +378,11 @@ export function ValidatorHeatmap({
     const validatorLabels = uniqueValidators.map(v => formatSlot(v));
     const validatorToIndex = new Map(uniqueValidators.map((v, i) => [v, i]));
 
-    const chartData: [number, number, number][] = attestationHourly.map(point => {
-      const hourIndex = new Date(point.timestamp * 1000).getUTCHours();
-      const valIdx = validatorToIndex.get(point.validatorIndex) ?? 0;
+    const chartData: [number, number, number][] = attestationHourly.flatMap(point => {
       const value = config.getValue(point);
-      return [hourIndex, valIdx, value];
+      if (value === null) return [];
+      const hourIndex = new Date(point.timestamp * 1000).getUTCHours();
+      return [[hourIndex, validatorToIndex.get(point.validatorIndex) ?? 0, value]];
     });
 
     return {
@@ -418,11 +420,10 @@ export function ValidatorHeatmap({
     const slotToIndex = new Map(allSlots.map((s, i) => [s, i]));
     const validatorToIndex = new Map(uniqueValidators.map((v, i) => [v, i]));
 
-    const chartData: [number, number, number][] = attestationSlot.map(point => {
-      const slotIdx = slotToIndex.get(point.slot) ?? 0;
-      const valIdx = validatorToIndex.get(point.validatorIndex) ?? 0;
+    const chartData: [number, number, number][] = attestationSlot.flatMap(point => {
       const value = slotConfig.getValue(point);
-      return [slotIdx, valIdx, value];
+      if (value === null) return [];
+      return [[slotToIndex.get(point.slot) ?? 0, validatorToIndex.get(point.validatorIndex) ?? 0, value]];
     });
 
     return {
@@ -795,6 +796,7 @@ export function ValidatorHeatmap({
       month: 'short',
       day: 'numeric',
       year: 'numeric',
+      timeZone: 'UTC',
     });
     const fullDate = stepDays === 7 ? `Week of ${dayText}` : dayText;
     if (value === NO_DATA) {
@@ -893,9 +895,9 @@ export function ValidatorHeatmap({
       <Card
         title={`${formatFullDate(drillDownDay!)}, ${formatHourLabel(drillDownHour)}`}
         subtitle={backLink('Hourly view', handleBackToHourly)}
-        actions={metricControl}
         className={className}
       >
+        <div className="mb-4">{metricControl}</div>
         <div ref={containerRef}>
           {(() => {
             const activeSlotData = isProposalsMetric ? proposalSlotHeatmap : slotHeatmap;
@@ -951,9 +953,9 @@ export function ValidatorHeatmap({
       <Card
         title={formatFullDate(drillDownDay)}
         subtitle={backLink('Daily view', handleBackToDaily)}
-        actions={metricControl}
         className={className}
       >
+        <div className="mb-4">{metricControl}</div>
         <div ref={containerRef}>
           {(() => {
             const activeHourlyData = isProposalsMetric ? proposalHourlyHeatmap : hourlyHeatmap;
@@ -1009,9 +1011,9 @@ export function ValidatorHeatmap({
     <Card
       title={dailyTitle}
       subtitle={stepDays === 7 ? 'Select a week to see its days' : 'Select a day to see its hours'}
-      actions={metricControl}
       className={className}
     >
+      <div className="mb-4">{metricControl}</div>
       <div ref={containerRef}>
         {activeDailyData.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
