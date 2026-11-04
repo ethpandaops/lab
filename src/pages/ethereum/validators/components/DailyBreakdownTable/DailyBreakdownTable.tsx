@@ -81,21 +81,10 @@ function formatDate(timestamp: number): string {
   return new Date(timestamp * 1000).toISOString().slice(0, 10);
 }
 
-/**
- * Format a percentage with color coding
- */
-function formatPercent(value: number | null, threshold = 95): ReactNode {
+/** Percentage, or a muted dash when there were no duties to rate */
+function formatPercent(value: number | null): ReactNode {
   if (value === null) return <span className="text-muted">-</span>;
-  return (
-    <span
-      className={clsx(
-        'tabular-nums',
-        value >= threshold ? 'text-foreground' : value >= 90 ? 'text-warning' : 'text-danger'
-      )}
-    >
-      {value.toFixed(2)}%
-    </span>
-  );
+  return <span className="tabular-nums">{value.toFixed(2)}%</span>;
 }
 
 /**
@@ -529,9 +518,9 @@ function HourlyRow({
           </span>
         </td>
         <td className="px-3 py-1 text-right text-xs">{formatPercent(row.inclusionRate)}</td>
-        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.headCorrectRate, 98)}</td>
-        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.targetCorrectRate, 98)}</td>
-        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.sourceCorrectRate, 98)}</td>
+        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.headCorrectRate)}</td>
+        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.targetCorrectRate)}</td>
+        <td className="px-3 py-1 text-right text-xs">{formatPercent(row.sourceCorrectRate)}</td>
         <td className="px-3 py-1 text-right text-xs text-foreground tabular-nums">
           {row.avgInclusionDistance !== null ? row.avgInclusionDistance.toFixed(2) : '-'}
         </td>
@@ -812,9 +801,9 @@ function DailyDateRow({
           </span>
         </td>
         <td className="px-3 py-1.5 text-right">{formatPercent(row.inclusionRate)}</td>
-        <td className="px-3 py-1.5 text-right">{formatPercent(row.headCorrectRate, 98)}</td>
-        <td className="px-3 py-1.5 text-right">{formatPercent(row.targetCorrectRate, 98)}</td>
-        <td className="px-3 py-1.5 text-right">{formatPercent(row.sourceCorrectRate, 98)}</td>
+        <td className="px-3 py-1.5 text-right">{formatPercent(row.headCorrectRate)}</td>
+        <td className="px-3 py-1.5 text-right">{formatPercent(row.targetCorrectRate)}</td>
+        <td className="px-3 py-1.5 text-right">{formatPercent(row.sourceCorrectRate)}</td>
         <td className="px-3 py-1.5 text-right text-foreground tabular-nums">
           {row.avgInclusionDistance !== null ? row.avgInclusionDistance.toFixed(2) : '-'}
         </td>

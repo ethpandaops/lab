@@ -5,7 +5,6 @@ export type { AttestationHourlyDataPoint, SyncCommitteeHourlyDataPoint, BalanceH
 export { useSlotData } from './useSlotData';
 export type { AttestationSlotDataPoint, SyncCommitteeSlotDataPoint, BalanceSlotDataPoint } from './useSlotData';
 export { useValidatorResolver } from './useValidatorResolver';
-export type { ValidatorInfo } from './useValidatorResolver';
 export { useValidatorStatus, formatStatusLabel, getStatusIconConfig } from './useValidatorStatus';
 export type { StatusIconConfig } from './useValidatorStatus';
 export { useValidatorIdentity } from './useValidatorIdentity';

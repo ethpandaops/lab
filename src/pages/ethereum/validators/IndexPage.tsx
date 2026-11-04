@@ -21,7 +21,7 @@ import {
   fctMissedSlotRateDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { Alert } from '@/components/Feedback/Alert';
-import { ValidatorsSkeleton } from './components';
+import { InspectSection, ValidatorsSkeleton } from './components';
 import { useOverviewData } from './hooks/useOverviewData';
 import type { OverviewPeriod } from './hooks/useOverviewData';
 import {
@@ -33,6 +33,7 @@ import {
   type CredentialType,
   type OverviewWindow,
 } from './utils/overview';
+import { weekStartOf } from './utils/week';
 
 const CREDENTIAL_LABELS: Record<CredentialType, string> = {
   '0x00': '0x00 BLS',
@@ -152,7 +153,15 @@ export function IndexPage(): JSX.Element {
     >);
   const activeCount = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].count, 0);
   const activeStake = CREDENTIAL_TYPES.reduce((a, ct) => a + activeByType[ct].stake, 0);
-  const lowDay = lowestSince(days, d => d.status.active + d.status.exiting);
+  // Weeks before the snapshot's, across all history, so the range control doesn't change it
+  const lowDay = snapshot?.activeHistory
+    ? lowestSince(
+        snapshot.activeHistory
+          .filter(h => h.day < weekStartOf(snapshot.day))
+          .map(h => ({ day: h.day, value: h.active })),
+        activeCount
+      )
+    : null;
   const queue = snapshot?.queue;
   const entryEth = queue
     ? ((queue.activation_queue_effective_balance ?? 0) + (queue.pending_deposit_amount ?? 0)) / 1e9
@@ -189,177 +198,109 @@ export function IndexPage(): JSX.Element {
   const headVoteSeries = byDay(headVote.data?.fct_head_vote_correctness_rate_daily, r => r.avg_head_vote_rate);
   const missedSeries = byDay(missed.data?.fct_missed_slot_rate_daily, r => r.missed_rate);
 
+  const rangeControls = (
+    <div className="flex flex-wrap items-center gap-4">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted">Forks</span>
+        <Toggle checked={showForks} onChange={setShowForks} size="small" />
+      </div>
+      <SegmentedControl
+        options={OVERVIEW_WINDOW_OPTIONS}
+        value={window}
+        onChange={value => navigate({ to: '/ethereum/validators', search: { t: value }, replace: true })}
+        ariaLabel="Time window"
+      />
+    </div>
+  );
+
   return (
     <Container>
       <Header title="Validators" description="Validator set, stake, queues and rewards across the network" />
-
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <SegmentedControl
-          options={OVERVIEW_WINDOW_OPTIONS}
-          value={window}
-          onChange={value => navigate({ to: '/ethereum/validators', search: { t: value }, replace: true })}
-          ariaLabel="Time window"
-        />
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted">Forks</span>
-            <Toggle checked={showForks} onChange={setShowForks} size="small" />
-          </div>
-          <Link
-            to="/ethereum/validators/inspect"
-            className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
-          >
-            Inspect validators
-          </Link>
-        </div>
-      </div>
 
       {error && <Alert variant="error" title="Could not load validator data" description={error.message} />}
       {!error && (isLoading || !snapshot) && <ValidatorsSkeleton />}
 
       {!error && !isLoading && snapshot && (
-        <div className="flex flex-col gap-4">
-          <Stats
-            gridClassName="grid grid-cols-2 gap-px md:grid-cols-3 xl:grid-cols-6"
-            stats={[
-              {
-                id: 'active',
-                name: 'Active validators',
-                value: activeCount.toLocaleString(),
-                subtitle: lowDay
-                  ? `Lowest since ${new Date(`${lowDay}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`
-                  : undefined,
-              },
-              {
-                id: 'stake',
-                name: 'Staked',
-                value: formatEth(activeStake),
-                subtitle: 'Effective balance',
-              },
-              {
-                id: 'compounding',
-                name: 'Compounding (0x02)',
-                value: activeByType['0x02'].count.toLocaleString(),
-                subtitle: `${((activeByType['0x02'].stake / activeStake) * 100).toFixed(1)}% of stake`,
-              },
-              {
-                id: 'avg-eb',
-                name: 'Avg effective balance',
-                value: `${(activeStake / activeCount).toFixed(1)} ETH`,
-              },
-              {
-                id: 'entry',
-                name: 'Entry queue',
-                value: entryEth === null ? '—' : formatEth(entryEth),
-              },
-              {
-                id: 'exit',
-                name: 'Exit queue',
-                value: exitEth === null ? '—' : formatEth(exitEth),
-              },
-            ]}
-          />
-
-          <Card
-            title="Credential mix"
+        <div className="flex flex-col gap-10">
+          <InspectSection
+            title="Latest day"
+            meta={snapshot.day}
             actions={
-              <SegmentedControl
-                options={[
-                  { value: 'stake', label: 'Stake' },
-                  { value: 'validators', label: 'Validators' },
-                ]}
-                value={mixMode}
-                onChange={setMixMode}
-                ariaLabel="Credential mix measure"
-              />
+              <Link
+                to="/ethereum/validators/inspect"
+                className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
+              >
+                Inspect validators
+              </Link>
             }
           >
-            <StackedBar
-              segments={CREDENTIAL_TYPES.map(ct => ({
-                name: CREDENTIAL_LABELS[ct],
-                value: mixMode === 'stake' ? activeByType[ct].stake : activeByType[ct].count,
-                color: credentialColors[ct],
-              }))}
-              showPercentages
-              showLegend
-              valueFormatter={v => (mixMode === 'stake' ? formatEth(v) : formatCompact(v))}
+            <Stats
+              gridClassName="grid grid-cols-2 gap-px md:grid-cols-3 2xl:grid-cols-6"
+              stats={[
+                {
+                  id: 'active',
+                  name: 'Active validators',
+                  value: activeCount.toLocaleString(),
+                  subtitle: lowDay
+                    ? `Lowest since ${new Date(`${lowDay}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`
+                    : undefined,
+                },
+                {
+                  id: 'stake',
+                  name: 'Staked',
+                  value: formatEth(activeStake),
+                  subtitle: 'Effective balance',
+                },
+                {
+                  id: 'compounding',
+                  name: 'Compounding (0x02)',
+                  value: activeByType['0x02'].count.toLocaleString(),
+                  subtitle: `${((activeByType['0x02'].stake / activeStake) * 100).toFixed(1)}% of stake`,
+                },
+                {
+                  id: 'avg-eb',
+                  name: 'Avg effective balance',
+                  value: `${(activeStake / activeCount).toFixed(1)} ETH`,
+                },
+                {
+                  id: 'entry',
+                  name: 'Entry queue',
+                  value: entryEth === null ? '—' : formatEth(entryEth),
+                  subtitle: 'Includes pending top-ups',
+                },
+                {
+                  id: 'exit',
+                  name: 'Exit queue',
+                  value: exitEth === null ? '—' : formatEth(exitEth),
+                },
+              ]}
             />
-          </Card>
 
-          <PopoutCard title="Stake by credential type" anchorId="stake-by-credential" modalSize="full">
-            {({ inModal }) => (
-              <MultiLineChart
-                series={[
-                  ...CREDENTIAL_TYPES.map(ct => ({
-                    name: CREDENTIAL_LABELS[ct],
-                    data: days.map(d => Math.round(d.credential[ct].effectiveBalanceEth)),
-                    color: credentialColors[ct],
-                    ...area('stake'),
-                  })),
-                  {
-                    name: 'Active validators',
-                    data: days.map(d => Math.round(d.status.active + d.status.exiting)),
-                    color: themeColors.foreground,
-                    yAxisIndex: 1,
-                    showSymbol: false,
-                  },
-                ]}
-                xAxis={{ type: 'category', labels }}
-                yAxis={{ name: 'Staked ETH', min: 0 }}
-                secondaryYAxis={{ name: 'Active validators', min: 0 }}
-                height={inModal ? 600 : 380}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                markLines={periodForkMarks}
-                syncGroup={inModal ? undefined : 'validators-overview'}
-              />
-            )}
-          </PopoutCard>
-
-          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-            <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={[
-                    {
-                      name: 'Active',
-                      data: days.map(d => Math.round(d.status.active)),
-                      color: themeColors.success,
-                      ...area('status'),
-                    },
-                    {
-                      name: 'Exiting',
-                      data: days.map(d => Math.round(d.status.exiting)),
-                      color: themeColors.warning,
-                      ...area('status'),
-                    },
-                    {
-                      name: 'Pending',
-                      data: days.map(d => Math.round(d.status.pending)),
-                      color: palette[0],
-                      ...area('status'),
-                    },
-                    {
-                      name: 'Exited',
-                      initiallyVisible: false,
-                      data: days.map(d => Math.round(d.status.exited)),
-                      color: themeColors.muted,
-                      showSymbol: false,
-                      lineStyle: 'dashed',
-                    },
+            <Card
+              title="Credential mix"
+              actions={
+                <SegmentedControl
+                  options={[
+                    { value: 'stake', label: 'Stake' },
+                    { value: 'validators', label: 'Validators' },
                   ]}
-                  xAxis={{ type: 'category', labels }}
-                  yAxis={{ name: 'Validators', min: 0 }}
-                  height={inModal ? 600 : 300}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  markLines={periodForkMarks}
-                  syncGroup={inModal ? undefined : 'validators-overview'}
+                  value={mixMode}
+                  onChange={setMixMode}
+                  ariaLabel="Credential mix measure"
                 />
-              )}
-            </PopoutCard>
+              }
+            >
+              <StackedBar
+                segments={CREDENTIAL_TYPES.map(ct => ({
+                  name: CREDENTIAL_LABELS[ct],
+                  value: mixMode === 'stake' ? activeByType[ct].stake : activeByType[ct].count,
+                  color: credentialColors[ct],
+                }))}
+                showPercentages
+                showLegend
+                valueFormatter={v => (mixMode === 'stake' ? formatEth(v) : formatCompact(v))}
+              />
+            </Card>
 
             <PopoutCard
               title="Effective balance distribution"
@@ -382,7 +323,7 @@ export function IndexPage(): JSX.Element {
                   series={CREDENTIAL_TYPES.map(ct => ({
                     name: CREDENTIAL_LABELS[ct],
                     data: EB_BUCKETS.map(b =>
-                      (snapshot?.histogram ?? [])
+                      snapshot.histogram
                         .filter(
                           h =>
                             h.credential_type === ct &&
@@ -401,7 +342,7 @@ export function IndexPage(): JSX.Element {
                     color: credentialColors[ct],
                     ...bar('eb'),
                   }))}
-                  xAxis={{ type: 'category', labels: EB_BUCKETS.map(b => b.label), name: 'Effective balance (ETH)' }}
+                  xAxis={{ type: 'category', labels: EB_BUCKETS.map(b => b.label), interval: 0 }}
                   yAxis={{ name: ebMode === 'stake' ? 'ETH' : 'Validators', min: 0 }}
                   height={inModal ? 600 : 300}
                   showLegend
@@ -409,33 +350,31 @@ export function IndexPage(): JSX.Element {
                 />
               )}
             </PopoutCard>
-          </div>
+          </InspectSection>
 
-          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-            <PopoutCard title="Entry and exit queues" anchorId="queues" modalSize="full">
+          <InspectSection title="History" actions={rangeControls}>
+            <PopoutCard title="Stake by credential type" anchorId="stake-by-credential" modalSize="full">
               {({ inModal }) => (
                 <MultiLineChart
                   series={[
+                    ...CREDENTIAL_TYPES.map(ct => ({
+                      name: CREDENTIAL_LABELS[ct],
+                      data: days.map(d => Math.round(d.credential[ct].effectiveBalanceEth)),
+                      color: credentialColors[ct],
+                      ...area('stake'),
+                    })),
                     {
-                      name: 'Entry',
-                      data: days.map(d => (d.activationQueueEth === null ? null : Math.round(d.activationQueueEth))),
-                      color: themeColors.success,
-                      showArea: true,
-                      areaOpacity: 0.3,
-                      showSymbol: false,
-                    },
-                    {
-                      name: 'Exit',
-                      data: days.map(d => (d.exitQueueEth === null ? null : -Math.round(d.exitQueueEth))),
-                      color: themeColors.danger,
-                      showArea: true,
-                      areaOpacity: 0.3,
+                      name: 'Active validators',
+                      data: days.map(d => Math.round(d.status.active)),
+                      color: themeColors.foreground,
+                      yAxisIndex: 1,
                       showSymbol: false,
                     },
                   ]}
                   xAxis={{ type: 'category', labels }}
-                  yAxis={{ name: 'Queued ETH', formatter: v => formatCompact(Math.abs(v)) }}
-                  height={inModal ? 600 : 300}
+                  yAxis={{ name: 'Staked ETH', min: 0 }}
+                  secondaryYAxis={{ name: 'Active validators', min: 0 }}
+                  height={inModal ? 600 : 380}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
@@ -445,175 +384,269 @@ export function IndexPage(): JSX.Element {
               )}
             </PopoutCard>
 
-            <PopoutCard
-              title={`Validator operations ${perPeriod}`}
-              subtitle={opsStart}
-              anchorId="operations"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={(
-                    [
-                      ['New deposits', d => opCount(d, 'deposit'), palette[0]],
-                      ['Top-ups', d => opCount(d, 'top_up'), palette[4]],
-                      ['Consolidations', d => opCount(d, 'consolidation'), palette[1]],
-                      ['Switch to 0x02', d => opCount(d, 'switch_to_compounding'), palette[10]],
-                      ['Partial withdrawal requests', d => opCount(d, 'withdrawal_request'), palette[2]],
-                      ['Exit requests (EL)', d => opCount(d, 'exit_request'), palette[6]],
-                      ['Voluntary exits', d => opCount(d, 'voluntary_exit'), palette[3]],
-                    ] as [string, (d: OverviewPeriod) => number | null, string][]
-                  ).map(([name, pick, color]) => ({
-                    name,
-                    data: days.map(pick),
-                    color,
-                    ...bar('ops'),
-                  }))}
-                  xAxis={{ type: 'category', labels }}
-                  yAxis={{ name: 'Operations', min: 0 }}
-                  height={inModal ? 600 : 300}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  markLines={periodForkMarks}
-                />
-              )}
-            </PopoutCard>
-          </div>
+            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+              <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={[
+                      {
+                        // `active` already counts validators that are exiting; they stack on top
+                        name: 'Active (not exiting)',
+                        data: days.map(d => Math.round(d.status.active - d.status.exiting)),
+                        color: themeColors.success,
+                        ...area('status'),
+                      },
+                      {
+                        name: 'Exiting',
+                        data: days.map(d => Math.round(d.status.exiting)),
+                        color: themeColors.warning,
+                        ...area('status'),
+                      },
+                      {
+                        name: 'Pending',
+                        data: days.map(d => Math.round(d.status.pending)),
+                        color: palette[0],
+                        ...area('status'),
+                      },
+                      {
+                        name: 'Exited',
+                        initiallyVisible: false,
+                        data: days.map(d => Math.round(d.status.exited)),
+                        color: themeColors.muted,
+                        showSymbol: false,
+                        lineStyle: 'dashed',
+                      },
+                    ]}
+                    xAxis={{ type: 'category', labels }}
+                    yAxis={{ name: 'Validators', min: 0 }}
+                    height={inModal ? 600 : 300}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    markLines={periodForkMarks}
+                    syncGroup={inModal ? undefined : 'validators-overview'}
+                  />
+                )}
+              </PopoutCard>
 
-          <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-            <PopoutCard title={`ETH in and out ${perPeriod}`} subtitle={opsStart} anchorId="flows" modalSize="full">
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={[
-                    {
-                      name: 'Deposited',
-                      data: days.map(d => flow(d, ['deposit', 'top_up'], [])),
-                      color: themeColors.success,
-                      ...bar('flows'),
-                    },
-                    {
-                      name: 'Reward skims',
-                      data: days.map(d => flow(d, [], ['withdrawal_partial'])),
-                      color: palette[2],
-                      ...bar('flows'),
-                    },
-                    {
-                      name: 'Full withdrawals',
-                      data: days.map(d => flow(d, [], ['withdrawal_full'])),
-                      color: themeColors.danger,
-                      ...bar('flows'),
-                    },
-                    {
-                      name: 'Net',
-                      data: days.map(d => flow(d, ['deposit', 'top_up'], ['withdrawal_partial', 'withdrawal_full'])),
-                      color: themeColors.foreground,
-                      showSymbol: false,
-                    },
-                  ]}
-                  xAxis={{ type: 'category', labels }}
-                  yAxis={{ name: 'ETH' }}
-                  height={inModal ? 600 : 300}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  markLines={periodForkMarks}
-                />
-              )}
-            </PopoutCard>
+              <PopoutCard
+                title="Entry and exit queues"
+                subtitle="Entry includes pending top-ups"
+                anchorId="queues"
+                modalSize="full"
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={[
+                      {
+                        name: 'Entry',
+                        data: days.map(d => (d.activationQueueEth === null ? null : Math.round(d.activationQueueEth))),
+                        color: themeColors.success,
+                        showArea: true,
+                        areaOpacity: 0.3,
+                        showSymbol: false,
+                      },
+                      {
+                        name: 'Exit',
+                        data: days.map(d => (d.exitQueueEth === null ? null : -Math.round(d.exitQueueEth))),
+                        color: themeColors.danger,
+                        showArea: true,
+                        areaOpacity: 0.3,
+                        showSymbol: false,
+                      },
+                    ]}
+                    xAxis={{ type: 'category', labels }}
+                    yAxis={{ name: 'Queued ETH', formatter: v => formatCompact(Math.abs(v)) }}
+                    height={inModal ? 600 : 300}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    markLines={periodForkMarks}
+                    syncGroup={inModal ? undefined : 'validators-overview'}
+                  />
+                )}
+              </PopoutCard>
+            </div>
 
-            <PopoutCard
-              title={`Consensus rewards ${perPeriod}`}
-              subtitle={dataStart(d => d.rewards !== null)}
-              anchorId="rewards"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={[
-                    {
-                      name: 'Attestations',
-                      data: days.map(d => (d.rewards ? Math.round(d.rewards.attestationEth) : null)),
-                      color: palette[0],
-                      ...bar('rewards'),
-                    },
-                    {
-                      name: 'Proposals',
-                      data: days.map(d => (d.rewards ? Math.round(d.rewards.proposerEth) : null)),
-                      color: palette[7],
-                      ...bar('rewards'),
-                    },
-                    {
-                      name: 'Sync committee',
-                      data: days.map(d => (d.rewards ? Math.round(d.rewards.syncEth) : null)),
-                      color: palette[4],
-                      ...bar('rewards'),
-                    },
-                    {
-                      name: 'Penalties',
-                      data: days.map(d => (d.rewards ? -Math.round(d.rewards.penaltiesEth) : null)),
-                      color: themeColors.danger,
-                      ...bar('rewards'),
-                    },
-                    {
-                      name: 'APR',
-                      data: days.map(d => {
-                        const stake = CREDENTIAL_TYPES.reduce((a, ct) => a + d.credential[ct].effectiveBalanceEth, 0);
-                        if (!d.rewards || !stake) return null;
-                        const r =
-                          d.rewards.attestationEth + d.rewards.proposerEth + d.rewards.syncEth - d.rewards.penaltiesEth;
-                        return Number(((((r / d.dayCount) * 365) / stake) * 100).toFixed(2));
-                      }),
-                      color: themeColors.foreground,
-                      yAxisIndex: 1,
-                      showSymbol: false,
-                    },
-                  ]}
-                  xAxis={{ type: 'category', labels }}
-                  yAxis={{ name: 'ETH' }}
-                  secondaryYAxis={{ name: 'APR', formatter: v => `${v}%` }}
-                  height={inModal ? 600 : 300}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  markLines={periodForkMarks}
-                />
-              )}
-            </PopoutCard>
-          </div>
+            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+              <PopoutCard
+                title={`Validator operations ${perPeriod}`}
+                subtitle={opsStart}
+                anchorId="operations"
+                modalSize="full"
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={(
+                      [
+                        ['New deposits', d => opCount(d, 'deposit'), palette[0]],
+                        ['Top-ups', d => opCount(d, 'top_up'), palette[4]],
+                        ['Consolidations', d => opCount(d, 'consolidation'), palette[1]],
+                        ['Switch to 0x02', d => opCount(d, 'switch_to_compounding'), palette[10]],
+                        ['Partial withdrawal requests', d => opCount(d, 'withdrawal_request'), palette[2]],
+                        ['Exit requests (EL)', d => opCount(d, 'exit_request'), palette[6]],
+                        ['Voluntary exits', d => opCount(d, 'voluntary_exit'), palette[3]],
+                      ] as [string, (d: OverviewPeriod) => number | null, string][]
+                    ).map(([name, pick, color]) => ({
+                      name,
+                      data: days.map(pick),
+                      color,
+                      ...bar('ops'),
+                    }))}
+                    xAxis={{ type: 'category', labels }}
+                    yAxis={{ name: 'Operations', min: 0 }}
+                    height={inModal ? 600 : 300}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    markLines={periodForkMarks}
+                  />
+                )}
+              </PopoutCard>
 
-          <PopoutCard title="Duty performance" anchorId="duty-performance" modalSize="full">
-            {({ inModal }) => (
-              <MultiLineChart
-                series={[
-                  {
-                    name: 'Attestation participation',
-                    data: participationSeries,
-                    color: palette[0],
-                    showSymbol: false,
-                  },
-                  { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
-                  {
-                    name: 'Missed slots',
-                    data: missedSeries,
-                    color: themeColors.danger,
-                    showSymbol: false,
-                    yAxisIndex: 1,
-                  },
-                ]}
-                xAxis={{ type: 'category', labels: dutyLabels }}
-                yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
-                secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
-                height={inModal ? 600 : 280}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                connectNulls
-                markLines={dutyForkMarks}
-                syncGroup={inModal ? undefined : 'validators-overview'}
-              />
-            )}
-          </PopoutCard>
+              <PopoutCard title={`ETH in and out ${perPeriod}`} subtitle={opsStart} anchorId="flows" modalSize="full">
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={[
+                      {
+                        name: 'Deposited',
+                        data: days.map(d => flow(d, ['deposit', 'top_up'], [])),
+                        color: themeColors.success,
+                        ...bar('flows'),
+                      },
+                      {
+                        name: 'Reward skims',
+                        data: days.map(d => flow(d, [], ['withdrawal_partial'])),
+                        color: palette[2],
+                        ...bar('flows'),
+                      },
+                      {
+                        name: 'Full withdrawals',
+                        data: days.map(d => flow(d, [], ['withdrawal_full'])),
+                        color: themeColors.danger,
+                        ...bar('flows'),
+                      },
+                      {
+                        name: 'Net',
+                        data: days.map(d => flow(d, ['deposit', 'top_up'], ['withdrawal_partial', 'withdrawal_full'])),
+                        color: themeColors.foreground,
+                        showSymbol: false,
+                      },
+                    ]}
+                    xAxis={{ type: 'category', labels }}
+                    yAxis={{ name: 'ETH' }}
+                    height={inModal ? 600 : 300}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    markLines={periodForkMarks}
+                  />
+                )}
+              </PopoutCard>
+            </div>
+
+            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+              <PopoutCard
+                title={`Consensus rewards ${perPeriod}`}
+                subtitle={dataStart(d => d.rewards !== null)}
+                anchorId="rewards"
+                modalSize="full"
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={[
+                      {
+                        name: 'Attestations',
+                        data: days.map(d => (d.rewards ? Math.round(d.rewards.attestationEth) : null)),
+                        color: palette[0],
+                        ...bar('rewards'),
+                      },
+                      {
+                        name: 'Proposals',
+                        data: days.map(d => (d.rewards ? Math.round(d.rewards.proposerEth) : null)),
+                        color: palette[7],
+                        ...bar('rewards'),
+                      },
+                      {
+                        name: 'Sync committee',
+                        data: days.map(d => (d.rewards ? Math.round(d.rewards.syncEth) : null)),
+                        color: palette[4],
+                        ...bar('rewards'),
+                      },
+                      {
+                        name: 'Penalties',
+                        data: days.map(d => (d.rewards ? -Math.round(d.rewards.penaltiesEth) : null)),
+                        color: themeColors.danger,
+                        ...bar('rewards'),
+                      },
+                      {
+                        name: 'APR',
+                        data: days.map(d => {
+                          const stake = CREDENTIAL_TYPES.reduce((a, ct) => a + d.credential[ct].effectiveBalanceEth, 0);
+                          if (!d.rewards?.dayCount || !stake) return null;
+                          const r =
+                            d.rewards.attestationEth +
+                            d.rewards.proposerEth +
+                            d.rewards.syncEth -
+                            d.rewards.penaltiesEth;
+                          return Number(((((r / d.rewards.dayCount) * 365) / stake) * 100).toFixed(2));
+                        }),
+                        color: themeColors.foreground,
+                        yAxisIndex: 1,
+                        showSymbol: false,
+                      },
+                    ]}
+                    xAxis={{ type: 'category', labels }}
+                    yAxis={{ name: 'ETH' }}
+                    secondaryYAxis={{ name: 'APR', formatter: v => `${v}%` }}
+                    height={inModal ? 600 : 300}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    markLines={periodForkMarks}
+                  />
+                )}
+              </PopoutCard>
+
+              <PopoutCard
+                title="Duty performance"
+                subtitle="Head vote correct is the share of each slot's committee that voted for that slot's block, from attestations on the canonical chain, averaged over slots. A missed slot counts as 0%."
+                anchorId="duty-performance"
+                modalSize="full"
+              >
+                {({ inModal }) => (
+                  <MultiLineChart
+                    series={[
+                      {
+                        name: 'Attestation participation',
+                        data: participationSeries,
+                        color: palette[0],
+                        showSymbol: false,
+                      },
+                      { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
+                      {
+                        name: 'Missed slots',
+                        data: missedSeries,
+                        color: themeColors.danger,
+                        showSymbol: false,
+                        yAxisIndex: 1,
+                      },
+                    ]}
+                    xAxis={{ type: 'category', labels: dutyLabels }}
+                    yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
+                    secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
+                    height={inModal ? 600 : 280}
+                    showLegend
+                    legendPosition="top"
+                    enableDataZoom
+                    connectNulls
+                    markLines={dutyForkMarks}
+                    syncGroup={inModal ? undefined : 'validators-overview'}
+                  />
+                )}
+              </PopoutCard>
+            </div>
+          </InspectSection>
         </div>
       )}
     </Container>

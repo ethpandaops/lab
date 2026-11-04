@@ -16,8 +16,6 @@ import {
   PerformanceSummary,
   ValidatorTable,
   ValidatorsSkeleton,
-  ThresholdConfig,
-  DEFAULT_THRESHOLDS,
   ValidatorHeatmap,
   ValidatorIdentityCard,
   ValidatorSetCard,
@@ -25,7 +23,7 @@ import {
   ValidatorDuties,
   InspectSection,
 } from './components';
-import type { ThresholdValues, HeatmapMetric, ValidatorSelection, ValidatorState } from './components';
+import type { HeatmapMetric, ValidatorSelection, ValidatorState } from './components';
 
 /** Search params for the inspect page; no `from` means all history */
 interface InspectSearch {
@@ -49,8 +47,7 @@ const formatDate = (ts: number): string =>
   new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
 /**
- * Inspect one or more validators: identity and balance, attestation performance against thresholds,
- * and individual duties.
+ * Inspect one or more validators: identity and balance, attestation performance, and individual duties.
  */
 export function InspectPage(): JSX.Element {
   const navigate = useNavigate();
@@ -67,7 +64,6 @@ export function InspectPage(): JSX.Element {
 
   const [tags, setTags] = useState<string[]>(() => tagsFromUrl(search.indices));
   const [range, setRange] = useState<{ from?: number; to?: number }>({ from: search.from, to: search.to });
-  const [thresholds, setThresholds] = useState<ThresholdValues>(DEFAULT_THRESHOLDS);
   const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('inclusion');
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   const [selection, setSelection] = useState<ValidatorSelection>({
@@ -89,7 +85,6 @@ export function InspectPage(): JSX.Element {
   const { valid: parsedIndices, pubkeys: parsedPubkeys } = useMemo(() => parseValidatorIndices(tags), [tags]);
   const {
     resolvedIndices,
-    validatorMap,
     isResolving,
     isResolved,
     error: resolverError,
@@ -114,11 +109,17 @@ export function InspectPage(): JSX.Element {
   });
 
   const { getStatusAtTimestamp, unknownValidators } = useValidatorStatus(ready ? resolvedIndices : []);
+  // Indices the chain has never seen are named in the alert below and left out of every view
+  const knownIndices = useMemo(
+    () => resolvedIndices.filter(i => !unknownValidators.includes(i)),
+    [resolvedIndices, unknownValidators]
+  );
   const { identities } = useValidatorIdentity(ready ? resolvedIndices : []);
   const identityList = useMemo(
     () => resolvedIndices.flatMap(i => identities.get(i) ?? []),
     [resolvedIndices, identities]
   );
+  const pubkeys = new Map(identityList.map(v => [v.index, v.pubkey]));
   // dim_validator holds today's state; a range that ends earlier shows each validator as it was on its last day
   const endsEarlier = dataTo < today;
   const balanceAtEnd = new Map(validators.map(v => [v.validatorIndex, v.balance]));
@@ -260,7 +261,7 @@ export function InspectPage(): JSX.Element {
           </p>
         )}
 
-        {hasAnalyzed && !error && !resolverError && (
+        {hasAnalyzed && !error && !resolverError && knownIndices.length > 0 && (
           <>
             <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
               {identityList.length === 1 && (!endsEarlier || endStates) && (
@@ -272,7 +273,7 @@ export function InspectPage(): JSX.Element {
               {hasData && !isLoading && (
                 <ValidatorBalance
                   balances={raw.balance}
-                  validatorIndices={resolvedIndices}
+                  validatorIndices={knownIndices}
                   from={dataFrom}
                   to={dataTo}
                   allHistory={allHistory}
@@ -281,13 +282,8 @@ export function InspectPage(): JSX.Element {
               )}
             </div>
 
-            <InspectSection
-              title="Performance"
-              meta={rangeMeta}
-              note={performanceNote}
-              actions={<ThresholdConfig values={thresholds} onChange={setThresholds} disabled={busy} />}
-            >
-              <PerformanceSummary summary={summary} thresholds={thresholds} isLoading={busy} />
+            <InspectSection title="Performance" meta={rangeMeta} note={performanceNote}>
+              <PerformanceSummary summary={summary} isLoading={busy} />
               <ValidatorHeatmap
                 data={attestationDaily}
                 blockProposals={blockProposals}
@@ -298,7 +294,7 @@ export function InspectPage(): JSX.Element {
                 stepDays={resolution === 'week' ? 7 : 1}
                 onWeekSelect={weekStart => applyRange({ from: weekStart, to: weekStart + 6 * DAY })}
                 isLoading={busy}
-                validatorIndices={resolvedIndices}
+                validatorIndices={knownIndices}
                 selection={selection}
                 onCellSelect={setSelection}
                 getStatusAtTimestamp={getStatusAtTimestamp}
@@ -312,7 +308,7 @@ export function InspectPage(): JSX.Element {
                   balanceDaily={balanceDaily}
                   syncCommitteeDaily={syncCommitteeDaily}
                   blockProposals={blockProposals}
-                  validatorMap={validatorMap}
+                  validatorMap={pubkeys}
                   from={performanceFrom}
                   to={dataTo}
                   getStatusAtTimestamp={getStatusAtTimestamp}
@@ -327,7 +323,7 @@ export function InspectPage(): JSX.Element {
             </InspectSection>
 
             {hasData && !isLoading && (
-              <ValidatorDuties indices={resolvedIndices} from={dataFrom} to={dataTo} proposals={raw.blockProposal} />
+              <ValidatorDuties indices={knownIndices} from={dataFrom} to={dataTo} proposals={raw.blockProposal} />
             )}
           </>
         )}

@@ -40,9 +40,6 @@ export function ValidatorsSkeleton({ className }: ValidatorsSkeletonProps): JSX.
       {/* Analyze button skeleton */}
       <LoadingContainer className="h-10 w-28 rounded-sm" shimmer={false} />
 
-      {/* Threshold config skeleton */}
-      <LoadingContainer className="h-12 w-full rounded-sm" shimmer={false} />
-
       {/* Performance summary skeleton */}
       <div className="grid grid-cols-2 overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (

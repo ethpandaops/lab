@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctValidatorCountByCredentialTypeDailyServiceListOptions,
   fctValidatorCountByCredentialTypeWeeklyServiceListOptions,
@@ -23,12 +23,11 @@ import { weekStartOf } from '../utils/week';
 const GWEI = 1e9;
 const DAY = 86_400;
 const PAGE = 10_000;
+const SLOTS_PER_DAY = 7_200;
 
 export interface OverviewPeriod {
   /** First day of the period (YYYY-MM-DD): the day, or the week's Monday */
   day: string;
-  /** Days the period covers so far (7 for a complete week) */
-  dayCount: number;
   /** Validator counts at the period's last complete epoch */
   status: { pending: number; active: number; exiting: number; exited: number };
   /** Active validators and their effective balance (ETH) per credential type, at the period's last epoch */
@@ -38,12 +37,23 @@ export interface OverviewPeriod {
   exitQueueEth: number | null;
   /** Operations included on chain during the period */
   ops: Record<string, { count: number; amountEth: number }>;
-  /** Consensus rewards paid during the period, in ETH */
-  rewards: { attestationEth: number; syncEth: number; proposerEth: number; penaltiesEth: number } | null;
+  /**
+   * Consensus rewards paid during the period, in ETH, and the days of blocks they cover (blocks / 7200), so
+   * a period still in progress or at the start of the data isn't read as a whole one
+   */
+  rewards: {
+    attestationEth: number;
+    syncEth: number;
+    proposerEth: number;
+    penaltiesEth: number;
+    dayCount: number;
+  } | null;
 }
 
 export interface OverviewSnapshot {
   day: string;
+  /** Active validators per week across all history, for "lowest since"; null until loaded */
+  activeHistory: { day: string; active: number }[] | null;
   epoch: number;
   byType: Record<CredentialType, { count: number; stake: number }>;
   queue: FctValidatorQueueDaily | null;
@@ -90,25 +100,37 @@ export function useOverviewData(window: OverviewWindow): {
   const daily = { ...dayFilter, page_size: PAGE, order_by: 'day_start_date' };
   const weekly = { ...weekFilter, page_size: PAGE, order_by: 'week_start_date' };
 
-  const counts = useQuery(
-    period === 'day'
+  // The period series keep the last window's rows on screen while the next loads, so the page keeps its height
+  const counts = useQuery({
+    ...(period === 'day'
       ? fctValidatorCountByCredentialTypeDailyServiceListOptions({ query: daily })
-      : fctValidatorCountByCredentialTypeWeeklyServiceListOptions({ query: weekly })
-  );
-  const queues = useQuery(
-    period === 'day'
+      : fctValidatorCountByCredentialTypeWeeklyServiceListOptions({ query: weekly })),
+    placeholderData: keepPreviousData,
+  });
+  const queues = useQuery({
+    ...(period === 'day'
       ? fctValidatorQueueDailyServiceListOptions({ query: daily })
-      : fctValidatorQueueWeeklyServiceListOptions({ query: weekly })
-  );
-  const operations = useQuery(
-    period === 'day'
+      : fctValidatorQueueWeeklyServiceListOptions({ query: weekly })),
+    placeholderData: keepPreviousData,
+  });
+  const operations = useQuery({
+    ...(period === 'day'
       ? fctValidatorOperationDailyServiceListOptions({ query: daily })
-      : fctValidatorOperationWeeklyServiceListOptions({ query: weekly })
-  );
-  const rewards = useQuery(
-    period === 'day'
+      : fctValidatorOperationWeeklyServiceListOptions({ query: weekly })),
+    placeholderData: keepPreviousData,
+  });
+  const rewards = useQuery({
+    ...(period === 'day'
       ? fctValidatorRewardTotalDailyServiceListOptions({ query: daily })
-      : fctValidatorRewardTotalWeeklyServiceListOptions({ query: weekly })
+      : fctValidatorRewardTotalWeeklyServiceListOptions({ query: weekly })),
+    placeholderData: keepPreviousData,
+  });
+
+  // Every week, whatever the window, so the snapshot's "lowest since" doesn't depend on it
+  const history = useQuery(
+    fctValidatorCountByCredentialTypeWeeklyServiceListOptions({
+      query: { week_start_date_like: '20%', page_size: PAGE, order_by: 'week_start_date' },
+    })
   );
 
   // Snapshot tables: the newest day only
@@ -162,20 +184,12 @@ export function useOverviewData(window: OverviewWindow): {
 
   // The count snapshots define which periods exist; other series join onto them
   const byDay = new Map<string, OverviewPeriod>();
-  const today = new Date().toISOString().slice(0, 10);
   for (const r of countRows) {
     const day = r.day_start_date ?? '';
     const p =
       byDay.get(day) ??
       ({
         day,
-        dayCount:
-          period === 'day'
-            ? 1
-            : Math.min(
-                7,
-                Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${day}T00:00:00Z`)) / 86_400_000) + 1
-              ),
         status: { pending: 0, active: 0, exiting: 0, exited: 0 },
         credential: emptyCredential(),
         activationQueueEth: null,
@@ -216,14 +230,21 @@ export function useOverviewData(window: OverviewWindow): {
       syncEth: (r.sync_committee_reward ?? 0) / GWEI,
       proposerEth: (r.proposer_total ?? 0) / GWEI,
       penaltiesEth: (attestationPenalty + syncPenalty) / GWEI,
+      dayCount: (r.block_count ?? 0) / SLOTS_PER_DAY,
     };
   }
   const periods = [...byDay.values()].sort((a, b) => a.day.localeCompare(b.day));
 
+  const activeByWeek = new Map<string, number>();
+  for (const r of history.data?.fct_validator_count_by_credential_type_weekly ?? []) {
+    const week = r.week_start_date ?? '';
+    activeByWeek.set(week, (activeByWeek.get(week) ?? 0) + (r.active_validator_count ?? 0));
+  }
   const latestRows = latestCounts.data?.fct_validator_count_by_credential_type_daily ?? [];
   const snapshot: OverviewSnapshot | null = latestDay
     ? {
         day: latestDay,
+        activeHistory: history.data ? [...activeByWeek].map(([day, active]) => ({ day, active })) : null,
         epoch: latestRows[0]?.epoch ?? 0,
         byType: Object.fromEntries(
           CREDENTIAL_TYPES.map(ct => {

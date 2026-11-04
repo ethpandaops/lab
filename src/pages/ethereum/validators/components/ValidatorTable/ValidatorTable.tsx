@@ -49,21 +49,10 @@ function truncatePubkey(pubkey: string): string {
   return `${pubkey.slice(0, 8)}...${pubkey.slice(-4)}`;
 }
 
-/**
- * Format percentage with color based on threshold
- */
-function formatPercent(value: number, threshold = 95): ReactNode {
-  const formatted = `${value.toFixed(2)}%`;
-  return (
-    <span
-      className={clsx(
-        'tabular-nums',
-        value >= threshold ? 'text-foreground' : value >= 90 ? 'text-warning' : 'text-danger'
-      )}
-    >
-      {formatted}
-    </span>
-  );
+/** Percentage, or a muted dash when there were no duties to rate */
+function formatPercent(value: number | null): ReactNode {
+  if (value === null) return <span className="text-muted">-</span>;
+  return <span className="tabular-nums">{`${value.toFixed(2)}%`}</span>;
 }
 
 /**
@@ -229,9 +218,9 @@ export function ValidatorTable({
               <th className="w-px px-2 py-3 text-right font-medium">Inclusion</th>
               <th className="w-px px-2 py-3 text-center font-medium">Incl. Trend</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Head</th>
-              <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Head Trend</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium 2xl:table-cell">Head Trend</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Target</th>
-              <th className="hidden w-px px-2 py-3 text-center font-medium lg:table-cell">Target Trend</th>
+              <th className="hidden w-px px-2 py-3 text-center font-medium 2xl:table-cell">Target Trend</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium 2xl:table-cell">Source</th>
               <th className="hidden w-px px-2 py-3 text-center font-medium 2xl:table-cell">Source Trend</th>
               <th className="hidden w-px px-2 py-3 text-right font-medium 2xl:table-cell">Avg Delay</th>
@@ -425,12 +414,10 @@ function ValidatorRow({
         </td>
 
         {/* Head */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">
-          {formatPercent(row.attestation.headCorrectRate, 98)}
-        </td>
+        <td className="hidden px-2 py-2 text-right lg:table-cell">{formatPercent(row.attestation.headCorrectRate)}</td>
 
         {/* Head sparkline */}
-        <td className="hidden px-2 py-2 text-center lg:table-cell">
+        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
           {headSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={headSparkline} width={80} />
@@ -442,11 +429,11 @@ function ValidatorRow({
 
         {/* Target */}
         <td className="hidden px-2 py-2 text-right lg:table-cell">
-          {formatPercent(row.attestation.targetCorrectRate, 98)}
+          {formatPercent(row.attestation.targetCorrectRate)}
         </td>
 
         {/* Target sparkline */}
-        <td className="hidden px-2 py-2 text-center lg:table-cell">
+        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
           {targetSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={targetSparkline} width={80} />
@@ -458,7 +445,7 @@ function ValidatorRow({
 
         {/* Source */}
         <td className="hidden px-2 py-2 text-right 2xl:table-cell">
-          {formatPercent(row.attestation.sourceCorrectRate, 98)}
+          {formatPercent(row.attestation.sourceCorrectRate)}
         </td>
 
         {/* Source sparkline */}
@@ -493,13 +480,7 @@ function ValidatorRow({
         </td>
 
         {/* Sync % */}
-        <td className="px-2 py-2 text-right">
-          {row.syncCommittee ? (
-            formatPercent(row.syncCommittee.participationRate)
-          ) : (
-            <span className="text-muted">N/A</span>
-          )}
-        </td>
+        <td className="px-2 py-2 text-right">{formatPercent(row.syncCommittee?.participationRate ?? null)}</td>
 
         {/* Proposals */}
         <td className="hidden px-2 py-2 text-right lg:table-cell">

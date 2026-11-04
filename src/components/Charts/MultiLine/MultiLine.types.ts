@@ -169,7 +169,8 @@ export interface XAxisConfig {
    */
   max?: number | 'dataMax';
   /**
-   * Fixed step between ticks, counted from `min` (only for type 'value' or 'time')
+   * Fixed step between ticks, counted from `min`. On a category axis, 0 shows every label, staggering
+   * them over two rows when they don't fit side by side, instead of hiding labels that would overlap.
    * @example 86_400_000 // One tick per day on a millisecond axis that starts at midnight
    */
   interval?: number;

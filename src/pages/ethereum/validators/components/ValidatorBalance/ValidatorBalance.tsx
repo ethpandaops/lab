@@ -57,11 +57,13 @@ export function ValidatorBalance({
 
   const balanceDays = [...new Set(balances.map(b => b.day_start_date ?? ''))].sort();
   const balanceLabels = balanceDays.map(formatDayLabel);
+  // Validators with no balance rows in the range get no line and no legend entry
+  const withBalances = validatorIndices.filter(idx => balances.some(b => b.validator_index === idx));
   // One validator: absolute balance. Several: change since the start of the range, so a 32 ETH
   // validator and a 2048 ETH one share a readable scale.
   const balanceSeries =
-    validatorIndices.length <= MAX_BALANCE_LINES
-      ? validatorIndices.map((idx, i) => {
+    withBalances.length <= MAX_BALANCE_LINES
+      ? withBalances.map((idx, i) => {
           const byDay = new Map(
             balances.filter(b => b.validator_index === idx).map(b => [b.day_start_date, b.end_balance])
           );
@@ -206,7 +208,7 @@ export function ValidatorBalance({
                 },
                 {
                   name: 'Penalties',
-                  data: rewardRows.map(d => Number(Math.min(0, d.attestationEth).toFixed(6))),
+                  data: rewardRows.map(d => Number((-d.penaltiesEth).toFixed(6))),
                   color: themeColors.danger,
                   stack: 'r',
                   seriesType: 'bar',
