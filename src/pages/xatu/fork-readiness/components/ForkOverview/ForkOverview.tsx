@@ -14,6 +14,7 @@ export function ForkOverview({
   actionNeededCount,
   readyClientsCount,
   totalClientsCount,
+  noMinimumCount,
 }: ForkOverviewProps): JSX.Element {
   return (
     <div className="space-y-4">
@@ -30,32 +31,36 @@ export function ForkOverview({
         stats={[
           {
             id: 'overall-readiness',
-            name: 'Overall Readiness',
+            name: 'Ready',
             value: `${overallReadyPercentage}%`,
             valueClassName: totalNodes > 0 && actionNeededCount === 0 ? 'text-success' : 'text-warning',
-            delta: {
-              value: `${readyNodes}/${totalNodes} nodes`,
-              type: 'neutral',
-            },
+            subtitle: `${readyNodes} of ${totalNodes} Xatu nodes`,
           },
           {
             id: 'ready-clients',
-            name: 'Ready Clients',
-            value: `${readyClientsCount}/${totalClientsCount}`,
+            name: 'Clients ready',
+            value: `${readyClientsCount} of ${totalClientsCount}`,
           },
           {
             id: 'action-needed',
-            name: 'Action Needed',
+            name: 'To upgrade',
             value: actionNeededCount.toString(),
             valueClassName: actionNeededCount === 0 ? 'text-success' : 'text-danger',
-            delta: {
-              value: 'nodes to update',
-              type: 'neutral',
-            },
+            subtitle: 'Xatu nodes',
           },
+          ...(noMinimumCount > 0
+            ? [
+                {
+                  id: 'no-minimum',
+                  name: 'No minimum version set',
+                  value: noMinimumCount.toString(),
+                  subtitle: 'Xatu nodes',
+                },
+              ]
+            : []),
           {
             id: 'time-to-fork',
-            name: 'Time to Fork',
+            name: 'Time to fork',
             value: timeRemaining,
           },
         ]}

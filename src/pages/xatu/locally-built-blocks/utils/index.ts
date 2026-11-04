@@ -1,2 +1,2 @@
-export { parseClientName } from './parse-clients';
+export { parseExecutionClient } from './parse-clients';
 export { getIntensity } from './color-intensity';

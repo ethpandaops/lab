@@ -46,8 +46,11 @@ export function InsightsDialog({
                       <ClientLogo client={client.name} size={16} />
                       {client.name}
                     </span>
-                    <span className="text-muted">
-                      {client.count} ({client.percentage.toFixed(1)}%)
+                    <span className="flex gap-3 text-muted tabular-nums">
+                      <span>
+                        {client.count} Xatu {client.count === 1 ? 'node' : 'nodes'}
+                      </span>
+                      <span className="w-12 text-right">{client.percentage.toFixed(1)}%</span>
                     </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-surface">
@@ -91,7 +94,9 @@ export function InsightsDialog({
                           <span className="text-xl">{country.emoji}</span>
                           <span className="text-sm font-medium text-foreground">{country.name}</span>
                         </div>
-                        <span className="text-xs font-semibold text-primary">{country.count} nodes</span>
+                        <span className="text-xs font-semibold text-primary">
+                          {country.count} Xatu {country.count === 1 ? 'node' : 'nodes'}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -133,7 +138,9 @@ export function InsightsDialog({
                           <span className="text-xs font-semibold text-muted">#{index + 1}</span>
                           <span className="text-sm font-medium text-foreground">{city.name}</span>
                         </div>
-                        <span className="text-xs font-semibold text-primary">{city.count} nodes</span>
+                        <span className="text-xs font-semibold text-primary">
+                          {city.count} Xatu {city.count === 1 ? 'node' : 'nodes'}
+                        </span>
                       </div>
                     ))}
                   </div>

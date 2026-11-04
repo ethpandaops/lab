@@ -55,18 +55,6 @@ export function summarize(values: number[]): Summary | null {
 }
 
 /**
- * Share of other nodes that were slower than `value` (strictly larger timing).
- *
- * @param value - This node's timing
- * @param others - Timings of every other node
- * @returns Fraction in [0, 1], or null when there is nothing to compare against
- */
-export function shareSlowerThan(value: number, others: number[]): number | null {
-  if (others.length === 0) return null;
-  return others.filter(other => other > value).length / others.length;
-}
-
-/**
  * Whether a node reported recently enough to count as online.
  *
  * @param lastSeen - Unix seconds the node last reported
@@ -124,20 +112,6 @@ export function formatNodeLocation(
   const { meta_client_geo_city: city, meta_client_geo_country: country } = node;
   if (city && country) return `${city}, ${country}`;
   return country || city || '–';
-}
-
-/** Step of the performance gradient (`--color-performance-*`) an arrival time falls in */
-export type ArrivalTier = 'excellent' | 'good' | 'fair' | 'slow' | 'poor';
-
-/**
- * Performance tier of an arrival time, one tier per second from slot start.
- */
-export function getArrivalTier(ms: number): ArrivalTier {
-  if (ms < 1000) return 'excellent';
-  if (ms < 2000) return 'good';
-  if (ms < 3000) return 'fair';
-  if (ms < 4000) return 'slow';
-  return 'poor';
 }
 
 /**

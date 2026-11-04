@@ -172,8 +172,9 @@ export function BlockDetailsModal({
         {isPairingContext ? (
           // Pairing context: group by slot, then nodes
           <div className="space-y-2">
-            <h3 className="mb-3 text-sm font-semibold text-muted">
-              Slots ({slotGroups.length}) • Nodes ({nodeCount})
+            <h3 className="mb-3 flex gap-4 text-sm font-semibold text-muted">
+              <span>{slotGroups.length} slots</span>
+              <span>{nodeCount} Xatu nodes</span>
             </h3>
             <div className="max-h-96 space-y-2 overflow-y-auto">
               {slotGroups.map(slotGroup => (
@@ -267,12 +268,9 @@ function NodeCard({ nodeGroup, index }: { nodeGroup: NodeGroup; index: number })
       <span className="flex-1 truncate text-sm">{nodeName}</span>
       <div className="flex items-center gap-3 text-xs text-muted">
         {blocks.length > 1 && (
-          <>
-            <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
-              {blocks.length} blocks
-            </span>
-            <span className="text-muted/50">•</span>
-          </>
+          <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
+            {blocks.length} blocks
+          </span>
         )}
         {executionClient && (
           <div className="flex items-center gap-1.5">
@@ -280,14 +278,12 @@ function NodeCard({ nodeGroup, index }: { nodeGroup: NodeGroup; index: number })
             <span>{executionClient}</span>
           </div>
         )}
-        {executionClient && consensusClient && <span className="text-muted/50">•</span>}
         {consensusClient && (
           <div className="flex items-center gap-1.5">
             <ClientLogo client={consensusClient} size={16} />
             <span>{consensusClient}</span>
           </div>
         )}
-        <span className="text-muted/50">•</span>
         <span>
           {totalTxs} tx{totalTxs !== 1 ? 's' : ''}
         </span>

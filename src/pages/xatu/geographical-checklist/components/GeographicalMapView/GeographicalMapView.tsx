@@ -42,7 +42,9 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
         node.meta_client_geo_longitude != null &&
         node.meta_client_geo_latitude != null &&
         !isNaN(node.meta_client_geo_longitude) &&
-        !isNaN(node.meta_client_geo_latitude)
+        !isNaN(node.meta_client_geo_latitude) &&
+        // 0,0 is the geo lookup's fallback for a node it couldn't place
+        !(node.meta_client_geo_longitude === 0 && node.meta_client_geo_latitude === 0)
       ) {
         const cityKey = `${node.meta_client_geo_city}-${node.meta_client_geo_country_code}`;
         if (!cityGroups.has(cityKey)) {
@@ -54,7 +56,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
 
     cityGroups.forEach((cityNodes, key) => {
       const node = cityNodes[0];
-      const city = node.meta_client_geo_city || 'Unknown';
+      const city = node.meta_client_geo_city || '';
       const country = node.meta_client_geo_country || 'Unknown';
       const coords: [number, number] = [node.meta_client_geo_longitude!, node.meta_client_geo_latitude!];
 
@@ -124,7 +126,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
           if (data) {
             const pointName = data.name || 'Unknown';
             const value = data.value?.[2] ?? 0;
-            return `<strong>${pointName}</strong><br/>Nodes: ${value}`;
+            return `<strong>${pointName}</strong><br/>Xatu nodes: ${value}`;
           }
           return params.name || '';
         },
@@ -241,9 +243,12 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
         size="full"
         title={
           selectedLocation
-            ? `${selectedLocation.city}, ${selectedLocation.country} (${selectedLocation.nodes.length} node${selectedLocation.nodes.length !== 1 ? 's' : ''})`
+            ? selectedLocation.city
+              ? `${selectedLocation.city}, ${selectedLocation.country}`
+              : selectedLocation.country
             : 'Node Details'
         }
+        description={selectedLocation ? `${selectedLocation.nodes.length} Xatu nodes` : undefined}
       >
         {selectedLocation && (
           <div className="max-h-[600px] overflow-y-auto">

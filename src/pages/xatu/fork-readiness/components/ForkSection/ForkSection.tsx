@@ -17,6 +17,7 @@ export function ForkSection({ fork }: ForkSectionProps): JSX.Element {
         actionNeededCount={fork.actionNeededCount}
         readyClientsCount={fork.readyClientsCount}
         totalClientsCount={fork.totalClientsCount}
+        noMinimumCount={fork.noMinimumCount}
       />
 
       {/* Client breakdown grid - only show clients with nodes */}

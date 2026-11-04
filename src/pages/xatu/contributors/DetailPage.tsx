@@ -246,7 +246,7 @@ export function DetailPage(): JSX.Element {
         <Header title="Contributor Details" />
         <div className="rounded-sm border border-border bg-surface p-12 text-center">
           <h2 className="mb-2 text-lg/7 font-semibold text-foreground">Contributor not found</h2>
-          <p className="mb-4 text-muted">No active nodes found for &quot;{id}&quot; in the last 24 hours.</p>
+          <p className="mb-4 text-muted">No Xatu nodes from &quot;{id}&quot; in the last 24h.</p>
           <Link to="/xatu/contributors" className="text-primary hover:underline">
             ← Back to all contributors
           </Link>
@@ -285,16 +285,13 @@ export function DetailPage(): JSX.Element {
 
         {/* Inline Client Logos */}
         {uniqueConsensusClients.size > 0 && (
-          <>
-            <span className="text-muted">/</span>
-            <div className="flex items-center gap-2">
-              {Array.from(uniqueConsensusClients)
-                .filter((client): client is string => typeof client === 'string')
-                .map(client => (
-                  <ClientLogo key={client} client={client} size={24} />
-                ))}
-            </div>
-          </>
+          <div className="flex items-center gap-2">
+            {Array.from(uniqueConsensusClients)
+              .filter((client): client is string => typeof client === 'string')
+              .map(client => (
+                <ClientLogo key={client} client={client} size={24} />
+              ))}
+          </div>
         )}
       </div>
 
@@ -304,13 +301,15 @@ export function DetailPage(): JSX.Element {
         stats={[
           {
             id: 'active-nodes',
-            name: 'Active Nodes',
+            name: 'Xatu nodes',
             value: nodes.length.toString(),
+            subtitle: 'Last 24h',
           },
           {
             id: 'countries',
             name: 'Countries',
             value: uniqueLocations.size.toString(),
+            subtitle: 'Last 24h',
           },
           {
             id: 'last-seen',
@@ -325,14 +324,14 @@ export function DetailPage(): JSX.Element {
       {nodes.length > 5 && (
         <div className="mt-4 text-center">
           <Button variant="secondary" size="sm" onClick={() => setShowAllNodes(!showAllNodes)}>
-            {showAllNodes ? 'Show Less' : `Show More (${nodes.length - 5} more)`}
+            {showAllNodes ? 'Show less' : `Show ${nodes.length - 5} more`}
           </Button>
         </div>
       )}
 
       <div className="mt-12">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg/7 font-semibold text-foreground">Propagation latency</h2>
+          <h2 className="text-lg/7 font-semibold text-foreground">Observation timings</h2>
           <SegmentedControl
             options={NODE_RANGE_OPTIONS}
             value={range}

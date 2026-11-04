@@ -8,7 +8,7 @@ export interface RouteData {
 export interface PointNodeData {
   nodeId: string; // Unique node identifier
   username?: string; // Node operator username
-  timing: number; // Block timing in ms from slot start
+  timing?: number; // Block timing in ms from slot start; the hover panel drops its column when no node has one
   client?: string; // Client implementation name
   country?: string; // Country name for geo hover aggregation
 }
@@ -17,7 +17,7 @@ export interface PointData {
   name?: string;
   coords: [number, number]; // [longitude, latitude]
   value?: number; // Optional value for sizing the point
-  color?: string; // Optional per-point color (e.g. encoding arrival time); falls back to the series color
+  color?: string; // Optional per-point color; falls back to the series color
   nodes?: PointNodeData[]; // All nodes at this location for tooltip display
 }
 

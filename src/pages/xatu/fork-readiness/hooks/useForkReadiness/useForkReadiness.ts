@@ -93,8 +93,13 @@ export function useForkReadiness(): UseForkReadinessReturn {
 
     const allForks = getAllForks(currentNetwork);
     const upcoming: ForkReadinessStats[] = [];
+    // Some configs list one fork under two names at the same epoch (fulu and fusaka); show it once
+    const seenEpochs = new Set<number>();
 
     for (const fork of allForks) {
+      // Without minimum versions there is nothing to be ready for
+      if (Object.keys(fork.min_client_versions).length === 0 || seenEpochs.has(fork.epoch)) continue;
+      seenEpochs.add(fork.epoch);
       const timeData = getTimeToEpoch(fork.epoch, currentNetwork.genesis_time);
       const isPast = timeData.isPast;
       if (isPast) continue;

@@ -1,1 +1,0 @@
-export { ArrivalLegend } from './ArrivalLegend';

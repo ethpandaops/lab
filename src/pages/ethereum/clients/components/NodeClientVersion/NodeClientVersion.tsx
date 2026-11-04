@@ -32,6 +32,7 @@ export function NodeClientVersion({ client, version, showNewer = false }: NodeCl
         version={release?.version}
         detail={release ? undefined : shortVersion(version) || undefined}
       />
+      {!version?.trim() && <span className="text-xs/5 text-muted">version unknown</span>}
       {behind && <span className="text-xs/5 text-warning">{newest?.version} available</span>}
     </span>
   );

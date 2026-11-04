@@ -427,3 +427,34 @@ export const GridLayout: Story = {
     </div>
   ),
 };
+
+/**
+ * A client the fork sets no minimum version for: its nodes are listed but not judged.
+ */
+export const NoMinimumVersion: Story = {
+  args: {
+    data: {
+      clientName: 'caplin',
+      totalNodes: 2,
+      readyNodes: 0,
+      readyPercentage: 0,
+      minVersion: null,
+      nodes: [
+        {
+          nodeName: 'pub-asn-city/sparingparsley27/hashed-26181929',
+          version: '3.8.1-cf6f14',
+          isReady: false,
+          classification: 'caplin',
+          lastSeen: Date.now() / 1000,
+        },
+        {
+          nodeName: 'corp-asn-city/techcorp42/hashed-91a2b3c4',
+          version: '3.8.1-cf6f14',
+          isReady: false,
+          classification: 'caplin',
+          lastSeen: Date.now() / 1000,
+        },
+      ],
+    },
+  },
+};

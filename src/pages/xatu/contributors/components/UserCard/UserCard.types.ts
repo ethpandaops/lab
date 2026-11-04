@@ -10,13 +10,13 @@ export interface UserCardProps {
    */
   classification: UserClassification;
   /**
-   * Number of active nodes
+   * Number of Xatu nodes seen in the last 24h
    */
   nodeCount: number;
   /**
-   * Number of unique locations
+   * Number of countries those nodes are in
    */
-  locationCount: number;
+  countryCount: number;
   /**
    * Last seen timestamp (Unix seconds)
    */
@@ -26,13 +26,13 @@ export interface UserCardProps {
    */
   primaryCountry?: string;
   /**
-   * Primary city name
+   * Collector the nodes report through (e.g., "Contributoor"), "several" when they differ
    */
-  primaryCity?: string;
+  collector?: string;
   /**
-   * Client version (e.g., "v0.0.70-7195855")
+   * Collector version (e.g., "v0.0.70-7195855"), "several" when they differ
    */
-  clientVersion?: string;
+  collectorVersion?: string;
   /**
    * Consensus client implementations (e.g., ["lighthouse", "prysm"])
    */

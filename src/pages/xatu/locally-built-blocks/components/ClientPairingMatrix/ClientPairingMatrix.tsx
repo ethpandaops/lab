@@ -60,7 +60,7 @@ export function ClientPairingMatrix({
     return (
       <Card
         title="Client Pairings"
-        subtitle="Unique execution + consensus client combinations across all visible slots"
+        subtitle="Xatu nodes per execution and consensus client pair, across the slots in the timeline"
       >
         <p className="text-center text-muted">No client pairings found</p>
       </Card>
@@ -68,7 +68,10 @@ export function ClientPairingMatrix({
   }
 
   return (
-    <Card title="Client Pairings" subtitle="Unique execution + consensus client combinations across all visible slots">
+    <Card
+      title="Client Pairings"
+      subtitle="Xatu nodes per execution and consensus client pair, across the slots in the timeline"
+    >
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
           {/* Consensus client headers */}
@@ -105,7 +108,7 @@ export function ClientPairingMatrix({
                           : 'cursor-not-allowed opacity-50',
                         getIntensity(count, maxPairingCount)
                       )}
-                      title={`${execClient} + ${consensusClient}: ${count} unique node${count !== 1 ? 's' : ''}`}
+                      title={`${execClient} + ${consensusClient}: ${count} Xatu node${count !== 1 ? 's' : ''}`}
                       disabled={count === 0}
                     >
                       {count > 0 && count}

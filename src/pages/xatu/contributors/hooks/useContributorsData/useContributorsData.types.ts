@@ -9,8 +9,10 @@ export interface Contributor {
   locations: Set<string>;
   primaryCountry: string | null;
   primaryCountryCode: string | null;
-  primaryCity: string | null;
+  /** Collector versions (Contributoor or Xatu), not consensus client versions */
   versions: Set<string>;
+  /** Collector implementations, e.g. Contributoor */
+  collectors: Set<string>;
   consensusImplementations: Set<string>;
   countryCount: Map<string, number>;
 }

@@ -102,7 +102,7 @@ export function SlotTimeline({
 
   if (slotGroups.length === 0) {
     return (
-      <Card title="Timeline" subtitle="Unique nodes building blocks per client per slot">
+      <Card title="Timeline" subtitle="Xatu nodes that built a block, per client and slot">
         <p className="text-center text-muted">No slots found</p>
       </Card>
     );
@@ -117,7 +117,7 @@ export function SlotTimeline({
   };
 
   return (
-    <Card title="Timeline" subtitle="Unique nodes building blocks per client per slot">
+    <Card title="Timeline" subtitle="Xatu nodes that built a block, per client and slot">
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
           {/* Slot headers */}
@@ -175,7 +175,7 @@ export function SlotTimeline({
                           getIntensity(count, maxBlockCount),
                           isNew && styles.newBlockAnimation
                         )}
-                        title={`${client}: ${count} unique node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
+                        title={`${client}: ${count} Xatu node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
                         disabled={count === 0}
                       >
                         {count > 0 && count}
@@ -213,7 +213,7 @@ export function SlotTimeline({
                         getIntensity(count, maxBlockCount),
                         isNew && styles.newBlockAnimation
                       )}
-                      title={`${client}: ${count} unique node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
+                      title={`${client}: ${count} Xatu node${count !== 1 ? 's' : ''} in slot ${group.slot}`}
                       disabled={count === 0}
                     >
                       {count > 0 && count}

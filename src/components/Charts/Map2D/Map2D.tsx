@@ -380,7 +380,7 @@ function Map2DChartComponent({
 
           if (countryNodes.length > 0) {
             // Sort by timing
-            countryNodes.sort((a, b) => a.timing - b.timing);
+            countryNodes.sort((a, b) => (a.timing ?? 0) - (b.timing ?? 0));
             setHoveredPoint({ name: countryName, nodes: countryNodes });
           }
         }
@@ -399,6 +399,8 @@ function Map2DChartComponent({
     return timing >= 1000 ? `${(timing / 1000).toFixed(2)}s` : `${timing}ms`;
   };
 
+  const showTiming = !!hoveredPoint?.nodes.some(node => node.timing !== undefined);
+
   // Always render the map container
   return (
     <div className="relative h-full w-full">
@@ -408,7 +410,7 @@ function Map2DChartComponent({
           <div className="rounded-sm border border-border bg-surface px-4 py-3">
             <div className="mb-2 border-b border-border pb-2 text-center">
               <span className="text-sm font-semibold text-foreground">{hoveredPoint.name}</span>
-              <span className="ml-2 text-xs text-muted">({hoveredPoint.nodes.length} nodes)</span>
+              <span className="ml-2 text-xs text-muted">{hoveredPoint.nodes.length} Xatu nodes</span>
             </div>
             <div className="max-h-64 overflow-y-auto">
               <table className="w-full text-xs">
@@ -417,7 +419,7 @@ function Map2DChartComponent({
                     <th className="pr-4 pb-1 text-left font-medium">Node ID</th>
                     <th className="pr-4 pb-1 text-left font-medium">Username</th>
                     <th className="pr-4 pb-1 text-left font-medium">Client</th>
-                    <th className="pb-1 text-right font-medium">Timing</th>
+                    {showTiming && <th className="pb-1 text-right font-medium">Timing</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -437,9 +439,11 @@ function Map2DChartComponent({
                           <span className="text-muted">—</span>
                         )}
                       </td>
-                      <td className="py-0.5 text-right font-mono whitespace-nowrap opacity-80">
-                        {formatTiming(node.timing)}
-                      </td>
+                      {showTiming && (
+                        <td className="py-0.5 text-right font-mono whitespace-nowrap opacity-80">
+                          {node.timing === undefined ? '—' : formatTiming(node.timing)}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -460,7 +464,7 @@ function Map2DChartComponent({
         onEvents={onEvents}
       />
       <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface px-2 py-1 text-xs text-muted">
-        Data from nodes contributing to Xatu • Not representative of actual Ethereum network distribution
+        Xatu nodes
       </div>
     </div>
   );

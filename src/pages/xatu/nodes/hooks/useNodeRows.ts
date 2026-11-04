@@ -1,13 +1,8 @@
 import { useMemo } from 'react';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { compareVersions } from '@/utils/version';
 import type { NodeRange } from '../constants';
 import { summarizeByNode } from '../utils/history';
 import { isNodeOnline, median } from '../utils/node-stats';
-import type { DimClientRelease } from '@/api/types.gen';
-import { normalizeClientName } from '@/utils/ethereum';
-import { useLatestReleases } from '@/pages/ethereum/clients/hooks/useClientReleases';
-import { displayVersion } from '@/pages/ethereum/clients/utils/client-versions';
 import { useActiveNodes } from './useActiveNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 
@@ -29,17 +24,11 @@ export interface NodeRow {
   node: FctNodeActiveLast24h;
   online: boolean;
   observation: NodeObservation | null;
-  /** Consensus client release the node runs, or its short version when it matches no release */
-  clientVersion: string;
-  /** The client's latest release, null when dim_client_release has none for it */
-  latestVersion: string | null;
-  /** The client's latest release, when the node runs an older one */
-  newerVersion: string | null;
 }
 
 export interface UseNodeRowsResult {
   rows: NodeRow[];
-  /** Median across nodes of each node's median over the range */
+  /** Median across nodes of each node's median over the range: the median node, not the median block */
   network: { blockP50: number | null; attestationP50: number | null };
   /** Block rollups of every node over the range */
   block: NodeHistory | null;
@@ -48,8 +37,7 @@ export interface UseNodeRowsResult {
 }
 
 /**
- * Every node that reported in the range, with its timings over the range and whether its consensus client is
- * behind its latest release, most recently seen first.
+ * Every node that reported in the range, with its timings over the range, most recently seen first.
  *
  * A node reported in the range if it has block or attestation rollup rows in it, or an active row, since the
  * last 24 hours sit inside every range. Identity comes from the active row when there is one, otherwise from the
@@ -59,9 +47,7 @@ export function buildNodeRows(
   nodes: FctNodeActiveLast24h[],
   block: HistoryRow[],
   attestation: HistoryRow[],
-  nowSeconds: number,
-  latest: Map<string, DimClientRelease> = new Map(),
-  releases: Map<string, DimClientRelease[]> = new Map()
+  nowSeconds: number
 ): NodeRow[] {
   const blockSummaries = summarizeByNode(block);
   const attestationSummaries = summarizeByNode(attestation);
@@ -79,10 +65,6 @@ export function buildNodeRows(
 
   return [...identities.entries()]
     .map(([nodeId, node]) => {
-      const client = normalizeClientName(node.meta_consensus_implementation ?? '');
-      const clientVersion = displayVersion(node.meta_consensus_version, releases.get(client) ?? []);
-      const newest = latest.get(client)?.version;
-      const outdated = !!newest && !!clientVersion && compareVersions(clientVersion, newest) < 0;
       const blockSummary = blockSummaries.get(nodeId);
       const attestationSummary = attestationSummaries.get(nodeId);
       return {
@@ -97,9 +79,6 @@ export function buildNodeRows(
                 blockSlots: blockSummary?.count ?? 0,
               }
             : null,
-        clientVersion,
-        latestVersion: newest ?? null,
-        newerVersion: outdated ? newest! : null,
       };
     })
     .sort(
@@ -116,17 +95,9 @@ export function useNodeRows(range: NodeRange): UseNodeRowsResult {
   const active = useActiveNodes();
   const block = useNodeHistory('block', range, {});
   const attestation = useNodeHistory('attestation', range, {});
-  const { latest, releases } = useLatestReleases();
 
   const { rows, network } = useMemo(() => {
-    const rows = buildNodeRows(
-      active.nodes,
-      block.data?.rows ?? [],
-      attestation.data?.rows ?? [],
-      Date.now() / 1000,
-      latest,
-      releases
-    );
+    const rows = buildNodeRows(active.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000);
     return {
       rows,
       network: {
@@ -136,7 +107,7 @@ export function useNodeRows(range: NodeRange): UseNodeRowsResult {
         ),
       },
     };
-  }, [active.nodes, block.data, attestation.data, latest, releases]);
+  }, [active.nodes, block.data, attestation.data]);
 
   return {
     rows,

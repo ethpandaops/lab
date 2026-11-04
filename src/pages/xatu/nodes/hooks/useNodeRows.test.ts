@@ -6,7 +6,6 @@ import type { HistoryRow } from './useNodeHistory';
 // The hooks pull in the generated API client, which buildNodeRows doesn't need
 vi.mock('./useActiveNodes', () => ({}));
 vi.mock('./useNodeHistory', () => ({}));
-vi.mock('@/pages/ethereum/clients/hooks/useClientReleases', () => ({}));
 
 const DAY = 86400;
 const NOW = 30 * DAY;
