@@ -7,7 +7,6 @@ import {
   histogram,
   isNodeOnline,
   median,
-  shareSlowerThan,
   shortVersion,
   summarize,
 } from './node-stats';
@@ -28,18 +27,6 @@ describe('summarize', () => {
 
   it('averages the middle pair for an even count', () => {
     expect(median([4, 1, 3, 2])).toBe(2.5);
-  });
-});
-
-describe('shareSlowerThan', () => {
-  it('counts only strictly slower nodes', () => {
-    expect(shareSlowerThan(200, [100, 200, 300, 400])).toBe(0.5);
-    expect(shareSlowerThan(50, [100, 200])).toBe(1);
-    expect(shareSlowerThan(500, [100, 200])).toBe(0);
-  });
-
-  it('returns null without other nodes', () => {
-    expect(shareSlowerThan(100, [])).toBeNull();
   });
 });
 

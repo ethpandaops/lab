@@ -14,7 +14,7 @@ import { formatGasToMillions } from '@/utils/gas';
 import { formatWeiAsEth } from '@/utils/epbs';
 import type { BlockSortKey } from '../../IndexPage.types';
 import { nodeIdOf } from '../../utils/block-query';
-import { parseClientName } from '../../utils';
+import { parseExecutionClient } from '../../utils';
 
 export interface PreparedBlocksTableProps {
   blocks: FctPreparedBlock[];
@@ -91,7 +91,7 @@ const columns: DataTableColumn<FctPreparedBlock>[] = [
     header: 'EL',
     enableSorting: false,
     cell: ({ row }) => {
-      const { executionClient } = parseClientName(row.original.meta_client_name);
+      const executionClient = parseExecutionClient(row.original.meta_client_name);
       return executionClient ? <ClientLabel client={executionClient} /> : '-';
     },
   },

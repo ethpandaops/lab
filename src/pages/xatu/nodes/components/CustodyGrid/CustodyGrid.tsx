@@ -3,16 +3,14 @@ import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { DATA_COLUMN_COUNT } from '../../constants';
 import type { NodeDataColumns } from '../../hooks/useNodeDataColumns';
-import { formatMs, getArrivalTier } from '../../utils/node-stats';
-import { ARRIVAL_TIER_CLASSES } from '../../constants';
-import { ArrivalLegend } from '../ArrivalLegend';
+import { formatMs } from '../../utils/node-stats';
 
 export interface CustodyGridProps {
   columns: NodeDataColumns;
 }
 
 /**
- * Every data column index, filled where the node saw that column and coloured by its median arrival.
+ * Every data column index, filled where the node saw that column; hovering one shows its median arrival.
  */
 export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -24,16 +22,23 @@ export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
       title="Data column custody"
       subtitle={`${custody} of ${DATA_COLUMN_COUNT} columns`}
       actions={
-        <span className="text-xs/5 text-muted tabular-nums">
+        <span className="flex flex-wrap justify-end gap-x-3 text-xs/5 text-muted tabular-nums">
+          {hovered !== null && (
+            <span>
+              Column <span className="text-foreground">{hovered}</span>
+            </span>
+          )}
           {hovered === null ? null : hoveredColumn ? (
             <>
-              Column <span className="text-foreground">{hovered}</span> · p50{' '}
-              <span className="text-foreground">{formatMs(hoveredColumn.p50)}</span> · {hoveredColumn.slots} slots
+              <span>
+                p50 <span className="text-foreground">{formatMs(hoveredColumn.p50)}</span>
+              </span>
+              <span>
+                <span className="text-foreground">{hoveredColumn.slots}</span> slots
+              </span>
             </>
           ) : (
-            <>
-              Column <span className="text-foreground">{hovered}</span> · not custodied
-            </>
+            <span>not custodied</span>
           )}
         </span>
       }
@@ -47,14 +52,13 @@ export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
               onMouseEnter={() => setHovered(index)}
               className={clsx(
                 'aspect-square rounded-xs transition-opacity',
-                column ? ARRIVAL_TIER_CLASSES[getArrivalTier(column.p50)] : 'bg-border/60',
+                column ? 'bg-primary/70' : 'bg-border/60',
                 hovered !== null && hovered !== index && 'opacity-60'
               )}
             />
           );
         })}
       </div>
-      <ArrivalLegend className="mt-3" />
     </Card>
   );
 }

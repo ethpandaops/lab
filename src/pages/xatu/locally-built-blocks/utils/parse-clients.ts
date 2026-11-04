@@ -1,43 +1,18 @@
-import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS } from '@/utils/ethereum';
+import { EXECUTION_CLIENTS } from '@/utils/ethereum';
 
 /**
- * Parse the meta_client_name to extract execution and consensus client names
+ * Execution client in a node name; fct_prepared_block has no execution client column. The consensus client comes
+ * from meta_consensus_implementation, which names tysm nodes tysm where their names say prysm.
  *
  * Example node names:
  * - ethpandaops/mainnet/utility-mainnet-prysm-geth-tysm-001
  * - ethpandaops/mainnet/sentry-mainnet-lighthouse-nethermind-001
  *
  * @param clientName - The full node name (meta_client_name)
- * @returns Object with executionClient and consensusClient, or null if not found
+ * @returns The execution client, or null if the name has none
  */
-export function parseClientName(clientName: string | undefined): {
-  executionClient: string | null;
-  consensusClient: string | null;
-} {
-  if (!clientName) {
-    return { executionClient: null, consensusClient: null };
-  }
-
+export function parseExecutionClient(clientName: string | undefined): string | null {
+  if (!clientName) return null;
   const lowerName = clientName.toLowerCase();
-  let executionClient: string | null = null;
-  let consensusClient: string | null = null;
-
-  // Find execution client in the name
-  for (const client of EXECUTION_CLIENTS) {
-    if (lowerName.includes(client)) {
-      executionClient = client;
-      break;
-    }
-  }
-
-  // Match consensus clients without the execution client name, so nimbusel does not read as nimbus
-  const consensusSearch = executionClient ? lowerName.replace(executionClient, '') : lowerName;
-  for (const client of CONSENSUS_CLIENTS) {
-    if (consensusSearch.includes(client)) {
-      consensusClient = client;
-      break;
-    }
-  }
-
-  return { executionClient, consensusClient };
+  return EXECUTION_CLIENTS.find(client => lowerName.includes(client)) ?? null;
 }

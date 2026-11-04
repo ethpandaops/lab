@@ -103,7 +103,7 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
       subtitle="Blocks over the last 24 hours and Xatu nodes on the minimum version or newer"
       actions={
         <Link to="/xatu/fork-readiness" className="text-sm text-primary hover:underline">
-          Node readiness
+          Xatu node readiness
         </Link>
       }
     >

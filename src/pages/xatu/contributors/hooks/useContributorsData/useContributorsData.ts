@@ -28,6 +28,10 @@ function processNodes(nodes: FctNodeActiveLast24h[]): Contributor[] {
         existing.versions.add(node.meta_client_version);
       }
 
+      if (node.meta_client_implementation) {
+        existing.collectors.add(node.meta_client_implementation);
+      }
+
       if (node.meta_client_geo_country) {
         existing.locations.add(node.meta_client_geo_country);
         const currentCount = existing.countryCount.get(node.meta_client_geo_country) || 0;
@@ -48,8 +52,8 @@ function processNodes(nodes: FctNodeActiveLast24h[]): Contributor[] {
         locations: new Set(node.meta_client_geo_country ? [node.meta_client_geo_country] : []),
         primaryCountry: node.meta_client_geo_country || null,
         primaryCountryCode: node.meta_client_geo_country_code || null,
-        primaryCity: node.meta_client_geo_city || null,
         versions: new Set(node.meta_client_version ? [node.meta_client_version] : []),
+        collectors: new Set(node.meta_client_implementation ? [node.meta_client_implementation] : []),
         consensusImplementations: new Set(
           node.meta_consensus_implementation ? [node.meta_consensus_implementation] : []
         ),
@@ -149,11 +153,10 @@ export function useContributorsData(): UseContributorsDataReturn {
 }
 
 /**
- * Utility function to get display version string
- * Returns single version, "Multi Versions" for multiple, or undefined for none
+ * The one value in a set, "several" for more, or undefined for none
  */
 export function getDisplayVersion(versions: Set<string>): string | undefined {
   if (versions.size === 0) return undefined;
   if (versions.size === 1) return Array.from(versions)[0];
-  return 'Multi Versions';
+  return 'several';
 }

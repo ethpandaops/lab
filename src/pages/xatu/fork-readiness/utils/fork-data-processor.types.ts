@@ -5,7 +5,8 @@ export interface ClientReadinessData {
   totalNodes: number;
   readyNodes: number;
   readyPercentage: number;
-  minVersion: string; // From config
+  /** From config; null when the fork sets no minimum for this client */
+  minVersion: string | null;
   nodes: NodeReadinessStatus[];
 }
 
@@ -28,9 +29,12 @@ export interface ForkReadinessStats {
   totalNodes: number;
   readyNodes: number;
   actionNeededCount: number;
+  /** Clients with a minimum version first, then clients without one */
   clientReadiness: ClientReadinessData[];
   readyClientsCount: number;
   totalClientsCount: number;
+  /** Nodes whose client has no minimum version for the fork; not in the totals above */
+  noMinimumCount: number;
 }
 
 export interface ProcessNodesParams {

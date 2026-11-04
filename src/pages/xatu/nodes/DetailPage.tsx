@@ -22,14 +22,14 @@ import {
 } from './components';
 import { DEFAULT_NODE_RANGE, NETWORK_WINDOW_SLOTS, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useActiveNodes } from './hooks/useActiveNodes';
+import { useBlockSlots } from './hooks/useBlockSlots';
 import { useNetworkObservations } from './hooks/useNetworkObservations';
 import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodePerformance } from './hooks/useNodePerformance';
 import { buildNodeRows } from './hooks/useNodeRows';
-import { behindStarts, medianByStart, rangeValue, summarizeByNode } from './utils/history';
-import { formatMs, getIngestedEndSlot, getSyncState, shareSlowerThan } from './utils/node-stats';
-import { expectedSlots } from './utils/time-buckets';
+import { behindStarts, medianByStart, rangeValue } from './utils/history';
+import { formatMs, getIngestedEndSlot, getSyncState } from './utils/node-stats';
 
 function Section({
   title,
@@ -52,8 +52,8 @@ function Section({
 }
 
 /**
- * One node in depth: identity, arrival history from the last day to all time, rank against every node,
- * data column custody, engine API timings and its most recent slots.
+ * One node in depth: identity, observation timings from the last day to all time, data column custody,
+ * engine API timings and its most recent slots.
  */
 export function DetailPage(): JSX.Element {
   const { nodeId } = useParams({ from: '/xatu/nodes/$nodeId' });
@@ -79,6 +79,7 @@ export function DetailPage(): JSX.Element {
   )[0];
   const dataColumn = useNodeHistory('dataColumn', range, filter);
   const network = useNodeHistory('block', range, {});
+  const blockSlots = useBlockSlots(range);
   // Only ethPandaOps nodes report engine API calls
   const reportsEngine = row?.node.classification === 'internal';
   const newPayload = useNodeHistory('newPayload', range, filter, reportsEngine);
@@ -128,22 +129,17 @@ export function DetailPage(): JSX.Element {
     );
   }
 
-  const networkByNode = summarizeByNode(network.data?.rows ?? []);
-  const ownP50 = networkByNode.get(nodeId)?.p50 ?? null;
-  const otherP50s = [...networkByNode].flatMap(([otherId, summary]) => (otherId === nodeId ? [] : [summary.p50]));
-  const fasterThan = ownP50 === null ? null : shareSlowerThan(ownP50, otherP50s);
-
   const blockRows = block.data?.rows ?? [];
-  const now = Date.now() / 1000;
-  const seen = blockRows.reduce((sum, entry) => sum + entry.count, 0);
-  // Count expected slots from the node's first bucket, so a node that joined mid-range isn't marked as missing
+  // Count from the node's first bucket, so a node that joined mid-range isn't marked as missing, over settled
+  // buckets: the one in progress lags ingestion
   const firstBucket = blockRows.length > 0 ? Math.min(...blockRows.map(entry => entry.start)) : null;
-  const expected =
-    block.data && firstBucket !== null
-      ? block.data.buckets
-          .filter(start => start >= firstBucket)
-          .reduce((sum, start) => sum + expectedSlots(start, block.data!.granularity, now), 0)
-      : 0;
+  const settled = new Set(
+    (block.data?.buckets.slice(0, -1) ?? []).filter(
+      start => firstBucket !== null && start >= firstBucket && blockSlots.data?.has(start)
+    )
+  );
+  const seen = blockRows.reduce((sum, entry) => sum + (settled.has(entry.start) ? entry.count : 0), 0);
+  const expected = [...settled].reduce((sum, start) => sum + blockSlots.data!.get(start)!, 0);
 
   const latestEngine = newPayload.data?.rows.reduce<(typeof newPayload.data.rows)[number] | null>(
     (latest, entry) => (!latest || entry.start > latest.start ? entry : latest),
@@ -171,50 +167,28 @@ export function DetailPage(): JSX.Element {
       <div className="flex flex-col gap-10">
         <NodeHeader row={row} execution={execution} sync={sync} />
 
-        <Section title="Performance" actions={rangeControl}>
+        <Section title={rangeLabel} actions={rangeControl}>
           <Stats
-            gridClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6"
+            gridClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
             stats={[
-              {
-                id: 'block-p50',
-                name: 'Block p50',
-                value: formatMs(rangeValue(blockRows, 'p50')),
-                subtitle: rangeLabel,
-              },
-              {
-                id: 'block-p90',
-                name: 'Block p90',
-                value: formatMs(rangeValue(blockRows, 'p90')),
-                subtitle: rangeLabel,
-              },
-              {
-                id: 'head-p50',
-                name: 'Head p50',
-                value: formatMs(rangeValue(head.data?.rows ?? [], 'p50')),
-                subtitle: rangeLabel,
-              },
+              { id: 'block-p50', name: 'Block p50', value: formatMs(rangeValue(blockRows, 'p50')) },
+              { id: 'block-p90', name: 'Block p90', value: formatMs(rangeValue(blockRows, 'p90')) },
+              { id: 'head-p50', name: 'Head p50', value: formatMs(rangeValue(head.data?.rows ?? [], 'p50')) },
               {
                 id: 'attestation-p50',
                 name: 'Attestation p50',
                 value: formatMs(rangeValue(attestation.data?.rows ?? [], 'p50')),
-                subtitle: rangeLabel,
               },
               {
                 id: 'blocks-seen',
-                name: 'Slots seen',
+                name: 'Blocks seen',
                 value: expected > 0 ? `${Math.min(100, (seen / expected) * 100).toFixed(1)}%` : '–',
-                subtitle: expected > 0 ? `${seen.toLocaleString()} of ${expected.toLocaleString()}` : rangeLabel,
-              },
-              {
-                id: 'rank',
-                name: 'Faster than',
-                value: fasterThan === null ? '–' : `${Math.round(fasterThan * 100)}%`,
-                subtitle: `of nodes, ${rangeLabel.toLowerCase()}`,
+                subtitle: expected > 0 ? `${seen.toLocaleString()} of ${expected.toLocaleString()} blocks` : undefined,
               },
             ]}
           />
 
-          {!block.data || !network.data ? (
+          {!block.data || !network.data || !blockSlots.data ? (
             <>
               <LoadingContainer className="h-28 rounded-sm" />
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -224,7 +198,7 @@ export function DetailPage(): JSX.Element {
             </>
           ) : (
             <>
-              <ActivityStrip block={block.data} rangeLabel={rangeLabel} behind={behind} />
+              <ActivityStrip block={block.data} blockSlots={blockSlots.data} behind={behind} />
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} behind={behind} />
                 <VsNetworkChart nodeId={nodeId} network={network.data} rangeLabel={rangeLabel} behind={behind} />

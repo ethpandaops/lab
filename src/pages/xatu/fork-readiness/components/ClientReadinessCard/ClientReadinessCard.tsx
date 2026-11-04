@@ -1,52 +1,70 @@
 import type { JSX } from 'react';
 import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Badge } from '@/components/Elements/Badge';
 import { ProgressBar } from '@/components/Navigation/ProgressBar';
+import { isKnownClient } from '@/utils/ethereum';
 import { formatNodeName } from '../../utils/node-name-formatter';
 import type { ClientReadinessCardProps } from './ClientReadinessCard.types';
 
 export function ClientReadinessCard({ data, forkName }: ClientReadinessCardProps): JSX.Element {
   const { clientName, totalNodes, readyNodes, readyPercentage, minVersion, nodes } = data;
+  const hasMinimum = minVersion !== null;
 
   return (
     <Card
       title={
-        <Link
-          to="/ethereum/clients/$client"
-          params={{ client: clientName }}
-          search={forkName ? { fork: forkName } : undefined}
-          className="flex items-center gap-2 capitalize hover:underline"
-        >
-          <ClientLogo client={clientName} size={28} noLink />
-          {clientName}
-        </Link>
+        isKnownClient(clientName) ? (
+          <Link
+            to="/ethereum/clients/$client"
+            params={{ client: clientName }}
+            search={forkName ? { fork: forkName } : undefined}
+            className="flex items-center gap-2 capitalize hover:underline"
+          >
+            <ClientLogo client={clientName} size={28} noLink />
+            {clientName}
+          </Link>
+        ) : (
+          <span className="flex items-center gap-2 capitalize">
+            <ClientLogo client={clientName} size={28} noLink />
+            {clientName}
+          </span>
+        )
       }
       subtitle={
-        <Badge color="gray" variant="flat">
-          v{minVersion}+
-        </Badge>
+        hasMinimum ? (
+          <Badge color="gray" variant="flat">
+            v{minVersion}+
+          </Badge>
+        ) : (
+          'No minimum version set'
+        )
       }
       actions={
-        <span className="text-2xl/8 font-semibold text-foreground">
-          {readyNodes}/{totalNodes}
+        <span className="text-right">
+          <span className="block text-2xl/8 font-semibold text-foreground">
+            {hasMinimum ? `${readyNodes} of ${totalNodes}` : totalNodes}
+          </span>
+          <span className="block text-xs/5 text-muted">Xatu nodes</span>
         </span>
       }
     >
-      {/* Progress bar */}
-      <div className="mb-4">
-        <ProgressBar
-          progress={readyPercentage}
-          fillColor={readyPercentage === 100 ? 'bg-success' : 'bg-warning'}
-          backgroundColor="bg-border"
-          ariaLabel={`${clientName} readiness`}
-        />
-      </div>
+      {hasMinimum && (
+        <div className="mb-4">
+          <ProgressBar
+            progress={readyPercentage}
+            fillColor={readyPercentage === 100 ? 'bg-success' : 'bg-warning'}
+            backgroundColor="bg-border"
+            ariaLabel={`${clientName} readiness`}
+          />
+        </div>
+      )}
 
-      {/* Only the Xatu nodes still to upgrade; the count and bar above cover the rest */}
+      {/* Only the Xatu nodes still to upgrade, or every node when there's no minimum to judge them by */}
       {nodes.some(node => !node.isReady) && (
-        <div className="mt-4 space-y-2 border-t border-border pt-4">
+        <div className={clsx('space-y-2', hasMinimum && 'mt-4 border-t border-border pt-4')}>
           {nodes
             .filter(node => !node.isReady)
             .map(node => (
@@ -63,7 +81,7 @@ export function ClientReadinessCard({ data, forkName }: ClientReadinessCardProps
                   <span className="min-w-0 flex-1 truncate pr-8 text-foreground">{formatNodeName(node.nodeName)}</span>
                 )}
                 <span className="shrink-0">
-                  <Badge color={node.isReady ? 'green' : 'red'} variant="flat">
+                  <Badge color={hasMinimum ? 'red' : 'gray'} variant="flat">
                     {node.version}
                   </Badge>
                 </span>

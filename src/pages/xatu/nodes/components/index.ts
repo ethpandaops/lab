@@ -1,6 +1,5 @@
 export { ActivityStrip } from './ActivityStrip';
 export { ArrivalHistogram } from './ArrivalHistogram';
-export { ArrivalLegend } from './ArrivalLegend';
 export { AttestationArrivalChart } from './AttestationArrivalChart';
 export { BreakdownList } from './BreakdownList';
 export { ClientArrivalChart } from './ClientArrivalChart';

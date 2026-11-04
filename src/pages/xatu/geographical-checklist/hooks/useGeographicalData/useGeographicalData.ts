@@ -142,7 +142,7 @@ export function useGeographicalData(): UseGeographicalDataReturn {
       const country = continent.countries.get(countryCode)!;
       country.totalNodes++;
 
-      // Get or create city
+      // Get or create city; nodes without one are grouped under "Unknown" but it isn't counted as a city
       if (!country.cities.has(cityName)) {
         country.cities.set(cityName, {
           name: cityName,
@@ -151,7 +151,7 @@ export function useGeographicalData(): UseGeographicalDataReturn {
           coords: [lon, lat],
           nodes: [],
         });
-        continent.totalCities++;
+        if (node.meta_client_geo_city) continent.totalCities++;
       }
       const city = country.cities.get(cityName)!;
       city.nodes.push(node);

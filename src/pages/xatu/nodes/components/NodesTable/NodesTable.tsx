@@ -96,7 +96,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
 
   return (
     <Card
-      title="All nodes"
+      title="Xatu nodes"
       actions={
         <div className="w-56">
           <Input size="sm">
@@ -106,8 +106,8 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
             <Input.Field
               value={search}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
-              placeholder="Search nodes"
-              aria-label="Search nodes"
+              placeholder="Search"
+              aria-label="Search Xatu nodes"
             />
           </Input>
         </div>
@@ -124,7 +124,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
         getRowId={row => row.nodeId}
         onRowClick={row => navigate({ to: '/xatu/nodes/$nodeId', params: { nodeId: row.nodeId } })}
         hideColumnVisibility
-        emptyMessage="No nodes match"
+        emptyMessage="No Xatu nodes match"
       />
     </Card>
   );

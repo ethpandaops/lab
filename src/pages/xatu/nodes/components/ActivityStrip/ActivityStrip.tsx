@@ -9,7 +9,8 @@ import { bucketHeading, expectedSlots } from '../../utils/time-buckets';
 export interface ActivityStripProps {
   /** The node's block rollups */
   block: NodeHistory;
-  rangeLabel: string;
+  /** Slots with a block per bucket start; a bucket without a count falls back to every slot */
+  blockSlots: Map<number, number>;
   /** Bucket starts where the node was behind the network */
   behind?: Set<number>;
 }
@@ -23,11 +24,14 @@ interface Bar {
   /** Trailing the network by more than a slot: the node was catching up */
   behind: boolean;
   seen: number;
+  /** Slots with a block */
   total: number;
+  /** Whether `total` comes from the proposal table rather than every slot */
+  counted: boolean;
   p50: number | null;
 }
 
-/** Share of a bucket's slots a node can miss before the bar is flagged; mainnet misses about 1% of slots */
+/** Share of a bucket's blocks a node can miss before the bar is flagged */
 const GAP_THRESHOLD = 0.9;
 
 function barClass(bar: Bar): string {
@@ -42,7 +46,7 @@ function barClass(bar: Bar): string {
 /**
  * Status-page bars, one per hour or day, flagged where the node saw few or no blocks or was catching up.
  */
-export function ActivityStrip({ block, rangeLabel, behind }: ActivityStripProps): JSX.Element {
+export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps): JSX.Element {
   const { timezone } = useTimezone();
   const [hovered, setHovered] = useState<Bar | null>(null);
   const now = Date.now() / 1000;
@@ -55,44 +59,47 @@ export function ActivityStrip({ block, rangeLabel, behind }: ActivityStripProps)
       current: index === block.buckets.length - 1,
       behind: behind?.has(start) ?? false,
       seen: byBucket.get(start)?.count ?? 0,
-      total: expectedSlots(start, block.granularity, now),
+      total: blockSlots.get(start) ?? expectedSlots(start, block.granularity, now),
+      counted: blockSlots.has(start),
       p50: byBucket.get(start)?.p50 ?? null,
     }))
     // The bucket in progress may not be ingested yet
     .filter((bar, index, all) => bar.total > 0 && !(index === all.length - 1 && bar.seen === 0));
   // The bucket in progress lags ingestion, so leave it out of the share
-  const settled = bars.filter(bar => !bar.current);
+  const settled = bars.filter(bar => !bar.current && bar.counted);
   const settledSeen = settled.reduce((sum, bar) => sum + bar.seen, 0);
   const settledTotal = settled.reduce((sum, bar) => sum + (bar.before ? 0 : bar.total), 0);
 
   return (
     <Card
       title="Activity"
-      subtitle={rangeLabel}
       actions={
-        <span className="text-xs/5 text-muted tabular-nums">
+        <span className="flex flex-wrap justify-end gap-x-3 text-xs/5 text-muted tabular-nums">
           {hovered ? (
             <>
-              {bucketHeading(hovered.start, block.granularity, timezone)} ·{' '}
+              <span>{bucketHeading(hovered.start, block.granularity, timezone)}</span>
               {hovered.before ? (
-                'not reporting yet'
+                <span>not reporting yet</span>
               ) : (
                 <>
-                  <span className="text-foreground">
-                    {hovered.seen.toLocaleString()}/{hovered.total.toLocaleString()}
-                  </span>{' '}
-                  slots · p50 <span className="text-foreground">{formatMs(hovered.p50)}</span>
-                  {hovered.behind && <span className="text-warning"> · catching up</span>}
+                  <span>
+                    <span className="text-foreground">{hovered.seen.toLocaleString()}</span> of{' '}
+                    {hovered.total.toLocaleString()} {hovered.counted ? 'blocks' : 'slots'}
+                  </span>
+                  <span>
+                    p50 <span className="text-foreground">{formatMs(hovered.p50)}</span>
+                  </span>
+                  {hovered.behind && <span className="text-warning">catching up</span>}
                 </>
               )}
             </>
           ) : (
-            <>
+            <span>
               <span className="text-foreground">
                 {settledTotal > 0 ? ((settledSeen / settledTotal) * 100).toFixed(1) : '–'}%
               </span>{' '}
-              of slots seen
-            </>
+              of blocks seen
+            </span>
           )}
         </span>
       }

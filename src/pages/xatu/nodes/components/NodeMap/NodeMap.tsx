@@ -2,70 +2,47 @@ import { type JSX, useMemo } from 'react';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import type { PointData } from '@/components/Charts/Map2D/Map2D.types';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { getDataVizColors } from '@/utils';
 import type { NodeRow } from '../../hooks/useNodeRows';
-import { getArrivalTier, median } from '../../utils/node-stats';
-import { ArrivalLegend } from '../ArrivalLegend';
 
 export interface NodeMapProps {
   rows: NodeRow[];
-  rangeLabel: string;
-  /** Changes when the timings behind the points change, so the map redraws them */
-  resetKey?: number;
 }
 
 /**
- * Node locations, one point per city sized by node count and coloured by the city's median block arrival.
+ * Node locations, one point per city sized by node count. Only the last 24 hours' active rows carry a location.
  */
-export function NodeMap({ rows, rangeLabel, resetKey }: NodeMapProps): JSX.Element {
+export function NodeMap({ rows }: NodeMapProps): JSX.Element {
   const points = useMemo(() => {
-    const { PERFORMANCE_TIME_COLORS } = getDataVizColors();
-    const byLocation = new Map<string, { point: PointData; timings: number[] }>();
+    const byLocation = new Map<string, PointData>();
 
-    rows.forEach(({ node, nodeId, observation }) => {
+    rows.forEach(({ node, nodeId }) => {
       const { meta_client_geo_latitude: lat, meta_client_geo_longitude: lon } = node;
-      const timing = observation?.blockP50 ?? null;
-      if (lat == null || lon == null || timing === null) return;
+      // 0,0 is the geo lookup's fallback for a node it couldn't place
+      if (lat == null || lon == null || (lat === 0 && lon === 0)) return;
       const key = `${lat.toFixed(2)},${lon.toFixed(2)}`;
       if (!byLocation.has(key)) {
         byLocation.set(key, {
-          point: {
-            name: node.meta_client_geo_city || node.meta_client_geo_country || 'Unknown',
-            coords: [lon, lat],
-            nodes: [],
-          },
-          timings: [],
+          name: node.meta_client_geo_city || node.meta_client_geo_country || 'Unknown',
+          coords: [lon, lat],
+          nodes: [],
         });
       }
-      const entry = byLocation.get(key)!;
-      entry.point.nodes!.push({
+      byLocation.get(key)!.nodes!.push({
         nodeId,
         username: node.username,
-        timing: Math.round(timing),
         client: node.meta_consensus_implementation,
         country: node.meta_client_geo_country,
       });
-      entry.timings.push(timing);
     });
 
-    return [...byLocation.values()].map(({ point, timings }) => ({
-      ...point,
-      value: point.nodes!.length,
-      color: PERFORMANCE_TIME_COLORS[getArrivalTier(median(timings)!)],
-    }));
+    return [...byLocation.values()].map(point => ({ ...point, value: point.nodes!.length }));
   }, [rows]);
 
   return (
-    <PopoutCard
-      title="Node locations"
-      subtitle={`Median block arrival per city, ${rangeLabel.toLowerCase()}`}
-      anchorId="node-map"
-      modalSize="full"
-      headerActions={<ArrivalLegend className="hidden lg:flex" />}
-    >
+    <PopoutCard title="Xatu node locations" subtitle="Last 24h" anchorId="node-map" modalSize="full">
       {({ inModal }) => (
         <div style={{ height: inModal ? 720 : 440 }}>
-          <Map2DChart points={points} height={inModal ? 720 : 440} pointSizeMultiplier={3} resetKey={resetKey} />
+          <Map2DChart points={points} height={inModal ? 720 : 440} pointSizeMultiplier={3} />
         </div>
       )}
     </PopoutCard>

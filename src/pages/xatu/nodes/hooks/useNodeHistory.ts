@@ -155,10 +155,12 @@ export type NodeIdentity = Pick<
 >;
 
 function identity(row: NodeIdentity): { nodeId: string; username: string; client: string; node: NodeIdentity } {
+  // Rows from libp2p gossip name tysm sentries "prysm"; the active-node table and every other page call them tysm
+  const consensus = row.meta_client_implementation === 'tysm' ? 'tysm' : row.meta_consensus_implementation;
   return {
     nodeId: row.node_id ?? '',
     username: row.username ?? '',
-    client: row.meta_consensus_implementation ?? '',
+    client: consensus ?? '',
     node: {
       node_id: row.node_id,
       username: row.username,
@@ -166,7 +168,7 @@ function identity(row: NodeIdentity): { nodeId: string; username: string; client
       meta_client_name: row.meta_client_name,
       meta_client_implementation: row.meta_client_implementation,
       meta_client_version: row.meta_client_version,
-      meta_consensus_implementation: row.meta_consensus_implementation,
+      meta_consensus_implementation: consensus,
       meta_consensus_version: row.meta_consensus_version,
     },
   };

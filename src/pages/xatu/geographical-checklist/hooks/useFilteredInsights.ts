@@ -38,8 +38,9 @@ export function useFilteredInsights(filteredNodes: ProcessedNode[]): FilteredIns
         });
       }
 
-      // City counts and metadata
-      const cityName = node.meta_client_geo_city || 'Unknown';
+      // City counts and metadata; a node without a city doesn't count towards one
+      const cityName = node.meta_client_geo_city;
+      if (!cityName) return;
       const cityKey = `${cityName}, ${countryName}`;
       cityCounts.set(cityKey, (cityCounts.get(cityKey) || 0) + 1);
       if (!cityMetadata.has(cityKey)) {

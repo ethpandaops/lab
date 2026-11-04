@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { parseClientName } from '../utils';
+import { parseExecutionClient } from '../utils';
 import { nodeIdOf } from '../utils/block-query';
 
 /** Recent span that every building node shows up in */
@@ -33,7 +33,7 @@ export function useNodeRoster(): NodeRoster {
     return {
       nodes: unique(rows.map(row => nodeIdOf(row.meta_client_name))),
       consensusClients: unique(rows.map(row => row.meta_consensus_implementation)),
-      executionClients: unique(rows.map(row => parseClientName(row.meta_client_name).executionClient)),
+      executionClients: unique(rows.map(row => parseExecutionClient(row.meta_client_name))),
     };
   }, [data]);
 }

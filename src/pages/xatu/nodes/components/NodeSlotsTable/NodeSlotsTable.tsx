@@ -1,5 +1,4 @@
 import type { JSX } from 'react';
-import clsx from 'clsx';
 import { DataTable } from '@/components/DataTable';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { Slot } from '@/components/Ethereum/Slot';
@@ -26,9 +25,6 @@ interface SlotRow {
   /** Block arrival minus the network median */
   delta?: number;
 }
-
-/** A block this much later than the network median is flagged */
-const LATE_DELTA_MS = 1000;
 
 const columns: DataTableColumn<SlotRow>[] = [
   {
@@ -63,12 +59,7 @@ const columns: DataTableColumn<SlotRow>[] = [
     cell: ({ getValue }) => {
       const delta = getValue() as number | undefined;
       if (delta === undefined) return '–';
-      return (
-        <span className={clsx(delta > LATE_DELTA_MS && 'text-warning')}>
-          {delta > 0 ? '+' : ''}
-          {formatMs(delta)}
-        </span>
-      );
+      return `${delta > 0 ? '+' : ''}${formatMs(delta)}`;
     },
     meta: { cellClassName: 'text-muted tabular-nums' },
   },

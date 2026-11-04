@@ -11,7 +11,7 @@ export function GeographicalStats({ stats, isLoading }: GeographicalStatsProps):
   const statItems = [
     {
       id: 'nodes',
-      name: 'Total Nodes',
+      name: 'Xatu nodes',
       value: stats.totalNodes.toString(),
       icon: GlobeAltIcon,
     },

@@ -103,21 +103,21 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
           <Disclosure
             key={code}
             title={
-              <div className="flex items-center justify-between gap-8">
+              <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{continent.emoji}</span>
                   <span className="text-lg/7 font-semibold">{continent.name}</span>
                 </div>
-                <div className="flex items-center gap-6 text-xs/5">
-                  <div className="flex items-baseline gap-1.5">
+                <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-1 text-xs/5">
+                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className="font-semibold text-foreground">{continent.totalNodes}</span>
-                    <span className="text-muted">nodes</span>
+                    <span className="text-muted">Xatu nodes</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5">
+                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className="font-semibold text-foreground">{continent.countries.size}</span>
                     <span className="text-muted">countries</span>
                   </div>
-                  <div className="flex items-baseline gap-1.5">
+                  <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className="font-semibold text-foreground">{continent.totalCities}</span>
                     <span className="text-muted">cities</span>
                   </div>

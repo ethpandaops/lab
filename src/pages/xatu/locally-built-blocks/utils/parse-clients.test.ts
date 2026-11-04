@@ -1,36 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { parseClientName } from './parse-clients';
+import { parseExecutionClient } from './parse-clients';
 
-describe('parseClientName', () => {
-  it('should parse execution and consensus clients from a node name', () => {
-    expect(parseClientName('ethpandaops/mainnet/sentry-mainnet-lighthouse-nethermind-001')).toEqual({
-      executionClient: 'nethermind',
-      consensusClient: 'lighthouse',
-    });
+describe('parseExecutionClient', () => {
+  it('finds the execution client in a node name', () => {
+    expect(parseExecutionClient('ethpandaops/mainnet/sentry-mainnet-lighthouse-nethermind-001')).toBe('nethermind');
+    expect(parseExecutionClient('ethpandaops/mainnet/utility-mainnet-prysm-geth-tysm-001')).toBe('geth');
   });
 
-  it('should not read the nimbus execution client as the nimbus consensus client', () => {
-    expect(parseClientName('ethpandaops/hoodi/teku-nimbusel-001')).toEqual({
-      executionClient: 'nimbusel',
-      consensusClient: 'teku',
-    });
+  it('reads nimbusel as the nimbus execution client', () => {
+    expect(parseExecutionClient('ethpandaops/hoodi/nimbus-nimbusel-001')).toBe('nimbusel');
   });
 
-  it('should still find nimbus as the consensus client next to nimbusel', () => {
-    expect(parseClientName('ethpandaops/hoodi/nimbus-nimbusel-001')).toEqual({
-      executionClient: 'nimbusel',
-      consensusClient: 'nimbus',
-    });
-  });
-
-  it('should parse caplin as a consensus client', () => {
-    expect(parseClientName('ethpandaops/mainnet/erigon-caplin-001')).toEqual({
-      executionClient: 'erigon',
-      consensusClient: 'caplin',
-    });
-  });
-
-  it('should return nulls for an empty name', () => {
-    expect(parseClientName(undefined)).toEqual({ executionClient: null, consensusClient: null });
+  it('returns null for an empty name', () => {
+    expect(parseExecutionClient(undefined)).toBeNull();
   });
 });

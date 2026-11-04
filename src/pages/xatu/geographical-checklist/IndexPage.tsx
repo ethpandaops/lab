@@ -21,6 +21,8 @@ import { InsightsDialog } from './components/InsightsDialog';
 import { DEFAULT_FILTERS } from './constants';
 import type { GeographicalFiltersFormData } from './components/GeographicalFilters/GeographicalFilters.types';
 
+const DESCRIPTION = 'Xatu nodes seen in the last 24h, by continent, country and city';
+
 export function IndexPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('list');
   const [isInsightsDialogOpen, setIsInsightsDialogOpen] = useState(false);
@@ -146,7 +148,7 @@ export function IndexPage(): JSX.Element {
       const country = continent.countries.get(countryCode)!;
       country.totalNodes++;
 
-      // Get or create city
+      // Get or create city; nodes without one are grouped under "Unknown" but it isn't counted as a city
       if (!country.cities.has(cityName)) {
         country.cities.set(cityName, {
           name: cityName,
@@ -155,7 +157,7 @@ export function IndexPage(): JSX.Element {
           coords: [lon, lat],
           nodes: [],
         });
-        continent.totalCities++;
+        if (node.meta_client_geo_city) continent.totalCities++;
       }
       const city = country.cities.get(cityName)!;
       city.nodes.push(node);
@@ -170,7 +172,7 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Geographical Checklist" description="Contributoor nodes by continent, country and city" />
+        <Header title="Geographical Checklist" description={DESCRIPTION} />
         <GeographicalChecklistSkeleton />
       </Container>
     );
@@ -187,7 +189,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Geographical Checklist" description="Contributoor nodes by continent, country and city" />
+      <Header title="Geographical Checklist" description={DESCRIPTION} />
 
       <div className="space-y-6">
         {/* Stats */}

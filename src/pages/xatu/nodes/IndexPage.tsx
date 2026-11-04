@@ -23,28 +23,26 @@ import {
 import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
-import { formatMs, median } from './utils/node-stats';
+import { formatMs } from './utils/node-stats';
 
 const DESCRIPTION = 'Nodes that reported to Xatu.';
 
-/** Count rows by key, with the median block arrival of each group */
+/** Count rows by key */
 function groupRows(
   rows: NodeRow[],
   keyOf: (row: NodeRow) => string | undefined
-): Map<string, { count: number; timings: number[]; sample: NodeRow }> {
-  const groups = new Map<string, { count: number; timings: number[]; sample: NodeRow }>();
+): Map<string, { count: number; sample: NodeRow }> {
+  const groups = new Map<string, { count: number; sample: NodeRow }>();
   rows.forEach(row => {
     const key = keyOf(row) || 'unknown';
-    if (!groups.has(key)) groups.set(key, { count: 0, timings: [], sample: row });
-    const group = groups.get(key)!;
-    group.count++;
-    if (row.observation?.blockP50 != null) group.timings.push(row.observation.blockP50);
+    if (!groups.has(key)) groups.set(key, { count: 0, sample: row });
+    groups.get(key)!.count++;
   });
   return groups;
 }
 
 /**
- * Nodes overview: headline counts, where nodes are, how fast they see blocks, and every node in a table.
+ * Nodes overview: headline counts, where nodes are, when they see blocks, and every node in a table.
  */
 export function IndexPage(): JSX.Element {
   const search = Route.useSearch();
@@ -84,18 +82,18 @@ export function IndexPage(): JSX.Element {
     icon: <ClientLogo client={client} size={18} />,
     count: group.count,
     color: getConsensusClientColor(client, index),
-    detail: formatMs(median(group.timings)),
   }));
 
-  const countryItems: BreakdownItem[] = [...groupRows(rows, row => row.node.meta_client_geo_country).entries()].map(
-    ([country, group]) => ({
-      key: country,
-      label: country === 'unknown' ? 'Unknown' : country,
-      icon: <span>{getCountryFlag(group.sample.node.meta_client_geo_country_code, '')}</span>,
-      count: group.count,
-      detail: formatMs(median(group.timings)),
-    })
-  );
+  // Only the last 24 hours' active rows carry a location
+  const activeRows = rows.filter(row => row.node.last_seen_date_time !== undefined);
+  const countryItems: BreakdownItem[] = [
+    ...groupRows(activeRows, row => row.node.meta_client_geo_country).entries(),
+  ].map(([country, group]) => ({
+    key: country,
+    label: country === 'unknown' ? 'Unknown' : country,
+    icon: <span>{getCountryFlag(group.sample.node.meta_client_geo_country_code, '')}</span>,
+    count: group.count,
+  }));
 
   const nodeMedians = rows.flatMap(row => (row.observation?.blockP50 == null ? [] : [row.observation.blockP50]));
   // Node medians sit in a narrow band, so fit the axis to them in 250 ms steps
@@ -116,32 +114,33 @@ export function IndexPage(): JSX.Element {
         />
 
         <Stats
-          gridClassName="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6"
+          gridClassName="grid grid-cols-2 md:grid-cols-4"
           stats={[
-            { id: 'nodes', name: 'Nodes', value: rows.length, subtitle: `${online} online` },
-            { id: 'contributors', name: 'Contributors', value: contributors },
-            { id: 'countries', name: 'Countries', value: countries },
-            { id: 'asns', name: 'ASNs', value: asns },
+            { id: 'nodes', name: 'Xatu nodes', value: rows.length, subtitle: rangeLabel },
+            { id: 'online', name: 'Online now', value: online, subtitle: 'Xatu nodes' },
+            { id: 'contributors', name: 'Contributors', value: contributors, subtitle: rangeLabel },
+            { id: 'countries', name: 'Countries', value: countries, subtitle: 'Last 24h' },
+            { id: 'asns', name: 'ASNs', value: asns, subtitle: 'Last 24h' },
             {
               id: 'block',
-              name: 'Block arrival p50',
+              name: 'Block arrival',
               value: formatMs(network.blockP50),
-              subtitle: rangeLabel,
+              subtitle: `Median node, ${rangeLabel.toLowerCase()}`,
             },
             {
               id: 'attestation',
-              name: 'Attestation arrival p50',
+              name: 'Attestation arrival',
               value: formatMs(network.attestationP50),
-              subtitle: rangeLabel,
+              subtitle: `Median node, ${rangeLabel.toLowerCase()}`,
             },
           ]}
         />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <div className="xl:col-span-2">
-            <NodeMap rows={rows} rangeLabel={rangeLabel} resetKey={block?.buckets[0]} />
+            <NodeMap rows={rows} />
           </div>
-          <BreakdownList title="Consensus clients" items={clientItems} detailLabel="Block p50" />
+          <BreakdownList title="Consensus clients" subtitle={rangeLabel} items={clientItems} />
         </div>
 
         <h2 className="text-lg/7 font-semibold tracking-tight text-foreground">Block arrival</h2>
@@ -158,13 +157,13 @@ export function IndexPage(): JSX.Element {
         )}
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <BreakdownList title="Countries" items={countryItems} detailLabel="Block p50" limit={6} />
+          <BreakdownList title="Countries" subtitle="Last 24h" items={countryItems} limit={6} />
           <ArrivalHistogram
-            title="Node block arrival"
+            title="Block arrival by Xatu node"
             subtitle={`Each node's median, ${rangeLabel.toLowerCase()}`}
             anchorId="node-arrival-histogram"
             values={nodeMedians}
-            unit="Nodes"
+            unit="Xatu nodes"
             bucketMs={50}
             minMs={histogramMin}
             maxMs={histogramMax}

@@ -35,19 +35,19 @@ function groupNodesByClient(nodes: FctNodeActiveLast24h[]): Map<string, FctNodeA
 
 /**
  * Calculate readiness for a specific client implementation
- * Compares all node versions against minVersion
+ * Compares all node versions against minVersion; with no minimum, no node counts as ready
  */
 function calculateClientReadiness(
   clientName: string,
   nodes: FctNodeActiveLast24h[],
-  minVersion: string
+  minVersion: string | null
 ): ClientReadinessData {
   const nodeStatuses: NodeReadinessStatus[] = [];
   let readyCount = 0;
 
   for (const node of nodes) {
     const version = node.meta_consensus_version || 'unknown';
-    const isReady = version !== 'unknown' && meetsMinVersion(version, minVersion);
+    const isReady = minVersion !== null && version !== 'unknown' && meetsMinVersion(version, minVersion);
 
     if (isReady) {
       readyCount++;
@@ -125,6 +125,15 @@ export function processForkReadiness(
     }
   }
 
+  // Clients the fork sets no minimum for can't be judged, so they're listed apart from the totals
+  const supported = new Set(supportedClients.filter(client => minClientVersions[client]).map(c => c.toLowerCase()));
+  let noMinimumCount = 0;
+  for (const [clientName, clientNodes] of nodesByClient) {
+    if (supported.has(clientName)) continue;
+    clientReadiness.push(calculateClientReadiness(clientName, clientNodes, null));
+    noMinimumCount += clientNodes.length;
+  }
+
   const overallReadyPercentage = totalNodes > 0 ? Math.round((totalReadyNodes / totalNodes) * 100) : 0;
   const actionNeededCount = totalNodes - totalReadyNodes;
 
@@ -136,5 +145,6 @@ export function processForkReadiness(
     clientReadiness,
     readyClientsCount,
     totalClientsCount: clientsWithNodesCount,
+    noMinimumCount,
   };
 }

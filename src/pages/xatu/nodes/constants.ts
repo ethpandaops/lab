@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { ArrivalTier } from './utils/node-stats';
 
 /** Slots in the network-wide window every node is ranked over (two epochs) */
 export const NETWORK_WINDOW_SLOTS = 64;
@@ -52,12 +51,3 @@ export const SLOTS_PER_BUCKET: Record<Granularity, number> = { hourly: 300, dail
 
 /** Number of columns a data column sidecar can carry (PeerDAS) */
 export const DATA_COLUMN_COUNT = 128;
-
-/** Tailwind fill of each arrival tier, from the shared performance gradient */
-export const ARRIVAL_TIER_CLASSES: Record<ArrivalTier, string> = {
-  excellent: 'bg-performance-excellent',
-  good: 'bg-performance-good',
-  fair: 'bg-performance-fair',
-  slow: 'bg-performance-slow',
-  poor: 'bg-performance-poor',
-};

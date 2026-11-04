@@ -1,22 +1,30 @@
-import { type JSX } from 'react';
+import { type JSX, type ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { MapPinIcon, ServerIcon } from '@heroicons/react/20/solid';
 import { Badge } from '@/components/Elements/Badge';
 import type { UserCardProps } from './UserCard.types';
 import { getClassificationBadgeClasses, getCountryFlag } from '@/utils';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
+function Detail({ label, children }: { label: string; children: ReactNode }): JSX.Element {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs/5 text-muted">{label}</dt>
+      <dd className="truncate text-sm/6 font-medium text-foreground">{children}</dd>
+    </div>
+  );
+}
+
 export function UserCard({
   username,
   classification,
   nodeCount,
-  locationCount,
+  countryCount,
   lastSeen,
   primaryCountry,
-  primaryCity,
-  clientVersion,
+  collector,
+  collectorVersion,
   consensusImplementations,
   to,
 }: UserCardProps): JSX.Element {
@@ -35,45 +43,28 @@ export function UserCard({
             {classification}
           </span>
         </div>
-        <div className="mt-1 flex items-center gap-x-2 text-xs/5 text-muted">
-          <div className="flex items-center gap-x-1">
-            <ServerIcon className="size-4" aria-hidden="true" />
-            <span className="font-medium text-foreground">{nodeCount}</span>
-            <span>{nodeCount === 1 ? 'node' : 'nodes'}</span>
+        <dl className="mt-2 grid grid-cols-3 gap-x-4">
+          <Detail label="Xatu nodes">{nodeCount}</Detail>
+          <Detail label="Countries">
+            {countryCount} {countryCount === 1 && countryFlag}
+          </Detail>
+          <Detail label="Last seen">
+            <Timestamp timestamp={lastSeen} format="relative" disableModal />
+          </Detail>
+        </dl>
+        {hasClients && (
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {consensusImplementations.map(client => (
+              <ClientLogo key={client} client={client} noLink />
+            ))}
           </div>
-          {locationCount > 0 && (
-            <>
-              <svg viewBox="0 0 2 2" className="size-0.5 fill-current">
-                <circle r={1} cx={1} cy={1} />
-              </svg>
-              <div className="flex items-center gap-x-1">
-                <MapPinIcon className="size-4" aria-hidden="true" />
-                {locationCount === 1 && primaryCity && countryFlag ? (
-                  <span>
-                    {primaryCity} {countryFlag}
-                  </span>
-                ) : (
-                  <>
-                    <span className="font-medium text-foreground">{locationCount}</span>
-                    <span>locations</span>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-          <svg viewBox="0 0 2 2" className="size-0.5 fill-current">
-            <circle r={1} cx={1} cy={1} />
-          </svg>
-          <Timestamp timestamp={lastSeen} format="relative" disableModal />
-        </div>
-        {(clientVersion || hasClients) && (
-          <div className="mt-2 flex items-center gap-2">
-            {hasClients && consensusImplementations.map(client => <ClientLogo key={client} client={client} noLink />)}
-            {clientVersion && (
-              <Badge color="gray" variant="flat" truncate>
-                {clientVersion}
-              </Badge>
-            )}
+        )}
+        {collectorVersion && (
+          <div className="mt-2 flex min-w-0 items-center gap-1.5 text-xs/5 text-muted">
+            <span className="shrink-0">{collector && collector !== 'several' ? collector : 'Collector'}</span>
+            <Badge color="gray" variant="flat" truncate>
+              {collectorVersion === 'several' ? 'several versions' : collectorVersion}
+            </Badge>
           </div>
         )}
       </div>

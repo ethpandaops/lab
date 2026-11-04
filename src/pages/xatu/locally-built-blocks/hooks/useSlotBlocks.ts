@@ -2,11 +2,11 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { parseClientName } from '../utils';
+import { parseExecutionClient } from '../utils';
 import type { PreparedBlockQuery } from '../utils/block-query';
 
 /**
- * Extended block data with parsed client names
+ * Extended block data with client names: execution from the node name, consensus from meta_consensus_implementation
  */
 export interface ParsedBlock extends FctPreparedBlock {
   parsedExecutionClient: string | null;
@@ -84,10 +84,11 @@ export function useSlotBlocks(filters: PreparedBlockQuery, live: boolean): UseSl
     refetchInterval: live ? LIVE_REFETCH_MS : false,
   });
 
-  const parsedBlocks: ParsedBlock[] = (data?.fct_prepared_block ?? []).map(block => {
-    const { executionClient, consensusClient } = parseClientName(block.meta_client_name);
-    return { ...block, parsedExecutionClient: executionClient, parsedConsensusClient: consensusClient };
-  });
+  const parsedBlocks: ParsedBlock[] = (data?.fct_prepared_block ?? []).map(block => ({
+    ...block,
+    parsedExecutionClient: parseExecutionClient(block.meta_client_name),
+    parsedConsensusClient: block.meta_consensus_implementation?.toLowerCase() || null,
+  }));
 
   const slotMap = new Map<number, SlotBlocksGroup>();
   for (const block of parsedBlocks) {

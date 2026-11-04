@@ -58,11 +58,11 @@ export function IndexPage(): JSX.Element {
               username={contributor.username}
               classification={contributor.classification}
               nodeCount={contributor.nodeCount}
-              locationCount={contributor.locations.size}
+              countryCount={contributor.locations.size}
               lastSeen={contributor.lastSeen}
               primaryCountry={contributor.primaryCountryCode || undefined}
-              primaryCity={contributor.primaryCity || undefined}
-              clientVersion={getDisplayVersion(contributor.versions)}
+              collector={getDisplayVersion(contributor.collectors)}
+              collectorVersion={getDisplayVersion(contributor.versions)}
               consensusImplementations={Array.from(contributor.consensusImplementations)}
               to={`/xatu/contributors/${contributor.username}`}
             />
@@ -78,7 +78,7 @@ export function IndexPage(): JSX.Element {
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <Header
             title="Contributoors"
-            description="Active node operators in the last 24 hours"
+            description="Contributors with Xatu nodes seen in the last 24h"
             className="lg:flex-1"
           />
 
@@ -151,7 +151,7 @@ export function IndexPage(): JSX.Element {
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <Header
           title="Contributoors"
-          description={`Active node operators in the last 24 hours (${totalCount})`}
+          description={`${totalCount} contributors with Xatu nodes seen in the last 24h`}
           className="lg:flex-1"
         />
 
@@ -224,7 +224,7 @@ export function IndexPage(): JSX.Element {
 
       {!searchQuery && totalCount === 0 && (
         <div className="rounded-sm border border-border bg-surface p-8 text-center text-muted">
-          No active contributors found in the last 24 hours.
+          No contributors with Xatu nodes seen in the last 24h.
         </div>
       )}
     </Container>
