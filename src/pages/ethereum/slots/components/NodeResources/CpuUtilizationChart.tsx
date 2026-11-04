@@ -47,7 +47,6 @@ interface CpuUtilizationChartProps {
   selectedNode: string | null;
   metric: CpuMetric;
   onMetricChange: (metric: CpuMetric) => void;
-  slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
   highlight: HighlightRange | null;
@@ -75,7 +74,6 @@ export function CpuUtilizationChart({
   selectedNode,
   metric,
   onMetricChange,
-  slot,
   annotations,
   enabledAnnotations,
   highlight,
@@ -280,9 +278,7 @@ export function CpuUtilizationChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode
-    ? `Slot ${slot} / ${shortNodeName}`
-    : `Slot ${slot} / ${METRIC_LABELS[metric]} across ${nodeCount} nodes`;
+  const subtitle = selectedNode ? shortNodeName : `${METRIC_LABELS[metric]} across ${nodeCount} ethPandaOps nodes`;
 
   const headerActions = (
     <div className="flex items-center gap-2">

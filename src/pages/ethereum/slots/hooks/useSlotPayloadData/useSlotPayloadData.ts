@@ -4,11 +4,11 @@ import {
   fctBlockPayloadFirstSeenByNodeServiceListOptions,
   fctBlockPayloadPtcVoteHeadServiceListOptions,
   fctBlockPayloadAvailableByNodeServiceListOptions,
-  fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions,
   fctBlockPayloadServiceListOptions,
   fctPayloadBidHighestValueChunked50MsServiceListOptions,
   fctPayloadAttestationFirstSeenChunked50MsServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { fctPayloadBidHighestValueByBuilderChunked50MsServiceList } from '@/api/sdk.gen';
 import type {
   FctBlockPayloadBid,
   FctBlockPayloadFirstSeenByNode,
@@ -21,6 +21,7 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
+import { fetchAllPages } from '@/utils/api-pagination';
 
 export interface SlotPayloadData {
   /** Winning bid committed in the canonical block (available after finalization pipeline) */
@@ -83,10 +84,16 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
         }),
         enabled: queryEnabled,
       },
+      // Every page: the builder count is unbounded
       {
-        ...fctPayloadBidHighestValueByBuilderChunked50MsServiceListOptions({
-          query: { slot_start_date_time_eq: slotTimestamp, page_size: 10000 },
-        }),
+        queryKey: ['slot', 'payload-bid-race', currentNetwork?.name, slotTimestamp],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctPayloadBidHighestValueByBuilderChunked50Ms>(
+            fctPayloadBidHighestValueByBuilderChunked50MsServiceList,
+            { query: { slot_start_date_time_eq: slotTimestamp, page_size: 10000 } },
+            'fct_payload_bid_highest_value_by_builder_chunked_50ms',
+            signal
+          ),
         enabled: queryEnabled,
       },
       {
@@ -127,7 +134,7 @@ export function useSlotPayloadData(slot: number, enabled = true): UseSlotPayload
       payloadFirstSeen: firstSeenQuery.data?.fct_block_payload_first_seen_by_node ?? [],
       payloadAvailable: availableQuery.data?.fct_block_payload_available_by_node ?? [],
       ptcVote: ptcVoteQuery.data?.fct_block_payload_ptc_vote_head?.[0],
-      bidRace: bidRaceQuery.data?.fct_payload_bid_highest_value_by_builder_chunked_50ms ?? [],
+      bidRace: bidRaceQuery.data ?? [],
       payload: payloadQuery.data?.fct_block_payload?.[0],
       bidFrontier: bidFrontierQuery.data?.fct_payload_bid_highest_value_chunked_50ms ?? [],
       ptcArrivals: ptcArrivalsQuery.data?.fct_payload_attestation_first_seen_chunked_50ms ?? [],

@@ -35,8 +35,11 @@ function calculateRewardWei(block: FctPreparedBlock | PreparedBlocksComparisonCh
  * and calculates the missed opportunity (delta) if any.
  *
  * Filters prepared blocks by timestamp:
- * - If `winningBidTimestamp` is provided: shows blocks prepared before MEV bid (MEV boost scenario)
+ * - If `winningBidMicros` is provided: shows blocks prepared before MEV bid (MEV boost scenario)
  * - Otherwise uses `slotStartTime`: shows blocks prepared before slot start (local building scenario)
+ *
+ * Blocks with no value and no transactions are left out: they come from a builder that is not building (every geth
+ * prepared block reads that way), not from an empty mempool.
  *
  * @example
  * ```tsx
@@ -49,15 +52,15 @@ function calculateRewardWei(block: FctPreparedBlock | PreparedBlocksComparisonCh
  *     execution_payload_value: '...',
  *     consensus_payload_value: '...',
  *   }}
- *   winningBidTimestamp={1234567890}
- *   slotStartTime={1234567800}
+ *   winningBidMicros={1234567891161000}
+ *   slotStartTime={1234567890}
  * />
  * ```
  */
 export function PreparedBlocksComparisonChart({
   preparedBlocks,
   proposedBlock,
-  winningBidTimestamp,
+  winningBidMicros,
   slotStartTime,
 }: PreparedBlocksComparisonChartProps): JSX.Element {
   const themeColors = useThemeColors();
@@ -68,16 +71,22 @@ export function PreparedBlocksComparisonChart({
     stats: ChartStats;
     filteredCount: number;
   } => {
-    // Filter prepared blocks to only show those created before or at the cutoff time
-    // If winningBidTimestamp is available, use it (MEV boost scenario)
-    // Otherwise, fall back to slotStartTime (local building scenario)
-    let filteredPreparedBlocks = preparedBlocks;
-    const originalCount = preparedBlocks.length;
+    // A builder that is not building reports no value and no transactions; that is not a block worth 0
+    const builtBlocks = preparedBlocks.filter(
+      block => (block.execution_payload_value ?? '0') !== '0' || (block.execution_payload_transactions_count ?? 0) > 0
+    );
 
-    const cutoffTime = winningBidTimestamp ?? slotStartTime;
+    // Filter prepared blocks to only show those created before or at the cutoff time
+    // If winningBidMicros is available, use it (MEV boost scenario)
+    // Otherwise, fall back to slotStartTime (local building scenario)
+    let filteredPreparedBlocks = builtBlocks;
+    const originalCount = builtBlocks.length;
+
+    // event_date_time is in seconds; the winning bid time is in microseconds
+    const cutoffTime = winningBidMicros ? winningBidMicros / 1e6 : slotStartTime;
 
     if (cutoffTime !== undefined && cutoffTime !== null) {
-      filteredPreparedBlocks = preparedBlocks.filter(block => {
+      filteredPreparedBlocks = builtBlocks.filter(block => {
         // Use event_date_time field which is when the block was prepared
         return block.event_date_time && block.event_date_time <= cutoffTime;
       });
@@ -149,7 +158,7 @@ export function PreparedBlocksComparisonChart({
       stats: chartStats,
       filteredCount: originalCount - filteredPreparedBlocks.length,
     };
-  }, [preparedBlocks, proposedBlock, winningBidTimestamp, slotStartTime]);
+  }, [preparedBlocks, proposedBlock, winningBidMicros, slotStartTime]);
 
   // Prepare data for BarChart component
   const { chartData, chartLabels, tooltipFormatter } = useMemo(() => {
@@ -200,10 +209,7 @@ export function PreparedBlocksComparisonChart({
     );
   }
 
-  // Build subtitle with statistics
-  const subtitle = stats.bestClientName
-    ? `${stats.preparedBlockCount} prepared blocks • Best: ${stats.bestClientName} (${stats.bestPreparedRewardEth.toFixed(5)} ETH)`
-    : undefined;
+  const subtitle = `${stats.preparedBlockCount} prepared ${stats.preparedBlockCount === 1 ? 'block' : 'blocks'}`;
 
   return (
     <PopoutCard title="Prepared Blocks Comparison" anchorId="prepared-blocks" subtitle={subtitle} modalSize="full">
@@ -218,8 +224,8 @@ export function PreparedBlocksComparisonChart({
           {/* Show filter info if blocks were filtered */}
           {filteredCount > 0 && (
             <div className="text-sm text-muted">
-              Showing {stats.preparedBlockCount} blocks prepared before{' '}
-              {winningBidTimestamp ? 'winning bid' : 'slot start'} ({filteredCount} filtered out)
+              {filteredCount} {filteredCount === 1 ? 'block' : 'blocks'} prepared after the{' '}
+              {winningBidMicros ? 'winning bid' : 'slot start'} left out
             </div>
           )}
 

@@ -1,5 +1,4 @@
 import { type JSX, useMemo } from 'react';
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
@@ -186,25 +185,6 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
   return (
     <PopoutCard title={title} subtitle={subtitle} anchorId="blob-datacolumn-spread-chart" modalSize="xl">
       {({ inModal }) => {
-        // Determine spread quality: fast <500ms, medium 500ms-1s, large >1s
-        const spreadColor = overallSpread
-          ? overallSpread.spread < 500
-            ? 'var(--color-success)'
-            : overallSpread.spread < 1000
-              ? 'var(--color-warning)'
-              : 'var(--color-danger)'
-          : 'var(--color-primary)';
-
-        const spreadIcon = overallSpread ? (
-          overallSpread.spread < 500 ? (
-            <CheckCircleIcon className="size-5" />
-          ) : overallSpread.spread < 1000 ? (
-            <ExclamationTriangleIcon className="size-5" />
-          ) : (
-            <XCircleIcon className="size-5" />
-          )
-        ) : null;
-
         return (
           <div className={inModal ? 'space-y-8' : 'space-y-6'}>
             {/* Network Level Metrics */}
@@ -212,12 +192,7 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
               <div>
                 <h4 className="mb-3 text-sm font-semibold text-foreground">Network Level</h4>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <MiniStat
-                    label="Spread"
-                    value={`${(overallSpread.spread / 1000).toFixed(3)}s`}
-                    icon={spreadIcon}
-                    color={spreadColor}
-                  />
+                  <MiniStat label="Spread" value={`${(overallSpread.spread / 1000).toFixed(3)}s`} />
                   <MiniStat label="First Available" value={`${(overallSpread.firstItemTime / 1000).toFixed(3)}s`} />
                   <MiniStat label="Last Available" value={`${(overallSpread.lastItemTime / 1000).toFixed(3)}s`} />
                 </div>
@@ -227,12 +202,12 @@ export function BlobDataColumnSpreadChart({ blobPropagationData, slot }: BlobDat
             {/* Per-Node Distribution */}
             {barData.length > 0 && (
               <div>
-                <h4 className="mb-4 text-sm font-semibold text-foreground">Per-Node Spread Distribution</h4>
+                <h4 className="mb-4 text-sm font-semibold text-foreground">Spread per Xatu Node</h4>
                 <BarChart
                   data={barData}
                   labels={barLabels}
                   height={inModal ? 400 : 250}
-                  axisName="Node Count"
+                  axisName="Xatu nodes"
                   showLabel={false}
                   color={CHART_CATEGORICAL_COLORS[2]}
                 />

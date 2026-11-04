@@ -29,7 +29,6 @@ const avg = (arr: number[]): number => arr.reduce((s, v) => s + v, 0) / arr.leng
 interface DiskIoChartProps {
   data: FctNodeDiskIoByProcess[];
   selectedNode: string | null;
-  slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
   highlight: HighlightRange | null;
@@ -49,7 +48,6 @@ interface EChartsTooltipParam {
 export function DiskIoChart({
   data,
   selectedNode,
-  slot,
   annotations,
   enabledAnnotations,
   highlight,
@@ -237,7 +235,7 @@ export function DiskIoChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode ? `Slot ${slot} / ${shortNodeName}` : `Slot ${slot} / Mean across ${nodeCount} nodes`;
+  const subtitle = selectedNode ? shortNodeName : `Mean across ${nodeCount} ethPandaOps nodes`;
 
   const headerActions =
     selectedNode && (clClient || elClient) ? (

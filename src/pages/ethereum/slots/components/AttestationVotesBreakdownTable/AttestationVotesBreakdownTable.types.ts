@@ -1,10 +1,10 @@
-import type { IntAttestationAttestedHead, FctBlockHead } from '@/api/types.gen';
+import type { IntAttestationAttested, FctBlockHead } from '@/api/types.gen';
 
 export interface AttestationVotesBreakdownTableProps {
   /**
    * Raw attestation data showing which block each validator voted for
    */
-  attestationData: IntAttestationAttestedHead[];
+  attestationData: IntAttestationAttested[];
 
   /**
    * Current slot number (to identify if vote is for current slot or other)
@@ -25,6 +25,11 @@ export interface AttestationVotesBreakdownTableProps {
    * Whether the attestation data is still loading
    */
   isLoading?: boolean;
+
+  /**
+   * Shown when there are no votes, in place of the default empty state
+   */
+  emptyMessage?: string;
 }
 
 export interface VoteGroup {

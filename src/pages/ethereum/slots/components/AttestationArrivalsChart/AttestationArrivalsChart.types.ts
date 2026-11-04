@@ -8,6 +8,8 @@ export interface AttestationArrivalsChartProps {
   title?: string;
   /** Anchor id for the popout card, must be unique per page */
   anchorId?: string;
+  /** Shown when there are no arrivals, in place of the default empty state */
+  emptyMessage?: string;
   /**
    * Array of attestation data points from fct_attestation_first_seen_chunked_50ms
    * Must include block_root and slot information

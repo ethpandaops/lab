@@ -54,7 +54,6 @@ interface MemoryUsageChartProps {
   selectedNode: string | null;
   metric: MemoryMetric;
   onMetricChange: (metric: MemoryMetric) => void;
-  slot: number;
   annotations: AnnotationEvent[];
   enabledAnnotations: Set<AnnotationType>;
   highlight: HighlightRange | null;
@@ -76,7 +75,6 @@ export function MemoryUsageChart({
   selectedNode,
   metric,
   onMetricChange,
-  slot,
   annotations,
   enabledAnnotations,
   highlight,
@@ -227,7 +225,7 @@ export function MemoryUsageChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode ? `Slot ${slot} / ${shortNodeName}` : `Slot ${slot} / Mean across ${nodeCount} nodes`;
+  const subtitle = selectedNode ? shortNodeName : `Mean across ${nodeCount} ethPandaOps nodes`;
 
   const headerActions = (
     <div className="flex items-center gap-2">

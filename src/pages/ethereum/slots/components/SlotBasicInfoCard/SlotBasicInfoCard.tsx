@@ -19,6 +19,7 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useNetwork } from '@/hooks/useNetwork';
 import { GRAFFITI_FORMAT_LABELS, formatClientName } from '@/utils/graffiti';
 import { useSlotProposerClient, type ProposerClientField } from '../../hooks/useSlotProposerClient';
+import { noDataBefore } from '../../hooks/useSlotTableCoverage';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
@@ -98,7 +99,13 @@ function ProposerClientValue({ field }: { field: ProposerClientField }): JSX.Ele
  * Displays basic information about a slot in a card layout.
  * Shows key metrics like slot number, epoch, proposer, status, block root, etc.
  */
-export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: SlotBasicInfoCardProps): JSX.Element {
+export function SlotBasicInfoCard({
+  slot,
+  epoch,
+  data,
+  isMissedSlot = false,
+  dataStart,
+}: SlotBasicInfoCardProps): JSX.Element {
   const { currentNetwork } = useNetwork();
   // Use canonical block head if available, otherwise fall back to orphaned block data
   // Will be undefined for missed slots
@@ -107,7 +114,11 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
   const blockMev = data.blockMev[0];
   const blobCount = data.blobCount[0];
   const proposerEntity = data.proposerEntity[0];
-  const proposerClient = useSlotProposerClient(slot, blockProposer?.proposer_validator_index);
+  // fct_block_proposer starts later than fct_block_head; older blocks still name their proposer
+  const proposerIndex = blockProposer?.proposer_validator_index ?? blockHead?.proposer_index;
+  const proposerClient = useSlotProposerClient(slot, proposerIndex);
+  const entityStart = proposerEntity ? undefined : dataStart('fct_block_proposer_entity');
+  const mevStart = blockMev ? undefined : dataStart('fct_block_mev');
 
   // Calculate blob count from blob propagation data if blobCount data is not available
   const actualBlobCount =
@@ -116,9 +127,6 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
       : data.blobPropagation.length > 0
         ? Math.max(...data.blobPropagation.map(b => (b.blob_index ?? -1) + 1))
         : 0;
-
-  // Determine if block was seen by monitoring infrastructure
-  const wasBlockSeen = !!blockHead;
 
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   // or from the isOrphaned/isMissedSlot flags
@@ -254,9 +262,6 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
           <div className="flex-1 space-y-6">
             {/* Status Section */}
             <div className="flex flex-wrap items-center gap-2">
-              <Badge color={wasBlockSeen ? 'green' : 'red'} variant="border">
-                {wasBlockSeen ? 'Block Seen' : 'Block Not Seen'}
-              </Badge>
               <Badge color={status.color} variant="border">
                 {status.label}
               </Badge>
@@ -361,20 +366,38 @@ export function SlotBasicInfoCard({ slot, epoch, data, isMissedSlot = false }: S
                 <div className="col-span-2">
                   <dt className="text-xs font-medium text-muted">Proposer</dt>
                   <dd className="mt-1 text-sm text-foreground">
-                    <Entity entity={proposerEntity?.entity} />
-                    {blockProposer?.proposer_validator_index !== undefined &&
-                      blockProposer.proposer_validator_index !== null && (
-                        <span className="ml-2 text-muted">
-                          (Validator <Validator index={blockProposer.proposer_validator_index} />)
-                        </span>
-                      )}
+                    {entityStart === undefined ? (
+                      <>
+                        <Entity entity={proposerEntity?.entity} />
+                        {proposerIndex !== undefined && proposerIndex !== null && (
+                          <span className="ml-2 text-muted">
+                            (Validator <Validator index={proposerIndex} />)
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {proposerIndex !== undefined && proposerIndex !== null && (
+                          <span>
+                            Validator <Validator index={proposerIndex} />
+                          </span>
+                        )}
+                        <span className="block text-xs text-muted">{noDataBefore(entityStart, 'entity')}</span>
+                      </>
+                    )}
                   </dd>
                 </div>
 
                 {/* MEV Value */}
                 <div className="col-span-2">
                   <dt className="text-xs font-medium text-muted">MEV Value</dt>
-                  <dd className="mt-1 text-base/7 font-semibold text-foreground">{formatMevValue(blockMev?.value)}</dd>
+                  {mevStart !== undefined ? (
+                    <dd className="mt-1 text-sm text-muted">{noDataBefore(mevStart)}</dd>
+                  ) : (
+                    <dd className="mt-1 text-base/7 font-semibold text-foreground">
+                      {formatMevValue(blockMev?.value)}
+                    </dd>
+                  )}
                 </div>
 
                 {/* Proposer clients parsed from the graffiti */}

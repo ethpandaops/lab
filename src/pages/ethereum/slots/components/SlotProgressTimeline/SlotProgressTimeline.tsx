@@ -177,7 +177,7 @@ export function SlotProgressTimeline({
 
   // Build filter options
   const filterOptions = [
-    { value: '', label: 'All nodes' },
+    { value: '', label: 'All Xatu nodes' },
     ...availableUsernames.map(username => ({ value: username, label: username })),
   ];
 
@@ -286,17 +286,14 @@ export function SlotProgressTimeline({
                           to="/xatu/nodes/$nodeId"
                           params={{ nodeId: span.nodeId }}
                           onClick={event => event.stopPropagation()}
-                          className={clsx('truncate hover:underline', span.isLate ? 'text-warning' : 'text-foreground')}
+                          className="truncate text-foreground hover:underline"
                           title={span.label}
                         >
                           {span.label}
                           {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
                         </Link>
                       ) : (
-                        <span
-                          className={clsx('truncate', span.isLate ? 'text-warning' : 'text-foreground')}
-                          title={span.label}
-                        >
+                        <span className="truncate text-foreground" title={span.label}>
                           {span.label}
                           {span.collapsible && isCollapsed && <span className="ml-1 text-muted">({childCount})</span>}
                         </span>
@@ -308,7 +305,7 @@ export function SlotProgressTimeline({
                       <div
                         className={clsx(
                           'absolute top-1 rounded-xs transition-all',
-                          span.isLate ? 'bg-warning/80' : colors.bg,
+                          colors.bg,
                           isHovered && 'ring-1 ring-white/20 brightness-110',
                           span.collapsible && 'cursor-pointer'
                         )}
@@ -325,10 +322,7 @@ export function SlotProgressTimeline({
 
                     {/* Duration column - show absolute time for point-in-time events */}
                     <div
-                      className={clsx(
-                        'shrink-0 px-2 text-right font-mono text-xs',
-                        span.isLate ? 'text-warning' : colors.text
-                      )}
+                      className={clsx('shrink-0 px-2 text-right font-mono text-xs', colors.text)}
                       style={{ width: 80 }}
                     >
                       {span.isPointInTime ? formatMs(span.startMs) : formatMs(duration)}

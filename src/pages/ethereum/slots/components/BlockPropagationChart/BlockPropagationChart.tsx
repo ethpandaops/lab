@@ -151,7 +151,7 @@ export function BlockPropagationChart({
             }
           } else {
             // Fallback if metadata not found
-            tooltip += `${p.marker} Node Index: ${nodeIndex}<br/>`;
+            tooltip += `${p.marker} Xatu node ${nodeIndex}<br/>`;
           }
         } else {
           tooltip += `${p.marker} Cumulative: ${data[1].toFixed(1)}%<br/>`;
@@ -162,13 +162,6 @@ export function BlockPropagationChart({
     },
     [nodeMetadata]
   );
-
-  // Calculate average propagation time for header
-  const avgPropagationTime = useMemo(() => {
-    if (blockPropagationData.length === 0) return 0;
-    const total = blockPropagationData.reduce((sum, point) => sum + point.seen_slot_start_diff, 0);
-    return total / blockPropagationData.length;
-  }, [blockPropagationData]);
 
   // Handle empty data
   if (blockPropagationData.length === 0) {
@@ -189,7 +182,7 @@ export function BlockPropagationChart({
     );
   }
 
-  const subtitle = `Avg: ${avgPropagationTime.toFixed(0)}ms across ${blockPropagationData.length.toLocaleString()} nodes`;
+  const subtitle = `${blockPropagationData.length.toLocaleString()} Xatu nodes`;
 
   return (
     <PopoutCard title={title} anchorId={anchorId} subtitle={subtitle} modalSize="xl">
@@ -198,7 +191,7 @@ export function BlockPropagationChart({
           scatterSeries={scatterSeries}
           lineSeries={lineSeries}
           xAxisTitle="Slot Time (s)"
-          yAxisTitle="Node Index"
+          yAxisTitle="Xatu nodes"
           yAxis2Title="Cumulative %"
           height={inModal ? 384 : 288}
           xMin={0}

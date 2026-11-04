@@ -34,10 +34,6 @@ export function TimelineLegend(): JSX.Element {
         <div className="size-3 rounded-xs bg-data-emerald" />
         <span className="text-muted">Attestations</span>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="size-3 rounded-xs bg-warning" />
-        <span className="text-muted">Late ({'>'} 4s)</span>
-      </div>
       <div className="ml-auto flex items-center gap-2">
         <div className="h-4 w-px bg-success/50" />
         <span className="text-muted">Attestation Deadline (4s)</span>
