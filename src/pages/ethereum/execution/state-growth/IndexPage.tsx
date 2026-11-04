@@ -8,22 +8,23 @@ import { Header } from '@/components/Layout/Header';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { formatSmartDecimal } from '@/utils';
+import { useNetwork } from '@/hooks/useNetwork';
 import { useStateSizeData, useStateDelta, type DeltaTimeframe } from './hooks';
 import { StateSizeSkeleton, TokenStorageShareCard } from './components';
 
 const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
-  { value: 'daily', label: '24h' },
+  { value: 'daily', label: '1d' },
   { value: 'weekly', label: '7d' },
   { value: 'monthly', label: '30d' },
   { value: 'yearly', label: '1Y' },
 ];
 
 function formatBytes(bytes: number): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1000) {
-    return `${(gb / 1024).toFixed(2)} TB`;
+  const gib = bytes / (1024 * 1024 * 1024);
+  if (gib >= 1024) {
+    return `${(gib / 1024).toFixed(2)} TiB`;
   }
-  return `${gb.toFixed(2)} GB`;
+  return `${gib.toFixed(2)} GiB`;
 }
 
 function formatDeltaBytes(bytes: number): string {
@@ -31,21 +32,23 @@ function formatDeltaBytes(bytes: number): string {
   const sign = bytes >= 0 ? '+' : '-';
 
   if (absBytes >= 1024 * 1024 * 1024) {
-    return `${sign}${(absBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    return `${sign}${(absBytes / (1024 * 1024 * 1024)).toFixed(2)} GiB`;
   }
   if (absBytes >= 1024 * 1024) {
-    return `${sign}${(absBytes / (1024 * 1024)).toFixed(2)} MB`;
+    return `${sign}${(absBytes / (1024 * 1024)).toFixed(2)} MiB`;
   }
   if (absBytes >= 1024) {
-    return `${sign}${(absBytes / 1024).toFixed(2)} KB`;
+    return `${sign}${(absBytes / 1024).toFixed(2)} KiB`;
   }
   return `${sign}${absBytes.toFixed(0)} B`;
 }
 
 export function IndexPage(): JSX.Element {
-  const { data, latestData, isLoading, error } = useStateSizeData();
+  const { data, isLoading, error } = useStateSizeData();
+  const { currentNetwork } = useNetwork();
   const [timeframe, setTimeframe] = useState<DeltaTimeframe>('daily');
   const delta = useStateDelta(data, timeframe);
+  const latestData = delta?.latest;
 
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -95,7 +98,7 @@ export function IndexPage(): JSX.Element {
           if (totalValue !== undefined) {
             html += `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(128, 128, 128, 0.2);">`;
             html += `<span style="font-weight: 500;">Total:</span>`;
-            html += `<span style="font-weight: 700; margin-left: auto; font-size: 14px;">${formatSmartDecimal(totalValue, 2)} GB</span>`;
+            html += `<span style="font-weight: 700; margin-left: auto; font-size: 14px;">${formatSmartDecimal(totalValue, 2)} GiB</span>`;
             html += `</div>`;
           }
         }
@@ -117,7 +120,7 @@ export function IndexPage(): JSX.Element {
             html += p.marker;
             html += `<span>${p.seriesName}:</span>`;
             html += `<span style="margin-left: auto; opacity: 0.7;">${percentage}%</span>`;
-            html += `<span style="font-weight: 600; min-width: 70px; text-align: right;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `<span style="font-weight: 600; min-width: 70px; text-align: right;">${formatSmartDecimal(yValue, 2)} GiB</span>`;
             html += `</div>`;
           }
         }
@@ -140,6 +143,12 @@ export function IndexPage(): JSX.Element {
       {error && (
         <Card rounded className="p-6">
           <p className="text-danger">Failed to load state size data: {error.message}</p>
+        </Card>
+      )}
+
+      {data?.length === 0 && (
+        <Card rounded>
+          <p className="text-sm text-muted">State size data isn&apos;t available on {currentNetwork?.display_name}.</p>
         </Card>
       )}
 
@@ -301,7 +310,7 @@ export function IndexPage(): JSX.Element {
                   name: 'Date',
                 }}
                 yAxis={{
-                  name: 'Size (GB)',
+                  name: 'Size (GiB)',
                   min: 0,
                 }}
                 height={inModal ? 600 : 480}

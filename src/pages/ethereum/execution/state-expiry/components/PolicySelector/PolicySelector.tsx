@@ -17,6 +17,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
   config,
   currentBytes,
   currentSlots,
+  currentDate,
   formatBytes,
   formatSlots,
   className,
@@ -105,6 +106,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                 {formatBytes(currentBytes)}
               </span>
               <span className="text-2xs text-muted tabular-nums lg:text-xs">{formatSlots(currentSlots)} slots</span>
+              {currentDate && <span className="mt-0.5 text-2xs text-muted tabular-nums lg:text-xs">{currentDate}</span>}
             </>
           ) : (
             <span className="text-sm text-muted/40">—</span>
@@ -217,6 +219,9 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                             >
                               {formatSlots(data.afterSlots)} slots
                             </span>
+                          )}
+                          {data.asOf && (
+                            <span className="mt-0.5 text-2xs font-medium text-warning tabular-nums">{data.asOf}</span>
                           )}
                         </>
                       ) : (

@@ -2,35 +2,31 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/Elements/Badge';
 import { getLabelColor } from '@/pages/ethereum/contracts/utils';
-import type { ContractTop100Item } from '../../hooks';
-
-/**
- * Key overhead per storage slot in geth's snapshot structure.
- * Each slot key = 1 (prefix) + 32 (account hash) + 32 (storage hash) = 65 bytes
- */
-const SLOT_KEY_OVERHEAD_BYTES = 65;
+import { expirySavings, storageSize, type ContractTop100Item } from '../../hooks';
 
 interface ContractRowProps {
   item: ContractTop100Item;
   /** Display index (1-based position in current sorted list) */
   index: number;
+  /** Leave out the 1y/2y savings (when the expiry data is older than the current state) */
+  hideSavings?: boolean;
 }
 
 /**
- * Format bytes to human-readable format (KB, MB, GB, TB)
+ * Format bytes to human-readable binary units (KiB, MiB, GiB, TiB)
  */
 function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024 * 1024 * 1024) {
-    return `${(bytes / (1024 * 1024 * 1024 * 1024)).toFixed(2)} TB`;
+    return `${(bytes / (1024 * 1024 * 1024 * 1024)).toFixed(2)} TiB`;
   }
   if (bytes >= 1024 * 1024 * 1024) {
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GiB`;
   }
   if (bytes >= 1024 * 1024) {
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`;
   }
   if (bytes >= 1024) {
-    return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${(bytes / 1024).toFixed(2)} KiB`;
   }
   return `${bytes} B`;
 }
@@ -49,24 +45,15 @@ function formatSlots(slots: number): string {
 }
 
 /**
- * Calculate savings percentage between base and expiry bytes
- */
-function calculateSavings(baseBytes: number | undefined, expiryBytes: number | undefined): number | null {
-  if (baseBytes === undefined || expiryBytes === undefined || baseBytes === 0) return null;
-  return ((baseBytes - expiryBytes) / baseBytes) * 100;
-}
-
-/**
  * Table row for the top 100 contracts list (desktop view).
  * Displays index, contract name/address with category badge, owner, size, and expiry savings.
  */
-export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
+export function ContractRow({ item, index, hideSavings = false }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
+  const { contract_address, contract_name, account_owner, labels, active_slots } = contract;
 
-  // Calculate savings percentages
-  const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
-  const savings2y = calculateSavings(effective_bytes, expiry24m?.effective_bytes);
+  const savings1y = hideSavings ? null : expirySavings(contract, expiry12m);
+  const savings2y = hideSavings ? null : expirySavings(contract, expiry24m);
 
   return (
     <tr className="group transition-colors hover:bg-muted/30">
@@ -103,7 +90,7 @@ export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
 
       {/* Size (includes 65-byte key overhead per slot) */}
       <td className="px-2 py-1.5 text-right text-xs font-medium whitespace-nowrap text-muted tabular-nums">
-        {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
+        {formatBytes(storageSize(contract) ?? 0)}
       </td>
 
       {/* Slots */}
@@ -132,13 +119,12 @@ export function ContractRow({ item, index }: ContractRowProps): JSX.Element {
  * Card layout for the top 100 contracts list (mobile view).
  * Displays contract info in a compact, stacked card format.
  */
-export function ContractCard({ item, index }: ContractRowProps): JSX.Element {
+export function ContractCard({ item, index, hideSavings = false }: ContractRowProps): JSX.Element {
   const { contract, expiry12m, expiry24m } = item;
-  const { contract_address, contract_name, account_owner, labels, effective_bytes, active_slots } = contract;
+  const { contract_address, contract_name, account_owner, labels, active_slots } = contract;
 
-  // Calculate savings percentages
-  const savings1y = calculateSavings(effective_bytes, expiry12m?.effective_bytes);
-  const savings2y = calculateSavings(effective_bytes, expiry24m?.effective_bytes);
+  const savings1y = hideSavings ? null : expirySavings(contract, expiry12m);
+  const savings2y = hideSavings ? null : expirySavings(contract, expiry24m);
 
   return (
     <Link
@@ -173,11 +159,11 @@ export function ContractCard({ item, index }: ContractRowProps): JSX.Element {
           {contract_name && <div className="mt-0.5 truncate font-mono text-xs text-muted">{contract_address}</div>}
 
           {/* Stats row */}
-          <div className="mt-2 flex items-center gap-4 text-xs">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
             <div>
               <span className="text-muted">Size: </span>
               <span className="font-medium text-foreground tabular-nums">
-                {formatBytes((active_slots ?? 0) * SLOT_KEY_OVERHEAD_BYTES + (effective_bytes ?? 0))}
+                {formatBytes(storageSize(contract) ?? 0)}
               </span>
             </div>
             <div>

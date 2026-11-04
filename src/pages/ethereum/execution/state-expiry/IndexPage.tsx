@@ -9,6 +9,7 @@ import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useStateExpiryData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
 import { PolicySelector, type PolicySelectorConfig, StateExpirySkeleton, ContractTop100List } from './components';
+import type { PolicyData } from './components/PolicySelector';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
@@ -85,14 +86,14 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
 };
 
 /**
- * Format bytes to human-readable format (GB, TB)
+ * Format bytes to human-readable binary units (GiB, TiB)
  */
 function formatBytes(bytes: number): string {
-  const gb = bytes / (1024 * 1024 * 1024);
-  if (gb >= 1000) {
-    return `${(gb / 1024).toFixed(2)} TB`;
+  const gib = bytes / (1024 * 1024 * 1024);
+  if (gib >= 1024) {
+    return `${(gib / 1024).toFixed(2)} TiB`;
   }
-  return `${gb.toFixed(2)} GB`;
+  return `${gib.toFixed(2)} GiB`;
 }
 
 /**
@@ -121,52 +122,34 @@ export function IndexPage(): JSX.Element {
   const [selectedType, setSelectedType] = useState<ExpiryType>('slot');
   const themeColors = useThemeColors();
 
-  // Calculate savings data for the policy selector matrix (includes actual values for enhanced cells)
+  // Savings for each policy cell, comparing the base and policy values of the same day: the latest
+  // day that has that policy's data. A cell older than the current state shows its own date.
   const savingsData = useMemo(() => {
-    const result: Record<
-      ExpiryType,
-      Record<
-        ExpiryPolicy,
-        {
-          bytesPercent: number | null;
-          slotsPercent: number | null;
-          afterBytes: number | null;
-          afterSlots: number | null;
-        }
-      >
-    > = {
-      slot: {
-        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-      },
-      contract: {
-        '12m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-        '24m': { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null },
-      },
+    const empty = { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null, asOf: null };
+    const result: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
+      slot: { '12m': { ...empty }, '24m': { ...empty } },
+      contract: { '12m': { ...empty }, '24m': { ...empty } },
     };
 
     if (!data || data.length === 0) return result;
+    const latest = data[data.length - 1];
 
-    // Find latest data point with expiry info
-    for (let i = data.length - 1; i >= 0; i--) {
-      const point = data[i];
+    for (const type of EXPIRY_TYPES) {
+      for (const policy of EXPIRY_POLICIES) {
+        const point = [...data].reverse().find(p => {
+          const policyData = type === 'slot' ? p.slotExpiryData[policy] : p.contractExpiryData[policy];
+          return policyData.effectiveBytes !== null && policyData.activeSlots !== null;
+        });
+        if (!point || point.effectiveBytes <= 0 || point.activeSlots <= 0) continue;
 
-      for (const type of EXPIRY_TYPES) {
-        for (const policy of EXPIRY_POLICIES) {
-          if (result[type][policy].bytesPercent !== null) continue;
-
-          const policyData = type === 'slot' ? point.slotExpiryData[policy] : point.contractExpiryData[policy];
-          if (policyData.effectiveBytes !== null && point.effectiveBytes > 0) {
-            const bytesSaved = point.effectiveBytes - policyData.effectiveBytes;
-            result[type][policy].bytesPercent = (bytesSaved / point.effectiveBytes) * 100;
-            result[type][policy].afterBytes = policyData.effectiveBytes;
-          }
-          if (policyData.activeSlots !== null && point.activeSlots > 0) {
-            const slotsSaved = point.activeSlots - policyData.activeSlots;
-            result[type][policy].slotsPercent = (slotsSaved / point.activeSlots) * 100;
-            result[type][policy].afterSlots = policyData.activeSlots;
-          }
-        }
+        const policyData = type === 'slot' ? point.slotExpiryData[policy] : point.contractExpiryData[policy];
+        result[type][policy] = {
+          bytesPercent: ((point.effectiveBytes - policyData.effectiveBytes!) / point.effectiveBytes) * 100,
+          slotsPercent: ((point.activeSlots - policyData.activeSlots!) / point.activeSlots) * 100,
+          afterBytes: policyData.effectiveBytes,
+          afterSlots: policyData.activeSlots,
+          asOf: point === latest ? null : point.dateLabel,
+        };
       }
     }
 
@@ -175,9 +158,9 @@ export function IndexPage(): JSX.Element {
 
   // Get current state (baseline) from latest data point
   const currentState = useMemo(() => {
-    if (!data || data.length === 0) return { bytes: null, slots: null };
+    if (!data || data.length === 0) return { bytes: null, slots: null, date: null };
     const latest = data[data.length - 1];
-    return { bytes: latest.effectiveBytes, slots: latest.activeSlots };
+    return { bytes: latest.effectiveBytes, slots: latest.activeSlots, date: latest.dateLabel };
   }, [data]);
 
   // Chart data - show all policies with selected one highlighted
@@ -282,7 +265,7 @@ export function IndexPage(): JSX.Element {
             const fontWeight = isCurrentState || isSelected ? '600' : '400';
             html += `<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 4px; opacity: ${opacity};">`;
             html += `<span style="display: flex; align-items: center; gap: 8px;">${p.marker}<span>${p.seriesName}</span></span>`;
-            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatSmartDecimal(yValue, 2)} GB</span>`;
+            html += `<span style="font-weight: ${fontWeight}; text-align: right; font-variant-numeric: tabular-nums;">${formatSmartDecimal(yValue, 2)} GiB</span>`;
             html += `</div>`;
           }
         }
@@ -453,6 +436,7 @@ export function IndexPage(): JSX.Element {
             config={POLICY_SELECTOR_CONFIG}
             currentBytes={currentState.bytes}
             currentSlots={currentState.slots}
+            currentDate={currentState.date}
             formatBytes={formatBytes}
             formatSlots={formatStorageSlotCount}
           />
@@ -478,7 +462,7 @@ export function IndexPage(): JSX.Element {
                         name: 'Date',
                       }}
                       yAxis={{
-                        name: 'Size (GB)',
+                        name: 'Size (GiB)',
                         formatter: (value: number) => value.toFixed(0),
                       }}
                       height={inModal ? 600 : 280}

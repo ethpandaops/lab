@@ -24,11 +24,14 @@ import { DEFAULT_TIME_RANGE, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRa
 export function IndexPage(): JSX.Element {
   // Time range from URL search params
   const navigate = useNavigate({ from: '/ethereum/execution/timings/' });
-  const { range } = useSearch({ from: '/ethereum/execution/timings/' });
+  const { range, refNodes } = useSearch({ from: '/ethereum/execution/timings/' });
   const timeRange: TimeRange = range ?? DEFAULT_TIME_RANGE;
 
   // Reference nodes filter - default to true (only ethPandaOps controlled fleet)
-  const [referenceNodesOnly, setReferenceNodesOnly] = useState(true);
+  const referenceNodesOnly = refNodes ?? true;
+  const setReferenceNodesOnly = (value: boolean): void => {
+    navigate({ search: prev => ({ ...prev, refNodes: value ? undefined : false }), replace: true, resetScroll: false });
+  };
 
   // Info dialog state
   const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
@@ -86,7 +89,7 @@ export function IndexPage(): JSX.Element {
             label: TIME_RANGE_CONFIG[r].label,
           }))}
           value={timeRange}
-          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true })}
+          onChange={r => navigate({ search: prev => ({ ...prev, range: r }), replace: true, resetScroll: false })}
           ariaLabel="Time window"
         />
         {dataSince && <span className="text-sm text-muted">Since {dataSince}</span>}
