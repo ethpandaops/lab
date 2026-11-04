@@ -42,6 +42,7 @@ import type {
 } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { formatBytes } from '@/utils';
+import { dailyDateValues } from '@/pages/ethereum/clients/utils/client-share';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
@@ -304,13 +305,17 @@ export function HomePage(): JSX.Element {
   });
 
   const opcodeGasDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'opcode-gas-daily'],
+    queryKey: ['gas-profiler', 'opcode-gas-daily', config.days],
     queryFn: ({ signal }) =>
       fetchAllPages<FctOpcodeGasByOpcodeDaily>(
         fctOpcodeGasByOpcodeDailyServiceList,
         {
           query: {
-            day_start_date_like: '20%',
+            // The date key only filters by value, so bounded ranges list their dates, with a spare
+            // day so the list covers the client-side cutoff below, which trims to the exact range.
+            ...(config.days === null
+              ? { day_start_date_like: '20%' }
+              : { day_start_date_in_values: dailyDateValues(config.days + 2) }),
             order_by: 'total_gas desc',
             page_size: 10000,
           },

@@ -282,7 +282,7 @@ export function ReferenceEngine({
             Slow payloads
           </Link>
         )}
-        <Link to="/ethereum/execution/timings" search={{ tab: 'clients' }} className="text-primary hover:underline">
+        <Link to="/ethereum/execution/timings" className="text-primary hover:underline">
           Engine timings
         </Link>
         <Link to="/ethereum/execution/performance" className="text-primary hover:underline">

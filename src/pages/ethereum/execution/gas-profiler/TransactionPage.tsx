@@ -1191,17 +1191,6 @@ export function TransactionPage(): JSX.Element {
                     height={280}
                   />
                 </div>
-
-                {/* Execution Trace */}
-                <CallTraceView
-                  callFrames={txData.callFrames}
-                  contractOwners={contractOwners}
-                  functionSignatures={functionSignatures}
-                  txHash={txHash}
-                  blockNumber={blockNumber}
-                  totalGas={metadata.receiptGasUsed}
-                  opcodeStats={callFrameOpcodeStats}
-                />
               </div>
             </HeadlessTab.Panel>
           )}
