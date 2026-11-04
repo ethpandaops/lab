@@ -193,7 +193,7 @@ export function EpochSlotsTable({
         accessor: row => <span className="text-muted">{row.blobCount}</span>,
       },
       {
-        header: 'Attestations',
+        header: 'Head votes',
         accessor: row => (
           <span className="text-muted">
             {row.attestationHead} / {row.attestationMax}
@@ -201,19 +201,10 @@ export function EpochSlotsTable({
         ),
       },
       {
-        header: 'Vote %',
+        header: 'Head vote %',
         accessor: row => {
-          const participation = row.attestationMax > 0 ? (row.attestationHead / row.attestationMax) * 100 : 0;
-          const colorClass =
-            participation >= 99
-              ? 'text-success'
-              : participation < 200 / 3
-                ? 'text-danger'
-                : participation < 95
-                  ? 'text-warning'
-                  : 'text-muted';
-
-          return <span className={colorClass}>{participation.toFixed(2)}%</span>;
+          const headVoteRate = row.attestationMax > 0 ? (row.attestationHead / row.attestationMax) * 100 : 0;
+          return <span className="text-muted">{headVoteRate.toFixed(2)}%</span>;
         },
       },
     ],

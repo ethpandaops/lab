@@ -7,9 +7,7 @@ import type { EpochHeaderProps } from './EpochHeader.types';
 /**
  * Unified epoch header - everything in a single card
  */
-export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: EpochHeaderProps): React.JSX.Element {
-  const hasArrival = p95BlockArrivalTime !== null && p95BlockArrivalTime !== undefined;
-
+export function EpochHeader({ epoch, stats, timestamp }: EpochHeaderProps): React.JSX.Element {
   return (
     <Card
       title={`Epoch ${epoch}`}
@@ -38,7 +36,7 @@ export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: Ep
       }
     >
       <Stats
-        gridClassName="grid grid-cols-2 sm:grid-cols-4"
+        gridClassName="grid grid-cols-2 sm:grid-cols-3"
         stats={[
           {
             id: 'blocks',
@@ -47,35 +45,14 @@ export function EpochHeader({ epoch, stats, timestamp, p95BlockArrivalTime }: Ep
             valueClassName: stats.canonicalBlockCount === 32 ? 'text-success' : 'text-foreground',
           },
           {
-            id: 'p95-block-arrival',
-            name: 'P95 Block Arrival',
-            value: hasArrival ? `${p95BlockArrivalTime.toFixed(2)}s` : '-',
-            valueClassName: hasArrival
-              ? p95BlockArrivalTime < 0.5
-                ? 'text-success'
-                : p95BlockArrivalTime > 1.0
-                  ? 'text-warning'
-                  : 'text-foreground'
-              : 'text-foreground',
-          },
-          {
             id: 'participation',
             name: 'Attestation Participation',
             value: `${(stats.participationRate * 100).toFixed(2)}%`,
-            valueClassName:
-              stats.participationRate >= 0.99
-                ? 'text-success'
-                : stats.participationRate < 2 / 3
-                  ? 'text-danger'
-                  : stats.participationRate < 0.95
-                    ? 'text-warning'
-                    : 'text-foreground',
           },
           {
             id: 'missed-attestations',
             name: 'Missed Attestations',
             value: stats.missedAttestations.toLocaleString(),
-            valueClassName: stats.missedAttestations > 1000 ? 'text-warning' : 'text-foreground',
           },
         ]}
       />

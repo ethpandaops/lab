@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dailyWindowStartDate, rollUpHourlyToDaily, trimDailyRecords } from './overview.utils';
+import { buildReorgChartConfig, dailyWindowStartDate, rollUpHourlyToDaily, trimDailyRecords } from './overview.utils';
 
 describe('dailyWindowStartDate', () => {
   // 2026-07-13T12:00:00Z
@@ -69,5 +69,33 @@ describe('rollUpHourlyToDaily', () => {
       ])
     );
     expect(result).toHaveLength(3);
+  });
+});
+
+describe('buildReorgChartConfig', () => {
+  // The reorg table starts part-way through 2025-05-14 and is processed into 2025-05-16
+  const bounds = { min: Date.UTC(2025, 4, 14, 1, 52) / 1000, max: Date.UTC(2025, 4, 16, 3) / 1000 };
+  const keys = ['2025-05-13', '2025-05-14', '2025-05-15', '2025-05-16', '2025-05-17'];
+
+  it('shows no data outside the bounds and 0 inside them where no reorg was recorded', () => {
+    const { series } = buildReorgChartConfig(
+      [
+        { day_start_date: '2025-05-15', depth: 1, reorg_count: 4 },
+        { day_start_date: '2025-05-15', depth: 2, reorg_count: 1 },
+      ],
+      keys,
+      true,
+      bounds
+    );
+    expect(series.map(s => [s.name, s.data])).toEqual([
+      ['Depth 1', [null, 0, 4, 0, null]],
+      ['Depth 2', [null, 0, 1, 0, null]],
+    ]);
+  });
+
+  it('draws depth 1 when the window has no reorgs', () => {
+    const hour = Date.UTC(2025, 4, 15, 10) / 1000;
+    const { series } = buildReorgChartConfig([], [String(hour), String(hour + 3600)], false, bounds);
+    expect(series.map(s => [s.name, s.data])).toEqual([['Depth 1', [0, 0]]]);
   });
 });

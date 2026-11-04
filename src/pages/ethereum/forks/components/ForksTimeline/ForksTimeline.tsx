@@ -140,8 +140,17 @@ export function ForksTimeline({
                                   const epochsSincePrev = fork.epoch - prevFork.epoch;
                                   const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
 
-                                  if (daysSincePrev === 0) {
+                                  if (fork.epoch === 0) {
                                     return <p className="text-xs text-muted">Activated at genesis</p>;
+                                  } else if (epochsSincePrev === 0) {
+                                    return <p className="text-xs text-muted">Activated with {prevFork.displayName}</p>;
+                                  } else if (daysSincePrev === 0) {
+                                    return (
+                                      <p className="text-xs text-muted">
+                                        Activated {epochsSincePrev} {epochsSincePrev === 1 ? 'epoch' : 'epochs'} after{' '}
+                                        {prevFork.displayName}
+                                      </p>
+                                    );
                                   } else if (daysSincePrev < 60) {
                                     return (
                                       <p className="text-xs text-muted">

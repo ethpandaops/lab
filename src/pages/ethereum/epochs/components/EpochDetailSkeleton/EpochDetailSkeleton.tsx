@@ -66,8 +66,8 @@ export function EpochDetailSkeleton({ epoch }: EpochDetailSkeletonProps): JSX.El
         }
       >
         <Stats
-          gridClassName="grid grid-cols-2 sm:grid-cols-4"
-          stats={['Blocks', 'P95 Block Arrival', 'Attestation Participation', 'Missed Attestations'].map(label => ({
+          gridClassName="grid grid-cols-2 sm:grid-cols-3"
+          stats={['Blocks', 'Attestation Participation', 'Missed Attestations'].map(label => ({
             id: label,
             name: label,
             value: '-',
@@ -117,11 +117,11 @@ export function EpochDetailSkeleton({ epoch }: EpochDetailSkeletonProps): JSX.El
                     accessor: () => <LoadingContainer className="h-5 w-8 rounded-sm" />,
                   },
                   {
-                    header: 'Attestations',
+                    header: 'Head votes',
                     accessor: () => <LoadingContainer className="h-5 w-24 rounded-sm" />,
                   },
                   {
-                    header: 'Vote %',
+                    header: 'Head vote %',
                     accessor: () => <LoadingContainer className="h-5 w-16 rounded-sm" />,
                   },
                 ]}
