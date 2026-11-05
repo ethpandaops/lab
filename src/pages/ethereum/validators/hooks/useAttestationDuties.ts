@@ -73,7 +73,7 @@ export function useAttestationDuties({
       query: {
         validator_index_in_values: indices.join(','),
         slot_start_date_time_gte: from,
-        slot_start_date_time_lte: to + 86_400,
+        slot_start_date_time_lt: to + 86_400,
         order_by: 'slot DESC, validator_index ASC',
         page_size: pageSize,
         page_token: pageToken,
@@ -108,13 +108,12 @@ export function useAttestationDuties({
   });
 
   // Rewards are per validator per epoch; the epoch starts (slot % 32) slots before the duty's slot
-  const epochStarts = rows.map(r => (r.slot_start_date_time ?? 0) - ((r.slot ?? 0) % 32) * 12);
+  const epochStarts = [...new Set(rows.map(r => (r.slot_start_date_time ?? 0) - ((r.slot ?? 0) % 32) * 12))];
   const rewards = useQuery({
     ...fctAttestationRewardByValidatorServiceListOptions({
       query: {
         validator_index_in_values: voters,
-        epoch_start_date_time_gte: Math.min(...epochStarts),
-        epoch_start_date_time_lte: Math.max(...epochStarts),
+        epoch_start_date_time_in_values: epochStarts.join(','),
         page_size: 10_000,
       },
     }),

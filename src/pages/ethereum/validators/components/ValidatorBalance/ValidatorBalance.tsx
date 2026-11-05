@@ -103,6 +103,7 @@ export function ValidatorBalance({
     resolution: daysPerRow === 7 ? 'week' : 'day',
     periodKeys,
     allHistory,
+    enabled: view === 'rewards',
   });
   const rewardRows = rewards.periods;
   const totalReward = rewards.totalRewardEth;

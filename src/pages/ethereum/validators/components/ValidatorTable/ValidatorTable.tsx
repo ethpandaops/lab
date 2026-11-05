@@ -31,6 +31,10 @@ interface ValidatorTableProps {
   from?: number;
   /** End of the selected date range (Unix seconds) */
   to?: number;
+  /** Days covered by each daily row: 1, or 7 for weekly rows keyed by their Monday */
+  stepDays?: 1 | 7;
+  /** Called with a weekly row's Monday when the row is picked */
+  onWeekSelect?: (validatorIndex: number, weekStart: number) => void;
   /** Look up validator status at a given timestamp */
   getStatusAtTimestamp?: (validatorIndex: number, timestamp: number) => string | null;
   /** Whether data is loading */
@@ -105,6 +109,8 @@ export function ValidatorTable({
   validatorMap,
   from,
   to,
+  stepDays = 1,
+  onWeekSelect,
   getStatusAtTimestamp,
   isLoading = false,
   selection,
@@ -267,6 +273,8 @@ export function ValidatorTable({
                   blockProposals={valProposals ?? []}
                   from={from}
                   to={to}
+                  stepDays={stepDays}
+                  onWeekSelect={onWeekSelect && (weekStart => onWeekSelect(row.validatorIndex, weekStart))}
                   getStatusAtTimestamp={getStatusAtTimestamp}
                   selectedDayTimestamp={isExpanded ? selection?.dayTimestamp : undefined}
                   selectedHourTimestamp={isExpanded ? selection?.hourTimestamp : undefined}
@@ -318,6 +326,8 @@ interface ValidatorRowProps {
   blockProposals: BlockProposalDataPoint[];
   from?: number;
   to?: number;
+  stepDays: 1 | 7;
+  onWeekSelect?: (weekStart: number) => void;
   getStatusAtTimestamp?: (validatorIndex: number, timestamp: number) => string | null;
   selectedDayTimestamp?: number | null;
   selectedHourTimestamp?: number | null;
@@ -346,6 +356,8 @@ function ValidatorRow({
   blockProposals,
   from,
   to,
+  stepDays,
+  onWeekSelect,
   getStatusAtTimestamp,
   selectedDayTimestamp,
   selectedHourTimestamp,
@@ -534,6 +546,8 @@ function ValidatorRow({
               validatorIndex={row.validatorIndex}
               from={from}
               to={to}
+              stepDays={stepDays}
+              onWeekSelect={onWeekSelect}
               getStatusAtTimestamp={getStatusAtTimestamp}
               selectedDayTimestamp={selectedDayTimestamp}
               selectedHourTimestamp={selectedHourTimestamp}

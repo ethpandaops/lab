@@ -10,6 +10,7 @@ import type {
 } from '../../hooks/useValidatorsData.types';
 import { useHourlyData, useSlotData } from '../../hooks';
 import { getStatusIconConfig } from '../../hooks/useValidatorStatus';
+import { weekStartOf } from '../../utils/week';
 
 interface DailyBreakdownTableProps {
   /** Daily attestation data for the validator */
@@ -26,6 +27,10 @@ interface DailyBreakdownTableProps {
   from?: number;
   /** End of the selected date range (Unix seconds) */
   to?: number;
+  /** Days covered by each row: 1, or 7 for weekly rows keyed by their Monday */
+  stepDays?: 1 | 7;
+  /** Called with a weekly row's Monday when the row is picked; weekly rows don't expand */
+  onWeekSelect?: (weekStart: number) => void;
   /** Look up validator status at a given timestamp */
   getStatusAtTimestamp?: (validatorIndex: number, timestamp: number) => string | null;
   /** Controlled: which day timestamp to expand (null = none) */
@@ -562,6 +567,8 @@ export function DailyBreakdownTable({
   validatorIndex,
   from,
   to,
+  stepDays = 1,
+  onWeekSelect,
   getStatusAtTimestamp,
   selectedDayTimestamp,
   selectedHourTimestamp,
@@ -569,17 +576,18 @@ export function DailyBreakdownTable({
   onHourSelect,
 }: DailyBreakdownTableProps): JSX.Element {
   const [internalExpandedDate, setInternalExpandedDate] = useState<string | null>(null);
+  const weekly = stepDays === 7;
 
   // Derive controlled expanded date from timestamp
   const controlledDate =
     selectedDayTimestamp != null ? new Date(selectedDayTimestamp * 1000).toISOString().slice(0, 10) : null;
   const expandedDate = selectedDayTimestamp !== undefined ? controlledDate : internalExpandedDate;
 
-  // Aggregate proposals by day
+  // Aggregate proposals by day, or by week under the week's Monday
   const proposalsByDay = useMemo(() => {
     const map = new Map<string, { canonical: number; total: number }>();
     for (const p of blockProposals) {
-      const date = formatDate(p.slotTimestamp);
+      const date = weekly ? weekStartOf(formatDate(p.slotTimestamp)) : formatDate(p.slotTimestamp);
       const existing = map.get(date);
       if (existing) {
         existing.total += 1;
@@ -589,10 +597,12 @@ export function DailyBreakdownTable({
       }
     }
     return map;
-  }, [blockProposals]);
+  }, [blockProposals, weekly]);
 
   const rows = useMemo(() => {
     const byDate = new Map<string, DailyRow>();
+    // First row of the range: its day, or its week's Monday
+    const firstDate = from != null ? (weekly ? weekStartOf(formatDate(from)) : formatDate(from)) : null;
 
     for (const a of attestationData) {
       const date = formatDate(a.timestamp);
@@ -633,6 +643,8 @@ export function DailyBreakdownTable({
 
     for (const b of balanceData) {
       const date = formatDate(b.timestamp);
+      // Balances start earlier than attestations; the table starts with the range
+      if (firstDate !== null && date < firstDate) continue;
       const existing = byDate.get(date);
       if (existing) {
         existing.balance = b.balance;
@@ -671,10 +683,9 @@ export function DailyBreakdownTable({
       }
     }
 
-    // Fill all days from→to with empty rows for missing dates
-    if (from != null && to != null) {
-      const startDate = new Date(from * 1000);
-      startDate.setUTCHours(0, 0, 0, 0);
+    // Fill every day (or week) from→to with empty rows for missing dates
+    if (firstDate !== null && to != null) {
+      const startDate = new Date(`${firstDate}T00:00:00Z`);
       const endDate = new Date(to * 1000);
       endDate.setUTCHours(0, 0, 0, 0);
       const current = new Date(startDate);
@@ -695,12 +706,12 @@ export function DailyBreakdownTable({
             proposals: null,
           });
         }
-        current.setUTCDate(current.getUTCDate() + 1);
+        current.setUTCDate(current.getUTCDate() + stepDays);
       }
     }
 
     return Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date));
-  }, [attestationData, balanceData, syncCommitteeData, proposalsByDay, from, to]);
+  }, [attestationData, balanceData, syncCommitteeData, proposalsByDay, from, to, weekly, stepDays]);
 
   if (rows.length === 0) {
     return <div className="py-4 text-center text-xs text-muted">No daily data available</div>;
@@ -710,7 +721,7 @@ export function DailyBreakdownTable({
     <table className="w-full text-xs">
       <thead>
         <tr className="border-b border-border/50 text-muted">
-          <th className="px-3 py-1.5 text-left font-medium">Date</th>
+          <th className="px-3 py-1.5 text-left font-medium">{weekly ? 'Week' : 'Date'}</th>
           <th className="px-3 py-1.5 text-right font-medium">Inclusion %</th>
           <th className="px-3 py-1.5 text-right font-medium">Head %</th>
           <th className="px-3 py-1.5 text-right font-medium">Target %</th>
@@ -723,7 +734,7 @@ export function DailyBreakdownTable({
       </thead>
       <tbody>
         {rows.map(row => {
-          const isExpanded = expandedDate === row.date;
+          const isExpanded = !weekly && expandedDate === row.date;
           return (
             <DailyDateRow
               key={row.date}
@@ -731,11 +742,14 @@ export function DailyBreakdownTable({
               isExpanded={isExpanded}
               validatorIndex={validatorIndex}
               blockProposals={blockProposals}
+              stepDays={stepDays}
               getStatusAtTimestamp={getStatusAtTimestamp}
               selectedHourTimestamp={isExpanded ? selectedHourTimestamp : undefined}
               onHourSelect={onHourSelect}
               onToggle={() => {
-                if (onDaySelect) {
+                if (weekly) {
+                  onWeekSelect?.(row.timestamp);
+                } else if (onDaySelect) {
                   onDaySelect(expandedDate === row.date ? null : row.timestamp);
                 } else {
                   setInternalExpandedDate(prev => (prev === row.date ? null : row.date));
@@ -757,6 +771,7 @@ function DailyDateRow({
   isExpanded,
   validatorIndex,
   blockProposals = [],
+  stepDays,
   getStatusAtTimestamp,
   selectedHourTimestamp,
   onHourSelect,
@@ -766,6 +781,7 @@ function DailyDateRow({
   isExpanded: boolean;
   validatorIndex: number;
   blockProposals?: BlockProposalDataPoint[];
+  stepDays: 1 | 7;
   getStatusAtTimestamp?: (validatorIndex: number, timestamp: number) => string | null;
   selectedHourTimestamp?: number | null;
   onHourSelect?: (hourTimestamp: number | null) => void;
@@ -790,7 +806,9 @@ function DailyDateRow({
             {row.date}
             {getStatusAtTimestamp &&
               (() => {
-                const config = getStatusIconConfig(getStatusAtTimestamp(validatorIndex, row.timestamp + 86399));
+                const config = getStatusIconConfig(
+                  getStatusAtTimestamp(validatorIndex, row.timestamp + stepDays * 86400 - 1)
+                );
                 const Icon = config.icon;
                 return (
                   <span className={clsx('ml-1', config.colorClass)} title={config.label}>

@@ -40,7 +40,7 @@ export function SyncDuties({ indices, validator, onValidatorChange, from, to }: 
       query: {
         validator_index_in_values: (validator === null ? indices : [validator]).join(','),
         slot_start_date_time_gte: from,
-        slot_start_date_time_lte: to + 86_400,
+        slot_start_date_time_lt: to + 86_400,
         order_by: 'slot DESC, validator_index ASC',
         page_size: page.pageSize,
         page_token: page.pageToken,
@@ -52,13 +52,11 @@ export function SyncDuties({ indices, validator, onValidatorChange, from, to }: 
     placeholderData: keepPreviousData,
   });
   const rows = data?.fct_sync_committee_participation_by_validator ?? [];
-  const slotTimes = rows.map(r => r.slot_start_date_time ?? 0);
   const rewards = useQuery({
     ...fctSyncCommitteeRewardByValidatorServiceListOptions({
       query: {
         validator_index_in_values: [...new Set(rows.map(r => r.validator_index ?? 0))].join(','),
-        slot_start_date_time_gte: Math.min(...slotTimes),
-        slot_start_date_time_lte: Math.max(...slotTimes),
+        slot_start_date_time_in_values: [...new Set(rows.map(r => r.slot_start_date_time ?? 0))].join(','),
         page_size: 10_000,
       },
     }),
