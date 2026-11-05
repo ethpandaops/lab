@@ -1,5 +1,5 @@
 import { dateCategoryTicks, describe, it, expect } from 'vitest';
-import { createBandSeries, createStatisticSeries, dateCategoryTicks } from './MultiLine.utils';
+import { createBandSeries, createStatisticSeries, dateCategoryTicks, timeAxisTicks } from './MultiLine.utils';
 
 describe('createBandSeries', () => {
   const lowerValues = [10, 20, 30];
@@ -211,5 +211,82 @@ describe('dateCategoryTicks', () => {
 
   it('returns null for labels that are not dates', () => {
     expect(dateCategoryTicks(['100', '101', '102'], 12)).toBeNull();
+  });
+});
+
+describe('timeAxisTicks', () => {
+  const day = (y: number, m: number, d: number): number => Date.UTC(y, m - 1, d) / 1000;
+  const labels = (min: number, max: number, width = 1200): string[] => timeAxisTicks(min, max, width).map(t => t.label);
+
+  it('ticks every UTC midnight across a week of hours', () => {
+    const ticks = timeAxisTicks(day(2026, 10, 29) + 13 * 3600, day(2026, 11, 5) + 12 * 3600, 1200);
+    expect(ticks.map(t => t.label)).toEqual(['Oct 30', 'Oct 31', 'Nov 1', 'Nov 2', 'Nov 3', 'Nov 4', 'Nov 5']);
+    expect(ticks.every(t => t.value % 86_400 === 0)).toBe(true);
+  });
+
+  it('ticks on Mondays across 30 to 90 days', () => {
+    const ticks = timeAxisTicks(day(2026, 10, 7), day(2026, 11, 4), 1200);
+    expect(ticks.map(t => t.label)).toEqual(['Oct 12', 'Oct 19', 'Oct 26', 'Nov 2']);
+    expect(ticks.every(t => new Date(t.value * 1000).getUTCDay() === 1)).toBe(true);
+  });
+
+  it('ticks on the first of each month across a year, naming each January by its year', () => {
+    expect(labels(day(2025, 11, 6), day(2026, 11, 4))).toEqual([
+      'Dec 2025',
+      '2026',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+    ]);
+  });
+
+  it('leaves the year off when the window is inside one year', () => {
+    expect(labels(day(2026, 5, 9), day(2026, 11, 4))).toEqual(['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']);
+  });
+
+  it('adds the year to the first day or week of each year when the window spans years', () => {
+    expect(labels(day(2025, 12, 28), day(2026, 1, 4))).toEqual([
+      'Dec 28 2025',
+      'Dec 29',
+      'Dec 30',
+      'Dec 31',
+      'Jan 1 2026',
+      'Jan 2',
+      'Jan 3',
+      'Jan 4',
+    ]);
+    expect(labels(day(2025, 12, 10), day(2026, 1, 9))).toEqual(['Dec 15 2025', 'Dec 22', 'Dec 29', 'Jan 5 2026']);
+  });
+
+  it('ticks on years across all of history', () => {
+    expect(labels(day(2015, 7, 30), day(2026, 11, 4))).toEqual([
+      '2016',
+      '2017',
+      '2018',
+      '2019',
+      '2020',
+      '2021',
+      '2022',
+      '2023',
+      '2024',
+      '2025',
+      '2026',
+    ]);
+  });
+
+  it('steps by calendar-aligned multiples when the labels do not fit', () => {
+    expect(labels(day(2015, 7, 30), day(2026, 11, 4), 282)).toEqual(['2016', '2018', '2020', '2022', '2024', '2026']);
+    expect(labels(day(2024, 11, 6), day(2026, 11, 4), 282)).toEqual(['2025', 'Jul', '2026', 'Jul']);
+  });
+
+  it('has no ticks for an empty window', () => {
+    expect(timeAxisTicks(100, 100, 1200)).toEqual([]);
   });
 });

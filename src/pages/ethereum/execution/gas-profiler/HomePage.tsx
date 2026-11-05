@@ -9,39 +9,12 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Divider } from '@/components/Layout/Divider';
 import { Alert } from '@/components/Feedback/Alert';
-// TODO: Re-enable when fork annotation data is available
-// import { Toggle } from '@/components/Forms/Toggle';
 import { CardChain, type CardChainItem } from '@/components/DataDisplay/CardChain';
-import { useNetwork } from '@/hooks/useNetwork';
-import { useForks } from '@/hooks/useForks';
-import {
-  MultiLineChart,
-  createStatisticSeries,
-  createBandSeries,
-  createForkMarkLines,
-  createExecutionForkMarkLines,
-  createBlobScheduleMarkLines,
-} from '@/components/Charts/MultiLine';
 import { BarChart } from '@/components/Charts/Bar';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import {
-  fctOpcodeOpsHourlyServiceList,
-  fctOpcodeOpsDailyServiceList,
-  fctOpcodeGasByOpcodeHourlyServiceList,
-  fctOpcodeGasByOpcodeDailyServiceList,
-  fctExecutionReceiptSizeHourlyServiceList,
-  fctExecutionReceiptSizeDailyServiceList,
-} from '@/api/sdk.gen';
-import type {
-  FctOpcodeOpsHourly,
-  FctOpcodeOpsDaily,
-  FctOpcodeGasByOpcodeHourly,
-  FctOpcodeGasByOpcodeDaily,
-  FctExecutionReceiptSizeHourly,
-  FctExecutionReceiptSizeDaily,
-} from '@/api/types.gen';
+import { fctOpcodeGasByOpcodeHourlyServiceList, fctOpcodeGasByOpcodeDailyServiceList } from '@/api/sdk.gen';
+import type { FctOpcodeGasByOpcodeHourly, FctOpcodeGasByOpcodeDaily } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { formatBytes } from '@/utils';
 import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
@@ -52,108 +25,6 @@ import type { GasProfilerHomeSearch } from './IndexPage.types';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
-
-// ============================================================================
-// TOOLTIP UTILITIES (matching execution/overview pattern)
-// ============================================================================
-
-/** Formats a date for tooltip display with more detail */
-function formatTooltipDate(value: number | string, isDaily: boolean): string {
-  if (isDaily) {
-    const date = new Date((value as string) + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  }
-  const date = new Date((value as number) * 1000);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    timeZone: 'UTC',
-  });
-}
-
-/** Item configuration for tooltip rows */
-interface TooltipItem {
-  color: string;
-  label: string;
-  value: string;
-  /** Visual style indicator: 'line' (default), 'dashed', 'dotted', 'area' */
-  style?: 'line' | 'dashed' | 'dotted' | 'area';
-}
-
-/** Section configuration for tooltip */
-interface TooltipSection {
-  title: string;
-  items: TooltipItem[];
-}
-
-/** Builds a single tooltip row HTML */
-function buildTooltipRow(item: TooltipItem, fontSize: number = 12): string {
-  let indicator: string;
-  switch (item.style) {
-    case 'dashed':
-      indicator = `<span style="width: 10px; height: 0; border-top: 2px dashed ${item.color};"></span>`;
-      break;
-    case 'dotted':
-      indicator = `<span style="width: 10px; height: 3px; border-radius: 1px; border-top: 2px dotted ${item.color};"></span>`;
-      break;
-    case 'area':
-      indicator = `<span style="width: 10px; height: 6px; border-radius: 1px; background: ${item.color}; opacity: 0.5;"></span>`;
-      break;
-    default:
-      indicator = `<span style="width: 10px; height: 3px; border-radius: 1px; background: ${item.color};"></span>`;
-  }
-
-  return `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: ${fontSize}px;">
-    ${indicator}
-    <span>${item.label}</span>
-    <span style="margin-left: auto; font-weight: 600;">${item.value}</span>
-  </div>`;
-}
-
-/** Builds complete tooltip HTML from sections */
-function buildTooltipHtml(dateStr: string, sections: TooltipSection[]): string {
-  let html = `<div style="margin-bottom: 10px; font-weight: 600; font-size: 13px;">${dateStr}</div>`;
-
-  sections.forEach((section, idx) => {
-    if (idx > 0) {
-      html += `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(128,128,128,0.3);">`;
-    }
-    html += `<div style="margin-bottom: 8px; font-size: 11px; text-transform: none; color: #9ca3af;">${section.title}</div>`;
-
-    section.items.forEach(item => {
-      const itemHtml = buildTooltipRow(item);
-      // For band items, use muted text color
-      if (section.title === 'BANDS') {
-        html += itemHtml
-          .replace(/<span>([^<]+)<\/span>/, '<span style="color: #d1d5db;">$1</span>')
-          .replace(
-            /<span style="margin-left: auto; font-weight: 600;">/,
-            '<span style="margin-left: auto; color: #d1d5db;">'
-          );
-      } else {
-        html += itemHtml;
-      }
-    });
-
-    if (idx > 0) {
-      html += `</div>`;
-    }
-  });
-
-  return html;
-}
-
-/** Formats an ops band range for display */
-function formatOpsBand(lower: number | undefined, upper: number | undefined): string {
-  const l = lower ?? 0;
-  const u = upper ?? 0;
-  return `${formatCompact(l)} – ${formatCompact(u)}`;
-}
 
 /**
  * Format gas value with comma separators
@@ -170,13 +41,6 @@ function formatCompact(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
   return value.toString();
-}
-
-/** Format a byte band range for display */
-function formatBytesBand(lower: number | undefined, upper: number | undefined): string {
-  const l = lower ?? 0;
-  const u = upper ?? 0;
-  return `${formatBytes(l)} – ${formatBytes(u)}`;
 }
 
 /**
@@ -200,17 +64,10 @@ const PAGE_DESCRIPTION =
 export function HomePage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/execution/gas-profiler/' }) as GasProfilerHomeSearch;
   const navigate = useNavigate({ from: '/ethereum/execution/gas-profiler/' });
-  const { currentNetwork } = useNetwork();
-  const { allForks } = useForks();
-
   // Time period from URL search params
   const timePeriod: TimePeriod = search.t ?? 'all';
-  // TODO: Re-enable when fork annotation data is available
-  // const [showAnnotations, setShowAnnotations] = useState(true);
-  const showAnnotations = true;
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
-  const movingAvgLabel = isDaily ? 'Moving Avg (7d)' : 'Moving Avg (6h)';
 
   // Search input states
   const [searchInput, setSearchInput] = useState('');
@@ -246,40 +103,6 @@ export function HomePage(): JSX.Element {
   const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
   const today = useMemo(() => currentUtcDate(), []);
   const startTimestamp = config.days === null ? undefined : hourlyEnd - config.days * 24 * 60 * 60;
-
-  // Opcode Ops Per Second Queries (real data) - with pagination
-  const opcodeOpsHourlyQuery = useQuery({
-    queryKey: ['gas-profiler', 'opcode-ops-hourly', startTimestamp, config.pageSize],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctOpcodeOpsHourly>(
-        fctOpcodeOpsHourlyServiceList,
-        {
-          query: {
-            hour_start_date_time_gte: startTimestamp,
-            hour_start_date_time_lt: hourlyEnd,
-            order_by: 'hour_start_date_time asc',
-            page_size: config.pageSize,
-          },
-        },
-        'fct_opcode_ops_hourly',
-        signal
-      ),
-    enabled: !isDaily,
-  });
-
-  const opcodeOpsDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'opcode-ops-daily', config.pageSize, today],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctOpcodeOpsDaily>(
-        fctOpcodeOpsDailyServiceList,
-        {
-          query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-        },
-        'fct_opcode_ops_daily',
-        signal
-      ),
-    enabled: isDaily,
-  });
 
   // Top Opcodes by Gas Queries (real data) - with pagination
   const opcodeGasHourlyQuery = useQuery({
@@ -322,85 +145,11 @@ export function HomePage(): JSX.Element {
     enabled: isDaily,
   });
 
-  // Receipt Size Per Block Queries - with pagination
-  const receiptSizeHourlyQuery = useQuery({
-    queryKey: ['gas-profiler', 'receipt-size-hourly', startTimestamp, config.pageSize],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctExecutionReceiptSizeHourly>(
-        fctExecutionReceiptSizeHourlyServiceList,
-        {
-          query: {
-            hour_start_date_time_gte: startTimestamp,
-            hour_start_date_time_lt: hourlyEnd,
-            order_by: 'hour_start_date_time asc',
-            page_size: config.pageSize,
-          },
-        },
-        'fct_execution_receipt_size_hourly',
-        signal
-      ),
-    enabled: !isDaily,
-  });
-
-  const receiptSizeDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'receipt-size-daily', config.pageSize, today],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctExecutionReceiptSizeDaily>(
-        fctExecutionReceiptSizeDailyServiceList,
-        {
-          query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-        },
-        'fct_execution_receipt_size_daily',
-        signal
-      ),
-    enabled: isDaily,
-  });
-
-  // First UTC date of a daily window, so an N-day window holds N complete daily rows.
-  // "All" starts where both the opcode and receipt tables have data, so every chart covers the same days.
-  const dailyCutoff = useMemo(() => {
-    if (config.days !== null) return completeUtcDays(config.days)[0];
-    const opsData = opcodeOpsDailyQuery.data;
-    const receiptData = receiptSizeDailyQuery.data;
-    if (!opsData?.length || !receiptData?.length) return null;
-    // Both queries are ordered newest first
-    const firstOps = opsData[opsData.length - 1].day_start_date ?? '';
-    const firstReceipt = receiptData[receiptData.length - 1].day_start_date ?? '';
-    return firstOps > firstReceipt ? firstOps : firstReceipt;
-  }, [config.days, opcodeOpsDailyQuery.data, receiptSizeDailyQuery.data]);
-
-  // Opcode ops records (fetchAllPages returns array directly)
-  // Filter by time period for daily data
-  const opcodeOpsRecords = useMemo(() => {
-    if (isDaily) {
-      const allRecords = [...(opcodeOpsDailyQuery.data ?? [])].reverse();
-      if (dailyCutoff === null) return allRecords;
-      return allRecords.filter(r => (r.day_start_date ?? '') >= dailyCutoff);
-    }
-    return opcodeOpsHourlyQuery.data;
-  }, [isDaily, opcodeOpsDailyQuery.data, opcodeOpsHourlyQuery.data, dailyCutoff]);
-
-  // Receipt size records - hourly/daily switching with client-side date filtering
-  const receiptSizeRecords = useMemo(() => {
-    if (isDaily) {
-      const allRecords = [...(receiptSizeDailyQuery.data ?? [])].reverse();
-      if (dailyCutoff === null) return allRecords;
-      return allRecords.filter(r => (r.day_start_date ?? '') >= dailyCutoff);
-    }
-    return receiptSizeHourlyQuery.data;
-  }, [isDaily, receiptSizeDailyQuery.data, receiptSizeHourlyQuery.data, dailyCutoff]);
-
   // Aggregate opcodes for OpcodeAnalysis component (fetchAllPages returns array directly)
-  // Filter by time period for daily data
   const opcodeStats = useMemo(() => {
-    let records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
+    const records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
 
     if (!records?.length) return [];
-
-    // Filter daily records by time period
-    if (isDaily && dailyCutoff !== null) {
-      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= dailyCutoff);
-    }
 
     // Aggregate gas by opcode across the filtered time period
     const opcodeMap = new Map<string, { totalGas: number; totalCount: number }>();
@@ -421,19 +170,14 @@ export function HomePage(): JSX.Element {
         count: data.totalCount,
       }))
       .sort((a, b) => b.totalGas - a.totalGas);
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, dailyCutoff]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
 
   // Aggregate gas by category across the time period (top 8 + Other for bar chart)
   // Filter by time period for daily data
   const gasByCategoryData = useMemo(() => {
-    let records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
+    const records = isDaily ? opcodeGasDailyQuery.data : opcodeGasHourlyQuery.data;
 
     if (!records?.length) return { labels: [], data: [], total: 0 };
-
-    // Filter daily records by time period
-    if (isDaily && dailyCutoff !== null) {
-      records = records.filter(r => ((r as FctOpcodeGasByOpcodeDaily).day_start_date ?? '') >= dailyCutoff);
-    }
 
     // Aggregate gas by category
     const categoryMap = new Map<string, number>();
@@ -465,7 +209,7 @@ export function HomePage(): JSX.Element {
       })),
       total,
     };
-  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data, dailyCutoff]);
+  }, [isDaily, opcodeGasDailyQuery.data, opcodeGasHourlyQuery.data]);
 
   // Navigate to older/newer blocks
   const handleLoadOlderBlocks = useCallback(() => {
@@ -574,446 +318,7 @@ export function HomePage(): JSX.Element {
   // CHART CONFIGS
   // ============================================================================
 
-  // Opcodes Per Second chart config (real data)
-  const opcodesPerSecondConfig = useMemo(() => {
-    if (!opcodeOpsRecords?.length) return null;
-
-    const labels: string[] = [];
-    const avgValues: (number | null)[] = [];
-    const movingAvgValues: (number | null)[] = [];
-    const medianValues: (number | null)[] = [];
-    const minValues: (number | null)[] = [];
-    const maxValues: (number | null)[] = [];
-    const p5Values: (number | null)[] = [];
-    const p95Values: (number | null)[] = [];
-    const lowerBandValues: (number | null)[] = [];
-    const upperBandValues: (number | null)[] = [];
-
-    for (const r of opcodeOpsRecords) {
-      // Format labels for display: daily uses date string as-is, hourly formats timestamp
-      let label: string;
-      if (isDaily) {
-        label = (r as FctOpcodeOpsDaily).day_start_date ?? '';
-      } else {
-        const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
-        const date = new Date(ts * 1000);
-        if (timePeriod === '24h') {
-          label = date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            timeZone: 'UTC',
-          });
-        } else if (timePeriod === '72h') {
-          label = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            timeZone: 'UTC',
-          });
-        } else {
-          label = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: '2-digit',
-            timeZone: 'UTC',
-          });
-        }
-      }
-
-      labels.push(label);
-      avgValues.push(r.avg_ops ?? null);
-      movingAvgValues.push(r.moving_avg_ops ?? null);
-      medianValues.push(r.p50_ops ?? null);
-      minValues.push(r.min_ops ?? null);
-      maxValues.push(r.max_ops ?? null);
-      p5Values.push(r.p05_ops ?? null);
-      p95Values.push(r.p95_ops ?? null);
-      lowerBandValues.push(r.lower_band_ops ?? null);
-      upperBandValues.push(r.upper_band_ops ?? null);
-    }
-
-    return {
-      labels,
-      series: [
-        createStatisticSeries('Average', avgValues, {
-          color: DATA_COLORS.emerald,
-          lineWidth: 2.5,
-          group: 'Statistics',
-        }),
-        createStatisticSeries(movingAvgLabel, movingAvgValues, {
-          color: DATA_COLORS.cyan,
-          lineWidth: 2,
-          group: 'Statistics',
-        }),
-        createStatisticSeries('Median', medianValues, {
-          color: DATA_COLORS.purple,
-          lineWidth: 1.5,
-          lineStyle: 'dotted',
-          group: 'Statistics',
-        }),
-        ...createBandSeries('Bollinger', 'ops-bollinger', lowerBandValues, upperBandValues, {
-          color: DATA_COLORS.amber,
-          opacity: 0.15,
-          group: 'Bands',
-          initiallyVisible: false,
-        }),
-        ...createBandSeries('P5/P95', 'ops-percentile', p5Values, p95Values, {
-          color: DATA_COLORS.indigo,
-          opacity: 0.1,
-          group: 'Bands',
-        }),
-        ...createBandSeries('Min/Max', 'ops-minmax', minValues, maxValues, {
-          color: DATA_COLORS.slate,
-          opacity: 0.06,
-          group: 'Bands',
-        }),
-      ],
-    };
-  }, [opcodeOpsRecords, isDaily, timePeriod, movingAvgLabel]);
-
-  // Fork annotation mark lines
-  const forkMarkLines = useMemo(() => {
-    if (!currentNetwork || !allForks.length) return [];
-    const labels = opcodesPerSecondConfig?.labels ?? [];
-    if (!labels.length) return [];
-
-    const consensusLines = createForkMarkLines({
-      forks: allForks,
-      labels,
-      genesisTime: currentNetwork.genesis_time,
-      isDaily,
-    });
-
-    const executionLines = currentNetwork.forks?.execution
-      ? createExecutionForkMarkLines({
-          executionForks: currentNetwork.forks.execution,
-          labels,
-        })
-      : [];
-
-    const blobLines = currentNetwork.blob_schedule?.length
-      ? createBlobScheduleMarkLines({
-          blobSchedule: currentNetwork.blob_schedule,
-          labels,
-          genesisTime: currentNetwork.genesis_time,
-        })
-      : [];
-
-    return [...consensusLines, ...executionLines, ...blobLines];
-  }, [currentNetwork, allForks, opcodesPerSecondConfig?.labels, isDaily]);
-
-  // Opcode Ops tooltip formatter
-  const opsTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!opcodeOpsRecords?.length || !opcodesPerSecondConfig) return '';
-
-      const recordsByKey = new Map<string, FctOpcodeOpsHourly | FctOpcodeOpsDaily>();
-      for (const r of opcodeOpsRecords) {
-        let key: string;
-        if (isDaily) {
-          key = (r as FctOpcodeOpsDaily).day_start_date ?? '';
-        } else {
-          const ts = (r as FctOpcodeOpsHourly).hour_start_date_time ?? 0;
-          const date = new Date(ts * 1000);
-          if (timePeriod === '24h') {
-            key = date.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              timeZone: 'UTC',
-            });
-          } else if (timePeriod === '72h') {
-            key = date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              timeZone: 'UTC',
-            });
-          } else {
-            key = date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: '2-digit',
-              timeZone: 'UTC',
-            });
-          }
-        }
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = opcodesPerSecondConfig.labels[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctOpcodeOpsDaily).day_start_date ?? '')
-        : ((record as FctOpcodeOpsHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const sections: TooltipSection[] = [
-        {
-          title: 'STATISTICS',
-          items: [
-            { color: DATA_COLORS.emerald, label: 'Average', value: formatCompact(record.avg_ops ?? 0) },
-            { color: DATA_COLORS.cyan, label: movingAvgLabel, value: formatCompact(record.moving_avg_ops ?? 0) },
-            { color: DATA_COLORS.purple, label: 'Median', value: formatCompact(record.p50_ops ?? 0), style: 'dotted' },
-          ],
-        },
-        {
-          title: 'BANDS',
-          items: [
-            {
-              color: DATA_COLORS.amber,
-              label: 'Bollinger',
-              value: formatOpsBand(record.lower_band_ops, record.upper_band_ops),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.indigo,
-              label: 'P5/P95',
-              value: formatOpsBand(record.p05_ops, record.p95_ops),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.slate,
-              label: 'Min/Max',
-              value: formatOpsBand(record.min_ops, record.max_ops),
-              style: 'area',
-            },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [opcodeOpsRecords, opcodesPerSecondConfig, isDaily, timePeriod, movingAvgLabel]
-  );
-
-  // Receipt Size Per Block chart config
-  const receiptSizeConfig = useMemo(() => {
-    if (!receiptSizeRecords?.length) return null;
-
-    const labels: string[] = [];
-    const avgValues: (number | null)[] = [];
-    const movingAvgValues: (number | null)[] = [];
-    const medianValues: (number | null)[] = [];
-    const minValues: (number | null)[] = [];
-    const maxValues: (number | null)[] = [];
-    const p5Values: (number | null)[] = [];
-    const p95Values: (number | null)[] = [];
-    const lowerBandValues: (number | null)[] = [];
-    const upperBandValues: (number | null)[] = [];
-
-    for (const r of receiptSizeRecords) {
-      let label: string;
-      if (isDaily) {
-        label = (r as FctExecutionReceiptSizeDaily).day_start_date ?? '';
-      } else {
-        const ts = (r as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0;
-        const date = new Date(ts * 1000);
-        if (timePeriod === '24h') {
-          label = date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            timeZone: 'UTC',
-          });
-        } else if (timePeriod === '72h') {
-          label = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            timeZone: 'UTC',
-          });
-        } else {
-          label = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: '2-digit',
-            timeZone: 'UTC',
-          });
-        }
-      }
-
-      labels.push(label);
-      avgValues.push(r.avg_receipt_bytes_per_block ?? null);
-      movingAvgValues.push(r.moving_avg_receipt_bytes_per_block ?? null);
-      medianValues.push(r.p50_receipt_bytes_per_block ?? null);
-      minValues.push(r.min_receipt_bytes_per_block ?? null);
-      maxValues.push(r.max_receipt_bytes_per_block ?? null);
-      p5Values.push(r.p05_receipt_bytes_per_block ?? null);
-      p95Values.push(r.p95_receipt_bytes_per_block ?? null);
-      lowerBandValues.push(r.lower_band_receipt_bytes_per_block ?? null);
-      upperBandValues.push(r.upper_band_receipt_bytes_per_block ?? null);
-    }
-
-    return {
-      labels,
-      series: [
-        createStatisticSeries('Average', avgValues, {
-          color: DATA_COLORS.emerald,
-          lineWidth: 2.5,
-          group: 'Statistics',
-        }),
-        createStatisticSeries(movingAvgLabel, movingAvgValues, {
-          color: DATA_COLORS.cyan,
-          lineWidth: 2,
-          group: 'Statistics',
-        }),
-        createStatisticSeries('Median', medianValues, {
-          color: DATA_COLORS.purple,
-          lineWidth: 1.5,
-          lineStyle: 'dotted',
-          group: 'Statistics',
-        }),
-        ...createBandSeries('Bollinger', 'receipt-bollinger', lowerBandValues, upperBandValues, {
-          color: DATA_COLORS.amber,
-          opacity: 0.15,
-          group: 'Bands',
-          initiallyVisible: false,
-        }),
-        ...createBandSeries('P5/P95', 'receipt-percentile', p5Values, p95Values, {
-          color: DATA_COLORS.indigo,
-          opacity: 0.1,
-          group: 'Bands',
-        }),
-        ...createBandSeries('Min/Max', 'receipt-minmax', minValues, maxValues, {
-          color: DATA_COLORS.slate,
-          opacity: 0.06,
-          group: 'Bands',
-        }),
-      ],
-    };
-  }, [receiptSizeRecords, isDaily, timePeriod, movingAvgLabel]);
-
-  // Receipt Size tooltip formatter
-  const receiptTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!receiptSizeRecords?.length || !receiptSizeConfig) return '';
-
-      const recordsByKey = new Map<string, FctExecutionReceiptSizeHourly | FctExecutionReceiptSizeDaily>();
-      for (const r of receiptSizeRecords) {
-        let key: string;
-        if (isDaily) {
-          key = (r as FctExecutionReceiptSizeDaily).day_start_date ?? '';
-        } else {
-          const ts = (r as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0;
-          const date = new Date(ts * 1000);
-          if (timePeriod === '24h') {
-            key = date.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              timeZone: 'UTC',
-            });
-          } else if (timePeriod === '72h') {
-            key = date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              timeZone: 'UTC',
-            });
-          } else {
-            key = date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: '2-digit',
-              timeZone: 'UTC',
-            });
-          }
-        }
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = receiptSizeConfig.labels[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctExecutionReceiptSizeDaily).day_start_date ?? '')
-        : ((record as FctExecutionReceiptSizeHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const sections: TooltipSection[] = [
-        {
-          title: 'STATISTICS',
-          items: [
-            {
-              color: DATA_COLORS.emerald,
-              label: 'Average',
-              value: formatBytes(record.avg_receipt_bytes_per_block ?? 0),
-            },
-            {
-              color: DATA_COLORS.cyan,
-              label: movingAvgLabel,
-              value: formatBytes(record.moving_avg_receipt_bytes_per_block ?? 0),
-            },
-            {
-              color: DATA_COLORS.purple,
-              label: 'Median',
-              value: formatBytes(record.p50_receipt_bytes_per_block ?? 0),
-              style: 'dotted',
-            },
-          ],
-        },
-        {
-          title: 'BANDS',
-          items: [
-            {
-              color: DATA_COLORS.amber,
-              label: 'Bollinger',
-              value: formatBytesBand(
-                record.lower_band_receipt_bytes_per_block,
-                record.upper_band_receipt_bytes_per_block
-              ),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.indigo,
-              label: 'P5/P95',
-              value: formatBytesBand(record.p05_receipt_bytes_per_block, record.p95_receipt_bytes_per_block),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.slate,
-              label: 'Min/Max',
-              value: formatBytesBand(record.min_receipt_bytes_per_block, record.max_receipt_bytes_per_block),
-              style: 'area',
-            },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [receiptSizeRecords, receiptSizeConfig, isDaily, timePeriod, movingAvgLabel]
-  );
-
-  // Loading states
-
-  // "All" waits for both daily tables, since its start depends on both
-  const isAllStartLoading = config.days === null && (opcodeOpsDailyQuery.isLoading || receiptSizeDailyQuery.isLoading);
-
-  const isOpcodeOpsLoading = isDaily
-    ? opcodeOpsDailyQuery.isLoading || isAllStartLoading
-    : opcodeOpsHourlyQuery.isLoading;
-
-  const isOpcodeGasLoading = isDaily
-    ? opcodeGasDailyQuery.isLoading || isAllStartLoading
-    : opcodeGasHourlyQuery.isLoading;
-
-  const isReceiptSizeLoading = isDaily
-    ? receiptSizeDailyQuery.isLoading || isAllStartLoading
-    : receiptSizeHourlyQuery.isLoading;
+  const isOpcodeGasLoading = isDaily ? opcodeGasDailyQuery.isLoading : opcodeGasHourlyQuery.isLoading;
 
   if (boundsLoading) {
     return (
@@ -1150,49 +455,9 @@ export function HomePage(): JSX.Element {
           onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
           ariaLabel="Time window"
         />
-
-        {/* TODO: Enable when fork annotation data is available
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted">Show Forks</span>
-          <Toggle checked={showAnnotations} onChange={setShowAnnotations} size="small" />
-        </div>
-        */}
       </div>
 
-      {/* Time Series Charts Row */}
-      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Opcodes Per Second */}
-        <PopoutCard title="Opcodes Per Second" anchorId="ops-chart" modalSize="full">
-          {({ inModal }) =>
-            isOpcodeOpsLoading ? (
-              <LoadingContainer className="h-[320px] rounded-sm" />
-            ) : opcodesPerSecondConfig ? (
-              <MultiLineChart
-                series={opcodesPerSecondConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: opcodesPerSecondConfig.labels,
-                  name: timePeriod === '24h' ? 'Time (UTC)' : timePeriod === '72h' ? 'Date/Time (UTC)' : 'Date',
-                }}
-                yAxis={{
-                  name: 'Ops/sec',
-                  min: 0,
-                  formatter: (value: number) => formatCompact(value),
-                }}
-                height={inModal ? 600 : 320}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={opsTooltipFormatter}
-                markLines={showAnnotations ? forkMarkLines : []}
-                syncGroup={inModal ? undefined : 'gas-profiler'}
-              />
-            ) : (
-              <div className="flex h-[320px] items-center justify-center text-muted">No data available</div>
-            )
-          }
-        </PopoutCard>
-
+      <div className="mb-6">
         {/* Gas by Category */}
         <PopoutCard title="Gas by Category" anchorId="gas-by-category" modalSize="full">
           {({ inModal }) =>
@@ -1236,40 +501,6 @@ export function HomePage(): JSX.Element {
             No opcode data available
           </div>
         )}
-      </div>
-
-      {/* Receipt Size Per Block */}
-      <div className="mb-6">
-        <PopoutCard title="Receipt Size Per Block" anchorId="receipt-size-chart" modalSize="full">
-          {({ inModal }) =>
-            isReceiptSizeLoading ? (
-              <LoadingContainer className="h-[320px] rounded-sm" />
-            ) : receiptSizeConfig ? (
-              <MultiLineChart
-                series={receiptSizeConfig.series}
-                xAxis={{
-                  type: 'category',
-                  labels: receiptSizeConfig.labels,
-                  name: timePeriod === '24h' ? 'Time (UTC)' : timePeriod === '72h' ? 'Date/Time (UTC)' : 'Date',
-                }}
-                yAxis={{
-                  name: 'Bytes',
-                  min: 0,
-                  formatter: (value: number) => formatBytes(value),
-                }}
-                height={inModal ? 600 : 320}
-                showLegend
-                legendPosition="top"
-                enableDataZoom
-                tooltipFormatter={receiptTooltipFormatter}
-                markLines={showAnnotations ? forkMarkLines : []}
-                syncGroup={inModal ? undefined : 'gas-profiler'}
-              />
-            ) : (
-              <div className="flex h-[320px] items-center justify-center text-muted">No data available</div>
-            )
-          }
-        </PopoutCard>
       </div>
     </Container>
   );

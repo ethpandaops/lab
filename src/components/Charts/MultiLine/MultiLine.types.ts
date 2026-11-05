@@ -144,7 +144,9 @@ export interface XAxisConfig {
    * Axis type
    * - 'category': Uses string labels (e.g., days of week)
    * - 'value': Uses numeric values (e.g., slot numbers)
-   * - 'time': Uses Unix timestamps (seconds) for time-based sync
+   * - 'time': Unix timestamps in seconds, as `[seconds, value]` points, on an axis whose ticks fall on
+   *   UTC calendar days, Monday weeks, months or years to suit the span. Mark lines and areas take
+   *   seconds too.
    */
   type: 'category' | 'value' | 'time';
   /**

@@ -3,7 +3,7 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /** Chart heights, in page order: a taller lead chart, then the rest of the stack */
-const CHART_HEIGHTS = [320, 240, 240, 240];
+const CHART_HEIGHTS = [320, 240, 240, 240, 240, 240];
 
 /**
  * Loading skeleton for the Execution Overview page: the same single-column stack of chart cards, so the

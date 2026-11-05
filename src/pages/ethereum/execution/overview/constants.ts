@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { SeriesData } from '@/components/Charts/MultiLine';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
@@ -23,12 +22,6 @@ export const TIME_RANGE_CONFIG = {
   '2y': { days: 730, dataType: 'daily' as const, pageSize: 730 },
   all: { days: null, dataType: 'daily' as const, pageSize: 10000 },
 } as const;
-
-/** Chart configuration with labels and series data */
-export interface ChartConfig {
-  labels: string[];
-  series: SeriesData[];
-}
 
 /**
  * Gas limit signalling bands. Each band is half-open, [previous max, max), so a round target
