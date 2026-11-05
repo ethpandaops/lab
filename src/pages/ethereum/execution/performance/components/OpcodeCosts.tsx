@@ -82,7 +82,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
   return (
     <PopoutCard
       title="Opcode Pricing"
-      subtitle="Execution time per gas relative to each client's average, median of daily fits"
+      subtitle={`Execution time per gas relative to each client's average, median of ${model.grain === 'week' ? 'weekly' : 'daily'} fits`}
       anchorId="opcode-pricing"
       modalSize="full"
       noPadding
@@ -218,13 +218,21 @@ const MAX_RELEASES_PER_CLIENT = 4;
 const fmtDate = (t: number): string =>
   new Date(t * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
+/** Date of a daily fit, or the week of a weekly one */
+const fmtFit = (t: number, grain: OpcodeCostModel['grain']): string =>
+  grain === 'week' ? `Week of ${fmtDate(t)}` : fmtDate(t);
+
 const VIEW_OPTIONS = [
   { value: 'combined', label: 'Combined' },
   { value: 'per-client', label: 'Per client' },
 ] as const;
 
-/** Tooltip for daily points: date, then each series' value */
-function dailyTooltip(params: unknown, label: (seriesName: string, ns: number) => string): string {
+/** Tooltip for daily or weekly points: date, then each series' value */
+function dailyTooltip(
+  params: unknown,
+  grain: OpcodeCostModel['grain'],
+  label: (seriesName: string, ns: number) => string
+): string {
   const points = (Array.isArray(params) ? params : [params]) as {
     seriesName?: string;
     value?: [number, number];
@@ -240,7 +248,7 @@ function dailyTooltip(params: unknown, label: (seriesName: string, ns: number) =
         `<div style="display:flex;gap:8px;align-items:center;margin:2px 0"><span style="width:8px;height:8px;border-radius:50%;background:${p.color}"></span>${clientLogoHtml(p.seriesName ?? '')}<span>${p.seriesName}</span><span style="margin-left:auto;font-weight:600">${label(p.seriesName ?? '', p.value![1])}</span></div>`
     )
     .join('');
-  return `<div style="font-weight:600;margin-bottom:4px">${fmtDate(first.value[0] / 1000)}</div>${rows}`;
+  return `<div style="font-weight:600;margin-bottom:4px">${fmtFit(first.value[0] / 1000, grain)}</div>${rows}`;
 }
 
 /**
@@ -288,7 +296,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
   return (
     <PopoutCard
       title="Opcode Cost Over Time"
-      subtitle={`Nanoseconds per ${op.name}, fitted per day`}
+      subtitle={`Nanoseconds per ${op.name}, fitted per ${model.grain}`}
       anchorId="opcode-versions"
       modalSize="full"
       noPadding
@@ -321,7 +329,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                 yAxis={{ min: 0, formatter: v => fmtNs(v) }}
                 height={inModal ? 600 : 360}
                 showLegend
-                tooltipFormatter={params => dailyTooltip(params, (_, ns) => fmtNs(ns))}
+                tooltipFormatter={params => dailyTooltip(params, model.grain, (_, ns) => fmtNs(ns))}
               />
             </div>
           ) : (
@@ -372,7 +380,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                         const p = (Array.isArray(params) ? params : [params]) as { value?: [number, number] }[];
                         const day = c.daily.find(d => d.day * 1000 === p[0]?.value?.[0]);
                         if (!day) return '';
-                        return `<div style="font-weight:600">${fmtDate(day.day)}</div><div>${fmtNs(day.nsPerOp[opIndex])}, ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
+                        return `<div style="font-weight:600">${fmtFit(day.day, model.grain)}</div><div>${fmtNs(day.nsPerOp[opIndex])}, ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
                       }}
                     />
                   </div>

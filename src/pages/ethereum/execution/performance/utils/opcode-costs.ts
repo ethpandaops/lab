@@ -1,4 +1,8 @@
-import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
+import type {
+  FctOpcodeCostByElClientDaily,
+  FctOpcodeCostByElClientVersion,
+  FctOpcodeCostByElClientWeekly,
+} from '@/api/types.gen';
 import { normalizeClient, quantile } from './performance';
 
 /** Opcode groups in the order the backend fits them */
@@ -89,9 +93,9 @@ export interface OpcodeCostVersion {
   ratios: OpcodeCost[];
 }
 
-/** One UTC day's fit */
+/** One UTC day's or week's fit */
 export interface OpcodeCostDay {
-  /** Unix seconds at 00:00 UTC */
+  /** Unix seconds at 00:00 UTC on the day, or the Monday starting the week */
   day: number;
   blocks: number;
   /** Aligned with OpcodeCostModel.opcodes */
@@ -110,6 +114,8 @@ export interface OpcodeCostClient {
 }
 
 export interface OpcodeCostModel {
+  /** Whether each fit covers a UTC day or a week */
+  grain: 'day' | 'week';
   windowStart: number;
   windowEnd: number;
   days: number;
@@ -171,16 +177,18 @@ export function medianWithInterval(values: number[], seed = 1): { value: number;
   return { value, lo: quantile(medians, 0.05), hi: quantile(medians, 0.95) };
 }
 
-function dayStart(date: string): number {
-  return Date.parse(`${date}T00:00:00Z`) / 1000;
+/** Unix seconds at the start of a fit's UTC day or week */
+function fitStart(row: FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWeekly): number {
+  const date = 'week_start_date' in row ? row.week_start_date : (row as FctOpcodeCostByElClientDaily).day_start_date;
+  return Date.parse(`${date ?? ''}T00:00:00Z`) / 1000;
 }
 
 /**
- * Builds the per-client opcode cost model from the backend's daily and per-release fits.
- * Days with fewer than `minDayBlocks` observations (such as a partial current day) are dropped.
+ * Builds the per-client opcode cost model from the backend's daily or weekly fits and per-release fits.
+ * Days or weeks with fewer than `minDayBlocks` observations (such as a partial current day) are dropped.
  */
 export function buildOpcodeCostModel(
-  dailyRows: FctOpcodeCostByElClientDaily[],
+  dailyRows: Array<FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWeekly>,
   versionRows: FctOpcodeCostByElClientVersion[],
   minDayBlocks = 3000
 ): OpcodeCostModel | null {
@@ -188,7 +196,12 @@ export function buildOpcodeCostModel(
   const n = OPCODE_GROUPS.length;
 
   // client -> day -> row per opcode
-  const byClientDay = new Map<string, Map<number, FctOpcodeCostByElClientDaily[]>>();
+  const byClientDay = new Map<
+    string,
+    Map<number, Array<FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWeekly>>
+  >();
+  const grain = dailyRows.some(row => 'week_start_date' in row) ? 'week' : 'day';
+  const fitSeconds = grain === 'week' ? 7 * 86400 : 86400;
   const gasShare = new Array(n).fill(0);
   const gasPerOp = new Array(n).fill(0);
   const weight = new Array(n).fill(0);
@@ -196,7 +209,7 @@ export function buildOpcodeCostModel(
     const i = index.get(row.opcode_group ?? '');
     if (i === undefined || (row.block_count ?? 0) < minDayBlocks) continue;
     const client = normalizeClient(row.meta_execution_implementation);
-    const day = dayStart(row.day_start_date ?? '');
+    const day = fitStart(row);
     if (!byClientDay.has(client)) byClientDay.set(client, new Map());
     const days = byClientDay.get(client)!;
     if (!days.has(day)) days.set(day, new Array(n));
@@ -263,7 +276,7 @@ export function buildOpcodeCostModel(
         }));
       for (const d of daily) {
         windowStart = Math.min(windowStart, d.day);
-        windowEnd = Math.max(windowEnd, d.day + 86400);
+        windowEnd = Math.max(windowEnd, d.day + fitSeconds);
       }
       const ratios: OpcodeCost[] = OPCODE_GROUPS.map((_, i) => {
         const r = medianWithInterval(
@@ -286,6 +299,7 @@ export function buildOpcodeCostModel(
 
   if (clients.length === 0) return null;
   return {
+    grain,
     windowStart,
     windowEnd,
     days: Math.round((windowEnd - windowStart) / 86400),

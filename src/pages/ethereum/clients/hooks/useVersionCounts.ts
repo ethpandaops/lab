@@ -3,11 +3,12 @@ import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { completeBucketEnd } from '@/utils/time';
+import { completeBucketEnd, wholeUtcWeeks } from '@/utils/time';
 import {
   UNRESOLVED_STATUSES,
   fctBlockGraffitiClientVersionByEntityDailyList,
   fctBlockGraffitiClientVersionByEntityHourlyList,
+  fctBlockGraffitiClientVersionByEntityWeeklyList,
   fctBlockGraffitiClientVersionDailyList,
   fctBlockGraffitiClientVersionHourlyList,
 } from '../api/client-models';
@@ -18,8 +19,10 @@ import { toVersionCounts, type VersionCount } from '../utils/client-versions';
 const DAY = 86400;
 /** Hourly windows load in chunks of this many days, in parallel */
 const HOURLY_CHUNK_DAYS = 7;
-/** Daily windows up to this long list their dates; longer ones load whole calendar years */
+/** Daily windows up to this long list their dates; longer ones load whole calendar years, or whole weeks per entity */
 const MAX_LISTED_DAYS = 120;
+/** Weekly rollup of the per-entity daily table */
+const ENTITY_WEEKLY_TABLE = 'fct_block_graffiti_client_version_by_entity_weekly';
 /** First year with blocks on any network Lab serves */
 const FIRST_YEAR = 2020;
 
@@ -52,6 +55,8 @@ export interface Chunk {
   query: Record<string, unknown>;
   /** Whether the chunk can still change */
   open: boolean;
+  /** Whether the chunk reads whole weeks from the weekly table */
+  weekly?: boolean;
 }
 
 /** YYYY-MM-DD of a unix time */
@@ -96,6 +101,19 @@ export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number 
   });
 }
 
+/** Chunks of whole weeks, a query per calendar year listing its Mondays */
+export function weekChunks(weeks: string[]): Chunk[] {
+  const byYear = new Map<string, string[]>();
+  for (const week of weeks) byYear.set(week.slice(0, 4), [...(byYear.get(week.slice(0, 4)) ?? []), week]);
+  const thisYear = String(new Date().getUTCFullYear());
+  return [...byYear].map(([year, list]) => ({
+    key: `weeks-${list[0]}-${list[list.length - 1]}`,
+    query: { week_start_date_in_values: list.join(',') },
+    open: year >= thisYear,
+    weekly: true,
+  }));
+}
+
 /**
  * The last result whose chunks all loaded, returned while the chunks of a new window or filter load, so the page
  * keeps its content and height instead of swapping in a skeleton.
@@ -120,7 +138,8 @@ function combine(
 
 /**
  * Blocks per client version from the graffiti version tables, over a window or all history. Windows split into
- * cached chunks that load in parallel.
+ * cached chunks that load in parallel. Per-entity windows over {@link MAX_LISTED_DAYS} read the whole weeks the
+ * weekly table holds, and the days around them from the daily table.
  */
 export function useVersionCounts({
   grain,
@@ -145,7 +164,21 @@ export function useVersionCounts({
   const bounds = useTableBounds(dataKey);
   const dataStart = bounds.data?.min;
   const start = from === undefined ? dataStart : dataStart === undefined ? from : Math.max(from, dataStart);
-  const chunks = useMemo(() => chunksFor(grain, start, end), [grain, start, end]);
+  const weeklyBounds = useTableBounds(ENTITY_WEEKLY_TABLE).data;
+  const weeklyMin = weeklyBounds?.min;
+  const weeklyMax = weeklyBounds?.max;
+  const chunks = useMemo(() => {
+    const long = start !== undefined && (end - start) / DAY > MAX_LISTED_DAYS;
+    if (grain !== 'entity-daily' || !long || weeklyMin === undefined || weeklyMax === undefined) {
+      return chunksFor(grain, start, end);
+    }
+    const weeks = wholeUtcWeeks(Math.max(start, weeklyMin), Math.min(end, weeklyMax));
+    return [
+      ...(start < weeks.from ? chunksFor(grain, start, weeks.from) : []),
+      ...weekChunks(weeks.weeks),
+      ...(weeks.to < end ? chunksFor(grain, weeks.to, end) : []),
+    ];
+  }, [grain, start, end, weeklyMin, weeklyMax]);
   const table = {
     daily: fctBlockGraffitiClientVersionDailyList,
     'entity-daily': fctBlockGraffitiClientVersionByEntityDailyList,
@@ -165,9 +198,9 @@ export function useVersionCounts({
       queryFn: async ({ signal }: { signal: AbortSignal }) =>
         toVersionCounts(
           await fetchAllPages<Record<string, unknown>>(
-            table,
+            chunk.weekly ? fctBlockGraffitiClientVersionByEntityWeeklyList : table,
             { query: { ...chunk.query, ...filters, page_size: PAGE_SIZE } },
-            dataKey,
+            chunk.weekly ? ENTITY_WEEKLY_TABLE : dataKey,
             signal
           )
         ),

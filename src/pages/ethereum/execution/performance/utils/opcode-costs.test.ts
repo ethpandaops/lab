@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
+import type {
+  FctOpcodeCostByElClientDaily,
+  FctOpcodeCostByElClientVersion,
+  FctOpcodeCostByElClientWeekly,
+} from '@/api/types.gen';
 import {
   OPCODE_GROUPS,
   buildOpcodeCostModel,
@@ -86,6 +90,22 @@ describe('buildOpcodeCostModel', () => {
     expect(model.days).toBe(3);
     expect(model.opcodes[stack].pricedFor).toBe('execution');
     expect(model.opcodes[OPCODE_GROUPS.indexOf('SSTORE')].pricedFor).toBe('state');
+  });
+
+  it('reads weekly fits as week-long points', () => {
+    const week = (date: string, stack: number): FctOpcodeCostByElClientWeekly[] =>
+      day('2026-01-01', 'Reth', { STACK: stack }).map(({ day_start_date: _, ...row }) => ({
+        ...row,
+        week_start_date: date,
+      }));
+    const model = buildOpcodeCostModel([...week('2026-10-19', 2), ...week('2026-10-26', 3)], [])!;
+    expect(model.grain).toBe('week');
+    expect(model.clients[0].daily.map(d => d.day)).toEqual([
+      Date.parse('2026-10-19T00:00:00Z') / 1000,
+      Date.parse('2026-10-26T00:00:00Z') / 1000,
+    ]);
+    expect(model.windowEnd).toBe(Date.parse('2026-11-02T00:00:00Z') / 1000);
+    expect(model.days).toBe(14);
   });
 
   it('attaches release fits to their client', () => {
