@@ -1,5 +1,6 @@
 import { useMemo, useState, type JSX } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 
 import { DataTable, type DataTableColumn } from '@/components/DataTable';
@@ -10,6 +11,7 @@ import { TableCard, TableSearch } from '@/pages/ethereum/validators/components';
 import { formatCompact } from '@/pages/ethereum/validators/utils/overview';
 
 import type { EntityStake } from '../../hooks';
+import { groupName } from '../../utils/groups';
 import { formatEthChange } from '../../utils/overview';
 import {
   compare,
@@ -54,7 +56,14 @@ export interface EntitiesTableProps {
   stakeWindow: string;
   /** Performance window, e.g. "Oct 5 to Nov 4" */
   performanceWindow: string;
+  /** Members of each group row, largest stake first; a group row with members expands to its largest ones */
+  members?: Map<string, EntityStake[]>;
+  /** Counts per member entity, for the expanded rows */
+  memberPerformance?: Map<string, PerformanceCounts>;
 }
+
+/** Operators listed when a group row expands */
+const EXPANDED_MEMBERS = 5;
 
 const DASH = <span className="text-muted">-</span>;
 
@@ -105,17 +114,28 @@ export function EntitiesTable({
   network,
   stakeWindow,
   performanceWindow,
+  members,
+  memberPerformance,
 }: EntitiesTableProps): JSX.Element {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('stake');
+  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const query = search.trim().toLowerCase();
+  // Members a search matches, so searching for an operator finds its group
+  const matching = (group: string): EntityStake[] =>
+    (members?.get(group) ?? []).filter(m => m.validators > 0 && m.entity.toLowerCase().includes(query));
 
   // Memoised: DataTable returns to page 1 whenever its data array changes
   const rows = useMemo<EntityRow[]>(() => {
-    const query = search.trim().toLowerCase();
     const ids = Object.values(VIEW_METRICS).flat();
     return entities
-      .filter(e => e.validators > 0 && e.entity.toLowerCase().includes(query))
+      .filter(
+        e =>
+          e.validators > 0 &&
+          (entityLabel(e.entity).toLowerCase().includes(query) ||
+            (members?.get(e.entity) ?? []).some(m => m.validators > 0 && m.entity.toLowerCase().includes(query)))
+      )
       .map(e => {
         const counts = performance.get(e.entity);
         return {
@@ -125,14 +145,122 @@ export function EntitiesTable({
           comparisons: counts ? Object.fromEntries(ids.map(id => [id, compare(metricById(id), counts, network)])) : {},
         };
       });
-  }, [entities, totalStakeEth, search, performance, network]);
+  }, [entities, totalStakeEth, query, members, performance, network]);
 
   const entityColumn: DataTableColumn<EntityRow> = {
     id: 'entity',
     header: 'Entity',
     accessorKey: 'entity',
-    cell: ({ row }) => <Entity entity={row.original.entity} label={entityLabel(row.original.entity)} />,
+    cell: ({ row }) => {
+      const entity = row.original.entity;
+      const expandable = (members?.get(entity)?.length ?? 0) > 0;
+      if (!expandable) return <Entity entity={entity} label={entityLabel(entity)} />;
+      const isOpen = open.has(entity) || query.length > 0;
+      return (
+        <span className="inline-flex items-center gap-1">
+          <button
+            type="button"
+            onClick={event => {
+              event.stopPropagation();
+              setOpen(current => {
+                const next = new Set(current);
+                if (next.has(entity)) next.delete(entity);
+                else next.add(entity);
+                return next;
+              });
+            }}
+            aria-expanded={isOpen}
+            aria-controls={`members-${entity}`}
+            aria-label={`${isOpen ? 'Hide' : 'Show'} ${entityLabel(entity)} operators`}
+            className="-ml-1 rounded-xs p-0.5 text-muted hover:bg-primary/10 hover:text-foreground"
+          >
+            <ChevronRightIcon className={clsx('size-4 transition-transform', isOpen && 'rotate-90')} />
+          </button>
+          <Entity entity={entity} label={entityLabel(entity)} />
+        </span>
+      );
+    },
     meta: { cellClassName: 'text-foreground' },
+  };
+
+  /** The group's largest operators (or those the search matches), with the view's measure, and a link to all */
+  const renderMembers = (row: EntityRow): JSX.Element | null => {
+    const all = members?.get(row.entity);
+    if (!all?.length || !(open.has(row.entity) || query.length > 0)) return null;
+    const active = all.filter(m => m.validators > 0);
+    const shown = (query ? matching(row.entity) : active).slice(0, EXPANDED_MEMBERS);
+    const metric = view === 'stake' ? null : metricById(view === 'attestations' ? 'attested' : 'missed');
+    return (
+      <div id={`members-${row.entity}`} className="flex flex-col gap-2 pl-5">
+        <table className="w-full max-w-2xl text-xs/5">
+          <thead>
+            <tr className="text-left text-muted">
+              <th className="pb-1 font-normal">Operator</th>
+              <th className="pb-1 text-right font-normal">
+                {metric ? (view === 'attestations' ? 'Duties' : 'Proposals') : 'Validators'}
+              </th>
+              <th className="pb-1 text-right font-normal">{metric ? metric.label : 'Stake'}</th>
+              <th className="pb-1 text-right font-normal">
+                {metric ? 'vs network' : `Share of ${groupName(row.entity) ?? entityLabel(row.entity)}`}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map(m => {
+              const counts = memberPerformance?.get(m.entity);
+              const comparison = metric && counts ? compare(metric, counts, network) : null;
+              return (
+                <tr key={m.entity}>
+                  <td className="max-w-48 truncate py-0.5 pr-3 text-foreground">
+                    <Entity entity={m.entity} />
+                  </td>
+                  <td className="py-0.5 text-right tabular-nums">
+                    {metric
+                      ? counts
+                        ? formatSample(view === 'attestations' ? counts.duties : proposals(counts))
+                        : '-'
+                      : m.validators.toLocaleString()}
+                  </td>
+                  <td
+                    className={clsx(
+                      'py-0.5 text-right tabular-nums',
+                      comparison?.verdict === 'thin' ? 'text-muted/70' : 'text-foreground'
+                    )}
+                  >
+                    {metric
+                      ? comparison?.value == null
+                        ? '-'
+                        : metric.format(comparison.value)
+                      : `${formatCompact(m.stakeEth)} ETH`}
+                  </td>
+                  <td
+                    className={clsx(
+                      'py-0.5 text-right tabular-nums',
+                      comparison ? (verdictClass(comparison.verdict) ?? 'text-muted') : 'text-muted'
+                    )}
+                  >
+                    {metric
+                      ? !comparison || comparison.difference === null
+                        ? '-'
+                        : comparison.verdict === 'thin'
+                          ? 'Too few'
+                          : metric.delta(comparison.difference)
+                      : formatShare(row.stakeEth ? m.stakeEth / row.stakeEth : 0)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <Link
+          to="/ethereum/entities/$entity"
+          params={{ entity: row.entity }}
+          className="self-start text-xs/5 text-primary hover:underline"
+        >
+          All {active.length.toLocaleString()} operators
+        </Link>
+      </div>
+    );
   };
 
   const stakeColumns: DataTableColumn<EntityRow>[] = [
@@ -216,6 +344,7 @@ export function EntitiesTable({
         getRowId={e => e.entity}
         onRowClick={e => navigate({ to: '/ethereum/entities/$entity', params: { entity: e.entity } })}
         emptyMessage="No entities match this search"
+        renderExpandedRow={renderMembers}
       />
     </TableCard>
   );

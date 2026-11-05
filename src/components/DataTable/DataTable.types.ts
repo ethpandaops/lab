@@ -49,6 +49,8 @@ export interface DataTableProps<TData> {
   onRowClick?: (row: TData) => void;
   getRowId?: (row: TData) => string;
   getRowClassName?: (row: TData, rowId: string) => string | undefined;
+  /** Content for a full-width row under a row, such as its details once expanded; null shows none */
+  renderExpandedRow?: (row: TData, rowId: string) => ReactNode | null;
   // Manual mode (server-side)
   manualPagination?: boolean;
   manualFiltering?: boolean;

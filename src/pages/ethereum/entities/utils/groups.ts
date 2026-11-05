@@ -50,6 +50,17 @@ export function groupStakes(entities: EntityStake[]): EntityStake[] {
   return [...rest, ...merged.values()].sort((a, b) => b.stakeEth - a.stakeEth);
 }
 
+/** Each group's member entities, largest stake first, keyed by the group value */
+export function groupMembers(entities: EntityStake[]): Map<string, EntityStake[]> {
+  const out = new Map<string, EntityStake[]>();
+  for (const e of entities) {
+    const group = entityGroupOf(e.entity);
+    if (group) out.set(group, [...(out.get(group) ?? []), e]);
+  }
+  for (const list of out.values()) list.sort((a, b) => b.stakeEth - a.stakeEth);
+  return out;
+}
+
 /** Counts with each group's members summed into one entry named by the group value; members are dropped */
 export function groupCounts(counts: Map<string, PerformanceCounts>): Map<string, PerformanceCounts> {
   const out = new Map<string, PerformanceCounts>();
