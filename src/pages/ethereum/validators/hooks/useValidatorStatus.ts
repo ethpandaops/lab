@@ -17,6 +17,8 @@ interface UseValidatorStatusReturn {
   getStatusAtTimestamp: (validatorIndex: number, timestamp: number) => string | null;
   /** Validator indices with zero status transitions (nonexistent) */
   unknownValidators: number[];
+  /** Each validator's latest status transition */
+  latestStatus: Map<number, DimValidatorStatus>;
   isLoading: boolean;
   error: Error | null;
 }
@@ -144,6 +146,11 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
     };
   }, [transitionsByValidator]);
 
+  const latestStatus = useMemo(
+    () => new Map([...transitionsByValidator].map(([index, arr]) => [index, arr[arr.length - 1]])),
+    [transitionsByValidator]
+  );
+
   // Validators with no status transitions at all
   const unknownValidators = useMemo(() => {
     if (!enabled || isLoading) return [];
@@ -154,6 +161,7 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
     return {
       getStatusAtTimestamp: () => null,
       unknownValidators: [],
+      latestStatus,
       isLoading: false,
       error: null,
     };
@@ -162,6 +170,7 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
   return {
     getStatusAtTimestamp,
     unknownValidators,
+    latestStatus,
     isLoading,
     error: (error as Error) ?? null,
   };

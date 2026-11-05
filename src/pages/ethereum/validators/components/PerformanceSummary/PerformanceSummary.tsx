@@ -36,11 +36,17 @@ function formatEth(value: number | null): string {
 export function PerformanceSummary({ summary, isLoading = false, className }: PerformanceSummaryProps): JSX.Element {
   const attestation = summary?.attestation;
   const inclusionRate = attestation?.inclusionRate ?? null;
-  const { headCorrectRate = null, targetCorrectRate = null, sourceCorrectRate = null } = attestation ?? {};
-  const avgCorrectnessRate =
-    headCorrectRate !== null && targetCorrectRate !== null && sourceCorrectRate !== null
-      ? (headCorrectRate + targetCorrectRate + sourceCorrectRate) / 3
-      : null;
+  const attested = attestation?.attestedCount ?? 0;
+  const sourceKnown = (attestation?.sourceCorrectCount ?? 0) + (attestation?.sourceIncorrectCount ?? 0);
+  /** Subtitle of a vote: correct out of counted, or why there is no rate */
+  const voteSubtitle = (correct: number, total: number, counted: string): string =>
+    total > 0
+      ? `${correct} of ${total} ${counted}`
+      : inclusionRate === null
+        ? 'No duties in range'
+        : attested === 0
+          ? 'No attestations in range'
+          : 'None seen on gossip';
   const syncRate = summary?.syncCommittee.participationRate ?? null;
   const blockProposal = summary?.blockProposal;
   const hasProposals = (blockProposal?.totalProposals ?? 0) > 0;
@@ -58,32 +64,22 @@ export function PerformanceSummary({ summary, isLoading = false, className }: Pe
           : `${attestation?.attestedCount ?? 0} / ${attestation?.totalDuties ?? 0} duties`,
     },
     {
-      id: 'vote-correctness',
-      name: 'Vote Correctness',
-      value: value(formatPercent(avgCorrectnessRate)),
-      subtitle:
-        avgCorrectnessRate === null ? (
-          inclusionRate === null ? (
-            'No duties in range'
-          ) : (
-            'No attestations in range'
-          )
-        ) : (
-          <span className="mt-1 grid grid-cols-3 gap-2 whitespace-normal">
-            {(
-              [
-                ['Head', headCorrectRate],
-                ['Target', targetCorrectRate],
-                ['Source', sourceCorrectRate],
-              ] as const
-            ).map(([label, rate]) => (
-              <span key={label}>
-                <span className="block">{label}</span>
-                <span className="block text-foreground tabular-nums">{formatPercent(rate, 1)}</span>
-              </span>
-            ))}
-          </span>
-        ),
+      id: 'head-correct',
+      name: 'Head Correct',
+      value: value(formatPercent(attestation?.headCorrectRate ?? null)),
+      subtitle: voteSubtitle(attestation?.headCorrectCount ?? 0, attested, 'attestations'),
+    },
+    {
+      id: 'target-correct',
+      name: 'Target Correct',
+      value: value(formatPercent(attestation?.targetCorrectRate ?? null)),
+      subtitle: voteSubtitle(attestation?.targetCorrectCount ?? 0, attested, 'attestations'),
+    },
+    {
+      id: 'source-correct',
+      name: 'Source Correct',
+      value: value(formatPercent(attestation?.sourceCorrectRate ?? null)),
+      subtitle: voteSubtitle(attestation?.sourceCorrectCount ?? 0, sourceKnown, 'seen on gossip'),
     },
     {
       id: 'sync-committee',
@@ -115,5 +111,5 @@ export function PerformanceSummary({ summary, isLoading = false, className }: Pe
     },
   ];
 
-  return <Stats stats={stats} className={className} gridClassName="grid grid-cols-2 lg:grid-cols-5" />;
+  return <Stats stats={stats} className={className} gridClassName="grid grid-cols-2 sm:grid-cols-4" />;
 }

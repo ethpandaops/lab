@@ -541,89 +541,6 @@ export function shareStat(
   };
 }
 
-/** How long a release took to reach a share of blocks */
-export type AdoptionLag =
-  | { status: 'reached'; seconds: number }
-  | { status: 'not-reached' }
-  /** The blocks loaded start after the release, so the lag cannot be measured */
-  | { status: 'out-of-window' };
-
-/** Trailing window the adoption share is measured over, so one entity's burst of blocks does not count */
-const LAG_WINDOW_SECONDS = 24 * 3600;
-/** Fewest resolved blocks a window needs before its share counts */
-const LAG_MIN_BLOCKS = 30;
-
-/**
- * Time from release until `threshold` (0-100) of the trailing 24 hours of resolved blocks ran the release or
- * newer, checked at every hour. Takes per-block or hourly rows; an hourly row counts once its hour has passed.
- */
-export function timeToAdoption(
-  blocks: VersionCount[],
-  version: string,
-  releaseTime: number,
-  threshold: number
-): AdoptionLag {
-  const resolved = blocks.filter(block => block.version).sort((a, b) => a.time - b.time);
-  if (resolved.length === 0 || resolved[0].time > releaseTime + 3600) return { status: 'out-of-window' };
-
-  const end = resolved[resolved.length - 1].time;
-  let head = 0;
-  let tail = 0;
-  let total = 0;
-  let atLeast = 0;
-  const isAtLeast = (block: VersionCount): boolean => compareVersions(block.version ?? '', version) >= 0;
-
-  for (let checkpoint = Math.ceil(releaseTime / 3600) * 3600; checkpoint <= end + 3600; checkpoint += 3600) {
-    while (head < resolved.length && resolved[head].time < checkpoint) {
-      total += resolved[head].count;
-      if (isAtLeast(resolved[head])) atLeast += resolved[head].count;
-      head++;
-    }
-    while (tail < head && resolved[tail].time < checkpoint - LAG_WINDOW_SECONDS) {
-      total -= resolved[tail].count;
-      if (isAtLeast(resolved[tail])) atLeast -= resolved[tail].count;
-      tail++;
-    }
-    if (total >= LAG_MIN_BLOCKS && (atLeast / total) * 100 >= threshold) {
-      return { status: 'reached', seconds: Math.max(0, checkpoint - releaseTime) };
-    }
-  }
-  return { status: 'not-reached' };
-}
-
-/**
- * Time from release until `threshold` (0-100) of a day's resolved count ran the release or newer, from daily
- * counts: the end of the first such day on or after the release day, so it is an upper bound to the day. Days
- * starting at or after `until` are not checked.
- */
-export function timeToDailyAdoption(
-  days: VersionDay[],
-  version: string,
-  releaseTime: number,
-  threshold: number,
-  until: number = Infinity
-): AdoptionLag {
-  const counted = days.filter(day => day.resolved > 0);
-  const releaseDay = new Date(releaseTime * 1000).toISOString().slice(0, 10);
-  if (counted.length === 0 || counted[0].day > releaseDay) return { status: 'out-of-window' };
-  for (const day of counted) {
-    const start = Date.parse(`${day.day}T00:00:00Z`) / 1000;
-    if (day.day < releaseDay) continue;
-    if (start >= until) break;
-    let atLeast = 0;
-    for (const [candidate, count] of day.counts) {
-      if (compareVersions(candidate, version) >= 0) atLeast += count;
-    }
-    if ((atLeast / day.resolved) * 100 >= threshold) {
-      return { status: 'reached', seconds: Math.max(0, start + 86400 - releaseTime) };
-    }
-  }
-  return { status: 'not-reached' };
-}
-
-/** Shares of stake at which one client's bug changes what the chain can do, drawn as faint ticks on share bars */
-export const DIVERSITY_THRESHOLDS = [{ share: 100 / 3 }, { share: 50 }, { share: 200 / 3 }] as const;
-
 /**
  * Build line of an execution client version: the version without its trailing commit,
  * e.g. "1.17.11-unstable-0x2321bba4" → "1.17.11-unstable", "2.9.0-84caec58" → "2.9.0".
@@ -803,22 +720,4 @@ export function compareOpcodeCosts(
       };
     })
     .sort((a, b) => Number(b.significant) - Number(a.significant) || Math.abs(b.change) - Math.abs(a.change));
-}
-
-/**
- * Human duration for an adoption lag, e.g. "18 hours" or "6 days".
- */
-export function formatLag(seconds: number): string {
-  const hours = Math.round(seconds / 3600);
-  if (hours < 48) return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
-  const days = Math.round(seconds / 86400);
-  return `${days} days`;
-}
-
-/**
- * Duration for an adoption lag measured from daily counts, in whole days rounded up, e.g. "1 day" or "6 days".
- */
-export function formatDayLag(seconds: number): string {
-  const days = Math.max(1, Math.ceil(seconds / 86400));
-  return `${days} ${days === 1 ? 'day' : 'days'}`;
 }

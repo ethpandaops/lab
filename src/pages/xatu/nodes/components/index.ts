@@ -17,4 +17,3 @@ export { PerNodeHistoryChart } from './PerNodeHistoryChart';
 export { TimeSeriesChart } from './TimeSeriesChart';
 export { NodesSkeleton } from './NodesSkeleton';
 export { NodesTable } from './NodesTable';
-export { VsNetworkChart } from './VsNetworkChart';

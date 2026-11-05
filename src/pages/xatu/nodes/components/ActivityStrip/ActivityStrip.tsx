@@ -12,16 +12,12 @@ export interface ActivityStripProps {
   block: NodeHistory;
   /** Slots with a block per bucket start; a bucket without a count falls back to every slot */
   blockSlots: Map<number, number>;
-  /** Bucket starts where the node was behind the network */
-  behind?: Set<number>;
 }
 
 interface Bar {
   start: number;
   /** Before the node's first report in the range */
   before: boolean;
-  /** Trailing the network by more than a slot: the node was catching up */
-  behind: boolean;
   seen: number;
   /** Slots with a block */
   total: number;
@@ -30,21 +26,10 @@ interface Bar {
   p50: number | null;
 }
 
-/** Share of a bucket's blocks a node can miss before the bar is flagged */
-const GAP_THRESHOLD = 0.9;
-
-function barClass(bar: Bar): string {
-  if (bar.before) return 'bg-border/60';
-  if (bar.seen === 0) return 'bg-danger';
-  if (bar.behind) return 'bg-warning';
-  if (bar.seen / bar.total < GAP_THRESHOLD) return 'bg-warning';
-  return 'bg-success/70 group-hover:bg-success';
-}
-
 /**
- * Status-page bars, one per hour or day, flagged where the node saw few or no blocks or was catching up.
+ * One bar per hour or day, filled to the share of the bucket's blocks the node saw.
  */
-export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps): JSX.Element {
+export function ActivityStrip({ block, blockSlots }: ActivityStripProps): JSX.Element {
   const { timezone } = useTimezone();
   const [hovered, setHovered] = useState<Bar | null>(null);
   const byBucket = rowsByBucket(block.rows);
@@ -53,7 +38,6 @@ export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps)
     .map(start => ({
       start,
       before: start < first,
-      behind: behind?.has(start) ?? false,
       seen: byBucket.get(start)?.count ?? 0,
       total: blockSlots.get(start) ?? SLOTS_PER_BUCKET[block.granularity],
       counted: blockSlots.has(start),
@@ -84,7 +68,6 @@ export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps)
                   <span>
                     p50 <span className="text-foreground">{formatMs(hovered.p50)}</span>
                   </span>
-                  {hovered.behind && <span className="text-warning">catching up</span>}
                 </>
               )}
             </>
@@ -109,7 +92,19 @@ export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps)
             className="group flex flex-1 cursor-default items-stretch"
             onMouseEnter={() => setHovered(bar)}
           >
-            <span className={clsx('w-full rounded-xs transition-colors', barClass(bar))} />
+            <span
+              className={clsx(
+                'flex w-full items-end overflow-hidden rounded-xs',
+                bar.before ? 'bg-border/40' : 'bg-border/60'
+              )}
+            >
+              {!bar.before && (
+                <span
+                  className="w-full bg-muted transition-colors group-hover:bg-foreground"
+                  style={{ height: `${Math.min(100, (bar.seen / bar.total) * 100)}%` }}
+                />
+              )}
+            </span>
           </div>
         ))}
       </div>

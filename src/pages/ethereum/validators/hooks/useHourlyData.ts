@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import {
+  fctAttestationVoteCorrectnessByValidatorServiceList,
   fctAttestationVoteCorrectnessByValidatorHourlyServiceList,
   fctSyncCommitteeParticipationByValidatorHourlyServiceList,
   fctValidatorBalanceHourlyServiceList,
@@ -8,6 +9,7 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import type {
+  FctAttestationVoteCorrectnessByValidator,
   FctAttestationVoteCorrectnessByValidatorHourly,
   FctSyncCommitteeParticipationByValidatorHourly,
   FctValidatorBalanceHourly,
@@ -65,20 +67,31 @@ function gweiToEth(gwei: number | null | undefined): number | null {
 }
 
 /**
- * Transform raw attestation hourly records to data points
+ * Transform raw attestation hourly records to data points. The source rate divides by correct plus wrong source
+ * votes: an attestation never seen on gossip has no known source vote.
  */
 function transformAttestationHourly(
-  data: FctAttestationVoteCorrectnessByValidatorHourly[]
+  data: FctAttestationVoteCorrectnessByValidatorHourly[],
+  sourceMisses: FctAttestationVoteCorrectnessByValidator[]
 ): AttestationHourlyDataPoint[] {
-  return data.map(record => ({
-    timestamp: record.hour_start_date_time ?? 0,
-    validatorIndex: record.validator_index ?? 0,
-    inclusionRate: safePercentage(record.attested_count ?? 0, record.total_duties ?? 0),
-    headCorrectRate: safePercentage(record.head_correct_count ?? 0, record.attested_count ?? 0),
-    targetCorrectRate: safePercentage(record.target_correct_count ?? 0, record.attested_count ?? 0),
-    sourceCorrectRate: safePercentage(record.source_correct_count ?? 0, record.attested_count ?? 0),
-    avgInclusionDistance: record.avg_inclusion_distance ?? null,
-  }));
+  const missesByHour = new Map<string, number>();
+  for (const row of sourceMisses) {
+    const key = `${row.validator_index}:${Math.floor((row.slot_start_date_time ?? 0) / 3600) * 3600}`;
+    missesByHour.set(key, (missesByHour.get(key) ?? 0) + 1);
+  }
+  return data.map(record => {
+    const sourceCorrect = record.source_correct_count ?? 0;
+    const sourceIncorrect = missesByHour.get(`${record.validator_index}:${record.hour_start_date_time}`) ?? 0;
+    return {
+      timestamp: record.hour_start_date_time ?? 0,
+      validatorIndex: record.validator_index ?? 0,
+      inclusionRate: safePercentage(record.attested_count ?? 0, record.total_duties ?? 0),
+      headCorrectRate: safePercentage(record.head_correct_count ?? 0, record.attested_count ?? 0),
+      targetCorrectRate: safePercentage(record.target_correct_count ?? 0, record.attested_count ?? 0),
+      sourceCorrectRate: safePercentage(sourceCorrect, sourceCorrect + sourceIncorrect),
+      avgInclusionDistance: record.avg_inclusion_distance ?? null,
+    };
+  });
 }
 
 /**
@@ -176,6 +189,25 @@ export function useHourlyData(validatorIndices: number[], dayTimestamp: number |
         enabled,
       },
       {
+        queryKey: ['validators', 'source-misses-hourly', currentNetwork?.name, indicesString, dayTimestamp],
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+          fetchAllPages<FctAttestationVoteCorrectnessByValidator>(
+            fctAttestationVoteCorrectnessByValidatorServiceList,
+            {
+              query: {
+                validator_index_in_values: indicesString,
+                slot_start_date_time_gte: dayTimestamp ?? 0,
+                slot_start_date_time_lt: dayEnd,
+                source_correct_eq: false,
+                page_size: 10000,
+              },
+            },
+            'fct_attestation_vote_correctness_by_validator',
+            signal
+          ),
+        enabled,
+      },
+      {
         queryKey: ['validators', 'fct_validator_balance_hourly', currentNetwork?.name, indicesString, dayTimestamp],
         queryFn: ({ signal }: { signal: AbortSignal }) =>
           fetchAllPages<FctValidatorBalanceHourly>(
@@ -197,12 +229,14 @@ export function useHourlyData(validatorIndices: number[], dayTimestamp: number |
     ],
   });
 
-  const [attestationQuery, syncCommitteeQuery, balanceQuery] = results;
+  const [attestationQuery, syncCommitteeQuery, sourceMissQuery, balanceQuery] = results;
 
-  const isLoading = attestationQuery.isLoading || syncCommitteeQuery.isLoading || balanceQuery.isLoading;
-  const error = attestationQuery.error || syncCommitteeQuery.error || balanceQuery.error;
+  const isLoading =
+    attestationQuery.isLoading || syncCommitteeQuery.isLoading || sourceMissQuery.isLoading || balanceQuery.isLoading;
+  const error = attestationQuery.error || syncCommitteeQuery.error || sourceMissQuery.error || balanceQuery.error;
 
   const attestationData = useMemo(() => attestationQuery.data ?? [], [attestationQuery.data]);
+  const sourceMissData = useMemo(() => sourceMissQuery.data ?? [], [sourceMissQuery.data]);
   const syncCommitteeData = useMemo(() => syncCommitteeQuery.data ?? [], [syncCommitteeQuery.data]);
   const balanceData = useMemo(() => balanceQuery.data ?? [], [balanceQuery.data]);
 
@@ -216,11 +250,11 @@ export function useHourlyData(validatorIndices: number[], dayTimestamp: number |
     }
 
     return {
-      attestationHourly: transformAttestationHourly(attestationData),
+      attestationHourly: transformAttestationHourly(attestationData, sourceMissData),
       syncCommitteeHourly: transformSyncCommitteeHourly(syncCommitteeData),
       balanceHourly: transformBalanceHourly(balanceData),
     };
-  }, [enabled, isLoading, attestationData, syncCommitteeData, balanceData]);
+  }, [enabled, isLoading, attestationData, sourceMissData, syncCommitteeData, balanceData]);
 
   return {
     ...processedData,

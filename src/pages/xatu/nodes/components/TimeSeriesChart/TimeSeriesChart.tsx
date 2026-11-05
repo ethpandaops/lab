@@ -66,7 +66,7 @@ export function TimeSeriesChart({
         // Category axes take indexes and shade from band centre to band centre, so reach into the next bucket
         xStart: first,
         xEnd: Math.min(last + 1, buckets.length - 1),
-        color: colors.warning,
+        color: colors.muted,
         opacity: 0.12,
       }))
     : undefined;
@@ -76,7 +76,7 @@ export function TimeSeriesChart({
     if (index === null || index >= buckets.length) return '';
     const rows = [
       ...(behind?.has(buckets[index])
-        ? [{ color: colors.warning, label: 'Behind the network, catching up', value: '' }]
+        ? [{ color: colors.muted, label: 'Behind the network, catching up', value: '' }]
         : []),
       ...tooltipRows(index),
     ];
