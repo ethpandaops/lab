@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { NormalizedDataPoint } from './useStateSizeData';
 
-export type DeltaTimeframe = 'daily' | 'weekly' | 'monthly' | 'yearly';
+export type DeltaTimeframe = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all';
 
 interface DeltaValue {
   current: number;
@@ -32,7 +32,8 @@ function calculateDelta(current: number, previous: number): DeltaValue {
   return { current, previous, delta, percentChange };
 }
 
-function getTimeframeDays(timeframe: DeltaTimeframe): number {
+/** Days back to compare against, or null to compare against the first row */
+function getTimeframeDays(timeframe: DeltaTimeframe): number | null {
   switch (timeframe) {
     case 'daily':
       return 1;
@@ -42,13 +43,15 @@ function getTimeframeDays(timeframe: DeltaTimeframe): number {
       return 30;
     case 'yearly':
       return 365;
+    case 'all':
+      return null;
   }
 }
 
 /**
  * Hook that calculates state deltas based on selected timeframe.
  * Today's row is still being written, so the comparison ends at the last complete UTC day and
- * starts at the day `timeframe` days before it (or the nearest earlier day with data).
+ * starts at the day `timeframe` days before it (or the nearest earlier day with data), or at the first row for 'all'.
  */
 export function useStateDelta(data: NormalizedDataPoint[] | null, timeframe: DeltaTimeframe): StateDelta | null {
   return useMemo(() => {
@@ -60,13 +63,17 @@ export function useStateDelta(data: NormalizedDataPoint[] | null, timeframe: Del
     const latestData = complete[complete.length - 1];
     if (!latestData) return null;
 
-    const targetDate = new Date(latestData.date);
-    targetDate.setUTCDate(targetDate.getUTCDate() - getTimeframeDays(timeframe));
-
+    const days = getTimeframeDays(timeframe);
     let previousData: NormalizedDataPoint | undefined;
-    for (const point of complete) {
-      if (point.date > targetDate) break;
-      previousData = point;
+    if (days === null) {
+      previousData = complete[0];
+    } else {
+      const targetDate = new Date(latestData.date);
+      targetDate.setUTCDate(targetDate.getUTCDate() - days);
+      for (const point of complete) {
+        if (point.date > targetDate) break;
+        previousData = point;
+      }
     }
     if (!previousData) return null;
 

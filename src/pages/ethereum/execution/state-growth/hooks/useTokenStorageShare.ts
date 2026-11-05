@@ -31,8 +31,11 @@ function normalizeByDay(rows: FctTokenContractStorageStateByBlockDaily[]): Token
   return byDay;
 }
 
+/** Two rows (ERC20, ERC721) per day, so this covers the last week */
+const TOKEN_STORAGE_ROWS = 14;
+
 /**
- * Fetches daily live storage slots owned by ERC20/ERC721 contracts
+ * Fetches the latest days of live storage slots owned by ERC20/ERC721 contracts
  * (fct_token_contract_storage_state_by_block_daily), keyed by day so the caller can align it with
  * the State Growth page's existing storage-leaves total rather than re-querying state size.
  */
@@ -40,7 +43,8 @@ export function useTokenStorageShare(): UseTokenStorageShareResult {
   const today = currentUtcDate();
   const query = useQuery({
     ...fctTokenContractStorageStateByBlockDailyServiceListOptions({
-      query: { day_start_date_ne: today, page_size: 10000 },
+      // Newest days first; the card shows the latest day the state-size series also has
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: TOKEN_STORAGE_ROWS },
     }),
     placeholderData: keepPreviousData,
   });

@@ -1,16 +1,11 @@
-import { type JSX, useMemo, useCallback, useRef } from 'react';
+import { type JSX, useMemo, useCallback } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatTimeRange } from '@/utils/time';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { PayloadsSearch, FilterValues } from './IndexPage.types';
-import {
-  DEFAULT_DURATION_MIN,
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_TIME_RANGE_HOURS,
-  LIVE_MODE_ENABLED,
-} from './IndexPage.types';
+import { DEFAULT_DURATION_MIN, DEFAULT_PAGE_SIZE, LIVE_MODE_ENABLED } from './IndexPage.types';
 import { PayloadsView } from './components/PayloadsView';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import type { SortingState } from '@tanstack/react-table';
@@ -25,53 +20,16 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/execution/payloads/' }) as PayloadsSearch;
   const { currentNetwork } = useNetwork();
 
-  // Capture initial detail params from URL on mount (for deep-linking)
-  const initialDetailSlotRef = useRef<number | undefined>(search.detailSlot);
-
-  // Calculate time range in seconds
-  // Use URL params if provided, otherwise default to last hour with no upper bound
-  // Skip time filtering when blockNumber is provided for deep-linking
+  // The table covers every observation unless the URL bounds it. A block number deep-link reads the block wherever it
+  // falls. slot_start_date_time is a required filter, so the start is 0 when unbounded.
   const timeRange = useMemo(() => {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const defaultRangeSeconds = DEFAULT_TIME_RANGE_HOURS * 60 * 60;
-
-    // When blockNumber is provided, skip time filtering to allow deep-linking
-    // to blocks that fall outside the default 6-hour window
-    if (search.blockNumber !== undefined) {
-      return {
-        start: undefined,
-        end: undefined,
-        label: undefined,
-      };
-    }
-
-    if (search.timeStart !== undefined && search.timeEnd !== undefined) {
-      return {
-        start: search.timeStart,
-        end: search.timeEnd,
-        label: formatTimeRange(search.timeStart, search.timeEnd),
-      };
-    }
-
-    // Only use initial detail slot for deep-linking
-    const initialDetailSlot = initialDetailSlotRef.current;
-    if (initialDetailSlot !== undefined) {
-      // Extend range to include the slot time with buffer
-      const oneHourSeconds = 60 * 60;
-      const rangeStart = Math.min(nowSeconds - defaultRangeSeconds, initialDetailSlot - oneHourSeconds);
-      const rangeEnd = Math.max(nowSeconds, initialDetailSlot + oneHourSeconds);
-      return {
-        start: rangeStart,
-        end: rangeEnd,
-        label: formatTimeRange(rangeStart, rangeEnd),
-      };
-    }
-
-    // Default: the last DEFAULT_TIME_RANGE_HOURS with no upper bound (undefined lets API use current time)
+    const bounded = search.blockNumber === undefined;
+    const start = bounded ? (search.timeStart ?? 0) : 0;
+    const end = bounded ? search.timeEnd : undefined;
     return {
-      start: nowSeconds - defaultRangeSeconds,
-      end: undefined,
-      label: `Last ${DEFAULT_TIME_RANGE_HOURS} hours`,
+      start,
+      end,
+      label: start > 0 && end !== undefined ? formatTimeRange(start, end) : undefined,
     };
   }, [search.timeStart, search.timeEnd, search.blockNumber]);
 
@@ -100,7 +58,7 @@ export function IndexPage(): JSX.Element {
   } = useQuery({
     ...intEngineNewPayloadServiceListOptions({
       query: {
-        ...(timeRange.start !== undefined && { slot_start_date_time_gte: timeRange.start }),
+        slot_start_date_time_gte: timeRange.start,
         ...(timeRange.end !== undefined && { slot_start_date_time_lte: timeRange.end }),
         duration_ms_gte: durationMin,
         page_size: search.pageSize ?? DEFAULT_PAGE_SIZE,

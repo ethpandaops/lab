@@ -55,7 +55,7 @@ export function IndexPage(): JSX.Element {
   // Show skeleton only on initial load (no data yet), not on time range changes
   const showInitialSkeleton = isLoading && !data;
 
-  // The daily tables start partway through the longest ranges; say where the shown data begins
+  // The daily tables start partway through the longest ranges and All; say where the shown data begins
   const dailyRows = activeTab === 'newPayload' ? data?.newPayloadByElClientDaily : data?.getBlobsByElClientDaily;
   const firstDay = HOURLY_CHART_RANGES.includes(timeRange)
     ? undefined
@@ -63,9 +63,11 @@ export function IndexPage(): JSX.Element {
         (min, r) => (r.day_start_date && (!min || r.day_start_date < min) ? r.day_start_date : min),
         undefined
       );
-  const rangeStartDay = new Date(Date.now() - TIME_RANGE_CONFIG[timeRange].seconds * 1000).toISOString().slice(0, 10);
+  const rangeSeconds = TIME_RANGE_CONFIG[timeRange].seconds;
+  const rangeStartDay =
+    rangeSeconds === null ? undefined : new Date(Date.now() - rangeSeconds * 1000).toISOString().slice(0, 10);
   const dataSince =
-    firstDay && firstDay > rangeStartDay
+    firstDay && (rangeStartDay === undefined || firstDay > rangeStartDay)
       ? new Date(`${firstDay}T00:00:00Z`).toLocaleDateString([], {
           month: 'short',
           day: 'numeric',

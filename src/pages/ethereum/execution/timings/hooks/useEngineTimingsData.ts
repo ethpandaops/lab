@@ -32,7 +32,7 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { completeBucketEnd } from '@/utils/time';
+import { completeBucketEnd, currentUtcDate } from '@/utils/time';
 import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../IndexPage.types';
 
 export interface EngineTimingsData {
@@ -95,19 +95,24 @@ export interface UseEngineTimingsDataResult {
 function getTimeRangeTimestamps(range: TimeRange): {
   hourlyStart: number;
   hourlyEnd: number;
-  /** UTC dates of the range's full days, ending yesterday, for the daily tables */
-  days: string;
+  /** The range's full days, ending yesterday, for the daily tables; All reads every complete day */
+  days: DayFilter;
 } {
-  const config = TIME_RANGE_CONFIG[range];
+  const { seconds } = TIME_RANGE_CONFIG[range];
 
   const hourlyEnd = completeBucketEnd('hour');
-  const hourlyStart = hourlyEnd - config.seconds;
+  const hourlyStart = seconds === null ? 0 : hourlyEnd - seconds;
 
   const todayStart = completeBucketEnd('day');
-  const days = generateDateRange(todayStart - config.seconds, todayStart - 1);
+  const days: DayFilter =
+    seconds === null
+      ? { day_start_date_ne: currentUtcDate() }
+      : { day_start_date_in_values: generateDateRange(todayStart - seconds, todayStart - 1) };
 
   return { hourlyStart, hourlyEnd, days };
 }
+
+type DayFilter = { day_start_date_in_values: string } | { day_start_date_ne: string };
 
 /**
  * Generate all YYYY-MM-DD UTC date strings in a timestamp range, joined by commas.
@@ -141,11 +146,11 @@ function histogramQuery(
   grain: HistogramGrain,
   hourlyStart: number,
   hourlyEnd: number,
-  days: string
+  days: DayFilter
 ): Record<string, string | number> {
   if (grain === 'slot') return { slot_start_date_time_gte: hourlyStart, slot_start_date_time_lt: hourlyEnd };
   if (grain === 'hourly') return { hour_start_date_time_gte: hourlyStart, hour_start_date_time_lt: hourlyEnd };
-  return { day_start_date_in_values: days };
+  return days;
 }
 
 const HISTOGRAM_TABLES = {
@@ -381,7 +386,7 @@ export function useEngineTimingsData({
             fctEngineNewPayloadWinrateDailyServiceList,
             {
               query: {
-                day_start_date_in_values: days,
+                ...days,
                 order_by: 'day_start_date ASC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -422,7 +427,7 @@ export function useEngineTimingsData({
             fctEngineNewPayloadByElClientDailyServiceList,
             {
               query: {
-                day_start_date_in_values: days,
+                ...days,
                 order_by: 'day_start_date DESC',
                 page_size: 10000,
                 ...refNodeFilter,
@@ -442,7 +447,7 @@ export function useEngineTimingsData({
             fctEngineGetBlobsByElClientDailyServiceList,
             {
               query: {
-                day_start_date_in_values: days,
+                ...days,
                 order_by: 'day_start_date DESC',
                 page_size: 10000,
                 ...refNodeFilter,

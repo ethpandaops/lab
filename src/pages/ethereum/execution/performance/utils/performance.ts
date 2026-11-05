@@ -22,8 +22,18 @@ export const FULL_BLOCK_RANGE_SECONDS = 6 * 3600;
 export const BLOCK_SLICE_COUNT = 28;
 export const BLOCK_SLICE_SECONDS = 15 * 60;
 
-/** The range [start, end) in seconds, ending at the last full hour so hourly rows are complete */
-export function rangeBounds(seconds: number, nowMs = Date.now()): { start: number; end: number } {
+/**
+ * The range [start, end) in seconds, ending at the last full hour so hourly rows are complete. All (null seconds) runs
+ * from the UTC day holding the first data to the last full day, since it reads daily rows.
+ */
+export function rangeBounds(
+  seconds: number | null,
+  firstDataTime: number,
+  nowMs = Date.now()
+): { start: number; end: number } {
+  if (seconds === null) {
+    return { start: Math.floor(firstDataTime / 86400) * 86400, end: completeBucketEnd('day', nowMs) };
+  }
   const end = completeBucketEnd('hour', nowMs);
   return { start: end - seconds, end };
 }
@@ -335,9 +345,9 @@ export function buildClientPerformance(
 }
 
 /** Chain demand: gas actually used per wall-clock second over the range, in Mgas/s */
-export function chainDemand(hourly: FctExecutionGasUsedHourly[]): number {
-  const gas = hourly.reduce((s, h) => s + (h.total_gas_used ?? 0), 0);
-  const blocks = hourly.reduce((s, h) => s + (h.block_count ?? 0), 0);
+export function chainDemand(rows: Pick<FctExecutionGasUsedHourly, 'total_gas_used' | 'block_count'>[]): number {
+  const gas = rows.reduce((s, h) => s + (h.total_gas_used ?? 0), 0);
+  const blocks = rows.reduce((s, h) => s + (h.block_count ?? 0), 0);
   return blocks > 0 ? gas / (blocks * SLOT_SECONDS) / 1e6 : 0;
 }
 
@@ -362,8 +372,8 @@ export function clientThroughput(
 }
 
 /**
- * Hourly throughput per client: total gas over total execution time ('avg'), or gas over the
- * hour's P95 duration ('p95', the throughput the slow tail gets).
+ * Throughput per client per hour (or per day for daily rows): total gas over total execution time ('avg'), or gas
+ * over the hour's P95 duration ('p95', the throughput the slow tail gets).
  */
 export function hourlyThroughputSeries(
   hourly: FctEngineNewPayloadByElClientHourly[],

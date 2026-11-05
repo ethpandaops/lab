@@ -95,6 +95,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
 
   // Long ranges (90d+) only fetch the daily tables, so trends there have one point per day
   const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
+  const rangeConfig = TIME_RANGE_CONFIG[timeRange];
+  const rangeSuffix = rangeConfig.seconds === null ? '' : `, ${rangeConfig.label.toLowerCase()}`;
 
   // Per-client/version rows covering the whole range (hourly up to 31d, daily beyond)
   const summaryRows: (FctEngineGetBlobsByElClientHourly | FctEngineGetBlobsByElClientDaily)[] = showHourlyCharts
@@ -181,7 +183,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
   const histogramCard = (
     <PopoutCard
       title="Duration Distribution (50ms buckets)"
-      subtitle={`Successful engine_getBlobs calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+      subtitle={`Successful engine_getBlobs calls from every Xatu node${rangeSuffix}`}
       anchorId="blob-duration"
       modalSize="full"
     >
@@ -661,7 +663,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
         {!showPerSlotCharts && histogramCard}
         <PopoutCard
           title="Status Distribution"
-          subtitle={`engine_getBlobs calls by response status, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          subtitle={`engine_getBlobs calls by response status${rangeSuffix}`}
           anchorId="blob-status"
           modalSize="full"
         >

@@ -4,6 +4,7 @@ import { fctOpcodeCostByElClientDailyServiceList, fctOpcodeCostByElClientVersion
 import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { currentUtcDate } from '@/utils/time';
 import { buildOpcodeCostModel, MIN_VERSION_HOURS, type OpcodeCostModel } from '../utils/opcode-costs';
 import { rangeDays } from '../utils/performance';
 import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
@@ -13,11 +14,13 @@ const NODE_CLASS = 'eip7870-block-builder';
 
 /**
  * Opcode cost fits over the complete UTC days that contain the range [rangeStart, rangeEnd), since the
- * fits are daily: daily fits per client, and per-release fits for releases that ran in those days.
+ * fits are daily: daily fits per client, and per-release fits for releases that ran in those days. `allDays`
+ * reads every complete day the table holds.
  */
 export function useOpcodeCostData(
   rangeStart: number,
-  rangeEnd: number
+  rangeEnd: number,
+  allDays = false
 ): {
   model: OpcodeCostModel | null;
   isLoading: boolean;
@@ -31,13 +34,15 @@ export function useOpcodeCostData(
   }, [rangeStart, rangeEnd]);
 
   const daily = useQuery({
-    queryKey: ['opcode-cost', 'daily', currentNetwork?.name, start, end],
+    queryKey: ['opcode-cost', 'daily', currentNetwork?.name, allDays, start, end],
     queryFn: ({ signal }) =>
       fetchAllPages<FctOpcodeCostByElClientDaily>(
         fctOpcodeCostByElClientDailyServiceList,
         {
           query: {
-            day_start_date_in_values: generateDateRange(start, end),
+            ...(allDays
+              ? { day_start_date_ne: currentUtcDate() }
+              : { day_start_date_in_values: generateDateRange(start, end) }),
             node_class_eq: NODE_CLASS,
             page_size: 10000,
           },
