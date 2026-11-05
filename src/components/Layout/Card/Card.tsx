@@ -68,7 +68,7 @@ export function Card({
     title !== undefined ? (
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm/6 font-semibold text-foreground">{title}</h3>
+          <h3 className="text-sm/6 font-semibold wrap-break-word text-foreground">{title}</h3>
           {subtitle && <p className="text-xs/5 text-muted">{subtitle}</p>}
         </div>
         {actions && <div className="-my-1 -mr-1.5 flex shrink-0 items-center gap-0.5">{actions}</div>}

@@ -247,9 +247,9 @@ export function PayloadsView({
             <FilterableCell field="meta_execution_implementation" value={client} onFilterClick={onFilterClick}>
               <span className="inline-flex items-center gap-1.5">
                 <ClientLogo client={clientLower} size={16} />
-                <span className="text-xs">
+                <span className="flex flex-col text-xs">
                   {clientLower}
-                  {version && <span className="text-muted"> ({version})</span>}
+                  {version && <span className="text-muted">{version}</span>}
                 </span>
               </span>
             </FilterableCell>
@@ -268,8 +268,6 @@ export function PayloadsView({
             .replace(/^utility-mainnet-/, 'utility/')
             .replace(/^sigma-mainnet-/, 'sigma/')
             .replace(/^berlin-/, 'berlin/');
-          // Truncate long node names
-          const displayName = shortName.length > 35 ? `${shortName.slice(0, 35)}...` : shortName;
           // Extract cluster for EIP-7870 reference nodes
           const clusterName = extractClusterFromNodeName(nodeName);
           const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
@@ -288,7 +286,8 @@ export function PayloadsView({
                   <ServerIcon className={`size-3.5 shrink-0 ${clusterColor}`} />
                 </button>
               )}
-              {displayName}
+              {/* Long names wrap at their hyphens so the table fits its card */}
+              <span className="max-w-40 whitespace-normal">{shortName}</span>
             </span>
           );
         },

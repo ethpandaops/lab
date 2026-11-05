@@ -260,7 +260,7 @@ export function PopoutCard({
             <div className="flex items-start gap-x-2">
               <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-x-4 gap-y-3">
                 <div className="min-w-0 flex-[1_1_16rem]">
-                  <h3 className="truncate text-sm/6 font-semibold text-foreground">
+                  <h3 className="text-sm/6 font-semibold wrap-break-word text-foreground">
                     {anchorId ? (
                       <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">
                         {title}

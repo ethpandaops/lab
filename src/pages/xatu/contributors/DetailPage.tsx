@@ -1,5 +1,6 @@
 import { type JSX, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { useQuery } from '@tanstack/react-query';
 import { fctNodeLastSeenServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctNodeLastSeen } from '@/api/types.gen';
@@ -37,53 +38,58 @@ const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: st
   },
 ];
 
+/** A Xatu node's city and country with its flag */
+function NodeLocation({ node }: { node: FctNodeLastSeen }): JSX.Element {
+  const city = node.meta_client_geo_city;
+  const country = node.meta_client_geo_country;
+  const countryCode = node.meta_client_geo_country_code;
+  const flag = countryCode ? getCountryFlag(countryCode, '') : '';
+
+  if (!country) return <span className="text-muted/60">Unknown</span>;
+  return (
+    <div className="flex items-center gap-2">
+      {flag && <span>{flag}</span>}
+      <span>{city ? `${city}, ${country}` : country}</span>
+    </div>
+  );
+}
+
+/** Columns past the Node ID give way on narrow screens, where the Node ID cell stacks them instead */
+const WIDE_ONLY = 'hidden sm:table-cell';
+
 // Node table columns (constant, defined once outside component)
 const nodeColumns: Column<FctNodeLastSeen>[] = [
   {
     header: 'Node ID',
-    accessor: (node: FctNodeLastSeen) =>
-      node.node_id ? (
-        <Link
-          to="/xatu/nodes/$nodeId"
-          params={{ nodeId: node.node_id }}
-          className="font-mono text-primary hover:underline"
-        >
-          {node.node_id}
-        </Link>
-      ) : (
-        '-'
-      ),
+    accessor: (node: FctNodeLastSeen) => (
+      <div className="flex flex-col gap-1">
+        {node.node_id ? (
+          <Link
+            to="/xatu/nodes/$nodeId"
+            params={{ nodeId: node.node_id }}
+            className="font-mono wrap-anywhere text-primary hover:underline"
+          >
+            {node.node_id}
+          </Link>
+        ) : (
+          '-'
+        )}
+        <div className="flex flex-col gap-1 text-xs text-muted sm:hidden">
+          {node.meta_consensus_implementation && (
+            <NodeClientVersion client={node.meta_consensus_implementation} version={node.meta_consensus_version} />
+          )}
+          <NodeLocation node={node} />
+          {node.last_seen_date_time && <Timestamp timestamp={node.last_seen_date_time} format="relative" />}
+        </div>
+      </div>
+    ),
+    cellClassName: 'max-sm:whitespace-normal text-foreground',
   },
   {
     header: 'Location',
-    accessor: (node: FctNodeLastSeen) => {
-      const city = node.meta_client_geo_city;
-      const country = node.meta_client_geo_country;
-      const countryCode = node.meta_client_geo_country_code;
-      const flag = countryCode ? getCountryFlag(countryCode, '') : '';
-
-      // Show city + country if both available
-      if (city && country) {
-        return (
-          <div className="flex items-center gap-2">
-            {flag && <span>{flag}</span>}
-            <span>{`${city}, ${country}`}</span>
-          </div>
-        );
-      }
-      // Otherwise show just country if available
-      if (country) {
-        return (
-          <div className="flex items-center gap-2">
-            {flag && <span>{flag}</span>}
-            <span>{country}</span>
-          </div>
-        );
-      }
-      // No location data
-      return <span className="text-muted/60">Unknown</span>;
-    },
-    cellClassName: 'text-muted',
+    accessor: (node: FctNodeLastSeen) => <NodeLocation node={node} />,
+    cellClassName: clsx('text-muted', WIDE_ONLY),
+    headerClassName: WIDE_ONLY,
   },
   {
     header: 'Implementation',
@@ -93,7 +99,8 @@ const nodeColumns: Column<FctNodeLastSeen>[] = [
       }
       return node.meta_client_implementation || node.meta_client_version || '-';
     },
-    cellClassName: 'text-muted',
+    cellClassName: clsx('text-muted', WIDE_ONLY),
+    headerClassName: WIDE_ONLY,
   },
   {
     header: 'Consensus',
@@ -103,7 +110,8 @@ const nodeColumns: Column<FctNodeLastSeen>[] = [
       ) : (
         '-'
       ),
-    cellClassName: 'text-muted',
+    cellClassName: clsx('text-muted', WIDE_ONLY),
+    headerClassName: WIDE_ONLY,
   },
   {
     header: 'Last Seen',
@@ -113,7 +121,8 @@ const nodeColumns: Column<FctNodeLastSeen>[] = [
       }
       return '-';
     },
-    cellClassName: 'text-muted',
+    cellClassName: clsx('text-muted', WIDE_ONLY),
+    headerClassName: WIDE_ONLY,
   },
 ];
 

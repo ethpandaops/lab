@@ -47,7 +47,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                     style={item.iconColor ? { color: item.iconColor } : undefined}
                   />
                 )}
-                <span className="truncate">{item.name}</span>
+                <span className="min-w-0 wrap-break-word">{item.name}</span>
               </dt>
 
               <dd className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2">
@@ -88,7 +88,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
                 )}
               </dd>
 
-              {item.subtitle && <div className="mt-0.5 truncate text-xs/5 text-muted">{item.subtitle}</div>}
+              {item.subtitle && <div className="mt-0.5 text-xs/5 wrap-break-word text-muted">{item.subtitle}</div>}
 
               {item.link && (
                 <Link

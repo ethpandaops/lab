@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useRef } from 'react';
+import { type JSX, useLayoutEffect, useRef } from 'react';
 import clsx from 'clsx';
 import type { SegmentedControlProps } from './SegmentedControl.types';
 
@@ -8,7 +8,8 @@ import type { SegmentedControlProps } from './SegmentedControl.types';
  * Shares the 32px control height and rounded-sm radius with SelectMenu and Button so a row of
  * filters lines up. The selected segment uses the app-wide selected state (`bg-primary/15
  * text-primary`) rather than a solid fill. When the options overflow a narrow screen, the control
- * scrolls sideways and keeps the selected segment in view.
+ * narrows to the whole segments around the selected one and scrolls sideways to the rest, so no
+ * segment is cut in half.
  */
 export function SegmentedControl<T extends string>({
   options,
@@ -19,16 +20,44 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>): JSX.Element {
   const groupRef = useRef<HTMLDivElement>(null);
   // Scrolls only the control, never the page, so the selection is visible without moving the reader
-  useEffect(() => {
+  useLayoutEffect(() => {
     const group = groupRef.current;
-    const selected = group?.querySelector('[aria-pressed="true"]');
-    if (!group || !selected) return;
-    const outer = group.getBoundingClientRect();
-    const inner = selected.getBoundingClientRect();
-    const inset = 2;
-    if (inner.right > outer.right - inset) group.scrollLeft += inner.right - outer.right + inset;
-    else if (inner.left < outer.left + inset) group.scrollLeft -= outer.left + inset - inner.left;
-  }, [value]);
+    if (!group) return;
+    const fit = (): void => {
+      group.style.width = '';
+      const buttons = [...group.querySelectorAll('button')];
+      const selected = buttons.findIndex(button => button.getAttribute('aria-pressed') === 'true');
+      if (selected < 0 || group.scrollWidth <= group.clientWidth) {
+        group.scrollLeft = 0;
+        return;
+      }
+      // Segment edges from the start of the scrolled content
+      const origin = group.getBoundingClientRect().left - group.scrollLeft;
+      const edges = buttons.map(button => {
+        const rect = button.getBoundingClientRect();
+        return { left: rect.left - origin, right: rect.right - origin };
+      });
+      const inset = edges[0].left;
+      const room = group.clientWidth - 2 * inset;
+      // As many whole segments as fit, from as early as the selected one allows
+      let first = selected;
+      while (first > 0 && edges[selected].right - edges[first - 1].left <= room) first--;
+      let last = selected;
+      while (last < edges.length - 1 && edges[last + 1].right - edges[first].left <= room) last++;
+      group.style.width = `${edges[last].right - edges[first].left + 2 * inset}px`;
+      group.scrollLeft = edges[first].left - inset;
+    };
+    fit();
+    // Refit when the screen width changes, not on the height changes of a mobile browser's toolbar
+    let width = window.innerWidth;
+    const onResize = (): void => {
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      fit();
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [value, options.length]);
 
   return (
     <div

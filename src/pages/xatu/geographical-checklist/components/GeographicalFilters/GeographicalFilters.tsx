@@ -27,14 +27,14 @@ export function GeographicalFilters({
   return (
     <>
       {/* Search and View Mode Toggle */}
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Input wrapperClassName="grow">
           <Input.Leading>
             <MagnifyingGlassIcon />
           </Input.Leading>
           <Input.Field {...register('search')} placeholder="Search by username or location..." />
         </Input>
-        <ButtonGroup>
+        <ButtonGroup className="self-start">
           <Button
             variant={viewMode === 'list' ? 'primary' : 'secondary'}
             onClick={() => onViewModeChange('list')}

@@ -82,8 +82,9 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
   }
 
   return (
-    <nav aria-label="Breadcrumb" className={clsx('flex items-center gap-2 text-sm/6', className)}>
-      <ol className="flex items-center gap-2">
+    <nav aria-label="Breadcrumb" className={clsx('flex min-w-0 items-center gap-2 text-sm/6', className)}>
+      {/* One line: parents keep their width and the current page truncates */}
+      <ol className="flex min-w-0 items-center gap-2 whitespace-nowrap">
         {/* Home icon */}
         {showHome && (
           <>
@@ -100,10 +101,10 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
 
         {/* Breadcrumb items */}
         {breadcrumbs.map((crumb, index) => (
-          <li key={crumb.path} className="flex items-center gap-2">
+          <li key={crumb.path} className={clsx('flex items-center gap-2', crumb.isActive ? 'min-w-0' : 'shrink-0')}>
             {crumb.isActive ? (
               // Active breadcrumb (current page)
-              <span className="font-medium text-foreground" aria-current="page">
+              <span className="truncate font-medium text-foreground" aria-current="page" title={crumb.label}>
                 {crumb.label}
               </span>
             ) : crumb.clickable ? (
