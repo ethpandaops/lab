@@ -205,7 +205,7 @@ export function IndexPage(): JSX.Element {
                   name: 'Largest entity',
                   value: groupName(largest.entity) ?? largest.entity,
                   valueClassName: 'truncate',
-                  subtitle: `${groupName(largest.entity) ? 'All operators, ' : ''}${percent(largest.stakeEth / totalStakeEth)} of stake`,
+                  subtitle: `${percent(largest.stakeEth / totalStakeEth)} of stake`,
                 },
                 {
                   id: 'top10',
