@@ -214,6 +214,8 @@ async function fetchOfflineValidators(
 export interface UseEpochsDataReturn {
   data: EpochsPageResult | undefined;
   missedAttestationsByEntity: MissedAttestationByEntity[];
+  /** First slot time of the offline validators table when the page's epochs start before it */
+  offlineDataStart?: number;
   isLoading: boolean;
   isPlaceholderData: boolean;
   error: Error | null;
@@ -227,6 +229,7 @@ export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
   const { data: summaryBounds } = useTableBounds('fct_epoch_summary_canonical');
+  const { data: livenessBounds } = useTableBounds('fct_attestation_liveness_by_entity_head');
   const genesisTime = currentNetwork?.genesis_time;
   const summary: SummaryEpochs | undefined =
     summaryBounds && genesisTime !== undefined
@@ -251,9 +254,18 @@ export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
     placeholderData: keepPreviousData,
   });
 
+  const firstEpochStart =
+    epochs.length > 0 && genesisTime !== undefined
+      ? slotToTimestamp(Math.min(...epochs) * SLOTS_PER_EPOCH, genesisTime)
+      : undefined;
+
   return {
     data: page.data,
     missedAttestationsByEntity: offline.data ?? [],
+    offlineDataStart:
+      livenessBounds && firstEpochStart !== undefined && firstEpochStart < livenessBounds.min
+        ? livenessBounds.min
+        : undefined,
     isLoading: page.isLoading || (genesisTime !== undefined && summary === undefined),
     isPlaceholderData: page.isPlaceholderData,
     error: page.error ?? offline.error,

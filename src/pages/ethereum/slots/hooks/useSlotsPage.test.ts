@@ -25,6 +25,7 @@ function buildTables(): void {
     proposer_validator_index: slot % 7,
     block_root: isMissed(slot) ? null : `0x${slot}`,
   }));
+  tables.int_block_proposer_canonical = tables.fct_block_proposer_head;
   tables.fct_block_proposer = slots.map(slot => ({ ...at(slot), status: isMissed(slot) ? 'missed' : 'canonical' }));
   tables.fct_block_proposer_entity = slots.map(slot => ({ ...at(slot), entity: entityOf(slot) }));
   const blocks = slots.filter(slot => !isMissed(slot));
@@ -91,14 +92,15 @@ vi.mock('@/api/sdk.gen', () => ({
   fctBlockMevHeadServiceList: list('fct_block_mev_head'),
   fctBlockGraffitiServiceList: list('fct_block_graffiti'),
   fctBlockPayloadPtcVoteHeadServiceList: list('fct_block_payload_ptc_vote_head'),
+  intBlockProposerCanonicalServiceList: list('int_block_proposer_canonical'),
 }));
 
 /** Every page from the first, following next cursors */
-async function allPages(args: Omit<SlotsPageArgs, 'cursor'>): Promise<number[][]> {
+async function allPages(args: Omit<SlotsPageArgs, 'cursor'>, headStart?: number): Promise<number[][]> {
   const pages: number[][] = [];
   let cursor: string | undefined;
   do {
-    const page = await fetchSlotsPage({ ...args, cursor }, 0, false);
+    const page = await fetchSlotsPage({ ...args, cursor }, 0, false, headStart);
     pages.push(page.rows.map(row => row.slot));
     cursor = page.nextCursor;
   } while (cursor && pages.length < 1000);
@@ -177,6 +179,30 @@ describe('fetchSlotsPage', () => {
     expect(recent.every(row => row.source === null)).toBe(true);
     const local = (await allPages(args({ source: 'local' }, 'slot', 10))).flat();
     expect(local[0]).toBeLessThanOrEqual(1190);
+  });
+
+  it('reads slots before the proposer head table from the canonical table', async () => {
+    const headStart = 2000;
+    // The canonical table only holds finalized slots
+    tables.int_block_proposer_canonical = tables.fct_block_proposer_head.filter(row => row.slot < 3900);
+    for (const table of ['fct_block_proposer_head', 'fct_block_proposer', 'fct_block_proposer_entity']) {
+      tables[table] = tables[table].filter(row => row.slot >= headStart);
+    }
+
+    expect((await allPages(args({}), headStart)).flat()).toEqual(slotsWhere(() => true));
+    expect((await allPages(args({ status: 'missed' }, 'slot', 7), headStart)).flat()).toEqual(slotsWhere(isMissed));
+    // Orphaned blocks are only known from the status table
+    expect((await allPages(args({ status: 'orphaned' }), headStart)).flat()).toEqual([]);
+
+    const old = await fetchSlotsPage({ ...args({}), cursor: 'lt:2010' }, 0, false, headStart);
+    expect(old.rows.map(row => row.slot)).toEqual(slotsWhere(s => s < 2010).slice(0, 25));
+    expect(old.rows.find(row => row.slot < headStart && isMissed(row.slot))).toMatchObject({
+      status: 'missed',
+      entity: null,
+    });
+    // Previous reads back up across the split
+    const back = await fetchSlotsPage({ ...args({}), cursor: old.prevCursor }, 0, false, headStart);
+    expect(back.rows.map(row => row.slot)).toEqual(slotsWhere(s => s >= 2010).slice(-25));
   });
 
   it('filters by blob count from the payload blob gas', async () => {

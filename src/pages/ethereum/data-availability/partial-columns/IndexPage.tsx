@@ -97,8 +97,18 @@ export function IndexPage(): JSX.Element {
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(COMPLETION_HOURLY_TABLE);
   const hasData = !!tableBounds;
 
-  const { pathRecords, partialRecords, peerRecords, keys, peerKeys, isDaily, isLoading, error } =
-    usePartialColumnRollups(timePeriod);
+  const {
+    pathRecords,
+    partialRecords,
+    peerRecords,
+    keys,
+    peerKeys,
+    isDaily,
+    windowStart: rollupStart,
+    windowEnd,
+    isLoading,
+    error,
+  } = usePartialColumnRollups(timePeriod);
 
   const sentryClients = useMemo(() => sentryClientsOf(pathRecords, partialRecords), [pathRecords, partialRecords]);
   const sentry = pickSentryClient(sentryClients, search.sentry);
@@ -106,10 +116,7 @@ export function IndexPage(): JSX.Element {
   const sentryPaths = useMemo(() => pathRecords.filter(r => r.sentryClient === sentry), [pathRecords, sentry]);
   const sentryPartials = useMemo(() => partialRecords.filter(r => r.sentryClient === sentry), [partialRecords, sentry]);
 
-  const windowStart = useMemo(() => {
-    if (config.days === null) return tableBounds?.min ?? 0;
-    return Math.floor(Date.now() / 1000) - config.days * 24 * 3600;
-  }, [config.days, tableBounds?.min]);
+  const windowStart = rollupStart ?? tableBounds?.min ?? 0;
   // The sentry data starts later than the longer windows reach back, so name where it starts
   const dataStartLabel =
     tableBounds && (config.days === null || windowStart < tableBounds.min)
@@ -122,6 +129,7 @@ export function IndexPage(): JSX.Element {
   const blockPageSize = search.pageSize ?? BLOCKS_PAGE_SIZE;
   const blocks = useCompletionBlocks({
     since: windowStart,
+    until: windowEnd,
     filters: blockFilters,
     sort: blockSort,
     order: blockOrder,

@@ -10,6 +10,7 @@ import { DataTable } from '@/components/DataTable';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
+import { noDataBefore } from '@/pages/ethereum/slots/hooks/useSlotTableCoverage';
 
 import { useEpochsData } from './hooks';
 import { EpochsFilters } from './components/EpochsFilters';
@@ -34,13 +35,15 @@ export function IndexPage(): JSX.Element {
   const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
   const pageIndex = search.page ?? 0;
 
-  const { data, missedAttestationsByEntity, isLoading, isPlaceholderData, error, currentEpoch } = useEpochsData({
-    filters,
-    pageSize,
-    cursor: search.cursor,
-  });
+  const { data, missedAttestationsByEntity, offlineDataStart, isLoading, isPlaceholderData, error, currentEpoch } =
+    useEpochsData({
+      filters,
+      pageSize,
+      cursor: search.cursor,
+    });
   const rows = data?.rows ?? [];
   const epochs = rows.map(row => row.epoch);
+  const offlineEmpty = offlineDataStart ? noDataBefore(offlineDataStart) : 'No offline validators in these epochs';
 
   const setFilters = useCallback(
     (next: EpochFilters) =>
@@ -174,10 +177,10 @@ export function IndexPage(): JSX.Element {
               title="Offline Validators"
               topN={10}
               anchorId="offline-validators-chart"
-              emptyMessage="No offline validators in these epochs"
+              emptyMessage={offlineEmpty}
             />
 
-            <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs} />
+            <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs} emptyMessage={offlineEmpty} />
           </>
         )}
       </div>

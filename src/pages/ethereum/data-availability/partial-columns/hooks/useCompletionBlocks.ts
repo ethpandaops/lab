@@ -22,6 +22,8 @@ export interface CompletionBlock extends FctBlockDataColumnCompletion {
 export interface CompletionBlocksQuery {
   /** Window start in unix seconds, used unless the filters give a start slot */
   since: number;
+  /** Exclusive window end in unix seconds, used unless the filters give an end slot */
+  until: number;
   filters: BlockFilters;
   sort: BlockSortKey;
   order: 'asc' | 'desc';
@@ -62,12 +64,13 @@ const toMs = (seconds: number | undefined): number | undefined =>
 
 /** API query for a page of blocks: filters, sort with a slot tie-break so pages never overlap, and page token */
 export function completionBlocksQuery(
-  { since, filters, sort, order, page, pageSize }: CompletionBlocksQuery,
+  { since, until, filters, sort, order, page, pageSize }: CompletionBlocksQuery,
   genesisTime: number
 ): CompletionQuery {
   const query: CompletionQuery = {
     slot_start_date_time_gte: filters.slotFrom !== undefined ? slotToTimestamp(filters.slotFrom, genesisTime) : since,
     slot_start_date_time_lte: filters.slotTo !== undefined ? slotToTimestamp(filters.slotTo, genesisTime) : undefined,
+    slot_start_date_time_lt: filters.slotTo !== undefined ? undefined : until,
     blob_count_gte: filters.blobsMin,
     blob_count_lte: filters.blobsMax,
     // The API ignores filters on its percentile columns, so latency filters use the latest completion.

@@ -14,11 +14,14 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { Validator } from '@/components/Ethereum/Validator';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useBounds } from '@/hooks/useBounds';
 import { getForkEpoch } from '@/utils/forks';
+import { slotToTimestamp } from '@/utils/beacon';
 import { formatSlot, truncateAddress, weiToEth } from '@/utils';
 import { useSlotsPage } from './hooks';
+import { noDataBefore } from './hooks/useSlotTableCoverage';
 import { SlotsFilters } from './components/SlotsFilters';
-import type { SlotRow } from './utils/slot-query';
+import { slotBounds, type SlotRow } from './utils/slot-query';
 import {
   DEFAULT_PAGE_SIZE,
   SLOT_FILTER_KEYS,
@@ -94,6 +97,26 @@ export function IndexPage(): JSX.Element {
     hasGloas
   );
   const rows = data?.rows ?? [];
+
+  // Orphaned blocks and entities are only known from tables that start after genesis; say so where the list ends
+  const { data: bounds } = useBounds();
+  const genesisTime = currentNetwork?.genesis_time;
+  const listFrom = genesisTime !== undefined ? slotBounds(filters, genesisTime).min : undefined;
+  const endsAt = (start: number | undefined): start is number =>
+    start !== undefined &&
+    genesisTime !== undefined &&
+    (listFrom === undefined || slotToTimestamp(listFrom, genesisTime) < start);
+  const entityDataStart = bounds?.fct_block_proposer_entity?.min;
+  const orphanedStart = filters.status === 'orphaned' ? bounds?.fct_block_proposer?.min : undefined;
+  const entityStart = filters.entity ? entityDataStart : undefined;
+  const listEnd =
+    !data || data.nextCursor
+      ? undefined
+      : endsAt(orphanedStart)
+        ? noDataBefore(orphanedStart, 'orphaned slot')
+        : endsAt(entityStart)
+          ? noDataBefore(entityStart, 'entity')
+          : undefined;
 
   // Cursors of pages already visited, so Previous works for value sorts where only Next can be derived
   const visited = useRef(new Map<string, string | undefined>());
@@ -201,7 +224,13 @@ export function IndexPage(): JSX.Element {
       column.accessor('entity', {
         id: 'entity',
         header: 'Entity',
-        cell: info => <Entity entity={info.getValue()} />,
+        // Before the entity table starts, a slot without a graffiti entity has no entity data
+        cell: info =>
+          info.getValue() === null && entityDataStart !== undefined && info.row.original.timestamp < entityDataStart ? (
+            <Muted />
+          ) : (
+            <Entity entity={info.getValue()} />
+          ),
         enableSorting: false,
       }),
       column.accessor('status', {
@@ -359,15 +388,16 @@ export function IndexPage(): JSX.Element {
           ]
         : []),
     ],
-    [addFilter, hasGloas]
+    [addFilter, hasGloas, entityDataStart]
   );
 
   const emptyMessage =
-    data?.searchedTo !== undefined
+    listEnd ??
+    (data?.searchedTo !== undefined
       ? `No matches down to slot ${formatSlot(data.searchedTo)}`
       : data?.partial
         ? 'No matches yet'
-        : 'No slots match these filters';
+        : 'No slots match these filters');
 
   return (
     <Container>
@@ -405,6 +435,8 @@ export function IndexPage(): JSX.Element {
           paginationPosition="both"
         />
       </div>
+
+      {listEnd && rows.length > 0 && <p className="mt-3 text-right text-sm text-muted">{listEnd}</p>}
 
       {data?.partial && data.nextCursor && (
         <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-sm text-muted">

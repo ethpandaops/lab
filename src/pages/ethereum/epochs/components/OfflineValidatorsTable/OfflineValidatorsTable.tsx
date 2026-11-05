@@ -13,6 +13,8 @@ export interface OfflineValidatorsTableProps {
   data: MissedAttestationByEntity[];
   /** Epochs on the page, newest first; one column each */
   epochs: number[];
+  /** Shown when no entity has offline validators */
+  emptyMessage: string;
 }
 
 interface Row {
@@ -25,7 +27,7 @@ interface Row {
  * Every entity with offline validators in the page's epochs: total plus a count per epoch,
  * worst first, filterable by name. Cells are shaded relative to the worst cell on the page.
  */
-export function OfflineValidatorsTable({ data, epochs }: OfflineValidatorsTableProps): JSX.Element {
+export function OfflineValidatorsTable({ data, epochs, emptyMessage }: OfflineValidatorsTableProps): JSX.Element {
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState(false);
 
@@ -93,7 +95,11 @@ export function OfflineValidatorsTable({ data, epochs }: OfflineValidatorsTableP
   return (
     <Card
       title="Offline validators by entity"
-      subtitle={`${grandTotal.toLocaleString()} missed attestations across ${rows.length} entities`}
+      subtitle={
+        rows.length > 0
+          ? `${grandTotal.toLocaleString()} missed attestations across ${rows.length} entities`
+          : undefined
+      }
       actions={
         <input
           type="text"
@@ -106,7 +112,7 @@ export function OfflineValidatorsTable({ data, epochs }: OfflineValidatorsTableP
       }
     >
       {rows.length === 0 ? (
-        <p className="text-sm text-muted">No offline validators in these epochs.</p>
+        <p className="text-sm text-muted">{emptyMessage}</p>
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted">No entity matches &ldquo;{query.trim()}&rdquo;.</p>
       ) : (

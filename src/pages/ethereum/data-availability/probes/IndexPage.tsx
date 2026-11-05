@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useCallback, useRef } from 'react';
+import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
@@ -6,7 +6,7 @@ import {
   intCustodyProbeServiceListOptions,
   intCustodyProbeOrderBySlotServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import { formatTimeRange } from '@/utils/time';
+import { formatTimeRange, formatTimestamp } from '@/utils/time';
 import { useFuluActivation } from '@/pages/ethereum/data-availability/custody/hooks/useFuluActivation';
 import type { ProbesSearch } from './IndexPage.types';
 import { ProbesView } from './components/ProbesView';
@@ -24,43 +24,18 @@ export function IndexPage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const { fuluActivation } = useFuluActivation();
 
-  // Capture the initial probeTime from URL on mount (for deep-linking)
-  // This prevents time range recalculation when user clicks on rows to view details
-  const initialProbeTimeRef = useRef<number | undefined>(search.probeTime);
-
   // timeStart/timeEnd scope the list to probes of slots in that window (the custody drill-down's
-  // range), read from the slot-ordered table. Without them, probes run in the last 7 days.
+  // range), read from the slot-ordered table. Without them, every probe since Fulu.
   const hasSlotWindow = search.timeStart !== undefined && search.timeEnd !== undefined;
 
-  // Calculate time range in seconds for the probe_date_time filter
-  // If probeTime was in URL on initial load (deep-linking), ensure the time range includes it
-  const timeRange = useMemo(() => {
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const sevenDaysSeconds = 7 * 24 * 60 * 60;
+  // Bounded by now so ClickHouse can cut off early with ORDER BY; fixed on mount so opening a probe keeps the page
+  const [now] = useState(() => Math.floor(Date.now() / 1000));
 
-    // Only use initial probeTime for deep-linking (not when user clicks rows)
-    const initialProbeTime = initialProbeTimeRef.current;
-    if (initialProbeTime !== undefined) {
-      // Extend range to include the probe time with a 1-day buffer on each side
-      const oneDaySeconds = 24 * 60 * 60;
-      const rangeStart = Math.min(nowSeconds - sevenDaysSeconds, initialProbeTime - oneDaySeconds);
-      const rangeEnd = Math.max(nowSeconds, initialProbeTime + oneDaySeconds);
-      return {
-        start: rangeStart,
-        end: rangeEnd,
-        label: formatTimeRange(rangeStart, rangeEnd),
-      };
-    }
-
-    // Default: NOW - 7d to NOW for bounded query (helps ClickHouse early cutoff with ORDER BY)
-    return {
-      start: nowSeconds - sevenDaysSeconds,
-      end: nowSeconds,
-      label: 'Last 7 days',
-    };
-  }, []);
-
-  const windowLabel = hasSlotWindow ? `Slots ${formatTimeRange(search.timeStart!, search.timeEnd!)}` : timeRange.label;
+  const windowLabel = hasSlotWindow
+    ? `Slots ${formatTimeRange(search.timeStart!, search.timeEnd!)}`
+    : fuluActivation
+      ? `Since ${formatTimestamp(fuluActivation.dateTime, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}`
+      : undefined;
 
   // Check if live mode is enabled from URL (needed before query)
   const isLive = search.isLive ?? false;
@@ -100,8 +75,8 @@ export function IndexPage(): JSX.Element {
   const probeTimeQuery = useQuery({
     ...intCustodyProbeServiceListOptions({
       query: {
-        probe_date_time_gte: timeRange.start,
-        probe_date_time_lte: timeRange.end,
+        probe_date_time_gte: fuluActivation?.dateTime,
+        probe_date_time_lte: now,
         // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
         ...(fuluActivation && { slot_gte: fuluActivation.slot }),
         ...listQuery,
