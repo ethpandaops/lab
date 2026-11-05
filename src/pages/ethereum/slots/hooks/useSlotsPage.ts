@@ -10,6 +10,7 @@ import {
   fctBlockProposerEntityServiceList,
   fctBlockProposerHeadServiceList,
   fctBlockProposerServiceList,
+  fctBlockServiceList,
   intBlockProposerCanonicalServiceList,
 } from '@/api/sdk.gen';
 import type { SlotFilters, SlotSort } from '../IndexPage.types';
@@ -46,6 +47,7 @@ const TABLES: Record<SlotTable, { list: ListFn; key: string }> = {
   status: { list: fctBlockProposerServiceList as unknown as ListFn, key: 'fct_block_proposer' },
   entity: { list: fctBlockProposerEntityServiceList as unknown as ListFn, key: 'fct_block_proposer_entity' },
   block: { list: fctBlockHeadServiceList as unknown as ListFn, key: 'fct_block_head' },
+  final: { list: fctBlockServiceList as unknown as ListFn, key: 'fct_block' },
   mev: { list: fctBlockMevHeadServiceList as unknown as ListFn, key: 'fct_block_mev_head' },
   graffiti: { list: fctBlockGraffitiServiceList as unknown as ListFn, key: 'fct_block_graffiti' },
   ptc: { list: fctBlockPayloadPtcVoteHeadServiceList as unknown as ListFn, key: 'fct_block_payload_ptc_vote_head' },
@@ -67,23 +69,36 @@ async function listRows(
   };
 }
 
-/** Read `tables` for `slots` and merge the rows into `facts` */
+/**
+ * Read `tables` for `slots` and merge the rows into `facts`. Blocks of slots up to `finalTo` come from fct_block,
+ * whose finalized payloads have transaction counts that fct_block_head is missing for some slots.
+ */
 async function loadFacts(
   slots: number[],
   tables: SlotTable[],
   genesisTime: number,
   facts: Map<number, SlotFacts>,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  finalTo?: number
 ): Promise<void> {
   if (slots.length === 0 || tables.length === 0) return;
-  const query = {
-    slot_in_values: slots.join(','),
-    slot_start_date_time_gte: slotToTimestamp(Math.min(...slots), genesisTime),
-    slot_start_date_time_lte: slotToTimestamp(Math.max(...slots), genesisTime),
-    page_size: slots.length * 2 + 10,
-  };
+  const reads = tables.flatMap((table): [SlotTable, number[]][] =>
+    table === 'block' && finalTo !== undefined
+      ? [
+          ['final', slots.filter(slot => slot <= finalTo)],
+          ['block', slots.filter(slot => slot > finalTo)],
+        ]
+      : [[table, slots]]
+  );
   await Promise.all(
-    tables.map(async table => {
+    reads.map(async ([table, ids]) => {
+      if (ids.length === 0) return;
+      const query = {
+        slot_in_values: ids.join(','),
+        slot_start_date_time_gte: slotToTimestamp(Math.min(...ids), genesisTime),
+        slot_start_date_time_lte: slotToTimestamp(Math.max(...ids), genesisTime),
+        page_size: ids.length * 2 + 10,
+      };
       const request = listRows(table, query, signal);
       // PTC votes only exist from gloas; a network without them still lists its slots
       const { rows } = table === 'ptc' ? await request.catch(() => ({ rows: [] })) : await request;
@@ -119,12 +134,14 @@ export interface SlotsPageResult {
  *
  * `headStart` is the first slot of fct_block_proposer_head. In slot order, slots before it are read from
  * int_block_proposer_canonical instead of the proposer and status tables, so the list reaches genesis.
+ * `finalTo` is the last slot of fct_block; blocks up to it are shown from there (see `loadFacts`).
  */
 export async function fetchSlotsPage(
   { filters, sort, dir, pageSize, cursor: cursorParam }: SlotsPageArgs,
   genesisTime: number,
   withPtc: boolean,
   headStart?: number,
+  finalTo?: number,
   signal?: AbortSignal
 ): Promise<SlotsPageResult> {
   const driver = chooseDriver(filters, sort);
@@ -182,7 +199,7 @@ export async function fetchSlotsPage(
       applyRow(table, row, facts);
       if (typeof row.slot === 'number' && slots[slots.length - 1] !== row.slot) slots.push(row.slot);
     }
-    await loadFacts(slots, tableJoins, genesisTime, facts, signal);
+    await loadFacts(slots, tableJoins, genesisTime, facts, signal, finalTo);
     return { slots, next: rows.length < batchSize ? undefined : (next ?? 'more') };
   };
 
@@ -284,9 +301,12 @@ export async function fetchSlotsPage(
 
   const shown = matched.map(entry => entry.slot);
   const missing = DISPLAY_TABLES.filter(table => table !== driver && !joins.includes(table));
+  // Value sorts page through fct_block_head; finalized rows still show their block from fct_block
+  const finalShown = driver === 'block' && finalTo !== undefined ? shown.filter(slot => slot <= finalTo) : [];
   const [coveredTo] = await Promise.all([
     mevLatest,
-    loadFacts(shown, withPtc ? [...missing, 'ptc'] : missing, genesisTime, facts, signal),
+    loadFacts(shown, withPtc ? [...missing, 'ptc'] : missing, genesisTime, facts, signal, finalTo),
+    loadFacts(finalShown, ['final'], genesisTime, facts, signal),
   ]);
 
   return { ...result, rows: matched.map(entry => toSlotRow(facts.get(entry.slot)!, genesisTime, coveredTo)) };
@@ -308,15 +328,17 @@ export function useSlotsPage(args: SlotsPageArgs, withPtc: boolean): UseSlotsPag
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time;
   const { data: headBounds, isLoading: boundsLoading } = useTableBounds('fct_block_proposer_head');
+  const { data: finalBounds, isLoading: finalLoading } = useTableBounds('fct_block');
   const headStart =
     headBounds && genesisTime !== undefined ? Math.max(0, timestampToSlot(headBounds.min, genesisTime)) : undefined;
+  const finalTo = finalBounds && genesisTime !== undefined ? timestampToSlot(finalBounds.max, genesisTime) : undefined;
   const followsHead =
     args.sort === 'slot' && !args.cursor && args.filters.slotMax === undefined && !args.filters.timeEnd;
 
   const query = useQuery({
-    queryKey: ['slots-list', currentNetwork?.name, args, withPtc, headStart],
-    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, headStart, signal),
-    enabled: genesisTime !== undefined && !boundsLoading,
+    queryKey: ['slots-list', currentNetwork?.name, args, withPtc, headStart, finalTo],
+    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, headStart, finalTo, signal),
+    enabled: genesisTime !== undefined && !boundsLoading && !finalLoading,
     placeholderData: keepPreviousData,
     refetchInterval: followsHead ? 12_000 : false,
     staleTime: followsHead ? 0 : 60_000,

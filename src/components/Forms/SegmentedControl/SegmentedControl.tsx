@@ -1,4 +1,4 @@
-import type { JSX } from 'react';
+import { type JSX, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import type { SegmentedControlProps } from './SegmentedControl.types';
 
@@ -7,7 +7,8 @@ import type { SegmentedControlProps } from './SegmentedControl.types';
  *
  * Shares the 32px control height and rounded-sm radius with SelectMenu and Button so a row of
  * filters lines up. The selected segment uses the app-wide selected state (`bg-primary/15
- * text-primary`) rather than a solid fill.
+ * text-primary`) rather than a solid fill. When the options overflow a narrow screen, the control
+ * scrolls sideways and keeps the selected segment in view.
  */
 export function SegmentedControl<T extends string>({
   options,
@@ -16,8 +17,22 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
   className,
 }: SegmentedControlProps<T>): JSX.Element {
+  const groupRef = useRef<HTMLDivElement>(null);
+  // Scrolls only the control, never the page, so the selection is visible without moving the reader
+  useEffect(() => {
+    const group = groupRef.current;
+    const selected = group?.querySelector('[aria-pressed="true"]');
+    if (!group || !selected) return;
+    const outer = group.getBoundingClientRect();
+    const inner = selected.getBoundingClientRect();
+    const inset = 2;
+    if (inner.right > outer.right - inset) group.scrollLeft += inner.right - outer.right + inset;
+    else if (inner.left < outer.left + inset) group.scrollLeft -= outer.left + inset - inner.left;
+  }, [value]);
+
   return (
     <div
+      ref={groupRef}
       role="group"
       aria-label={ariaLabel}
       className={clsx(

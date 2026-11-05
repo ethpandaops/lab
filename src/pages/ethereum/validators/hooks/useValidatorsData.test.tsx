@@ -143,4 +143,35 @@ describe('useValidatorsData', () => {
     expect(urls.filter(u => u.pathname.endsWith('fct_validator_balance_daily'))).toHaveLength(4);
     expect(result.current.raw.balance).toHaveLength(4);
   });
+
+  it('reads proposals to the range end and counts only those inside the weekly rollups', async () => {
+    const monday = 1788134400; // 2026-08-31
+    const sunday = monday + 6 * 86400;
+    const rangeEnd = sunday + 3 * 86400;
+    const urls: URL[] = [];
+    const proposal = (ts: number): object => ({ validator_index: 1, slot_start_date_time: ts, status: 'canonical' });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (request: Request) => {
+        const url = new URL(request.url);
+        urls.push(url);
+        const body = url.pathname.endsWith('fct_block_proposer_by_validator')
+          ? { fct_block_proposer_by_validator: [proposal(monday + 12), proposal(rangeEnd + 12)] }
+          : {};
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      })
+    );
+
+    const { result } = renderHook(
+      () => useValidatorsData([1], monday, sunday, { resolution: 'week', slotsTo: rangeEnd }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.summary).not.toBeNull());
+    const read = urls.find(u => u.pathname.endsWith('fct_block_proposer_by_validator'));
+    expect(read?.searchParams.get('slot_start_date_time_lt')).toBe(String(rangeEnd + 86400));
+    expect(result.current.raw.blockProposal).toHaveLength(2);
+    expect(result.current.summary?.blockProposal.totalProposals).toBe(1);
+    expect(result.current.blockProposals).toHaveLength(1);
+  });
 });

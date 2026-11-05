@@ -492,11 +492,14 @@ export function useValidatorsData(
   {
     resolution = 'day',
     allHistory = false,
+    slotsTo = endTime,
   }: {
     /** Row granularity: one row per validator per day, or per week (Monday UTC) */
     resolution?: 'day' | 'week';
     /** The range starts at the earliest data, so days need no explicit list */
     allHistory?: boolean;
+    /** Last day of the per-slot proposal read (start of day UTC), which can run past the last complete week */
+    slotsTo?: number;
   } = {}
 ): UseValidatorsDataReturn {
   const { currentNetwork } = useNetwork();
@@ -536,6 +539,7 @@ export function useValidatorsData(
       periodFilter,
       startTime,
       endTime,
+      slotsTo,
       missesFrom,
       missesTo,
     ],
@@ -585,7 +589,7 @@ export function useValidatorsData(
         ),
         rows<FctBlockProposerByValidator>(fctBlockProposerByValidatorServiceList, 'fct_block_proposer_by_validator', {
           slot_start_date_time_gte: startTime,
-          slot_start_date_time_lt: endTime + 86400,
+          slot_start_date_time_lt: slotsTo + 86400,
           order_by: 'slot_start_date_time',
         }),
         rows<FctAttestationVoteCorrectnessByValidator>(
@@ -618,13 +622,9 @@ export function useValidatorsData(
         blockProposals: [],
       };
     }
-    const {
-      attestation: attestationData,
-      syncCommittee: syncCommitteeData,
-      balance: balanceData,
-      blockProposal: blockProposalData,
-      sourceMisses,
-    } = data;
+    const { attestation: attestationData, syncCommittee: syncCommitteeData, balance: balanceData, sourceMisses } = data;
+    // Summaries and the heatmap count proposals over the rollups' days, which can end before the per-slot read
+    const blockProposalData = data.blockProposal.filter(p => (p.slot_start_date_time ?? 0) < endTime + 86400);
 
     const attestationByValidator = aggregateAttestationByValidator(attestationData, sourceMisses);
     const syncCommitteeByValidator = aggregateSyncCommitteeByValidator(syncCommitteeData);
@@ -696,7 +696,7 @@ export function useValidatorsData(
       balanceDaily: transformBalanceDaily(balanceData),
       blockProposals: transformBlockProposals(blockProposalData),
     };
-  }, [data]);
+  }, [data, endTime]);
 
   const raw = {
     attestation: data?.attestation ?? [],

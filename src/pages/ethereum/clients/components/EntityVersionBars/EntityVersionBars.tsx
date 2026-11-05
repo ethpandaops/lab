@@ -203,9 +203,9 @@ export function EntityVersionBars({
           <p className="text-sm text-muted">No entity matches.</p>
         ) : (
           <div className="flex flex-col gap-1">
-            <div className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_3.5rem_4rem] items-center gap-3 text-xs/5 text-muted sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]">
+            <div className="grid grid-cols-[minmax(0,1fr)_3.5rem_4rem] items-center gap-3 text-xs/5 text-muted sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]">
               <span>Entity</span>
-              <span className="truncate">
+              <span className="hidden truncate sm:block">
                 {scale === 'mix' ? 'Share of its blocks by version' : 'Blocks by version'}
               </span>
               <span className="text-right">Blocks</span>
@@ -218,7 +218,7 @@ export function EntityVersionBars({
               return (
                 <div
                   key={row.entity}
-                  className="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)_3.5rem_4rem] items-center gap-3 rounded-xs py-0.5 hover:bg-muted/10 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]"
+                  className="grid grid-cols-[minmax(0,1fr)_3.5rem_4rem] items-center gap-x-3 gap-y-1 rounded-xs py-0.5 hover:bg-muted/10 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]"
                 >
                   <Link
                     to="/ethereum/entities/$entity"
@@ -229,15 +229,17 @@ export function EntityVersionBars({
                   >
                     {row.entity}
                   </Link>
-                  <div className="h-4">
+                  {/* On a phone the bar gets a full-width line under the entity */}
+                  <div className="order-last col-span-full h-4 sm:order-none sm:col-span-1">
                     <div className="flex h-full overflow-hidden rounded-xs" style={{ width: `${width}%` }}>
                       {orderOf(row).map(version => {
                         const count = row.counts.get(version) ?? 0;
                         const dimmed = !!highlight && version !== highlight;
                         return (
+                          // An inset divider takes no width, so slivers of rare versions can't crowd out the rest
                           <span
                             key={version}
-                            className="h-full border-r border-surface last:border-r-0"
+                            className="h-full shadow-[inset_-1px_0_0_var(--color-surface)] last:shadow-none"
                             style={{
                               width: `${(count / row.blocks) * 100}%`,
                               backgroundColor: colorOf(version),

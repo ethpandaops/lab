@@ -6,7 +6,7 @@ import type { BlockSource, SlotFilters, SlotSort, SlotStatus } from '../IndexPag
  * Tables that hold per-slot facts. Filters run server-side on one of them (the driver); the rest are joined by
  * slot and checked here.
  */
-export type SlotTable = 'proposer' | 'canonical' | 'status' | 'entity' | 'block' | 'mev' | 'graffiti' | 'ptc';
+export type SlotTable = 'proposer' | 'canonical' | 'status' | 'entity' | 'block' | 'final' | 'mev' | 'graffiti' | 'ptc';
 
 /** Blob gas per blob, unchanged since Deneb */
 export const GAS_PER_BLOB = 131_072;
@@ -29,6 +29,7 @@ export interface SlotFacts {
   /** fct_block_proposer: finalized status */
   status?: 'canonical' | 'orphaned' | 'missed';
   entity?: string | null;
+  /** fct_block_head, or fct_block for finalized slots */
   block?: {
     number: number | null;
     proposerIndex: number | null;
@@ -225,7 +226,10 @@ export function applyRow(table: SlotTable, row: Record<string, unknown>, facts: 
     case 'entity':
       entry.entity = str(row.entity);
       break;
-    case 'block': {
+    case 'block':
+    case 'final': {
+      // A finalized slot can hold an orphaned block beside the canonical one; the canonical block wins
+      if (table === 'final' && row.status !== 'canonical' && entry.block) break;
       const blobGas = num(row.execution_payload_blob_gas_used);
       entry.block = {
         number: num(row.execution_payload_block_number),
