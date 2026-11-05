@@ -141,7 +141,9 @@ export function useOverviewData(window: OverviewWindow): {
       query: {
         day_start_date_ne: currentUtcDate(),
         order_by: 'day_start_date desc',
-        page_size: CREDENTIAL_TYPES.length,
+        // A day can hold more credential types than Lab charts (hoodi has 0x03 and 0xb0 rows), so read a
+        // margin and keep only the newest day's rows below
+        page_size: 50,
       },
     })
   );
@@ -246,7 +248,9 @@ export function useOverviewData(window: OverviewWindow): {
     const week = r.week_start_date ?? '';
     activeByWeek.set(week, (activeByWeek.get(week) ?? 0) + (r.active_validator_count ?? 0));
   }
-  const latestRows = latestCounts.data?.fct_validator_count_by_credential_type_daily ?? [];
+  const latestRows = (latestCounts.data?.fct_validator_count_by_credential_type_daily ?? []).filter(
+    r => r.day_start_date === latestDay
+  );
   const snapshot: OverviewSnapshot | null = latestDay
     ? {
         day: latestDay,
