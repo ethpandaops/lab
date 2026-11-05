@@ -7,7 +7,7 @@ import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { getCountryFlag, getRelativeTime } from '@/utils';
 import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatMs, formatNodeLocation } from '../../utils/node-stats';
+import { formatNodeLocation } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
@@ -18,7 +18,7 @@ export interface NodesTableProps {
 const columns: DataTableColumn<NodeRow>[] = [
   {
     id: 'node',
-    header: 'Node',
+    header: 'Node ID',
     accessorFn: row => row.nodeId,
     cell: ({ row }) => (
       <span className="flex items-center gap-2">
@@ -59,22 +59,6 @@ const columns: DataTableColumn<NodeRow>[] = [
     ),
   },
   {
-    id: 'block',
-    header: () => <span className="whitespace-nowrap">Block p50</span>,
-    accessorFn: row => row.observation?.blockP50 ?? undefined,
-    sortUndefined: 'last',
-    cell: ({ getValue }) => formatMs(getValue() as number | undefined),
-    meta: { cellClassName: 'text-foreground' },
-  },
-  {
-    id: 'attestation',
-    header: () => <span className="whitespace-nowrap">Attestation p50</span>,
-    accessorFn: row => row.observation?.attestationP50 ?? undefined,
-    sortUndefined: 'last',
-    cell: ({ getValue }) => formatMs(getValue() as number | undefined),
-    meta: { cellClassName: 'text-foreground' },
-  },
-  {
     id: 'lastSeen',
     header: () => <span className="whitespace-nowrap">Last seen</span>,
     accessorFn: row => row.node.last_seen_date_time ?? undefined,
@@ -88,7 +72,7 @@ const columns: DataTableColumn<NodeRow>[] = [
 ];
 
 /**
- * Every node that reported in the range, searchable and sortable; rows open the node page.
+ * Every node ID that reported in the range, searchable and sortable; rows open the node page.
  */
 export function NodesTable({ rows }: NodesTableProps): JSX.Element {
   const navigate = useNavigate();
@@ -96,7 +80,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
 
   return (
     <Card
-      title="Xatu nodes"
+      title="Node IDs"
       actions={
         <div className="w-56">
           <Input size="sm">
@@ -107,7 +91,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
               value={search}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
               placeholder="Search"
-              aria-label="Search Xatu nodes"
+              aria-label="Search node IDs"
             />
           </Input>
         </div>
@@ -124,7 +108,7 @@ export function NodesTable({ rows }: NodesTableProps): JSX.Element {
         getRowId={row => row.nodeId}
         onRowClick={row => navigate({ to: '/xatu/nodes/$nodeId', params: { nodeId: row.nodeId } })}
         hideColumnVisibility
-        emptyMessage="No Xatu nodes match"
+        emptyMessage="No node IDs match"
       />
     </Card>
   );

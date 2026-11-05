@@ -83,4 +83,32 @@ describe('useValidatorsData', () => {
     expect(offline?.headCorrectRate).toBeNull();
     expect(offline?.targetCorrectRate).toBeNull();
   });
+
+  it('divides source by known source votes, leaving out attestations never seen on gossip', async () => {
+    // 200 attestations: 190 with a correct source, 2 with a wrong one, 8 never seen on gossip
+    const daily = { ...day('2026-09-01', 1, 225, 200, 1), source_correct_count: 190 };
+    const wrong = [1, 2].map(n => ({ validator_index: 1, slot_start_date_time: 1788220800 + n * 12 }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (request: Request) => {
+        const url = new URL(request.url);
+        const body = url.pathname.endsWith('fct_attestation_vote_correctness_by_validator_daily')
+          ? { fct_attestation_vote_correctness_by_validator_daily: [daily] }
+          : url.pathname.endsWith('fct_attestation_vote_correctness_by_validator') &&
+              url.searchParams.get('source_correct_eq') === 'false'
+            ? { fct_attestation_vote_correctness_by_validator: wrong }
+            : {};
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      })
+    );
+
+    const { result } = renderHook(() => useValidatorsData([1], 1788220800, 1788220800), { wrapper });
+
+    await waitFor(() => expect(result.current.summary).not.toBeNull());
+    expect(result.current.summary?.attestation.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
+    expect(result.current.validators[0].attestation.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
+    expect(result.current.attestationDaily[0].sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
+    // Head and target still divide by attestations
+    expect(result.current.summary?.attestation.headCorrectRate).toBe(100);
+  });
 });

@@ -68,7 +68,7 @@ function Share({
   return (
     <div className="flex items-center gap-3">
       <div className={barClassName}>
-        <ShareBar share={share} color={color} showThresholds={false} />
+        <ShareBar share={share} color={color} />
       </div>
       <span className="w-12 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
         {share > 0 && share < 0.05 ? '<0.1%' : `${share.toFixed(1)}%`}

@@ -1,1 +1,0 @@
-export { VsNetworkChart } from './VsNetworkChart';

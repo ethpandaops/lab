@@ -3,14 +3,12 @@ import { DataTable } from '@/components/DataTable';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Card } from '@/components/Layout/Card';
-import type { NetworkObservations } from '../../hooks/useNetworkObservations';
 import type { NodeDataColumns } from '../../hooks/useNodeDataColumns';
 import type { NodePerformance } from '../../hooks/useNodePerformance';
 import { formatMs } from '../../utils/node-stats';
 
 export interface NodeSlotsTableProps {
   performance: NodePerformance;
-  network: NetworkObservations | null;
   columns: NodeDataColumns | null;
   /** End (exclusive) of the slots ingested so far */
   endSlot: number;
@@ -22,8 +20,6 @@ interface SlotRow {
   head?: number;
   attestation?: number;
   lastColumn?: number;
-  /** Block arrival minus the network median */
-  delta?: number;
 }
 
 const columns: DataTableColumn<SlotRow>[] = [
@@ -51,42 +47,22 @@ const columns: DataTableColumn<SlotRow>[] = [
       meta: { cellClassName: 'text-foreground tabular-nums' },
     })
   ),
-  {
-    id: 'delta',
-    header: () => <span className="whitespace-nowrap">vs network median</span>,
-    accessorFn: row => row.delta,
-    sortUndefined: 'last',
-    cell: ({ getValue }) => {
-      const delta = getValue() as number | undefined;
-      if (delta === undefined) return '–';
-      return `${delta > 0 ? '+' : ''}${formatMs(delta)}`;
-    },
-    meta: { cellClassName: 'text-muted tabular-nums' },
-  },
 ];
 
 /**
- * Every slot in the range, newest first, with what the node saw and how it compares to the network.
+ * Every slot in the range, newest first, with when the node saw each block, head, attestation and data column.
  */
-export function NodeSlotsTable({
-  performance,
-  network,
-  columns: dataColumns,
-  endSlot,
-}: NodeSlotsTableProps): JSX.Element {
-  const networkMedian = new Map(network?.slots.map(slot => [slot.slot, slot.p50]) ?? []);
+export function NodeSlotsTable({ performance, columns: dataColumns, endSlot }: NodeSlotsTableProps): JSX.Element {
   const rows: SlotRow[] = [];
   for (let slot = endSlot - 1; slot >= performance.window.startSlot; slot--) {
     const block = performance.block.get(slot);
     const head = performance.head.get(slot);
-    const median = networkMedian.get(slot);
     rows.push({
       slot,
       block,
       head,
       attestation: performance.attestations.get(slot)?.p50,
       lastColumn: dataColumns?.slots.get(slot)?.last,
-      delta: block !== undefined && median != null ? block - median : undefined,
     });
   }
 

@@ -8,6 +8,7 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { useNetwork } from '@/hooks/useNetwork';
 import { epochToTimestamp } from '@/utils';
+import type { DimValidatorStatus } from '@/api/types.gen';
 import type { ValidatorIdentity as Identity } from '../../hooks/useValidatorIdentity';
 
 /** Status and balances at one point in time */
@@ -265,6 +266,87 @@ export function ValidatorSetCard({
           ))}
         </tbody>
       </table>
+    </Card>
+  );
+}
+
+/**
+ * Validators that joined after the latest daily `dim_validator` snapshot, from their status transitions alone.
+ */
+export function NewValidatorsCard({
+  statuses,
+  className,
+}: {
+  statuses: DimValidatorStatus[];
+  className?: string;
+}): JSX.Element {
+  const single = statuses.length === 1 ? statuses[0] : undefined;
+  // Unset epochs are 2^64 - 1
+  const activation = (s: DimValidatorStatus): number | null =>
+    s.activation_epoch != null && s.activation_epoch < Number.MAX_SAFE_INTEGER ? s.activation_epoch : null;
+  const note = (
+    <p className="mt-5 text-xs/5 text-muted">Credentials and entity appear after the next daily snapshot.</p>
+  );
+
+  if (single) {
+    const status = single.status ?? 'unknown';
+    const activationEpoch = activation(single);
+    return (
+      <Card
+        title={`Validator ${single.validator_index}`}
+        className={className}
+        actions={
+          <div className="flex items-center gap-2">
+            <Badge color={statusColor(status)} dot>
+              {statusLabel(status)}
+            </Badge>
+            <BeaconchainLink index={single.validator_index ?? 0} />
+          </div>
+        }
+      >
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+          <Fact label="Pubkey">
+            <span className="inline-flex items-center gap-1 font-mono">
+              {shortHex(single.pubkey ?? '')}
+              <CopyToClipboard content={single.pubkey ?? ''} />
+            </span>
+          </Fact>
+          <Fact label="Activated">
+            {activationEpoch !== null ? (
+              <EpochDate epoch={activationEpoch} />
+            ) : (
+              <span className="text-muted">Pending</span>
+            )}
+          </Fact>
+        </dl>
+        {note}
+      </Card>
+    );
+  }
+
+  return (
+    <Card title={`${statuses.length} new validators`} className={className}>
+      <table className="w-full text-sm/6">
+        <thead>
+          <tr className="border-b border-border text-left text-xs/5 text-muted">
+            <th className="pb-1.5 font-medium">Validator</th>
+            <th className="pb-1.5 text-right font-medium">Status</th>
+          </tr>
+        </thead>
+        <tbody className="text-foreground tabular-nums">
+          {statuses.map(s => (
+            <tr key={s.validator_index}>
+              <td className="pt-1.5">{s.validator_index}</td>
+              <td className="pt-1.5 text-right">
+                <Badge color={statusColor(s.status ?? 'unknown')} dot>
+                  {statusLabel(s.status ?? 'unknown')}
+                </Badge>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {note}
     </Card>
   );
 }

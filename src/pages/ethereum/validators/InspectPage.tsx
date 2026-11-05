@@ -18,6 +18,7 @@ import {
   ValidatorTable,
   ValidatorsSkeleton,
   ValidatorHeatmap,
+  NewValidatorsCard,
   ValidatorIdentityCard,
   ValidatorSetCard,
   ValidatorBalance,
@@ -111,17 +112,21 @@ export function InspectPage(): JSX.Element {
     allHistory,
   });
 
-  const { getStatusAtTimestamp, unknownValidators } = useValidatorStatus(ready ? resolvedIndices : []);
+  const { getStatusAtTimestamp, unknownValidators, latestStatus } = useValidatorStatus(ready ? resolvedIndices : []);
   // Indices the chain has never seen are named in the alert below and left out of every view
   const knownIndices = useMemo(
     () => resolvedIndices.filter(i => !unknownValidators.includes(i)),
     [resolvedIndices, unknownValidators]
   );
-  const { identities } = useValidatorIdentity(ready ? resolvedIndices : []);
+  const { identities, isLoading: identitiesLoading } = useValidatorIdentity(ready ? resolvedIndices : []);
   const identityList = useMemo(
     () => resolvedIndices.flatMap(i => identities.get(i) ?? []),
     [resolvedIndices, identities]
   );
+  // Validators deposited after the daily dim_validator snapshot have only their status transitions so far
+  const newValidators = identitiesLoading
+    ? []
+    : knownIndices.flatMap(i => (identities.has(i) ? [] : (latestStatus.get(i) ?? [])));
   const pubkeys = new Map(identityList.map(v => [v.index, v.pubkey]));
   // dim_validator holds the current state; a range that ends earlier shows each validator as it was on its last day
   const endsEarlier = dataTo < lastDay;
@@ -273,6 +278,7 @@ export function InspectPage(): JSX.Element {
               {identityList.length > 1 && (!endsEarlier || endStates) && (
                 <ValidatorSetCard identities={identityList} endStates={endStates} />
               )}
+              {newValidators.length > 0 && <NewValidatorsCard statuses={newValidators} className="self-start" />}
               {hasData && !isLoading && (
                 <ValidatorBalance
                   balances={raw.balance}

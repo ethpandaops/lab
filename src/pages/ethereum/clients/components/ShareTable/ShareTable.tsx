@@ -39,7 +39,7 @@ export function ShareTable({ rows, labelHeader, countHeader, labelClassName = 'w
           {/* The label gives way before the bar on narrow screens */}
           <span className={clsx(labelClassName, 'min-w-0 truncate')}>{row.label}</span>
           <span className="min-w-12 flex-1">
-            <ShareBar share={row.share} color={row.color} showThresholds={false} />
+            <ShareBar share={row.share} color={row.color} />
           </span>
           <span className="w-14 shrink-0 text-right text-sm/6 font-medium text-foreground tabular-nums">
             {row.share.toFixed(1)}%

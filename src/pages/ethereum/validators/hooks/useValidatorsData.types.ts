@@ -16,8 +16,13 @@ export interface ValidatorAttestationMetrics {
   headCorrectCount: number;
   targetCorrectCount: number;
   sourceCorrectCount: number;
+  /** Attestations seen on gossip with a wrong source; an attestation never seen there has no known source vote */
+  sourceIncorrectCount: number;
   avgInclusionDistance: number | null;
-  /** Rates are null when there is nothing to divide by: no duties, or no attestations for head/target/source */
+  /**
+   * Rates are null when there is nothing to divide by: no duties, no attestations for head/target, or no known
+   * source votes for source
+   */
   inclusionRate: number | null;
   headCorrectRate: number | null;
   targetCorrectRate: number | null;
@@ -129,6 +134,7 @@ export interface AggregateSummary {
     headCorrectCount: number;
     targetCorrectCount: number;
     sourceCorrectCount: number;
+    sourceIncorrectCount: number;
     inclusionRate: number | null;
     headCorrectRate: number | null;
     targetCorrectRate: number | null;

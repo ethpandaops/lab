@@ -52,7 +52,7 @@ export function ClientPage(): JSX.Element {
   const client = normalizeClientName(params.client);
   const layer = clientLayerOf(client);
   const window: VersionWindow = search.w ?? '7d';
-  const shareWindow: ShareWindow = search.t ?? 'all';
+  const shareWindow: ShareWindow = search.t ?? '30d';
 
   const { selectedIndex, onChange } = useTabState(CLIENT_TABS.map(id => ({ id })));
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);

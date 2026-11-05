@@ -18,7 +18,6 @@ import {
   NodeDetailSkeleton,
   NodeHeader,
   NodeSlotsTable,
-  VsNetworkChart,
 } from './components';
 import { DEFAULT_NODE_RANGE, NETWORK_WINDOW_SLOTS, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useBlockSlots } from './hooks/useBlockSlots';
@@ -197,17 +196,18 @@ export function DetailPage(): JSX.Element {
             </>
           ) : (
             <>
-              <ActivityStrip block={block.data} blockSlots={blockSlots.data} behind={behind} />
+              <ActivityStrip block={block.data} blockSlots={blockSlots.data} />
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} behind={behind} />
-                <VsNetworkChart nodeId={nodeId} network={network.data} rangeLabel={rangeLabel} behind={behind} />
+                <div className={attestation.data ? undefined : 'xl:col-span-2'}>
+                  <NodeArrivalChart block={block.data} head={head.data} rangeLabel={rangeLabel} behind={behind} />
+                </div>
                 {attestation.data && (
-                  <div className={hasColumns ? undefined : 'xl:col-span-2'}>
-                    <AttestationArrivalChart history={attestation.data} rangeLabel={rangeLabel} behind={behind} />
-                  </div>
+                  <AttestationArrivalChart history={attestation.data} rangeLabel={rangeLabel} behind={behind} />
                 )}
                 {hasColumns && (
-                  <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} behind={behind} />
+                  <div className="xl:col-span-2">
+                    <ColumnArrivalChart history={dataColumn.data!} rangeLabel={rangeLabel} behind={behind} />
+                  </div>
                 )}
               </div>
             </>
@@ -228,12 +228,7 @@ export function DetailPage(): JSX.Element {
               )}
               {hasRecent && (
                 <div className={hasCustody ? 'xl:col-span-3' : 'xl:col-span-5'}>
-                  <NodeSlotsTable
-                    performance={recent.data!}
-                    network={recentNetwork.data}
-                    columns={custody.data}
-                    endSlot={recentEndSlot}
-                  />
+                  <NodeSlotsTable performance={recent.data!} columns={custody.data} endSlot={recentEndSlot} />
                 </div>
               )}
             </div>

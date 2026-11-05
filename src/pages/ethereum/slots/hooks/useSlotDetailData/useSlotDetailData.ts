@@ -105,6 +105,15 @@ export interface UseSlotDetailDataResult {
 }
 
 /**
+ * Rows of a slot's latest model run. Each run rewrites the chunks it has votes in but leaves earlier rows for chunks
+ * that are now empty, so a vote whose first sighting moved to an earlier chunk would be counted twice.
+ */
+function latestRun<T extends { updated_date_time?: number }>(rows: T[]): T[] {
+  const latest = Math.max(...rows.map(row => row.updated_date_time ?? 0));
+  return rows.filter(row => (row.updated_date_time ?? 0) === latest);
+}
+
+/**
  * Hook to fetch all data for a slot detail page.
  * Fetches data from multiple endpoints in parallel for a given slot.
  *
@@ -421,7 +430,7 @@ export function useSlotDetailData(slot: number, coverage: SlotTableCoverage): Us
     headPropagation: queries[6].data?.fct_head_first_seen_by_node ?? [],
     blobPropagation: queries[7].data?.fct_block_blob_first_seen_by_node ?? [],
     dataColumnPropagation: queries[8].data?.fct_block_data_column_sidecar_first_seen_by_node ?? [],
-    attestations: queries[9].data?.fct_attestation_first_seen_chunked_50ms ?? [],
+    attestations: latestRun(queries[9].data?.fct_attestation_first_seen_chunked_50ms ?? []),
     attestationCorrectness:
       (settled.fct_attestation_correctness
         ? queries[10].data?.fct_attestation_correctness

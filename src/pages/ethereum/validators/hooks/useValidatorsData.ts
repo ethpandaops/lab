@@ -9,10 +9,13 @@ import {
   fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions,
   fctValidatorBalanceWeeklyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
+import { fctAttestationVoteCorrectnessByValidatorServiceList } from '@/api/sdk.gen';
+import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import { weekStartOf } from '../utils/week';
 import { currentUtcDate, currentUtcWeek } from '@/utils/time';
 import type {
+  FctAttestationVoteCorrectnessByValidator,
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
   FctSyncCommitteeParticipationByValidatorDaily,
@@ -92,10 +95,38 @@ function generateDateRange(startTs: number, endTs: number): string {
 }
 
 /**
+ * Wrong source votes per validator and per validator and day (or week), keyed `validator` and `validator:day`.
+ * The rollups count only correct source votes; a source vote is unknown when the attestation was never seen on
+ * gossip, so the source rate divides by correct plus wrong votes rather than by attestations.
+ */
+type SourceMisses = Map<string, number>;
+
+/** Key of a validator's wrong source votes on one day (or week), or over the range */
+function sourceMissKey(validatorIndex: number, day?: string): string {
+  return day === undefined ? String(validatorIndex) : `${validatorIndex}:${day}`;
+}
+
+/** Count wrong source votes per validator, and per validator and day or week */
+function countSourceMisses(rows: FctAttestationVoteCorrectnessByValidator[], weekly: boolean): SourceMisses {
+  const misses: SourceMisses = new Map();
+  const add = (key: string): void => {
+    misses.set(key, (misses.get(key) ?? 0) + 1);
+  };
+  for (const row of rows) {
+    const validatorIndex = row.validator_index ?? 0;
+    const day = new Date((row.slot_start_date_time ?? 0) * 1000).toISOString().slice(0, 10);
+    add(sourceMissKey(validatorIndex));
+    add(sourceMissKey(validatorIndex, weekly ? weekStartOf(day) : day));
+  }
+  return misses;
+}
+
+/**
  * Aggregate attestation data by validator
  */
 function aggregateAttestationByValidator(
-  data: FctAttestationVoteCorrectnessByValidatorDaily[]
+  data: FctAttestationVoteCorrectnessByValidatorDaily[],
+  sourceMisses: SourceMisses
 ): Map<number, ValidatorAttestationMetrics> {
   const byValidator = new Map<number, ValidatorAttestationMetrics>();
   // Σ(avg inclusion distance × attested) per validator, so the average weighs each attestation once
@@ -114,6 +145,7 @@ function aggregateAttestationByValidator(
         headCorrectCount: 0,
         targetCorrectCount: 0,
         sourceCorrectCount: 0,
+        sourceIncorrectCount: 0,
         avgInclusionDistance: null,
         inclusionRate: null,
         headCorrectRate: null,
@@ -143,7 +175,11 @@ function aggregateAttestationByValidator(
     metrics.inclusionRate = safePercentage(metrics.attestedCount, metrics.totalDuties);
     metrics.headCorrectRate = safePercentage(metrics.headCorrectCount, metrics.attestedCount);
     metrics.targetCorrectRate = safePercentage(metrics.targetCorrectCount, metrics.attestedCount);
-    metrics.sourceCorrectRate = safePercentage(metrics.sourceCorrectCount, metrics.attestedCount);
+    metrics.sourceIncorrectCount = sourceMisses.get(sourceMissKey(metrics.validatorIndex)) ?? 0;
+    metrics.sourceCorrectRate = safePercentage(
+      metrics.sourceCorrectCount,
+      metrics.sourceCorrectCount + metrics.sourceIncorrectCount
+    );
   }
 
   return byValidator;
@@ -310,6 +346,7 @@ function calculateAggregateSummary(
       headCorrectCount: acc.headCorrectCount + m.headCorrectCount,
       targetCorrectCount: acc.targetCorrectCount + m.targetCorrectCount,
       sourceCorrectCount: acc.sourceCorrectCount + m.sourceCorrectCount,
+      sourceIncorrectCount: acc.sourceIncorrectCount + m.sourceIncorrectCount,
     }),
     {
       totalDuties: 0,
@@ -318,6 +355,7 @@ function calculateAggregateSummary(
       headCorrectCount: 0,
       targetCorrectCount: 0,
       sourceCorrectCount: 0,
+      sourceIncorrectCount: 0,
     }
   );
 
@@ -373,7 +411,10 @@ function calculateAggregateSummary(
       inclusionRate: safePercentage(attestationTotals.attestedCount, attestationTotals.totalDuties),
       headCorrectRate: safePercentage(attestationTotals.headCorrectCount, attestationTotals.attestedCount),
       targetCorrectRate: safePercentage(attestationTotals.targetCorrectCount, attestationTotals.attestedCount),
-      sourceCorrectRate: safePercentage(attestationTotals.sourceCorrectCount, attestationTotals.attestedCount),
+      sourceCorrectRate: safePercentage(
+        attestationTotals.sourceCorrectCount,
+        attestationTotals.sourceCorrectCount + attestationTotals.sourceIncorrectCount
+      ),
     },
     syncCommittee: {
       ...syncCommitteeTotals,
@@ -396,16 +437,24 @@ function calculateAggregateSummary(
 /**
  * Transform attestation data to daily data points
  */
-function transformAttestationDaily(data: FctAttestationVoteCorrectnessByValidatorDaily[]): AttestationDailyDataPoint[] {
-  return data.map(record => ({
-    timestamp: dateStringToTimestamp(record.day_start_date ?? ''),
-    validatorIndex: record.validator_index ?? 0,
-    inclusionRate: safePercentage(record.attested_count ?? 0, record.total_duties ?? 0),
-    headCorrectRate: safePercentage(record.head_correct_count ?? 0, record.attested_count ?? 0),
-    targetCorrectRate: safePercentage(record.target_correct_count ?? 0, record.attested_count ?? 0),
-    sourceCorrectRate: safePercentage(record.source_correct_count ?? 0, record.attested_count ?? 0),
-    avgInclusionDistance: record.avg_inclusion_distance ?? null,
-  }));
+function transformAttestationDaily(
+  data: FctAttestationVoteCorrectnessByValidatorDaily[],
+  sourceMisses: SourceMisses
+): AttestationDailyDataPoint[] {
+  return data.map(record => {
+    const validatorIndex = record.validator_index ?? 0;
+    const sourceCorrect = record.source_correct_count ?? 0;
+    const sourceIncorrect = sourceMisses.get(sourceMissKey(validatorIndex, record.day_start_date ?? '')) ?? 0;
+    return {
+      timestamp: dateStringToTimestamp(record.day_start_date ?? ''),
+      validatorIndex,
+      inclusionRate: safePercentage(record.attested_count ?? 0, record.total_duties ?? 0),
+      headCorrectRate: safePercentage(record.head_correct_count ?? 0, record.attested_count ?? 0),
+      targetCorrectRate: safePercentage(record.target_correct_count ?? 0, record.attested_count ?? 0),
+      sourceCorrectRate: safePercentage(sourceCorrect, sourceCorrect + sourceIncorrect),
+      avgInclusionDistance: record.avg_inclusion_distance ?? null,
+    };
+  });
 }
 
 /**
@@ -529,8 +578,35 @@ export function useValidatorsData(
     }),
   });
 
-  const isLoading = results.some(r => r.isLoading);
-  const error = results.find(r => r.error)?.error ?? null;
+  // Wrong source votes over the same days or weeks as the rollups, from the per-slot table
+  const firstDay = new Date(startTime * 1000).toISOString().slice(0, 10);
+  const lastDay = new Date(endTime * 1000).toISOString().slice(0, 10);
+  const missesFrom = allHistory ? 0 : dateStringToTimestamp(weekly ? weekStartOf(firstDay) : firstDay);
+  const missesTo = dateStringToTimestamp(weekly ? weekStartOf(lastDay) : lastDay) + (weekly ? 7 : 1) * 86400;
+  const sourceMissResults = useQueries({
+    queries: validatorChunks.map(chunk => ({
+      queryKey: ['validators', 'source-misses', currentNetwork?.name, chunk.join(','), missesFrom, missesTo, weekly],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchAllPages<FctAttestationVoteCorrectnessByValidator>(
+          fctAttestationVoteCorrectnessByValidatorServiceList,
+          {
+            query: {
+              validator_index_in_values: chunk.join(','),
+              slot_start_date_time_gte: missesFrom,
+              slot_start_date_time_lt: missesTo,
+              source_correct_eq: false,
+              page_size: API_MAX_PAGE_SIZE,
+            },
+          },
+          'fct_attestation_vote_correctness_by_validator',
+          signal
+        ),
+      enabled,
+    })),
+  });
+
+  const isLoading = results.some(r => r.isLoading) || sourceMissResults.some(r => r.isLoading);
+  const error = results.find(r => r.error)?.error ?? sourceMissResults.find(r => r.error)?.error ?? null;
 
   // Type assertions for response data extraction
   // Weekly rows keep the daily shape, keyed by their week's Monday, so every consumer reads both
@@ -617,6 +693,17 @@ export function useValidatorsData(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chunkCount, blockProposalUpdatedAt]);
 
+  const sourceMissesUpdatedAt = sourceMissResults.map(r => r.dataUpdatedAt).join(',');
+  const sourceMisses = useMemo(
+    () =>
+      countSourceMisses(
+        sourceMissResults.flatMap(r => r.data ?? []),
+        weekly
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sourceMissesUpdatedAt, weekly]
+  );
+
   const processedData = useMemo(() => {
     if (!enabled || isLoading) {
       return {
@@ -629,7 +716,7 @@ export function useValidatorsData(
       };
     }
 
-    const attestationByValidator = aggregateAttestationByValidator(attestationData);
+    const attestationByValidator = aggregateAttestationByValidator(attestationData, sourceMisses);
     const syncCommitteeByValidator = aggregateSyncCommitteeByValidator(syncCommitteeData);
     const blockProposalByValidator = aggregateBlockProposalByValidator(blockProposalData);
     const balanceByValidator = aggregateBalanceByValidator(balanceData);
@@ -652,6 +739,7 @@ export function useValidatorsData(
           headCorrectCount: 0,
           targetCorrectCount: 0,
           sourceCorrectCount: 0,
+          sourceIncorrectCount: 0,
           avgInclusionDistance: null,
           inclusionRate: null,
           headCorrectRate: null,
@@ -693,12 +781,12 @@ export function useValidatorsData(
     return {
       validators,
       summary,
-      attestationDaily: transformAttestationDaily(attestationData),
+      attestationDaily: transformAttestationDaily(attestationData, sourceMisses),
       syncCommitteeDaily: transformSyncCommitteeDaily(syncCommitteeData),
       balanceDaily: transformBalanceDaily(balanceData),
       blockProposals: transformBlockProposals(blockProposalData),
     };
-  }, [enabled, isLoading, attestationData, syncCommitteeData, balanceData, blockProposalData]);
+  }, [enabled, isLoading, attestationData, sourceMisses, syncCommitteeData, balanceData, blockProposalData]);
 
   return {
     ...processedData,

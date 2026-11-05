@@ -19,20 +19,12 @@ import {
   adoptionByDay,
   countVersionsByDay,
   formatDataDate,
-  formatDayLag,
-  formatLag,
   last24hStart,
   matchReleaseVersion,
-  timeToAdoption,
-  timeToDailyAdoption,
-  type AdoptionLag,
   type AdoptionPoint,
   type VersionCount,
   type VersionDay,
 } from '../../utils/client-versions';
-
-/** Days after release the time to adoption is measured over */
-const LAG_HORIZON_DAYS = 60;
 
 /** Whether the chart draws the share on exactly the version or on it or newer */
 type ShareMode = 'atLeast' | 'exact';
@@ -89,110 +81,20 @@ function nodeVersionCounts(rows: FctHeadFirstSeenByNodeDaily[], releases: DimCli
     }));
 }
 
-/** Counts from each angle over the days after a release, for its time to adoption */
-interface ReleaseCounts {
-  /** Hourly block counts */
-  hours: VersionCount[];
-  peerDays: VersionDay[];
-  /** First day the P2P census has data for */
-  peerDataStart?: number;
-  xatuDays: VersionDay[];
-  isLoading: boolean;
-}
-
-/**
- * Counts from the day before a release to the horizon after it, whatever the page's range, so time to adoption is
- * measured for any release the tables reach back to.
- */
-function useReleaseCounts(
-  client: string,
-  layer: ClientLayer,
-  releaseTime: number | null | undefined,
-  releases: DimClientRelease[]
-): ReleaseCounts {
-  const now = Math.floor(Date.now() / 1000 / 600) * 600;
-  const horizon = releaseTime ? releaseTime + LAG_HORIZON_DAYS * 86400 : undefined;
-  const end = horizon && horizon < now ? Math.ceil(horizon / 86400) * 86400 : undefined;
-  const firstDay = releaseTime ? Math.floor(releaseTime / 86400) * 86400 : undefined;
-  const blocks = useVersionCounts({
-    grain: 'hourly',
-    client,
-    layer,
-    from: releaseTime ? Math.floor(releaseTime / 3600) * 3600 - 24 * 3600 : undefined,
-    to: end,
-    enabled: !!releaseTime,
-  });
-  const peers = useCensus<FctPeerCountByElClientDaily>(
-    layer === 'consensus' ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers,
-    releaseTime ? { client_eq: client } : null,
-    firstDay,
-    end
-  );
-  const nodes = useNodeVersions(
-    client,
-    null,
-    layer === 'consensus' && !!releaseTime,
-    firstDay !== undefined ? { from: firstDay, to: end ?? Infinity } : undefined
-  );
-  const peerDays = useMemo(
-    () => countVersionsByDay(censusVersionCounts(peers.rows, row => row.peer_count)),
-    [peers.rows]
-  );
-  const xatuDays = useMemo(() => countVersionsByDay(nodeVersionCounts(nodes.rows, releases)), [nodes.rows, releases]);
-  return {
-    hours: blocks.rows,
-    peerDays,
-    peerDataStart: peers.dataStart,
-    xatuDays,
-    isLoading: !!releaseTime && (blocks.isLoading || peers.isLoading || nodes.isLoading),
-  };
-}
-
-/** Where a lag comes from, to say why it could not be measured */
-interface LagContext {
-  releaseTime: number | null | undefined;
-  /** First time the source table has data for */
-  dataStart?: number;
-  grain: 'hour' | 'day';
-}
-
-/** A time to adoption as it reads in a cell */
-function lagText(lag: AdoptionLag | null, context: LagContext): string {
-  const { releaseTime, dataStart, grain } = context;
-  if (!lag || !releaseTime) return '-';
-  if (lag.status === 'reached') return grain === 'hour' ? formatLag(lag.seconds) : formatDayLag(lag.seconds);
-  if (lag.status === 'not-reached') {
-    return releaseTime + LAG_HORIZON_DAYS * 86400 < Date.now() / 1000 ? `${LAG_HORIZON_DAYS}+ days` : 'Not yet';
-  }
-  if (dataStart !== undefined && dataStart > releaseTime) return `Data from ${formatDataDate(dataStart)}`;
-  return '-';
-}
-
-/** One version's numbers from one angle */
+/** One version's shares from one angle */
 interface AngleFacts {
   exact: number | null;
   atLeast: number | null;
-  lag50: string;
-  lag90: string;
 }
 
-/** Shares now and time to adoption of a version, from one angle's daily counts */
-function angleFacts(
-  version: string | undefined,
-  release: DimClientRelease | undefined,
-  current: VersionDay | undefined,
-  lag: (version: string, releaseTime: number, threshold: number) => AdoptionLag | null,
-  context: Omit<LagContext, 'releaseTime'>
-): AngleFacts | null {
+/** Shares now of a version, from one angle's current counts */
+function angleFacts(version: string | undefined, current: VersionDay | undefined): AngleFacts | null {
   if (!version) return null;
   const point = current ? adoptionByDay([current], version)[0] : undefined;
-  const releaseTime = release?.release_date ?? null;
-  const measure = (threshold: number): string =>
-    lagText(releaseTime ? lag(version, releaseTime, threshold) : null, { ...context, releaseTime });
-  return { exact: point?.exact ?? null, atLeast: point?.atLeast ?? null, lag50: measure(50), lag90: measure(90) };
+  return { exact: point?.exact ?? null, atLeast: point?.atLeast ?? null };
 }
 
-/** The four rows every angle shares */
+/** The rows every angle shares */
 function angleRows(current: AngleFacts | null, previous: AngleFacts | null): AngleRow[] {
   return [
     { metric: 'Exactly this version', current: shareText(current?.exact), previous: shareText(previous?.exact) },
@@ -201,8 +103,6 @@ function angleRows(current: AngleFacts | null, previous: AngleFacts | null): Ang
       current: shareText(current?.atLeast),
       previous: shareText(previous?.atLeast),
     },
-    { metric: 'Time to 50%', current: current?.lag50 ?? '-', previous: previous?.lag50 ?? '-' },
-    { metric: 'Time to 90%', current: current?.lag90 ?? '-', previous: previous?.lag90 ?? '-' },
   ];
 }
 
@@ -286,8 +186,8 @@ export interface VersionAdoptionProps {
 
 /**
  * Adoption of one version from three angles side by side: proposed blocks (stake-weighted), P2P peers
- * (node-weighted) and Xatu nodes. Each gives the share on exactly the version and on it or newer, its share over
- * the range and how long it took to reach half and most of its population, against the release before.
+ * (node-weighted) and Xatu nodes. Each gives the share on exactly the version and on it or newer, and its share
+ * over the range, against the release before.
  */
 export function VersionAdoption({
   client,
@@ -304,13 +204,10 @@ export function VersionAdoption({
   const consensus = layer === 'consensus';
   const previousVersion = previous?.version;
 
-  // Proposed blocks: daily counts over the range, hourly counts after each release
+  // Proposed blocks: daily counts over the range, hourly counts for the last 24 hours
   const blocks = useVersionCounts({ grain: 'daily', client, layer, from: rangeStart });
   const blocks24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart() });
   const entityCounts = useVersionCounts({ grain: 'entity-daily', client, layer, from: rangeStart });
-  // Time to adoption reads the days after each release, whatever the range
-  const releaseCounts = useReleaseCounts(client, layer, release?.release_date, releases);
-  const previousCounts = useReleaseCounts(client, layer, previous?.release_date, releases);
   // P2P peers: the daily census
   const peers = useCensus<FctPeerCountByElClientDaily>(
     consensus ? CENSUS_TABLES.clPeers : CENSUS_TABLES.elPeers,
@@ -351,50 +248,21 @@ export function VersionAdoption({
   const peerPoints = useMemo(() => adoptionByDay(peerDays, version), [peerDays, version]);
   const xatuPoints = useMemo(() => adoptionByDay(xatuDays, version), [xatuDays, version]);
 
-  const blockFacts = (target: DimClientRelease | undefined, counts: ReleaseCounts): AngleFacts | null =>
-    angleFacts(
-      target?.version,
-      target,
-      blocksNowDay,
-      (v, releaseTime, threshold) =>
-        counts.hours.length > 0 ? timeToAdoption(counts.hours, v, releaseTime, threshold) : null,
-      { dataStart: blocks.dataStart, grain: 'hour' }
-    );
-  const dailyFacts = (
-    target: DimClientRelease | undefined,
-    lagDays: VersionDay[],
-    current: VersionDay | undefined,
-    dataStart: number | undefined
-  ): AngleFacts | null =>
-    angleFacts(
-      target?.version,
-      target,
-      current,
-      (v, releaseTime, threshold) =>
-        timeToDailyAdoption(lagDays, v, releaseTime, threshold, releaseTime + LAG_HORIZON_DAYS * 86400),
-      { dataStart, grain: 'day' }
-    );
-
   const isLoading =
     blocks.isLoading ||
     blocks24h.isLoading ||
     entityCounts.isLoading ||
-    releaseCounts.isLoading ||
-    previousCounts.isLoading ||
     peers.isLoading ||
     (consensus && (nodesLoading || nodeDays.isLoading));
   if (isLoading) return <LoadingContainer className="h-[40rem] rounded-sm" />;
 
-  const thisRelease = release ?? ({ version } as DimClientRelease);
-  const blocksNow = blockFacts(thisRelease, releaseCounts);
-  const blocksBefore = previous ? blockFacts(previous, previousCounts) : null;
+  const blocksNow = angleFacts(version, blocksNowDay);
+  const blocksBefore = angleFacts(previousVersion, blocksNowDay);
   const latestPeerDay = lastCounted(peerDays);
-  const peersNow = dailyFacts(thisRelease, releaseCounts.peerDays, latestPeerDay, releaseCounts.peerDataStart);
-  const peersBefore = previous
-    ? dailyFacts(previous, previousCounts.peerDays, latestPeerDay, previousCounts.peerDataStart)
-    : null;
-  const xatuNowFacts = dailyFacts(thisRelease, releaseCounts.xatuDays, xatuNow, undefined);
-  const xatuBefore = previous ? dailyFacts(previous, previousCounts.xatuDays, xatuNow, undefined) : null;
+  const peersNow = angleFacts(version, latestPeerDay);
+  const peersBefore = angleFacts(previousVersion, latestPeerDay);
+  const xatuNowFacts = angleFacts(version, xatuNow);
+  const xatuBefore = angleFacts(previousVersion, xatuNow);
 
   const blockCount = (target?: string): string =>
     target
@@ -458,11 +326,6 @@ export function VersionAdoption({
         <p>
           <strong>Xatu nodes</strong> are nodes running Xatu or contributoor that report to ethPandaOps. Only their
           consensus client&apos;s version is known.
-        </p>
-        <p>
-          <strong>Time to 50% and 90%</strong> runs from the release until that share of blocks over a trailing 24
-          hours, or of a day&apos;s P2P peers or Xatu nodes, ran it or newer. It is checked over the {LAG_HORIZON_DAYS}{' '}
-          days after the release, whatever the range.
         </p>
       </InfoBox>
 

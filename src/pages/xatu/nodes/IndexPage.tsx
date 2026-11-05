@@ -22,6 +22,7 @@ import {
 } from './components';
 import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
+import { useLatestDayNodes } from './hooks/useLatestDayNodes';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
 import { formatMs } from './utils/node-stats';
 
@@ -50,6 +51,7 @@ export function IndexPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const { rows, network, block, isLoading, error } = useNodeRows(range);
+  const latestDay = useLatestDayNodes();
 
   if (isLoading) {
     return (
@@ -116,7 +118,13 @@ export function IndexPage(): JSX.Element {
         <Stats
           gridClassName="grid grid-cols-2 md:grid-cols-4"
           stats={[
-            { id: 'nodes', name: 'Xatu nodes', value: rows.length, subtitle: rangeLabel },
+            {
+              id: 'nodes',
+              name: 'Xatu nodes',
+              value: latestDay.count ?? '–',
+              subtitle: `Reporting on ${latestDay.day}`,
+            },
+            { id: 'node-ids', name: 'Node IDs', value: rows.length, subtitle: rangeLabel },
             { id: 'online', name: 'Online now', value: online, subtitle: 'Xatu nodes' },
             { id: 'contributors', name: 'Contributors', value: contributors, subtitle: rangeLabel },
             { id: 'countries', name: 'Countries', value: countries, subtitle: rangeLabel },
@@ -159,11 +167,11 @@ export function IndexPage(): JSX.Element {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <BreakdownList title="Countries" subtitle={rangeLabel} items={countryItems} limit={6} />
           <ArrivalHistogram
-            title="Block arrival by Xatu node"
-            subtitle={`Each node's median, ${rangeLabel.toLowerCase()}`}
+            title="Block arrival by node ID"
+            subtitle={`Each node ID's median, ${rangeLabel.toLowerCase()}`}
             anchorId="node-arrival-histogram"
             values={nodeMedians}
-            unit="Xatu nodes"
+            unit="Node IDs"
             bucketMs={50}
             minMs={histogramMin}
             maxMs={histogramMax}
