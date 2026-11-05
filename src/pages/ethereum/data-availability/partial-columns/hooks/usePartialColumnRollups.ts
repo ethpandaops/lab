@@ -27,6 +27,10 @@ export interface UsePartialColumnRollupsResult {
   peerKeys: string[];
   /** Whether the window uses daily buckets */
   isDaily: boolean;
+  /** Window start in unix seconds, the first bucket's; undefined for All */
+  windowStart?: number;
+  /** Exclusive window end in unix seconds, the end of the last complete bucket */
+  windowEnd: number;
   isLoading: boolean;
   error: Error | null;
 }
@@ -43,6 +47,7 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
   const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
   const today = useMemo(() => currentUtcDate(), []);
   const hourlyStart = hourlyEnd - (config.days ?? 0) * 24 * 3600;
+  const dailyEnd = useMemo(() => completeBucketEnd('day'), []);
 
   const fetchRows = async <T>(
     hourly: { fn: ListFn; key: string },
@@ -164,6 +169,8 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
     keys,
     peerKeys,
     isDaily,
+    windowStart: config.days === null ? undefined : isDaily ? dailyEnd - config.days * 24 * 3600 : hourlyStart,
+    windowEnd: isDaily ? dailyEnd : hourlyEnd,
     isLoading: paths.isLoading || partials.isLoading || peers.isLoading,
     error: paths.error ?? partials.error ?? peers.error ?? null,
   };

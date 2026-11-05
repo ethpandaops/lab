@@ -23,7 +23,7 @@ export const TIME_PERIOD_OPTIONS: ReadonlyArray<{ value: TimePeriod; label: stri
 ];
 
 /** Default time period */
-export const DEFAULT_TIME_PERIOD: TimePeriod = '7d';
+export const DEFAULT_TIME_PERIOD: TimePeriod = 'all';
 
 /** Page size for the aggregate queries */
 export const PAGE_SIZE = 10_000;
