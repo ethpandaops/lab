@@ -191,16 +191,20 @@ export function EntitiesTable({
     const shown = (query ? matching(row.entity) : active).slice(0, EXPANDED_MEMBERS);
     const metric = view === 'stake' ? null : metricById(view === 'attestations' ? 'attested' : 'missed');
     return (
-      <div id={`members-${row.entity}`} className="flex flex-col gap-2 pl-5">
+      <div
+        id={`members-${row.entity}`}
+        // Stays in view when the table scrolls sideways on narrow screens
+        className="sticky left-(--table-inset) flex max-w-[calc(100vw-4.5rem)] flex-col gap-2 pl-5 lg:max-w-none"
+      >
         <table className="w-full max-w-2xl text-xs/5">
           <thead>
             <tr className="text-left text-muted">
               <th className="pb-1 font-normal">Operator</th>
-              <th className="pb-1 text-right font-normal">
+              <th className="hidden pb-1 pl-3 text-right font-normal sm:table-cell">
                 {metric ? (view === 'attestations' ? 'Duties' : 'Proposals') : 'Validators'}
               </th>
-              <th className="pb-1 text-right font-normal">{metric ? metric.label : 'Stake'}</th>
-              <th className="pb-1 text-right font-normal">
+              <th className="pb-1 pl-3 text-right font-normal whitespace-nowrap">{metric ? metric.label : 'Stake'}</th>
+              <th className="pb-1 pl-3 text-right font-normal whitespace-nowrap">
                 {metric ? 'vs network' : `Share of ${groupName(row.entity) ?? entityLabel(row.entity)}`}
               </th>
             </tr>
@@ -214,7 +218,7 @@ export function EntitiesTable({
                   <td className="max-w-48 truncate py-0.5 pr-3 text-foreground">
                     <Entity entity={m.entity} />
                   </td>
-                  <td className="py-0.5 text-right tabular-nums">
+                  <td className="hidden py-0.5 pl-3 text-right tabular-nums sm:table-cell">
                     {metric
                       ? counts
                         ? formatSample(view === 'attestations' ? counts.duties : proposals(counts))
@@ -223,7 +227,7 @@ export function EntitiesTable({
                   </td>
                   <td
                     className={clsx(
-                      'py-0.5 text-right tabular-nums',
+                      'py-0.5 pl-3 text-right whitespace-nowrap tabular-nums',
                       comparison?.verdict === 'thin' ? 'text-muted/70' : 'text-foreground'
                     )}
                   >
@@ -235,7 +239,7 @@ export function EntitiesTable({
                   </td>
                   <td
                     className={clsx(
-                      'py-0.5 text-right tabular-nums',
+                      'py-0.5 pl-3 text-right whitespace-nowrap tabular-nums',
                       comparison ? (verdictClass(comparison.verdict) ?? 'text-muted') : 'text-muted'
                     )}
                   >
