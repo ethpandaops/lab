@@ -257,11 +257,11 @@ export function ReferenceEngine({
     },
   ];
 
-  if (isLoading) return <p className="text-sm text-muted">Loading reference node data</p>;
+  if (isLoading) return <p className="text-sm text-muted">Loading reference Xatu node data</p>;
   if (lines.length === 0) {
     return (
-      <Card rounded title="Reference nodes">
-        <p className="text-sm/6 text-muted">The EIP-7870 reference nodes have not run this client.</p>
+      <Card rounded title="Reference Xatu nodes">
+        <p className="text-sm/6 text-muted">The EIP-7870 reference Xatu nodes have not run this client.</p>
       </Card>
     );
   }
@@ -270,7 +270,7 @@ export function ReferenceEngine({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <span className="text-muted">
-          EIP-7870 reference nodes, since{' '}
+          EIP-7870 reference Xatu nodes, since{' '}
           {lines.reduce((first, line) => (line.firstDay < first ? line.firstDay : first), lines[0].firstDay)}
         </span>
         {implementation && (
@@ -292,7 +292,7 @@ export function ReferenceEngine({
 
       <Card rounded title="engine_newPayload by build">
         {visibleLines.length === 0 ? (
-          <p className="text-sm/6 text-muted">No reference node ran these builds.</p>
+          <p className="text-sm/6 text-muted">No reference Xatu node ran these builds.</p>
         ) : (
           <Table variant="nested" data={visibleLines} columns={columns} getRowKey={row => row.line} />
         )}

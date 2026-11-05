@@ -15,14 +15,14 @@ export const Route = createFileRoute('/xatu/locally-built-blocks')({
       },
       {
         name: 'description',
-        content: 'Blocks built locally by ethPandaOps sentry nodes.',
+        content: 'Blocks built locally by ethPandaOps Xatu nodes.',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/xatu/locally-built-blocks` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Locally Built Blocks | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
-        content: 'Blocks built locally by ethPandaOps sentry nodes.',
+        content: 'Blocks built locally by ethPandaOps Xatu nodes.',
       },
       {
         property: 'og:image',
@@ -32,7 +32,7 @@ export const Route = createFileRoute('/xatu/locally-built-blocks')({
       { name: 'twitter:title', content: `Locally Built Blocks | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
-        content: 'Blocks built locally by ethPandaOps sentry nodes.',
+        content: 'Blocks built locally by ethPandaOps Xatu nodes.',
       },
       {
         name: 'twitter:image',

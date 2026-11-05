@@ -159,7 +159,7 @@ export function PeerCensus({ client, layer, from, windowControl }: PeerCensusPro
       <Card
         rounded
         title="P2P peers"
-        subtitle={`P2P peers ${PEER_SOURCE[layer]} each day, node-weighted${sinceSuffix(own.dataStart, from)}`}
+        subtitle={`P2P peers ${PEER_SOURCE[layer]} each day, peer-weighted${sinceSuffix(own.dataStart, from)}`}
         actions={windowControl}
       >
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -475,7 +475,7 @@ export function EnrReadiness({ client, layer, version }: EnrReadinessProps): JSX
     <Card
       rounded
       title="Next fork in ENRs"
-      subtitle={`Node-weighted, from the ENR crawl${source.day ? ` on ${source.day}` : ''}`}
+      subtitle={`From the ENR crawl${source.day ? ` on ${source.day}` : ''}`}
       actions={
         next && (
           <Link

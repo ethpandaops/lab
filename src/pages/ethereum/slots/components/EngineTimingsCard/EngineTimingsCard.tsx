@@ -110,7 +110,7 @@ export function EngineTimingsCard({
             <button
               onClick={() => setShowRefNodeInfo(true)}
               className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
-              aria-label="Learn more about reference nodes"
+              aria-label="Learn more about reference Xatu nodes"
             >
               <InformationCircleIcon className="size-5" />
             </button>
@@ -146,7 +146,7 @@ export function EngineTimingsCard({
             <button
               onClick={() => setShowRefNodeInfo(true)}
               className="rounded-xs p-1 text-muted transition-colors hover:text-foreground"
-              aria-label="Learn more about reference nodes"
+              aria-label="Learn more about reference Xatu nodes"
             >
               <InformationCircleIcon className="size-5" />
             </button>

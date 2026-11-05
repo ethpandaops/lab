@@ -288,7 +288,7 @@ export function NodeResourcesPanel({
 
   if (cpuLoading) {
     return (
-      <Card title="Node Resources" subtitle="Resource metrics from observoor eBPF agent">
+      <Card title="Xatu Node Resources" subtitle="Resource metrics from observoor eBPF agent">
         <div className="space-y-3">
           <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
           <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
@@ -301,7 +301,7 @@ export function NodeResourcesPanel({
     return (
       <Card>
         <div className="py-8 text-center">
-          <p className="text-muted">Failed to load node resource data: {cpuError.message}</p>
+          <p className="text-muted">Failed to load Xatu node resource data: {cpuError.message}</p>
         </div>
       </Card>
     );
@@ -311,7 +311,7 @@ export function NodeResourcesPanel({
     return (
       <Card>
         <div className="py-8 text-center">
-          <p className="text-muted">No node resource data available for this slot</p>
+          <p className="text-muted">No Xatu node resource data available for this slot</p>
         </div>
       </Card>
     );
@@ -321,7 +321,7 @@ export function NodeResourcesPanel({
     <div className="space-y-4">
       {/* Controls */}
       <Card
-        title="Node Resources"
+        title="Xatu Node Resources"
         subtitle={
           <>
             Data from{' '}
@@ -333,7 +333,7 @@ export function NodeResourcesPanel({
             >
               Observoor
             </a>{' '}
-            on {nodeNames.length} ethPandaOps nodes
+            on {nodeNames.length} ethPandaOps Xatu nodes
           </>
         }
         actions={
@@ -357,7 +357,7 @@ export function NodeResourcesPanel({
                 type="button"
                 onClick={() => setShowRefNodeInfo(true)}
                 className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
-                aria-label="Learn more about reference nodes"
+                aria-label="Learn more about reference Xatu nodes"
               >
                 <InformationCircleIcon className="size-4" />
               </button>

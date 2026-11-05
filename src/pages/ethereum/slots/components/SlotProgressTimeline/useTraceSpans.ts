@@ -763,7 +763,7 @@ function buildAttestationSpans(result: TraceSpan[], attestations: FctAttestation
       endMs: Math.max(lastAttTime + 50, firstAttTime + 100),
       category: 'attestation',
       depth: 1,
-      details: `${totalAttestations.toLocaleString()} attestations observed across all nodes (${formatMs(firstAttTime)} → ${formatMs(lastAttTime)})`,
+      details: `${totalAttestations.toLocaleString()} attestations observed across all Xatu nodes (${formatMs(firstAttTime)} → ${formatMs(lastAttTime)})`,
     });
   }
 }

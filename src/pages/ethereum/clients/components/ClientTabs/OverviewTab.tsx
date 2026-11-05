@@ -176,7 +176,7 @@ export function OverviewTab({
 
       <PopoutCard
         title="Share over time"
-        subtitle={`Of blocks naming a client (stake-weighted) and of P2P peers with an agent (node-weighted), ${windowText}`}
+        subtitle={`Of blocks naming a client (stake-weighted) and of P2P peers with an agent (peer-weighted), ${windowText}`}
         anchorId="client-share"
         modalSize="full"
       >

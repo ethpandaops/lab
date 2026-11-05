@@ -421,7 +421,7 @@ export function SlotBasicInfoCard({
                 {/* Node name, only published on devnets */}
                 {proposerClient.nodeName && (
                   <div className="col-span-2">
-                    <dt className="text-xs font-medium text-muted">Node</dt>
+                    <dt className="text-xs font-medium text-muted">Beacon node</dt>
                     <dd className="mt-1 font-mono text-xs text-foreground">{proposerClient.nodeName}</dd>
                   </div>
                 )}

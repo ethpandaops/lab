@@ -60,16 +60,16 @@ export function MethodologyDialog({
       <div ref={bodyRef} className="max-h-[70vh] space-y-6 overflow-y-auto pr-1 text-sm/6 text-muted">
         <p>
           Durations are engine_newPayload calls timed by the consensus client, so they include validating the block and
-          computing its state root, not only running the EVM. Reference nodes run every execution client on the same
-          EIP-7870 hardware. The opcode fits always use reference nodes only, whatever the toggle above says.
+          computing its state root, not only running the EVM. Reference Xatu nodes run every execution client on the
+          same EIP-7870 hardware. The opcode fits always use reference Xatu nodes only, whatever the toggle above says.
         </p>
 
         <Section id="throughput" title="Execution throughput">
           <Formula>Mgas/s = gas used ÷ engine_newPayload duration</Formula>
           <p>
             Over a period, throughput is total gas over total duration, so large blocks weigh more than small ones. P95
-            uses each block&apos;s 95th percentile duration across reference nodes: the throughput the slowest nodes
-            get.
+            uses each block&apos;s 95th percentile duration across reference Xatu nodes: the throughput the slowest Xatu
+            nodes get.
           </p>
           <p>
             Chain demand is gas used per second of wall clock (gas used per block ÷ 12 s). Headroom is the slowest
@@ -81,8 +81,8 @@ export function MethodologyDialog({
           <Formula>duration ms = overhead + marginal cost × Mgas</Formula>
           <p>
             Fitted by least squares to every block in the range, per client; ranges over 6 hours use 28 15-minute slices
-            spread evenly across the range. Typical node uses each block&apos;s median duration across reference nodes,
-            slow node its 95th percentile.
+            spread evenly across the range. Typical Xatu node uses each block&apos;s median duration across reference
+            Xatu nodes, slow Xatu node its 95th percentile.
           </p>
           <Formula>ceiling = (budget − overhead) ÷ marginal cost</Formula>
           <p>

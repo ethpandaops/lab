@@ -27,7 +27,7 @@ function getFilterLabel(key: string): string {
     elClient: 'EL Client',
     slot: 'Slot',
     blockNumber: 'Block',
-    referenceNodes: 'Reference Nodes',
+    referenceNodes: 'Reference Xatu nodes',
   };
   return labels[key] || key;
 }
@@ -342,8 +342,8 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           {/* Reference Nodes toggle */}
           <div className="flex items-center justify-between rounded-sm border border-border bg-background p-4">
             <div>
-              <h4 className="text-sm font-medium text-foreground">Reference Nodes Only</h4>
-              <p className="text-xs text-muted">Show only observations from EIP-7870 reference block builder nodes</p>
+              <h4 className="text-sm font-medium text-foreground">Reference Xatu nodes only</h4>
+              <p className="text-xs text-muted">Show only observations from EIP-7870 reference Xatu nodes</p>
             </div>
             <Toggle
               checked={draftFilters.referenceNodes ?? true}

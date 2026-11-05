@@ -257,7 +257,7 @@ export function PayloadsView({
         },
       }),
       columnHelper.accessor('meta_client_name', {
-        header: 'Node',
+        header: 'Xatu node',
         cell: info => {
           const nodeName = info.getValue();
           if (!nodeName) return <span className="text-muted">-</span>;

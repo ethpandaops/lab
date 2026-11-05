@@ -849,7 +849,7 @@ export function SimulatePage(): JSX.Element {
                   <ArrowPathIcon className="size-4 animate-spin text-warning" style={{ animationDuration: '2s' }} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm/5 font-medium text-foreground">Backend nodes are syncing</p>
+                  <p className="text-sm/5 font-medium text-foreground">Backend execution clients are syncing</p>
                   <p className="mt-0.5 text-xs/4 text-muted">Check back shortly and try again.</p>
                 </div>
               </div>
@@ -977,8 +977,8 @@ export function SimulatePage(): JSX.Element {
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-semibold text-foreground">Backend Syncing</h3>
                   <p className="mt-1 text-sm/5 text-muted">
-                    The simulation was interrupted because all backend nodes for this network are currently syncing with
-                    the chain.
+                    The simulation was interrupted because all backend execution clients for this network are currently
+                    syncing with the chain.
                     {simState.completedBlocks > 0 &&
                       ` ${simState.completedBlocks} of ${simState.totalBlocks} blocks completed before the interruption.`}{' '}
                     Check back shortly and try again.

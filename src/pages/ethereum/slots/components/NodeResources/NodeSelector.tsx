@@ -16,7 +16,7 @@ interface NodeSelectorProps {
 
 export function NodeSelector({ nodes, selectedNode, onChange, nodeClientInfo }: NodeSelectorProps): JSX.Element {
   const options = [
-    { value: '__all__', label: `All nodes (${nodes.length})` },
+    { value: '__all__', label: `All Xatu nodes (${nodes.length})` },
     ...nodes.map(node => {
       const info = nodeClientInfo.get(node);
       const shortName = node.split('/').pop() ?? node;

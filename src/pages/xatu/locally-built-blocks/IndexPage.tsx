@@ -79,8 +79,8 @@ export function IndexPage(): JSX.Element {
       </div>
 
       <InfoBox summary="What these blocks are" className="mb-6">
-        These blocks were built locally by ethPandaOps sentry nodes. They represent what each node would have proposed
-        if selected as a block proposer.
+        These blocks were built locally by ethPandaOps Xatu nodes. They represent what each Xatu node would have
+        proposed if selected as a block proposer.
       </InfoBox>
 
       <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3">

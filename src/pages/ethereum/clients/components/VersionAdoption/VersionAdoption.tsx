@@ -320,13 +320,13 @@ export function VersionAdoption({
           against the client&apos;s releases, and blocks that match none are left out of the shares.
         </p>
         <p>
-          <strong>P2P peers</strong> are node-weighted: the peers {PEER_SOURCE[layer]} each day, by the version their
+          <strong>P2P peers</strong> are peer-weighted: the peers {PEER_SOURCE[layer]} each day, by the version their
           agent states and the commit it resolves to. Peers stating a version without a matching commit are counted
           apart, outside its share.
         </p>
         <p>
-          <strong>Xatu nodes</strong> are nodes running Xatu or contributoor that report to ethPandaOps. Only their
-          consensus client&apos;s version is known.
+          <strong>Xatu nodes</strong> are beacon nodes running Xatu or contributoor that report to ethPandaOps. Only
+          their consensus client&apos;s version is known.
         </p>
       </InfoBox>
 
@@ -428,7 +428,7 @@ export function VersionAdoption({
         <AngleCard
           title="P2P peers"
           color={ANGLE_COLORS.peers}
-          subtitle={`Node-weighted, shares on ${peers.day ?? '-'}`}
+          subtitle={`Peer-weighted, shares on ${peers.day ?? '-'}`}
           version={version}
           previous={previousVersion}
           rows={[

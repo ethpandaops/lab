@@ -127,7 +127,7 @@ export function BlockClassificationCDFChart({ blockPropagationData }: BlockClass
 
           {/* Classification Legend */}
           <div className="rounded-sm bg-muted/10 px-4 py-3">
-            <p className="mb-2 text-xs font-medium text-muted">Node Classifications:</p>
+            <p className="mb-2 text-xs font-medium text-muted">Xatu Node Classifications:</p>
             <div className="space-y-1.5">
               {(['individual', 'corporate', 'internal'] as const).map(cls => (
                 <div key={cls} className="flex items-start gap-2 text-xs">

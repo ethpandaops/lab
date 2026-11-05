@@ -12,7 +12,7 @@ export const Route = createFileRoute('/ethereum/clients/$client/')({
   head: ctx => {
     const name = formatClientName(ctx.params.client);
     const title = `${name} | ${import.meta.env.VITE_BASE_TITLE}`;
-    const description = `${name} on Ethereum: share of proposed blocks, versions, releases, entities, pairings and nodes`;
+    const description = `${name} on Ethereum: share of proposed blocks, versions, releases, entities, pairings, P2P peers and Xatu nodes`;
     const url = `${import.meta.env.VITE_BASE_URL}/ethereum/clients/${ctx.params.client}`;
     return {
       meta: [

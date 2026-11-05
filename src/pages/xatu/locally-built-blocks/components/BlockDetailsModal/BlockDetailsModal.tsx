@@ -224,7 +224,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
       </span>
       <div className="flex items-center gap-3 text-xs text-muted">
         <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
-          {nodes.length} node{nodes.length !== 1 ? 's' : ''}
+          {nodes.length} Xatu node{nodes.length !== 1 ? 's' : ''}
         </span>
       </div>
     </div>

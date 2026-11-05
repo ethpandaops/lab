@@ -130,7 +130,7 @@ const columns: DataTableColumn<CompletionBlock>[] = [
   {
     id: 'node_done' satisfies BlockSortKey,
     accessorFn: row => row.p50_node_last_completion_slot_start_diff,
-    header: 'Node done',
+    header: 'Xatu node done',
     cell: ({ row }) => formatSeconds(row.original.p50_node_last_completion_slot_start_diff),
     meta: { cellClassName: value },
   },
@@ -177,11 +177,11 @@ export function CompletionBlocksTable({
     <Card
       rounded
       title="Blocks"
-      subtitle="Column completions across all sentry nodes by path, with completion times from slot start."
+      subtitle="Column completions across all Xatu nodes by path, with completion times from slot start."
     >
       <InfoBox summary="How this is measured" className="mb-4">
-        Node done is when the median node completed its last column, last is the latest completion by any node, and
-        header is when a node first received the partial column header.
+        Xatu node done is when the median Xatu node completed its last column, last is the latest completion by any Xatu
+        node, and header is when a Xatu node first received the partial column header.
       </InfoBox>
       <div className="mb-4">
         <BlockFilterPanel filters={filters} onChange={onFiltersChange} />

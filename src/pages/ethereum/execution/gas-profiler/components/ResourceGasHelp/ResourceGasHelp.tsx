@@ -59,9 +59,9 @@ export function ResourceGasHelp(): JSX.Element {
               </ResourceDef>
 
               <ResourceDef color={DATA_COLORS.cyan} term="History">
-                The cost of data that nodes must store but the EVM doesn&rsquo;t re-read. This includes LOG event data,
-                contract deployment code storage overhead, and a portion of intrinsic transaction costs. A share of
-                per-byte calldata cost is also attributed here.
+                The cost of data that execution clients must store but the EVM doesn&rsquo;t re-read. This includes LOG
+                event data, contract deployment code storage overhead, and a portion of intrinsic transaction costs. A
+                share of per-byte calldata cost is also attributed here.
               </ResourceDef>
 
               <ResourceDef color={DATA_COLORS.pink} term="Bloom Topics">

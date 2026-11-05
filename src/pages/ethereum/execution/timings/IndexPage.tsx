@@ -123,12 +123,12 @@ export function IndexPage(): JSX.Element {
                 className="flex cursor-pointer items-center gap-2"
               >
                 <Checkbox checked={referenceNodesOnly} onChange={setReferenceNodesOnly} />
-                <span className="text-sm text-foreground">Reference nodes only</span>
+                <span className="text-sm text-foreground">Reference Xatu nodes only</span>
               </button>
               <button
                 onClick={() => setShowRefNodeInfo(true)}
                 className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
-                aria-label="Learn more about reference nodes"
+                aria-label="Learn more about reference Xatu nodes"
               >
                 <InformationCircleIcon className="size-4" />
               </button>
