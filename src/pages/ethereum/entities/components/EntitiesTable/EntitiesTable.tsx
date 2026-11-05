@@ -4,6 +4,7 @@ import clsx from 'clsx';
 
 import { DataTable, type DataTableColumn } from '@/components/DataTable';
 import { Entity } from '@/components/Ethereum/Entity';
+import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { TableCard, TableSearch } from '@/pages/ethereum/validators/components';
 import { formatCompact } from '@/pages/ethereum/validators/utils/overview';
@@ -42,6 +43,8 @@ interface EntityRow extends EntityStake {
 }
 
 export interface EntitiesTableProps {
+  /** Card title */
+  title?: string;
   entities: EntityStake[];
   totalStakeEth: number;
   /** Counts per entity over the window */
@@ -95,6 +98,7 @@ function metricColumn(id: MetricId): DataTableColumn<EntityRow> {
  * trend cover the stake window; performance columns cover the performance window and read against the network.
  */
 export function EntitiesTable({
+  title = 'All entities',
   entities,
   totalStakeEth,
   performance,
@@ -127,7 +131,7 @@ export function EntitiesTable({
     id: 'entity',
     header: 'Entity',
     accessorKey: 'entity',
-    cell: ({ row }) => <Entity entity={row.original.entity} />,
+    cell: ({ row }) => <Entity entity={row.original.entity} label={entityLabel(row.original.entity)} />,
     meta: { cellClassName: 'text-foreground' },
   };
 
@@ -190,7 +194,7 @@ export function EntitiesTable({
 
   return (
     <TableCard
-      title="All entities"
+      title={title}
       actions={<SegmentedControl options={VIEW_OPTIONS} value={view} onChange={setView} ariaLabel="Table view" />}
       filters={<TableSearch value={search} onChange={setSearch} placeholder="Search entities" />}
       footer={

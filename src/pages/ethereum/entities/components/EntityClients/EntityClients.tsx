@@ -13,6 +13,7 @@ import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT } from '@/utils/graffiti';
 import { ShareTable } from '@/pages/ethereum/clients/components/ShareTable';
 import {
+  entityQuery,
   summariseClients,
   toClientCountRecords,
   type ClientLayer,
@@ -112,11 +113,10 @@ function LayerCard({
  */
 export function EntityClients({ entity, days, window }: EntityClientsProps): JSX.Element {
   const { currentNetwork } = useNetwork();
-  // Whole UTC days, the newest included
-  const since = useMemo(
-    () => (days === null ? undefined : Math.floor(Date.now() / 1000 / 86400) * 86400 - (days - 1) * 86400),
-    [days]
-  );
+  // Whole UTC days ending yesterday, so today's partial count never sits beside complete days
+  const today = useMemo(() => Math.floor(Date.now() / 1000 / 86400) * 86400, []);
+  const since = days === null ? undefined : today - days * 86400;
+  const todayDay = new Date(today * 1000).toISOString().slice(0, 10);
   const sinceDay = since === undefined ? '' : new Date(since * 1000).toISOString().slice(0, 10);
 
   const counts = useQuery({
@@ -125,21 +125,24 @@ export function EntityClients({ entity, days, window }: EntityClientsProps): JSX
       fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
         fctBlockGraffitiClientByEntityDailyServiceList,
         // The daily table only filters its date key by value; every date starts with 20
-        { query: { entity_eq: entity, day_start_date_like: '20%', page_size: 10000 } },
+        { query: { ...entityQuery(entity), day_start_date_like: '20%', page_size: 10000 } },
         'fct_block_graffiti_client_by_entity_daily',
         signal
       ),
     enabled: !!currentNetwork,
   });
-  const blocks = useVersionCounts({ grain: 'entity-daily', entity, from: since });
+  const blocks = useVersionCounts({ grain: 'entity-daily', entity, from: since, to: today });
 
   const shares = useMemo(() => {
-    const inWindow = (counts.data ?? []).filter(row => (row.day_start_date ?? '') >= sinceDay);
+    const inWindow = (counts.data ?? []).filter(row => {
+      const day = row.day_start_date ?? '';
+      return day >= sinceDay && day < todayDay;
+    });
     const records = toClientCountRecords(inWindow, true);
     const identified = (layer: ClientLayer): ClientSummary[] =>
       summariseClients(records, layer).filter(summary => summary.client !== UNKNOWN_CLIENT);
     return { consensus: identified('consensus'), execution: identified('execution') };
-  }, [counts.data, sinceDay]);
+  }, [counts.data, sinceDay, todayDay]);
 
   const versions = useMemo(() => {
     const named = { consensus: 0, execution: 0 };

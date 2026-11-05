@@ -7,6 +7,13 @@ import type { FctValidatorStakeByEntityDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 
+import {
+  ENTITY_TABLES,
+  fctValidatorStakeByEntityGroupDailyList,
+  type FctValidatorStakeByEntityGroupDaily,
+} from '../api/entity-models';
+import { groupId, isEntityGroup } from '../utils/groups';
+
 const GWEI = 1e9;
 
 export interface EntityStakeDay {
@@ -25,19 +32,30 @@ export interface UseEntityStakeHistoryResult {
   error: Error | null;
 }
 
-/** An entity's active stake and validators on every day, and its share of all stake on the newest one */
+/**
+ * An entity's or entity group's active stake and validators on every day, and its share of all stake on the newest
+ * one. Groups read their own daily table.
+ */
 export function useEntityStakeHistory(entity: string): UseEntityStakeHistoryResult {
   const { currentNetwork } = useNetwork();
+  const group = isEntityGroup(entity);
   const stake = useQuery({
     queryKey: ['entities', 'entity-stake', currentNetwork?.name, entity],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctValidatorStakeByEntityDaily>(
-        fctValidatorStakeByEntityDailyServiceList,
-        // The daily table only filters its date key by value; every date starts with 20
-        { query: { entity_eq: entity, day_start_date_like: '20%', page_size: 10_000 } },
-        'fct_validator_stake_by_entity_daily',
-        signal
-      ),
+    queryFn: ({ signal }): Promise<Array<FctValidatorStakeByEntityDaily | FctValidatorStakeByEntityGroupDaily>> =>
+      group
+        ? fetchAllPages<FctValidatorStakeByEntityGroupDaily>(
+            fctValidatorStakeByEntityGroupDailyList,
+            // The daily table only filters its date key by value; every date starts with 20
+            { query: { entity_group_eq: groupId(entity), day_start_date_like: '20%', page_size: 10_000 } },
+            ENTITY_TABLES.groupStake,
+            signal
+          )
+        : fetchAllPages<FctValidatorStakeByEntityDaily>(
+            fctValidatorStakeByEntityDailyServiceList,
+            { query: { entity_eq: entity, day_start_date_like: '20%', page_size: 10_000 } },
+            'fct_validator_stake_by_entity_daily',
+            signal
+          ),
     enabled: !!currentNetwork && entity.length > 0,
   });
 

@@ -50,15 +50,16 @@ export interface UseEntityStakeResult {
 /**
  * Stake and validator counts per entity on the latest day, and each entity's stake on the window's first day.
  */
-export function useEntityStake(window: EntitiesWindow): UseEntityStakeResult {
+export function useEntityStake(window: EntitiesWindow, enabled = true): UseEntityStakeResult {
   const { currentNetwork } = useNetwork();
 
   // Shares its query with the validators overview
-  const latest = useQuery(
-    fctValidatorCountByCredentialTypeDailyServiceListOptions({
+  const latest = useQuery({
+    ...fctValidatorCountByCredentialTypeDailyServiceListOptions({
       query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 3 },
-    })
-  );
+    }),
+    enabled,
+  });
   const latestDay = latest.data?.fct_validator_count_by_credential_type_daily?.[0]?.day_start_date;
 
   const genesisDay = currentNetwork ? dayOf(currentNetwork.genesis_time) : undefined;
@@ -82,7 +83,7 @@ export function useEntityStake(window: EntitiesWindow): UseEntityStakeResult {
         signal
       ),
     }),
-    enabled: days.length > 0,
+    enabled: enabled && days.length > 0,
     placeholderData: keepPreviousData,
   });
 

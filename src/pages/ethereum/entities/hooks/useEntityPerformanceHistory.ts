@@ -6,10 +6,13 @@ import { useAttestationRows, useProposalRows } from '@/pages/ethereum/clients/ho
 import {
   ENTITY_TABLES,
   fctAttestationVoteCorrectnessByEntityDailyList,
+  fctAttestationVoteCorrectnessByEntityGroupDailyList,
   fctBlockProposalByEntityDailyList,
+  fctBlockProposalByEntityGroupDailyList,
   type FctAttestationVoteCorrectnessByEntityDaily,
   type FctBlockProposalByEntityDaily,
 } from '../api/entity-models';
+import { groupId, isEntityGroup } from '../utils/groups';
 import { addCounts, EMPTY_COUNTS, toCounts, type PerformanceCounts } from '../utils/performance';
 
 export interface UseEntityPerformanceHistoryResult {
@@ -38,7 +41,7 @@ function byDay<T extends { day_start_date?: string }>(
 }
 
 /**
- * An entity's attestation and proposal counts per day from `start` to `end` (Unix seconds, end exclusive), beside
+ * An entity's or entity group's attestation and proposal counts per day from `start` to `end` (Unix seconds, end exclusive), beside
  * the whole network's. Network days sum the per-client tables of one layer, which hold every validator once.
  */
 export function useEntityPerformanceHistory(
@@ -46,17 +49,18 @@ export function useEntityPerformanceHistory(
   start: number | undefined,
   end: number | undefined
 ): UseEntityPerformanceHistoryResult {
-  const filters = start === undefined ? null : { entity_eq: entity };
+  const group = isEntityGroup(entity);
+  const filters = start === undefined ? null : group ? { entity_group_eq: groupId(entity) } : { entity_eq: entity };
   const attestations = useDailyByClient<FctAttestationVoteCorrectnessByEntityDaily & { day_start_date?: string }>(
-    fctAttestationVoteCorrectnessByEntityDailyList,
-    ENTITY_TABLES.attestationsDaily,
+    group ? fctAttestationVoteCorrectnessByEntityGroupDailyList : fctAttestationVoteCorrectnessByEntityDailyList,
+    group ? ENTITY_TABLES.groupAttestations : ENTITY_TABLES.attestationsDaily,
     filters,
     start,
     end
   );
   const proposals = useDailyByClient<FctBlockProposalByEntityDaily & { day_start_date?: string }>(
-    fctBlockProposalByEntityDailyList,
-    ENTITY_TABLES.proposalsDaily,
+    group ? fctBlockProposalByEntityGroupDailyList : fctBlockProposalByEntityDailyList,
+    group ? ENTITY_TABLES.groupProposals : ENTITY_TABLES.proposalsDaily,
     filters,
     start,
     end

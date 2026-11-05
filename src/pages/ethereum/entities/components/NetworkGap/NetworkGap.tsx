@@ -2,6 +2,7 @@ import { useState, type JSX } from 'react';
 import clsx from 'clsx';
 
 import { Entity } from '@/components/Ethereum/Entity';
+import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { Card } from '@/components/Layout/Card';
@@ -145,7 +146,11 @@ export function NetworkGap({ entities, counts, network, window }: NetworkGapProp
               return (
                 <tr key={row.entity}>
                   <td className="max-w-40 py-1 pr-3">
-                    <Entity entity={row.entity} className="block truncate text-foreground" />
+                    <Entity
+                      entity={row.entity}
+                      label={entityLabel(row.entity)}
+                      className="block truncate text-foreground"
+                    />
                   </td>
                   <td className="hidden w-[40%] py-1 sm:table-cell">
                     <span className="relative block h-2.5">

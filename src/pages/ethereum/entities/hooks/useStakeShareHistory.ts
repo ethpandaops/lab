@@ -6,6 +6,12 @@ import type { FctValidatorStakeByEntityDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 
+import {
+  ENTITY_TABLES,
+  fctValidatorStakeByEntityGroupDailyList,
+  type FctValidatorStakeByEntityGroupDaily,
+} from '../api/entity-models';
+import { groupId, isEntityGroup } from '../utils/groups';
 import { daysBack } from '../utils/overview';
 
 const GWEI = 1e9;
@@ -25,7 +31,8 @@ export interface UseStakeShareHistoryResult {
 }
 
 /**
- * Stake over the window for a few entities, next to the network total so the rest can be shown as one band.
+ * Stake over the window for a few entities or entity groups, next to the network total so the rest can be shown as
+ * one band. Groups read their own daily table.
  */
 export function useStakeShareHistory(
   entities: string[],
@@ -40,18 +47,32 @@ export function useStakeShareHistory(
   const dayFilter =
     days.length > MAX_LISTED_DAYS ? { day_start_date_like: '20%' } : { day_start_date_in_values: dayValues };
 
+  const single = entities.filter(e => !isEntityGroup(e));
+  const groups = entities.filter(isEntityGroup);
+
   const stake = useQuery({
-    queryKey: ['entities', 'stake-history', currentNetwork?.name, entities.join(','), dayValues],
+    queryKey: ['entities', 'stake-history', currentNetwork?.name, single.join(','), dayValues],
     queryFn: ({ signal }) =>
       fetchAllPages<FctValidatorStakeByEntityDaily>(
         fctValidatorStakeByEntityDailyServiceList,
         {
-          query: { ...dayFilter, entity_in_values: entities.join(','), page_size: PAGE_SIZE },
+          query: { ...dayFilter, entity_in_values: single.join(','), page_size: PAGE_SIZE },
         },
         'fct_validator_stake_by_entity_daily',
         signal
       ),
-    enabled: days.length > 0 && entities.length > 0,
+    enabled: days.length > 0 && single.length > 0,
+  });
+  const groupStake = useQuery({
+    queryKey: ['entities', 'group-stake-history', currentNetwork?.name, groups.join(','), dayValues],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctValidatorStakeByEntityGroupDaily>(
+        fctValidatorStakeByEntityGroupDailyList,
+        { query: { ...dayFilter, entity_group_in_values: groups.map(groupId).join(','), page_size: PAGE_SIZE } },
+        ENTITY_TABLES.groupStake,
+        signal
+      ),
+    enabled: days.length > 0 && groups.length > 0,
   });
 
   const totalsQuery = useQuery({
@@ -71,7 +92,11 @@ export function useStakeShareHistory(
 
   // An entity missing from a day with a network total had no stake that day
   const byEntity = new Map(entities.map(e => [e, totals.map(t => (t === null ? null : 0)) as (number | null)[]]));
-  for (const row of stake.data ?? []) {
+  const rows = [
+    ...(stake.data ?? []),
+    ...(groupStake.data ?? []).map(row => ({ ...row, entity: `*${row.entity_group ?? ''}` })),
+  ];
+  for (const row of rows) {
     const series = byEntity.get(row.entity ?? '');
     const i = dayIndex.get(row.day_start_date ?? '');
     if (!series || i === undefined || series[i] === null) continue;
@@ -82,7 +107,7 @@ export function useStakeShareHistory(
     days,
     byEntity,
     totals,
-    isLoading: stake.isLoading || totalsQuery.isLoading,
-    error: (stake.error ?? totalsQuery.error ?? null) as Error | null,
+    isLoading: stake.isLoading || groupStake.isLoading || totalsQuery.isLoading,
+    error: (stake.error ?? groupStake.error ?? totalsQuery.error ?? null) as Error | null,
   };
 }

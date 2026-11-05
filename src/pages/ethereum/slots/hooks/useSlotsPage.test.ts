@@ -50,7 +50,7 @@ function list(table: string) {
   return async ({ query }: { query: Record<string, string | number> }) => {
     let rows = [...tables[table]];
     for (const [key, raw] of Object.entries(query)) {
-      const match = /^(.*)_(eq|gte|lte|in_values|has|ends_with)$/.exec(key);
+      const match = /^(.*)_(eq|gte|lte|in_values|has|ends_with|contains)$/.exec(key);
       if (!match) continue;
       const [, field, op] = match;
       const set = op === 'in_values' ? new Set(String(raw).split(',').map(Number)) : undefined;
@@ -61,6 +61,7 @@ function list(table: string) {
         if (op === 'lte') return (value as number) <= Number(raw);
         if (set) return set.has(value as number);
         if (op === 'has') return (value as string[]).includes(String(raw));
+        if (op === 'contains') return String(value).includes(String(raw));
         return String(value).endsWith(String(raw));
       });
     }

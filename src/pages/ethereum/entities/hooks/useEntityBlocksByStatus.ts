@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { offsetPageToken } from '@/utils/page-token';
+import { entityQuery } from '@/pages/ethereum/clients/utils/client-share';
 import {
   DEFAULT_BLOCK_PAGE_SIZE,
   parseProposers,
@@ -43,7 +44,7 @@ export function useEntityBlocksByStatus(
   const { field, desc } = parseSort(search.sort, STATUS_SORT_FIELDS);
   const tieBreak = field === 'slot_start_date_time' || field === 'slot' ? '' : ',slot_start_date_time desc';
   const query = {
-    entity_eq: entity,
+    ...entityQuery(entity),
     status_eq: status,
     slot_start_date_time_gte: search.since ?? currentNetwork?.genesis_time ?? 0,
     ...(search.until !== undefined && { slot_start_date_time_lte: search.until }),
