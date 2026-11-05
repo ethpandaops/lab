@@ -1,16 +1,24 @@
-import { type JSX, useCallback, useMemo, useState } from 'react';
+import { type JSX, useMemo, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Alert } from '@/components/Feedback/Alert';
 import { Input } from '@/components/Forms/Input';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
+import { Route } from '@/routes/xatu/contributors/index';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { UserCard } from './components/UserCard';
 import { UserCardSkeleton } from './components/UserCardSkeleton';
 import { useContributorsData, getDisplayVersion, type Contributor } from './hooks';
 
 export function IndexPage(): JSX.Element {
+  const navigate = useNavigate({ from: '/xatu/contributors/' });
+  const range = Route.useSearch().range ?? 'all';
+  // Hashed node IDs rotate, so past a day they count IDs rather than machines
+  const nodeLabel = range === '24h' ? 'Xatu nodes' : 'Node IDs';
   const { publicContributors, corporateContributors, internalContributors, totalCount, isLoading, error } =
-    useContributorsData();
+    useContributorsData(range);
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -41,8 +49,7 @@ export function IndexPage(): JSX.Element {
 
   const filteredCount = filteredPublic.length + filteredCorporate.length + filteredInternal.length;
 
-  // Memoize render function to avoid recreation on every render
-  const renderContributorSection = useCallback((title: string, contributors: Contributor[]): JSX.Element | null => {
+  const renderContributorSection = (title: string, contributors: Contributor[]): JSX.Element | null => {
     if (contributors.length === 0) return null;
 
     return (
@@ -58,6 +65,7 @@ export function IndexPage(): JSX.Element {
               username={contributor.username}
               classification={contributor.classification}
               nodeCount={contributor.nodeCount}
+              nodeLabel={nodeLabel}
               countryCount={contributor.locations.size}
               lastSeen={contributor.lastSeen}
               primaryCountry={contributor.primaryCountryCode || undefined}
@@ -70,17 +78,13 @@ export function IndexPage(): JSX.Element {
         </ul>
       </div>
     );
-  }, []);
+  };
 
   if (isLoading) {
     return (
       <Container>
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
-          <Header
-            title="Contributoors"
-            description="Contributors with Xatu nodes seen in the last 24h"
-            className="lg:flex-1"
-          />
+          <Header title="Contributoors" description="Contributors with Xatu nodes" className="lg:flex-1" />
 
           <Alert
             variant="info"
@@ -151,7 +155,7 @@ export function IndexPage(): JSX.Element {
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <Header
           title="Contributoors"
-          description={`${totalCount} contributors with Xatu nodes seen in the last 24h`}
+          description={`${totalCount} contributors with Xatu nodes`}
           className="lg:flex-1"
         />
 
@@ -194,17 +198,34 @@ export function IndexPage(): JSX.Element {
       </div>
 
       <div className="mb-8">
-        <Input size="md">
-          <Input.Leading>
-            <MagnifyingGlassIcon />
-          </Input.Leading>
-          <Input.Field
-            type="text"
-            placeholder="Search contributors..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <SegmentedControl
+            options={NODE_RANGE_OPTIONS}
+            value={range}
+            onChange={value =>
+              navigate({
+                search: prev => ({ ...prev, range: value === 'all' ? undefined : value }),
+                replace: true,
+                resetScroll: false,
+              })
+            }
+            ariaLabel="Time range"
+            className="self-start sm:self-auto"
           />
-        </Input>
+          <div className="sm:flex-1">
+            <Input size="md">
+              <Input.Leading>
+                <MagnifyingGlassIcon />
+              </Input.Leading>
+              <Input.Field
+                type="text"
+                placeholder="Search contributors..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </Input>
+          </div>
+        </div>
         {searchQuery && (
           <p className="mt-2 text-sm text-muted">
             Showing {filteredCount} of {totalCount} contributors
@@ -224,7 +245,7 @@ export function IndexPage(): JSX.Element {
 
       {!searchQuery && totalCount === 0 && (
         <div className="rounded-sm border border-border bg-surface p-8 text-center text-muted">
-          No contributors with Xatu nodes seen in the last 24h.
+          No contributors with Xatu nodes in this range.
         </div>
       )}
     </Container>

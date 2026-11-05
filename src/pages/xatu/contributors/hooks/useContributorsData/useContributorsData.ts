@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { FctNodeLastSeen } from '@/api/types.gen';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { useLastSeenNodes } from '@/pages/xatu/nodes/hooks/useLastSeenNodes';
 import type { UserClassification } from '../../components/UserCard';
 import type { Contributor, UseContributorsDataReturn } from './useContributorsData.types';
 
 /**
  * Processes raw node data into aggregated contributor information
  */
-function processNodes(nodes: FctNodeActiveLast24h[]): Contributor[] {
+function processNodes(nodes: FctNodeLastSeen[]): Contributor[] {
   const contributorMap = new Map<string, Contributor>();
 
   nodes.forEach(node => {
@@ -74,71 +74,20 @@ function processNodes(nodes: FctNodeActiveLast24h[]): Contributor[] {
 }
 
 /**
- * Custom hook to fetch and process contributors data
- * Fetches data for public, corporate, and internal contributors
- * and aggregates the node information for each contributor
+ * Contributors with Xatu nodes last seen inside the range, grouped into public, corporate and internal by node name
  */
-export function useContributorsData(): UseContributorsDataReturn {
-  // Fetch public contributors
-  const {
-    data: pubData,
-    error: pubError,
-    isLoading: pubLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'pub-',
-        page_size: 1000,
-      },
-    }),
-  });
+export function useContributorsData(range: NodeRange): UseContributorsDataReturn {
+  const { nodes, isLoading, error } = useLastSeenNodes(range);
 
-  // Fetch corporate contributors
-  const {
-    data: corpData,
-    error: corpError,
-    isLoading: corpLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'corp-',
-        page_size: 1000,
-      },
-    }),
-  });
-
-  // Fetch internal (ethPandaOps) contributors
-  const {
-    data: ethData,
-    error: ethError,
-    isLoading: ethLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'ethpandaops',
-        page_size: 1000,
-      },
-    }),
-  });
-
-  const isLoading = pubLoading || corpLoading || ethLoading;
-  const error = (pubError || corpError || ethError) as Error | null;
-
-  // Memoize processed contributor lists to avoid reprocessing on every render
-  const publicContributors = useMemo(
-    () => processNodes(pubData?.fct_node_active_last_24h ?? []),
-    [pubData?.fct_node_active_last_24h]
-  );
-
-  const corporateContributors = useMemo(
-    () => processNodes(corpData?.fct_node_active_last_24h ?? []),
-    [corpData?.fct_node_active_last_24h]
-  );
-
-  const internalContributors = useMemo(
-    () => processNodes(ethData?.fct_node_active_last_24h ?? []),
-    [ethData?.fct_node_active_last_24h]
-  );
+  const { publicContributors, corporateContributors, internalContributors } = useMemo(() => {
+    const byPrefix = (prefix: string): Contributor[] =>
+      processNodes(nodes.filter(node => node.meta_client_name?.startsWith(prefix)));
+    return {
+      publicContributors: byPrefix('pub-'),
+      corporateContributors: byPrefix('corp-'),
+      internalContributors: byPrefix('ethpandaops'),
+    };
+  }, [nodes]);
 
   const totalCount = publicContributors.length + corporateContributors.length + internalContributors.length;
 

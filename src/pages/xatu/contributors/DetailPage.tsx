@@ -1,8 +1,8 @@
 import { type JSX, useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { FctNodeActiveLast24h } from '@/api/types.gen';
+import { fctNodeLastSeenServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import type { FctNodeLastSeen } from '@/api/types.gen';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Button } from '@/components/Elements/Button';
 import { Container } from '@/components/Layout/Container';
@@ -21,25 +21,26 @@ import { PerNodeHistoryChart } from '@/pages/xatu/nodes/components';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
 import { useNodeHistory, type HistoryMetric } from '@/pages/xatu/nodes/hooks/useNodeHistory';
 import { behindStarts, medianByStart } from '@/pages/xatu/nodes/utils/history';
+import { getBuckets } from '@/pages/xatu/nodes/utils/time-buckets';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: string; anchorId: string }> = [
-  { metric: 'block', title: 'Block arrival', subtitle: 'Median per node', anchorId: 'block-latency' },
-  { metric: 'head', title: 'Head events', subtitle: 'Median per node', anchorId: 'head-latency' },
-  { metric: 'attestation', title: 'Attestations', subtitle: 'Median per node', anchorId: 'attestation-latency' },
+  { metric: 'block', title: 'Block arrival', subtitle: 'Median per Xatu node', anchorId: 'block-latency' },
+  { metric: 'head', title: 'Head events', subtitle: 'Median per Xatu node', anchorId: 'head-latency' },
+  { metric: 'attestation', title: 'Attestations', subtitle: 'Median per Xatu node', anchorId: 'attestation-latency' },
   {
     metric: 'dataColumn',
     title: 'Data columns',
-    subtitle: 'Median per node of when the last custody column arrived',
+    subtitle: 'Median per Xatu node of when the last custody column arrived',
     anchorId: 'data-column-latency',
   },
 ];
 
 // Node table columns (constant, defined once outside component)
-const nodeColumns: Column<FctNodeActiveLast24h>[] = [
+const nodeColumns: Column<FctNodeLastSeen>[] = [
   {
-    header: 'Node',
-    accessor: (node: FctNodeActiveLast24h) =>
+    header: 'Node ID',
+    accessor: (node: FctNodeLastSeen) =>
       node.node_id ? (
         <Link
           to="/xatu/nodes/$nodeId"
@@ -54,7 +55,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   },
   {
     header: 'Location',
-    accessor: (node: FctNodeActiveLast24h) => {
+    accessor: (node: FctNodeLastSeen) => {
       const city = node.meta_client_geo_city;
       const country = node.meta_client_geo_country;
       const countryCode = node.meta_client_geo_country_code;
@@ -85,7 +86,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   },
   {
     header: 'Implementation',
-    accessor: (node: FctNodeActiveLast24h) => {
+    accessor: (node: FctNodeLastSeen) => {
       if (node.meta_client_implementation && node.meta_client_version) {
         return `${node.meta_client_implementation} ${node.meta_client_version}`;
       }
@@ -95,7 +96,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   },
   {
     header: 'Consensus',
-    accessor: (node: FctNodeActiveLast24h) =>
+    accessor: (node: FctNodeLastSeen) =>
       node.meta_consensus_implementation ? (
         <NodeClientVersion client={node.meta_consensus_implementation} version={node.meta_consensus_version} />
       ) : (
@@ -105,7 +106,7 @@ const nodeColumns: Column<FctNodeActiveLast24h>[] = [
   },
   {
     header: 'Last Seen',
-    accessor: (node: FctNodeActiveLast24h) => {
+    accessor: (node: FctNodeLastSeen) => {
       if (node.last_seen_date_time) {
         return <Timestamp timestamp={node.last_seen_date_time} format="relative" />;
       }
@@ -157,63 +158,22 @@ export function DetailPage(): JSX.Element {
       networkMedians
     );
 
-  // Query all three categories since we don't know which one the username belongs to
-  const {
-    data: pubData,
-    error: pubError,
-    isLoading: pubLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
+  // Every Xatu node the contributor ever ran, newest first; the range only narrows what is shown
+  const { data, error, isLoading } = useQuery({
+    ...fctNodeLastSeenServiceListOptions({
       query: {
+        // The API requires a filter the primary key index can use
+        meta_client_name_ne: '',
         username_eq: id,
-        meta_client_name_starts_with: 'pub-',
-        page_size: 1000,
+        page_size: 10000,
         order_by: 'last_seen_date_time DESC',
       },
     }),
   });
-
-  const {
-    data: corpData,
-    error: corpError,
-    isLoading: corpLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        username_eq: id,
-        meta_client_name_starts_with: 'corp-',
-        page_size: 1000,
-        order_by: 'last_seen_date_time DESC',
-      },
-    }),
-  });
-
-  const {
-    data: ethData,
-    error: ethError,
-    isLoading: ethLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        username_eq: id,
-        meta_client_name_starts_with: 'ethpandaops',
-        page_size: 1000,
-        order_by: 'last_seen_date_time DESC',
-      },
-    }),
-  });
-
-  const isLoading = pubLoading || corpLoading || ethLoading;
-  const error = pubError || corpError || ethError;
-
-  // Combine all results from the three queries
-  const allNodes = [
-    ...(pubData?.fct_node_active_last_24h ?? []),
-    ...(corpData?.fct_node_active_last_24h ?? []),
-    ...(ethData?.fct_node_active_last_24h ?? []),
-  ];
-
-  const data = allNodes.length > 0 ? { fct_node_active_last_24h: allNodes } : null;
+  const allNodes = data?.fct_node_last_seen ?? [];
+  const seen = search.seen ?? 'all';
+  const seenStart = seen === 'all' ? 0 : getBuckets(seen, Date.now() / 1000)[0];
+  const nodes = allNodes.filter(node => (node.last_seen_date_time ?? 0) >= seenStart);
 
   if (isLoading) {
     return (
@@ -238,15 +198,13 @@ export function DetailPage(): JSX.Element {
     );
   }
 
-  const nodes = data?.fct_node_active_last_24h ?? [];
-
-  if (nodes.length === 0) {
+  if (allNodes.length === 0) {
     return (
       <Container>
         <Header title="Contributor Details" />
         <div className="rounded-sm border border-border bg-surface p-12 text-center">
           <h2 className="mb-2 text-lg/7 font-semibold text-foreground">Contributor not found</h2>
-          <p className="mb-4 text-muted">No Xatu nodes from &quot;{id}&quot; in the last 24h.</p>
+          <p className="mb-4 text-muted">No Xatu nodes from &quot;{id}&quot;.</p>
           <Link to="/xatu/contributors" className="text-primary hover:underline">
             ← Back to all contributors
           </Link>
@@ -255,7 +213,7 @@ export function DetailPage(): JSX.Element {
     );
   }
 
-  const contributoor = nodes[0];
+  const contributoor = allNodes[0];
   const username = contributoor.username || id;
   const classification = (contributoor.classification || 'unclassified') as UserClassification;
 
@@ -267,10 +225,13 @@ export function DetailPage(): JSX.Element {
   nodes.forEach(n => {
     if (n.meta_client_geo_country) uniqueLocations.add(n.meta_client_geo_country);
     if (n.meta_consensus_implementation) uniqueConsensusClients.add(n.meta_consensus_implementation);
+  });
+  allNodes.forEach(n => {
     if (n.last_seen_date_time && n.last_seen_date_time > latestSeen) {
       latestSeen = n.last_seen_date_time;
     }
   });
+  const seenLabel = NODE_RANGE_CONFIG[seen].label;
 
   return (
     <Container>
@@ -295,21 +256,36 @@ export function DetailPage(): JSX.Element {
         )}
       </div>
 
+      <SegmentedControl
+        options={NODE_RANGE_OPTIONS}
+        value={seen}
+        onChange={value =>
+          navigate({
+            search: prev => ({ ...prev, seen: value === 'all' ? undefined : value }),
+            replace: true,
+            resetScroll: false,
+          })
+        }
+        ariaLabel="Xatu nodes time range"
+        className="mb-4"
+      />
+
       {/* Statistics - Full Width */}
       <Stats
         className="mb-6"
         stats={[
           {
             id: 'active-nodes',
-            name: 'Xatu nodes',
+            // Hashed node IDs rotate, so past a day they count IDs rather than machines
+            name: seen === '24h' ? 'Xatu nodes' : 'Node IDs',
             value: nodes.length.toString(),
-            subtitle: 'Last 24h',
+            subtitle: seenLabel,
           },
           {
             id: 'countries',
             name: 'Countries',
             value: uniqueLocations.size.toString(),
-            subtitle: 'Last 24h',
+            subtitle: seenLabel,
           },
           {
             id: 'last-seen',
@@ -320,7 +296,9 @@ export function DetailPage(): JSX.Element {
       />
 
       {/* Nodes Table */}
-      <Table data={showAllNodes ? nodes : nodes.slice(0, 5)} columns={nodeColumns} variant="nested" />
+      {nodes.length > 0 && (
+        <Table data={showAllNodes ? nodes : nodes.slice(0, 5)} columns={nodeColumns} variant="nested" />
+      )}
       {nodes.length > 5 && (
         <div className="mt-4 text-center">
           <Button variant="secondary" size="sm" onClick={() => setShowAllNodes(!showAllNodes)}>
@@ -335,7 +313,9 @@ export function DetailPage(): JSX.Element {
           <SegmentedControl
             options={NODE_RANGE_OPTIONS}
             value={range}
-            onChange={value => navigate({ search: prev => ({ ...prev, range: value }), replace: true })}
+            onChange={value =>
+              navigate({ search: prev => ({ ...prev, range: value }), replace: true, resetScroll: false })
+            }
             ariaLabel="Time range"
           />
         </div>

@@ -20,6 +20,7 @@ export function UserCard({
   username,
   classification,
   nodeCount,
+  nodeLabel = 'Xatu nodes',
   countryCount,
   lastSeen,
   primaryCountry,
@@ -44,7 +45,7 @@ export function UserCard({
           </span>
         </div>
         <dl className="mt-2 grid grid-cols-3 gap-x-4">
-          <Detail label="Xatu nodes">{nodeCount}</Detail>
+          <Detail label={nodeLabel}>{nodeCount}</Detail>
           <Detail label="Countries">
             {countryCount} {countryCount === 1 && countryFlag}
           </Detail>

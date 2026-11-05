@@ -22,7 +22,7 @@ export function NetworkArrivalChart({ history, rangeLabel }: NetworkArrivalChart
   return (
     <TimeSeriesChart
       title="Block arrival across Xatu nodes"
-      subtitle={`Each node's median, ${rangeLabel.toLowerCase()}`}
+      subtitle={`Each Xatu node's median, ${rangeLabel.toLowerCase()}`}
       anchorId="network-block-arrival"
       buckets={history.buckets}
       granularity={history.granularity}

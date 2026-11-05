@@ -3,7 +3,7 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { GlobeAltIcon, MapPinIcon, FlagIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import type { GeographicalStatsProps } from './GeographicalStats.types';
 
-export function GeographicalStats({ stats, isLoading }: GeographicalStatsProps): JSX.Element {
+export function GeographicalStats({ stats, isLoading, nodeLabel }: GeographicalStatsProps): JSX.Element {
   if (isLoading) {
     return <div className="h-32">Loading stats...</div>;
   }
@@ -11,7 +11,7 @@ export function GeographicalStats({ stats, isLoading }: GeographicalStatsProps):
   const statItems = [
     {
       id: 'nodes',
-      name: 'Xatu nodes',
+      name: nodeLabel,
       value: stats.totalNodes.toString(),
       icon: GlobeAltIcon,
     },

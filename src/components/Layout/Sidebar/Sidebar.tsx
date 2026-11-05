@@ -232,7 +232,7 @@ const ethereumExecutionPages: NavItem[] = [
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
-  { name: 'Nodes', to: '/xatu/nodes', icon: ServerIcon },
+  { name: 'Xatu nodes', to: '/xatu/nodes', icon: ServerIcon },
   { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
   { name: 'Local Blocks', to: '/xatu/locally-built-blocks', icon: CubeIcon },
   { name: 'Fork Readiness', to: '/xatu/fork-readiness', icon: WrenchScrewdriverIcon },

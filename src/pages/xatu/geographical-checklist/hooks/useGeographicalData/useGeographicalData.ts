@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fctNodeActiveLast24hServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import type { FctNodeActiveLast24h } from '@/api/types.gen';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { useLastSeenNodes } from '@/pages/xatu/nodes/hooks/useLastSeenNodes';
 import type {
   UseGeographicalDataReturn,
   ProcessedNode,
@@ -13,50 +12,11 @@ import type {
 import { CONTINENT_CONFIG, getContinentCode, getClassification } from './useGeographicalData.utils';
 import { getCountryFlag } from '@/utils';
 
-export function useGeographicalData(): UseGeographicalDataReturn {
-  // Three parallel queries for pub-, corp-, ethpandaops nodes
-  const {
-    data: publicData,
-    error: publicError,
-    isLoading: publicLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'pub-',
-        page_size: 1000,
-      },
-    }),
-  });
-
-  const {
-    data: corporateData,
-    error: corporateError,
-    isLoading: corporateLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'corp-',
-        page_size: 1000,
-      },
-    }),
-  });
-
-  const {
-    data: internalData,
-    error: internalError,
-    isLoading: internalLoading,
-  } = useQuery({
-    ...fctNodeActiveLast24hServiceListOptions({
-      query: {
-        meta_client_name_starts_with: 'ethpandaops',
-        page_size: 1000,
-      },
-    }),
-  });
-
-  // Combine loading states
-  const isLoading = publicLoading || corporateLoading || internalLoading;
-  const error = publicError || corporateError || internalError;
+/**
+ * Xatu nodes last seen inside the range, by continent, country and city
+ */
+export function useGeographicalData(range: NodeRange): UseGeographicalDataReturn {
+  const { nodes: rawNodes, isLoading, error } = useLastSeenNodes(range);
 
   // Process and aggregate data
   const { continents, stats, allNodes } = useMemo(() => {
@@ -73,12 +33,6 @@ export function useGeographicalData(): UseGeographicalDataReturn {
         allNodes: [],
       };
     }
-
-    const rawNodes: FctNodeActiveLast24h[] = [
-      ...(publicData?.fct_node_active_last_24h || []),
-      ...(corporateData?.fct_node_active_last_24h || []),
-      ...(internalData?.fct_node_active_last_24h || []),
-    ];
 
     // Process nodes with classification and continent metadata
     const processedNodes: ProcessedNode[] = rawNodes.map(node => {
@@ -182,13 +136,13 @@ export function useGeographicalData(): UseGeographicalDataReturn {
     };
 
     return { continents: continentsMap, stats, allNodes: processedNodes };
-  }, [publicData, corporateData, internalData, isLoading, error]);
+  }, [rawNodes, isLoading, error]);
 
   return {
     continents,
     stats,
     allNodes,
     isLoading,
-    error: error as Error | null,
+    error,
   };
 }

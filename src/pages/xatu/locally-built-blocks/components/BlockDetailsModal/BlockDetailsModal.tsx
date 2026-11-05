@@ -185,7 +185,7 @@ export function BlockDetailsModal({
         ) : (
           // Single slot context: group by node only
           <div className="space-y-2">
-            <h3 className="mb-3 text-sm font-semibold text-muted">Nodes ({nodeCount})</h3>
+            <h3 className="mb-3 text-sm font-semibold text-muted">Xatu nodes ({nodeCount})</h3>
             <div className="max-h-96 space-y-2 overflow-y-auto">
               {nodeGroups.map((nodeGroup, index) => (
                 <NodeCard key={nodeGroup.nodeName} nodeGroup={nodeGroup} index={index} />
@@ -357,7 +357,7 @@ function BlockDetails({
         <h3 className="text-xs font-semibold text-foreground">Client Information</h3>
 
         <div>
-          <div className="text-xs text-muted">Node</div>
+          <div className="text-xs text-muted">Xatu node</div>
           <div className="text-sm text-foreground">{block.meta_client_name || 'Unknown'}</div>
           <div className="text-xs text-muted">{block.meta_client_version || 'N/A'}</div>
         </div>
