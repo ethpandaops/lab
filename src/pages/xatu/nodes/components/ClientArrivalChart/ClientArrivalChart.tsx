@@ -22,7 +22,7 @@ export function ClientArrivalChart({ history, rangeLabel }: ClientArrivalChartPr
   return (
     <TimeSeriesChart
       title="Block arrival by consensus client"
-      subtitle={`Median of each client's nodes, ${rangeLabel.toLowerCase()}`}
+      subtitle={`Median of each client's Xatu nodes, ${rangeLabel.toLowerCase()}`}
       anchorId="client-block-arrival"
       buckets={history.buckets}
       granularity={history.granularity}

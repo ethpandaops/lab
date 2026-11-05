@@ -40,6 +40,9 @@ export const nodeDetailSearchSchema = z.object({ range: rangeSchema });
 
 export const nodesSearchSchema = z.object({ range: rangeSchema });
 
+/** `seen` scopes a contributor's Xatu nodes; `range` scopes their observation timings */
+export const contributorSearchSchema = z.object({ range: rangeSchema, seen: rangeSchema });
+
 /**
  * How far a node's median arrival can trail the network's median before the node counts as behind: one slot.
  * Measured against the network, not slot start, so a chain-wide delay never marks every node as behind.

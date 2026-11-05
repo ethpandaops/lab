@@ -10,9 +10,14 @@ export interface UserCardProps {
    */
   classification: UserClassification;
   /**
-   * Number of Xatu nodes seen in the last 24h
+   * Number of Xatu nodes (or node IDs, over ranges where hashed IDs rotate) seen in the range
    */
   nodeCount: number;
+  /**
+   * Label of the node count
+   * @default 'Xatu nodes'
+   */
+  nodeLabel?: string;
   /**
    * Number of countries those nodes are in
    */

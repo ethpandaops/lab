@@ -107,7 +107,7 @@ export function DetailPage(): JSX.Element {
     return (
       <Container>
         <Header title={nodeId} />
-        <Alert variant="error" title="Error loading node" description={error.message} />
+        <Alert variant="error" title="Error loading Xatu node" description={error.message} />
       </Container>
     );
   }
@@ -118,10 +118,10 @@ export function DetailPage(): JSX.Element {
         <Header title={nodeId} />
         <div className="flex flex-col items-start gap-4">
           {rangeControl}
-          <Alert variant="info" title="Node not found" description="No reports from this node in this range." />
+          <Alert variant="info" title="Xatu node not found" description="No reports in this range." />
         </div>
         <Link to="/xatu/nodes" className="mt-4 inline-block text-sm text-primary hover:underline">
-          All nodes
+          All Xatu nodes
         </Link>
       </Container>
     );

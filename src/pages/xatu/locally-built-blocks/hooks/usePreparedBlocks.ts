@@ -18,16 +18,17 @@ const LIVE_REFETCH_MS = 12_000;
 
 /**
  * One page of locally built blocks matching the filters, sorted by the API. The first page of the newest blocks
- * refreshes every slot when the query has no upper bound.
+ * refreshes every slot when the query has no upper bound and `canRefresh` allows it.
  */
 export function usePreparedBlocks(
   filters: PreparedBlockQuery,
   sort: BlockSortKey,
   order: 'asc' | 'desc',
   page: number,
-  pageSize: number
+  pageSize: number,
+  canRefresh = true
 ): UsePreparedBlocksResult {
-  const live = page === 0 && sort === 'slot' && order === 'desc' && !filters.slot_start_date_time_lte;
+  const live = canRefresh && page === 0 && sort === 'slot' && order === 'desc' && !filters.slot_start_date_time_lte;
   const { currentNetwork } = useNetwork();
   const { data, error, isLoading } = useQuery({
     ...fctPreparedBlockServiceListOptions({
@@ -38,7 +39,7 @@ export function usePreparedBlocks(
         page_token: offsetPageToken(page, pageSize),
       },
     }),
-    enabled: !!currentNetwork && !!filters.slot_start_date_time_gte,
+    enabled: !!currentNetwork && filters.slot_start_date_time_gte !== undefined,
     placeholderData: keepPreviousData,
     refetchInterval: live ? LIVE_REFETCH_MS : false,
   });

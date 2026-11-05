@@ -22,22 +22,24 @@ export function NodeArrivalChart({ block, head, rangeLabel, behind }: NodeArriva
   const headColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0];
   const blockRows = rowsByBucket(block.rows);
   const headRows = rowsByBucket(head?.rows ?? []);
-  const aligned = block.buckets.map(start => blockRows.get(start) ?? null);
-  const headP50 = block.buckets.map(start => headRows.get(start)?.p50 ?? null);
+  // Head history can start before the block table's, so the axis spans both
+  const buckets = [...new Set([...block.buckets, ...(head?.buckets ?? [])])].sort((a, b) => a - b);
+  const aligned = buckets.map(start => blockRows.get(start) ?? null);
+  const headP50 = buckets.map(start => headRows.get(start)?.p50 ?? null);
   // Hours spent catching up are shaded instead of plotted, so they don't flatten the rest
-  const plotted = aligned.map((row, index) => (behind?.has(block.buckets[index]) ? null : row));
-  const plottedHead = headP50.map((value, index) => (behind?.has(block.buckets[index]) ? null : value));
+  const plotted = aligned.map((row, index) => (behind?.has(buckets[index]) ? null : row));
+  const plottedHead = headP50.map((value, index) => (behind?.has(buckets[index]) ? null : value));
 
   return (
     <TimeSeriesChart
       title="Block and head arrival"
       subtitle={rangeLabel}
       anchorId="block-head-arrival"
-      buckets={block.buckets}
+      buckets={buckets}
       granularity={block.granularity}
       yMax={axisCeiling([...plotted.map(row => row?.p90 ?? null), ...plottedHead])}
       behind={behind}
-      empty={block.rows.length === 0 ? 'No data in this range' : undefined}
+      empty={block.rows.length === 0 && !head?.rows.length ? 'No data in this range' : undefined}
       series={[
         ...createBandSeries(
           'Block P10–P90',
@@ -55,12 +57,13 @@ export function NodeArrivalChart({ block, head, rangeLabel, behind }: NodeArriva
       ]}
       tooltipRows={index => {
         const row = aligned[index];
-        if (!row) return [];
+        const headRow = { color: headColor, label: 'Head median', value: formatMs(headP50[index]) };
+        if (!row) return headP50[index] === null ? [] : [headRow];
         return [
           { color: colors.primary, label: 'Block p90', value: formatMs(row.p90) },
           { color: colors.primary, label: 'Block median', value: formatMs(row.p50) },
           { color: colors.primary, label: 'Block p10', value: formatMs(row.p10) },
-          { color: headColor, label: 'Head median', value: formatMs(headP50[index]) },
+          headRow,
           { label: 'Slots', value: row.count.toLocaleString() },
         ];
       }}

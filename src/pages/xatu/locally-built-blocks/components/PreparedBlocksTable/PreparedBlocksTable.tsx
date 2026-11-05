@@ -54,7 +54,7 @@ const columns: DataTableColumn<FctPreparedBlock>[] = [
   },
   {
     id: 'node' satisfies BlockSortKey,
-    header: 'Node',
+    header: 'Xatu node',
     accessorFn: row => row.meta_client_name,
     cell: ({ row }) => {
       const nodeId = nodeIdOf(row.original.meta_client_name);

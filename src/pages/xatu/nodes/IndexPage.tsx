@@ -26,8 +26,6 @@ import { useLatestDayNodes } from './hooks/useLatestDayNodes';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
 import { formatMs } from './utils/node-stats';
 
-const DESCRIPTION = 'Nodes that reported to Xatu.';
-
 /** Count rows by key */
 function groupRows(
   rows: NodeRow[],
@@ -43,7 +41,7 @@ function groupRows(
 }
 
 /**
- * Nodes overview: headline counts, where nodes are, when they see blocks, and every node in a table.
+ * Xatu nodes overview: headline counts, where they are, when they see blocks, and every Xatu node in a table.
  */
 export function IndexPage(): JSX.Element {
   const search = Route.useSearch();
@@ -56,7 +54,7 @@ export function IndexPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Nodes" description={DESCRIPTION} />
+        <Header title="Xatu nodes" />
         <NodesSkeleton />
       </Container>
     );
@@ -65,8 +63,8 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title="Nodes" description={DESCRIPTION} />
-        <Alert variant="error" title="Error loading nodes" description={error.message} />
+        <Header title="Xatu nodes" />
+        <Alert variant="error" title="Error loading Xatu nodes" description={error.message} />
       </Container>
     );
   }
@@ -104,7 +102,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Nodes" description={DESCRIPTION} />
+      <Header title="Xatu nodes" />
 
       <div className="flex flex-col gap-6">
         <SegmentedControl
@@ -133,13 +131,13 @@ export function IndexPage(): JSX.Element {
               id: 'block',
               name: 'Block arrival',
               value: formatMs(network.blockP50),
-              subtitle: `Median node, ${rangeLabel.toLowerCase()}`,
+              subtitle: `Median Xatu node, ${rangeLabel.toLowerCase()}`,
             },
             {
               id: 'attestation',
               name: 'Attestation arrival',
               value: formatMs(network.attestationP50),
-              subtitle: `Median node, ${rangeLabel.toLowerCase()}`,
+              subtitle: `Median Xatu node, ${rangeLabel.toLowerCase()}`,
             },
           ]}
         />

@@ -79,7 +79,7 @@ export function useSlotBlocks(filters: PreparedBlockQuery, live: boolean): UseSl
     ...fctPreparedBlockServiceListOptions({
       query: { ...filters, page_size: TIMELINE_ROWS, order_by: 'slot_start_date_time desc' },
     }),
-    enabled: !!currentNetwork && !!filters.slot_start_date_time_gte,
+    enabled: !!currentNetwork && filters.slot_start_date_time_gte !== undefined,
     placeholderData: keepPreviousData,
     refetchInterval: live ? LIVE_REFETCH_MS : false,
   });

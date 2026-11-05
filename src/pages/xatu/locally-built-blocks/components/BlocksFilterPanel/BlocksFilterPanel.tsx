@@ -57,7 +57,7 @@ export function BlocksFilterPanel({ filters, onChange, roster }: BlocksFilterPan
       onChange({ ...filters, ...Object.fromEntries(keys.map(key => [key, undefined])) });
 
   const chips: FilterChipItem[] = [];
-  if (filters.node) chips.push({ id: 'node', label: 'Node', value: filters.node, onRemove: remove('node') });
+  if (filters.node) chips.push({ id: 'node', label: 'Xatu node', value: filters.node, onRemove: remove('node') });
   if (filters.cl)
     chips.push({ id: 'cl', label: 'CL', value: <ClientChipValue client={filters.cl} />, onRemove: remove('cl') });
   if (filters.clVersion)
@@ -81,7 +81,7 @@ export function BlocksFilterPanel({ filters, onChange, roster }: BlocksFilterPan
     <FilterBar filters={filters} onChange={onChange} chips={chips} title="Filter blocks">
       {(draft, setDraft) => (
         <div className="flex flex-col gap-5">
-          <FilterField label="Node">
+          <FilterField label="Xatu node">
             <SelectMenu
               value={draft.node ?? ''}
               onChange={node => setDraft({ ...draft, node: node || undefined })}

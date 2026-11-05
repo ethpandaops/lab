@@ -1,18 +1,18 @@
 import { z } from 'zod';
 
-/** Time windows for the page when no slot range is set */
-export const TIME_WINDOWS = ['1h', '6h', '24h', '7d'] as const;
+/** Time windows for the page when no slot range is set; `all` starts at genesis */
+export const TIME_WINDOWS = ['1h', '6h', '24h', '7d', 'all'] as const;
 export type TimeWindow = (typeof TIME_WINDOWS)[number];
 
 /** Seconds in each time window */
-export const TIME_WINDOW_SECONDS: Record<TimeWindow, number> = {
+export const TIME_WINDOW_SECONDS: Record<Exclude<TimeWindow, 'all'>, number> = {
   '1h': 3600,
   '6h': 6 * 3600,
   '24h': 24 * 3600,
   '7d': 7 * 24 * 3600,
 };
 
-export const DEFAULT_TIME_WINDOW: TimeWindow = '1h';
+export const DEFAULT_TIME_WINDOW: TimeWindow = 'all';
 
 /** Blocks table columns the API can sort by */
 export const BLOCK_SORT_KEYS = ['slot', 'node', 'gas', 'txs', 'size'] as const;

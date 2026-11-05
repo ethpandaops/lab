@@ -1,6 +1,10 @@
 import type { JSX } from 'react';
 import { useState, useMemo } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
+import { useNavigate } from '@tanstack/react-router';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
+import { Route } from '@/routes/xatu/geographical-checklist';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -21,14 +25,19 @@ import { InsightsDialog } from './components/InsightsDialog';
 import { DEFAULT_FILTERS } from './constants';
 import type { GeographicalFiltersFormData } from './components/GeographicalFilters/GeographicalFilters.types';
 
-const DESCRIPTION = 'Xatu nodes seen in the last 24h, by continent, country and city';
+const DESCRIPTION = 'Xatu nodes by continent, country and city';
 
 export function IndexPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('list');
   const [isInsightsDialogOpen, setIsInsightsDialogOpen] = useState(false);
 
+  const navigate = useNavigate({ from: '/xatu/geographical-checklist' });
+  const range = Route.useSearch().range ?? 'all';
+  // Hashed node IDs rotate, so past a day they count IDs rather than machines
+  const nodeLabel = range === '24h' ? 'Xatu nodes' : 'Node IDs';
+
   // Data fetching
-  const { continents, stats, allNodes, isLoading, error } = useGeographicalData();
+  const { continents, stats, allNodes, isLoading, error } = useGeographicalData(range);
 
   // Form setup
   const methods = useForm<GeographicalFiltersFormData>({
@@ -192,8 +201,21 @@ export function IndexPage(): JSX.Element {
       <Header title="Geographical Checklist" description={DESCRIPTION} />
 
       <div className="space-y-6">
+        <SegmentedControl
+          options={NODE_RANGE_OPTIONS}
+          value={range}
+          onChange={value =>
+            navigate({
+              search: prev => ({ ...prev, range: value === 'all' ? undefined : value }),
+              replace: true,
+              resetScroll: false,
+            })
+          }
+          ariaLabel="Time range"
+        />
+
         {/* Stats */}
-        <GeographicalStats stats={stats} isLoading={isLoading} />
+        <GeographicalStats stats={stats} isLoading={isLoading} nodeLabel={nodeLabel} />
 
         {/* Filters with View Mode Toggle */}
         <FormProvider {...methods}>
@@ -222,7 +244,7 @@ export function IndexPage(): JSX.Element {
             <GeographicalMapView nodes={filteredNodes} isLoading={isLoading} />
           </Card>
         ) : (
-          <GeographicalListView continents={filteredContinents} isLoading={isLoading} />
+          <GeographicalListView continents={filteredContinents} isLoading={isLoading} nodeLabel={nodeLabel} />
         )}
       </div>
     </Container>

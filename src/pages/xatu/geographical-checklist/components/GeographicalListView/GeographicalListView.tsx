@@ -9,13 +9,13 @@ import { getClassificationBadgeClasses } from '@/utils';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 
-export function GeographicalListView({ continents, isLoading }: GeographicalListViewProps): JSX.Element {
+export function GeographicalListView({ continents, isLoading, nodeLabel }: GeographicalListViewProps): JSX.Element {
   if (isLoading) {
     return <div className="py-8 text-center">Loading data...</div>;
   }
 
   if (continents.size === 0) {
-    return <div className="py-12 text-center text-muted">No nodes found matching your filters.</div>;
+    return <div className="py-12 text-center text-muted">No Xatu nodes match these filters.</div>;
   }
 
   const nodeColumns: Column<ProcessedNode>[] = [
@@ -111,7 +111,7 @@ export function GeographicalListView({ continents, isLoading }: GeographicalList
                 <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-1 text-xs/5">
                   <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className="font-semibold text-foreground">{continent.totalNodes}</span>
-                    <span className="text-muted">Xatu nodes</span>
+                    <span className="text-muted">{nodeLabel}</span>
                   </div>
                   <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                     <span className="font-semibold text-foreground">{continent.countries.size}</span>

@@ -28,7 +28,7 @@ import { preparedBlockFilters } from './utils/block-query';
 
 const BLOCKS_PAGE_SIZE = 25;
 
-const WINDOW_OPTIONS = TIME_WINDOWS.map(value => ({ value, label: value }));
+const WINDOW_OPTIONS = TIME_WINDOWS.map(value => ({ value, label: value === 'all' ? 'All' : value }));
 
 /** The block filters out of a search, every key present so a navigation also clears removed filters */
 function pickBlockFilters(search: BlockFilters): BlockFilters {
@@ -44,8 +44,9 @@ export function IndexPage(): JSX.Element {
 
   const timeWindow: TimeWindow = search.window ?? DEFAULT_TIME_WINDOW;
   const windowStart = useMemo(
-    () => Math.floor(Date.now() / 1000 / 60) * 60 - TIME_WINDOW_SECONDS[timeWindow],
-    [timeWindow]
+    () =>
+      timeWindow === 'all' ? genesisTime : Math.floor(Date.now() / 1000 / 60) * 60 - TIME_WINDOW_SECONDS[timeWindow],
+    [timeWindow, genesisTime]
   );
   const filters = pickBlockFilters(search);
   const isFiltered = Object.values(filters).some(value => value !== undefined);
@@ -59,7 +60,8 @@ export function IndexPage(): JSX.Element {
 
   const roster = useNodeRoster();
   const timeline = useSlotBlocks(query, filters.slotTo === undefined);
-  const table = usePreparedBlocks(query, sort, order, page, pageSize);
+  // All history is too slow to reread every slot; the timeline keeps following the newest slots
+  const table = usePreparedBlocks(query, sort, order, page, pageSize, timeWindow !== 'all');
 
   const setSearch = useCallback(
     (update: Partial<LocallyBuiltBlocksSearch>) =>

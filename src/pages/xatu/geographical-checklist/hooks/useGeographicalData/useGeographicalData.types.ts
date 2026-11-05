@@ -1,9 +1,9 @@
-import type { FctNodeActiveLast24h } from '@/api';
+import type { FctNodeLastSeen } from '@/api';
 
 export type ContinentCode = 'AF' | 'AS' | 'EU' | 'NA' | 'SA' | 'OC' | 'AN';
 export type NodeClassification = 'individual' | 'corporate' | 'internal' | 'unclassified';
 
-export interface ProcessedNode extends FctNodeActiveLast24h {
+export interface ProcessedNode extends FctNodeLastSeen {
   classification: NodeClassification;
   continentCode: ContinentCode;
   continentName: string;

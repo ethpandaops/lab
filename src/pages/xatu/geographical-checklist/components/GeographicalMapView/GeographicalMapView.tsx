@@ -246,7 +246,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
             ? selectedLocation.city
               ? `${selectedLocation.city}, ${selectedLocation.country}`
               : selectedLocation.country
-            : 'Node Details'
+            : 'Xatu node details'
         }
         description={selectedLocation ? `${selectedLocation.nodes.length} Xatu nodes` : undefined}
       >
