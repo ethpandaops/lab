@@ -27,6 +27,9 @@ export interface NewPayloadTabProps {
   timeRange: TimeRange;
 }
 
+/** node_class of the ethPandaOps reference fleet; every other node has an empty node_class */
+const REFERENCE_NODE_CLASS = 'eip7870-block-builder';
+
 const PERCENTILE_OPTIONS = [
   { value: 'p50', label: 'P50' },
   { value: 'p95', label: 'P95' },
@@ -358,62 +361,104 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       return winratePerSlot;
     }
 
-    // Aggregate by (slot, client) → weighted average duration
+    // Aggregate by (slot, node class, client) → weighted average duration
     const slotClientAgg = new Map<
       string,
-      { slot: number; client: string; totalDurObs: number; totalObs: number; timestamp: number }
+      {
+        slot: number;
+        nodeClass: string;
+        client: string;
+        totalDurObs: number;
+        totalObs: number;
+        timestamp: number;
+      }
     >();
 
     for (const r of validPayloadByElClient) {
       const slot = r.slot ?? 0;
+      const nodeClass = r.node_class ?? '';
       const client = normalizeClientName(r.meta_execution_implementation ?? '');
       const duration = r.avg_duration_ms ?? 0;
       const obs = r.observation_count ?? 0;
       const timestamp = r.slot_start_date_time ?? 0;
       if (!slot || !client || !obs || !duration) continue;
 
-      const key = `${slot}|${client}`;
+      const key = `${slot}|${nodeClass}|${client}`;
       const existing = slotClientAgg.get(key);
       if (existing) {
         existing.totalDurObs += duration * obs;
         existing.totalObs += obs;
       } else {
-        slotClientAgg.set(key, { slot, client, totalDurObs: duration * obs, totalObs: obs, timestamp });
+        slotClientAgg.set(key, { slot, nodeClass, client, totalDurObs: duration * obs, totalObs: obs, timestamp });
       }
     }
 
-    // For each slot, find the client with the lowest weighted average duration
-    const slotWinner = new Map<number, { client: string; avgDuration: number; timestamp: number }>();
+    // For each slot and node class, find the client with the lowest weighted average duration
+    const slotWinner = new Map<
+      string,
+      { slot: number; nodeClass: string; client: string; avgDuration: number; timestamp: number }
+    >();
 
     for (const agg of slotClientAgg.values()) {
       const avgDuration = agg.totalDurObs / agg.totalObs;
-      const existing = slotWinner.get(agg.slot);
+      const key = `${agg.slot}|${agg.nodeClass}`;
+      const existing = slotWinner.get(key);
       if (!existing || avgDuration < existing.avgDuration) {
-        slotWinner.set(agg.slot, { client: agg.client, avgDuration, timestamp: agg.timestamp });
+        slotWinner.set(key, { ...agg, avgDuration });
       }
     }
 
-    return Array.from(slotWinner.entries()).map(([slot, data]) => ({
-      slot,
+    return Array.from(slotWinner.values()).map(data => ({
+      slot: data.slot,
       slot_start_date_time: data.timestamp,
+      node_class: data.nodeClass,
       meta_execution_implementation: data.client,
     }));
   }, [winratePerSlot, showPerSlotCharts, validPayloadByElClient]);
+
+  // A slot has one winner per node class, so each class gets its own winrate
+  const winrateByClass = useMemo(() => {
+    type ClassRecords = {
+      hourly: FctEngineNewPayloadWinrateHourly[];
+      daily: FctEngineNewPayloadWinrateDaily[];
+      perSlot: IntEngineNewPayloadFastestExecutionByNodeClass[];
+    };
+    const groups = new Map<string, ClassRecords>();
+    const group = (nodeClass: string | undefined): ClassRecords => {
+      const key = nodeClass ?? '';
+      if (!groups.has(key)) groups.set(key, { hourly: [], daily: [], perSlot: [] });
+      return groups.get(key)!;
+    };
+
+    if (showPerSlotCharts) computedWinratePerSlot.forEach(r => group(r.node_class).perSlot.push(r));
+    else if (showHourlyCharts) winrateHourly.forEach(r => group(r.node_class).hourly.push(r));
+    else winrateDaily.forEach(r => group(r.node_class).daily.push(r));
+
+    if (groups.size === 0) group(REFERENCE_NODE_CLASS);
+
+    return [...groups.entries()].sort(
+      ([a], [b]) => Number(b === REFERENCE_NODE_CLASS) - Number(a === REFERENCE_NODE_CLASS)
+    );
+  }, [showPerSlotCharts, showHourlyCharts, computedWinratePerSlot, winrateHourly, winrateDaily]);
 
   return (
     <div className="space-y-6">
       <EIP7870SpecsBanner />
 
-      {/* Execution Winrate — fastest client per slot */}
-      <WinrateSection
-        hourlyRecords={winrateHourly}
-        dailyRecords={winrateDaily}
-        perSlotRecords={computedWinratePerSlot}
-        allClients={[...new Set([...trendClientList, ...elClientList])]}
-        timeRange={timeRange}
-        showPerSlot={showPerSlotCharts}
-        showDaily={!showHourlyCharts}
-      />
+      {/* Execution Winrate — fastest client per slot, one section per node class */}
+      {winrateByClass.map(([nodeClass, records]) => (
+        <WinrateSection
+          key={nodeClass}
+          nodeClass={nodeClass}
+          hourlyRecords={records.hourly}
+          dailyRecords={records.daily}
+          perSlotRecords={records.perSlot}
+          allClients={[...new Set([...trendClientList, ...elClientList])]}
+          timeRange={timeRange}
+          showPerSlot={showPerSlotCharts}
+          showDaily={!showHourlyCharts}
+        />
+      ))}
 
       {/* Client Version Breakdown — VALID status only */}
       <PopoutCard
@@ -663,6 +708,7 @@ function buildStandings(totalsByImpl: Map<string, number>, allClients: string[])
 
 /** Winrate chart + standings for engine_newPayload fastest client per slot */
 function WinrateSection({
+  nodeClass,
   hourlyRecords,
   dailyRecords,
   perSlotRecords,
@@ -671,6 +717,7 @@ function WinrateSection({
   showPerSlot,
   showDaily,
 }: {
+  nodeClass: string;
   hourlyRecords: FctEngineNewPayloadWinrateHourly[];
   dailyRecords: FctEngineNewPayloadWinrateDaily[];
   perSlotRecords: IntEngineNewPayloadFastestExecutionByNodeClass[];
@@ -966,14 +1013,16 @@ function WinrateSection({
 
   if (!chartConfig && standings.length === 0) return null;
 
-  const totalSlots = standings.reduce((s, st) => s + st.totalWins, 0);
+  const totalWins = standings.reduce((s, st) => s + st.totalWins, 0);
   const maxWinRate = standings.length > 0 ? standings[0].winRate : 0;
 
   return (
     <PopoutCard
-      title="Execution Winrate"
+      title={
+        nodeClass === REFERENCE_NODE_CLASS ? 'Execution Winrate: Reference nodes' : 'Execution Winrate: Other nodes'
+      }
       subtitle="Fastest engine_newPayload per slot"
-      anchorId="winrate"
+      anchorId={nodeClass === REFERENCE_NODE_CLASS ? 'winrate' : 'winrate-other'}
       modalSize="full"
     >
       {({ inModal }) => (
@@ -1090,10 +1139,10 @@ function WinrateSection({
               })}
             </div>
 
-            {/* Slot count */}
-            {totalSlots > 0 && (
+            {/* Wins in total; a tie counts for every tied client */}
+            {totalWins > 0 && (
               <div className="mt-3 text-center text-2xs text-muted/40 tabular-nums">
-                {totalSlots.toLocaleString()} slots analyzed
+                {totalWins.toLocaleString()} wins
               </div>
             )}
           </div>

@@ -353,7 +353,6 @@ export function useEngineTimingsData({
         placeholderData: keepPreviousData,
       },
       // newPayload winrate (hourly) - which EL client had fastest newPayload per slot
-      // Must apply refNodeFilter to avoid double-counting across node_classes
       {
         queryKey: ['engine-timings', 'winrate-hourly', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
@@ -375,7 +374,6 @@ export function useEngineTimingsData({
         placeholderData: keepPreviousData,
       },
       // newPayload winrate (daily) - lightweight aggregation for long ranges (90d+)
-      // Must apply refNodeFilter to avoid double-counting across node_classes
       {
         queryKey: ['engine-timings', 'winrate-daily', hourlyStart, hourlyEnd, referenceNodesOnly],
         queryFn: ({ signal }) =>
