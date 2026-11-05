@@ -2,21 +2,23 @@ import type { JSX } from 'react';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import type { NodeHistory } from '../../hooks/useNodeHistory';
-import { medianByClient, medianByStart } from '../../utils/history';
+import { medianByClient } from '../../utils/history';
 import { formatMs } from '../../utils/node-stats';
 import { TimeSeriesChart } from '../TimeSeriesChart';
 
 export interface ClientArrivalChartProps {
   /** Block rollups of every node */
   history: NodeHistory;
+  /** Network median by bucket start, to leave out nodes that were catching up */
+  networkMedians: Map<number, number>;
   rangeLabel: string;
 }
 
 /**
  * Median block arrival of each consensus client's nodes over time.
  */
-export function ClientArrivalChart({ history, rangeLabel }: ClientArrivalChartProps): JSX.Element {
-  const clients = medianByClient(history.rows, history.buckets, medianByStart(history.rows));
+export function ClientArrivalChart({ history, networkMedians, rangeLabel }: ClientArrivalChartProps): JSX.Element {
+  const clients = medianByClient(history.rows, history.buckets, networkMedians);
   const colors = clients.map((client, index) => getConsensusClientColor(client.client, index));
 
   return (

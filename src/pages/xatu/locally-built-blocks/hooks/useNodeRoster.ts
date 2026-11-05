@@ -1,12 +1,17 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { fctPreparedBlockByNodeDailyServiceList } from '@/api/sdk.gen';
+import type { FctPreparedBlockByNodeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
+import { fetchAllPages } from '@/utils/api-pagination';
+import { toUtcDate } from '@/utils/time';
 import { parseExecutionClient } from '../utils';
 import { nodeIdOf } from '../utils/block-query';
 
-/** Recent span that every building node shows up in */
-const ROSTER_SECONDS = 5 * 60;
+/** Past this many days the roster reads every day and keeps the window's in memory, instead of listing them */
+const MAX_LISTED_DAYS = 31;
+
+const DAY = 86400;
 
 export interface NodeRoster {
   /** Node ids, sorted */
@@ -16,18 +21,45 @@ export interface NodeRoster {
 }
 
 /**
- * Nodes that built blocks in the last 5 minutes, with their consensus and execution clients, for filter options.
+ * Nodes that built blocks in the UTC days a window touches, with their consensus and execution clients, for filter
+ * options.
+ *
+ * @param start - Window start (unix seconds); genesis for all history
+ * @param end - Window end (unix seconds), now when unset
  */
-export function useNodeRoster(): NodeRoster {
+export function useNodeRoster(start: number, end?: number): NodeRoster {
   const { currentNetwork } = useNetwork();
-  const since = useMemo(() => Math.floor(Date.now() / 1000 / 60) * 60 - ROSTER_SECONDS, []);
+  const genesisTime = currentNetwork?.genesis_time ?? 0;
+  const endSeconds = end ?? Date.now() / 1000;
+  const firstDay = toUtcDate(start);
+  const lastDay = toUtcDate(endSeconds);
+  const dayCount = Math.floor(endSeconds / DAY) - Math.floor(start / DAY) + 1;
+  const dayFilter =
+    start > genesisTime && dayCount <= MAX_LISTED_DAYS
+      ? {
+          day_start_date_in_values: Array.from({ length: dayCount }, (_, i) =>
+            toUtcDate((Math.floor(start / DAY) + i) * DAY)
+          ).join(','),
+        }
+      : null;
+
   const { data } = useQuery({
-    ...fctPreparedBlockServiceListOptions({ query: { slot_start_date_time_gte: since, page_size: 1000 } }),
+    queryKey: ['locally-built-blocks', 'roster', currentNetwork?.name, dayFilter],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctPreparedBlockByNodeDaily>(
+        fctPreparedBlockByNodeDailyServiceList as Parameters<typeof fetchAllPages>[0],
+        // Without a day list, every day since genesis: the API needs a filter on the first primary key column, the day
+        { query: { ...(dayFilter ?? { day_start_date_ne: toUtcDate(genesisTime - DAY) }), page_size: 10000 } },
+        'fct_prepared_block_by_node_daily',
+        signal
+      ),
     enabled: !!currentNetwork,
   });
 
   return useMemo(() => {
-    const rows = data?.fct_prepared_block ?? [];
+    const rows = (data ?? []).filter(
+      row => !!row.day_start_date && row.day_start_date >= firstDay && row.day_start_date <= lastDay
+    );
     const unique = (values: Array<string | null | undefined>): string[] =>
       [...new Set(values.filter((value): value is string => !!value))].sort();
     return {
@@ -35,5 +67,5 @@ export function useNodeRoster(): NodeRoster {
       consensusClients: unique(rows.map(row => row.meta_consensus_implementation)),
       executionClients: unique(rows.map(row => parseExecutionClient(row.meta_client_name))),
     };
-  }, [data]);
+  }, [data, firstDay, lastDay]);
 }

@@ -19,8 +19,9 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Route } from '@/routes/xatu/contributors/$id';
 import { PerNodeHistoryChart } from '@/pages/xatu/nodes/components';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from '@/pages/xatu/nodes/constants';
+import { useNetworkHistory } from '@/pages/xatu/nodes/hooks/useNetworkHistory';
 import { useNodeHistory, type HistoryMetric } from '@/pages/xatu/nodes/hooks/useNodeHistory';
-import { behindStarts, medianByStart } from '@/pages/xatu/nodes/utils/history';
+import { behindStarts } from '@/pages/xatu/nodes/utils/history';
 import { getBuckets } from '@/pages/xatu/nodes/utils/time-buckets';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
@@ -149,9 +150,8 @@ export function DetailPage(): JSX.Element {
     attestation: useNodeHistory('attestation', range, { username: id }),
     dataColumn: useNodeHistory('dataColumn', range, { username: id }),
   };
-  // Every node's block arrival, to tell when one of these nodes was catching up rather than slow
-  const network = useNodeHistory('block', range, {});
-  const networkMedians = medianByStart(network.data?.rows ?? []);
+  // The network's block arrival, to tell when one of these nodes was catching up rather than slow
+  const networkMedians = useNetworkHistory(range).data?.medians ?? new Map<number, number>();
   const behindOf = (nodeId: string): Set<number> =>
     behindStarts(
       (histories.block.data?.rows ?? []).filter(row => row.nodeId === nodeId),

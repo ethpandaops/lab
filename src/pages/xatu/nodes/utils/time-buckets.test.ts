@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { HistoryRow } from '../hooks/useNodeHistory';
-import { behindStarts, medianByClient, medianByStart, spreadByBucket, summarizeByNode } from './history';
-import { getBuckets, parseBucket, weightedMedian } from './time-buckets';
+import { behindStarts, medianByClient, summarizeByNode } from './history';
+import { bucketFilter, getBuckets, parseBucket, weekStart, weightedMedian } from './time-buckets';
 
 const HOUR = 3600;
 const DAY = 86400;
@@ -28,9 +28,35 @@ describe('getBuckets', () => {
     expect(buckets[1] - buckets[0]).toBe(DAY);
   });
 
-  it('starts all history at the earliest day with data', () => {
-    const buckets = getBuckets('all', now, Date.UTC(2026, 9, 27, 13) / 1000);
+  it('starts all history at the Monday of the earliest week with data and ends with the last complete week', () => {
+    // Tuesday Oct 13; the week in progress starts Monday Oct 26
+    const buckets = getBuckets('all', now, Date.UTC(2026, 9, 13, 13) / 1000);
+    expect(buckets).toEqual([12, 19].map(day => Date.UTC(2026, 9, day) / 1000));
+  });
+
+  it('reads all history by day for tables without weekly rollups', () => {
+    const buckets = getBuckets('all', now, Date.UTC(2026, 9, 27, 13) / 1000, 'daily');
     expect(buckets).toEqual([27, 28, 29].map(day => Date.UTC(2026, 9, day) / 1000));
+  });
+});
+
+describe('weekStart', () => {
+  it('returns the Monday starting the UTC week', () => {
+    expect(weekStart(Date.UTC(2026, 9, 30, 5, 30) / 1000)).toBe(Date.UTC(2026, 9, 26) / 1000);
+    expect(weekStart(Date.UTC(2026, 9, 26) / 1000)).toBe(Date.UTC(2026, 9, 26) / 1000);
+  });
+});
+
+describe('bucketFilter', () => {
+  it('reads every bucket but the one in progress for all history', () => {
+    const weeks = [Date.UTC(2026, 9, 12) / 1000, Date.UTC(2026, 9, 19) / 1000];
+    expect(bucketFilter('weekly', weeks, true)).toEqual({ week_start_date_ne: '2026-10-26' });
+    expect(bucketFilter('daily', [Date.UTC(2026, 9, 29) / 1000], true)).toEqual({ day_start_date_ne: '2026-10-30' });
+  });
+
+  it('lists the days of a fixed range', () => {
+    const days = [Date.UTC(2026, 9, 28) / 1000, Date.UTC(2026, 9, 29) / 1000];
+    expect(bucketFilter('daily', days, false)).toEqual({ day_start_date_in_values: '2026-10-28,2026-10-29' });
   });
 });
 
@@ -56,18 +82,6 @@ describe('weightedMedian', () => {
   });
 });
 
-describe('spreadByBucket', () => {
-  it('spreads node medians per bucket and leaves empty buckets null', () => {
-    const rows = [row(0, 'a', 1000), row(0, 'b', 2000), row(0, 'c', 3000), row(HOUR, 'a', 1500)];
-    const [first, second, third] = spreadByBucket(rows, [0, HOUR, 2 * HOUR]);
-    expect(first).toMatchObject({ p50: 2000, nodeCount: 3 });
-    expect(first.p10).toBeCloseTo(1200);
-    expect(first.p90).toBeCloseTo(2800);
-    expect(second).toMatchObject({ p10: 1500, p50: 1500, p90: 1500, nodeCount: 1 });
-    expect(third).toEqual({ p10: null, p50: null, p90: null, nodeCount: 0 });
-  });
-});
-
 describe('summarizeByNode', () => {
   it('sums slots and takes the slot-weighted median per node', () => {
     const summaries = summarizeByNode([row(0, 'a', 1600, 300), row(HOUR, 'a', 4000, 20), row(0, 'b', 2000, 300)]);
@@ -88,7 +102,11 @@ describe('behindStarts', () => {
       row(HOUR, 'b', 42000),
       row(HOUR, 'sync', 45000),
     ];
-    const medians = medianByStart(rows);
+    // The network rollup's median of node medians per hour
+    const medians = new Map([
+      [0, 1750],
+      [HOUR, 42000],
+    ]);
     expect(
       behindStarts(
         rows.filter(r => r.nodeId === 'sync'),
@@ -107,7 +125,7 @@ describe('behindStarts', () => {
         client: 'grandine',
       },
     ];
-    const grandine = medianByClient(rows, [0], medianByStart(rows)).find(c => c.client === 'grandine')!;
+    const grandine = medianByClient(rows, [0], new Map([[0, 1850]])).find(c => c.client === 'grandine')!;
     expect(grandine.p50).toEqual([1900]);
     expect(grandine.nodeCount).toBe(2);
   });

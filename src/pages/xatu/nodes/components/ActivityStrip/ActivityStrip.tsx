@@ -27,7 +27,7 @@ interface Bar {
 }
 
 /**
- * One bar per hour or day, filled to the share of the bucket's blocks the node saw.
+ * One bar per hour, day or week, filled to the share of the bucket's blocks the node saw.
  */
 export function ActivityStrip({ block, blockSlots }: ActivityStripProps): JSX.Element {
   const { timezone } = useTimezone();

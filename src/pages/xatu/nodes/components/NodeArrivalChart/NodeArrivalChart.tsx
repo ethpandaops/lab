@@ -15,7 +15,7 @@ export interface NodeArrivalChartProps {
 }
 
 /**
- * When the node first saw blocks (median inside its p10–p90) and head events, per hour or day.
+ * When the node first saw blocks (median inside its p10–p90) and head events, per hour, day or week.
  */
 export function NodeArrivalChart({ block, head, rangeLabel, behind }: NodeArrivalChartProps): JSX.Element {
   const colors = useThemeColors();

@@ -4,38 +4,39 @@ import type { FctBlockProposalStatusDaily, FctBlockProposalStatusHourly } from '
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { NODE_RANGE_CONFIG, type NodeRange } from '../constants';
-import { getBuckets, parseBucket, toDateString } from '../utils/time-buckets';
+import { bucketFilter, getBuckets, rowBucket, weekStart } from '../utils/time-buckets';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 
 /**
- * Slots that had a block (canonical or orphaned) in each hour or day of a range, by bucket start. A bucket the
+ * Slots that had a block (canonical or orphaned) in each hour, day or week of a range, by bucket start. A bucket the
  * proposal table hasn't written yet is absent; every bucket is when the network has no proposal table.
  */
 export function useBlockSlots(range: NodeRange): { data: Map<number, number> | null; isLoading: boolean } {
   const { currentNetwork } = useNetwork();
   const { granularity } = NODE_RANGE_CONFIG[range];
-  const buckets = getBuckets(range, Date.now() / 1000);
+  // There is no weekly proposal table, so weeks add up their days
+  const tableGranularity = granularity === 'weekly' ? 'daily' : granularity;
+  const buckets = getBuckets(range, Date.now() / 1000, undefined, tableGranularity);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['xatu-nodes', 'block-slots', currentNetwork?.name, range, buckets[0]],
     queryFn: async ({ signal }) => {
-      const hourly = granularity === 'hourly';
-      const bucketFilter = hourly
-        ? { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: buckets[buckets.length - 1] + 3600 }
-        : range === 'all'
-          ? { day_start_date_ne: toDateString(buckets[buckets.length - 1] + 86400) }
-          : { day_start_date_in_values: buckets.map(toDateString).join(',') };
+      const hourly = tableGranularity === 'hourly';
       const rows = await fetchAllPages<FctBlockProposalStatusHourly & FctBlockProposalStatusDaily>(
         (hourly ? fctBlockProposalStatusHourlyServiceList : fctBlockProposalStatusDailyServiceList) as ListFn,
-        { query: { ...bucketFilter, status_ne: 'missed', page_size: 10000 } },
-        `fct_block_proposal_status_${granularity}`,
+        {
+          query: { ...bucketFilter(tableGranularity, buckets, range === 'all'), status_ne: 'missed', page_size: 10000 },
+        },
+        `fct_block_proposal_status_${tableGranularity}`,
         signal
       );
       const bySlot = new Map<number, number>();
       rows.forEach(row => {
-        const start = parseBucket(hourly ? row.hour_start_date_time : row.day_start_date);
-        if (start !== null) bySlot.set(start, (bySlot.get(start) ?? 0) + (row.slot_count ?? 0));
+        const bucket = rowBucket(row, tableGranularity);
+        if (bucket === null) return;
+        const start = granularity === 'weekly' ? weekStart(bucket) : bucket;
+        bySlot.set(start, (bySlot.get(start) ?? 0) + (row.slot_count ?? 0));
       });
       return bySlot;
     },

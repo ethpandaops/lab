@@ -2,16 +2,20 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctAttestationObservationByNodeDailyServiceList,
   fctAttestationObservationByNodeHourlyServiceList,
+  fctAttestationObservationByNodeWeeklyServiceList,
   fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceList,
   fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceList,
+  fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList,
   fctBlockFirstSeenByNodeDailyServiceList,
   fctBlockFirstSeenByNodeHourlyServiceList,
+  fctBlockFirstSeenByNodeWeeklyServiceList,
   fctEngineGetBlobsByNodeDailyServiceList,
   fctEngineGetBlobsByNodeHourlyServiceList,
   fctEngineNewPayloadByNodeDailyServiceList,
   fctEngineNewPayloadByNodeHourlyServiceList,
   fctHeadFirstSeenByNodeDailyServiceList,
   fctHeadFirstSeenByNodeHourlyServiceList,
+  fctHeadFirstSeenByNodeWeeklyServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctAttestationObservationByNodeHourly,
@@ -23,12 +27,12 @@ import type {
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
-import { getBuckets, parseBucket, toDateString } from '../utils/time-buckets';
+import { bucketFilter, getBuckets, rowBucket, type BucketColumns } from '../utils/time-buckets';
 
 /** Rollup family: block, head and attestation arrival, data column completion, engine API calls */
 export type HistoryMetric = 'block' | 'head' | 'attestation' | 'dataColumn' | 'newPayload' | 'getBlobs';
 
-/** One node's summary for one hour or day, in milliseconds */
+/** One node's summary for one hour, day or week, in milliseconds */
 export interface HistoryRow {
   start: number;
   nodeId: string;
@@ -53,31 +57,41 @@ export interface HistoryRow {
   returned?: number;
 }
 
-/** Hourly and daily rows share their columns apart from the bucket column */
-type RawRow = { hour_start_date_time?: number; day_start_date?: string };
+/** Hourly, daily and weekly rows share their columns apart from the bucket column */
+type RawRow = BucketColumns;
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 
 const SOURCES: Record<
   HistoryMetric,
-  { table: string; hourly: ListFn; daily: ListFn; normalize: (row: RawRow) => Omit<HistoryRow, 'start'> }
+  {
+    table: string;
+    hourly: ListFn;
+    daily: ListFn;
+    /** Families without weekly rollups read daily rows for all history */
+    weekly?: ListFn;
+    normalize: (row: RawRow) => Omit<HistoryRow, 'start'>;
+  }
 > = {
   block: {
     table: 'fct_block_first_seen_by_node',
     hourly: fctBlockFirstSeenByNodeHourlyServiceList as ListFn,
     daily: fctBlockFirstSeenByNodeDailyServiceList as ListFn,
+    weekly: fctBlockFirstSeenByNodeWeeklyServiceList as ListFn,
     normalize: arrival,
   },
   head: {
     table: 'fct_head_first_seen_by_node',
     hourly: fctHeadFirstSeenByNodeHourlyServiceList as ListFn,
     daily: fctHeadFirstSeenByNodeDailyServiceList as ListFn,
+    weekly: fctHeadFirstSeenByNodeWeeklyServiceList as ListFn,
     normalize: arrival,
   },
   attestation: {
     table: 'fct_attestation_observation_by_node',
     hourly: fctAttestationObservationByNodeHourlyServiceList as ListFn,
     daily: fctAttestationObservationByNodeDailyServiceList as ListFn,
+    weekly: fctAttestationObservationByNodeWeeklyServiceList as ListFn,
     normalize: (row: FctAttestationObservationByNodeHourly) => ({
       ...identity(row),
       count: row.slot_count ?? 0,
@@ -91,6 +105,7 @@ const SOURCES: Record<
     table: 'fct_block_data_column_sidecar_first_seen_by_node',
     hourly: fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceList as ListFn,
     daily: fctBlockDataColumnSidecarFirstSeenByNodeDailyServiceList as ListFn,
+    weekly: fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList as ListFn,
     normalize: (row: FctBlockDataColumnSidecarFirstSeenByNodeHourly) => ({
       ...identity(row),
       count: row.slot_count ?? 0,
@@ -184,7 +199,8 @@ export interface UseNodeHistoryResult {
 }
 
 /**
- * Hourly or daily rollups for a range: hourly up to a week, daily beyond, all history for "all".
+ * Rollups for a range: hourly up to a week, daily up to 90 days, weekly for all history (daily for families without
+ * weekly rollups).
  *
  * @param enabled - Skip the query, e.g. engine metrics for nodes that don't report engine calls
  */
@@ -195,10 +211,11 @@ export function useNodeHistory(
   enabled = true
 ): UseNodeHistoryResult {
   const { currentNetwork } = useNetwork();
-  const { granularity } = NODE_RANGE_CONFIG[range];
-  // Bucket starts move once an hour, which keeps the query key stable in between
-  const buckets = getBuckets(range, Date.now() / 1000);
   const source = SOURCES[metric];
+  const rangeGranularity = NODE_RANGE_CONFIG[range].granularity;
+  const granularity = rangeGranularity === 'weekly' && !source.weekly ? 'daily' : rangeGranularity;
+  // Bucket starts move once a bucket, which keeps the query key stable in between
+  const buckets = getBuckets(range, Date.now() / 1000, undefined, granularity);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -213,17 +230,11 @@ export function useNodeHistory(
     ],
     queryFn: async ({ signal }) => {
       const table = `${source.table}_${granularity}`;
-      const bucketFilter =
-        granularity === 'hourly'
-          ? { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: buckets[buckets.length - 1] + 3600 }
-          : range === 'all'
-            ? { day_start_date_ne: toDateString(buckets[buckets.length - 1] + 86400) }
-            : { day_start_date_in_values: buckets.map(toDateString).join(',') };
       const raw = await fetchAllPages<RawRow>(
-        granularity === 'hourly' ? source.hourly : source.daily,
+        source[granularity]!,
         {
           query: {
-            ...bucketFilter,
+            ...bucketFilter(granularity, buckets, range === 'all'),
             ...(filter.nodeId ? { node_id_eq: filter.nodeId } : {}),
             ...(filter.username ? { username_eq: filter.username } : {}),
             page_size: 10000,
@@ -233,13 +244,13 @@ export function useNodeHistory(
         signal
       );
       const rows = raw.flatMap(row => {
-        const start = parseBucket(granularity === 'hourly' ? row.hour_start_date_time : row.day_start_date);
+        const start = rowBucket(row, granularity);
         return start === null ? [] : [{ start, ...source.normalize(row) }];
       });
       const earliest = rows.length > 0 ? Math.min(...rows.map(row => row.start)) : undefined;
       return {
         rows,
-        buckets: range === 'all' ? getBuckets(range, Date.now() / 1000, earliest) : buckets,
+        buckets: range === 'all' ? getBuckets(range, Date.now() / 1000, earliest, granularity) : buckets,
         granularity,
       };
     },
