@@ -12,7 +12,7 @@ import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useE
 const NODE_CLASS = 'eip7870-block-builder';
 
 /**
- * Opcode cost fits over the whole UTC days that contain the range [rangeStart, rangeEnd), since the
+ * Opcode cost fits over the complete UTC days that contain the range [rangeStart, rangeEnd), since the
  * fits are daily: daily fits per client, and per-release fits for releases that ran in those days.
  */
 export function useOpcodeCostData(

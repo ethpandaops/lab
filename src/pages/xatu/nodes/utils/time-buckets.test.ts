@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { HistoryRow } from '../hooks/useNodeHistory';
 import { behindStarts, medianByClient, medianByStart, spreadByBucket, summarizeByNode } from './history';
-import { expectedSlots, getBuckets, parseBucket, weightedMedian } from './time-buckets';
+import { getBuckets, parseBucket, weightedMedian } from './time-buckets';
 
 const HOUR = 3600;
 const DAY = 86400;
@@ -14,23 +14,23 @@ describe('getBuckets', () => {
   // 2026-10-30 05:30 UTC
   const now = Date.UTC(2026, 9, 30, 5, 30) / 1000;
 
-  it('ends with the hour in progress and covers 24 hourly buckets', () => {
+  it('ends with the last complete hour and covers 24 hourly buckets', () => {
     const buckets = getBuckets('24h', now);
     expect(buckets).toHaveLength(24);
-    expect(buckets[23]).toBe(Date.UTC(2026, 9, 30, 5) / 1000);
-    expect(buckets[0]).toBe(Date.UTC(2026, 9, 29, 6) / 1000);
+    expect(buckets[23]).toBe(Date.UTC(2026, 9, 30, 4) / 1000);
+    expect(buckets[0]).toBe(Date.UTC(2026, 9, 29, 5) / 1000);
   });
 
-  it('uses UTC days for 30d', () => {
+  it('uses complete UTC days for 30d', () => {
     const buckets = getBuckets('30d', now);
     expect(buckets).toHaveLength(30);
-    expect(buckets[29]).toBe(Date.UTC(2026, 9, 30) / 1000);
+    expect(buckets[29]).toBe(Date.UTC(2026, 9, 29) / 1000);
     expect(buckets[1] - buckets[0]).toBe(DAY);
   });
 
   it('starts all history at the earliest day with data', () => {
     const buckets = getBuckets('all', now, Date.UTC(2026, 9, 27, 13) / 1000);
-    expect(buckets).toEqual([27, 28, 29, 30].map(day => Date.UTC(2026, 9, day) / 1000));
+    expect(buckets).toEqual([27, 28, 29].map(day => Date.UTC(2026, 9, day) / 1000));
   });
 });
 
@@ -39,15 +39,6 @@ describe('parseBucket', () => {
     expect(parseBucket(1793336400)).toBe(1793336400);
     expect(parseBucket('2026-10-30')).toBe(Date.UTC(2026, 9, 30) / 1000);
     expect(parseBucket('')).toBeNull();
-  });
-});
-
-describe('expectedSlots', () => {
-  it('counts only the slots elapsed in the bucket in progress', () => {
-    const start = Date.UTC(2026, 9, 30, 5) / 1000;
-    expect(expectedSlots(start, 'hourly', start + 120)).toBe(10);
-    expect(expectedSlots(start, 'hourly', start + 2 * HOUR)).toBe(300);
-    expect(expectedSlots(start, 'daily', start + 2 * DAY)).toBe(7200);
   });
 });
 

@@ -4,6 +4,7 @@ import { fctHeadFirstSeenByNodeDailyServiceList } from '@/api/sdk.gen';
 import type { FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd } from '@/utils/time';
 import { PAGE_SIZE } from '../constants';
 import { windowStart } from '../utils/client-versions';
 import { chunksFor } from './useVersionCounts';
@@ -47,8 +48,7 @@ export function useNodeVersions(
 ): UseNodeVersionsResult {
   const { currentNetwork } = useNetwork();
   const from = span ? span.from : days === null ? undefined : windowStart(days);
-  // Ten-minute aligned so the chunks, and their cache keys, stay put while the page is open
-  const now = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const now = useMemo(() => completeBucketEnd('day'), []);
   const to = span && span.to < now ? span.to : now;
   const chunks = useMemo(() => chunksFor('daily', from, to), [from, to]);
 

@@ -11,6 +11,7 @@ import {
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { weekStartOf } from '../utils/week';
+import { currentUtcDate, currentUtcWeek } from '@/utils/time';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
@@ -466,8 +467,12 @@ export function useValidatorsData(
     return weekly ? [...new Set(days.split(',').map(weekStartOf))].join(',') : days;
   }, [enabled, allHistory, weekly, startTime, endTime]);
   // Listing every day of a multi-year range would not fit in a URL
-  const dayFilter = allHistory ? { day_start_date_like: '20%' } : { day_start_date_in_values: dateRangeString };
-  const weekFilter = allHistory ? { week_start_date_like: '20%' } : { week_start_date_in_values: dateRangeString };
+  const dayFilter = allHistory
+    ? { day_start_date_ne: currentUtcDate() }
+    : { day_start_date_in_values: dateRangeString };
+  const weekFilter = allHistory
+    ? { week_start_date_ne: currentUtcWeek() }
+    : { week_start_date_in_values: dateRangeString };
 
   // Split validators into chunks so each chunk x rows per validator < API_MAX_PAGE_SIZE
   const rowsPerValidator = weekly

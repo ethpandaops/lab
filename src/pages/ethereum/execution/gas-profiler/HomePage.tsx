@@ -42,7 +42,7 @@ import type {
 } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { formatBytes } from '@/utils';
-import { dailyDateValues } from '@/pages/ethereum/clients/utils/client-share';
+import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
@@ -242,12 +242,10 @@ export function HomePage(): JSX.Element {
     newerBlockCount,
   } = useRecentBlocks({ count: 6, offset: blocksOffset, anchorBlock: pinnedMax ?? undefined });
 
-  // Calculate timestamp for start of selected time range
-  const startTimestamp = useMemo(() => {
-    if (config.days === null) return undefined;
-    const now = Math.floor(Date.now() / 1000);
-    return now - config.days * 24 * 60 * 60;
-  }, [config.days]);
+  // Rollups are read up to the hour or UTC day in progress, never including it
+  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
+  const today = useMemo(() => currentUtcDate(), []);
+  const startTimestamp = config.days === null ? undefined : hourlyEnd - config.days * 24 * 60 * 60;
 
   // Opcode Ops Per Second Queries (real data) - with pagination
   const opcodeOpsHourlyQuery = useQuery({
@@ -258,6 +256,7 @@ export function HomePage(): JSX.Element {
         {
           query: {
             hour_start_date_time_gte: startTimestamp,
+            hour_start_date_time_lt: hourlyEnd,
             order_by: 'hour_start_date_time asc',
             page_size: config.pageSize,
           },
@@ -269,16 +268,12 @@ export function HomePage(): JSX.Element {
   });
 
   const opcodeOpsDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'opcode-ops-daily', config.pageSize],
+    queryKey: ['gas-profiler', 'opcode-ops-daily', config.pageSize, today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctOpcodeOpsDaily>(
         fctOpcodeOpsDailyServiceList,
         {
-          query: {
-            day_start_date_like: '20%',
-            order_by: 'day_start_date desc',
-            page_size: config.pageSize,
-          },
+          query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
         },
         'fct_opcode_ops_daily',
         signal
@@ -295,6 +290,7 @@ export function HomePage(): JSX.Element {
         {
           query: {
             hour_start_date_time_gte: startTimestamp,
+            hour_start_date_time_lt: hourlyEnd,
             order_by: 'total_gas desc',
             page_size: 10000,
           },
@@ -306,17 +302,16 @@ export function HomePage(): JSX.Element {
   });
 
   const opcodeGasDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'opcode-gas-daily', config.days],
+    queryKey: ['gas-profiler', 'opcode-gas-daily', config.days, today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctOpcodeGasByOpcodeDaily>(
         fctOpcodeGasByOpcodeDailyServiceList,
         {
           query: {
-            // The date key only filters by value, so bounded ranges list their dates, with a spare
-            // day so the list covers the client-side cutoff below, which trims to the exact range.
+            // The date key only filters by value, so bounded ranges list their dates
             ...(config.days === null
-              ? { day_start_date_like: '20%' }
-              : { day_start_date_in_values: dailyDateValues(config.days + 2) }),
+              ? { day_start_date_ne: today }
+              : { day_start_date_in_values: completeUtcDays(config.days).join(',') }),
             order_by: 'total_gas desc',
             page_size: 10000,
           },
@@ -336,6 +331,7 @@ export function HomePage(): JSX.Element {
         {
           query: {
             hour_start_date_time_gte: startTimestamp,
+            hour_start_date_time_lt: hourlyEnd,
             order_by: 'hour_start_date_time asc',
             page_size: config.pageSize,
           },
@@ -347,16 +343,12 @@ export function HomePage(): JSX.Element {
   });
 
   const receiptSizeDailyQuery = useQuery({
-    queryKey: ['gas-profiler', 'receipt-size-daily', config.pageSize],
+    queryKey: ['gas-profiler', 'receipt-size-daily', config.pageSize, today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctExecutionReceiptSizeDaily>(
         fctExecutionReceiptSizeDailyServiceList,
         {
-          query: {
-            day_start_date_like: '20%',
-            order_by: 'day_start_date desc',
-            page_size: config.pageSize,
-          },
+          query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
         },
         'fct_execution_receipt_size_daily',
         signal
@@ -364,10 +356,10 @@ export function HomePage(): JSX.Element {
     enabled: isDaily,
   });
 
-  // First UTC date of a daily window, so an N-day window holds N daily rows including today.
+  // First UTC date of a daily window, so an N-day window holds N complete daily rows.
   // "All" starts where both the opcode and receipt tables have data, so every chart covers the same days.
   const dailyCutoff = useMemo(() => {
-    if (config.days !== null) return dailyDateValues(config.days).slice(0, 10);
+    if (config.days !== null) return completeUtcDays(config.days)[0];
     const opsData = opcodeOpsDailyQuery.data;
     const receiptData = receiptSizeDailyQuery.data;
     if (!opsData?.length || !receiptData?.length) return null;

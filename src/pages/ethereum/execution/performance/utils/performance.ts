@@ -6,6 +6,7 @@ import type {
   FctExecutionGasUsedHourly,
 } from '@/api/types.gen';
 import { getExecutionClientColor } from '@/utils';
+import { completeBucketEnd } from '@/utils/time';
 
 /** Seconds per slot on mainnet-like networks */
 export const SLOT_SECONDS = 12;
@@ -23,7 +24,7 @@ export const BLOCK_SLICE_SECONDS = 15 * 60;
 
 /** The range [start, end) in seconds, ending at the last full hour so hourly rows are complete */
 export function rangeBounds(seconds: number, nowMs = Date.now()): { start: number; end: number } {
-  const end = Math.floor(nowMs / 1000 / 3600) * 3600;
+  const end = completeBucketEnd('hour', nowMs);
   return { start: end - seconds, end };
 }
 
@@ -40,9 +41,13 @@ export function blockSlices(start: number, end: number): [number, number][] {
   });
 }
 
-/** The whole UTC days that contain [start, end), as [first day start, last day end) */
-export function rangeDays(start: number, end: number): { start: number; end: number } {
-  return { start: Math.floor(start / 86400) * 86400, end: Math.ceil(end / 86400) * 86400 };
+/**
+ * The complete UTC days that contain [start, end), as [first day start, last day end). The day in progress is left
+ * out, so a range inside it takes the last complete day.
+ */
+export function rangeDays(start: number, end: number, nowMs = Date.now()): { start: number; end: number } {
+  const last = Math.min(Math.ceil(end / 86400) * 86400, completeBucketEnd('day', nowMs));
+  return { start: Math.min(Math.floor(start / 86400) * 86400, last - 86400), end: last };
 }
 
 /** Resource gas dimensions, in display order */

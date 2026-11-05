@@ -32,6 +32,7 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd } from '@/utils/time';
 import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../IndexPage.types';
 
 export interface EngineTimingsData {
@@ -97,13 +98,12 @@ function getTimeRangeTimestamps(range: TimeRange): {
   /** UTC dates of the range's full days, ending yesterday, for the daily tables */
   days: string;
 } {
-  const now = Math.floor(Date.now() / 1000);
   const config = TIME_RANGE_CONFIG[range];
 
-  const hourlyEnd = Math.floor(now / 3600) * 3600;
+  const hourlyEnd = completeBucketEnd('hour');
   const hourlyStart = hourlyEnd - config.seconds;
 
-  const todayStart = Math.floor(now / 86400) * 86400;
+  const todayStart = completeBucketEnd('day');
   const days = generateDateRange(todayStart - config.seconds, todayStart - 1);
 
   return { hourlyStart, hourlyEnd, days };

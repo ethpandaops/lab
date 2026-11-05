@@ -20,14 +20,12 @@ export const PEER_SOURCE: Record<ClientLayer, string> = {
 /** Census rows carry a day and a client */
 type DayRow = { day_start_date?: string; client?: string };
 
-/**
- * The newest day the rows cover, skipping today when an earlier day exists, since today is still filling.
- */
-export function latestFullDay(rows: DayRow[], today: string = new Date().toISOString().slice(0, 10)): string | null {
-  const days = [...new Set(rows.map(row => row.day_start_date ?? ''))].filter(Boolean).sort();
-  if (days.length === 0) return null;
-  const last = days[days.length - 1];
-  return last === today && days.length > 1 ? days[days.length - 2] : last;
+/** The newest day the rows cover */
+export function latestDay(rows: DayRow[]): string | null {
+  return rows.reduce<string | null>((latest, row) => {
+    const day = row.day_start_date;
+    return day && (latest === null || day > latest) ? day : latest;
+  }, null);
 }
 
 /** Sum of a value over rows */

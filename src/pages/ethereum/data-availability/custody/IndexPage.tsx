@@ -43,6 +43,7 @@ import {
   transformSlotsToRows,
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd, completeUtcDays } from '@/utils/time';
 import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy } from './IndexPage.types';
 
@@ -106,8 +107,8 @@ function hourOfEpochsWindow(hourStart: number, genesisTime: number): TimeRangeCo
 function levelWindow(level: DrillDownLevel, genesisTime: number): TimeRangeContext {
   switch (level.type) {
     case 'window': {
-      const tomorrow = (Math.floor(Date.now() / 1000 / SECONDS_PER_DAY) + 1) * SECONDS_PER_DAY;
-      return { timeStart: tomorrow - WINDOW_DAYS * SECONDS_PER_DAY, timeEnd: tomorrow };
+      const end = completeBucketEnd('day');
+      return { timeStart: end - WINDOW_DAYS * SECONDS_PER_DAY, timeEnd: end };
     }
     case 'day': {
       const dayStart = Date.parse(level.date) / 1000;
@@ -268,11 +269,7 @@ export function IndexPage(): JSX.Element {
   const windowQuery = useQuery({
     ...fctDataColumnAvailabilityDailyServiceListOptions({
       query: {
-        // Get last WINDOW_DAYS days - generate list of dates
-        date_in_values: Array.from({ length: WINDOW_DAYS }, (_, i) => {
-          const date = new Date(Date.now() - i * HOURS_PER_DAY * 60 * 60 * 1000);
-          return date.toISOString().split('T')[0];
-        }).join(','),
+        date_in_values: completeUtcDays(WINDOW_DAYS).join(','),
         page_size: WINDOW_DAYS * TOTAL_COLUMNS,
         order_by: 'date desc',
       },

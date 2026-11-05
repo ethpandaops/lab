@@ -3,6 +3,7 @@ import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd } from '@/utils/time';
 import { PAGE_SIZE } from '../constants';
 import { chunksFor } from './useVersionCounts';
 
@@ -27,7 +28,7 @@ function combine<T>(results: Array<UseQueryResult<T[]>>): Omit<UseDailyByClientR
 
 /**
  * Every row of a daily table matching `filters` over a window, or all its history, in cached chunks. The window
- * ends now unless `to` (exclusive) is earlier. Pass null filters to skip loading.
+ * ends with the last complete UTC day unless `to` (exclusive) is earlier. Pass null filters to skip loading.
  */
 export function useDailyByClient<T extends { day_start_date?: string }>(
   list: ListFn,
@@ -37,7 +38,7 @@ export function useDailyByClient<T extends { day_start_date?: string }>(
   to?: number
 ): UseDailyByClientResult<T> {
   const { currentNetwork } = useNetwork();
-  const now = useMemo(() => Math.ceil(Date.now() / 1000 / 600) * 600, []);
+  const now = useMemo(() => completeBucketEnd('day'), []);
   const end = to !== undefined && to < now ? to : now;
   // Start no earlier than the table's data, which may not reach back to genesis
   const bounds = useTableBounds(dataKey);

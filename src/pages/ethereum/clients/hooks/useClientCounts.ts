@@ -14,9 +14,10 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
 import { fillTimeKeys } from '@/pages/ethereum/execution/overview/overview.utils';
 import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '../constants';
-import { dailyDateValues, entityQuery, toClientCountRecords, type ClientCountRecord } from '../utils/client-share';
+import { entityQuery, toClientCountRecords, type ClientCountRecord } from '../utils/client-share';
 
 export interface UseClientCountsResult {
   /** Aggregate rows for the selected window */
@@ -38,8 +39,8 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 
-  // Whole hours only: the window ends where the current, still-filling hour starts
-  const hourlyEnd = useMemo(() => Math.floor(Date.now() / 1000 / 3600) * 3600, []);
+  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
+  const today = useMemo(() => currentUtcDate(), []);
   const hourlyStart = hourlyEnd - (config.days ?? 0) * 24 * 3600;
 
   const query = useQuery({
@@ -48,7 +49,7 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
       'counts',
       currentNetwork?.name,
       timePeriod,
-      isDaily ? 'daily' : hourlyStart,
+      isDaily ? today : hourlyStart,
       entity ?? '',
     ],
     queryFn: async ({ signal }): Promise<ClientCountRecord[]> => {
@@ -78,8 +79,8 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
       // The daily table only filters its date key by value, so bounded windows list their dates.
       const dateFilter =
         config.days === null
-          ? { day_start_date_like: '20%' }
-          : { day_start_date_in_values: dailyDateValues(config.days) };
+          ? { day_start_date_ne: today }
+          : { day_start_date_in_values: completeUtcDays(config.days).join(',') };
       const query = { ...dateFilter, order_by: 'day_start_date asc', page_size: PAGE_SIZE };
       const rows = entity
         ? await fetchAllPages<FctBlockGraffitiClientByEntityDaily>(

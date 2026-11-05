@@ -246,18 +246,6 @@ export function bucketShares(
   };
 }
 
-/** Comma separated YYYY-MM-DD dates of the last `days` UTC days, for day_start_date_in_values. */
-export function dailyDateValues(days: number, now: number = Date.now()): string {
-  const dates: string[] = [];
-  const today = new Date(now);
-  today.setUTCHours(0, 0, 0, 0);
-  for (let offset = days - 1; offset >= 0; offset--) {
-    const date = new Date(today.getTime() - offset * 24 * 60 * 60 * 1000);
-    dates.push(date.toISOString().slice(0, 10));
-  }
-  return dates.join(',');
-}
-
 /** Active client filters for the page */
 export interface ClientFilters {
   consensusClient?: string;

@@ -18,7 +18,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { normalizeClientName } from '@/utils/ethereum';
 import { PAGE_SIZE, REFERENCE_NODE_CLASS } from '../constants';
-import { dailyDateValues } from '../utils/client-share';
+import { completeUtcDays, currentUtcDate } from '@/utils/time';
 import { opcodeRowsFromDaily } from '../utils/client-versions';
 
 export interface UseReferenceEngineResult {
@@ -53,13 +53,14 @@ export function useReferenceEngine(
   const network = currentNetwork?.name;
   const on = !!currentNetwork && !!client && enabled;
 
-  // The daily tables only filter their date key by value: list the window's dates, or match every date
-  const dates = useMemo(() => (days ? dailyDateValues(days) : null), [days]);
-  const dateFilter = dates ? { day_start_date_in_values: dates } : { day_start_date_like: '20%' };
+  // The daily tables only filter their date key by value: list the window's dates, or match every complete date
+  const dates = useMemo(() => (days ? completeUtcDays(days).join(',') : null), [days]);
+  const today = useMemo(() => currentUtcDate(), []);
+  const dateFilter = dates ? { day_start_date_in_values: dates } : { day_start_date_ne: today };
   const dailyQuery = { ...dateFilter, node_class_eq: REFERENCE_NODE_CLASS, page_size: PAGE_SIZE };
 
   const newPayload = useQuery({
-    queryKey: ['client-pages', 'reference', 'new-payload', network, dates],
+    queryKey: ['client-pages', 'reference', 'new-payload', network, dates ?? today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadByElClientDaily>(
         fctEngineNewPayloadByElClientDailyServiceList,
@@ -71,7 +72,7 @@ export function useReferenceEngine(
     staleTime: 30 * 60 * 1000,
   });
   const getBlobs = useQuery({
-    queryKey: ['client-pages', 'reference', 'get-blobs', network, dates],
+    queryKey: ['client-pages', 'reference', 'get-blobs', network, dates ?? today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineGetBlobsByElClientDaily>(
         fctEngineGetBlobsByElClientDailyServiceList,
@@ -83,7 +84,7 @@ export function useReferenceEngine(
     staleTime: 30 * 60 * 1000,
   });
   const winrate = useQuery({
-    queryKey: ['client-pages', 'reference', 'winrate', network, dates],
+    queryKey: ['client-pages', 'reference', 'winrate', network, dates ?? today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctEngineNewPayloadWinrateDaily>(
         fctEngineNewPayloadWinrateDailyServiceList,
@@ -95,7 +96,7 @@ export function useReferenceEngine(
     staleTime: 30 * 60 * 1000,
   });
   const opcodes = useQuery({
-    queryKey: ['client-pages', 'reference', 'opcodes', network, dates],
+    queryKey: ['client-pages', 'reference', 'opcodes', network, dates ?? today],
     // Over a window, daily fits of the window's days; otherwise each version's fit over its whole life
     queryFn: async ({ signal }): Promise<FctOpcodeCostByElClientVersion[]> =>
       dates

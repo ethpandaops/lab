@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { currentUtcDate } from '@/utils/time';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fctTokenContractStorageStateByBlockDailyServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctTokenContractStorageStateByBlockDaily } from '@/api/types.gen';
@@ -36,12 +37,10 @@ function normalizeByDay(rows: FctTokenContractStorageStateByBlockDaily[]): Token
  * the State Growth page's existing storage-leaves total rather than re-querying state size.
  */
 export function useTokenStorageShare(): UseTokenStorageShareResult {
+  const today = currentUtcDate();
   const query = useQuery({
     ...fctTokenContractStorageStateByBlockDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
+      query: { day_start_date_ne: today, page_size: 10000 },
     }),
     placeholderData: keepPreviousData,
   });

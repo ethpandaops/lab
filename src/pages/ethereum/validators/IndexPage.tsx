@@ -34,6 +34,7 @@ import {
   type OverviewWindow,
 } from './utils/overview';
 import { weekStartOf } from './utils/week';
+import { currentUtcDate } from '@/utils/time';
 
 const CREDENTIAL_LABELS: Record<CredentialType, string> = {
   '0x00': '0x00 BLS',
@@ -169,7 +170,7 @@ export function IndexPage(): JSX.Element {
   const exitEth = queue ? (queue.exit_queue_effective_balance ?? 0) / 1e9 : null;
 
   // --- Real duty performance from existing daily tables ---
-  const dailyQuery = { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 10_000 };
+  const dailyQuery = { day_start_date_ne: currentUtcDate(), order_by: 'day_start_date desc', page_size: 10_000 };
   const participation = useQuery(fctAttestationParticipationRateDailyServiceListOptions({ query: dailyQuery }));
   const headVote = useQuery(fctHeadVoteCorrectnessRateDailyServiceListOptions({ query: dailyQuery }));
   const missed = useQuery(fctMissedSlotRateDailyServiceListOptions({ query: dailyQuery }));

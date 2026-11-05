@@ -18,7 +18,7 @@ import type {
   FctValidatorEffectiveBalanceByCredentialTypeDaily,
 } from '@/api/types.gen';
 import { CREDENTIAL_TYPES, type CredentialType, type OverviewWindow } from '../utils/overview';
-import { weekStartOf } from '../utils/week';
+import { completeBucketEnd, completeUtcDays, currentUtcDate, currentUtcWeek, toUtcDate } from '@/utils/time';
 
 const GWEI = 1e9;
 const DAY = 86_400;
@@ -64,9 +64,10 @@ export interface OverviewSnapshot {
 const DAILY_WINDOW_DAYS: Partial<Record<OverviewWindow, number>> = { '30d': 30, '90d': 90 };
 const WEEKLY_WINDOW_DAYS: Partial<Record<OverviewWindow, number>> = { '1y': 365, '2y': 730 };
 
-function lastDays(n: number): string[] {
-  const today = Math.floor(Date.now() / 1000 / DAY) * DAY;
-  return Array.from({ length: n }, (_, i) => new Date((today - (n - 1 - i) * DAY) * 1000).toISOString().slice(0, 10));
+/** Mondays of the last `n` complete weeks, oldest first */
+function lastWeeks(n: number): string[] {
+  const end = completeBucketEnd('week');
+  return Array.from({ length: n }, (_, i) => toUtcDate(end - (n - i) * 7 * DAY));
 }
 
 type WeekRow<T> = Omit<T, 'day_start_date'> & { week_start_date?: string };
@@ -92,11 +93,12 @@ export function useOverviewData(window: OverviewWindow): {
   const dailyDays = DAILY_WINDOW_DAYS[window];
   const period = dailyDays !== undefined ? 'day' : 'week';
   const weeklyDays = WEEKLY_WINDOW_DAYS[window];
-  const dayFilter = dailyDays !== undefined ? { day_start_date_in_values: lastDays(dailyDays).join(',') } : {};
+  const thisWeek = currentUtcWeek();
+  const dayFilter = dailyDays !== undefined ? { day_start_date_in_values: completeUtcDays(dailyDays).join(',') } : {};
   const weekFilter =
     weeklyDays !== undefined
-      ? { week_start_date_in_values: [...new Set(lastDays(weeklyDays).map(weekStartOf))].join(',') }
-      : { week_start_date_like: '20%' };
+      ? { week_start_date_in_values: lastWeeks(Math.round(weeklyDays / 7)).join(',') }
+      : { week_start_date_ne: thisWeek };
   const daily = { ...dayFilter, page_size: PAGE, order_by: 'day_start_date' };
   const weekly = { ...weekFilter, page_size: PAGE, order_by: 'week_start_date' };
 
@@ -129,14 +131,18 @@ export function useOverviewData(window: OverviewWindow): {
   // Every week, whatever the window, so the snapshot's "lowest since" doesn't depend on it
   const history = useQuery(
     fctValidatorCountByCredentialTypeWeeklyServiceListOptions({
-      query: { week_start_date_like: '20%', page_size: PAGE, order_by: 'week_start_date' },
+      query: { week_start_date_ne: thisWeek, page_size: PAGE, order_by: 'week_start_date' },
     })
   );
 
-  // Snapshot tables: the newest day only
+  // Snapshot tables: the newest complete day only
   const latestCounts = useQuery(
     fctValidatorCountByCredentialTypeDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: CREDENTIAL_TYPES.length },
+      query: {
+        day_start_date_ne: currentUtcDate(),
+        order_by: 'day_start_date desc',
+        page_size: CREDENTIAL_TYPES.length,
+      },
     })
   );
   const latestDay = latestCounts.data?.fct_validator_count_by_credential_type_daily?.[0]?.day_start_date;

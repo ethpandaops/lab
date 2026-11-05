@@ -1,5 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getRelativeTime, formatTimestamp, formatTimeRange } from './time';
+import {
+  getRelativeTime,
+  formatTimestamp,
+  formatTimeRange,
+  completeBucketEnd,
+  completeUtcDays,
+  currentUtcDate,
+  currentUtcWeek,
+} from './time';
 
 describe('getRelativeTime', () => {
   let mockNow: number;
@@ -298,5 +306,36 @@ describe('formatTimeRange', () => {
     // Jan 15, 2021 12:00 GMT → 12:30 GMT
     const result = formatTimeRange(1610712000, 1610713800);
     expect(result.match(/Jan/g)).toHaveLength(1);
+  });
+});
+
+describe('completeBucketEnd', () => {
+  // Thursday 2026-11-05 13:20:45 UTC
+  const now = Date.UTC(2026, 10, 5, 13, 20, 45);
+
+  it('ends at the start of the hour, UTC day and Monday-started week in progress', () => {
+    expect(completeBucketEnd('hour', now)).toBe(Date.UTC(2026, 10, 5, 13) / 1000);
+    expect(completeBucketEnd('day', now)).toBe(Date.UTC(2026, 10, 5) / 1000);
+    expect(completeBucketEnd('week', now)).toBe(Date.UTC(2026, 10, 2) / 1000);
+  });
+
+  it('keeps a Sunday in the week that started the Monday before, and starts a new week on Monday', () => {
+    expect(completeBucketEnd('week', Date.UTC(2026, 10, 8, 23, 59))).toBe(Date.UTC(2026, 10, 2) / 1000);
+    expect(completeBucketEnd('week', Date.UTC(2026, 10, 9))).toBe(Date.UTC(2026, 10, 9) / 1000);
+  });
+});
+
+describe('complete UTC days', () => {
+  const now = Date.UTC(2026, 10, 5, 0, 30);
+
+  it('names the day and week in progress', () => {
+    expect(currentUtcDate(now)).toBe('2026-11-05');
+    expect(currentUtcWeek(now)).toBe('2026-11-02');
+  });
+
+  it('lists the last N complete days ending yesterday, across a month boundary', () => {
+    expect(completeUtcDays(3, now)).toEqual(['2026-11-02', '2026-11-03', '2026-11-04']);
+    expect(completeUtcDays(5, now)[0]).toBe('2026-10-31');
+    expect(completeUtcDays(0, now)).toEqual([]);
   });
 });

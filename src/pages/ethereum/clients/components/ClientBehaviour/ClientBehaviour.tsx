@@ -8,7 +8,7 @@ import type {
 } from '../../api/client-models';
 import type { ClientLayer } from '../../utils/client-share';
 import { UNKNOWN_CLIENT } from '../../constants';
-import { latestFullDay } from '../../utils/census';
+import { latestDay as latestDayOf } from '../../utils/census';
 import { sinceSuffix } from '../../utils/client-versions';
 import { ClientMetricCompare } from '../ClientMetricCompare';
 import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
@@ -150,8 +150,7 @@ export function PerformanceHeadline({
     const knownDuties = attestations.rows
       .filter(row => row.client && row.client !== UNKNOWN_CLIENT)
       .reduce((sum, row) => sum + (row.total_duties ?? 0), 0);
-    // Today is still filling, so the count is the latest full day's
-    const latestDay = latestFullDay(attestations.rows);
+    const latestDay = latestDayOf(attestations.rows);
     const validators = attestations.rows
       .filter(row => row.client === client && row.day_start_date === latestDay)
       .reduce((sum, row) => sum + (row.validator_count ?? 0), 0);

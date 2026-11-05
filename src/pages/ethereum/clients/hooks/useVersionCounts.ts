@@ -3,6 +3,7 @@ import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { completeBucketEnd } from '@/utils/time';
 import {
   UNRESOLVED_STATUSES,
   fctBlockGraffitiClientVersionByEntityDailyList,
@@ -33,7 +34,7 @@ export interface UseVersionCountsOptions {
   unresolvedOnly?: boolean;
   /** Window start (unix seconds); all history when omitted */
   from?: number;
-  /** Window end (unix seconds, exclusive); when omitted, the current hour's start for hourly grains, else now */
+  /** Window end (unix seconds, exclusive); when omitted, the start of the hour or UTC day in progress */
   to?: number;
   enabled?: boolean;
 }
@@ -82,13 +83,16 @@ export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number 
   }
 
   const firstYear = from === undefined ? FIRST_YEAR : new Date(from * 1000).getUTCFullYear();
-  const lastYear = new Date(to * 1000).getUTCFullYear();
+  const lastYear = new Date((to - 1) * 1000).getUTCFullYear();
   const thisYear = new Date().getUTCFullYear();
-  return Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i).map(year => ({
-    key: String(year),
-    query: { day_start_date_like: `${year}%` },
-    open: year >= thisYear,
-  }));
+  return Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i).map(year => {
+    const open = year >= thisYear;
+    if (year < lastYear) return { key: String(year), query: { day_start_date_like: `${year}%` }, open };
+    // The year the window ends in lists its days, so the chunk stops where the window does
+    const days: string[] = [];
+    for (let day = Date.UTC(year, 0, 1) / 1000; day < to; day += DAY) days.push(isoDay(day));
+    return { key: `${year}-${isoDay(to)}`, query: { day_start_date_in_values: days.join(',') }, open };
+  });
 }
 
 /** Joins the chunk queries; module scoped so React Query only re-runs it when a chunk changes */
@@ -116,12 +120,7 @@ export function useVersionCounts({
 }: UseVersionCountsOptions): UseVersionCountsResult {
   const { currentNetwork } = useNetwork();
   const hourly = grain === 'hourly' || grain === 'entity-hourly';
-  // Hourly windows end where the current, still-filling hour starts; daily ones ten-minute aligned so the window,
-  // and the cache keys, stay put while the page is open
-  const end = useMemo(
-    () => to ?? (hourly ? Math.floor(Date.now() / 1000 / 3600) * 3600 : Math.ceil(Date.now() / 1000 / 600) * 600),
-    [to, hourly]
-  );
+  const end = useMemo(() => to ?? completeBucketEnd(hourly ? 'hour' : 'day'), [to, hourly]);
   const dataKey = {
     daily: 'fct_block_graffiti_client_version_daily',
     'entity-daily': 'fct_block_graffiti_client_version_by_entity_daily',

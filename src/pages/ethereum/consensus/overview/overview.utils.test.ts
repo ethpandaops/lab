@@ -9,16 +9,16 @@ describe('dailyWindowStartDate', () => {
     expect(dailyWindowStartDate(null, now)).toBeUndefined();
   });
 
-  it('spans exactly 30 calendar days including today', () => {
-    expect(dailyWindowStartDate(30, now)).toBe('2026-06-14');
+  it('spans 30 complete days ending yesterday', () => {
+    expect(dailyWindowStartDate(30, now)).toBe('2026-06-13');
   });
 
-  it('spans exactly 180 calendar days including today', () => {
-    expect(dailyWindowStartDate(180, now)).toBe('2026-01-15');
+  it('spans 180 complete days ending yesterday', () => {
+    expect(dailyWindowStartDate(180, now)).toBe('2026-01-14');
   });
 
-  it('spans exactly 365 calendar days including today', () => {
-    expect(dailyWindowStartDate(365, now)).toBe('2025-07-14');
+  it('spans 365 complete days ending yesterday', () => {
+    expect(dailyWindowStartDate(365, now)).toBe('2025-07-13');
   });
 });
 

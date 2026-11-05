@@ -1,6 +1,7 @@
 import type { ChangeEvent, JSX } from 'react';
 import clsx from 'clsx';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import { completeBucketEnd } from '@/utils/time';
 
 type RangePreset = '7d' | '30d' | '90d' | '1y' | 'all' | 'custom';
 
@@ -19,15 +20,15 @@ interface DateRangeSelectorProps {
 const DAY = 86_400;
 const PRESET_DAYS: Partial<Record<RangePreset, number>> = { '7d': 7, '30d': 30, '90d': 90, '1y': 365 };
 
-const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
-const today = (): number => startOfDay(Date.now() / 1000);
+/** Start of the last complete UTC day */
+const lastDay = (): number => completeBucketEnd('day') - DAY;
 const toInputValue = (ts: number): string => new Date(ts * 1000).toISOString().slice(0, 10);
 const fromInputValue = (value: string): number => Date.parse(`${value}T00:00:00Z`) / 1000;
 
 function currentPreset(from: number, to: number, earliest: number | undefined): RangePreset {
-  if (to !== today()) return 'custom';
+  if (to !== lastDay()) return 'custom';
   if (earliest !== undefined && from <= earliest) return 'all';
-  const days = (to - from) / DAY;
+  const days = (to - from) / DAY + 1;
   const match = Object.entries(PRESET_DAYS).find(([, d]) => d === days);
   return (match?.[0] as RangePreset | undefined) ?? 'custom';
 }
@@ -52,17 +53,17 @@ export function DateRangeSelector({
   const preset = currentPreset(from, to, earliest);
 
   const selectPreset = (value: RangePreset): void => {
-    const end = today();
+    const end = lastDay();
     if (value === 'all') {
       if (earliest !== undefined) onChange(earliest, end);
       return;
     }
     const days = PRESET_DAYS[value];
-    if (days !== undefined) onChange(end - days * DAY, end);
+    if (days !== undefined) onChange(end - (days - 1) * DAY, end);
   };
 
   const min = earliest !== undefined ? toInputValue(earliest) : undefined;
-  const max = toInputValue(today());
+  const max = toInputValue(lastDay());
 
   return (
     <div className={clsx('flex flex-wrap items-center gap-2', className)}>
