@@ -1298,6 +1298,80 @@ export type FctAttestationObservationByNodeHourly = {
 };
 
 /**
+ * Weekly attestation arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export type FctAttestationObservationByNodeWeekly = {
+  /**
+   * Attestations the node saw
+   */
+  attestation_count?: number;
+  /**
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * Latest collector implementation of the node in the period
+   */
+  meta_client_implementation?: string;
+  /**
+   * Latest client name of the node in the period
+   */
+  meta_client_name?: string;
+  /**
+   * Latest collector version of the node in the period
+   */
+  meta_client_version?: string;
+  /**
+   * Latest consensus client implementation of the node in the period
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Latest consensus client version of the node in the period
+   */
+  meta_consensus_version?: string;
+  /**
+   * Earliest attestation arrival, in milliseconds from slot start
+   */
+  min_seen_slot_start_diff?: number;
+  /**
+   * ID of the node
+   */
+  node_id?: string;
+  /**
+   * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start
+   */
+  p10_median_seen_slot_start_diff?: number;
+  /**
+   * Median of the per-slot median attestation arrival, in milliseconds from slot start
+   */
+  p50_median_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start
+   */
+  p90_median_seen_slot_start_diff?: number;
+  /**
+   * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start
+   */
+  p95_median_seen_slot_start_diff?: number;
+  /**
+   * Slots the node saw attestations in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the node
+   */
+  username?: string;
+  /**
+   * Start of the week period (Monday, UTC), by slot
+   */
+  week_start_date?: string;
+};
+
+/**
  * Daily aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export type FctAttestationParticipationRateDaily = {
@@ -1672,6 +1746,156 @@ export type FctAttestationVoteCorrectnessByClientPairDaily = {
 };
 
 /**
+ * Daily attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export type FctAttestationVoteCorrectnessByEntityDaily = {
+  /**
+   * Attestations included on the finalized chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance in slots per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Staking entity of the validators in dim_node, or unknown
+   */
+  entity?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Attestations missed: duties with no attestation included on the finalized chain
+   */
+  missed_count?: number;
+  /**
+   * Source votes that were correct, from attestations seen on gossip
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Most validators of the entity with attestation duties in one hour of the day
+   */
+  validator_count?: number;
+};
+
+/**
+ * Daily attestation liveness, vote correctness and inclusion per entity group on the finalized chain: the sum of the member entities in fct_attestation_vote_correctness_by_entity_daily. Only entities in a group have rows
+ */
+export type FctAttestationVoteCorrectnessByEntityGroupDaily = {
+  /**
+   * Attestations included on the finalized chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance in slots per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Entities of the group with attestation duties in the day
+   */
+  entity_count?: number;
+  /**
+   * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters)
+   */
+  entity_group?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Attestations missed: duties with no attestation included on the finalized chain
+   */
+  missed_count?: number;
+  /**
+   * Source votes that were correct, from attestations seen on gossip
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Hourly attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of an hour sum to the whole network
+ */
+export type FctAttestationVoteCorrectnessByEntityHourly = {
+  /**
+   * Attestations included on the finalized chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance in slots per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Staking entity of the validators in dim_node, or unknown
+   */
+  entity?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Start of the hour period
+   */
+  hour_start_date_time?: number;
+  /**
+   * Attestations missed: duties with no attestation included on the finalized chain
+   */
+  missed_count?: number;
+  /**
+   * Source votes that were correct, from attestations seen on gossip
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Validators of the entity with attestation duties in the hour
+   */
+  validator_count?: number;
+};
+
+/**
  * Per-slot attestation vote correctness by validator
  */
 export type FctAttestationVoteCorrectnessByValidator = {
@@ -1868,7 +2092,7 @@ export type FctBlobCountDaily = {
    */
   day_start_date?: string;
   /**
-   * Lower Bollinger band (avg - 2*stddev)
+   * Lower Bollinger band (avg - 2*stddev), floored at 0 because a blob count cannot be negative
    */
   lower_band_blob_count?: number;
   /**
@@ -1930,7 +2154,7 @@ export type FctBlobCountHourly = {
    */
   hour_start_date_time?: number;
   /**
-   * Lower Bollinger band (avg - 2*stddev)
+   * Lower Bollinger band (avg - 2*stddev), floored at 0 because a blob count cannot be negative
    */
   lower_band_blob_count?: number;
   /**
@@ -2094,7 +2318,7 @@ export type FctBlock = {
 };
 
 /**
- * Blob count of a block for the finalized chain
+ * Blob count of every block that carries blobs, canonical blocks from int_block_blob_count_canonical and orphaned ones from the unfinalized chain
  */
 export type FctBlockBlobCount = {
   /**
@@ -2122,7 +2346,7 @@ export type FctBlockBlobCount = {
    */
   slot_start_date_time?: number;
   /**
-   * Can be "canonical" or "orphaned"
+   * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot
    */
   status?: string;
   /**
@@ -2808,6 +3032,190 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeHourly = {
 };
 
 /**
+ * Weekly data column arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeekly = {
+  /**
+   * Average columns the node saw per slot
+   */
+  avg_columns_per_slot?: number;
+  /**
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * Distinct column indexes the node saw, its custody set
+   */
+  column_count?: number;
+  /**
+   * Latest arrival of the last column in a slot, in milliseconds from slot start
+   */
+  max_last_seen_slot_start_diff?: number;
+  /**
+   * Latest collector implementation of the node in the period
+   */
+  meta_client_implementation?: string;
+  /**
+   * Latest client name of the node in the period
+   */
+  meta_client_name?: string;
+  /**
+   * Latest collector version of the node in the period
+   */
+  meta_client_version?: string;
+  /**
+   * Latest consensus client implementation of the node in the period
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Latest consensus client version of the node in the period
+   */
+  meta_consensus_version?: string;
+  /**
+   * ID of the node
+   */
+  node_id?: string;
+  /**
+   * 10th percentile arrival of the last column in a slot, in milliseconds from slot start
+   */
+  p10_last_seen_slot_start_diff?: number;
+  /**
+   * Median arrival of the first column in a slot, in milliseconds from slot start
+   */
+  p50_first_seen_slot_start_diff?: number;
+  /**
+   * Median arrival of the last column in a slot, in milliseconds from slot start
+   */
+  p50_last_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile arrival of the last column in a slot, in milliseconds from slot start
+   */
+  p90_last_seen_slot_start_diff?: number;
+  /**
+   * 95th percentile arrival of the last column in a slot, in milliseconds from slot start
+   */
+  p95_last_seen_slot_start_diff?: number;
+  /**
+   * Slots the node saw data columns in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the node
+   */
+  username?: string;
+  /**
+   * Start of the week period (Monday, UTC), by slot
+   */
+  week_start_date?: string;
+};
+
+/**
+ * Daily block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_daily, one row per day
+ */
+export type FctBlockFirstSeenByNetworkDaily = {
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day
+   */
+  node_count?: number;
+  /**
+   * 10th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_daily), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p10_median_seen_slot_start_diff?: number;
+  /**
+   * Median across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_daily), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p50_median_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_daily), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p90_median_seen_slot_start_diff?: number;
+  /**
+   * Slots in the day that at least one Xatu node saw a block in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Hourly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_hourly, one row per hour
+ */
+export type FctBlockFirstSeenByNetworkHourly = {
+  /**
+   * The wall clock time at the start of the hour, by slot
+   */
+  hour_start_date_time?: number;
+  /**
+   * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour
+   */
+  node_count?: number;
+  /**
+   * 10th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_hourly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p10_median_seen_slot_start_diff?: number;
+  /**
+   * Median across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_hourly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p50_median_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_hourly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p90_median_seen_slot_start_diff?: number;
+  /**
+   * Slots in the hour that at least one Xatu node saw a block in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Weekly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_weekly, one row per week (Monday to Sunday, UTC)
+ */
+export type FctBlockFirstSeenByNetworkWeekly = {
+  /**
+   * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week
+   */
+  node_count?: number;
+  /**
+   * 10th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_weekly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p10_median_seen_slot_start_diff?: number;
+  /**
+   * Median across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_weekly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p50_median_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile across nodes of each node median block arrival (p50_seen_slot_start_diff in fct_block_first_seen_by_node_weekly), in milliseconds from slot start. Every node weighs the same, linear interpolation between ranks
+   */
+  p90_median_seen_slot_start_diff?: number;
+  /**
+   * Slots in the week that at least one Xatu node saw a block in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Start of the week period (Monday, UTC), by slot
+   */
+  week_start_date?: string;
+};
+
+/**
  * When the block was first seen on the network by a sentry node
  */
 export type FctBlockFirstSeenByNode = {
@@ -3058,6 +3466,80 @@ export type FctBlockFirstSeenByNodeHourly = {
 };
 
 /**
+ * Weekly block arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export type FctBlockFirstSeenByNodeWeekly = {
+  /**
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * Latest block arrival, in milliseconds from slot start
+   */
+  max_seen_slot_start_diff?: number;
+  /**
+   * Latest collector implementation of the node in the period
+   */
+  meta_client_implementation?: string;
+  /**
+   * Latest client name of the node in the period
+   */
+  meta_client_name?: string;
+  /**
+   * Latest collector version of the node in the period
+   */
+  meta_client_version?: string;
+  /**
+   * Latest consensus client implementation of the node in the period
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Latest consensus client version of the node in the period
+   */
+  meta_consensus_version?: string;
+  /**
+   * Earliest block arrival, in milliseconds from slot start
+   */
+  min_seen_slot_start_diff?: number;
+  /**
+   * ID of the node
+   */
+  node_id?: string;
+  /**
+   * 10th percentile block arrival, in milliseconds from slot start
+   */
+  p10_seen_slot_start_diff?: number;
+  /**
+   * Median block arrival, in milliseconds from slot start
+   */
+  p50_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile block arrival, in milliseconds from slot start
+   */
+  p90_seen_slot_start_diff?: number;
+  /**
+   * 95th percentile block arrival, in milliseconds from slot start
+   */
+  p95_seen_slot_start_diff?: number;
+  /**
+   * Slots the node saw a block in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the node
+   */
+  username?: string;
+  /**
+   * Start of the week period (Monday, UTC), by slot
+   */
+  week_start_date?: string;
+};
+
+/**
  * Canonical beacon block graffiti with the consensus and execution clients it names, parsed from the engine API client version codes or client default graffiti
  */
 export type FctBlockGraffiti = {
@@ -3154,6 +3636,40 @@ export type FctBlockGraffitiClientByEntityDaily = {
 };
 
 /**
+ * Daily canonical block counts per entity group and consensus and execution client pair named by block graffiti: the sum of the member entities in fct_block_graffiti_client_by_entity_daily. Only entities in a group have rows
+ */
+export type FctBlockGraffitiClientByEntityGroupDaily = {
+  /**
+   * Number of canonical blocks in the day from the group with this consensus and execution client pair
+   */
+  block_count?: number;
+  /**
+   * Consensus client named by the block graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Entities of the group with a block from this consensus and execution client pair in the day
+   */
+  entity_count?: number;
+  /**
+   * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters)
+   */
+  entity_group?: string;
+  /**
+   * Execution client named by the block graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Hourly canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export type FctBlockGraffitiClientByEntityHourly = {
@@ -3181,6 +3697,36 @@ export type FctBlockGraffitiClientByEntityHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+/**
+ * Weekly (Monday to Sunday, UTC) canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
+ */
+export type FctBlockGraffitiClientByEntityWeekly = {
+  /**
+   * Number of canonical blocks in the week from this entity with this consensus and execution client pair
+   */
+  block_count?: number;
+  /**
+   * Consensus client named by the block graffiti, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Execution client named by the block graffiti, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Start of the week period (Monday, UTC)
+   */
+  week_start_date?: string;
 };
 
 /**
@@ -3278,6 +3824,52 @@ export type FctBlockGraffitiClientVersionByEntityDaily = {
 };
 
 /**
+ * Daily canonical block counts per entity group, the sum of the member entities in fct_block_graffiti_client_version_by_entity_daily, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version. Only entities in a group have rows
+ */
+export type FctBlockGraffitiClientVersionByEntityGroupDaily = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Entities of the group with a block of this client, version and release status in the day
+   */
+  entity_count?: number;
+  /**
+   * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters)
+   */
+  entity_group?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
+   */
+  version?: string;
+};
+
+/**
  * Hourly canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export type FctBlockGraffitiClientVersionByEntityHourly = {
@@ -3317,6 +3909,48 @@ export type FctBlockGraffitiClientVersionByEntityHourly = {
    * Release version the graffiti resolves to, else the version it states, empty when unresolved
    */
   version?: string;
+};
+
+/**
+ * Weekly (Monday to Sunday, UTC) canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
+export type FctBlockGraffitiClientVersionByEntityWeekly = {
+  /**
+   * Number of canonical blocks with this client, version and release status
+   */
+  block_count?: number;
+  /**
+   * Client named by the block graffiti, or unknown
+   */
+  client?: string;
+  /**
+   * Commit prefix from the graffiti, lowercase, empty when there is none
+   */
+  commit_prefix?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * Client layer: consensus or execution
+   */
+  layer?: string;
+  /**
+   * How the version was resolved, see the table comment for values
+   */
+  release_status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Release version the graffiti resolves to, else the version it states, empty when unresolved
+   */
+  version?: string;
+  /**
+   * Start of the week period (Monday, UTC)
+   */
+  week_start_date?: string;
 };
 
 /**
@@ -4402,6 +5036,86 @@ export type FctBlockProposalByClientPairDaily = {
 };
 
 /**
+ * Daily block proposals per staking entity on the finalized chain: canonical blocks, MEV share and value, orphaned blocks and missed slots. Proposals due are block_count + orphaned_block_count + missed_slot_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export type FctBlockProposalByEntityDaily = {
+  /**
+   * Mean relay-reported value of the MEV blocks in ETH, NULL when there were none
+   */
+  avg_mev_value_eth?: number | null;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Staking entity of the scheduled proposer in dim_node, or unknown
+   */
+  entity?: string;
+  /**
+   * Canonical blocks delivered by an MEV relay, the rest were built locally
+   */
+  mev_block_count?: number;
+  /**
+   * Slots the entity was scheduled to propose where no block was seen
+   */
+  missed_slot_count?: number;
+  /**
+   * Blocks proposed that did not make the finalized chain
+   */
+  orphaned_block_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily block proposals per entity group on the finalized chain: the sum of the member entities in fct_block_proposal_by_entity_daily. Proposals due are block_count + orphaned_block_count + missed_slot_count. Only entities in a group have rows
+ */
+export type FctBlockProposalByEntityGroupDaily = {
+  /**
+   * Mean relay-reported value of the MEV blocks in ETH, NULL when there were none
+   */
+  avg_mev_value_eth?: number | null;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Entities of the group with a proposal in the day
+   */
+  entity_count?: number;
+  /**
+   * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters)
+   */
+  entity_group?: string;
+  /**
+   * Canonical blocks delivered by an MEV relay, the rest were built locally
+   */
+  mev_block_count?: number;
+  /**
+   * Slots the group was scheduled to propose where no block was seen
+   */
+  missed_slot_count?: number;
+  /**
+   * Blocks proposed that did not make the finalized chain
+   */
+  orphaned_block_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily block proposal status counts by status type
  */
 export type FctBlockProposalStatusDaily = {
@@ -4479,6 +5193,48 @@ export type FctBlockProposer = {
   slot_start_date_time?: number;
   /**
    * Can be "canonical", "orphaned" or "missed"
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Every slot of the finalized chain with the staking entity of its scheduled proposer and how the proposal ended: canonical, orphaned or missed. Validators map to their current entity in dim_node, and validators it does not name are unknown
+ */
+export type FctBlockProposerByEntity = {
+  /**
+   * The beacon block root, NULL when the slot was missed
+   */
+  block_root?: string | null;
+  /**
+   * Staking entity of the scheduled proposer in dim_node, or unknown
+   */
+  entity?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The validator index of the scheduled proposer
+   */
+  proposer_validator_index?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen)
    */
   status?: string;
   /**
@@ -5324,7 +6080,7 @@ export type FctDataColumnAvailabilityBySlotBlob = {
 };
 
 /**
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
  */
 export type FctDataColumnAvailabilityDaily = {
   /**
@@ -7408,7 +8164,7 @@ export type FctEpochSummaryCanonical = {
 };
 
 /**
- * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export type FctExecutionGasLimitDaily = {
   /**
@@ -7416,11 +8172,11 @@ export type FctExecutionGasLimitDaily = {
    */
   avg_gas_limit?: number;
   /**
-   * Number of blocks in this day
+   * Number of canonical blocks of this network in this day, genesis excluded
    */
   block_count?: number;
   /**
-   * Start of the day period
+   * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   day_start_date?: string;
   /**
@@ -7470,7 +8226,7 @@ export type FctExecutionGasLimitDaily = {
 };
 
 /**
- * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export type FctExecutionGasLimitHourly = {
   /**
@@ -7478,11 +8234,11 @@ export type FctExecutionGasLimitHourly = {
    */
   avg_gas_limit?: number;
   /**
-   * Number of blocks in this hour
+   * Number of canonical blocks of this network in this hour, genesis excluded
    */
   block_count?: number;
   /**
-   * Start of the hour period
+   * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   hour_start_date_time?: number;
   /**
@@ -7554,7 +8310,7 @@ export type FctExecutionGasLimitSignallingHourly = {
 };
 
 /**
- * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export type FctExecutionGasUsedDaily = {
   /**
@@ -7562,7 +8318,7 @@ export type FctExecutionGasUsedDaily = {
    */
   avg_gas_used?: number;
   /**
-   * Number of blocks in this day
+   * Number of canonical blocks of this network in this day, genesis excluded
    */
   block_count?: number;
   /**
@@ -7570,7 +8326,7 @@ export type FctExecutionGasUsedDaily = {
    */
   cumulative_gas_used?: number;
   /**
-   * Start of the day period
+   * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   day_start_date?: string;
   /**
@@ -7620,7 +8376,7 @@ export type FctExecutionGasUsedDaily = {
 };
 
 /**
- * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export type FctExecutionGasUsedHourly = {
   /**
@@ -7628,7 +8384,7 @@ export type FctExecutionGasUsedHourly = {
    */
   avg_gas_used?: number;
   /**
-   * Number of blocks in this hour
+   * Number of canonical blocks of this network in this hour, genesis excluded
    */
   block_count?: number;
   /**
@@ -7636,7 +8392,7 @@ export type FctExecutionGasUsedHourly = {
    */
   cumulative_gas_used?: number;
   /**
-   * Start of the hour period
+   * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   hour_start_date_time?: number;
   /**
@@ -7866,7 +8622,7 @@ export type FctExecutionReceiptSizeHourly = {
 };
 
 /**
- * Execution layer state size metrics aggregated by day
+ * Execution layer state size at the last canonical block of each UTC day. Starts at the day of block 1, the genesis block is not given a row of its own
  */
 export type FctExecutionStateSizeDaily = {
   /**
@@ -7894,7 +8650,7 @@ export type FctExecutionStateSizeDaily = {
    */
   contract_codes?: number;
   /**
-   * Start of the day period
+   * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   day_start_date?: string;
   /**
@@ -7924,7 +8680,7 @@ export type FctExecutionStateSizeDaily = {
 };
 
 /**
- * Execution layer state size metrics aggregated by hour
+ * Execution layer state size at the last canonical block of each UTC hour. Starts at the hour of block 1, the genesis block is not given a row of its own
  */
 export type FctExecutionStateSizeHourly = {
   /**
@@ -7952,7 +8708,7 @@ export type FctExecutionStateSizeHourly = {
    */
   contract_codes?: number;
   /**
-   * Start of the hour period
+   * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
    */
   hour_start_date_time?: number;
   /**
@@ -8114,7 +8870,7 @@ export type FctExecutionTpsHourly = {
 };
 
 /**
- * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC day, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export type FctExecutionTransactionsDaily = {
   /**
@@ -8122,7 +8878,7 @@ export type FctExecutionTransactionsDaily = {
    */
   avg_txn_per_block?: number;
   /**
-   * Number of blocks in this day
+   * Number of canonical blocks of this network in this day, genesis excluded
    */
   block_count?: number;
   /**
@@ -8130,7 +8886,7 @@ export type FctExecutionTransactionsDaily = {
    */
   cumulative_transactions?: number;
   /**
-   * Start of the day period
+   * UTC day
    */
   day_start_date?: string;
   /**
@@ -8180,7 +8936,7 @@ export type FctExecutionTransactionsDaily = {
 };
 
 /**
- * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC hour, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export type FctExecutionTransactionsHourly = {
   /**
@@ -8188,7 +8944,7 @@ export type FctExecutionTransactionsHourly = {
    */
   avg_txn_per_block?: number;
   /**
-   * Number of blocks in this hour
+   * Number of canonical blocks of this network in this hour, genesis excluded
    */
   block_count?: number;
   /**
@@ -8196,7 +8952,7 @@ export type FctExecutionTransactionsHourly = {
    */
   cumulative_transactions?: number;
   /**
-   * Start of the hour period
+   * Start of the UTC hour
    */
   hour_start_date_time?: number;
   /**
@@ -8493,6 +9249,80 @@ export type FctHeadFirstSeenByNodeHourly = {
    * Username of the node
    */
   username?: string;
+};
+
+/**
+ * Weekly head event arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export type FctHeadFirstSeenByNodeWeekly = {
+  /**
+   * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified"
+   */
+  classification?: string;
+  /**
+   * Latest head event arrival, in milliseconds from slot start
+   */
+  max_seen_slot_start_diff?: number;
+  /**
+   * Latest collector implementation of the node in the period
+   */
+  meta_client_implementation?: string;
+  /**
+   * Latest client name of the node in the period
+   */
+  meta_client_name?: string;
+  /**
+   * Latest collector version of the node in the period
+   */
+  meta_client_version?: string;
+  /**
+   * Latest consensus client implementation of the node in the period
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Latest consensus client version of the node in the period
+   */
+  meta_consensus_version?: string;
+  /**
+   * Earliest head event arrival, in milliseconds from slot start
+   */
+  min_seen_slot_start_diff?: number;
+  /**
+   * ID of the node
+   */
+  node_id?: string;
+  /**
+   * 10th percentile head event arrival, in milliseconds from slot start
+   */
+  p10_seen_slot_start_diff?: number;
+  /**
+   * Median head event arrival, in milliseconds from slot start
+   */
+  p50_seen_slot_start_diff?: number;
+  /**
+   * 90th percentile head event arrival, in milliseconds from slot start
+   */
+  p90_seen_slot_start_diff?: number;
+  /**
+   * 95th percentile head event arrival, in milliseconds from slot start
+   */
+  p95_seen_slot_start_diff?: number;
+  /**
+   * Slots the node saw a head event in
+   */
+  slot_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Username of the node
+   */
+  username?: string;
+  /**
+   * Start of the week period (Monday, UTC), by slot
+   */
+  week_start_date?: string;
 };
 
 /**
@@ -9358,6 +10188,96 @@ export type FctOpcodeCostByElClientVersion = {
 };
 
 /**
+ * Weekly (Monday to Sunday, UTC) execution cost per opcode group by execution client, fitted from engine_newPayload durations over the whole week
+ */
+export type FctOpcodeCostByElClientWeekly = {
+  /**
+   * Block observations in the fit
+   */
+  block_count?: number;
+  /**
+   * Client average execution time per unit of gas, in nanoseconds
+   */
+  client_ns_per_gas?: number;
+  /**
+   * Average gas charged per execution of this opcode group
+   */
+  gas_per_op?: number;
+  /**
+   * Share of all opcode and non-opcode gas spent on this opcode group
+   */
+  gas_share?: number;
+  /**
+   * Hours with data in the fit
+   */
+  hour_count?: number;
+  /**
+   * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Client versions that ran during the week, most blocks first
+   */
+  meta_execution_versions?: Array<string>;
+  /**
+   * Node classification the timings come from (e.g., eip7870-block-builder)
+   */
+  node_class?: string;
+  /**
+   * Fitted execution time per unit of gas for this opcode group, in nanoseconds
+   */
+  ns_per_gas?: number;
+  /**
+   * Fitted execution time per execution of this opcode group, in nanoseconds
+   */
+  ns_per_op?: number;
+  /**
+   * 5th percentile of ns_per_op over an hourly bootstrap
+   */
+  ns_per_op_lower?: number;
+  /**
+   * 95th percentile of ns_per_op over an hourly bootstrap
+   */
+  ns_per_op_upper?: number;
+  /**
+   * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK)
+   */
+  opcode_group?: string;
+  /**
+   * Fitted fixed cost per block, in milliseconds
+   */
+  overhead_ms?: number;
+  /**
+   * Fitted cost per transaction, in microseconds
+   */
+  per_tx_us?: number;
+  /**
+   * ns_per_gas divided by the client average ns per gas, where 1 means gas prices this opcode group in line with the rest of execution
+   */
+  price_ratio?: number;
+  /**
+   * 5th percentile of price_ratio over an hourly bootstrap
+   */
+  price_ratio_lower?: number;
+  /**
+   * 95th percentile of price_ratio over an hourly bootstrap
+   */
+  price_ratio_upper?: number;
+  /**
+   * Share of block duration variance the fit explains
+   */
+  r_squared?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Start of the week period (Monday, UTC), by block timestamp
+   */
+  week_start_date?: string;
+};
+
+/**
  * Daily per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export type FctOpcodeGasByOpcodeDaily = {
@@ -9447,6 +10367,52 @@ export type FctOpcodeGasByOpcodeHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+/**
+ * Weekly (Monday to Sunday, UTC) per-opcode gas consumption for Top Opcodes by Gas charts, summed from fct_opcode_gas_by_opcode_daily
+ */
+export type FctOpcodeGasByOpcodeWeekly = {
+  /**
+   * Average executions per block
+   */
+  avg_count_per_block?: number;
+  /**
+   * Average gas per block
+   */
+  avg_gas_per_block?: number;
+  /**
+   * Average gas per execution
+   */
+  avg_gas_per_execution?: number;
+  /**
+   * Number of blocks containing this opcode in this week
+   */
+  block_count?: number;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Total execution count of this opcode in this week
+   */
+  total_count?: number;
+  /**
+   * Total error count for this opcode in this week
+   */
+  total_error_count?: number;
+  /**
+   * Total gas consumed by this opcode in this week
+   */
+  total_gas?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Start of the week period (Monday, UTC), by block timestamp
+   */
+  week_start_date?: string;
 };
 
 /**
@@ -10298,6 +11264,36 @@ export type FctPreparedBlock = {
 };
 
 /**
+ * Daily locally built block counts per Xatu node and consensus client version, from fct_prepared_block
+ */
+export type FctPreparedBlockByNodeDaily = {
+  /**
+   * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day
+   */
+  block_count?: number;
+  /**
+   * Start of the day period, by slot
+   */
+  day_start_date?: string;
+  /**
+   * Name of the node that built the blocks
+   */
+  meta_client_name?: string;
+  /**
+   * Consensus client implementation of the node
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * Consensus client version of the node
+   */
+  meta_consensus_version?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export type FctProposerRewardDaily = {
@@ -10708,7 +11704,7 @@ export type FctStorageSlotStateWithExpiryByBlockHourly = {
 };
 
 /**
- * Top 100 contracts by effective storage bytes with expiry policies applied
+ * Top 100 contracts by storage size (active_slots * 65 + effective_bytes) with expiry policies applied
  */
 export type FctStorageSlotTop100ByBytes = {
   /**
@@ -10748,7 +11744,7 @@ export type FctStorageSlotTop100ByBytes = {
    */
   owner_key?: string | null;
   /**
-   * Rank by effective bytes (1=highest), based on raw state
+   * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state
    */
   rank?: number;
   /**
@@ -11538,6 +12534,80 @@ export type FctValidatorOperationWeekly = {
 };
 
 /**
+ * Attestation and block proposal performance per staking entity over rolling periods, refreshed every 30 minutes: one row per period and entity with duties or proposals in it. 24h sums fct_attestation_vote_correctness_by_entity_hourly and fct_block_proposer_by_entity over the last 24 complete hours. The day periods sum fct_attestation_vote_correctness_by_entity_daily and fct_block_proposal_by_entity_daily over the last complete UTC days. The rows of a period sum to the whole network
+ */
+export type FctValidatorPerformanceByEntityRolling = {
+  /**
+   * Attestations included on the finalized chain
+   */
+  attested_count?: number;
+  /**
+   * Mean inclusion distance in slots per included attestation, NULL when there were none
+   */
+  avg_inclusion_distance?: number | null;
+  /**
+   * Mean relay-reported value of the MEV blocks in ETH, NULL when there were none
+   */
+  avg_mev_value_eth?: number | null;
+  /**
+   * Canonical blocks proposed
+   */
+  block_count?: number;
+  /**
+   * Staking entity of the validators in dim_node, or unknown
+   */
+  entity?: string;
+  /**
+   * Head votes that were correct
+   */
+  head_correct_count?: number;
+  /**
+   * Canonical blocks delivered by an MEV relay, the rest were built locally
+   */
+  mev_block_count?: number;
+  /**
+   * Attestations missed: duties with no attestation included on the finalized chain
+   */
+  missed_count?: number;
+  /**
+   * Slots the entity was scheduled to propose where no block was seen
+   */
+  missed_slot_count?: number;
+  /**
+   * Blocks proposed that did not make the finalized chain
+   */
+  orphaned_block_count?: number;
+  /**
+   * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data)
+   */
+  period?: string;
+  /**
+   * End of the period, exclusive
+   */
+  period_end_date_time?: number;
+  /**
+   * Start of the period, or of the data when it starts later
+   */
+  period_start_date_time?: number;
+  /**
+   * Source votes that were correct, from attestations seen on gossip
+   */
+  source_correct_count?: number;
+  /**
+   * Target votes that were correct
+   */
+  target_correct_count?: number;
+  /**
+   * Attestation duties
+   */
+  total_duties?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Activation and exit queues and the Electra pending queues, one snapshot per day
  */
 export type FctValidatorQueueDaily = {
@@ -11868,6 +12938,44 @@ export type FctValidatorStakeByEntityDaily = {
 };
 
 /**
+ * Active validators and stake per entity group and withdrawal credential type, one snapshot per day: the sum of the member entities in fct_validator_stake_by_entity_daily. Only entities in a group have rows
+ */
+export type FctValidatorStakeByEntityGroupDaily = {
+  /**
+   * Sum of active validators' balance in Gwei
+   */
+  active_balance?: number;
+  /**
+   * Sum of active validators' effective balance in Gwei (active stake)
+   */
+  active_effective_balance?: number;
+  /**
+   * Active validators (active_ongoing, active_exiting, active_slashed)
+   */
+  active_validator_count?: number;
+  /**
+   * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02
+   */
+  credential_type?: string;
+  /**
+   * The day (UTC)
+   */
+  day_start_date?: string;
+  /**
+   * Entities of the group with active validators of this credential type on the day
+   */
+  entity_count?: number;
+  /**
+   * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters)
+   */
+  entity_group?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Response for getting a single admin_cbt_incremental record
  */
 export type GetAdminCbtIncrementalResponse = {
@@ -12057,6 +13165,13 @@ export type GetFctAttestationObservationByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_attestation_observation_by_node_weekly record
+ */
+export type GetFctAttestationObservationByNodeWeeklyResponse = {
+  item?: FctAttestationObservationByNodeWeekly;
+};
+
+/**
  * Response for getting a single fct_attestation_participation_rate_daily record
  */
 export type GetFctAttestationParticipationRateDailyResponse = {
@@ -12103,6 +13218,27 @@ export type GetFctAttestationVoteCorrectnessByClientDailyResponse = {
  */
 export type GetFctAttestationVoteCorrectnessByClientPairDailyResponse = {
   item?: FctAttestationVoteCorrectnessByClientPairDaily;
+};
+
+/**
+ * Response for getting a single fct_attestation_vote_correctness_by_entity_daily record
+ */
+export type GetFctAttestationVoteCorrectnessByEntityDailyResponse = {
+  item?: FctAttestationVoteCorrectnessByEntityDaily;
+};
+
+/**
+ * Response for getting a single fct_attestation_vote_correctness_by_entity_group_daily record
+ */
+export type GetFctAttestationVoteCorrectnessByEntityGroupDailyResponse = {
+  item?: FctAttestationVoteCorrectnessByEntityGroupDaily;
+};
+
+/**
+ * Response for getting a single fct_attestation_vote_correctness_by_entity_hourly record
+ */
+export type GetFctAttestationVoteCorrectnessByEntityHourlyResponse = {
+  item?: FctAttestationVoteCorrectnessByEntityHourly;
 };
 
 /**
@@ -12204,10 +13340,38 @@ export type GetFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_data_column_sidecar_first_seen_by_node_weekly record
+ */
+export type GetFctBlockDataColumnSidecarFirstSeenByNodeWeeklyResponse = {
+  item?: FctBlockDataColumnSidecarFirstSeenByNodeWeekly;
+};
+
+/**
  * Response for getting a single fct_block_data_column_sidecar_first_seen record
  */
 export type GetFctBlockDataColumnSidecarFirstSeenResponse = {
   item?: FctBlockDataColumnSidecarFirstSeen;
+};
+
+/**
+ * Response for getting a single fct_block_first_seen_by_network_daily record
+ */
+export type GetFctBlockFirstSeenByNetworkDailyResponse = {
+  item?: FctBlockFirstSeenByNetworkDaily;
+};
+
+/**
+ * Response for getting a single fct_block_first_seen_by_network_hourly record
+ */
+export type GetFctBlockFirstSeenByNetworkHourlyResponse = {
+  item?: FctBlockFirstSeenByNetworkHourly;
+};
+
+/**
+ * Response for getting a single fct_block_first_seen_by_network_weekly record
+ */
+export type GetFctBlockFirstSeenByNetworkWeeklyResponse = {
+  item?: FctBlockFirstSeenByNetworkWeekly;
 };
 
 /**
@@ -12232,6 +13396,13 @@ export type GetFctBlockFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_first_seen_by_node_weekly record
+ */
+export type GetFctBlockFirstSeenByNodeWeeklyResponse = {
+  item?: FctBlockFirstSeenByNodeWeekly;
+};
+
+/**
  * Response for getting a single fct_block_graffiti_client_by_entity_daily record
  */
 export type GetFctBlockGraffitiClientByEntityDailyResponse = {
@@ -12239,10 +13410,24 @@ export type GetFctBlockGraffitiClientByEntityDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_client_by_entity_group_daily record
+ */
+export type GetFctBlockGraffitiClientByEntityGroupDailyResponse = {
+  item?: FctBlockGraffitiClientByEntityGroupDaily;
+};
+
+/**
  * Response for getting a single fct_block_graffiti_client_by_entity_hourly record
  */
 export type GetFctBlockGraffitiClientByEntityHourlyResponse = {
   item?: FctBlockGraffitiClientByEntityHourly;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_by_entity_weekly record
+ */
+export type GetFctBlockGraffitiClientByEntityWeeklyResponse = {
+  item?: FctBlockGraffitiClientByEntityWeekly;
 };
 
 /**
@@ -12267,10 +13452,24 @@ export type GetFctBlockGraffitiClientVersionByEntityDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_client_version_by_entity_group_daily record
+ */
+export type GetFctBlockGraffitiClientVersionByEntityGroupDailyResponse = {
+  item?: FctBlockGraffitiClientVersionByEntityGroupDaily;
+};
+
+/**
  * Response for getting a single fct_block_graffiti_client_version_by_entity_hourly record
  */
 export type GetFctBlockGraffitiClientVersionByEntityHourlyResponse = {
   item?: FctBlockGraffitiClientVersionByEntityHourly;
+};
+
+/**
+ * Response for getting a single fct_block_graffiti_client_version_by_entity_weekly record
+ */
+export type GetFctBlockGraffitiClientVersionByEntityWeeklyResponse = {
+  item?: FctBlockGraffitiClientVersionByEntityWeekly;
 };
 
 /**
@@ -12400,6 +13599,20 @@ export type GetFctBlockProposalByClientPairDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_proposal_by_entity_daily record
+ */
+export type GetFctBlockProposalByEntityDailyResponse = {
+  item?: FctBlockProposalByEntityDaily;
+};
+
+/**
+ * Response for getting a single fct_block_proposal_by_entity_group_daily record
+ */
+export type GetFctBlockProposalByEntityGroupDailyResponse = {
+  item?: FctBlockProposalByEntityGroupDaily;
+};
+
+/**
  * Response for getting a single fct_block_proposal_status_daily record
  */
 export type GetFctBlockProposalStatusDailyResponse = {
@@ -12411,6 +13624,13 @@ export type GetFctBlockProposalStatusDailyResponse = {
  */
 export type GetFctBlockProposalStatusHourlyResponse = {
   item?: FctBlockProposalStatusHourly;
+};
+
+/**
+ * Response for getting a single fct_block_proposer_by_entity record
+ */
+export type GetFctBlockProposerByEntityResponse = {
+  item?: FctBlockProposerByEntity;
 };
 
 /**
@@ -12869,6 +14089,13 @@ export type GetFctHeadFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for getting a single fct_head_first_seen_by_node_weekly record
+ */
+export type GetFctHeadFirstSeenByNodeWeeklyResponse = {
+  item?: FctHeadFirstSeenByNodeWeekly;
+};
+
+/**
  * Response for getting a single fct_head_vote_correctness_rate_daily record
  */
 export type GetFctHeadVoteCorrectnessRateDailyResponse = {
@@ -12974,6 +14201,13 @@ export type GetFctOpcodeCostByElClientVersionResponse = {
 };
 
 /**
+ * Response for getting a single fct_opcode_cost_by_el_client_weekly record
+ */
+export type GetFctOpcodeCostByElClientWeeklyResponse = {
+  item?: FctOpcodeCostByElClientWeekly;
+};
+
+/**
  * Response for getting a single fct_opcode_gas_by_opcode_daily record
  */
 export type GetFctOpcodeGasByOpcodeDailyResponse = {
@@ -12985,6 +14219,13 @@ export type GetFctOpcodeGasByOpcodeDailyResponse = {
  */
 export type GetFctOpcodeGasByOpcodeHourlyResponse = {
   item?: FctOpcodeGasByOpcodeHourly;
+};
+
+/**
+ * Response for getting a single fct_opcode_gas_by_opcode_weekly record
+ */
+export type GetFctOpcodeGasByOpcodeWeeklyResponse = {
+  item?: FctOpcodeGasByOpcodeWeekly;
 };
 
 /**
@@ -13104,6 +14345,13 @@ export type GetFctPeerPartialMessageSupportByClientHourlyResponse = {
  */
 export type GetFctPeerProtocolByClClientDailyResponse = {
   item?: FctPeerProtocolByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_prepared_block_by_node_daily record
+ */
+export type GetFctPreparedBlockByNodeDailyResponse = {
+  item?: FctPreparedBlockByNodeDaily;
 };
 
 /**
@@ -13352,6 +14600,13 @@ export type GetFctValidatorOperationWeeklyResponse = {
 };
 
 /**
+ * Response for getting a single fct_validator_performance_by_entity_rolling record
+ */
+export type GetFctValidatorPerformanceByEntityRollingResponse = {
+  item?: FctValidatorPerformanceByEntityRolling;
+};
+
+/**
  * Response for getting a single fct_validator_queue_daily record
  */
 export type GetFctValidatorQueueDailyResponse = {
@@ -13384,6 +14639,13 @@ export type GetFctValidatorRewardTotalWeeklyResponse = {
  */
 export type GetFctValidatorStakeByEntityDailyResponse = {
   item?: FctValidatorStakeByEntityDaily;
+};
+
+/**
+ * Response for getting a single fct_validator_stake_by_entity_group_daily record
+ */
+export type GetFctValidatorStakeByEntityGroupDailyResponse = {
+  item?: FctValidatorStakeByEntityGroupDaily;
 };
 
 /**
@@ -14383,11 +15645,11 @@ export type IntBeaconCommitteeHead = {
 };
 
 /**
- * Blob count of a block for the finalized chain
+ * Blob count of every canonical block that carries blobs, from its execution payload blob gas (blob gas used over 131072) before Gloas, from the blob KZG commitments in its execution payload bid from Gloas, and from its blob sidecars only when neither is available
  */
 export type IntBlockBlobCountCanonical = {
   /**
-   * The number of blobs in the block
+   * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available
    */
   blob_count?: number;
   /**
@@ -16255,7 +17517,7 @@ export type IntEngineNewPayloadOpcodeGramHourly = {
 };
 
 /**
- * Execution blocks ordered by timestamp for efficient date range lookups
+ * Block number and block time of every canonical execution block of this network, for date range lookups. A range is only written once canonical_execution_block holds every block in it
  */
 export type IntExecutionBlockByDate = {
   /**
@@ -17287,6 +18549,10 @@ export type IntTransactionCallFrame = {
    */
   call_type?: string;
   /**
+   * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before
+   */
+  calldata_floor_gas?: number | null;
+  /**
    * Call depth (0 = root transaction execution)
    */
   depth?: number;
@@ -17311,7 +18577,7 @@ export type IntTransactionCallFrame = {
    */
   gas_refund?: number | null;
   /**
-   * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs.
+   * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0).
    */
   intrinsic_gas?: number | null;
   /**
@@ -17535,7 +18801,7 @@ export type IntTransactionOpcodeGas = {
 };
 
 /**
- * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data. A range is only written once no block in it is missing transactions, and no block has a hole in its transaction or log indexes
  */
 export type IntTransactionReceiptSize = {
   /**
@@ -18013,6 +19279,20 @@ export type ListFctAttestationObservationByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_attestation_observation_by_node_weekly records
+ */
+export type ListFctAttestationObservationByNodeWeeklyResponse = {
+  /**
+   * The list of fct_attestation_observation_by_node_weekly.
+   */
+  fct_attestation_observation_by_node_weekly?: Array<FctAttestationObservationByNodeWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_attestation_participation_rate_daily records
  */
 export type ListFctAttestationParticipationRateDailyResponse = {
@@ -18104,6 +19384,48 @@ export type ListFctAttestationVoteCorrectnessByClientPairDailyResponse = {
    * The list of fct_attestation_vote_correctness_by_client_pair_daily.
    */
   fct_attestation_vote_correctness_by_client_pair_daily?: Array<FctAttestationVoteCorrectnessByClientPairDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_vote_correctness_by_entity_daily records
+ */
+export type ListFctAttestationVoteCorrectnessByEntityDailyResponse = {
+  /**
+   * The list of fct_attestation_vote_correctness_by_entity_daily.
+   */
+  fct_attestation_vote_correctness_by_entity_daily?: Array<FctAttestationVoteCorrectnessByEntityDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_vote_correctness_by_entity_group_daily records
+ */
+export type ListFctAttestationVoteCorrectnessByEntityGroupDailyResponse = {
+  /**
+   * The list of fct_attestation_vote_correctness_by_entity_group_daily.
+   */
+  fct_attestation_vote_correctness_by_entity_group_daily?: Array<FctAttestationVoteCorrectnessByEntityGroupDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_vote_correctness_by_entity_hourly records
+ */
+export type ListFctAttestationVoteCorrectnessByEntityHourlyResponse = {
+  /**
+   * The list of fct_attestation_vote_correctness_by_entity_hourly.
+   */
+  fct_attestation_vote_correctness_by_entity_hourly?: Array<FctAttestationVoteCorrectnessByEntityHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18307,6 +19629,20 @@ export type ListFctBlockDataColumnSidecarFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_block_data_column_sidecar_first_seen_by_node_weekly records
+ */
+export type ListFctBlockDataColumnSidecarFirstSeenByNodeWeeklyResponse = {
+  /**
+   * The list of fct_block_data_column_sidecar_first_seen_by_node_weekly.
+   */
+  fct_block_data_column_sidecar_first_seen_by_node_weekly?: Array<FctBlockDataColumnSidecarFirstSeenByNodeWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_data_column_sidecar_first_seen records
  */
 export type ListFctBlockDataColumnSidecarFirstSeenResponse = {
@@ -18314,6 +19650,48 @@ export type ListFctBlockDataColumnSidecarFirstSeenResponse = {
    * The list of fct_block_data_column_sidecar_first_seen.
    */
   fct_block_data_column_sidecar_first_seen?: Array<FctBlockDataColumnSidecarFirstSeen>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_first_seen_by_network_daily records
+ */
+export type ListFctBlockFirstSeenByNetworkDailyResponse = {
+  /**
+   * The list of fct_block_first_seen_by_network_daily.
+   */
+  fct_block_first_seen_by_network_daily?: Array<FctBlockFirstSeenByNetworkDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_first_seen_by_network_hourly records
+ */
+export type ListFctBlockFirstSeenByNetworkHourlyResponse = {
+  /**
+   * The list of fct_block_first_seen_by_network_hourly.
+   */
+  fct_block_first_seen_by_network_hourly?: Array<FctBlockFirstSeenByNetworkHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_first_seen_by_network_weekly records
+ */
+export type ListFctBlockFirstSeenByNetworkWeeklyResponse = {
+  /**
+   * The list of fct_block_first_seen_by_network_weekly.
+   */
+  fct_block_first_seen_by_network_weekly?: Array<FctBlockFirstSeenByNetworkWeekly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18363,6 +19741,20 @@ export type ListFctBlockFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_block_first_seen_by_node_weekly records
+ */
+export type ListFctBlockFirstSeenByNodeWeeklyResponse = {
+  /**
+   * The list of fct_block_first_seen_by_node_weekly.
+   */
+  fct_block_first_seen_by_node_weekly?: Array<FctBlockFirstSeenByNodeWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti_client_by_entity_daily records
  */
 export type ListFctBlockGraffitiClientByEntityDailyResponse = {
@@ -18377,6 +19769,20 @@ export type ListFctBlockGraffitiClientByEntityDailyResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_client_by_entity_group_daily records
+ */
+export type ListFctBlockGraffitiClientByEntityGroupDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_by_entity_group_daily.
+   */
+  fct_block_graffiti_client_by_entity_group_daily?: Array<FctBlockGraffitiClientByEntityGroupDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti_client_by_entity_hourly records
  */
 export type ListFctBlockGraffitiClientByEntityHourlyResponse = {
@@ -18384,6 +19790,20 @@ export type ListFctBlockGraffitiClientByEntityHourlyResponse = {
    * The list of fct_block_graffiti_client_by_entity_hourly.
    */
   fct_block_graffiti_client_by_entity_hourly?: Array<FctBlockGraffitiClientByEntityHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_by_entity_weekly records
+ */
+export type ListFctBlockGraffitiClientByEntityWeeklyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_by_entity_weekly.
+   */
+  fct_block_graffiti_client_by_entity_weekly?: Array<FctBlockGraffitiClientByEntityWeekly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18433,6 +19853,20 @@ export type ListFctBlockGraffitiClientVersionByEntityDailyResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_client_version_by_entity_group_daily records
+ */
+export type ListFctBlockGraffitiClientVersionByEntityGroupDailyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_by_entity_group_daily.
+   */
+  fct_block_graffiti_client_version_by_entity_group_daily?: Array<FctBlockGraffitiClientVersionByEntityGroupDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti_client_version_by_entity_hourly records
  */
 export type ListFctBlockGraffitiClientVersionByEntityHourlyResponse = {
@@ -18440,6 +19874,20 @@ export type ListFctBlockGraffitiClientVersionByEntityHourlyResponse = {
    * The list of fct_block_graffiti_client_version_by_entity_hourly.
    */
   fct_block_graffiti_client_version_by_entity_hourly?: Array<FctBlockGraffitiClientVersionByEntityHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_graffiti_client_version_by_entity_weekly records
+ */
+export type ListFctBlockGraffitiClientVersionByEntityWeeklyResponse = {
+  /**
+   * The list of fct_block_graffiti_client_version_by_entity_weekly.
+   */
+  fct_block_graffiti_client_version_by_entity_weekly?: Array<FctBlockGraffitiClientVersionByEntityWeekly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -18699,6 +20147,34 @@ export type ListFctBlockProposalByClientPairDailyResponse = {
 };
 
 /**
+ * Response for listing fct_block_proposal_by_entity_daily records
+ */
+export type ListFctBlockProposalByEntityDailyResponse = {
+  /**
+   * The list of fct_block_proposal_by_entity_daily.
+   */
+  fct_block_proposal_by_entity_daily?: Array<FctBlockProposalByEntityDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposal_by_entity_group_daily records
+ */
+export type ListFctBlockProposalByEntityGroupDailyResponse = {
+  /**
+   * The list of fct_block_proposal_by_entity_group_daily.
+   */
+  fct_block_proposal_by_entity_group_daily?: Array<FctBlockProposalByEntityGroupDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_proposal_status_daily records
  */
 export type ListFctBlockProposalStatusDailyResponse = {
@@ -18720,6 +20196,20 @@ export type ListFctBlockProposalStatusHourlyResponse = {
    * The list of fct_block_proposal_status_hourly.
    */
   fct_block_proposal_status_hourly?: Array<FctBlockProposalStatusHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_block_proposer_by_entity records
+ */
+export type ListFctBlockProposerByEntityResponse = {
+  /**
+   * The list of fct_block_proposer_by_entity.
+   */
+  fct_block_proposer_by_entity?: Array<FctBlockProposerByEntity>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -19637,6 +21127,20 @@ export type ListFctHeadFirstSeenByNodeResponse = {
 };
 
 /**
+ * Response for listing fct_head_first_seen_by_node_weekly records
+ */
+export type ListFctHeadFirstSeenByNodeWeeklyResponse = {
+  /**
+   * The list of fct_head_first_seen_by_node_weekly.
+   */
+  fct_head_first_seen_by_node_weekly?: Array<FctHeadFirstSeenByNodeWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_head_vote_correctness_rate_daily records
  */
 export type ListFctHeadVoteCorrectnessRateDailyResponse = {
@@ -19847,6 +21351,20 @@ export type ListFctOpcodeCostByElClientVersionResponse = {
 };
 
 /**
+ * Response for listing fct_opcode_cost_by_el_client_weekly records
+ */
+export type ListFctOpcodeCostByElClientWeeklyResponse = {
+  /**
+   * The list of fct_opcode_cost_by_el_client_weekly.
+   */
+  fct_opcode_cost_by_el_client_weekly?: Array<FctOpcodeCostByElClientWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_opcode_gas_by_opcode_daily records
  */
 export type ListFctOpcodeGasByOpcodeDailyResponse = {
@@ -19868,6 +21386,20 @@ export type ListFctOpcodeGasByOpcodeHourlyResponse = {
    * The list of fct_opcode_gas_by_opcode_hourly.
    */
   fct_opcode_gas_by_opcode_hourly?: Array<FctOpcodeGasByOpcodeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_opcode_gas_by_opcode_weekly records
+ */
+export type ListFctOpcodeGasByOpcodeWeeklyResponse = {
+  /**
+   * The list of fct_opcode_gas_by_opcode_weekly.
+   */
+  fct_opcode_gas_by_opcode_weekly?: Array<FctOpcodeGasByOpcodeWeekly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -20106,6 +21638,20 @@ export type ListFctPeerProtocolByClClientDailyResponse = {
    * The list of fct_peer_protocol_by_cl_client_daily.
    */
   fct_peer_protocol_by_cl_client_daily?: Array<FctPeerProtocolByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_prepared_block_by_node_daily records
+ */
+export type ListFctPreparedBlockByNodeDailyResponse = {
+  /**
+   * The list of fct_prepared_block_by_node_daily.
+   */
+  fct_prepared_block_by_node_daily?: Array<FctPreparedBlockByNodeDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -20603,6 +22149,20 @@ export type ListFctValidatorOperationWeeklyResponse = {
 };
 
 /**
+ * Response for listing fct_validator_performance_by_entity_rolling records
+ */
+export type ListFctValidatorPerformanceByEntityRollingResponse = {
+  /**
+   * The list of fct_validator_performance_by_entity_rolling.
+   */
+  fct_validator_performance_by_entity_rolling?: Array<FctValidatorPerformanceByEntityRolling>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_validator_queue_daily records
  */
 export type ListFctValidatorQueueDailyResponse = {
@@ -20666,6 +22226,20 @@ export type ListFctValidatorStakeByEntityDailyResponse = {
    * The list of fct_validator_stake_by_entity_daily.
    */
   fct_validator_stake_by_entity_daily?: Array<FctValidatorStakeByEntityDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_validator_stake_by_entity_group_daily records
+ */
+export type ListFctValidatorStakeByEntityGroupDailyResponse = {
+  /**
+   * The list of fct_validator_stake_by_entity_group_daily.
+   */
+  fct_validator_stake_by_entity_group_daily?: Array<FctValidatorStakeByEntityGroupDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -33619,6 +35193,722 @@ export type FctAttestationObservationByNodeHourlyServiceGetResponses = {
 export type FctAttestationObservationByNodeHourlyServiceGetResponse =
   FctAttestationObservationByNodeHourlyServiceGetResponses[keyof FctAttestationObservationByNodeHourlyServiceGetResponses];
 
+export type FctAttestationObservationByNodeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * ID of the node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Username of the node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Latest client name of the node in the period (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Latest client name of the node in the period (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Latest client name of the node in the period (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Latest collector version of the node in the period (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Latest collector version of the node in the period (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Slots the node saw attestations in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots the node saw attestations in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots the node saw attestations in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots the node saw attestations in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots the node saw attestations in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots the node saw attestations in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots the node saw attestations in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots the node saw attestations in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots the node saw attestations in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots the node saw attestations in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Attestations the node saw (filter: eq)
+     */
+    attestation_count_eq?: number;
+    /**
+     * Attestations the node saw (filter: ne)
+     */
+    attestation_count_ne?: number;
+    /**
+     * Attestations the node saw (filter: lt)
+     */
+    attestation_count_lt?: number;
+    /**
+     * Attestations the node saw (filter: lte)
+     */
+    attestation_count_lte?: number;
+    /**
+     * Attestations the node saw (filter: gt)
+     */
+    attestation_count_gt?: number;
+    /**
+     * Attestations the node saw (filter: gte)
+     */
+    attestation_count_gte?: number;
+    /**
+     * Attestations the node saw (filter: between_min)
+     */
+    attestation_count_between_min?: number;
+    /**
+     * Attestations the node saw (filter: between_max_value)
+     */
+    attestation_count_between_max_value?: number;
+    /**
+     * Attestations the node saw (filter: in_values) (comma-separated list)
+     */
+    attestation_count_in_values?: string;
+    /**
+     * Attestations the node saw (filter: not_in_values) (comma-separated list)
+     */
+    attestation_count_not_in_values?: string;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: eq)
+     */
+    min_seen_slot_start_diff_eq?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: ne)
+     */
+    min_seen_slot_start_diff_ne?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: lt)
+     */
+    min_seen_slot_start_diff_lt?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: lte)
+     */
+    min_seen_slot_start_diff_lte?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: gt)
+     */
+    min_seen_slot_start_diff_gt?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: gte)
+     */
+    min_seen_slot_start_diff_gte?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: between_min)
+     */
+    min_seen_slot_start_diff_between_min?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_in_values?: string;
+    /**
+     * Earliest attestation arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: eq)
+     */
+    p10_median_seen_slot_start_diff_eq?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: ne)
+     */
+    p10_median_seen_slot_start_diff_ne?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lt)
+     */
+    p10_median_seen_slot_start_diff_lt?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lte)
+     */
+    p10_median_seen_slot_start_diff_lte?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gt)
+     */
+    p10_median_seen_slot_start_diff_gt?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gte)
+     */
+    p10_median_seen_slot_start_diff_gte?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p10_median_seen_slot_start_diff_between_min?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p10_median_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p10_median_seen_slot_start_diff_in_values?: string;
+    /**
+     * 10th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p10_median_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: eq)
+     */
+    p50_median_seen_slot_start_diff_eq?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: ne)
+     */
+    p50_median_seen_slot_start_diff_ne?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: lt)
+     */
+    p50_median_seen_slot_start_diff_lt?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: lte)
+     */
+    p50_median_seen_slot_start_diff_lte?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: gt)
+     */
+    p50_median_seen_slot_start_diff_gt?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: gte)
+     */
+    p50_median_seen_slot_start_diff_gte?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p50_median_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_median_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_median_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median of the per-slot median attestation arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_median_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: eq)
+     */
+    p90_median_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: ne)
+     */
+    p90_median_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lt)
+     */
+    p90_median_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lte)
+     */
+    p90_median_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gt)
+     */
+    p90_median_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gte)
+     */
+    p90_median_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p90_median_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_median_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_median_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_median_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: eq)
+     */
+    p95_median_seen_slot_start_diff_eq?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: ne)
+     */
+    p95_median_seen_slot_start_diff_ne?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lt)
+     */
+    p95_median_seen_slot_start_diff_lt?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: lte)
+     */
+    p95_median_seen_slot_start_diff_lte?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gt)
+     */
+    p95_median_seen_slot_start_diff_gt?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: gte)
+     */
+    p95_median_seen_slot_start_diff_gte?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p95_median_seen_slot_start_diff_between_min?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p95_median_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p95_median_seen_slot_start_diff_in_values?: string;
+    /**
+     * 95th percentile of the per-slot median attestation arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p95_median_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_observation_by_node_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationObservationByNodeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_observation_by_node_weekly';
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceListError =
+  FctAttestationObservationByNodeWeeklyServiceListErrors[keyof FctAttestationObservationByNodeWeeklyServiceListErrors];
+
+export type FctAttestationObservationByNodeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationObservationByNodeWeeklyResponse;
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceListResponse =
+  FctAttestationObservationByNodeWeeklyServiceListResponses[keyof FctAttestationObservationByNodeWeeklyServiceListResponses];
+
+export type FctAttestationObservationByNodeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by slot
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_observation_by_node_weekly/{week_start_date}';
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceGetError =
+  FctAttestationObservationByNodeWeeklyServiceGetErrors[keyof FctAttestationObservationByNodeWeeklyServiceGetErrors];
+
+export type FctAttestationObservationByNodeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationObservationByNodeWeeklyResponse;
+};
+
+export type FctAttestationObservationByNodeWeeklyServiceGetResponse =
+  FctAttestationObservationByNodeWeeklyServiceGetResponses[keyof FctAttestationObservationByNodeWeeklyServiceGetResponses];
+
 export type FctAttestationParticipationRateDailyServiceListData = {
   body?: never;
   path?: never;
@@ -36614,6 +38904,1414 @@ export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses = 
 
 export type FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse =
   FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByClientPairDailyServiceGetResponses];
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Most validators of the entity with attestation duties in one hour of the day (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on the finalized chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * The maximum number of fct_attestation_vote_correctness_by_entity_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteCorrectnessByEntityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_daily';
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceListError =
+  FctAttestationVoteCorrectnessByEntityDailyServiceListErrors[keyof FctAttestationVoteCorrectnessByEntityDailyServiceListErrors];
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteCorrectnessByEntityDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceListResponse =
+  FctAttestationVoteCorrectnessByEntityDailyServiceListResponses[keyof FctAttestationVoteCorrectnessByEntityDailyServiceListResponses];
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_daily/{day_start_date}';
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceGetError =
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetErrors[keyof FctAttestationVoteCorrectnessByEntityDailyServiceGetErrors];
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteCorrectnessByEntityDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityDailyServiceGetResponse =
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByEntityDailyServiceGetResponses];
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: eq)
+     */
+    entity_group_eq?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ne)
+     */
+    entity_group_ne?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: contains)
+     */
+    entity_group_contains?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: starts_with)
+     */
+    entity_group_starts_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ends_with)
+     */
+    entity_group_ends_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: like)
+     */
+    entity_group_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_like)
+     */
+    entity_group_not_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: in_values) (comma-separated list)
+     */
+    entity_group_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_in_values) (comma-separated list)
+     */
+    entity_group_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Entities of the group with attestation duties in the day (filter: eq)
+     */
+    entity_count_eq?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: ne)
+     */
+    entity_count_ne?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: lt)
+     */
+    entity_count_lt?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: lte)
+     */
+    entity_count_lte?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: gt)
+     */
+    entity_count_gt?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: gte)
+     */
+    entity_count_gte?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: between_min)
+     */
+    entity_count_between_min?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: between_max_value)
+     */
+    entity_count_between_max_value?: number;
+    /**
+     * Entities of the group with attestation duties in the day (filter: in_values) (comma-separated list)
+     */
+    entity_count_in_values?: string;
+    /**
+     * Entities of the group with attestation duties in the day (filter: not_in_values) (comma-separated list)
+     */
+    entity_count_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on the finalized chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * The maximum number of fct_attestation_vote_correctness_by_entity_group_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteCorrectnessByEntityGroupDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_group_daily';
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceListError =
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListErrors[keyof FctAttestationVoteCorrectnessByEntityGroupDailyServiceListErrors];
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteCorrectnessByEntityGroupDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse =
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponses[keyof FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponses];
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_group_daily/{day_start_date}';
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetError =
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetErrors[keyof FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetErrors];
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteCorrectnessByEntityGroupDailyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse =
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponses[keyof FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponses];
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: eq)
+     */
+    validator_count_eq?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: ne)
+     */
+    validator_count_ne?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: lt)
+     */
+    validator_count_lt?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: lte)
+     */
+    validator_count_lte?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: gt)
+     */
+    validator_count_gt?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: gte)
+     */
+    validator_count_gte?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: between_min)
+     */
+    validator_count_between_min?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: between_max_value)
+     */
+    validator_count_between_max_value?: number;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: in_values) (comma-separated list)
+     */
+    validator_count_in_values?: string;
+    /**
+     * Validators of the entity with attestation duties in the hour (filter: not_in_values) (comma-separated list)
+     */
+    validator_count_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on the finalized chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * The maximum number of fct_attestation_vote_correctness_by_entity_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteCorrectnessByEntityHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_hourly';
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceListError =
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListErrors[keyof FctAttestationVoteCorrectnessByEntityHourlyServiceListErrors];
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteCorrectnessByEntityHourlyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceListResponse =
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListResponses[keyof FctAttestationVoteCorrectnessByEntityHourlyServiceListResponses];
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_correctness_by_entity_hourly/{hour_start_date_time}';
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceGetError =
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetErrors[keyof FctAttestationVoteCorrectnessByEntityHourlyServiceGetErrors];
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteCorrectnessByEntityHourlyResponse;
+};
+
+export type FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse =
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponses[keyof FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponses];
 
 export type FctAttestationVoteCorrectnessByValidatorServiceListData = {
   body?: never;
@@ -40324,39 +44022,39 @@ export type FctBlockBlobCountServiceListData = {
      */
     blob_count_not_in_values?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: eq)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: eq)
      */
     status_eq?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: ne)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: ne)
      */
     status_ne?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: contains)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: contains)
      */
     status_contains?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: starts_with)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: starts_with)
      */
     status_starts_with?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: ends_with)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: ends_with)
      */
     status_ends_with?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: like)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: like)
      */
     status_like?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: not_like)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: not_like)
      */
     status_not_like?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: in_values) (comma-separated list)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: in_values) (comma-separated list)
      */
     status_in_values?: string;
     /**
-     * Can be "canonical" or "orphaned" (filter: not_in_values) (comma-separated list)
+     * canonical when the block is on the finalized chain, orphaned when the finalized chain has a different block or none at its slot (filter: not_in_values) (comma-separated list)
      */
     status_not_in_values?: string;
     /**
@@ -46718,6 +50416,1490 @@ export type FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponses = 
 export type FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponse =
   FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetResponses];
 
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * ID of the node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Username of the node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Latest client name of the node in the period (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Latest client name of the node in the period (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Latest client name of the node in the period (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Latest collector version of the node in the period (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Latest collector version of the node in the period (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Slots the node saw data columns in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots the node saw data columns in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots the node saw data columns in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots the node saw data columns in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots the node saw data columns in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots the node saw data columns in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots the node saw data columns in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots the node saw data columns in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots the node saw data columns in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots the node saw data columns in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: eq)
+     */
+    column_count_eq?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: ne)
+     */
+    column_count_ne?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: lt)
+     */
+    column_count_lt?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: lte)
+     */
+    column_count_lte?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: gt)
+     */
+    column_count_gt?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: gte)
+     */
+    column_count_gte?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: between_min)
+     */
+    column_count_between_min?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: between_max_value)
+     */
+    column_count_between_max_value?: number;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: in_values) (comma-separated list)
+     */
+    column_count_in_values?: string;
+    /**
+     * Distinct column indexes the node saw, its custody set (filter: not_in_values) (comma-separated list)
+     */
+    column_count_not_in_values?: string;
+    /**
+     * Filter avg_columns_per_slot using value
+     */
+    avg_columns_per_slot_value?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    p50_first_seen_slot_start_diff_eq?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    p50_first_seen_slot_start_diff_ne?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    p50_first_seen_slot_start_diff_lt?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    p50_first_seen_slot_start_diff_lte?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    p50_first_seen_slot_start_diff_gt?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    p50_first_seen_slot_start_diff_gte?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    p50_first_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_first_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_first_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median arrival of the first column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_first_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    p10_last_seen_slot_start_diff_eq?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    p10_last_seen_slot_start_diff_ne?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    p10_last_seen_slot_start_diff_lt?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    p10_last_seen_slot_start_diff_lte?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    p10_last_seen_slot_start_diff_gt?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    p10_last_seen_slot_start_diff_gte?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    p10_last_seen_slot_start_diff_between_min?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    p10_last_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p10_last_seen_slot_start_diff_in_values?: string;
+    /**
+     * 10th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p10_last_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    p50_last_seen_slot_start_diff_eq?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    p50_last_seen_slot_start_diff_ne?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    p50_last_seen_slot_start_diff_lt?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    p50_last_seen_slot_start_diff_lte?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    p50_last_seen_slot_start_diff_gt?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    p50_last_seen_slot_start_diff_gte?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    p50_last_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_last_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_last_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median arrival of the last column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_last_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    p90_last_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    p90_last_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    p90_last_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    p90_last_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    p90_last_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    p90_last_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    p90_last_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_last_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_last_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_last_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    p95_last_seen_slot_start_diff_eq?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    p95_last_seen_slot_start_diff_ne?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    p95_last_seen_slot_start_diff_lt?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    p95_last_seen_slot_start_diff_lte?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    p95_last_seen_slot_start_diff_gt?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    p95_last_seen_slot_start_diff_gte?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    p95_last_seen_slot_start_diff_between_min?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    p95_last_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p95_last_seen_slot_start_diff_in_values?: string;
+    /**
+     * 95th percentile arrival of the last column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p95_last_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: eq)
+     */
+    max_last_seen_slot_start_diff_eq?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: ne)
+     */
+    max_last_seen_slot_start_diff_ne?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: lt)
+     */
+    max_last_seen_slot_start_diff_lt?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: lte)
+     */
+    max_last_seen_slot_start_diff_lte?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: gt)
+     */
+    max_last_seen_slot_start_diff_gt?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: gte)
+     */
+    max_last_seen_slot_start_diff_gte?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: between_min)
+     */
+    max_last_seen_slot_start_diff_between_min?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_last_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_last_seen_slot_start_diff_in_values?: string;
+    /**
+     * Latest arrival of the last column in a slot, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_last_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_data_column_sidecar_first_seen_by_node_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockDataColumnSidecarFirstSeenByNodeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_weekly';
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListError =
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListErrors[keyof FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListErrors];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockDataColumnSidecarFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse =
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponses];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by slot
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_weekly/{week_start_date}';
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetError =
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetErrors[keyof FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetErrors];
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockDataColumnSidecarFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse =
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponses[keyof FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponses];
+
+export type FctBlockFirstSeenByNetworkDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_daily for the day (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots in the day that at least one Xatu node saw a block in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter p10_median_seen_slot_start_diff using value
+     */
+    p10_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p50_median_seen_slot_start_diff using value
+     */
+    p50_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p90_median_seen_slot_start_diff using value
+     */
+    p90_median_seen_slot_start_diff_value?: number;
+    /**
+     * The maximum number of fct_block_first_seen_by_network_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFirstSeenByNetworkDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_first_seen_by_network_daily';
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceListError =
+  FctBlockFirstSeenByNetworkDailyServiceListErrors[keyof FctBlockFirstSeenByNetworkDailyServiceListErrors];
+
+export type FctBlockFirstSeenByNetworkDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFirstSeenByNetworkDailyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceListResponse =
+  FctBlockFirstSeenByNetworkDailyServiceListResponses[keyof FctBlockFirstSeenByNetworkDailyServiceListResponses];
+
+export type FctBlockFirstSeenByNetworkDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_first_seen_by_network_daily/{day_start_date}';
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceGetError =
+  FctBlockFirstSeenByNetworkDailyServiceGetErrors[keyof FctBlockFirstSeenByNetworkDailyServiceGetErrors];
+
+export type FctBlockFirstSeenByNetworkDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFirstSeenByNetworkDailyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkDailyServiceGetResponse =
+  FctBlockFirstSeenByNetworkDailyServiceGetResponses[keyof FctBlockFirstSeenByNetworkDailyServiceGetResponses];
+
+export type FctBlockFirstSeenByNetworkHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The wall clock time at the start of the hour, by slot (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_hourly for the hour (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots in the hour that at least one Xatu node saw a block in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter p10_median_seen_slot_start_diff using value
+     */
+    p10_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p50_median_seen_slot_start_diff using value
+     */
+    p50_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p90_median_seen_slot_start_diff using value
+     */
+    p90_median_seen_slot_start_diff_value?: number;
+    /**
+     * The maximum number of fct_block_first_seen_by_network_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFirstSeenByNetworkHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_first_seen_by_network_hourly';
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceListError =
+  FctBlockFirstSeenByNetworkHourlyServiceListErrors[keyof FctBlockFirstSeenByNetworkHourlyServiceListErrors];
+
+export type FctBlockFirstSeenByNetworkHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFirstSeenByNetworkHourlyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceListResponse =
+  FctBlockFirstSeenByNetworkHourlyServiceListResponses[keyof FctBlockFirstSeenByNetworkHourlyServiceListResponses];
+
+export type FctBlockFirstSeenByNetworkHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time at the start of the hour, by slot
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_first_seen_by_network_hourly/{hour_start_date_time}';
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceGetError =
+  FctBlockFirstSeenByNetworkHourlyServiceGetErrors[keyof FctBlockFirstSeenByNetworkHourlyServiceGetErrors];
+
+export type FctBlockFirstSeenByNetworkHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFirstSeenByNetworkHourlyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkHourlyServiceGetResponse =
+  FctBlockFirstSeenByNetworkHourlyServiceGetResponses[keyof FctBlockFirstSeenByNetworkHourlyServiceGetResponses];
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * Xatu nodes with a row in fct_block_first_seen_by_node_weekly for the week (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots in the week that at least one Xatu node saw a block in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Filter p10_median_seen_slot_start_diff using value
+     */
+    p10_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p50_median_seen_slot_start_diff using value
+     */
+    p50_median_seen_slot_start_diff_value?: number;
+    /**
+     * Filter p90_median_seen_slot_start_diff using value
+     */
+    p90_median_seen_slot_start_diff_value?: number;
+    /**
+     * The maximum number of fct_block_first_seen_by_network_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFirstSeenByNetworkWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_first_seen_by_network_weekly';
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceListError =
+  FctBlockFirstSeenByNetworkWeeklyServiceListErrors[keyof FctBlockFirstSeenByNetworkWeeklyServiceListErrors];
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFirstSeenByNetworkWeeklyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceListResponse =
+  FctBlockFirstSeenByNetworkWeeklyServiceListResponses[keyof FctBlockFirstSeenByNetworkWeeklyServiceListResponses];
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by slot
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_first_seen_by_network_weekly/{week_start_date}';
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceGetError =
+  FctBlockFirstSeenByNetworkWeeklyServiceGetErrors[keyof FctBlockFirstSeenByNetworkWeeklyServiceGetErrors];
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFirstSeenByNetworkWeeklyResponse;
+};
+
+export type FctBlockFirstSeenByNetworkWeeklyServiceGetResponse =
+  FctBlockFirstSeenByNetworkWeeklyServiceGetResponses[keyof FctBlockFirstSeenByNetworkWeeklyServiceGetResponses];
+
 export type FctBlockFirstSeenByNodeServiceListData = {
   body?: never;
   path?: never;
@@ -49054,6 +54236,722 @@ export type FctBlockFirstSeenByNodeHourlyServiceGetResponses = {
 export type FctBlockFirstSeenByNodeHourlyServiceGetResponse =
   FctBlockFirstSeenByNodeHourlyServiceGetResponses[keyof FctBlockFirstSeenByNodeHourlyServiceGetResponses];
 
+export type FctBlockFirstSeenByNodeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * ID of the node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Username of the node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Latest client name of the node in the period (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Latest client name of the node in the period (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Latest client name of the node in the period (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Latest collector version of the node in the period (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Latest collector version of the node in the period (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Slots the node saw a block in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots the node saw a block in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots the node saw a block in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots the node saw a block in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots the node saw a block in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots the node saw a block in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots the node saw a block in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots the node saw a block in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots the node saw a block in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots the node saw a block in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: eq)
+     */
+    min_seen_slot_start_diff_eq?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: ne)
+     */
+    min_seen_slot_start_diff_ne?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: lt)
+     */
+    min_seen_slot_start_diff_lt?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: lte)
+     */
+    min_seen_slot_start_diff_lte?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: gt)
+     */
+    min_seen_slot_start_diff_gt?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: gte)
+     */
+    min_seen_slot_start_diff_gte?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    min_seen_slot_start_diff_between_min?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_in_values?: string;
+    /**
+     * Earliest block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: eq)
+     */
+    p10_seen_slot_start_diff_eq?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: ne)
+     */
+    p10_seen_slot_start_diff_ne?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: lt)
+     */
+    p10_seen_slot_start_diff_lt?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: lte)
+     */
+    p10_seen_slot_start_diff_lte?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: gt)
+     */
+    p10_seen_slot_start_diff_gt?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: gte)
+     */
+    p10_seen_slot_start_diff_gte?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p10_seen_slot_start_diff_between_min?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p10_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p10_seen_slot_start_diff_in_values?: string;
+    /**
+     * 10th percentile block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p10_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: eq)
+     */
+    p50_seen_slot_start_diff_eq?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: ne)
+     */
+    p50_seen_slot_start_diff_ne?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: lt)
+     */
+    p50_seen_slot_start_diff_lt?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: lte)
+     */
+    p50_seen_slot_start_diff_lte?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: gt)
+     */
+    p50_seen_slot_start_diff_gt?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: gte)
+     */
+    p50_seen_slot_start_diff_gte?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p50_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: eq)
+     */
+    p90_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: ne)
+     */
+    p90_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: lt)
+     */
+    p90_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: lte)
+     */
+    p90_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: gt)
+     */
+    p90_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: gte)
+     */
+    p90_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p90_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: eq)
+     */
+    p95_seen_slot_start_diff_eq?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: ne)
+     */
+    p95_seen_slot_start_diff_ne?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: lt)
+     */
+    p95_seen_slot_start_diff_lt?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: lte)
+     */
+    p95_seen_slot_start_diff_lte?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: gt)
+     */
+    p95_seen_slot_start_diff_gt?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: gte)
+     */
+    p95_seen_slot_start_diff_gte?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p95_seen_slot_start_diff_between_min?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p95_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p95_seen_slot_start_diff_in_values?: string;
+    /**
+     * 95th percentile block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p95_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: eq)
+     */
+    max_seen_slot_start_diff_eq?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: ne)
+     */
+    max_seen_slot_start_diff_ne?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: lt)
+     */
+    max_seen_slot_start_diff_lt?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: lte)
+     */
+    max_seen_slot_start_diff_lte?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: gt)
+     */
+    max_seen_slot_start_diff_gt?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: gte)
+     */
+    max_seen_slot_start_diff_gte?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: between_min)
+     */
+    max_seen_slot_start_diff_between_min?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_seen_slot_start_diff_in_values?: string;
+    /**
+     * Latest block arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_first_seen_by_node_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockFirstSeenByNodeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_first_seen_by_node_weekly';
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceListError =
+  FctBlockFirstSeenByNodeWeeklyServiceListErrors[keyof FctBlockFirstSeenByNodeWeeklyServiceListErrors];
+
+export type FctBlockFirstSeenByNodeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceListResponse =
+  FctBlockFirstSeenByNodeWeeklyServiceListResponses[keyof FctBlockFirstSeenByNodeWeeklyServiceListResponses];
+
+export type FctBlockFirstSeenByNodeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by slot
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_first_seen_by_node_weekly/{week_start_date}';
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceGetError =
+  FctBlockFirstSeenByNodeWeeklyServiceGetErrors[keyof FctBlockFirstSeenByNodeWeeklyServiceGetErrors];
+
+export type FctBlockFirstSeenByNodeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctBlockFirstSeenByNodeWeeklyServiceGetResponse =
+  FctBlockFirstSeenByNodeWeeklyServiceGetResponses[keyof FctBlockFirstSeenByNodeWeeklyServiceGetResponses];
+
 export type FctBlockGraffitiServiceListData = {
   body?: never;
   path?: never;
@@ -49985,6 +55883,342 @@ export type FctBlockGraffitiClientByEntityDailyServiceGetResponses = {
 export type FctBlockGraffitiClientByEntityDailyServiceGetResponse =
   FctBlockGraffitiClientByEntityDailyServiceGetResponses[keyof FctBlockGraffitiClientByEntityDailyServiceGetResponses];
 
+export type FctBlockGraffitiClientByEntityGroupDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: eq)
+     */
+    entity_group_eq?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ne)
+     */
+    entity_group_ne?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: contains)
+     */
+    entity_group_contains?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: starts_with)
+     */
+    entity_group_starts_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ends_with)
+     */
+    entity_group_ends_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: like)
+     */
+    entity_group_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_like)
+     */
+    entity_group_not_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: in_values) (comma-separated list)
+     */
+    entity_group_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_in_values) (comma-separated list)
+     */
+    entity_group_not_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: eq)
+     */
+    entity_count_eq?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: ne)
+     */
+    entity_count_ne?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: lt)
+     */
+    entity_count_lt?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: lte)
+     */
+    entity_count_lte?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: gt)
+     */
+    entity_count_gt?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: gte)
+     */
+    entity_count_gte?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: between_min)
+     */
+    entity_count_between_min?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: between_max_value)
+     */
+    entity_count_between_max_value?: number;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: in_values) (comma-separated list)
+     */
+    entity_count_in_values?: string;
+    /**
+     * Entities of the group with a block from this consensus and execution client pair in the day (filter: not_in_values) (comma-separated list)
+     */
+    entity_count_not_in_values?: string;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks in the day from the group with this consensus and execution client pair (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_by_entity_group_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientByEntityGroupDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_by_entity_group_daily';
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceListError =
+  FctBlockGraffitiClientByEntityGroupDailyServiceListErrors[keyof FctBlockGraffitiClientByEntityGroupDailyServiceListErrors];
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientByEntityGroupDailyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceListResponse =
+  FctBlockGraffitiClientByEntityGroupDailyServiceListResponses[keyof FctBlockGraffitiClientByEntityGroupDailyServiceListResponses];
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_by_entity_group_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceGetError =
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetErrors[keyof FctBlockGraffitiClientByEntityGroupDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientByEntityGroupDailyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityGroupDailyServiceGetResponse =
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetResponses[keyof FctBlockGraffitiClientByEntityGroupDailyServiceGetResponses];
+
 export type FctBlockGraffitiClientByEntityHourlyServiceListData = {
   body?: never;
   path?: never;
@@ -50284,6 +56518,302 @@ export type FctBlockGraffitiClientByEntityHourlyServiceGetResponses = {
 
 export type FctBlockGraffitiClientByEntityHourlyServiceGetResponse =
   FctBlockGraffitiClientByEntityHourlyServiceGetResponses[keyof FctBlockGraffitiClientByEntityHourlyServiceGetResponses];
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks in the week from this entity with this consensus and execution client pair (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_by_entity_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientByEntityWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_by_entity_weekly';
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceListError =
+  FctBlockGraffitiClientByEntityWeeklyServiceListErrors[keyof FctBlockGraffitiClientByEntityWeeklyServiceListErrors];
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientByEntityWeeklyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceListResponse =
+  FctBlockGraffitiClientByEntityWeeklyServiceListResponses[keyof FctBlockGraffitiClientByEntityWeeklyServiceListResponses];
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_by_entity_weekly/{week_start_date}';
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceGetError =
+  FctBlockGraffitiClientByEntityWeeklyServiceGetErrors[keyof FctBlockGraffitiClientByEntityWeeklyServiceGetErrors];
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientByEntityWeeklyResponse;
+};
+
+export type FctBlockGraffitiClientByEntityWeeklyServiceGetResponse =
+  FctBlockGraffitiClientByEntityWeeklyServiceGetResponses[keyof FctBlockGraffitiClientByEntityWeeklyServiceGetResponses];
 
 export type FctBlockGraffitiClientDailyServiceListData = {
   body?: never;
@@ -51213,6 +57743,450 @@ export type FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses = {
 export type FctBlockGraffitiClientVersionByEntityDailyServiceGetResponse =
   FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityDailyServiceGetResponses];
 
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: eq)
+     */
+    entity_group_eq?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ne)
+     */
+    entity_group_ne?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: contains)
+     */
+    entity_group_contains?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: starts_with)
+     */
+    entity_group_starts_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ends_with)
+     */
+    entity_group_ends_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: like)
+     */
+    entity_group_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_like)
+     */
+    entity_group_not_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: in_values) (comma-separated list)
+     */
+    entity_group_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_in_values) (comma-separated list)
+     */
+    entity_group_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: eq)
+     */
+    entity_count_eq?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: ne)
+     */
+    entity_count_ne?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: lt)
+     */
+    entity_count_lt?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: lte)
+     */
+    entity_count_lte?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: gt)
+     */
+    entity_count_gt?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: gte)
+     */
+    entity_count_gte?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: between_min)
+     */
+    entity_count_between_min?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: between_max_value)
+     */
+    entity_count_between_max_value?: number;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: in_values) (comma-separated list)
+     */
+    entity_count_in_values?: string;
+    /**
+     * Entities of the group with a block of this client, version and release status in the day (filter: not_in_values) (comma-separated list)
+     */
+    entity_count_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_by_entity_group_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionByEntityGroupDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_group_daily';
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceListError =
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListErrors[keyof FctBlockGraffitiClientVersionByEntityGroupDailyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionByEntityGroupDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse =
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponses[keyof FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_group_daily/{day_start_date}';
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetError =
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetErrors[keyof FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionByEntityGroupDailyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse =
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponses];
+
 export type FctBlockGraffitiClientVersionByEntityHourlyServiceListData = {
   body?: never;
   path?: never;
@@ -51620,6 +58594,410 @@ export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses = {
 
 export type FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse =
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses];
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC) (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC) (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: eq)
+     */
+    layer_eq?: string;
+    /**
+     * Client layer: consensus or execution (filter: ne)
+     */
+    layer_ne?: string;
+    /**
+     * Client layer: consensus or execution (filter: contains)
+     */
+    layer_contains?: string;
+    /**
+     * Client layer: consensus or execution (filter: starts_with)
+     */
+    layer_starts_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: ends_with)
+     */
+    layer_ends_with?: string;
+    /**
+     * Client layer: consensus or execution (filter: like)
+     */
+    layer_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_like)
+     */
+    layer_not_like?: string;
+    /**
+     * Client layer: consensus or execution (filter: in_values) (comma-separated list)
+     */
+    layer_in_values?: string;
+    /**
+     * Client layer: consensus or execution (filter: not_in_values) (comma-separated list)
+     */
+    layer_not_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Client named by the block graffiti, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Release version the graffiti resolves to, else the version it states, empty when unresolved (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: eq)
+     */
+    commit_prefix_eq?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ne)
+     */
+    commit_prefix_ne?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: contains)
+     */
+    commit_prefix_contains?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: starts_with)
+     */
+    commit_prefix_starts_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: ends_with)
+     */
+    commit_prefix_ends_with?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: like)
+     */
+    commit_prefix_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_like)
+     */
+    commit_prefix_not_like?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: in_values) (comma-separated list)
+     */
+    commit_prefix_in_values?: string;
+    /**
+     * Commit prefix from the graffiti, lowercase, empty when there is none (filter: not_in_values) (comma-separated list)
+     */
+    commit_prefix_not_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: eq)
+     */
+    release_status_eq?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ne)
+     */
+    release_status_ne?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: contains)
+     */
+    release_status_contains?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: starts_with)
+     */
+    release_status_starts_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: ends_with)
+     */
+    release_status_ends_with?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: like)
+     */
+    release_status_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_like)
+     */
+    release_status_not_like?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: in_values) (comma-separated list)
+     */
+    release_status_in_values?: string;
+    /**
+     * How the version was resolved, see the table comment for values (filter: not_in_values) (comma-separated list)
+     */
+    release_status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of canonical blocks with this client, version and release status (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_client_version_by_entity_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiClientVersionByEntityWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_weekly';
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceListError =
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListErrors[keyof FctBlockGraffitiClientVersionByEntityWeeklyServiceListErrors];
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiClientVersionByEntityWeeklyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse =
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponses[keyof FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponses];
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC)
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_client_version_by_entity_weekly/{week_start_date}';
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceGetError =
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetErrors[keyof FctBlockGraffitiClientVersionByEntityWeeklyServiceGetErrors];
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiClientVersionByEntityWeeklyResponse;
+};
+
+export type FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse =
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponses[keyof FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponses];
 
 export type FctBlockGraffitiClientVersionDailyServiceListData = {
   body?: never;
@@ -61701,6 +69079,742 @@ export type FctBlockProposalByClientPairDailyServiceGetResponses = {
 export type FctBlockProposalByClientPairDailyServiceGetResponse =
   FctBlockProposalByClientPairDailyServiceGetResponses[keyof FctBlockProposalByClientPairDailyServiceGetResponses];
 
+export type FctBlockProposalByEntityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: eq)
+     */
+    mev_block_count_eq?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: ne)
+     */
+    mev_block_count_ne?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lt)
+     */
+    mev_block_count_lt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lte)
+     */
+    mev_block_count_lte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gt)
+     */
+    mev_block_count_gt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gte)
+     */
+    mev_block_count_gte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_min)
+     */
+    mev_block_count_between_min?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_max_value)
+     */
+    mev_block_count_between_max_value?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: in_values) (comma-separated list)
+     */
+    mev_block_count_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: not_in_values) (comma-separated list)
+     */
+    mev_block_count_not_in_values?: string;
+    /**
+     * Filter avg_mev_value_eth using value
+     */
+    avg_mev_value_eth_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: eq)
+     */
+    orphaned_block_count_eq?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: ne)
+     */
+    orphaned_block_count_ne?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lt)
+     */
+    orphaned_block_count_lt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lte)
+     */
+    orphaned_block_count_lte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gt)
+     */
+    orphaned_block_count_gt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gte)
+     */
+    orphaned_block_count_gte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_min)
+     */
+    orphaned_block_count_between_min?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_max_value)
+     */
+    orphaned_block_count_between_max_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: in_values) (comma-separated list)
+     */
+    orphaned_block_count_in_values?: string;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_block_count_not_in_values?: string;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposal_by_entity_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposalByEntityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposal_by_entity_daily';
+};
+
+export type FctBlockProposalByEntityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByEntityDailyServiceListError =
+  FctBlockProposalByEntityDailyServiceListErrors[keyof FctBlockProposalByEntityDailyServiceListErrors];
+
+export type FctBlockProposalByEntityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposalByEntityDailyResponse;
+};
+
+export type FctBlockProposalByEntityDailyServiceListResponse =
+  FctBlockProposalByEntityDailyServiceListResponses[keyof FctBlockProposalByEntityDailyServiceListResponses];
+
+export type FctBlockProposalByEntityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposal_by_entity_daily/{day_start_date}';
+};
+
+export type FctBlockProposalByEntityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByEntityDailyServiceGetError =
+  FctBlockProposalByEntityDailyServiceGetErrors[keyof FctBlockProposalByEntityDailyServiceGetErrors];
+
+export type FctBlockProposalByEntityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposalByEntityDailyResponse;
+};
+
+export type FctBlockProposalByEntityDailyServiceGetResponse =
+  FctBlockProposalByEntityDailyServiceGetResponses[keyof FctBlockProposalByEntityDailyServiceGetResponses];
+
+export type FctBlockProposalByEntityGroupDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: eq)
+     */
+    entity_group_eq?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ne)
+     */
+    entity_group_ne?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: contains)
+     */
+    entity_group_contains?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: starts_with)
+     */
+    entity_group_starts_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ends_with)
+     */
+    entity_group_ends_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: like)
+     */
+    entity_group_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_like)
+     */
+    entity_group_not_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: in_values) (comma-separated list)
+     */
+    entity_group_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_in_values) (comma-separated list)
+     */
+    entity_group_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Entities of the group with a proposal in the day (filter: eq)
+     */
+    entity_count_eq?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: ne)
+     */
+    entity_count_ne?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: lt)
+     */
+    entity_count_lt?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: lte)
+     */
+    entity_count_lte?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: gt)
+     */
+    entity_count_gt?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: gte)
+     */
+    entity_count_gte?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: between_min)
+     */
+    entity_count_between_min?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: between_max_value)
+     */
+    entity_count_between_max_value?: number;
+    /**
+     * Entities of the group with a proposal in the day (filter: in_values) (comma-separated list)
+     */
+    entity_count_in_values?: string;
+    /**
+     * Entities of the group with a proposal in the day (filter: not_in_values) (comma-separated list)
+     */
+    entity_count_not_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: eq)
+     */
+    mev_block_count_eq?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: ne)
+     */
+    mev_block_count_ne?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lt)
+     */
+    mev_block_count_lt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lte)
+     */
+    mev_block_count_lte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gt)
+     */
+    mev_block_count_gt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gte)
+     */
+    mev_block_count_gte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_min)
+     */
+    mev_block_count_between_min?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_max_value)
+     */
+    mev_block_count_between_max_value?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: in_values) (comma-separated list)
+     */
+    mev_block_count_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: not_in_values) (comma-separated list)
+     */
+    mev_block_count_not_in_values?: string;
+    /**
+     * Filter avg_mev_value_eth using value
+     */
+    avg_mev_value_eth_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: eq)
+     */
+    orphaned_block_count_eq?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: ne)
+     */
+    orphaned_block_count_ne?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lt)
+     */
+    orphaned_block_count_lt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lte)
+     */
+    orphaned_block_count_lte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gt)
+     */
+    orphaned_block_count_gt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gte)
+     */
+    orphaned_block_count_gte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_min)
+     */
+    orphaned_block_count_between_min?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_max_value)
+     */
+    orphaned_block_count_between_max_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: in_values) (comma-separated list)
+     */
+    orphaned_block_count_in_values?: string;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_block_count_not_in_values?: string;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Slots the group was scheduled to propose where no block was seen (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposal_by_entity_group_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposalByEntityGroupDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposal_by_entity_group_daily';
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceListError =
+  FctBlockProposalByEntityGroupDailyServiceListErrors[keyof FctBlockProposalByEntityGroupDailyServiceListErrors];
+
+export type FctBlockProposalByEntityGroupDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposalByEntityGroupDailyResponse;
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceListResponse =
+  FctBlockProposalByEntityGroupDailyServiceListResponses[keyof FctBlockProposalByEntityGroupDailyServiceListResponses];
+
+export type FctBlockProposalByEntityGroupDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposal_by_entity_group_daily/{day_start_date}';
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceGetError =
+  FctBlockProposalByEntityGroupDailyServiceGetErrors[keyof FctBlockProposalByEntityGroupDailyServiceGetErrors];
+
+export type FctBlockProposalByEntityGroupDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposalByEntityGroupDailyResponse;
+};
+
+export type FctBlockProposalByEntityGroupDailyServiceGetResponse =
+  FctBlockProposalByEntityGroupDailyServiceGetResponses[keyof FctBlockProposalByEntityGroupDailyServiceGetResponses];
+
 export type FctBlockProposalStatusDailyServiceListData = {
   body?: never;
   path?: never;
@@ -62571,6 +70685,426 @@ export type FctBlockProposerServiceGetResponses = {
 
 export type FctBlockProposerServiceGetResponse =
   FctBlockProposerServiceGetResponses[keyof FctBlockProposerServiceGetResponses];
+
+export type FctBlockProposerByEntityServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the scheduled proposer in dim_node, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * The validator index of the scheduled proposer (filter: eq)
+     */
+    proposer_validator_index_eq?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: ne)
+     */
+    proposer_validator_index_ne?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: lt)
+     */
+    proposer_validator_index_lt?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: lte)
+     */
+    proposer_validator_index_lte?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: gt)
+     */
+    proposer_validator_index_gt?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: gte)
+     */
+    proposer_validator_index_gte?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: between_min)
+     */
+    proposer_validator_index_between_min?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: between_max_value)
+     */
+    proposer_validator_index_between_max_value?: number;
+    /**
+     * The validator index of the scheduled proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_validator_index_in_values?: string;
+    /**
+     * The validator index of the scheduled proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_validator_index_not_in_values?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root, NULL when the slot was missed (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * canonical, orphaned (a block was seen but is not on the finalized chain) or missed (no block was seen) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_proposer_by_entity to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockProposerByEntity` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_proposer_by_entity';
+};
+
+export type FctBlockProposerByEntityServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerByEntityServiceListError =
+  FctBlockProposerByEntityServiceListErrors[keyof FctBlockProposerByEntityServiceListErrors];
+
+export type FctBlockProposerByEntityServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockProposerByEntityResponse;
+};
+
+export type FctBlockProposerByEntityServiceListResponse =
+  FctBlockProposerByEntityServiceListResponses[keyof FctBlockProposerByEntityServiceListResponses];
+
+export type FctBlockProposerByEntityServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_proposer_by_entity/{slot_start_date_time}';
+};
+
+export type FctBlockProposerByEntityServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockProposerByEntityServiceGetError =
+  FctBlockProposerByEntityServiceGetErrors[keyof FctBlockProposerByEntityServiceGetErrors];
+
+export type FctBlockProposerByEntityServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockProposerByEntityResponse;
+};
+
+export type FctBlockProposerByEntityServiceGetResponse =
+  FctBlockProposerByEntityServiceGetResponses[keyof FctBlockProposerByEntityServiceGetResponses];
 
 export type FctBlockProposerByValidatorServiceListData = {
   body?: never;
@@ -90893,39 +99427,39 @@ export type FctExecutionGasLimitDailyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the day period (filter: eq)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     day_start_date_eq?: string;
     /**
-     * Start of the day period (filter: ne)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     day_start_date_ne?: string;
     /**
-     * Start of the day period (filter: contains)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: contains)
      */
     day_start_date_contains?: string;
     /**
-     * Start of the day period (filter: starts_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: starts_with)
      */
     day_start_date_starts_with?: string;
     /**
-     * Start of the day period (filter: ends_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ends_with)
      */
     day_start_date_ends_with?: string;
     /**
-     * Start of the day period (filter: like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: like)
      */
     day_start_date_like?: string;
     /**
-     * Start of the day period (filter: not_like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_like)
      */
     day_start_date_not_like?: string;
     /**
-     * Start of the day period (filter: in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     day_start_date_in_values?: string;
     /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     day_start_date_not_in_values?: string;
     /**
@@ -90969,43 +99503,43 @@ export type FctExecutionGasLimitDailyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this day (filter: eq)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this day (filter: ne)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this day (filter: lt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this day (filter: lte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this day (filter: gt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this day (filter: gte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this day (filter: between_min)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this day (filter: between_max_value)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -91488,7 +100022,7 @@ export type FctExecutionGasLimitDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the day period
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     day_start_date: string;
   };
@@ -91521,43 +100055,43 @@ export type FctExecutionGasLimitHourlyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the hour period (filter: eq)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     hour_start_date_time_eq?: number;
     /**
-     * Start of the hour period (filter: ne)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     hour_start_date_time_ne?: number;
     /**
-     * Start of the hour period (filter: lt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lt)
      */
     hour_start_date_time_lt?: number;
     /**
-     * Start of the hour period (filter: lte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lte)
      */
     hour_start_date_time_lte?: number;
     /**
-     * Start of the hour period (filter: gt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gt)
      */
     hour_start_date_time_gt?: number;
     /**
-     * Start of the hour period (filter: gte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gte)
      */
     hour_start_date_time_gte?: number;
     /**
-     * Start of the hour period (filter: between_min)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_min)
      */
     hour_start_date_time_between_min?: number;
     /**
-     * Start of the hour period (filter: between_max_value)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_max_value)
      */
     hour_start_date_time_between_max_value?: number;
     /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     hour_start_date_time_in_values?: string;
     /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     hour_start_date_time_not_in_values?: string;
     /**
@@ -91601,43 +100135,43 @@ export type FctExecutionGasLimitHourlyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: eq)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this hour (filter: ne)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this hour (filter: lt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this hour (filter: lte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this hour (filter: gt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this hour (filter: gte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this hour (filter: between_min)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this hour (filter: between_max_value)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -92120,7 +100654,7 @@ export type FctExecutionGasLimitHourlyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the hour period
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     hour_start_date_time: number;
   };
@@ -92567,39 +101101,39 @@ export type FctExecutionGasUsedDailyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the day period (filter: eq)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     day_start_date_eq?: string;
     /**
-     * Start of the day period (filter: ne)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     day_start_date_ne?: string;
     /**
-     * Start of the day period (filter: contains)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: contains)
      */
     day_start_date_contains?: string;
     /**
-     * Start of the day period (filter: starts_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: starts_with)
      */
     day_start_date_starts_with?: string;
     /**
-     * Start of the day period (filter: ends_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ends_with)
      */
     day_start_date_ends_with?: string;
     /**
-     * Start of the day period (filter: like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: like)
      */
     day_start_date_like?: string;
     /**
-     * Start of the day period (filter: not_like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_like)
      */
     day_start_date_not_like?: string;
     /**
-     * Start of the day period (filter: in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     day_start_date_in_values?: string;
     /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     day_start_date_not_in_values?: string;
     /**
@@ -92643,43 +101177,43 @@ export type FctExecutionGasUsedDailyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this day (filter: eq)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this day (filter: ne)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this day (filter: lt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this day (filter: lte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this day (filter: gt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this day (filter: gte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this day (filter: between_min)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this day (filter: between_max_value)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -93202,7 +101736,7 @@ export type FctExecutionGasUsedDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the day period
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     day_start_date: string;
   };
@@ -93235,43 +101769,43 @@ export type FctExecutionGasUsedHourlyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the hour period (filter: eq)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     hour_start_date_time_eq?: number;
     /**
-     * Start of the hour period (filter: ne)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     hour_start_date_time_ne?: number;
     /**
-     * Start of the hour period (filter: lt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lt)
      */
     hour_start_date_time_lt?: number;
     /**
-     * Start of the hour period (filter: lte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lte)
      */
     hour_start_date_time_lte?: number;
     /**
-     * Start of the hour period (filter: gt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gt)
      */
     hour_start_date_time_gt?: number;
     /**
-     * Start of the hour period (filter: gte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gte)
      */
     hour_start_date_time_gte?: number;
     /**
-     * Start of the hour period (filter: between_min)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_min)
      */
     hour_start_date_time_between_min?: number;
     /**
-     * Start of the hour period (filter: between_max_value)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_max_value)
      */
     hour_start_date_time_between_max_value?: number;
     /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     hour_start_date_time_in_values?: string;
     /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     hour_start_date_time_not_in_values?: string;
     /**
@@ -93315,43 +101849,43 @@ export type FctExecutionGasUsedHourlyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: eq)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this hour (filter: ne)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this hour (filter: lt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this hour (filter: lte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this hour (filter: gt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this hour (filter: gte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this hour (filter: between_min)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this hour (filter: between_max_value)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -93874,7 +102408,7 @@ export type FctExecutionGasUsedHourlyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the hour period
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     hour_start_date_time: number;
   };
@@ -95223,39 +103757,39 @@ export type FctExecutionStateSizeDailyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the day period (filter: eq)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     day_start_date_eq?: string;
     /**
-     * Start of the day period (filter: ne)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     day_start_date_ne?: string;
     /**
-     * Start of the day period (filter: contains)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: contains)
      */
     day_start_date_contains?: string;
     /**
-     * Start of the day period (filter: starts_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: starts_with)
      */
     day_start_date_starts_with?: string;
     /**
-     * Start of the day period (filter: ends_with)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ends_with)
      */
     day_start_date_ends_with?: string;
     /**
-     * Start of the day period (filter: like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: like)
      */
     day_start_date_like?: string;
     /**
-     * Start of the day period (filter: not_like)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_like)
      */
     day_start_date_not_like?: string;
     /**
-     * Start of the day period (filter: in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     day_start_date_in_values?: string;
     /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     day_start_date_not_in_values?: string;
     /**
@@ -95778,7 +104312,7 @@ export type FctExecutionStateSizeDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the day period
+     * UTC day. The first row is the day of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     day_start_date: string;
   };
@@ -95811,43 +104345,43 @@ export type FctExecutionStateSizeHourlyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the hour period (filter: eq)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: eq)
      */
     hour_start_date_time_eq?: number;
     /**
-     * Start of the hour period (filter: ne)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: ne)
      */
     hour_start_date_time_ne?: number;
     /**
-     * Start of the hour period (filter: lt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lt)
      */
     hour_start_date_time_lt?: number;
     /**
-     * Start of the hour period (filter: lte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: lte)
      */
     hour_start_date_time_lte?: number;
     /**
-     * Start of the hour period (filter: gt)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gt)
      */
     hour_start_date_time_gt?: number;
     /**
-     * Start of the hour period (filter: gte)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: gte)
      */
     hour_start_date_time_gte?: number;
     /**
-     * Start of the hour period (filter: between_min)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_min)
      */
     hour_start_date_time_between_min?: number;
     /**
-     * Start of the hour period (filter: between_max_value)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: between_max_value)
      */
     hour_start_date_time_between_max_value?: number;
     /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: in_values) (comma-separated list)
      */
     hour_start_date_time_in_values?: string;
     /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0) (filter: not_in_values) (comma-separated list)
      */
     hour_start_date_time_not_in_values?: string;
     /**
@@ -96370,7 +104904,7 @@ export type FctExecutionStateSizeHourlyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the hour period
+     * Start of the UTC hour. The first row is the hour of block 1, never 1970-01-01 (the mainnet genesis block has timestamp 0)
      */
     hour_start_date_time: number;
   };
@@ -97023,39 +105557,39 @@ export type FctExecutionTransactionsDailyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the day period (filter: eq)
+     * UTC day (filter: eq)
      */
     day_start_date_eq?: string;
     /**
-     * Start of the day period (filter: ne)
+     * UTC day (filter: ne)
      */
     day_start_date_ne?: string;
     /**
-     * Start of the day period (filter: contains)
+     * UTC day (filter: contains)
      */
     day_start_date_contains?: string;
     /**
-     * Start of the day period (filter: starts_with)
+     * UTC day (filter: starts_with)
      */
     day_start_date_starts_with?: string;
     /**
-     * Start of the day period (filter: ends_with)
+     * UTC day (filter: ends_with)
      */
     day_start_date_ends_with?: string;
     /**
-     * Start of the day period (filter: like)
+     * UTC day (filter: like)
      */
     day_start_date_like?: string;
     /**
-     * Start of the day period (filter: not_like)
+     * UTC day (filter: not_like)
      */
     day_start_date_not_like?: string;
     /**
-     * Start of the day period (filter: in_values) (comma-separated list)
+     * UTC day (filter: in_values) (comma-separated list)
      */
     day_start_date_in_values?: string;
     /**
-     * Start of the day period (filter: not_in_values) (comma-separated list)
+     * UTC day (filter: not_in_values) (comma-separated list)
      */
     day_start_date_not_in_values?: string;
     /**
@@ -97099,43 +105633,43 @@ export type FctExecutionTransactionsDailyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this day (filter: eq)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this day (filter: ne)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this day (filter: lt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this day (filter: lte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this day (filter: gt)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this day (filter: gte)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this day (filter: between_min)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this day (filter: between_max_value)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this day (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this day (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this day, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -97478,7 +106012,7 @@ export type FctExecutionTransactionsDailyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the day period
+     * UTC day
      */
     day_start_date: string;
   };
@@ -97511,43 +106045,43 @@ export type FctExecutionTransactionsHourlyServiceListData = {
   path?: never;
   query?: {
     /**
-     * Start of the hour period (filter: eq)
+     * Start of the UTC hour (filter: eq)
      */
     hour_start_date_time_eq?: number;
     /**
-     * Start of the hour period (filter: ne)
+     * Start of the UTC hour (filter: ne)
      */
     hour_start_date_time_ne?: number;
     /**
-     * Start of the hour period (filter: lt)
+     * Start of the UTC hour (filter: lt)
      */
     hour_start_date_time_lt?: number;
     /**
-     * Start of the hour period (filter: lte)
+     * Start of the UTC hour (filter: lte)
      */
     hour_start_date_time_lte?: number;
     /**
-     * Start of the hour period (filter: gt)
+     * Start of the UTC hour (filter: gt)
      */
     hour_start_date_time_gt?: number;
     /**
-     * Start of the hour period (filter: gte)
+     * Start of the UTC hour (filter: gte)
      */
     hour_start_date_time_gte?: number;
     /**
-     * Start of the hour period (filter: between_min)
+     * Start of the UTC hour (filter: between_min)
      */
     hour_start_date_time_between_min?: number;
     /**
-     * Start of the hour period (filter: between_max_value)
+     * Start of the UTC hour (filter: between_max_value)
      */
     hour_start_date_time_between_max_value?: number;
     /**
-     * Start of the hour period (filter: in_values) (comma-separated list)
+     * Start of the UTC hour (filter: in_values) (comma-separated list)
      */
     hour_start_date_time_in_values?: string;
     /**
-     * Start of the hour period (filter: not_in_values) (comma-separated list)
+     * Start of the UTC hour (filter: not_in_values) (comma-separated list)
      */
     hour_start_date_time_not_in_values?: string;
     /**
@@ -97591,43 +106125,43 @@ export type FctExecutionTransactionsHourlyServiceListData = {
      */
     updated_date_time_not_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: eq)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: eq)
      */
     block_count_eq?: number;
     /**
-     * Number of blocks in this hour (filter: ne)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: ne)
      */
     block_count_ne?: number;
     /**
-     * Number of blocks in this hour (filter: lt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lt)
      */
     block_count_lt?: number;
     /**
-     * Number of blocks in this hour (filter: lte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: lte)
      */
     block_count_lte?: number;
     /**
-     * Number of blocks in this hour (filter: gt)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gt)
      */
     block_count_gt?: number;
     /**
-     * Number of blocks in this hour (filter: gte)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: gte)
      */
     block_count_gte?: number;
     /**
-     * Number of blocks in this hour (filter: between_min)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_min)
      */
     block_count_between_min?: number;
     /**
-     * Number of blocks in this hour (filter: between_max_value)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: between_max_value)
      */
     block_count_between_max_value?: number;
     /**
-     * Number of blocks in this hour (filter: in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: in_values) (comma-separated list)
      */
     block_count_in_values?: string;
     /**
-     * Number of blocks in this hour (filter: not_in_values) (comma-separated list)
+     * Number of canonical blocks of this network in this hour, genesis excluded (filter: not_in_values) (comma-separated list)
      */
     block_count_not_in_values?: string;
     /**
@@ -97970,7 +106504,7 @@ export type FctExecutionTransactionsHourlyServiceGetData = {
   body?: never;
   path: {
     /**
-     * Start of the hour period
+     * Start of the UTC hour
      */
     hour_start_date_time: number;
   };
@@ -100333,6 +108867,722 @@ export type FctHeadFirstSeenByNodeHourlyServiceGetResponses = {
 
 export type FctHeadFirstSeenByNodeHourlyServiceGetResponse =
   FctHeadFirstSeenByNodeHourlyServiceGetResponses[keyof FctHeadFirstSeenByNodeHourlyServiceGetResponses];
+
+export type FctHeadFirstSeenByNodeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by slot (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * ID of the node (filter: eq)
+     */
+    node_id_eq?: string;
+    /**
+     * ID of the node (filter: ne)
+     */
+    node_id_ne?: string;
+    /**
+     * ID of the node (filter: contains)
+     */
+    node_id_contains?: string;
+    /**
+     * ID of the node (filter: starts_with)
+     */
+    node_id_starts_with?: string;
+    /**
+     * ID of the node (filter: ends_with)
+     */
+    node_id_ends_with?: string;
+    /**
+     * ID of the node (filter: like)
+     */
+    node_id_like?: string;
+    /**
+     * ID of the node (filter: not_like)
+     */
+    node_id_not_like?: string;
+    /**
+     * ID of the node (filter: in_values) (comma-separated list)
+     */
+    node_id_in_values?: string;
+    /**
+     * ID of the node (filter: not_in_values) (comma-separated list)
+     */
+    node_id_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Username of the node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Username of the node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Username of the node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Username of the node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Username of the node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Username of the node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Username of the node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Username of the node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Username of the node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: eq)
+     */
+    classification_eq?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ne)
+     */
+    classification_ne?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: contains)
+     */
+    classification_contains?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: starts_with)
+     */
+    classification_starts_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: ends_with)
+     */
+    classification_ends_with?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: like)
+     */
+    classification_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_like)
+     */
+    classification_not_like?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: in_values) (comma-separated list)
+     */
+    classification_in_values?: string;
+    /**
+     * Classification of the node, e.g. "individual", "corporate", "internal" (aka ethPandaOps) or "unclassified" (filter: not_in_values) (comma-separated list)
+     */
+    classification_not_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Latest client name of the node in the period (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Latest client name of the node in the period (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Latest client name of the node in the period (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Latest client name of the node in the period (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Latest client name of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Latest client name of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: eq)
+     */
+    meta_client_implementation_eq?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ne)
+     */
+    meta_client_implementation_ne?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: contains)
+     */
+    meta_client_implementation_contains?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: starts_with)
+     */
+    meta_client_implementation_starts_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: ends_with)
+     */
+    meta_client_implementation_ends_with?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: like)
+     */
+    meta_client_implementation_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_like)
+     */
+    meta_client_implementation_not_like?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_implementation_in_values?: string;
+    /**
+     * Latest collector implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_implementation_not_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: eq)
+     */
+    meta_client_version_eq?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ne)
+     */
+    meta_client_version_ne?: string;
+    /**
+     * Latest collector version of the node in the period (filter: contains)
+     */
+    meta_client_version_contains?: string;
+    /**
+     * Latest collector version of the node in the period (filter: starts_with)
+     */
+    meta_client_version_starts_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: ends_with)
+     */
+    meta_client_version_ends_with?: string;
+    /**
+     * Latest collector version of the node in the period (filter: like)
+     */
+    meta_client_version_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_like)
+     */
+    meta_client_version_not_like?: string;
+    /**
+     * Latest collector version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_client_version_in_values?: string;
+    /**
+     * Latest collector version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_version_not_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Latest consensus client implementation of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Latest consensus client version of the node in the period (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Slots the node saw a head event in (filter: eq)
+     */
+    slot_count_eq?: number;
+    /**
+     * Slots the node saw a head event in (filter: ne)
+     */
+    slot_count_ne?: number;
+    /**
+     * Slots the node saw a head event in (filter: lt)
+     */
+    slot_count_lt?: number;
+    /**
+     * Slots the node saw a head event in (filter: lte)
+     */
+    slot_count_lte?: number;
+    /**
+     * Slots the node saw a head event in (filter: gt)
+     */
+    slot_count_gt?: number;
+    /**
+     * Slots the node saw a head event in (filter: gte)
+     */
+    slot_count_gte?: number;
+    /**
+     * Slots the node saw a head event in (filter: between_min)
+     */
+    slot_count_between_min?: number;
+    /**
+     * Slots the node saw a head event in (filter: between_max_value)
+     */
+    slot_count_between_max_value?: number;
+    /**
+     * Slots the node saw a head event in (filter: in_values) (comma-separated list)
+     */
+    slot_count_in_values?: string;
+    /**
+     * Slots the node saw a head event in (filter: not_in_values) (comma-separated list)
+     */
+    slot_count_not_in_values?: string;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    min_seen_slot_start_diff_eq?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    min_seen_slot_start_diff_ne?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    min_seen_slot_start_diff_lt?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    min_seen_slot_start_diff_lte?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    min_seen_slot_start_diff_gt?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    min_seen_slot_start_diff_gte?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    min_seen_slot_start_diff_between_min?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    min_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_in_values?: string;
+    /**
+     * Earliest head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    min_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    p10_seen_slot_start_diff_eq?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    p10_seen_slot_start_diff_ne?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    p10_seen_slot_start_diff_lt?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    p10_seen_slot_start_diff_lte?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    p10_seen_slot_start_diff_gt?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    p10_seen_slot_start_diff_gte?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p10_seen_slot_start_diff_between_min?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p10_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p10_seen_slot_start_diff_in_values?: string;
+    /**
+     * 10th percentile head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p10_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    p50_seen_slot_start_diff_eq?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    p50_seen_slot_start_diff_ne?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    p50_seen_slot_start_diff_lt?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    p50_seen_slot_start_diff_lte?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    p50_seen_slot_start_diff_gt?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    p50_seen_slot_start_diff_gte?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p50_seen_slot_start_diff_between_min?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p50_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p50_seen_slot_start_diff_in_values?: string;
+    /**
+     * Median head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p50_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    p90_seen_slot_start_diff_eq?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    p90_seen_slot_start_diff_ne?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    p90_seen_slot_start_diff_lt?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    p90_seen_slot_start_diff_lte?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    p90_seen_slot_start_diff_gt?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    p90_seen_slot_start_diff_gte?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p90_seen_slot_start_diff_between_min?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p90_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p90_seen_slot_start_diff_in_values?: string;
+    /**
+     * 90th percentile head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p90_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    p95_seen_slot_start_diff_eq?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    p95_seen_slot_start_diff_ne?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    p95_seen_slot_start_diff_lt?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    p95_seen_slot_start_diff_lte?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    p95_seen_slot_start_diff_gt?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    p95_seen_slot_start_diff_gte?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    p95_seen_slot_start_diff_between_min?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    p95_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    p95_seen_slot_start_diff_in_values?: string;
+    /**
+     * 95th percentile head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    p95_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: eq)
+     */
+    max_seen_slot_start_diff_eq?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: ne)
+     */
+    max_seen_slot_start_diff_ne?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: lt)
+     */
+    max_seen_slot_start_diff_lt?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: lte)
+     */
+    max_seen_slot_start_diff_lte?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: gt)
+     */
+    max_seen_slot_start_diff_gt?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: gte)
+     */
+    max_seen_slot_start_diff_gte?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: between_min)
+     */
+    max_seen_slot_start_diff_between_min?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: between_max_value)
+     */
+    max_seen_slot_start_diff_between_max_value?: number;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: in_values) (comma-separated list)
+     */
+    max_seen_slot_start_diff_in_values?: string;
+    /**
+     * Latest head event arrival, in milliseconds from slot start (filter: not_in_values) (comma-separated list)
+     */
+    max_seen_slot_start_diff_not_in_values?: string;
+    /**
+     * The maximum number of fct_head_first_seen_by_node_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctHeadFirstSeenByNodeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_head_first_seen_by_node_weekly';
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceListError =
+  FctHeadFirstSeenByNodeWeeklyServiceListErrors[keyof FctHeadFirstSeenByNodeWeeklyServiceListErrors];
+
+export type FctHeadFirstSeenByNodeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctHeadFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceListResponse =
+  FctHeadFirstSeenByNodeWeeklyServiceListResponses[keyof FctHeadFirstSeenByNodeWeeklyServiceListResponses];
+
+export type FctHeadFirstSeenByNodeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by slot
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_head_first_seen_by_node_weekly/{week_start_date}';
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceGetError =
+  FctHeadFirstSeenByNodeWeeklyServiceGetErrors[keyof FctHeadFirstSeenByNodeWeeklyServiceGetErrors];
+
+export type FctHeadFirstSeenByNodeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctHeadFirstSeenByNodeWeeklyResponse;
+};
+
+export type FctHeadFirstSeenByNodeWeeklyServiceGetResponse =
+  FctHeadFirstSeenByNodeWeeklyServiceGetResponses[keyof FctHeadFirstSeenByNodeWeeklyServiceGetResponses];
 
 export type FctHeadVoteCorrectnessRateDailyServiceListData = {
   body?: never;
@@ -106752,6 +116002,426 @@ export type FctOpcodeCostByElClientVersionServiceGetResponses = {
 export type FctOpcodeCostByElClientVersionServiceGetResponse =
   FctOpcodeCostByElClientVersionServiceGetResponses[keyof FctOpcodeCostByElClientVersionServiceGetResponses];
 
+export type FctOpcodeCostByElClientWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification the timings come from (e.g., eip7870-block-builder) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: eq)
+     */
+    opcode_group_eq?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ne)
+     */
+    opcode_group_ne?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: contains)
+     */
+    opcode_group_contains?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: starts_with)
+     */
+    opcode_group_starts_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: ends_with)
+     */
+    opcode_group_ends_with?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: like)
+     */
+    opcode_group_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_like)
+     */
+    opcode_group_not_like?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: in_values) (comma-separated list)
+     */
+    opcode_group_in_values?: string;
+    /**
+     * Opcode, or opcode group (LOG, ARITHMETIC, CONTROL, ENVIRONMENT, MEMORY, STACK) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_group_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: has)
+     */
+    meta_execution_versions_has?: string;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: has_all_values)
+     */
+    meta_execution_versions_has_all_values?: Array<string>;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: has_any_values)
+     */
+    meta_execution_versions_has_any_values?: Array<string>;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: length_eq)
+     */
+    meta_execution_versions_length_eq?: number;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: length_gt)
+     */
+    meta_execution_versions_length_gt?: number;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: length_gte)
+     */
+    meta_execution_versions_length_gte?: number;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: length_lt)
+     */
+    meta_execution_versions_length_lt?: number;
+    /**
+     * Client versions that ran during the week, most blocks first (filter: length_lte)
+     */
+    meta_execution_versions_length_lte?: number;
+    /**
+     * Block observations in the fit (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Block observations in the fit (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Block observations in the fit (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Block observations in the fit (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Block observations in the fit (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Block observations in the fit (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Block observations in the fit (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Block observations in the fit (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Block observations in the fit (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Block observations in the fit (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: eq)
+     */
+    hour_count_eq?: number;
+    /**
+     * Hours with data in the fit (filter: ne)
+     */
+    hour_count_ne?: number;
+    /**
+     * Hours with data in the fit (filter: lt)
+     */
+    hour_count_lt?: number;
+    /**
+     * Hours with data in the fit (filter: lte)
+     */
+    hour_count_lte?: number;
+    /**
+     * Hours with data in the fit (filter: gt)
+     */
+    hour_count_gt?: number;
+    /**
+     * Hours with data in the fit (filter: gte)
+     */
+    hour_count_gte?: number;
+    /**
+     * Hours with data in the fit (filter: between_min)
+     */
+    hour_count_between_min?: number;
+    /**
+     * Hours with data in the fit (filter: between_max_value)
+     */
+    hour_count_between_max_value?: number;
+    /**
+     * Hours with data in the fit (filter: in_values) (comma-separated list)
+     */
+    hour_count_in_values?: string;
+    /**
+     * Hours with data in the fit (filter: not_in_values) (comma-separated list)
+     */
+    hour_count_not_in_values?: string;
+    /**
+     * Filter gas_share using value
+     */
+    gas_share_value?: number;
+    /**
+     * Filter gas_per_op using value
+     */
+    gas_per_op_value?: number;
+    /**
+     * Filter ns_per_gas using value
+     */
+    ns_per_gas_value?: number;
+    /**
+     * Filter ns_per_op using value
+     */
+    ns_per_op_value?: number;
+    /**
+     * Filter ns_per_op_lower using value
+     */
+    ns_per_op_lower_value?: number;
+    /**
+     * Filter ns_per_op_upper using value
+     */
+    ns_per_op_upper_value?: number;
+    /**
+     * Filter price_ratio using value
+     */
+    price_ratio_value?: number;
+    /**
+     * Filter price_ratio_lower using value
+     */
+    price_ratio_lower_value?: number;
+    /**
+     * Filter price_ratio_upper using value
+     */
+    price_ratio_upper_value?: number;
+    /**
+     * Filter client_ns_per_gas using value
+     */
+    client_ns_per_gas_value?: number;
+    /**
+     * Filter overhead_ms using value
+     */
+    overhead_ms_value?: number;
+    /**
+     * Filter per_tx_us using value
+     */
+    per_tx_us_value?: number;
+    /**
+     * Filter r_squared using value
+     */
+    r_squared_value?: number;
+    /**
+     * The maximum number of fct_opcode_cost_by_el_client_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeCostByElClientWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_cost_by_el_client_weekly';
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceListError =
+  FctOpcodeCostByElClientWeeklyServiceListErrors[keyof FctOpcodeCostByElClientWeeklyServiceListErrors];
+
+export type FctOpcodeCostByElClientWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeCostByElClientWeeklyResponse;
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceListResponse =
+  FctOpcodeCostByElClientWeeklyServiceListResponses[keyof FctOpcodeCostByElClientWeeklyServiceListResponses];
+
+export type FctOpcodeCostByElClientWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_cost_by_el_client_weekly/{week_start_date}';
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceGetError =
+  FctOpcodeCostByElClientWeeklyServiceGetErrors[keyof FctOpcodeCostByElClientWeeklyServiceGetErrors];
+
+export type FctOpcodeCostByElClientWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeCostByElClientWeeklyResponse;
+};
+
+export type FctOpcodeCostByElClientWeeklyServiceGetResponse =
+  FctOpcodeCostByElClientWeeklyServiceGetResponses[keyof FctOpcodeCostByElClientWeeklyServiceGetResponses];
+
 export type FctOpcodeGasByOpcodeDailyServiceListData = {
   body?: never;
   path?: never;
@@ -107467,6 +117137,362 @@ export type FctOpcodeGasByOpcodeHourlyServiceGetResponses = {
 
 export type FctOpcodeGasByOpcodeHourlyServiceGetResponse =
   FctOpcodeGasByOpcodeHourlyServiceGetResponses[keyof FctOpcodeGasByOpcodeHourlyServiceGetResponses];
+
+export type FctOpcodeGasByOpcodeWeeklyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: eq)
+     */
+    week_start_date_eq?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: ne)
+     */
+    week_start_date_ne?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: contains)
+     */
+    week_start_date_contains?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: starts_with)
+     */
+    week_start_date_starts_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: ends_with)
+     */
+    week_start_date_ends_with?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: like)
+     */
+    week_start_date_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: not_like)
+     */
+    week_start_date_not_like?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: in_values) (comma-separated list)
+     */
+    week_start_date_in_values?: string;
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp (filter: not_in_values) (comma-separated list)
+     */
+    week_start_date_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this week (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks containing this opcode in this week (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks containing this opcode in this week (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Total execution count of this opcode in this week (filter: eq)
+     */
+    total_count_eq?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: ne)
+     */
+    total_count_ne?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: lt)
+     */
+    total_count_lt?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: lte)
+     */
+    total_count_lte?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: gt)
+     */
+    total_count_gt?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: gte)
+     */
+    total_count_gte?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: between_min)
+     */
+    total_count_between_min?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: between_max_value)
+     */
+    total_count_between_max_value?: number;
+    /**
+     * Total execution count of this opcode in this week (filter: in_values) (comma-separated list)
+     */
+    total_count_in_values?: string;
+    /**
+     * Total execution count of this opcode in this week (filter: not_in_values) (comma-separated list)
+     */
+    total_count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this week (filter: eq)
+     */
+    total_gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: ne)
+     */
+    total_gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: lt)
+     */
+    total_gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: lte)
+     */
+    total_gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: gt)
+     */
+    total_gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: gte)
+     */
+    total_gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: between_min)
+     */
+    total_gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: between_max_value)
+     */
+    total_gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode in this week (filter: in_values) (comma-separated list)
+     */
+    total_gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in this week (filter: not_in_values) (comma-separated list)
+     */
+    total_gas_not_in_values?: string;
+    /**
+     * Total error count for this opcode in this week (filter: eq)
+     */
+    total_error_count_eq?: number;
+    /**
+     * Total error count for this opcode in this week (filter: ne)
+     */
+    total_error_count_ne?: number;
+    /**
+     * Total error count for this opcode in this week (filter: lt)
+     */
+    total_error_count_lt?: number;
+    /**
+     * Total error count for this opcode in this week (filter: lte)
+     */
+    total_error_count_lte?: number;
+    /**
+     * Total error count for this opcode in this week (filter: gt)
+     */
+    total_error_count_gt?: number;
+    /**
+     * Total error count for this opcode in this week (filter: gte)
+     */
+    total_error_count_gte?: number;
+    /**
+     * Total error count for this opcode in this week (filter: between_min)
+     */
+    total_error_count_between_min?: number;
+    /**
+     * Total error count for this opcode in this week (filter: between_max_value)
+     */
+    total_error_count_between_max_value?: number;
+    /**
+     * Total error count for this opcode in this week (filter: in_values) (comma-separated list)
+     */
+    total_error_count_in_values?: string;
+    /**
+     * Total error count for this opcode in this week (filter: not_in_values) (comma-separated list)
+     */
+    total_error_count_not_in_values?: string;
+    /**
+     * Filter avg_count_per_block using value
+     */
+    avg_count_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_block using value
+     */
+    avg_gas_per_block_value?: number;
+    /**
+     * Filter avg_gas_per_execution using value
+     */
+    avg_gas_per_execution_value?: number;
+    /**
+     * The maximum number of fct_opcode_gas_by_opcode_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctOpcodeGasByOpcodeWeekly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_opcode_gas_by_opcode_weekly';
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceListError =
+  FctOpcodeGasByOpcodeWeeklyServiceListErrors[keyof FctOpcodeGasByOpcodeWeeklyServiceListErrors];
+
+export type FctOpcodeGasByOpcodeWeeklyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctOpcodeGasByOpcodeWeeklyResponse;
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceListResponse =
+  FctOpcodeGasByOpcodeWeeklyServiceListResponses[keyof FctOpcodeGasByOpcodeWeeklyServiceListResponses];
+
+export type FctOpcodeGasByOpcodeWeeklyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the week period (Monday, UTC), by block timestamp
+     */
+    week_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_opcode_gas_by_opcode_weekly/{week_start_date}';
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceGetError =
+  FctOpcodeGasByOpcodeWeeklyServiceGetErrors[keyof FctOpcodeGasByOpcodeWeeklyServiceGetErrors];
+
+export type FctOpcodeGasByOpcodeWeeklyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctOpcodeGasByOpcodeWeeklyResponse;
+};
+
+export type FctOpcodeGasByOpcodeWeeklyServiceGetResponse =
+  FctOpcodeGasByOpcodeWeeklyServiceGetResponses[keyof FctOpcodeGasByOpcodeWeeklyServiceGetResponses];
 
 export type FctOpcodeOpsDailyServiceListData = {
   body?: never;
@@ -114883,6 +124909,302 @@ export type FctPreparedBlockServiceGetResponses = {
 export type FctPreparedBlockServiceGetResponse =
   FctPreparedBlockServiceGetResponses[keyof FctPreparedBlockServiceGetResponses];
 
+export type FctPreparedBlockByNodeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, by slot (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, by slot (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, by slot (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, by slot (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, by slot (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, by slot (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, by slot (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, by slot (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, by slot (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Name of the node that built the blocks (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the node that built the blocks (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the node that built the blocks (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the node that built the blocks (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the node that built the blocks (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the node that built the blocks (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the node that built the blocks (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the node that built the blocks (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the node that built the blocks (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Consensus client implementation of the node (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client implementation of the node (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client implementation of the node (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client implementation of the node (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client implementation of the node (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client implementation of the node (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client implementation of the node (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client implementation of the node (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client implementation of the node (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Consensus client version of the node (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * Consensus client version of the node (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * Consensus client version of the node (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * Consensus client version of the node (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * Consensus client version of the node (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * Consensus client version of the node (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * Consensus client version of the node (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * Consensus client version of the node (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * Consensus client version of the node (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Locally built blocks (rows in fct_prepared_block) from the node with this consensus client version in the day (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_prepared_block_by_node_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPreparedBlockByNodeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_prepared_block_by_node_daily';
+};
+
+export type FctPreparedBlockByNodeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPreparedBlockByNodeDailyServiceListError =
+  FctPreparedBlockByNodeDailyServiceListErrors[keyof FctPreparedBlockByNodeDailyServiceListErrors];
+
+export type FctPreparedBlockByNodeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPreparedBlockByNodeDailyResponse;
+};
+
+export type FctPreparedBlockByNodeDailyServiceListResponse =
+  FctPreparedBlockByNodeDailyServiceListResponses[keyof FctPreparedBlockByNodeDailyServiceListResponses];
+
+export type FctPreparedBlockByNodeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, by slot
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_prepared_block_by_node_daily/{day_start_date}';
+};
+
+export type FctPreparedBlockByNodeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPreparedBlockByNodeDailyServiceGetError =
+  FctPreparedBlockByNodeDailyServiceGetErrors[keyof FctPreparedBlockByNodeDailyServiceGetErrors];
+
+export type FctPreparedBlockByNodeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPreparedBlockByNodeDailyResponse;
+};
+
+export type FctPreparedBlockByNodeDailyServiceGetResponse =
+  FctPreparedBlockByNodeDailyServiceGetResponses[keyof FctPreparedBlockByNodeDailyServiceGetResponses];
+
 export type FctProposerRewardDailyServiceListData = {
   body?: never;
   path?: never;
@@ -118275,43 +128597,43 @@ export type FctStorageSlotTop100ByBytesServiceListData = {
   path?: never;
   query?: {
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: eq)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: eq)
      */
     rank_eq?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: ne)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: ne)
      */
     rank_ne?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: lt)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: lt)
      */
     rank_lt?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: lte)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: lte)
      */
     rank_lte?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: gt)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: gt)
      */
     rank_gt?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: gte)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: gte)
      */
     rank_gte?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: between_min)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: between_min)
      */
     rank_between_min?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: between_max_value)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: between_max_value)
      */
     rank_between_max_value?: number;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: in_values) (comma-separated list)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: in_values) (comma-separated list)
      */
     rank_in_values?: string;
     /**
-     * Rank by effective bytes (1=highest), based on raw state (filter: not_in_values) (comma-separated list)
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state (filter: not_in_values) (comma-separated list)
      */
     rank_not_in_values?: string;
     /**
@@ -118722,7 +129044,7 @@ export type FctStorageSlotTop100ByBytesServiceGetData = {
   body?: never;
   path: {
     /**
-     * Rank by effective bytes (1=highest), based on raw state
+     * Rank by storage size, active_slots * 65 + effective_bytes (1=highest), based on raw state
      */
     rank: number;
   };
@@ -126486,6 +136808,678 @@ export type FctValidatorOperationWeeklyServiceGetResponses = {
 export type FctValidatorOperationWeeklyServiceGetResponse =
   FctValidatorOperationWeeklyServiceGetResponses[keyof FctValidatorOperationWeeklyServiceGetResponses];
 
+export type FctValidatorPerformanceByEntityRollingServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: eq)
+     */
+    period_eq?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: ne)
+     */
+    period_ne?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: contains)
+     */
+    period_contains?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: starts_with)
+     */
+    period_starts_with?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: ends_with)
+     */
+    period_ends_with?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: like)
+     */
+    period_like?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: not_like)
+     */
+    period_not_like?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: in_values) (comma-separated list)
+     */
+    period_in_values?: string;
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data) (filter: not_in_values) (comma-separated list)
+     */
+    period_not_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the validators in dim_node, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the period, or of the data when it starts later (filter: eq)
+     */
+    period_start_date_time_eq?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: ne)
+     */
+    period_start_date_time_ne?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: lt)
+     */
+    period_start_date_time_lt?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: lte)
+     */
+    period_start_date_time_lte?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: gt)
+     */
+    period_start_date_time_gt?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: gte)
+     */
+    period_start_date_time_gte?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: between_min)
+     */
+    period_start_date_time_between_min?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: between_max_value)
+     */
+    period_start_date_time_between_max_value?: number;
+    /**
+     * Start of the period, or of the data when it starts later (filter: in_values) (comma-separated list)
+     */
+    period_start_date_time_in_values?: string;
+    /**
+     * Start of the period, or of the data when it starts later (filter: not_in_values) (comma-separated list)
+     */
+    period_start_date_time_not_in_values?: string;
+    /**
+     * End of the period, exclusive (filter: eq)
+     */
+    period_end_date_time_eq?: number;
+    /**
+     * End of the period, exclusive (filter: ne)
+     */
+    period_end_date_time_ne?: number;
+    /**
+     * End of the period, exclusive (filter: lt)
+     */
+    period_end_date_time_lt?: number;
+    /**
+     * End of the period, exclusive (filter: lte)
+     */
+    period_end_date_time_lte?: number;
+    /**
+     * End of the period, exclusive (filter: gt)
+     */
+    period_end_date_time_gt?: number;
+    /**
+     * End of the period, exclusive (filter: gte)
+     */
+    period_end_date_time_gte?: number;
+    /**
+     * End of the period, exclusive (filter: between_min)
+     */
+    period_end_date_time_between_min?: number;
+    /**
+     * End of the period, exclusive (filter: between_max_value)
+     */
+    period_end_date_time_between_max_value?: number;
+    /**
+     * End of the period, exclusive (filter: in_values) (comma-separated list)
+     */
+    period_end_date_time_in_values?: string;
+    /**
+     * End of the period, exclusive (filter: not_in_values) (comma-separated list)
+     */
+    period_end_date_time_not_in_values?: string;
+    /**
+     * Attestation duties (filter: eq)
+     */
+    total_duties_eq?: number;
+    /**
+     * Attestation duties (filter: ne)
+     */
+    total_duties_ne?: number;
+    /**
+     * Attestation duties (filter: lt)
+     */
+    total_duties_lt?: number;
+    /**
+     * Attestation duties (filter: lte)
+     */
+    total_duties_lte?: number;
+    /**
+     * Attestation duties (filter: gt)
+     */
+    total_duties_gt?: number;
+    /**
+     * Attestation duties (filter: gte)
+     */
+    total_duties_gte?: number;
+    /**
+     * Attestation duties (filter: between_min)
+     */
+    total_duties_between_min?: number;
+    /**
+     * Attestation duties (filter: between_max_value)
+     */
+    total_duties_between_max_value?: number;
+    /**
+     * Attestation duties (filter: in_values) (comma-separated list)
+     */
+    total_duties_in_values?: string;
+    /**
+     * Attestation duties (filter: not_in_values) (comma-separated list)
+     */
+    total_duties_not_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: eq)
+     */
+    attested_count_eq?: number;
+    /**
+     * Attestations included on the finalized chain (filter: ne)
+     */
+    attested_count_ne?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lt)
+     */
+    attested_count_lt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: lte)
+     */
+    attested_count_lte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gt)
+     */
+    attested_count_gt?: number;
+    /**
+     * Attestations included on the finalized chain (filter: gte)
+     */
+    attested_count_gte?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_min)
+     */
+    attested_count_between_min?: number;
+    /**
+     * Attestations included on the finalized chain (filter: between_max_value)
+     */
+    attested_count_between_max_value?: number;
+    /**
+     * Attestations included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    attested_count_in_values?: string;
+    /**
+     * Attestations included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    attested_count_not_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: eq)
+     */
+    missed_count_eq?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: ne)
+     */
+    missed_count_ne?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lt)
+     */
+    missed_count_lt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: lte)
+     */
+    missed_count_lte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gt)
+     */
+    missed_count_gt?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: gte)
+     */
+    missed_count_gte?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_min)
+     */
+    missed_count_between_min?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: between_max_value)
+     */
+    missed_count_between_max_value?: number;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: in_values) (comma-separated list)
+     */
+    missed_count_in_values?: string;
+    /**
+     * Attestations missed: duties with no attestation included on the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    missed_count_not_in_values?: string;
+    /**
+     * Head votes that were correct (filter: eq)
+     */
+    head_correct_count_eq?: number;
+    /**
+     * Head votes that were correct (filter: ne)
+     */
+    head_correct_count_ne?: number;
+    /**
+     * Head votes that were correct (filter: lt)
+     */
+    head_correct_count_lt?: number;
+    /**
+     * Head votes that were correct (filter: lte)
+     */
+    head_correct_count_lte?: number;
+    /**
+     * Head votes that were correct (filter: gt)
+     */
+    head_correct_count_gt?: number;
+    /**
+     * Head votes that were correct (filter: gte)
+     */
+    head_correct_count_gte?: number;
+    /**
+     * Head votes that were correct (filter: between_min)
+     */
+    head_correct_count_between_min?: number;
+    /**
+     * Head votes that were correct (filter: between_max_value)
+     */
+    head_correct_count_between_max_value?: number;
+    /**
+     * Head votes that were correct (filter: in_values) (comma-separated list)
+     */
+    head_correct_count_in_values?: string;
+    /**
+     * Head votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    head_correct_count_not_in_values?: string;
+    /**
+     * Target votes that were correct (filter: eq)
+     */
+    target_correct_count_eq?: number;
+    /**
+     * Target votes that were correct (filter: ne)
+     */
+    target_correct_count_ne?: number;
+    /**
+     * Target votes that were correct (filter: lt)
+     */
+    target_correct_count_lt?: number;
+    /**
+     * Target votes that were correct (filter: lte)
+     */
+    target_correct_count_lte?: number;
+    /**
+     * Target votes that were correct (filter: gt)
+     */
+    target_correct_count_gt?: number;
+    /**
+     * Target votes that were correct (filter: gte)
+     */
+    target_correct_count_gte?: number;
+    /**
+     * Target votes that were correct (filter: between_min)
+     */
+    target_correct_count_between_min?: number;
+    /**
+     * Target votes that were correct (filter: between_max_value)
+     */
+    target_correct_count_between_max_value?: number;
+    /**
+     * Target votes that were correct (filter: in_values) (comma-separated list)
+     */
+    target_correct_count_in_values?: string;
+    /**
+     * Target votes that were correct (filter: not_in_values) (comma-separated list)
+     */
+    target_correct_count_not_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
+     */
+    source_correct_count_eq?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
+     */
+    source_correct_count_ne?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
+     */
+    source_correct_count_lt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
+     */
+    source_correct_count_lte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
+     */
+    source_correct_count_gt?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
+     */
+    source_correct_count_gte?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
+     */
+    source_correct_count_between_min?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_correct_count_between_max_value?: number;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_correct_count_in_values?: string;
+    /**
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_correct_count_not_in_values?: string;
+    /**
+     * Filter avg_inclusion_distance using value
+     */
+    avg_inclusion_distance_value?: number;
+    /**
+     * Canonical blocks proposed (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Canonical blocks proposed (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Canonical blocks proposed (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Canonical blocks proposed (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Canonical blocks proposed (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Canonical blocks proposed (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Canonical blocks proposed (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Canonical blocks proposed (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Canonical blocks proposed (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Canonical blocks proposed (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: eq)
+     */
+    mev_block_count_eq?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: ne)
+     */
+    mev_block_count_ne?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lt)
+     */
+    mev_block_count_lt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: lte)
+     */
+    mev_block_count_lte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gt)
+     */
+    mev_block_count_gt?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: gte)
+     */
+    mev_block_count_gte?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_min)
+     */
+    mev_block_count_between_min?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: between_max_value)
+     */
+    mev_block_count_between_max_value?: number;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: in_values) (comma-separated list)
+     */
+    mev_block_count_in_values?: string;
+    /**
+     * Canonical blocks delivered by an MEV relay, the rest were built locally (filter: not_in_values) (comma-separated list)
+     */
+    mev_block_count_not_in_values?: string;
+    /**
+     * Filter avg_mev_value_eth using value
+     */
+    avg_mev_value_eth_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: eq)
+     */
+    orphaned_block_count_eq?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: ne)
+     */
+    orphaned_block_count_ne?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lt)
+     */
+    orphaned_block_count_lt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: lte)
+     */
+    orphaned_block_count_lte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gt)
+     */
+    orphaned_block_count_gt?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: gte)
+     */
+    orphaned_block_count_gte?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_min)
+     */
+    orphaned_block_count_between_min?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: between_max_value)
+     */
+    orphaned_block_count_between_max_value?: number;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: in_values) (comma-separated list)
+     */
+    orphaned_block_count_in_values?: string;
+    /**
+     * Blocks proposed that did not make the finalized chain (filter: not_in_values) (comma-separated list)
+     */
+    orphaned_block_count_not_in_values?: string;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: eq)
+     */
+    missed_slot_count_eq?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: ne)
+     */
+    missed_slot_count_ne?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: lt)
+     */
+    missed_slot_count_lt?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: lte)
+     */
+    missed_slot_count_lte?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: gt)
+     */
+    missed_slot_count_gt?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: gte)
+     */
+    missed_slot_count_gte?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: between_min)
+     */
+    missed_slot_count_between_min?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: between_max_value)
+     */
+    missed_slot_count_between_max_value?: number;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: in_values) (comma-separated list)
+     */
+    missed_slot_count_in_values?: string;
+    /**
+     * Slots the entity was scheduled to propose where no block was seen (filter: not_in_values) (comma-separated list)
+     */
+    missed_slot_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_performance_by_entity_rolling to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorPerformanceByEntityRolling` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_performance_by_entity_rolling';
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceListError =
+  FctValidatorPerformanceByEntityRollingServiceListErrors[keyof FctValidatorPerformanceByEntityRollingServiceListErrors];
+
+export type FctValidatorPerformanceByEntityRollingServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorPerformanceByEntityRollingResponse;
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceListResponse =
+  FctValidatorPerformanceByEntityRollingServiceListResponses[keyof FctValidatorPerformanceByEntityRollingServiceListResponses];
+
+export type FctValidatorPerformanceByEntityRollingServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Rolling period: 24h (the last 24 complete hours), 7d, 30d, 90d or 1y (the last complete UTC days), or all (every day with data)
+     */
+    period: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_performance_by_entity_rolling/{period}';
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceGetError =
+  FctValidatorPerformanceByEntityRollingServiceGetErrors[keyof FctValidatorPerformanceByEntityRollingServiceGetErrors];
+
+export type FctValidatorPerformanceByEntityRollingServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorPerformanceByEntityRollingResponse;
+};
+
+export type FctValidatorPerformanceByEntityRollingServiceGetResponse =
+  FctValidatorPerformanceByEntityRollingServiceGetResponses[keyof FctValidatorPerformanceByEntityRollingServiceGetResponses];
+
 export type FctValidatorQueueDailyServiceListData = {
   body?: never;
   path?: never;
@@ -129817,6 +140811,386 @@ export type FctValidatorStakeByEntityDailyServiceGetResponses = {
 
 export type FctValidatorStakeByEntityDailyServiceGetResponse =
   FctValidatorStakeByEntityDailyServiceGetResponses[keyof FctValidatorStakeByEntityDailyServiceGetResponses];
+
+export type FctValidatorStakeByEntityGroupDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The day (UTC) (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The day (UTC) (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The day (UTC) (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The day (UTC) (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The day (UTC) (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The day (UTC) (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The day (UTC) (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The day (UTC) (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The day (UTC) (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: eq)
+     */
+    entity_group_eq?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ne)
+     */
+    entity_group_ne?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: contains)
+     */
+    entity_group_contains?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: starts_with)
+     */
+    entity_group_starts_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: ends_with)
+     */
+    entity_group_ends_with?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: like)
+     */
+    entity_group_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_like)
+     */
+    entity_group_not_like?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: in_values) (comma-separated list)
+     */
+    entity_group_in_values?: string;
+    /**
+     * Group of staking entities run under one protocol: lido is every entity whose name contains lido (lido itself, the curated *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters) (filter: not_in_values) (comma-separated list)
+     */
+    entity_group_not_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: eq)
+     */
+    credential_type_eq?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ne)
+     */
+    credential_type_ne?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: contains)
+     */
+    credential_type_contains?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: starts_with)
+     */
+    credential_type_starts_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: ends_with)
+     */
+    credential_type_ends_with?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: like)
+     */
+    credential_type_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_like)
+     */
+    credential_type_not_like?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: in_values) (comma-separated list)
+     */
+    credential_type_in_values?: string;
+    /**
+     * Withdrawal credential prefix at the snapshot: 0x00, 0x01 or 0x02 (filter: not_in_values) (comma-separated list)
+     */
+    credential_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: eq)
+     */
+    entity_count_eq?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: ne)
+     */
+    entity_count_ne?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: lt)
+     */
+    entity_count_lt?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: lte)
+     */
+    entity_count_lte?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: gt)
+     */
+    entity_count_gt?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: gte)
+     */
+    entity_count_gte?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: between_min)
+     */
+    entity_count_between_min?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: between_max_value)
+     */
+    entity_count_between_max_value?: number;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: in_values) (comma-separated list)
+     */
+    entity_count_in_values?: string;
+    /**
+     * Entities of the group with active validators of this credential type on the day (filter: not_in_values) (comma-separated list)
+     */
+    entity_count_not_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: eq)
+     */
+    active_validator_count_eq?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: ne)
+     */
+    active_validator_count_ne?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lt)
+     */
+    active_validator_count_lt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: lte)
+     */
+    active_validator_count_lte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gt)
+     */
+    active_validator_count_gt?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: gte)
+     */
+    active_validator_count_gte?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_min)
+     */
+    active_validator_count_between_min?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: between_max_value)
+     */
+    active_validator_count_between_max_value?: number;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: in_values) (comma-separated list)
+     */
+    active_validator_count_in_values?: string;
+    /**
+     * Active validators (active_ongoing, active_exiting, active_slashed) (filter: not_in_values) (comma-separated list)
+     */
+    active_validator_count_not_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: eq)
+     */
+    active_effective_balance_eq?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: ne)
+     */
+    active_effective_balance_ne?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lt)
+     */
+    active_effective_balance_lt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: lte)
+     */
+    active_effective_balance_lte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gt)
+     */
+    active_effective_balance_gt?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: gte)
+     */
+    active_effective_balance_gte?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_min)
+     */
+    active_effective_balance_between_min?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: between_max_value)
+     */
+    active_effective_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: in_values) (comma-separated list)
+     */
+    active_effective_balance_in_values?: string;
+    /**
+     * Sum of active validators' effective balance in Gwei (active stake) (filter: not_in_values) (comma-separated list)
+     */
+    active_effective_balance_not_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: eq)
+     */
+    active_balance_eq?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: ne)
+     */
+    active_balance_ne?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lt)
+     */
+    active_balance_lt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: lte)
+     */
+    active_balance_lte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gt)
+     */
+    active_balance_gt?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: gte)
+     */
+    active_balance_gte?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_min)
+     */
+    active_balance_between_min?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: between_max_value)
+     */
+    active_balance_between_max_value?: number;
+    /**
+     * Sum of active validators' balance in Gwei (filter: in_values) (comma-separated list)
+     */
+    active_balance_in_values?: string;
+    /**
+     * Sum of active validators' balance in Gwei (filter: not_in_values) (comma-separated list)
+     */
+    active_balance_not_in_values?: string;
+    /**
+     * The maximum number of fct_validator_stake_by_entity_group_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctValidatorStakeByEntityGroupDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_validator_stake_by_entity_group_daily';
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceListError =
+  FctValidatorStakeByEntityGroupDailyServiceListErrors[keyof FctValidatorStakeByEntityGroupDailyServiceListErrors];
+
+export type FctValidatorStakeByEntityGroupDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctValidatorStakeByEntityGroupDailyResponse;
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceListResponse =
+  FctValidatorStakeByEntityGroupDailyServiceListResponses[keyof FctValidatorStakeByEntityGroupDailyServiceListResponses];
+
+export type FctValidatorStakeByEntityGroupDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The day (UTC)
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_validator_stake_by_entity_group_daily/{day_start_date}';
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceGetError =
+  FctValidatorStakeByEntityGroupDailyServiceGetErrors[keyof FctValidatorStakeByEntityGroupDailyServiceGetErrors];
+
+export type FctValidatorStakeByEntityGroupDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctValidatorStakeByEntityGroupDailyResponse;
+};
+
+export type FctValidatorStakeByEntityGroupDailyServiceGetResponse =
+  FctValidatorStakeByEntityGroupDailyServiceGetResponses[keyof FctValidatorStakeByEntityGroupDailyServiceGetResponses];
 
 export type IntAttestationAttestedServiceListData = {
   body?: never;
@@ -134379,43 +145753,43 @@ export type IntBlockBlobCountCanonicalServiceListData = {
      */
     epoch_start_date_time_not_in_values?: string;
     /**
-     * The number of blobs in the block (filter: eq)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: eq)
      */
     blob_count_eq?: number;
     /**
-     * The number of blobs in the block (filter: ne)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: ne)
      */
     blob_count_ne?: number;
     /**
-     * The number of blobs in the block (filter: lt)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: lt)
      */
     blob_count_lt?: number;
     /**
-     * The number of blobs in the block (filter: lte)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: lte)
      */
     blob_count_lte?: number;
     /**
-     * The number of blobs in the block (filter: gt)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: gt)
      */
     blob_count_gt?: number;
     /**
-     * The number of blobs in the block (filter: gte)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: gte)
      */
     blob_count_gte?: number;
     /**
-     * The number of blobs in the block (filter: between_min)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: between_min)
      */
     blob_count_between_min?: number;
     /**
-     * The number of blobs in the block (filter: between_max_value)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: between_max_value)
      */
     blob_count_between_max_value?: number;
     /**
-     * The number of blobs in the block (filter: in_values) (comma-separated list)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: in_values) (comma-separated list)
      */
     blob_count_in_values?: string;
     /**
-     * The number of blobs in the block (filter: not_in_values) (comma-separated list)
+     * The number of blobs in the block, from its execution payload blob gas before Gloas, its execution payload bid blob KZG commitments from Gloas, or its blob sidecars when neither is available (filter: not_in_values) (comma-separated list)
      */
     blob_count_not_in_values?: string;
     /**
@@ -162785,43 +174159,43 @@ export type IntTransactionCallFrameServiceListData = {
      */
     gas_refund_not_in_values?: string;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: eq)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: eq)
      */
     intrinsic_gas_eq?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: ne)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: ne)
      */
     intrinsic_gas_ne?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: lt)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: lt)
      */
     intrinsic_gas_lt?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: lte)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: lte)
      */
     intrinsic_gas_lte?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: gt)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: gt)
      */
     intrinsic_gas_gt?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: gte)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: gte)
      */
     intrinsic_gas_gte?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: between_min)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: between_min)
      */
     intrinsic_gas_between_min?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: between_max_value)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: between_max_value)
      */
     intrinsic_gas_between_max_value?: number;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: in_values) (comma-separated list)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: in_values) (comma-separated list)
      */
     intrinsic_gas_in_values?: string;
     /**
-     * Intrinsic tx cost (21000 + calldata). Only populated for root frame of successful txs. (filter: not_in_values) (comma-separated list)
+     * Intrinsic tx cost from the transaction: 21000 (53000 for a creation) + calldata + initcode words + access list + EIP-7702 authorizations. Excludes refunds and the calldata floor. Only populated for root frame (call_frame_id=0). (filter: not_in_values) (comma-separated list)
      */
     intrinsic_gas_not_in_values?: string;
     /**
@@ -162864,6 +174238,46 @@ export type IntTransactionCallFrameServiceListData = {
      * Actual gas used from transaction receipt. Only populated for root frame (call_frame_id=0). Source of truth for total gas display. (filter: not_in_values) (comma-separated list)
      */
     receipt_gas_used_not_in_values?: string;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: eq)
+     */
+    calldata_floor_gas_eq?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: ne)
+     */
+    calldata_floor_gas_ne?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: lt)
+     */
+    calldata_floor_gas_lt?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: lte)
+     */
+    calldata_floor_gas_lte?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: gt)
+     */
+    calldata_floor_gas_gt?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: gte)
+     */
+    calldata_floor_gas_gte?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: between_min)
+     */
+    calldata_floor_gas_between_min?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: between_max_value)
+     */
+    calldata_floor_gas_between_max_value?: number;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: in_values) (comma-separated list)
+     */
+    calldata_floor_gas_in_values?: string;
+    /**
+     * EIP-7623 calldata floor, 21000 + 10 * (zero input bytes + 4 * non-zero input bytes). The receipt is max(intrinsic_gas + gas_cumulative - min(gas_refund, (intrinsic_gas + gas_cumulative) / 5), calldata_floor_gas). Only populated for root frame (call_frame_id=0) from Prague, NULL before (filter: not_in_values) (comma-separated list)
+     */
+    calldata_floor_gas_not_in_values?: string;
     /**
      * The maximum number of int_transaction_call_frame to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
