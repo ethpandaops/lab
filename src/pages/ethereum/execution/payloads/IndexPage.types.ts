@@ -79,7 +79,6 @@ export type EngineStatus = (typeof ENGINE_STATUS_VALUES)[number];
  */
 export const DEFAULT_DURATION_MIN = 0; // No duration filter by default
 export const DEFAULT_PAGE_SIZE = 25;
-export const DEFAULT_TIME_RANGE_HOURS = 6;
 
 /**
  * Feature flags

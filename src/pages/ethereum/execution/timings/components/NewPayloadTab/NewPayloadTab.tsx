@@ -58,6 +58,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
   // Long ranges (90d+) only fetch the daily tables, so trends there have one point per day
   const showHourlyCharts = HOURLY_CHART_RANGES.includes(timeRange);
+  const rangeConfig = TIME_RANGE_CONFIG[timeRange];
+  const rangeSuffix = rangeConfig.seconds === null ? '' : `, ${rangeConfig.label.toLowerCase()}`;
 
   // Per-client/version rows covering the whole range (hourly up to 31d, daily beyond)
   const summaryRows: (FctEngineNewPayloadByElClientHourly | FctEngineNewPayloadByElClientDaily)[] = showHourlyCharts
@@ -578,7 +580,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <PopoutCard
           title="Duration Distribution (50ms buckets)"
-          subtitle={`VALID engine_newPayload calls from every node, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          subtitle={`VALID engine_newPayload calls from every Xatu node${rangeSuffix}`}
           anchorId="duration-histogram"
           modalSize="full"
         >
@@ -599,7 +601,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
 
         <PopoutCard
           title="Status Distribution"
-          subtitle={`engine_newPayload calls by response status, ${TIME_RANGE_CONFIG[timeRange].label.toLowerCase()}`}
+          subtitle={`engine_newPayload calls by response status${rangeSuffix}`}
           anchorId="status-distribution"
           modalSize="full"
         >

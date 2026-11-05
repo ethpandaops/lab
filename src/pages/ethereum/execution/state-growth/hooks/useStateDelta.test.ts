@@ -51,4 +51,14 @@ describe('useStateDelta', () => {
     expect(result.current?.currentDate).toBe('2026-11-03');
     expect(result.current?.previousDate).toBe('2026-10-27');
   });
+
+  it('compares against the first row for all', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-04T11:00:00Z'));
+    const { result } = renderHook(() => useStateDelta(DATA, 'all'));
+
+    expect(result.current?.currentDate).toBe('2026-11-03');
+    expect(result.current?.previousDate).toBe('2026-10-27');
+    expect(result.current?.total.delta).toBe(1_707_640_504);
+  });
 });

@@ -1,11 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueries, useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadByElClientServiceList,
   fctEngineNewPayloadBySlotServiceList,
   intBlockResourceGasServiceList,
   fctExecutionGasUsedHourlyServiceList,
+  fctExecutionGasUsedDailyServiceList,
   fctEngineNewPayloadByElClientHourlyServiceList,
+  fctEngineNewPayloadByElClientDailyServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
@@ -13,19 +15,22 @@ import type {
   IntBlockResourceGas,
   FctExecutionGasUsedHourly,
   FctEngineNewPayloadByElClientHourly,
+  FctEngineNewPayloadByElClientDaily,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { currentUtcDate } from '@/utils/time';
 import { blockSlices, buildClientPerformance, type SlowBlock } from '../utils/performance';
 
 /** Rows of the per-slot timing table read to find the slowest blocks' candidate slots */
 const SLOWEST_CANDIDATE_ROWS = 100;
 
+/** Rows per hour, or per day (keyed by the day's start in hour_start_date_time) on daily ranges */
 export interface HourlyData {
   /** Per-client, per-version newPayload timings per hour over the range */
   perClientHourly: FctEngineNewPayloadByElClientHourly[];
   /** Chain-wide gas used per hour over the range */
-  gasUsedHourly: FctExecutionGasUsedHourly[];
+  gasUsedHourly: Pick<FctExecutionGasUsedHourly, 'total_gas_used' | 'block_count'>[];
 }
 
 export interface BlockData {
@@ -142,17 +147,20 @@ function combineSlices(results: { data?: BlockData }[]): BlockData | null {
 }
 
 /**
- * Fetches everything behind the performance page over [start, end): hourly per-client timings and
- * chain gas, block-level data (every block, or evenly spread slices on long ranges) and the
- * slowest blocks of the whole range.
+ * Fetches everything behind the performance page over [start, end): hourly (or, when `daily`, daily) per-client
+ * timings and chain gas, block-level data (every block, or evenly spread slices on long ranges) and the
+ * slowest blocks of the whole range. The previous range's data stays until the next one loads.
  */
 export function usePerformanceData({
   start,
   end,
+  daily,
   referenceNodesOnly,
 }: {
   start: number;
   end: number;
+  /** Read the daily tables, which hold the whole range from its first day */
+  daily: boolean;
   referenceNodesOnly: boolean;
 }): { hourly: HourlyData | null; blocks: BlockData | null; slowBlocks: SlowBlock[] | null } {
   const { currentNetwork } = useNetwork();
@@ -160,43 +168,76 @@ export function usePerformanceData({
   const refNodeFilter: RefNodeFilter = referenceNodesOnly ? { node_class_eq: 'eip7870-block-builder' } : {};
   const on = !!currentNetwork;
 
+  const today = currentUtcDate();
+
   const gasUsedHourly = useQuery({
-    queryKey: ['engine-perf', 'gas-used-hourly', network, start, end],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctExecutionGasUsedHourly>(
-        fctExecutionGasUsedHourlyServiceList,
-        {
-          query: {
-            hour_start_date_time_gte: start,
-            hour_start_date_time_lt: end,
-            order_by: 'hour_start_date_time ASC',
-            page_size: 10000,
-          },
-        },
-        'fct_execution_gas_used_hourly',
-        signal
-      ),
+    queryKey: ['engine-perf', 'gas-used', network, daily, start, end],
+    queryFn: ({ signal }): Promise<HourlyData['gasUsedHourly']> =>
+      daily
+        ? // The table goes back to genesis, so read only the range's days, newest first
+          fctExecutionGasUsedDailyServiceList({
+            query: {
+              day_start_date_ne: today,
+              order_by: 'day_start_date DESC',
+              page_size: Math.round((end - start) / 86400),
+            },
+            signal,
+            throwOnError: true,
+          }).then(({ data }) => data.fct_execution_gas_used_daily ?? [])
+        : fetchAllPages<FctExecutionGasUsedHourly>(
+            fctExecutionGasUsedHourlyServiceList,
+            {
+              query: {
+                hour_start_date_time_gte: start,
+                hour_start_date_time_lt: end,
+                order_by: 'hour_start_date_time ASC',
+                page_size: 10000,
+              },
+            },
+            'fct_execution_gas_used_hourly',
+            signal
+          ),
     enabled: on,
     placeholderData: keepPreviousData,
   });
 
   const perClientHourly = useQuery({
-    queryKey: ['engine-perf', 'by-el-client-hourly', network, start, end, referenceNodesOnly],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctEngineNewPayloadByElClientHourly>(
-        fctEngineNewPayloadByElClientHourlyServiceList,
-        {
-          query: {
-            hour_start_date_time_gte: start,
-            hour_start_date_time_lt: end,
-            order_by: 'hour_start_date_time DESC',
-            page_size: 10000,
-            ...refNodeFilter,
-          },
-        },
-        'fct_engine_new_payload_by_el_client_hourly',
-        signal
-      ),
+    queryKey: ['engine-perf', 'by-el-client', network, daily, start, end, referenceNodesOnly],
+    queryFn: ({ signal }): Promise<FctEngineNewPayloadByElClientHourly[]> =>
+      daily
+        ? // The daily table starts at the range's first day
+          fetchAllPages<FctEngineNewPayloadByElClientDaily>(
+            fctEngineNewPayloadByElClientDailyServiceList,
+            {
+              query: {
+                day_start_date_ne: today,
+                order_by: 'day_start_date DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_new_payload_by_el_client_daily',
+            signal
+          ).then(rows =>
+            rows.map(({ day_start_date, ...row }) => ({
+              ...row,
+              hour_start_date_time: Date.parse(`${day_start_date}T00:00:00Z`) / 1000,
+            }))
+          )
+        : fetchAllPages<FctEngineNewPayloadByElClientHourly>(
+            fctEngineNewPayloadByElClientHourlyServiceList,
+            {
+              query: {
+                hour_start_date_time_gte: start,
+                hour_start_date_time_lt: end,
+                order_by: 'hour_start_date_time DESC',
+                page_size: 10000,
+                ...refNodeFilter,
+              },
+            },
+            'fct_engine_new_payload_by_el_client_hourly',
+            signal
+          ),
     enabled: on,
     placeholderData: keepPreviousData,
   });
@@ -209,11 +250,15 @@ export function usePerformanceData({
     })),
     combine: combineSlices,
   });
+  // The slices' keys change with the range, so hold the last complete set while the next one loads
+  const [shownBlocks, setShownBlocks] = useState<BlockData | null>(null);
+  if (blocks && blocks !== shownBlocks) setShownBlocks(blocks);
 
   const slowBlocks = useQuery({
     queryKey: ['engine-perf', 'slowest-blocks', network, start, end, referenceNodesOnly],
     queryFn: ({ signal }) => fetchSlowestBlocks(start, end, refNodeFilter, signal),
     enabled: on,
+    placeholderData: keepPreviousData,
   });
 
   const hourly = useMemo(
@@ -224,7 +269,7 @@ export function usePerformanceData({
 
   return {
     hourly,
-    blocks,
+    blocks: blocks ?? shownBlocks,
     slowBlocks: slowBlocks.data ?? null,
   };
 }

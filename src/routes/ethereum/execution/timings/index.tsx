@@ -11,9 +11,10 @@ export const Route = createFileRoute('/ethereum/execution/timings/')({
       throw redirect({
         to: '/ethereum/execution/performance',
         search: {
+          // Performance has no 90d, 6mo or 1y range, so those open All
           range:
             search.range === '90days' || search.range === '180days' || search.range === '365days'
-              ? undefined
+              ? 'all'
               : search.range,
         },
       });

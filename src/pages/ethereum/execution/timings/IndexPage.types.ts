@@ -3,12 +3,12 @@ import { z } from 'zod';
 /**
  * Time range options for engine timing data
  */
-export type TimeRange = '1hour' | '6hours' | '24hours' | '7days' | '31days' | '90days' | '180days' | '365days';
+export type TimeRange = '1hour' | '6hours' | '24hours' | '7days' | '31days' | '90days' | '180days' | '365days' | 'all';
 
 /**
- * Time range configuration with labels and duration in seconds
+ * Time range configuration with labels and duration in seconds (null for All)
  */
-export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: number }> = {
+export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: number | null }> = {
   '1hour': { label: 'Last 1h', seconds: 3600 },
   '6hours': { label: 'Last 6h', seconds: 21600 },
   '24hours': { label: 'Last 24h', seconds: 86400 },
@@ -17,6 +17,7 @@ export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: numb
   '90days': { label: 'Last 90d', seconds: 7776000 },
   '180days': { label: 'Last 6mo', seconds: 15552000 },
   '365days': { label: 'Last 1y', seconds: 31536000 },
+  all: { label: 'All', seconds: null },
 };
 
 /**
@@ -41,7 +42,7 @@ export const timingsSearchSchema = z.object({
   tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients', 'performance']).optional(),
 
   // Time range for data queries
-  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days']).optional(),
+  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days', 'all']).optional(),
 
   // Filter to reference nodes only (ethPandaOps controlled fleet)
   refNodes: z.boolean().optional(),
@@ -55,7 +56,7 @@ export type TimingsSearch = z.infer<typeof timingsSearchSchema>;
 /**
  * Default time range for the page
  */
-export const DEFAULT_TIME_RANGE: TimeRange = '7days';
+export const DEFAULT_TIME_RANGE: TimeRange = 'all';
 
 /**
  * Status values for engine_newPayload responses

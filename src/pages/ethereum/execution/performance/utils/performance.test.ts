@@ -7,6 +7,7 @@ import {
   linearFit,
   mgasPerSecond,
   normalizeClient,
+  rangeBounds,
   rangeDays,
 } from './performance';
 
@@ -110,5 +111,25 @@ describe('normalizeClient', () => {
     expect(normalizeClient('go-ethereum')).toBe('geth');
     expect(normalizeClient('Nethermind')).toBe('nethermind');
     expect(normalizeClient(undefined)).toBe('unknown');
+  });
+});
+
+describe('rangeBounds', () => {
+  // 2026-11-05 13:20 UTC
+  const now = Date.UTC(2026, 10, 5, 13, 20);
+
+  it('ends a fixed range at the last full hour', () => {
+    expect(rangeBounds(3600, 0, now)).toEqual({
+      start: Date.UTC(2026, 10, 5, 12) / 1000,
+      end: Date.UTC(2026, 10, 5, 13) / 1000,
+    });
+  });
+
+  it('runs All from the first data day to the last full day', () => {
+    // First data at 2025-12-09 00:29:23 UTC
+    expect(rangeBounds(null, Date.UTC(2025, 11, 9, 0, 29, 23) / 1000, now)).toEqual({
+      start: Date.UTC(2025, 11, 9) / 1000,
+      end: Date.UTC(2026, 10, 5) / 1000,
+    });
   });
 });

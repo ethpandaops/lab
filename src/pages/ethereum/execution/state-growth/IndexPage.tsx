@@ -17,6 +17,7 @@ const TIMEFRAME_OPTIONS: { value: DeltaTimeframe; label: string }[] = [
   { value: 'weekly', label: '7d' },
   { value: 'monthly', label: '30d' },
   { value: 'yearly', label: '1Y' },
+  { value: 'all', label: 'All' },
 ];
 
 function formatBytes(bytes: number): string {
@@ -46,9 +47,11 @@ function formatDeltaBytes(bytes: number): string {
 export function IndexPage(): JSX.Element {
   const { data, isLoading, error } = useStateSizeData();
   const { currentNetwork } = useNetwork();
-  const [timeframe, setTimeframe] = useState<DeltaTimeframe>('daily');
+  const [timeframe, setTimeframe] = useState<DeltaTimeframe>('all');
   const delta = useStateDelta(data, timeframe);
   const latestData = delta?.latest;
+  // The first day's state is tiny, so a percentage change against it is meaningless
+  const showPercentChange = timeframe !== 'all';
 
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -186,15 +189,17 @@ export function IndexPage(): JSX.Element {
                     <TotalIcon className="size-4" />
                     <span className="text-sm font-semibold tabular-nums">{formatDeltaBytes(delta.total.delta)}</span>
                   </div>
-                  <span
-                    className={clsx(
-                      'text-sm font-medium tabular-nums',
-                      totalIsPositive ? 'text-warning' : 'text-success'
-                    )}
-                  >
-                    {delta.total.percentChange >= 0 ? '+' : ''}
-                    {delta.total.percentChange.toFixed(3)}%
-                  </span>
+                  {showPercentChange && (
+                    <span
+                      className={clsx(
+                        'text-sm font-medium tabular-nums',
+                        totalIsPositive ? 'text-warning' : 'text-success'
+                      )}
+                    >
+                      {delta.total.percentChange >= 0 ? '+' : ''}
+                      {delta.total.percentChange.toFixed(3)}%
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -215,15 +220,17 @@ export function IndexPage(): JSX.Element {
                     >
                       {formatDeltaBytes(delta.accounts.bytes.delta)}
                     </span>
-                    <span
-                      className={clsx(
-                        'text-xs font-medium tabular-nums',
-                        delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                      )}
-                    >
-                      {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
-                      {delta.accounts.bytes.percentChange.toFixed(3)}%
-                    </span>
+                    {showPercentChange && (
+                      <span
+                        className={clsx(
+                          'text-xs font-medium tabular-nums',
+                          delta.accounts.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                        )}
+                      >
+                        {delta.accounts.bytes.percentChange >= 0 ? '+' : ''}
+                        {delta.accounts.bytes.percentChange.toFixed(3)}%
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1.5 text-sm text-muted tabular-nums">
                     Account Leaves: {latestData.accounts.toLocaleString()} ({formatBytes(latestData.account_bytes)})
@@ -245,15 +252,17 @@ export function IndexPage(): JSX.Element {
                     >
                       {formatDeltaBytes(delta.storage.bytes.delta)}
                     </span>
-                    <span
-                      className={clsx(
-                        'text-xs font-medium tabular-nums',
-                        delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                      )}
-                    >
-                      {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
-                      {delta.storage.bytes.percentChange.toFixed(3)}%
-                    </span>
+                    {showPercentChange && (
+                      <span
+                        className={clsx(
+                          'text-xs font-medium tabular-nums',
+                          delta.storage.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                        )}
+                      >
+                        {delta.storage.bytes.percentChange >= 0 ? '+' : ''}
+                        {delta.storage.bytes.percentChange.toFixed(3)}%
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1.5 text-sm text-muted tabular-nums">
                     Storage Leaves: {latestData.storages.toLocaleString()} ({formatBytes(latestData.storage_bytes)})
@@ -277,15 +286,17 @@ export function IndexPage(): JSX.Element {
                     >
                       {formatDeltaBytes(delta.contractCodes.bytes.delta)}
                     </span>
-                    <span
-                      className={clsx(
-                        'text-xs font-medium tabular-nums',
-                        delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-success'
-                      )}
-                    >
-                      {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
-                      {delta.contractCodes.bytes.percentChange.toFixed(3)}%
-                    </span>
+                    {showPercentChange && (
+                      <span
+                        className={clsx(
+                          'text-xs font-medium tabular-nums',
+                          delta.contractCodes.bytes.delta >= 0 ? 'text-warning' : 'text-success'
+                        )}
+                      >
+                        {delta.contractCodes.bytes.percentChange >= 0 ? '+' : ''}
+                        {delta.contractCodes.bytes.percentChange.toFixed(3)}%
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1.5 text-sm text-muted tabular-nums">
                     Unique Bytecodes: {latestData.contract_codes.toLocaleString()}

@@ -16,8 +16,10 @@ import { Sparkline } from '@/components/Charts/Sparkline';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
+import { completeBucketEnd } from '@/utils/time';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
+import { useTableBounds } from '@/hooks/useBounds';
 import { usePerformanceData } from './hooks/usePerformanceData';
 import { useOpcodeCostData } from './hooks/useOpcodeCostData';
 import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
@@ -74,6 +76,10 @@ function fmtPct(value: number): string {
 function timeFormatter(timeRange: TimeRange): (value: number | string) => string {
   return value => {
     const date = new Date(Number(value));
+    // Daily points sit at UTC midnight
+    if (timeRange === 'all') {
+      return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+    }
     if (timeRange === '7days' || timeRange === '31days') {
       return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
@@ -99,6 +105,8 @@ export function IndexPage(): JSX.Element {
   const timeRange: TimeRange = range ?? DEFAULT_TIME_RANGE;
   const referenceNodesOnly = refNodes ?? true;
   const [showRefNodeInfo, setShowRefNodeInfo] = useState(false);
+  // All starts at the first day of the daily per-client table
+  const { data: dailyBounds, isLoading: boundsLoading } = useTableBounds(DAILY_TIMINGS_TABLE);
 
   return (
     <Container>
@@ -141,7 +149,15 @@ export function IndexPage(): JSX.Element {
 
       <ReferenceNodesInfoDialog open={showRefNodeInfo} onClose={() => setShowRefNodeInfo(false)} />
 
-      <PerformanceSections timeRange={timeRange} referenceNodesOnly={referenceNodesOnly} />
+      {timeRange === 'all' && boundsLoading ? (
+        <div className={clsx('h-96', SKELETON)} />
+      ) : (
+        <PerformanceSections
+          timeRange={timeRange}
+          referenceNodesOnly={referenceNodesOnly}
+          firstDataTime={dailyBounds?.min ?? completeBucketEnd('day') - 86400}
+        />
+      )}
     </Container>
   );
 }
@@ -156,6 +172,9 @@ function fmtDayWindow(start: number, end: number): string {
 
 const SKELETON = 'animate-pulse rounded-sm bg-surface outline -outline-offset-1 outline-border';
 
+/** Daily per-client newPayload timings, read at All */
+const DAILY_TIMINGS_TABLE = 'fct_engine_new_payload_by_el_client_daily';
+
 /**
  * Turns engine_newPayload timings plus block gas into execution throughput (Mgas/s), per-client
  * cost models, gas limit headroom, workload sensitivity and opcode pricing, all over the range.
@@ -163,9 +182,12 @@ const SKELETON = 'animate-pulse rounded-sm bg-surface outline -outline-offset-1 
 function PerformanceSections({
   timeRange,
   referenceNodesOnly,
+  firstDataTime,
 }: {
   timeRange: TimeRange;
   referenceNodesOnly: boolean;
+  /** Where All starts, in unix seconds */
+  firstDataTime: number;
 }): JSX.Element {
   const [percentile, setPercentile] = useState<'avg' | 'p95'>('avg');
   const [budget, setBudget] = useState<(typeof BUDGET_OPTIONS)[number]['value']>('1000');
@@ -177,9 +199,13 @@ function PerformanceSections({
     setMethodology(section);
   };
 
-  const { start, end } = useMemo(() => rangeBounds(TIME_RANGE_CONFIG[timeRange].seconds), [timeRange]);
-  const opcodeCosts = useOpcodeCostData(start, end);
-  const { hourly, blocks, slowBlocks } = usePerformanceData({ start, end, referenceNodesOnly });
+  const daily = timeRange === 'all';
+  const { start, end } = useMemo(
+    () => rangeBounds(TIME_RANGE_CONFIG[timeRange].seconds, firstDataTime),
+    [timeRange, firstDataTime]
+  );
+  const opcodeCosts = useOpcodeCostData(start, end, daily);
+  const { hourly, blocks, slowBlocks } = usePerformanceData({ start, end, daily, referenceNodesOnly });
   const usePerSlotTrend = PER_SLOT_CHART_RANGES.includes(timeRange);
   const sampled = blockSlices(start, end).length > 1;
 
@@ -285,7 +311,7 @@ function PerformanceSections({
         {/* Throughput over time */}
         <PopoutCard
           title="Execution Throughput"
-          subtitle={`Gas executed per second of engine_newPayload, ${usePerSlotTrend ? (timeRange === '1hour' ? 'per minute' : 'per 5 minutes') : 'hourly'}`}
+          subtitle={`Gas executed per second of engine_newPayload, ${usePerSlotTrend ? (timeRange === '1hour' ? 'per minute' : 'per 5 minutes') : daily ? 'daily' : 'hourly'}`}
           anchorId="throughput"
           modalSize="full"
           headerActions={
@@ -319,7 +345,7 @@ function PerformanceSections({
                 height={inModal ? 600 : 340}
                 showLegend
                 enableDataZoom
-                tooltipFormatter={params => throughputTooltip(params)}
+                tooltipFormatter={params => throughputTooltip(params, daily)}
               />
             ) : (
               <div className="h-[340px] animate-pulse rounded-xs bg-background" />
@@ -500,19 +526,19 @@ function ClientInline({ client }: { client: string }): JSX.Element {
   );
 }
 
-function throughputTooltip(params: unknown): string {
+function throughputTooltip(params: unknown, daily: boolean): string {
   const points = (Array.isArray(params) ? params : [params]) as {
     seriesName?: string;
     value?: [number, number];
     color?: string;
   }[];
   if (!points.length) return '';
-  const time = new Date(points[0].value?.[0] ?? 0).toLocaleString([], {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const time = new Date(points[0].value?.[0] ?? 0).toLocaleString(
+    [],
+    daily
+      ? { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
+      : { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+  );
   const rows = [...points]
     .filter(p => p.value?.[1] != null)
     .sort((a, b) => (b.value?.[1] ?? 0) - (a.value?.[1] ?? 0))
