@@ -187,6 +187,8 @@ export interface UseValidatorsDataReturn {
   };
   /** Loading state */
   isLoading: boolean;
+  /** The previous range's data is on screen while this range loads */
+  isPlaceholderData: boolean;
   /** Error state */
   error: Error | null;
   /** Whether any data has been fetched */

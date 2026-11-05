@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
-  fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions,
-  fctBlockProposerByValidatorServiceListOptions,
-  fctSyncCommitteeParticipationByValidatorDailyServiceListOptions,
-  fctValidatorBalanceDailyServiceListOptions,
-  fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions,
-  fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions,
-  fctValidatorBalanceWeeklyServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
-import { fctAttestationVoteCorrectnessByValidatorServiceList } from '@/api/sdk.gen';
+  fctAttestationVoteCorrectnessByValidatorDailyServiceList,
+  fctAttestationVoteCorrectnessByValidatorServiceList,
+  fctAttestationVoteCorrectnessByValidatorWeeklyServiceList,
+  fctBlockProposerByValidatorServiceList,
+  fctSyncCommitteeParticipationByValidatorDailyServiceList,
+  fctSyncCommitteeParticipationByValidatorWeeklyServiceList,
+  fctValidatorBalanceDailyServiceList,
+  fctValidatorBalanceWeeklyServiceList,
+} from '@/api/sdk.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import { weekStartOf } from '../utils/week';
@@ -36,6 +36,10 @@ import type {
 } from './useValidatorsData.types';
 
 const API_MAX_PAGE_SIZE = 10_000;
+/** Validators per request, so the index list keeps the URL short; page tokens fetch the rows beyond one page */
+const VALIDATORS_PER_REQUEST = 250;
+
+type ListFn = Parameters<typeof fetchAllPages>[0];
 
 /** Split an array into chunks of a given size */
 function chunkArray<T>(array: T[], size: number): T[][] {
@@ -44,15 +48,6 @@ function chunkArray<T>(array: T[], size: number): T[][] {
     chunks.push(array.slice(i, i + size));
   }
   return chunks;
-}
-
-/** Count the number of days in a UTC timestamp range (inclusive) */
-function countDaysInRange(startTs: number, endTs: number): number {
-  const startDate = new Date(startTs * 1000);
-  startDate.setUTCHours(0, 0, 0, 0);
-  const endDate = new Date(endTs * 1000);
-  endDate.setUTCHours(0, 0, 0, 0);
-  return Math.max(1, Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1);
 }
 
 /**
@@ -522,190 +517,98 @@ export function useValidatorsData(
   const weekFilter = allHistory
     ? { week_start_date_ne: currentUtcWeek() }
     : { week_start_date_in_values: dateRangeString };
-
-  // Split validators into chunks so each chunk x rows per validator < API_MAX_PAGE_SIZE
-  const rowsPerValidator = weekly
-    ? Math.ceil(countDaysInRange(startTime, endTime) / 7) + 1
-    : countDaysInRange(startTime, endTime);
-  const maxValidatorsPerChunk = Math.max(1, Math.floor(API_MAX_PAGE_SIZE / rowsPerValidator));
-  const validatorChunks = useMemo(
-    () => (enabled ? chunkArray(validatorIndices, maxValidatorsPerChunk) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [enabled, indicesString, maxValidatorsPerChunk]
-  );
-  const chunkCount = validatorChunks.length;
-
-  // Build dynamic query list: for each chunk, generate 4 endpoint queries
-  // Layout: [attestation_chunk0..N, sync_chunk0..N, balance_chunk0..N, blockProposer_chunk0..N]
-  const results = useQueries({
-    queries: validatorChunks.flatMap(chunk => {
-      const validator_index_in_values = chunk.join(',');
-      const dailyQuery = {
-        validator_index_in_values,
-        ...dayFilter,
-        page_size: API_MAX_PAGE_SIZE,
-        order_by: 'day_start_date',
-      };
-      const weeklyQuery = {
-        validator_index_in_values,
-        ...weekFilter,
-        page_size: API_MAX_PAGE_SIZE,
-        order_by: 'week_start_date',
-      };
-      return [
-        weekly
-          ? { ...fctAttestationVoteCorrectnessByValidatorWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
-          : { ...fctAttestationVoteCorrectnessByValidatorDailyServiceListOptions({ query: dailyQuery }), enabled },
-        weekly
-          ? { ...fctSyncCommitteeParticipationByValidatorWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
-          : { ...fctSyncCommitteeParticipationByValidatorDailyServiceListOptions({ query: dailyQuery }), enabled },
-        weekly
-          ? { ...fctValidatorBalanceWeeklyServiceListOptions({ query: weeklyQuery }), enabled }
-          : { ...fctValidatorBalanceDailyServiceListOptions({ query: dailyQuery }), enabled },
-        {
-          ...fctBlockProposerByValidatorServiceListOptions({
-            query: {
-              validator_index_in_values,
-              slot_start_date_time_gte: startTime,
-              slot_start_date_time_lte: endTime + 86400,
-              page_size: API_MAX_PAGE_SIZE,
-              order_by: 'slot_start_date_time',
-            },
-          }),
-          enabled,
-        },
-      ];
-    }),
-  });
+  const periodFilter = weekly ? weekFilter : dayFilter;
+  const periodColumn = weekly ? 'week_start_date' : 'day_start_date';
 
   // Wrong source votes over the same days or weeks as the rollups, from the per-slot table
   const firstDay = new Date(startTime * 1000).toISOString().slice(0, 10);
   const lastDay = new Date(endTime * 1000).toISOString().slice(0, 10);
   const missesFrom = allHistory ? 0 : dateStringToTimestamp(weekly ? weekStartOf(firstDay) : firstDay);
   const missesTo = dateStringToTimestamp(weekly ? weekStartOf(lastDay) : lastDay) + (weekly ? 7 : 1) * 86400;
-  const sourceMissResults = useQueries({
-    queries: validatorChunks.map(chunk => ({
-      queryKey: ['validators', 'source-misses', currentNetwork?.name, chunk.join(','), missesFrom, missesTo, weekly],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchAllPages<FctAttestationVoteCorrectnessByValidator>(
-          fctAttestationVoteCorrectnessByValidatorServiceList,
-          {
-            query: {
-              validator_index_in_values: chunk.join(','),
-              slot_start_date_time_gte: missesFrom,
-              slot_start_date_time_lt: missesTo,
-              source_correct_eq: false,
-              page_size: API_MAX_PAGE_SIZE,
-            },
-          },
-          'fct_attestation_vote_correctness_by_validator',
-          signal
+
+  const { data, isLoading, isPlaceholderData, error } = useQuery({
+    queryKey: [
+      'validators',
+      'inspect',
+      currentNetwork?.name,
+      indicesString,
+      resolution,
+      periodFilter,
+      startTime,
+      endTime,
+      missesFrom,
+      missesTo,
+    ],
+    queryFn: async ({ signal }) => {
+      const chunks = chunkArray(validatorIndices, VALIDATORS_PER_REQUEST).map(c => c.join(','));
+      /** Every row for every chunk of validators */
+      const rows = async <T>(fn: unknown, table: string, query: Record<string, unknown>): Promise<T[]> =>
+        (
+          await Promise.all(
+            chunks.map(ids =>
+              fetchAllPages<T>(
+                fn as ListFn,
+                { query: { validator_index_in_values: ids, ...query, page_size: API_MAX_PAGE_SIZE } },
+                table,
+                signal
+              )
+            )
+          )
+        ).flat();
+      // Weekly rows keep the daily shape, keyed by their week's Monday, so every consumer reads both
+      const rollup = async <T>(daily: unknown, weeklyFn: unknown, table: string): Promise<T[]> =>
+        (
+          await rows<T & { week_start_date?: string }>(
+            weekly ? weeklyFn : daily,
+            `${table}_${weekly ? 'weekly' : 'daily'}`,
+            { ...periodFilter, order_by: `${periodColumn}, validator_index` }
+          )
+        ).map(({ week_start_date, ...rest }) =>
+          week_start_date === undefined ? (rest as T) : ({ ...rest, day_start_date: week_start_date } as T)
+        );
+
+      const [attestation, syncCommittee, balance, blockProposal, sourceMissRows] = await Promise.all([
+        rollup<FctAttestationVoteCorrectnessByValidatorDaily>(
+          fctAttestationVoteCorrectnessByValidatorDailyServiceList,
+          fctAttestationVoteCorrectnessByValidatorWeeklyServiceList,
+          'fct_attestation_vote_correctness_by_validator'
         ),
-      enabled,
-    })),
+        rollup<FctSyncCommitteeParticipationByValidatorDaily>(
+          fctSyncCommitteeParticipationByValidatorDailyServiceList,
+          fctSyncCommitteeParticipationByValidatorWeeklyServiceList,
+          'fct_sync_committee_participation_by_validator'
+        ),
+        rollup<FctValidatorBalanceDaily>(
+          fctValidatorBalanceDailyServiceList,
+          fctValidatorBalanceWeeklyServiceList,
+          'fct_validator_balance'
+        ),
+        rows<FctBlockProposerByValidator>(fctBlockProposerByValidatorServiceList, 'fct_block_proposer_by_validator', {
+          slot_start_date_time_gte: startTime,
+          slot_start_date_time_lt: endTime + 86400,
+          order_by: 'slot_start_date_time',
+        }),
+        rows<FctAttestationVoteCorrectnessByValidator>(
+          fctAttestationVoteCorrectnessByValidatorServiceList,
+          'fct_attestation_vote_correctness_by_validator',
+          { slot_start_date_time_gte: missesFrom, slot_start_date_time_lt: missesTo, source_correct_eq: false }
+        ),
+      ]);
+      return {
+        attestation,
+        syncCommittee,
+        balance,
+        blockProposal,
+        sourceMisses: countSourceMisses(sourceMissRows, weekly),
+      };
+    },
+    enabled,
+    // Another range of the same validators stays on screen while this one loads
+    placeholderData: (previous, previousQuery) => (previousQuery?.queryKey[3] === indicesString ? previous : undefined),
   });
 
-  const isLoading = results.some(r => r.isLoading) || sourceMissResults.some(r => r.isLoading);
-  const error = results.find(r => r.error)?.error ?? sourceMissResults.find(r => r.error)?.error ?? null;
-
-  // Type assertions for response data extraction
-  // Weekly rows keep the daily shape, keyed by their week's Monday, so every consumer reads both
-  type WeekRow<T> = Omit<T, 'day_start_date'> & { week_start_date?: string };
-  type AttestationResponse = {
-    fct_attestation_vote_correctness_by_validator_daily?: FctAttestationVoteCorrectnessByValidatorDaily[];
-    fct_attestation_vote_correctness_by_validator_weekly?: WeekRow<FctAttestationVoteCorrectnessByValidatorDaily>[];
-  };
-  type SyncCommitteeResponse = {
-    fct_sync_committee_participation_by_validator_daily?: FctSyncCommitteeParticipationByValidatorDaily[];
-    fct_sync_committee_participation_by_validator_weekly?: WeekRow<FctSyncCommitteeParticipationByValidatorDaily>[];
-  };
-  type BalanceResponse = {
-    fct_validator_balance_daily?: FctValidatorBalanceDaily[];
-    fct_validator_balance_weekly?: WeekRow<FctValidatorBalanceDaily>[];
-  };
-  const asDaily = <T>(rows: WeekRow<T>[] | undefined): T[] =>
-    (rows ?? []).map(({ week_start_date, ...rest }) => ({ ...rest, day_start_date: week_start_date }) as T);
-  type BlockProposalResponse = { fct_block_proposer_by_validator?: FctBlockProposerByValidator[] };
-
-  // Merge chunked results: each chunk produced 4 queries (attestation, sync, balance, blockProposer)
-  // Use dataUpdatedAt as a stable dependency — changes only when data actually updates
-  const attestationUpdatedAt = results
-    .filter((_, i) => i % 4 === 0)
-    .map(r => r.dataUpdatedAt)
-    .join(',');
-  const syncUpdatedAt = results
-    .filter((_, i) => i % 4 === 1)
-    .map(r => r.dataUpdatedAt)
-    .join(',');
-  const balanceUpdatedAt = results
-    .filter((_, i) => i % 4 === 2)
-    .map(r => r.dataUpdatedAt)
-    .join(',');
-  const blockProposalUpdatedAt = results
-    .filter((_, i) => i % 4 === 3)
-    .map(r => r.dataUpdatedAt)
-    .join(',');
-
-  const attestationData = useMemo(() => {
-    if (chunkCount === 0) return [];
-    return results
-      .filter((_, i) => i % 4 === 0)
-      .flatMap(r => {
-        const data = r.data as AttestationResponse | undefined;
-        return (
-          data?.fct_attestation_vote_correctness_by_validator_daily ??
-          asDaily(data?.fct_attestation_vote_correctness_by_validator_weekly)
-        );
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, attestationUpdatedAt]);
-
-  const syncCommitteeData = useMemo(() => {
-    if (chunkCount === 0) return [];
-    return results
-      .filter((_, i) => i % 4 === 1)
-      .flatMap(r => {
-        const data = r.data as SyncCommitteeResponse | undefined;
-        return (
-          data?.fct_sync_committee_participation_by_validator_daily ??
-          asDaily(data?.fct_sync_committee_participation_by_validator_weekly)
-        );
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, syncUpdatedAt]);
-
-  const balanceData = useMemo(() => {
-    if (chunkCount === 0) return [];
-    return results
-      .filter((_, i) => i % 4 === 2)
-      .flatMap(r => {
-        const data = r.data as BalanceResponse | undefined;
-        return data?.fct_validator_balance_daily ?? asDaily(data?.fct_validator_balance_weekly);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, balanceUpdatedAt]);
-
-  const blockProposalData = useMemo(() => {
-    if (chunkCount === 0) return [];
-    return results
-      .filter((_, i) => i % 4 === 3)
-      .flatMap(r => (r.data as BlockProposalResponse | undefined)?.fct_block_proposer_by_validator ?? []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chunkCount, blockProposalUpdatedAt]);
-
-  const sourceMissesUpdatedAt = sourceMissResults.map(r => r.dataUpdatedAt).join(',');
-  const sourceMisses = useMemo(
-    () =>
-      countSourceMisses(
-        sourceMissResults.flatMap(r => r.data ?? []),
-        weekly
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sourceMissesUpdatedAt, weekly]
-  );
-
   const processedData = useMemo(() => {
-    if (!enabled || isLoading) {
+    if (!data) {
       return {
         validators: [],
         summary: null,
@@ -715,6 +618,13 @@ export function useValidatorsData(
         blockProposals: [],
       };
     }
+    const {
+      attestation: attestationData,
+      syncCommittee: syncCommitteeData,
+      balance: balanceData,
+      blockProposal: blockProposalData,
+      sourceMisses,
+    } = data;
 
     const attestationByValidator = aggregateAttestationByValidator(attestationData, sourceMisses);
     const syncCommitteeByValidator = aggregateSyncCommitteeByValidator(syncCommitteeData);
@@ -786,22 +696,20 @@ export function useValidatorsData(
       balanceDaily: transformBalanceDaily(balanceData),
       blockProposals: transformBlockProposals(blockProposalData),
     };
-  }, [enabled, isLoading, attestationData, sourceMisses, syncCommitteeData, balanceData, blockProposalData]);
+  }, [data]);
 
+  const raw = {
+    attestation: data?.attestation ?? [],
+    syncCommittee: data?.syncCommittee ?? [],
+    balance: data?.balance ?? [],
+    blockProposal: data?.blockProposal ?? [],
+  };
   return {
     ...processedData,
-    raw: {
-      attestation: attestationData,
-      syncCommittee: syncCommitteeData,
-      balance: balanceData,
-      blockProposal: blockProposalData,
-    },
+    raw,
     isLoading,
-    error: error as Error | null,
-    hasData:
-      attestationData.length > 0 ||
-      syncCommitteeData.length > 0 ||
-      balanceData.length > 0 ||
-      blockProposalData.length > 0,
+    isPlaceholderData,
+    error,
+    hasData: Object.values(raw).some(rows => rows.length > 0),
   };
 }

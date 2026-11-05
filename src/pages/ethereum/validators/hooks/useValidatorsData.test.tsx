@@ -111,4 +111,36 @@ describe('useValidatorsData', () => {
     // Head and target still divide by attestations
     expect(result.current.summary?.attestation.headCorrectRate).toBe(100);
   });
+
+  it('asks for 250 validators per request and follows page tokens', async () => {
+    const urls: URL[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (request: Request) => {
+        const url = new URL(request.url);
+        urls.push(url);
+        const body = url.pathname.endsWith('fct_validator_balance_daily')
+          ? url.searchParams.get('page_token')
+            ? { fct_validator_balance_daily: [{ day_start_date: '2026-09-01', validator_index: 2, end_balance: 1 }] }
+            : {
+                fct_validator_balance_daily: [{ day_start_date: '2026-09-01', validator_index: 1, end_balance: 1 }],
+                next_page_token: 'next',
+              }
+          : {};
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      })
+    );
+
+    const indices = Array.from({ length: 300 }, (_, i) => i + 1);
+    const { result } = renderHook(() => useValidatorsData(indices, 1788220800, 1788220800), { wrapper });
+
+    await waitFor(() => expect(result.current.summary).not.toBeNull());
+    const sizes = urls
+      .filter(u => u.pathname.endsWith('fct_attestation_vote_correctness_by_validator_daily'))
+      .map(u => u.searchParams.get('validator_index_in_values')?.split(',').length);
+    expect(sizes).toEqual([250, 50]);
+    // Two chunks, each with a second page
+    expect(urls.filter(u => u.pathname.endsWith('fct_validator_balance_daily'))).toHaveLength(4);
+    expect(result.current.raw.balance).toHaveLength(4);
+  });
 });

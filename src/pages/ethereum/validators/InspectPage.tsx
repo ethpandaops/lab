@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -27,7 +28,7 @@ import {
 } from './components';
 import type { HeatmapMetric, ValidatorSelection, ValidatorState } from './components';
 
-/** Search params for the inspect page; no `from` means all history */
+/** Search params for the inspect page; no `from` means all history, no `to` the last complete day */
 interface InspectSearch {
   indices?: string;
   from?: number;
@@ -37,8 +38,6 @@ interface InspectSearch {
 const DAY = 86_400;
 /** Ranges longer than this load one row per validator per week instead of per day */
 const MAX_DAILY_RANGE_DAYS = 120;
-/** Range shown when the URL has none */
-const DEFAULT_RANGE_DAYS = 30;
 
 const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
 /** Monday (UTC) of the week containing the day */
@@ -78,7 +77,9 @@ export function InspectPage(): JSX.Element {
   const lastDay = completeBucketEnd('day') - DAY;
   const lastWeekDay = completeBucketEnd('week') - DAY;
   const to = range.to ?? lastDay;
-  const from = range.from ?? to - (DEFAULT_RANGE_DAYS - 1) * DAY;
+  // Until the earliest day is known, an open start has no date; nothing loads before then
+  const rangeFrom = range.from ?? earliest;
+  const from = rangeFrom ?? to;
   // Only a range that also ends on the last complete day can skip listing its periods; an earlier end must cut rows off
   const allHistory = earliest !== undefined && from <= earliest && to >= lastDay;
   const resolution = (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
@@ -95,7 +96,7 @@ export function InspectPage(): JSX.Element {
     unresolvedPubkeys,
   } = useValidatorResolver(parsedIndices, parsedPubkeys, hasAnalyzed);
 
-  const ready = hasAnalyzed && isResolved;
+  const ready = hasAnalyzed && isResolved && rangeFrom !== undefined;
   const {
     validators,
     summary,
@@ -104,6 +105,7 @@ export function InspectPage(): JSX.Element {
     syncCommitteeDaily,
     blockProposals,
     isLoading,
+    isPlaceholderData,
     error,
     hasData,
     raw,
@@ -155,6 +157,7 @@ export function InspectPage(): JSX.Element {
         to: '/ethereum/validators/inspect',
         search: prev => ({ ...prev, indices: tagList.join(',') || undefined, from: next.from, to: next.to }),
         replace: true,
+        resetScroll: false,
       });
     },
     [navigate]
@@ -177,14 +180,16 @@ export function InspectPage(): JSX.Element {
     [range, updateUrl]
   );
 
-  // Range changes apply straight away once a set has been analysed
+  // Range changes apply straight away once a set has been analysed; All leaves both ends open
   const applyRange = useCallback(
-    (next: { from?: number; to?: number }) => {
+    (picked: { from: number; to: number }) => {
+      const isAll = earliest !== undefined && picked.from <= earliest && picked.to === completeBucketEnd('day') - DAY;
+      const next = isAll ? {} : picked;
       setRange(next);
       setSelection({ validatorIndex: null, dayTimestamp: null, hourTimestamp: null });
       if (hasAnalyzed) updateUrl(tags, next);
     },
-    [hasAnalyzed, tags, updateUrl]
+    [earliest, hasAnalyzed, tags, updateUrl]
   );
 
   const handleRangeChange = useCallback(
@@ -202,7 +207,8 @@ export function InspectPage(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const busy = isResolving || isLoading;
+  const loading = isResolving || isLoading || rangeFrom === undefined;
+  const busy = loading || isPlaceholderData;
   // Attestation and proposal tables start later than balances; the heatmap and table begin where they do
   const performanceFrom = performanceFloor !== undefined ? Math.max(dataFrom, performanceFloor) : dataFrom;
   const rangeMeta = (
@@ -270,7 +276,7 @@ export function InspectPage(): JSX.Element {
         )}
 
         {hasAnalyzed && !error && !resolverError && knownIndices.length > 0 && (
-          <>
+          <div className={clsx('flex flex-col gap-10 transition-opacity', isPlaceholderData && 'opacity-60')}>
             <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
               {identityList.length === 1 && (!endsEarlier || endStates) && (
                 <ValidatorIdentityCard identity={identityList[0]} endState={endStates?.get(identityList[0].index)} />
@@ -279,7 +285,7 @@ export function InspectPage(): JSX.Element {
                 <ValidatorSetCard identities={identityList} endStates={endStates} />
               )}
               {newValidators.length > 0 && <NewValidatorsCard statuses={newValidators} className="self-start" />}
-              {hasData && !isLoading && (
+              {hasData && (
                 <ValidatorBalance
                   balances={raw.balance}
                   validatorIndices={knownIndices}
@@ -292,7 +298,7 @@ export function InspectPage(): JSX.Element {
             </div>
 
             <InspectSection title="Performance" meta={rangeMeta} note={performanceNote}>
-              <PerformanceSummary summary={summary} isLoading={busy} />
+              <PerformanceSummary summary={summary} isLoading={loading} />
               <ValidatorHeatmap
                 data={attestationDaily}
                 blockProposals={blockProposals}
@@ -302,13 +308,13 @@ export function InspectPage(): JSX.Element {
                 to={dataTo}
                 stepDays={resolution === 'week' ? 7 : 1}
                 onWeekSelect={weekStart => applyRange({ from: weekStart, to: weekStart + 6 * DAY })}
-                isLoading={busy}
+                isLoading={loading}
                 validatorIndices={knownIndices}
                 selection={selection}
                 onCellSelect={setSelection}
                 getStatusAtTimestamp={getStatusAtTimestamp}
               />
-              {busy ? (
+              {loading ? (
                 <ValidatorsSkeleton />
               ) : hasData ? (
                 <ValidatorTable
@@ -320,6 +326,11 @@ export function InspectPage(): JSX.Element {
                   validatorMap={pubkeys}
                   from={performanceFrom}
                   to={dataTo}
+                  stepDays={resolution === 'week' ? 7 : 1}
+                  onWeekSelect={(validatorIndex, weekStart) => {
+                    applyRange({ from: weekStart, to: weekStart + 6 * DAY });
+                    setSelection({ validatorIndex, dayTimestamp: null, hourTimestamp: null });
+                  }}
                   getStatusAtTimestamp={getStatusAtTimestamp}
                   selection={selection}
                   onValidatorSelect={setSelection}
@@ -331,10 +342,10 @@ export function InspectPage(): JSX.Element {
               )}
             </InspectSection>
 
-            {hasData && !isLoading && (
+            {hasData && (
               <ValidatorDuties indices={knownIndices} from={dataFrom} to={dataTo} proposals={raw.blockProposal} />
             )}
-          </>
+          </div>
         )}
       </div>
     </Container>

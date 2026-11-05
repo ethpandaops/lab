@@ -64,7 +64,7 @@ export function ValidatorEvents({
       query: {
         validator_index_in_values: (validator === null ? indices : [validator]).join(','),
         slot_start_date_time_gte: from,
-        slot_start_date_time_lte: to + 86_400,
+        slot_start_date_time_lt: to + 86_400,
         order_by: 'slot DESC, event_position ASC',
         page_size: page.pageSize,
         page_token: page.pageToken,

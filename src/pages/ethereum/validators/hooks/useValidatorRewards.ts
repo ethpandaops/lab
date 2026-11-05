@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctAttestationRewardByValidatorDailyServiceList,
   fctAttestationRewardByValidatorWeeklyServiceList,
@@ -20,6 +20,8 @@ import { currentUtcDate, currentUtcWeek } from '@/utils/time';
 
 const GWEI = 1e9;
 const PAGE = 10_000;
+/** Validators per request, so the index list keeps the URL short; page tokens fetch the rows beyond one page */
+const VALIDATORS_PER_REQUEST = 250;
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 
@@ -44,6 +46,7 @@ export function useValidatorRewards({
   resolution,
   periodKeys,
   allHistory,
+  enabled: wanted,
 }: {
   indices: number[];
   from: number;
@@ -52,6 +55,8 @@ export function useValidatorRewards({
   /** Days (or Mondays) in the range; ignored when allHistory */
   periodKeys: string[];
   allHistory: boolean;
+  /** Load only while the rewards are shown */
+  enabled: boolean;
 }): {
   periods: RewardPeriod[];
   totalRewardEth: number;
@@ -60,17 +65,16 @@ export function useValidatorRewards({
   error: Error | null;
 } {
   const { currentNetwork } = useNetwork();
-  const enabled = indices.length > 0 && from > 0;
+  const enabled = wanted && indices.length > 0 && from > 0;
   const weekly = resolution === 'week';
   const column = weekly ? 'week_start_date' : 'day_start_date';
   const periodFilter = allHistory
     ? { [`${column}_ne`]: weekly ? currentUtcWeek() : currentUtcDate() }
     : { [`${column}_in_values`]: periodKeys.join(',') };
-  // Validators per request, so a chunk's rows fit in about one page; page tokens pick up the rest
-  const periodCount = allHistory ? Math.ceil((to - from) / 86_400 / (weekly ? 7 : 1)) + 1 : periodKeys.length;
-  const chunkSize = Math.max(1, Math.floor(PAGE / Math.max(1, periodCount)));
   const chunks: string[] = [];
-  for (let i = 0; i < indices.length; i += chunkSize) chunks.push(indices.slice(i, i + chunkSize).join(','));
+  for (let i = 0; i < indices.length; i += VALIDATORS_PER_REQUEST) {
+    chunks.push(indices.slice(i, i + VALIDATORS_PER_REQUEST).join(','));
+  }
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['validator-rewards', currentNetwork?.name, resolution, chunks, periodFilter, from, to],
@@ -127,7 +131,7 @@ export function useValidatorRewards({
                   validator_index_in_values: ids,
                   event_type_in_values: 'withdrawal_partial,withdrawal_full',
                   slot_start_date_time_gte: from,
-                  slot_start_date_time_lte: to + 86_400,
+                  slot_start_date_time_lt: to + 86_400,
                   page_size: PAGE,
                   order_by: 'slot_start_date_time',
                 },
@@ -141,6 +145,7 @@ export function useValidatorRewards({
       return { attestation, sync, blocks, withdrawals };
     },
     enabled,
+    placeholderData: keepPreviousData,
   });
 
   const byPeriod = new Map<string, RewardPeriod>();
