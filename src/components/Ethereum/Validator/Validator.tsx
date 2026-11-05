@@ -22,7 +22,7 @@ export function Validator({ index, noLink = false, className }: ValidatorProps):
   return (
     <Link
       to="/ethereum/validators/inspect"
-      search={{ indices: String(index) }}
+      search={{ indices: index }}
       className={clsx('hover:underline', className)}
       onClick={event => event.stopPropagation()}
     >

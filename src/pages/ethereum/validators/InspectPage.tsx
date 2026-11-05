@@ -30,7 +30,7 @@ import type { HeatmapMetric, ValidatorSelection, ValidatorState } from './compon
 
 /** Search params for the inspect page; no `from` means all history, no `to` the last complete day */
 interface InspectSearch {
-  indices?: string;
+  indices?: string | number;
   from?: number;
   to?: number;
 }
@@ -43,7 +43,11 @@ const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
 /** Monday (UTC) of the week containing the day */
 const mondayOf = (ts: number): number => ts - ((new Date(ts * 1000).getUTCDay() + 6) % 7) * DAY;
 // Links can carry the list JSON-quoted (indices="1,2"), so quotes are dropped
-const tagsFromUrl = (indices?: string): string[] => (indices ?? '').replace(/"/g, '').split(',').filter(Boolean);
+const tagsFromUrl = (indices?: string | number): string[] =>
+  String(indices ?? '')
+    .replace(/"/g, '')
+    .split(',')
+    .filter(Boolean);
 const formatDate = (ts: number): string =>
   new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
@@ -112,6 +116,7 @@ export function InspectPage(): JSX.Element {
   } = useValidatorsData(ready ? resolvedIndices : [], ready ? dataFrom : 0, ready ? dataTo : 0, {
     resolution,
     allHistory,
+    slotsTo: to,
   });
 
   const { getStatusAtTimestamp, unknownValidators, latestStatus } = useValidatorStatus(ready ? resolvedIndices : []);
@@ -343,7 +348,8 @@ export function InspectPage(): JSX.Element {
             </InspectSection>
 
             {hasData && (
-              <ValidatorDuties indices={knownIndices} from={dataFrom} to={dataTo} proposals={raw.blockProposal} />
+              // Per-slot activity runs to the range's last day, past the last complete week
+              <ValidatorDuties indices={knownIndices} from={dataFrom} to={to} proposals={raw.blockProposal} />
             )}
           </div>
         )}
