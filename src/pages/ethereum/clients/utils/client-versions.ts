@@ -276,6 +276,33 @@ export function latestAdoption(
   return result;
 }
 
+/** An entity's blocks with a known release, and how many of them ran the latest release or newer */
+export interface EntityOnLatest {
+  resolved: number;
+  onLatest: number;
+}
+
+/**
+ * Per entity: its blocks with a known release and those on `latestVersion` or newer. Entities without blocks are
+ * left out.
+ */
+export function onLatestByEntity(
+  rows: Array<Pick<VersionCount, 'entity' | 'version' | 'count'>>,
+  latestVersion: string | undefined
+): Map<string, EntityOnLatest> {
+  const byEntity = new Map<string, EntityOnLatest>();
+  for (const row of rows) {
+    if (!row.entity) continue;
+    const entry = byEntity.get(row.entity) ?? { resolved: 0, onLatest: 0 };
+    if (row.version) {
+      entry.resolved += row.count;
+      if (latestVersion && compareVersions(row.version, latestVersion) >= 0) entry.onLatest += row.count;
+    }
+    byEntity.set(row.entity, entry);
+  }
+  return byEntity;
+}
+
 /** Blocks per version over a window */
 export interface VersionSummary {
   version: string;
