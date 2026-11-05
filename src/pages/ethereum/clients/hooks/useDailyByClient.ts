@@ -5,7 +5,7 @@ import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd } from '@/utils/time';
 import { PAGE_SIZE } from '../constants';
-import { chunksFor } from './useVersionCounts';
+import { chunksFor, useKeepPrevious } from './useVersionCounts';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 
@@ -18,10 +18,13 @@ export interface UseDailyByClientResult<T> {
 }
 
 /** Joins the chunk queries */
-function combine<T>(results: Array<UseQueryResult<T[]>>): Omit<UseDailyByClientResult<T>, 'dataStart'> {
+function combine<T>(
+  results: Array<UseQueryResult<T[]>>
+): Omit<UseDailyByClientResult<T>, 'dataStart'> & { /** Whether every chunk loaded */ settled: boolean } {
   return {
     rows: results.flatMap(result => result.data ?? []),
     isLoading: results.some(result => result.isLoading),
+    settled: results.length > 0 && results.every(result => result.isSuccess),
     error: (results.find(result => result.error)?.error as Error | undefined) ?? null,
   };
 }
@@ -46,7 +49,7 @@ export function useDailyByClient<T extends { day_start_date?: string }>(
   const start = from === undefined ? dataStart : dataStart === undefined ? from : Math.max(from, dataStart);
   const chunks = useMemo(() => chunksFor('daily', start, end), [start, end]);
 
-  const result = useQueries({
+  const queried = useQueries({
     queries: chunks.map(chunk => ({
       queryKey: ['client-pages', dataKey, currentNetwork?.name, filters, chunk.key],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
@@ -56,6 +59,7 @@ export function useDailyByClient<T extends { day_start_date?: string }>(
     })),
     combine: combine<T>,
   });
+  const result = useKeepPrevious(queried);
 
   const fromDay = from === undefined ? '' : new Date(from * 1000).toISOString().slice(0, 10);
   const rows = useMemo(

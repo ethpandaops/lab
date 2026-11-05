@@ -51,12 +51,13 @@ export function ClientPage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const client = normalizeClientName(params.client);
   const layer = clientLayerOf(client);
-  const window: VersionWindow = search.w ?? '7d';
-  const shareWindow: ShareWindow = search.t ?? '30d';
+  const window: VersionWindow = search.w ?? 'all';
+  const shareWindow: ShareWindow = search.t ?? 'all';
 
   const { selectedIndex, onChange } = useTabState(CLIENT_TABS.map(id => ({ id })));
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
-  const since = windowStart(VERSION_WINDOW_DAYS[window]);
+  const windowDays = VERSION_WINDOW_DAYS[window];
+  const since = windowDays === null ? undefined : windowStart(windowDays);
   const { rows: last24h } = useVersionCounts({
     grain: 'hourly',
     client,
@@ -69,12 +70,16 @@ export function ClientPage(): JSX.Element {
   const requirement = requirements.find(item => item.fork === search.fork);
 
   const onShareWindowChange = useCallback(
-    (value: ShareWindow) => navigate({ search: prev => ({ ...prev, t: value }), replace: true }),
+    (value: ShareWindow) => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false }),
     [navigate]
   );
   const onWindowChange = useCallback(
     (value: VersionWindow) =>
-      navigate({ search: prev => ({ ...prev, w: value as '7d' | '30d' | '90d' }), replace: true }),
+      navigate({
+        search: prev => ({ ...prev, w: value as '7d' | '30d' | '90d' | 'all' }),
+        replace: true,
+        resetScroll: false,
+      }),
     [navigate]
   );
 

@@ -179,9 +179,10 @@ export interface VersionAdoptionProps {
   releases: DimClientRelease[];
   /** The range as it reads in copy, e.g. 30d */
   window: string;
-  windowDays: number;
   /** Start of the page's range (unix seconds) */
   rangeStart: number;
+  /** End of the page's range (unix seconds, exclusive) */
+  rangeEnd: number;
 }
 
 /**
@@ -197,8 +198,8 @@ export function VersionAdoption({
   previous,
   releases,
   window,
-  windowDays,
   rangeStart,
+  rangeEnd,
 }: VersionAdoptionProps): JSX.Element {
   const [mode, setMode] = useState<ShareMode>('atLeast');
   const consensus = layer === 'consensus';
@@ -216,7 +217,7 @@ export function VersionAdoption({
   );
   // Xatu nodes: those active in the last 24 hours now, and the versions they ran each day over the range
   const { nodes, isLoading: nodesLoading } = useClientNodes(client, layer);
-  const nodeDays = useNodeVersions(client, windowDays, consensus);
+  const nodeDays = useNodeVersions(client, null, consensus, { from: rangeStart, to: rangeEnd });
 
   const blockDays = useMemo(() => countVersionsByDay(blocks.rows), [blocks.rows]);
   const peerDays = useMemo(

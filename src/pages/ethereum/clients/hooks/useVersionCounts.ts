@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
@@ -82,7 +82,8 @@ export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number 
     return [{ key: days.join(','), query: { day_start_date_in_values: days.join(',') }, open: true }];
   }
 
-  const firstYear = from === undefined ? FIRST_YEAR : new Date(from * 1000).getUTCFullYear();
+  // No network Lab serves has blocks before FIRST_YEAR, so an earlier start (0 for all history) begins there
+  const firstYear = Math.max(FIRST_YEAR, from === undefined ? FIRST_YEAR : new Date(from * 1000).getUTCFullYear());
   const lastYear = new Date((to - 1) * 1000).getUTCFullYear();
   const thisYear = new Date().getUTCFullYear();
   return Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i).map(year => {
@@ -95,11 +96,24 @@ export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number 
   });
 }
 
+/**
+ * The last result whose chunks all loaded, returned while the chunks of a new window or filter load, so the page
+ * keeps its content and height instead of swapping in a skeleton.
+ */
+export function useKeepPrevious<T extends { isLoading: boolean; settled: boolean }>(result: T): T {
+  const previous = useRef<T | undefined>(undefined);
+  if (result.settled) previous.current = result;
+  return result.isLoading && previous.current ? previous.current : result;
+}
+
 /** Joins the chunk queries; module scoped so React Query only re-runs it when a chunk changes */
-function combine(results: Array<UseQueryResult<VersionCount[]>>): UseVersionCountsResult {
+function combine(
+  results: Array<UseQueryResult<VersionCount[]>>
+): UseVersionCountsResult & { /** Whether every chunk loaded */ settled: boolean } {
   return {
     rows: results.flatMap(result => result.data ?? []),
     isLoading: results.some(result => result.isLoading),
+    settled: results.length > 0 && results.every(result => result.isSuccess),
     error: (results.find(result => result.error)?.error as Error | undefined) ?? null,
   };
 }
@@ -145,7 +159,7 @@ export function useVersionCounts({
     ...(unresolvedOnly && { release_status_in_values: UNRESOLVED_STATUSES.join(',') }),
   };
 
-  const result = useQueries({
+  const queried = useQueries({
     queries: chunks.map(chunk => ({
       queryKey: ['client-pages', 'version-counts', currentNetwork?.name, grain, filters, chunk.key],
       queryFn: async ({ signal }: { signal: AbortSignal }) =>
@@ -162,6 +176,7 @@ export function useVersionCounts({
     })),
     combine,
   });
+  const result = useKeepPrevious(queried);
 
   // Year chunks overrun a window; trim them to it
   const rows = useMemo(

@@ -37,15 +37,12 @@ export function useClientReleases(client: string | undefined): UseClientReleases
   return { releases, latest: latestRelease(releases), isLoading: query.isLoading, error: query.error };
 }
 
-/** Releases from the last year are enough to find every active client's newest */
-const LATEST_LOOKBACK_SECONDS = 400 * 24 * 3600;
-
 /**
  * Newest full release of every known client, keyed by client.
  */
 export function useLatestReleases(): {
   latest: Map<string, DimClientRelease>;
-  /** Full releases from the last year per client */
+  /** Full releases per client */
   releases: Map<string, DimClientRelease[]>;
   isLoading: boolean;
 } {
@@ -58,7 +55,6 @@ export function useLatestReleases(): {
           query: {
             client_in_values: [...CONSENSUS_CLIENTS, ...EXECUTION_CLIENTS].join(','),
             prerelease_eq: false,
-            release_date_gte: Math.floor(Date.now() / 1000 / 86400) * 86400 - LATEST_LOOKBACK_SECONDS,
             page_size: PAGE_SIZE,
           },
         },

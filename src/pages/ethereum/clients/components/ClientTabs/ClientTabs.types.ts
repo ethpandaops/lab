@@ -15,8 +15,8 @@ export interface ClientTabProps {
   /** Hourly version counts over the last 24 hours */
   last24h: VersionCount[];
   window: VersionWindow;
-  /** Start of the window (unix seconds) */
-  since: number;
+  /** Start of the window (unix seconds); all history when undefined */
+  since?: number;
   onWindowChange: (window: VersionWindow) => void;
   /** Window of the share charts, from daily counts */
   shareWindow: ShareWindow;
