@@ -53,6 +53,15 @@ describe('transformDailyToRows', () => {
     expect(result[0].cells[1].availability).toBe(0.98);
   });
 
+  it('labels rows with the year when they span years', () => {
+    const result = transformDailyToRows([
+      { date: '2026-01-01', column_index: 0, avg_availability_pct: 100 },
+      { date: '2025-12-31', column_index: 0, avg_availability_pct: 100 },
+    ]);
+
+    expect(result.map(row => row.label)).toEqual(['2026-01-01', '2025-12-31']);
+  });
+
   it('should handle empty data', () => {
     const result = transformDailyToRows([]);
     expect(result).toEqual([]);

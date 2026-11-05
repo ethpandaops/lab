@@ -168,6 +168,29 @@ export function currentUtcWeek(nowMs: number = Date.now()): string {
   return toUtcDate(completeBucketEnd('week', nowMs));
 }
 
+/**
+ * The whole UTC weeks (Monday to Monday) inside [start, end), whose weekly rollup rows (keyed by the `weeks` dates)
+ * cover [from, to). The rest of [start, end), before `from` and from `to` on, is left for a daily rollup. Without a
+ * whole week, `from` and `to` are both `end`.
+ *
+ * @example
+ * ```ts
+ * // Thursday 2026-10-01 to Thursday 2026-11-05
+ * wholeUtcWeeks(Date.UTC(2026, 9, 1) / 1000, Date.UTC(2026, 10, 5) / 1000);
+ * // { from: 2026-10-05, to: 2026-11-02, weeks: ['2026-10-05', '2026-10-12', '2026-10-19', '2026-10-26'] }
+ * ```
+ */
+export function wholeUtcWeeks(start: number, end: number): { from: number; to: number; weeks: string[] } {
+  const week = 7 * DAY_SECONDS;
+  const floorStart = completeBucketEnd('week', start * 1000);
+  const from = floorStart === start ? start : floorStart + week;
+  const to = completeBucketEnd('week', end * 1000);
+  if (to <= from) return { from: end, to: end, weeks: [] };
+  const weeks: string[] = [];
+  for (let monday = from; monday < to; monday += week) weeks.push(toUtcDate(monday));
+  return { from, to, weeks };
+}
+
 /** The last `days` complete UTC days, oldest first, ending yesterday, e.g. for day_start_date_in_values */
 export function completeUtcDays(days: number, nowMs: number = Date.now()): string[] {
   const end = completeBucketEnd('day', nowMs);

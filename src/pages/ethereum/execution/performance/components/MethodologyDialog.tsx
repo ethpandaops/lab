@@ -128,10 +128,10 @@ export function MethodologyDialog({
               takes twice as long.
             </li>
             <li>
-              <span className="text-foreground">Intervals.</span> A fit runs per client per UTC day. The matrix shows
-              the median over the range&apos;s days, with a 5–95% interval from resampling days. Each day&apos;s own
-              interval comes from resampling its hours. Releases are fitted over every hour they ran and resampled in
-              6-hour blocks. Releases with fewer than 24 hours are left out.
+              <span className="text-foreground">Intervals.</span> A fit runs per client per UTC day, or per week at All.
+              The matrix shows the median over the range&apos;s fits, with a 5–95% interval from resampling them. Each
+              fit&apos;s own interval comes from resampling its hours. Releases are fitted over every hour they ran and
+              resampled in 6-hour blocks. Releases with fewer than 24 hours are left out.
             </li>
             <li>
               <span className="text-foreground">Highlighting.</span> A cell is coloured when its interval excludes 1×

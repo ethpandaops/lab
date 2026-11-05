@@ -75,6 +75,9 @@ export function transformDailyToRows(
 
   // Convert to rows (sorted by date descending for most recent first)
   const rows: DataAvailabilityRow[] = [];
+  // Rows spanning years are labelled by full date, which fits the label column where "Dec 31, 2025" doesn't
+  const spansYears = new Set([...byDate.keys()].map(date => date.slice(0, 4))).size > 1;
+  const zone: Intl.DateTimeFormatOptions = timezone === 'UTC' ? { timeZone: 'UTC' } : {};
 
   for (const [date, items] of Array.from(byDate.entries()).sort((a, b) => b[0].localeCompare(a[0]))) {
     // For local timezone, use end-of-day UTC to determine the local date label.
@@ -103,10 +106,9 @@ export function transformDailyToRows(
 
     rows.push({
       identifier: date,
-      label: labelDate.toLocaleDateString(
-        'en-US',
-        timezone === 'UTC' ? { month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric' }
-      ),
+      label: spansYears
+        ? labelDate.toLocaleDateString('en-CA', zone)
+        : labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', ...zone }),
       cells: ensureAllColumns(cells, date),
     });
   }

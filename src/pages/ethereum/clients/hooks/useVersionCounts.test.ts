@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { chunksFor } from './useVersionCounts';
+import { chunksFor, weekChunks } from './useVersionCounts';
 
 const to = Date.UTC(2026, 10, 5) / 1000;
 
@@ -19,5 +19,16 @@ describe('chunksFor', () => {
     const chunks = chunksFor('daily', to - 2 * 86400, to);
     expect(chunks).toHaveLength(1);
     expect(chunks[0].query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
+  });
+});
+
+describe('weekChunks', () => {
+  it('lists the weeks of each year in one weekly query', () => {
+    const chunks = weekChunks(['2025-12-22', '2025-12-29', '2026-01-05']);
+    expect(chunks.map(chunk => chunk.query)).toEqual([
+      { week_start_date_in_values: '2025-12-22,2025-12-29' },
+      { week_start_date_in_values: '2026-01-05' },
+    ]);
+    expect(chunks.every(chunk => chunk.weekly)).toBe(true);
   });
 });

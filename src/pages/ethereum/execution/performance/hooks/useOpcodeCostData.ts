@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { fctOpcodeCostByElClientDailyServiceList, fctOpcodeCostByElClientVersionServiceList } from '@/api/sdk.gen';
-import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientVersion } from '@/api/types.gen';
+import {
+  fctOpcodeCostByElClientDailyServiceList,
+  fctOpcodeCostByElClientVersionServiceList,
+  fctOpcodeCostByElClientWeeklyServiceList,
+} from '@/api/sdk.gen';
+import type {
+  FctOpcodeCostByElClientDaily,
+  FctOpcodeCostByElClientVersion,
+  FctOpcodeCostByElClientWeekly,
+} from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { currentUtcDate } from '@/utils/time';
+import { currentUtcWeek } from '@/utils/time';
 import { buildOpcodeCostModel, MIN_VERSION_HOURS, type OpcodeCostModel } from '../utils/opcode-costs';
 import { rangeDays } from '../utils/performance';
 import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
@@ -15,7 +23,7 @@ const NODE_CLASS = 'eip7870-block-builder';
 /**
  * Opcode cost fits over the complete UTC days that contain the range [rangeStart, rangeEnd), since the
  * fits are daily: daily fits per client, and per-release fits for releases that ran in those days. `allDays`
- * reads every complete day the table holds.
+ * reads the weekly fits of every complete week the table holds instead, the same model at a coarser grain.
  */
 export function useOpcodeCostData(
   rangeStart: number,
@@ -35,21 +43,26 @@ export function useOpcodeCostData(
 
   const daily = useQuery({
     queryKey: ['opcode-cost', 'daily', currentNetwork?.name, allDays, start, end],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctOpcodeCostByElClientDaily>(
-        fctOpcodeCostByElClientDailyServiceList,
-        {
-          query: {
-            ...(allDays
-              ? { day_start_date_ne: currentUtcDate() }
-              : { day_start_date_in_values: generateDateRange(start, end) }),
-            node_class_eq: NODE_CLASS,
-            page_size: 10000,
-          },
-        },
-        'fct_opcode_cost_by_el_client_daily',
-        signal
-      ),
+    queryFn: ({ signal }): Promise<Array<FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWeekly>> =>
+      allDays
+        ? fetchAllPages<FctOpcodeCostByElClientWeekly>(
+            fctOpcodeCostByElClientWeeklyServiceList,
+            { query: { week_start_date_ne: currentUtcWeek(), node_class_eq: NODE_CLASS, page_size: 10000 } },
+            'fct_opcode_cost_by_el_client_weekly',
+            signal
+          )
+        : fetchAllPages<FctOpcodeCostByElClientDaily>(
+            fctOpcodeCostByElClientDailyServiceList,
+            {
+              query: {
+                day_start_date_in_values: generateDateRange(start, end),
+                node_class_eq: NODE_CLASS,
+                page_size: 10000,
+              },
+            },
+            'fct_opcode_cost_by_el_client_daily',
+            signal
+          ),
     enabled: !!currentNetwork,
     placeholderData: keepPreviousData,
   });

@@ -177,6 +177,7 @@ type AggregateRow = {
   client?: string;
   layer?: string;
   day_start_date?: string;
+  week_start_date?: string;
   hour_start_date_time?: number;
   entity?: string;
   version?: string;
@@ -186,18 +187,18 @@ type AggregateRow = {
 };
 
 /**
- * Rows of the daily or hourly graffiti version tables as {@link VersionCount}s.
+ * Rows of the hourly, daily or weekly graffiti version tables as {@link VersionCount}s; a week counts on its Monday.
  */
 export function toVersionCounts(rows: AggregateRow[]): VersionCount[] {
   return rows
     .filter(row => (row.block_count ?? 0) > 0)
     .map(row => {
-      const time =
-        row.hour_start_date_time ?? (row.day_start_date ? Date.parse(`${row.day_start_date}T00:00:00Z`) / 1000 : 0);
+      const date = row.day_start_date ?? row.week_start_date;
+      const time = row.hour_start_date_time ?? (date ? Date.parse(`${date}T00:00:00Z`) / 1000 : 0);
       const resolved = RESOLVED_STATUSES.has(row.release_status ?? '') && !!row.version;
       return {
         time,
-        day: row.day_start_date ?? new Date(time * 1000).toISOString().slice(0, 10),
+        day: date ?? new Date(time * 1000).toISOString().slice(0, 10),
         version: resolved ? row.version! : null,
         status: row.release_status || 'none',
         stated: resolved ? undefined : row.version || undefined,

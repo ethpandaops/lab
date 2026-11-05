@@ -15,6 +15,7 @@ import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availabi
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import type { DataAvailabilityFilters } from '@/pages/ethereum/data-availability/components/DataAvailabilityHeatmap/DataAvailabilityFilterPanel.types';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useTableBounds } from '@/hooks/useBounds';
 import { formatEpoch, formatSlot } from '@/utils';
 import { SECONDS_PER_SLOT, epochToTimestamp, slotToTimestamp } from '@/utils/beacon';
 import { useFuluActivation } from './hooks/useFuluActivation';
@@ -30,12 +31,19 @@ import {
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import {
-  fctDataColumnAvailabilityDailyServiceListOptions,
   fctDataColumnAvailabilityHourlyServiceListOptions,
   intCustodyProbeOrderBySlotServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
-import { fctDataColumnAvailabilityByEpochServiceList, fctDataColumnAvailabilityBySlotServiceList } from '@/api/sdk.gen';
-import type { FctDataColumnAvailabilityByEpoch, FctDataColumnAvailabilityBySlot } from '@/api/types.gen';
+import {
+  fctDataColumnAvailabilityByEpochServiceList,
+  fctDataColumnAvailabilityBySlotServiceList,
+  fctDataColumnAvailabilityDailyServiceList,
+} from '@/api/sdk.gen';
+import type {
+  FctDataColumnAvailabilityByEpoch,
+  FctDataColumnAvailabilityBySlot,
+  FctDataColumnAvailabilityDaily,
+} from '@/api/types.gen';
 import {
   transformDailyToRows,
   transformHourlyToRows,
@@ -43,7 +51,7 @@ import {
   transformSlotsToRows,
 } from '@/pages/ethereum/data-availability/utils/data-availability-transform';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { completeBucketEnd, completeUtcDays } from '@/utils/time';
+import { completeBucketEnd, currentUtcDate, toUtcDate } from '@/utils/time';
 import type { CustodySearch } from './IndexPage.types';
 import { validateSearchParamHierarchy } from './IndexPage.types';
 
@@ -61,11 +69,6 @@ type DrillDownLevel =
  * Total number of columns in PeerDAS
  */
 const TOTAL_COLUMNS = 128;
-
-/**
- * Number of days to show in the window view
- */
-const WINDOW_DAYS = 19;
 
 /**
  * Number of hours in a day
@@ -103,13 +106,11 @@ function hourOfEpochsWindow(hourStart: number, genesisTime: number): TimeRangeCo
   return { timeStart: epochToTimestamp(firstEpoch, genesisTime), timeEnd: epochToTimestamp(endEpoch, genesisTime) };
 }
 
-/** Slot start time window covered by a drill-down level */
-function levelWindow(level: DrillDownLevel, genesisTime: number): TimeRangeContext {
+/** Slot start time window covered by a drill-down level; the window level starts at `windowStart` */
+function levelWindow(level: DrillDownLevel, genesisTime: number, windowStart = 0): TimeRangeContext {
   switch (level.type) {
-    case 'window': {
-      const end = completeBucketEnd('day');
-      return { timeStart: end - WINDOW_DAYS * SECONDS_PER_DAY, timeEnd: end };
-    }
+    case 'window':
+      return { timeStart: windowStart, timeEnd: completeBucketEnd('day') };
     case 'day': {
       const dayStart = Date.parse(level.date) / 1000;
       return { timeStart: dayStart, timeEnd: dayStart + SECONDS_PER_DAY };
@@ -182,15 +183,27 @@ function deriveCurrentLevel(search: CustodySearch): DrillDownLevel {
   return { type: 'window' };
 }
 
+/** "Since Dec 3, 2025 (UTC)" for the window level's first day, if known */
+function sinceLabel(windowStart: number | undefined): string | undefined {
+  if (windowStart === undefined) return undefined;
+  const date = new Date(windowStart * 1000).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+  return `Since ${date} (UTC)`;
+}
+
 /**
  * Get a human-readable title for the current viewing level
  * Main title = where you are, subtitle = what you're viewing
  * All times are displayed in UTC
  */
-function getLevelTitle(level: DrillDownLevel): { main: string; sub?: string } {
+function getLevelTitle(level: DrillDownLevel, windowStart: number | undefined): { main: string; sub?: string } {
   switch (level.type) {
     case 'window':
-      return { main: 'Custody Window', sub: `Last ${WINDOW_DAYS} days (UTC)` };
+      return { main: 'Custody Window', sub: sinceLabel(windowStart) };
     case 'day': {
       const labelDate = new Date(level.date + 'T00:00:00Z');
       const dateStr = labelDate.toLocaleDateString('en-US', {
@@ -246,6 +259,11 @@ export function IndexPage(): JSX.Element {
   // PeerDAS/data columns only exist after Fulu activation
   const { fuluActivation } = useFuluActivation();
 
+  // The window starts on the day Fulu activated, or later where the daily table's history starts
+  const { data: dailyBounds } = useTableBounds('fct_data_column_availability_daily');
+  const windowStartTime = Math.max(fuluActivation?.dateTime ?? 0, dailyBounds?.min ?? 0);
+  const windowStart = windowStartTime > 0 ? Math.floor(windowStartTime / SECONDS_PER_DAY) * SECONDS_PER_DAY : undefined;
+
   // Default filter state (all columns, no filtering)
   const filters: DataAvailabilityFilters = useMemo(
     () => ({
@@ -265,16 +283,19 @@ export function IndexPage(): JSX.Element {
   // Learn more dialog state
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
 
-  // Window Level: Last 19 days of daily aggregated data
+  // Window Level: every complete day of daily aggregated data
+  const today = currentUtcDate();
   const windowQuery = useQuery({
-    ...fctDataColumnAvailabilityDailyServiceListOptions({
-      query: {
-        date_in_values: completeUtcDays(WINDOW_DAYS).join(','),
-        page_size: WINDOW_DAYS * TOTAL_COLUMNS,
-        order_by: 'date desc',
-      },
+    queryKey: ['custody', 'window', currentNetwork?.name, today],
+    queryFn: async ({ signal }) => ({
+      fct_data_column_availability_daily: await fetchAllPages<FctDataColumnAvailabilityDaily>(
+        fctDataColumnAvailabilityDailyServiceList,
+        { query: { date_ne: today, page_size: 10000, order_by: 'date desc' } },
+        'fct_data_column_availability_daily',
+        signal
+      ),
     }),
-    enabled: currentLevel.type === 'window',
+    enabled: currentLevel.type === 'window' && !!currentNetwork,
   });
 
   // Day Level: 24 hours for a specific day
@@ -378,17 +399,16 @@ export function IndexPage(): JSX.Element {
 
   /**
    * Transform Window data (daily) to heatmap rows
-   * Filters out dates before Fulu activation (PeerDAS didn't exist)
+   * Filters out dates before the window starts (PeerDAS didn't exist before Fulu)
    */
   const windowRows = useMemo(() => {
     const rows = transformDailyToRows(windowQuery.data?.fct_data_column_availability_daily, timezone);
-    if (!fuluActivation) return rows;
+    if (windowStart === undefined) return rows;
 
-    // Filter out dates before Fulu activation
-    // Use the activation date (the day containing the fork should be shown)
-    const fuluDate = new Date(fuluActivation.dateTime * 1000).toISOString().split('T')[0];
-    return rows.filter(row => row.identifier >= fuluDate);
-  }, [windowQuery.data, timezone, fuluActivation]);
+    // The day containing the fork is shown
+    const startDate = toUtcDate(windowStart);
+    return rows.filter(row => row.identifier >= startDate);
+  }, [windowQuery.data, timezone, windowStart]);
 
   /**
    * Transform Day data (hourly) to heatmap rows
@@ -636,7 +656,7 @@ export function IndexPage(): JSX.Element {
       let contextLabel: string;
       switch (currentLevel.type) {
         case 'window':
-          contextLabel = `Last ${WINDOW_DAYS} Days (UTC)`;
+          contextLabel = sinceLabel(windowStart) ?? 'All days (UTC)';
           break;
         case 'day': {
           const labelDate = new Date(currentLevel.date + 'T00:00:00Z');
@@ -682,13 +702,13 @@ export function IndexPage(): JSX.Element {
       };
 
       // Probes of every slot the current level covers
-      const timeRange = levelWindow(currentLevel, genesisTime);
+      const timeRange = levelWindow(currentLevel, genesisTime, windowStart);
 
       setCellContext(cellCtx);
       setTimeRangeContext(timeRange);
       setCellDialogOpen(true);
     },
-    [granularity, currentLevel, genesisTime]
+    [granularity, currentLevel, genesisTime, windowStart]
   );
 
   /**
@@ -798,7 +818,7 @@ export function IndexPage(): JSX.Element {
     return crumbs;
   }, [currentLevel, navigate]);
 
-  const levelTitle = getLevelTitle(currentLevel);
+  const levelTitle = getLevelTitle(currentLevel, windowStart);
 
   if (error) {
     return (

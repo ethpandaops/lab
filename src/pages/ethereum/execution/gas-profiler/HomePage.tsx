@@ -12,10 +12,18 @@ import { Alert } from '@/components/Feedback/Alert';
 import { CardChain, type CardChainItem } from '@/components/DataDisplay/CardChain';
 import { BarChart } from '@/components/Charts/Bar';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { fctOpcodeGasByOpcodeHourlyServiceList, fctOpcodeGasByOpcodeDailyServiceList } from '@/api/sdk.gen';
-import type { FctOpcodeGasByOpcodeHourly, FctOpcodeGasByOpcodeDaily } from '@/api/types.gen';
+import {
+  fctOpcodeGasByOpcodeHourlyServiceList,
+  fctOpcodeGasByOpcodeDailyServiceList,
+  fctOpcodeGasByOpcodeWeeklyServiceList,
+} from '@/api/sdk.gen';
+import type {
+  FctOpcodeGasByOpcodeHourly,
+  FctOpcodeGasByOpcodeDaily,
+  FctOpcodeGasByOpcodeWeekly,
+} from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
+import { completeBucketEnd, completeUtcDays, currentUtcDate, currentUtcWeek } from '@/utils/time';
 import { useRecentBlocks } from './hooks/useRecentBlocks';
 import { useGasProfilerBounds } from './hooks/useGasProfilerBounds';
 import { GasProfilerSkeleton, OpcodeAnalysis } from './components';
@@ -126,22 +134,34 @@ export function HomePage(): JSX.Element {
 
   const opcodeGasDailyQuery = useQuery({
     queryKey: ['gas-profiler', 'opcode-gas-daily', config.days, today],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctOpcodeGasByOpcodeDaily>(
-        fctOpcodeGasByOpcodeDailyServiceList,
-        {
-          query: {
-            // The date key only filters by value, so bounded ranges list their dates
-            ...(config.days === null
-              ? { day_start_date_ne: today }
-              : { day_start_date_in_values: completeUtcDays(config.days).join(',') }),
-            order_by: 'total_gas desc',
-            page_size: 10000,
-          },
-        },
-        'fct_opcode_gas_by_opcode_daily',
+    queryFn: async ({ signal }) => {
+      const daily = (dates: Record<string, string>): Promise<FctOpcodeGasByOpcodeDaily[]> =>
+        fetchAllPages<FctOpcodeGasByOpcodeDaily>(
+          fctOpcodeGasByOpcodeDailyServiceList,
+          { query: { ...dates, order_by: 'total_gas desc', page_size: 10000 } },
+          'fct_opcode_gas_by_opcode_daily',
+          signal
+        );
+      // The date key only filters by value, so bounded ranges list their dates
+      if (config.days !== null) return daily({ day_start_date_in_values: completeUtcDays(config.days).join(',') });
+
+      // All: complete weeks from the weekly table, then the days after its last week from the daily table
+      const weeks = await fetchAllPages<FctOpcodeGasByOpcodeWeekly>(
+        fctOpcodeGasByOpcodeWeeklyServiceList,
+        { query: { week_start_date_ne: currentUtcWeek(), order_by: 'total_gas desc', page_size: 10000 } },
+        'fct_opcode_gas_by_opcode_weekly',
         signal
-      ),
+      );
+      const lastWeek = weeks.reduce(
+        (last, row) => (row.week_start_date && row.week_start_date > last ? row.week_start_date : last),
+        ''
+      );
+      if (!lastWeek) return daily({ day_start_date_ne: today });
+      const days = (completeBucketEnd('day') - Date.parse(lastWeek) / 1000) / 86400 - 7;
+      return days > 0
+        ? [...weeks, ...(await daily({ day_start_date_in_values: completeUtcDays(days).join(',') }))]
+        : weeks;
+    },
     enabled: isDaily,
   });
 

@@ -7,6 +7,7 @@ import {
   completeUtcDays,
   currentUtcDate,
   currentUtcWeek,
+  wholeUtcWeeks,
 } from './time';
 
 describe('getRelativeTime', () => {
@@ -337,5 +338,26 @@ describe('complete UTC days', () => {
     expect(completeUtcDays(3, now)).toEqual(['2026-11-02', '2026-11-03', '2026-11-04']);
     expect(completeUtcDays(5, now)[0]).toBe('2026-10-31');
     expect(completeUtcDays(0, now)).toEqual([]);
+  });
+});
+
+describe('wholeUtcWeeks', () => {
+  const utc = (month: number, day: number): number => Date.UTC(2026, month, day) / 1000;
+
+  it('keeps the Monday-started weeks inside the window and leaves the days around them', () => {
+    // Thursday Oct 1 to Thursday Nov 5
+    expect(wholeUtcWeeks(utc(9, 1), utc(10, 5))).toEqual({
+      from: utc(9, 5),
+      to: utc(10, 2),
+      weeks: ['2026-10-05', '2026-10-12', '2026-10-19', '2026-10-26'],
+    });
+  });
+
+  it('starts on a Monday start and ends on a Monday end', () => {
+    expect(wholeUtcWeeks(utc(9, 5), utc(9, 19)).weeks).toEqual(['2026-10-05', '2026-10-12']);
+  });
+
+  it('gives the whole window to days when no week fits', () => {
+    expect(wholeUtcWeeks(utc(9, 6), utc(9, 15))).toEqual({ from: utc(9, 15), to: utc(9, 15), weeks: [] });
   });
 });
