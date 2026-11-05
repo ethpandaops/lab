@@ -14,6 +14,7 @@ import type { DimClientRelease, FctCustodyProbeByClientDaily, FctHeadFirstSeenBy
 import { useNetwork } from '@/hooks/useNetwork';
 import { normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
+import { completeBucketEnd } from '@/utils/time';
 import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
 import { VERSION_WINDOW_DAYS, VERSION_WINDOW_OPTIONS, type VersionWindow } from './constants';
 import {
@@ -80,33 +81,41 @@ export function VersionPage(): JSX.Element {
 
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
   const release = findRelease(releases, params.version);
-  // Long enough by default to cover adoption since release
-  const releaseAge = release?.release_date ? Date.now() / 1000 - release.release_date : 0;
-  const window: VersionWindow = search.w ?? (releaseAge > 25 * 86400 ? '90d' : '30d');
+  const window: VersionWindow = search.w ?? 'all';
   const version = release?.version ?? params.version;
   const previous = release ? previousRelease(releases, release) : undefined;
   const next = release ? nextRelease(releases, release) : undefined;
 
-  // Everything below the range control covers the range
+  // Everything below the range control covers the range. Neither this version nor the one before it has blocks
+  // before its release, so All starts on the day the earlier of the two was released, or with each table's data.
   const windowDays = VERSION_WINDOW_DAYS[window];
-  const rangeStart = windowStart(windowDays);
-  const entityCounts = useVersionCounts({ grain: 'entity-daily', client, layer, from: rangeStart, enabled: !!layer });
+  const releasedFrom = Math.min(release?.release_date ?? Infinity, previous?.release_date ?? Infinity);
+  const rangeStart =
+    windowDays !== null
+      ? windowStart(windowDays)
+      : Number.isFinite(releasedFrom)
+        ? Math.floor(releasedFrom / 86400) * 86400
+        : 0;
+  const rangeEnd = completeBucketEnd('day');
+  const ready = !!layer && !releasesLoading;
+  const entityCounts = useVersionCounts({ grain: 'entity-daily', client, layer, from: rangeStart, enabled: ready });
   // The fork card above the control reads the last 24 hours and the nodes active now
   const recent24h = useVersionCounts({ grain: 'hourly', client, layer, from: last24hStart(), enabled: !!layer });
   const { nodes } = useClientNodes(client, layer);
-  const nodeDays = useNodeVersions(client, windowDays, layer === 'consensus');
+  const nodeDays = useNodeVersions(client, null, ready && layer === 'consensus', { from: rangeStart, to: rangeEnd });
   const probes = useCensus<FctCustodyProbeByClientDaily>(
     CENSUS_TABLES.custody,
-    layer === 'consensus' ? { client_eq: client } : null,
+    ready && layer === 'consensus' ? { client_eq: client } : null,
     rangeStart
   );
-  const reference = useReferenceEngine(client, layer === 'execution', windowDays);
+  const reference = useReferenceEngine(client, ready && layer === 'execution', windowDays ?? undefined);
   const versionNodes = useMemo(() => nodesByVersion(nodeDays.rows, releases), [nodeDays.rows, releases]);
 
   const requirement = forkRequirements(currentNetwork, client).find(item => item.fork === search.fork);
 
   const onWindowChange = useCallback(
-    (value: VersionWindow) => navigate({ search: prev => ({ ...prev, w: value as '30d' | '90d' }), replace: true }),
+    (value: VersionWindow) =>
+      navigate({ search: prev => ({ ...prev, w: value as '30d' | '90d' | 'all' }), replace: true, resetScroll: false }),
     [navigate]
   );
 
@@ -273,15 +282,15 @@ export function VersionPage(): JSX.Element {
               release={release}
               previous={previous}
               releases={releases}
-              window={window}
-              windowDays={windowDays}
+              window={window === 'all' ? 'all time' : window}
               rangeStart={rangeStart}
+              rangeEnd={rangeEnd}
             />
           )}
         </InspectSection>
 
         <InspectSection title="Proposed blocks">
-          {releasesLoading || entityCounts.isLoading ? (
+          {!ready || entityCounts.isLoading ? (
             <LoadingContainer className="h-64 rounded-sm" />
           ) : (
             <EntityVersionBars
@@ -302,7 +311,7 @@ export function VersionPage(): JSX.Element {
                 version={version}
                 previous={previous?.version}
                 rows={probes.rows}
-                isLoading={probes.isLoading}
+                isLoading={!ready || probes.isLoading}
               />
             )}
           </VersionPeers>
@@ -311,7 +320,7 @@ export function VersionPage(): JSX.Element {
         {layer === 'consensus' && (
           <InspectSection title="Xatu nodes">
             <Card rounded title="Xatu nodes on this version">
-              {nodeDays.isLoading ? (
+              {!ready || nodeDays.isLoading ? (
                 <LoadingContainer className="h-32 rounded-sm" />
               ) : (
                 <VersionNodeTable nodes={versionNodes.filter(node => node.version === version)} />
@@ -322,7 +331,13 @@ export function VersionPage(): JSX.Element {
 
         {layer === 'execution' && (
           <InspectSection title="On reference hardware">
-            <ReferenceEngine client={client} releases={releases} {...reference} focus={referenceFocus} />
+            <ReferenceEngine
+              client={client}
+              releases={releases}
+              {...reference}
+              isLoading={!ready || reference.isLoading}
+              focus={referenceFocus}
+            />
           </InspectSection>
         )}
       </div>

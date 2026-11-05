@@ -37,7 +37,7 @@ export const TIME_PERIOD_OPTIONS: ReadonlyArray<{ value: TimePeriod; label: stri
 ];
 
 /** Default time period */
-export const DEFAULT_TIME_PERIOD: TimePeriod = '7d';
+export const DEFAULT_TIME_PERIOD: TimePeriod = 'all';
 
 /** Page size for the aggregate queries */
 export const PAGE_SIZE = 10_000;
@@ -49,15 +49,16 @@ export const ENTITY_OPTIONS_STATUS = 'active_ongoing';
 export const BLOCK_GRAFFITI_TABLE = 'fct_block_graffiti';
 
 /** Windows of per-block graffiti the version views load; each day is a few thousand blocks per client */
-export type VersionWindow = '7d' | '14d' | '30d' | '60d' | '90d';
+export type VersionWindow = '7d' | '14d' | '30d' | '60d' | '90d' | 'all';
 
-/** Days in each version window */
-export const VERSION_WINDOW_DAYS: Record<VersionWindow, number> = {
+/** Days in each version window; all history when null */
+export const VERSION_WINDOW_DAYS: Record<VersionWindow, number | null> = {
   '7d': 7,
   '14d': 14,
   '30d': 30,
   '60d': 60,
   '90d': 90,
+  all: null,
 };
 
 /** Version window options on the client page */
@@ -65,12 +66,14 @@ export const CLIENT_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label:
   { value: '7d', label: '7d' },
   { value: '30d', label: '30d' },
   { value: '90d', label: '90d' },
+  { value: 'all', label: 'All' },
 ];
 
 /** Version window options on the version page, longer so adoption since release fits */
 export const VERSION_WINDOW_OPTIONS: ReadonlyArray<{ value: VersionWindow; label: string }> = [
   { value: '30d', label: '30d' },
   { value: '90d', label: '90d' },
+  { value: 'all', label: 'All' },
 ];
 
 /** Share chart windows on the client page */
@@ -112,7 +115,7 @@ export type ClientTab = (typeof CLIENT_TABS)[number];
 export const clientSearchSchema = z.object({
   tab: z.enum(CLIENT_TABS).optional(),
   /** Window of blocks the version, proposer and pairing views use */
-  w: z.enum(['7d', '14d', '30d', '90d']).optional().catch(undefined),
+  w: z.enum(['7d', '14d', '30d', '90d', 'all']).optional().catch(undefined),
   /** Window of the share charts, which come from daily counts and reach back to genesis */
   t: z.enum(['30d', '90d', '1y', 'all']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
@@ -125,7 +128,7 @@ export type ClientSearch = z.infer<typeof clientSearchSchema>;
 /** Zod schema for the version page search params */
 export const versionSearchSchema = z.object({
   /** Window of blocks adoption is measured over */
-  w: z.enum(['14d', '30d', '60d', '90d']).optional().catch(undefined),
+  w: z.enum(['14d', '30d', '60d', '90d', 'all']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
 });

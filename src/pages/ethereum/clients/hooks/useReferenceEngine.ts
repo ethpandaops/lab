@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineNewPayloadByElClientDailyServiceList,
@@ -70,6 +70,7 @@ export function useReferenceEngine(
       ),
     enabled: on,
     staleTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
   const getBlobs = useQuery({
     queryKey: ['client-pages', 'reference', 'get-blobs', network, dates ?? today],
@@ -82,6 +83,7 @@ export function useReferenceEngine(
       ),
     enabled: on,
     staleTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
   const winrate = useQuery({
     queryKey: ['client-pages', 'reference', 'winrate', network, dates ?? today],
@@ -94,6 +96,7 @@ export function useReferenceEngine(
       ),
     enabled: on,
     staleTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
   const opcodes = useQuery({
     queryKey: ['client-pages', 'reference', 'opcodes', network, dates ?? today],
@@ -119,6 +122,7 @@ export function useReferenceEngine(
           ),
     enabled: on,
     staleTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   return useMemo(

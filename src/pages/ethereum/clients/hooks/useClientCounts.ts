@@ -18,6 +18,7 @@ import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time
 import { fillTimeKeys } from '@/pages/ethereum/execution/overview/overview.utils';
 import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '../constants';
 import { entityQuery, toClientCountRecords, type ClientCountRecord } from '../utils/client-share';
+import { chunksFor } from './useVersionCounts';
 
 export interface UseClientCountsResult {
   /** Aggregate rows for the selected window */
@@ -76,26 +77,31 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
         return toClientCountRecords(rows, false);
       }
 
-      // The daily table only filters its date key by value, so bounded windows list their dates.
-      const dateFilter =
+      // The daily table only filters its date key by value, so bounded windows list their dates and all history
+      // loads a query per calendar year, in parallel.
+      const dateFilters =
         config.days === null
-          ? { day_start_date_ne: today }
-          : { day_start_date_in_values: completeUtcDays(config.days).join(',') };
-      const query = { ...dateFilter, order_by: 'day_start_date asc', page_size: PAGE_SIZE };
-      const rows = entity
-        ? await fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
-            fctBlockGraffitiClientByEntityDailyServiceList,
-            { query: { ...query, ...entityQuery(entity) } },
-            'fct_block_graffiti_client_by_entity_daily',
-            signal
-          )
-        : await fetchAllPages<FctBlockGraffitiClientDaily>(
-            fctBlockGraffitiClientDailyServiceList,
-            { query },
-            'fct_block_graffiti_client_daily',
-            signal
-          );
-      return toClientCountRecords(rows, true);
+          ? chunksFor('daily', undefined, completeBucketEnd('day')).map(chunk => chunk.query)
+          : [{ day_start_date_in_values: completeUtcDays(config.days).join(',') }];
+      const chunks = await Promise.all(
+        dateFilters.map(dateFilter => {
+          const query = { ...dateFilter, order_by: 'day_start_date asc', page_size: PAGE_SIZE };
+          return entity
+            ? fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
+                fctBlockGraffitiClientByEntityDailyServiceList,
+                { query: { ...query, ...entityQuery(entity) } },
+                'fct_block_graffiti_client_by_entity_daily',
+                signal
+              )
+            : fetchAllPages<FctBlockGraffitiClientDaily>(
+                fctBlockGraffitiClientDailyServiceList,
+                { query },
+                'fct_block_graffiti_client_daily',
+                signal
+              );
+        })
+      );
+      return toClientCountRecords(chunks.flat(), true);
     },
     enabled: !!currentNetwork,
     placeholderData: keepPreviousData,
