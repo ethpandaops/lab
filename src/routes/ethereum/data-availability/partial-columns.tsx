@@ -14,7 +14,7 @@ export const Route = createFileRoute('/ethereum/data-availability/partial-column
       {
         name: 'description',
         content:
-          'Gossipsub partial message adoption and how sentry nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
+          'Gossipsub partial message adoption and how Xatu nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/data-availability/partial-columns` },
       { property: 'og:type', content: 'website' },
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/ethereum/data-availability/partial-column
       {
         property: 'og:description',
         content:
-          'Gossipsub partial message adoption and how sentry nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
+          'Gossipsub partial message adoption and how Xatu nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
       },
       {
         property: 'og:image',
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/ethereum/data-availability/partial-column
       {
         name: 'twitter:description',
         content:
-          'Gossipsub partial message adoption and how sentry nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
+          'Gossipsub partial message adoption and how Xatu nodes complete PeerDAS data columns: by path, cells from the execution layer, useful cells and timings',
       },
       {
         name: 'twitter:image',

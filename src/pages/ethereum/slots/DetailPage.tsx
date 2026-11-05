@@ -510,7 +510,7 @@ export function DetailPage(): JSX.Element {
             {isGloas && <Tab>Payload</Tab>}
             <Tab>Execution</Tab>
             <Tab>MEV</Tab>
-            <Tab>Node Resources</Tab>
+            <Tab>Xatu Node Resources</Tab>
           </ScrollableTabs>
 
           {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}

@@ -266,7 +266,7 @@ export function QuickFilters({
         <button
           type="button"
           onClick={handleReferenceNodesToggle}
-          title={isReferenceNodesActive ? 'Showing EIP-7870 reference nodes only' : 'Showing all nodes'}
+          title={isReferenceNodesActive ? 'Showing EIP-7870 reference Xatu nodes only' : 'Showing all Xatu nodes'}
           className={clsx(
             'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
             isReferenceNodesActive

@@ -337,7 +337,7 @@ export function ProbeDetailDialog({
                     >
                       slot {formatSlot(probe.slot)}
                     </Link>{' '}
-                    from a {peerClient} node
+                    from a {peerClient} peer
                     {peerCountry && (
                       <>
                         {' '}

@@ -46,7 +46,7 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
   return (
     <div className="flex flex-col gap-6">
       <InfoBox summary="What Xatu nodes are">
-        Nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
+        Beacon nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
       </InfoBox>
       <Stats
         gridClassName="grid grid-cols-2 gap-4 lg:grid-cols-4"

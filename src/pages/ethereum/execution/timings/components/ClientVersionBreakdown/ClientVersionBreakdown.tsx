@@ -263,7 +263,7 @@ function ExpandedRowContent({
           <table className="w-full">
             <thead>
               <tr className="text-xs text-muted">
-                <th className="px-2 py-1 text-left font-medium">Node</th>
+                <th className="px-2 py-1 text-left font-medium">Xatu node</th>
                 <th className="px-2 py-1 text-left font-medium">Status</th>
                 <th className="px-2 py-1 text-right font-medium">Duration</th>
               </tr>

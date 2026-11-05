@@ -12,20 +12,20 @@ export interface ReferenceNodesInfoDialogProps {
  */
 export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDialogProps): JSX.Element {
   return (
-    <Dialog open={open} onClose={onClose} title="About Reference Nodes" size="lg">
+    <Dialog open={open} onClose={onClose} title="About reference Xatu nodes" size="lg">
       <div className="space-y-4 text-sm leading-relaxed text-muted">
         <p className="font-medium text-foreground">
-          Reference nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
+          Reference Xatu nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
         </p>
         <p>
-          EIP-7870 defines three node types with specific requirements: Full Nodes for chain following, Attesters for
-          validators, and Local Block Builders for block proposal.
+          EIP-7870 defines three hardware tiers with specific requirements: Full Nodes for chain following, Attesters
+          for validators, and Local Block Builders for block proposal.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-2 pr-4 font-medium text-foreground">Node Type</th>
+                <th className="py-2 pr-4 font-medium text-foreground">Tier</th>
                 <th className="py-2 pr-4 font-medium text-foreground">RAM</th>
                 <th className="py-2 pr-4 font-medium text-foreground">CPU</th>
                 <th className="py-2 font-medium text-foreground">Bandwidth</th>
@@ -55,13 +55,13 @@ export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDi
         </div>
         <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
           <p className="text-foreground">
-            <span className="font-medium">Why filter by reference nodes?</span>{' '}
+            <span className="font-medium">Why filter by reference Xatu nodes?</span>{' '}
             <span className="italic">
               This ensures timing data reflects consistent, spec-compliant hardware rather than varied community setups.
             </span>
           </p>
         </div>
-        <p>All reference nodes use 4 TB NVMe storage.</p>
+        <p>All reference Xatu nodes use 4 TB NVMe storage.</p>
         <p className="text-xs">
           <a
             href="https://eips.ethereum.org/EIPS/eip-7870"

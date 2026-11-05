@@ -447,7 +447,7 @@ function ComparisonTable({ rows, version, previous }: ComparisonTableProps): JSX
       data={rows}
       getRowKey={row => row.metric}
       columns={[
-        { header: 'Metric', accessor: row => row.metric, cellClassName: 'text-muted' },
+        { header: 'Metric', accessor: row => row.metric, cellClassName: 'text-muted max-sm:whitespace-normal' },
         {
           header: version,
           accessor: row => row.current,

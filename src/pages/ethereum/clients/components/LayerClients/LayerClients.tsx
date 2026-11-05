@@ -1,4 +1,4 @@
-import { type JSX, type ReactNode, useMemo } from 'react';
+import { Fragment, type JSX, type ReactNode, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
@@ -50,6 +50,9 @@ export interface LayerClientsProps {
   adoptionScope?: string;
 }
 
+/** Columns shown from the sm breakpoint; narrower screens stack their values under the client */
+const WIDE_ONLY = 'hidden sm:table-cell';
+
 /** A share as a bar and a percentage, or a dash */
 function ShareCell({ share, color }: { share: number | null; color: string }): JSX.Element {
   if (share === null) return <span className="block text-right text-sm/6 text-muted">-</span>;
@@ -80,11 +83,11 @@ function HeaderCell({
 }): JSX.Element {
   return (
     <th scope="col" className={clsx('px-3 py-2 text-left align-bottom font-normal first:pl-0 last:pr-0', className)}>
-      <span className="inline-flex items-center gap-1.5 text-xs/5 font-medium whitespace-nowrap text-foreground">
+      <span className="inline-flex items-center gap-1.5 text-xs/5 font-medium text-foreground sm:whitespace-nowrap">
         {color && <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
         {title}
       </span>
-      {note && <span className="block text-xs/4 whitespace-nowrap text-muted">{note}</span>}
+      {note && <span className="block text-xs/4 text-muted sm:whitespace-nowrap">{note}</span>}
     </th>
   );
 }
@@ -157,7 +160,7 @@ export function LayerClients({
         <div>
           <dt className="inline font-medium text-foreground">Xatu nodes: </dt>
           <dd className="inline">
-            nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
+            beacon nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
           </dd>
         </div>
       )}
@@ -191,7 +194,7 @@ export function LayerClients({
           <table className="w-full border-collapse sm:min-w-[44rem]">
             <thead className="border-b border-border">
               <tr>
-                <HeaderCell title="Client" className="w-44" />
+                <HeaderCell title="Client" className="sm:w-44" />
                 <HeaderCell
                   title="Proposed blocks"
                   note="Stake-weighted"
@@ -199,17 +202,23 @@ export function LayerClients({
                   className="w-[26%]"
                 />
                 {showPeers && (
-                  <HeaderCell title="P2P peers" note="Node-weighted" color={ANGLE_COLORS.peers} className="w-[26%]" />
+                  <HeaderCell title="P2P peers" note="Peer-weighted" color={ANGLE_COLORS.peers} className="w-[26%]" />
                 )}
-                {showXatu && <HeaderCell title="Xatu nodes" color={ANGLE_COLORS.xatu} className="text-right" />}
-                <HeaderCell title="Latest" />
+                {showXatu && (
+                  <HeaderCell title="Xatu nodes" color={ANGLE_COLORS.xatu} className={clsx('text-right', WIDE_ONLY)} />
+                )}
+                <HeaderCell title="Latest" className={WIDE_ONLY} />
                 {!hideLatestAdoption && (
                   <>
-                    <HeaderCell title="Known release" className="text-right" />
-                    <HeaderCell title="On latest" note="Of known-release blocks" className="text-right" />
+                    <HeaderCell title="Known release" className={clsx('text-right', WIDE_ONLY)} />
+                    <HeaderCell
+                      title="On latest"
+                      note="Of known-release blocks"
+                      className={clsx('text-right', WIDE_ONLY)}
+                    />
                   </>
                 )}
-                <th aria-hidden className="w-5" />
+                <th aria-hidden className={clsx('w-5', WIDE_ONLY)} />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -217,53 +226,88 @@ export function LayerClients({
                 const latest = latestReleases.get(row.client)?.version;
                 const adoption = latestAdoption.get(row.client);
                 return (
-                  <tr key={row.client} className="group relative transition-colors hover:bg-primary/5">
-                    <td className="py-2 pr-3">
-                      <Link
-                        to="/ethereum/clients/$client"
-                        params={{ client: row.client }}
-                        className="inline-flex items-center gap-2 text-sm/6 font-medium whitespace-nowrap text-foreground group-hover:text-primary after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-primary"
-                      >
-                        <ClientLogo client={row.client} size={20} noLink decorative />
-                        {formatClientName(row.client)}
-                      </Link>
-                    </td>
-                    <td className="px-3 py-2">
-                      <ShareCell share={row.blockShare} color={getClientColor(row.client)} />
-                    </td>
-                    {showPeers && (
+                  <Fragment key={row.client}>
+                    <tr className="group relative transition-colors hover:bg-primary/5 max-sm:border-b-0">
+                      <td className="py-2 pr-3">
+                        <Link
+                          to="/ethereum/clients/$client"
+                          params={{ client: row.client }}
+                          className="inline-flex items-center gap-2 text-sm/6 font-medium whitespace-nowrap text-foreground group-hover:text-primary after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-primary"
+                        >
+                          <ClientLogo client={row.client} size={20} noLink decorative />
+                          {formatClientName(row.client)}
+                        </Link>
+                      </td>
                       <td className="px-3 py-2">
-                        {peersLoading ? (
-                          <LoadingContainer className="h-2 rounded-full" />
-                        ) : (
-                          <ShareCell share={row.peerShare} color={getClientColor(row.client)} />
-                        )}
+                        <ShareCell share={row.blockShare} color={getClientColor(row.client)} />
                       </td>
-                    )}
-                    {showXatu && xatuNodes && (
-                      <td className="px-3 py-2 text-right text-sm/6 text-muted tabular-nums">
-                        {(xatuNodes.get(row.client) ?? 0).toLocaleString()}
-                      </td>
-                    )}
-                    <td className="px-3 py-2 font-mono text-xs/6 whitespace-nowrap text-muted">{latest ?? '-'}</td>
-                    {!hideLatestAdoption && (
-                      <>
-                        <td className="px-3 py-2 text-right text-sm/6 text-muted tabular-nums">
-                          {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
-                        </td>
-                        <td className="px-3 py-2 text-right text-sm/6 text-foreground tabular-nums">
-                          {adoption === undefined ? (
-                            <span className="text-muted">-</span>
+                      {showPeers && (
+                        <td className="px-3 py-2">
+                          {peersLoading ? (
+                            <LoadingContainer className="h-2 rounded-full" />
                           ) : (
-                            `${adoption.share.toFixed(0)}%`
+                            <ShareCell share={row.peerShare} color={getClientColor(row.client)} />
                           )}
                         </td>
-                      </>
-                    )}
-                    <td className="py-2 pl-1 text-right">
-                      <ChevronRightIcon className="inline size-4 text-muted group-hover:text-primary" />
-                    </td>
-                  </tr>
+                      )}
+                      {showXatu && xatuNodes && (
+                        <td className={clsx('px-3 py-2 text-right text-sm/6 text-muted tabular-nums', WIDE_ONLY)}>
+                          {(xatuNodes.get(row.client) ?? 0).toLocaleString()}
+                        </td>
+                      )}
+                      <td className={clsx('px-3 py-2 font-mono text-xs/6 whitespace-nowrap text-muted', WIDE_ONLY)}>
+                        {latest ?? '-'}
+                      </td>
+                      {!hideLatestAdoption && (
+                        <>
+                          <td className={clsx('px-3 py-2 text-right text-sm/6 text-muted tabular-nums', WIDE_ONLY)}>
+                            {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
+                          </td>
+                          <td
+                            className={clsx('px-3 py-2 text-right text-sm/6 text-foreground tabular-nums', WIDE_ONLY)}
+                          >
+                            {adoption === undefined ? (
+                              <span className="text-muted">-</span>
+                            ) : (
+                              `${adoption.share.toFixed(0)}%`
+                            )}
+                          </td>
+                        </>
+                      )}
+                      <td className={clsx('py-2 pl-1 text-right', WIDE_ONLY)}>
+                        <ChevronRightIcon className="inline size-4 text-muted group-hover:text-primary" />
+                      </td>
+                    </tr>
+                    <tr className="sm:hidden">
+                      <td colSpan={3} className="p-0">
+                        {/* Narrow screens stack the columns that do not fit in a row under the client */}
+                        <dl className="grid grid-cols-[auto_auto_auto_auto] justify-start gap-x-3 pb-2 pl-7 text-xs/5 whitespace-nowrap text-muted">
+                          {showXatu && xatuNodes && (
+                            <>
+                              <dt>Xatu nodes</dt>
+                              <dd className="text-foreground tabular-nums">
+                                {(xatuNodes.get(row.client) ?? 0).toLocaleString()}
+                              </dd>
+                            </>
+                          )}
+                          <dt>Latest</dt>
+                          <dd className="font-mono">{latest ?? '-'}</dd>
+                          {!hideLatestAdoption && (
+                            <>
+                              <dt>Known release</dt>
+                              <dd className="text-foreground tabular-nums">
+                                {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
+                              </dd>
+                              <dt>On latest</dt>
+                              <dd className="text-foreground tabular-nums">
+                                {adoption === undefined ? '-' : `${adoption.share.toFixed(0)}%`}
+                              </dd>
+                            </>
+                          )}
+                        </dl>
+                      </td>
+                    </tr>
+                  </Fragment>
                 );
               })}
               {other.peers > 0 && (
@@ -277,15 +321,15 @@ export function LayerClients({
                   <td className="px-3 py-2">
                     <ShareCell share={other.peerShare} color={OTHER_VERSION_COLOR} />
                   </td>
-                  {showXatu && <td />}
-                  <td />
+                  {showXatu && <td className={WIDE_ONLY} />}
+                  <td className={WIDE_ONLY} />
                   {!hideLatestAdoption && (
                     <>
-                      <td />
-                      <td />
+                      <td className={WIDE_ONLY} />
+                      <td className={WIDE_ONLY} />
                     </>
                   )}
-                  <td />
+                  <td className={WIDE_ONLY} />
                 </tr>
               )}
             </tbody>

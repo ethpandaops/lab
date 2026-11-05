@@ -117,7 +117,7 @@ export function ClusterSpecsModal({ open, onClose, clusterName }: ClusterSpecsMo
 
         {/* Footer info */}
         <div className="flex items-center justify-between border-t border-border pt-4">
-          <p className="text-xs text-muted">Reference nodes controlled by ethPandaOps</p>
+          <p className="text-xs text-muted">Reference Xatu nodes controlled by ethPandaOps</p>
           <a
             href="https://eips.ethereum.org/EIPS/eip-7870"
             target="_blank"

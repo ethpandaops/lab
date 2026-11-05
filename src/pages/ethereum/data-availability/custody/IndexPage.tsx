@@ -866,7 +866,7 @@ export function IndexPage(): JSX.Element {
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
         <div className="space-y-4 text-sm leading-relaxed text-muted">
           <p>
-            Instead of every node storing every blob, data is erasure coded with 2x redundancy and split into 128
+            Instead of every beacon node storing every blob, data is erasure coded with 2x redundancy and split into 128
             columns. Each P2P peer commits to storing a subset based on its identity and validator balance.
           </p>
           <p>64 distinct columns are required to reconstruct the full blob matrix.</p>

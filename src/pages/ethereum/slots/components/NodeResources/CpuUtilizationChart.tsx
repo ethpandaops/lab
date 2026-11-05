@@ -278,7 +278,7 @@ export function CpuUtilizationChart({
   const nodeCount = new Set(data.map(d => d.meta_client_name)).size;
   const shortNodeName = selectedNode?.split('/').pop() ?? '';
 
-  const subtitle = selectedNode ? shortNodeName : `${METRIC_LABELS[metric]} across ${nodeCount} ethPandaOps nodes`;
+  const subtitle = selectedNode ? shortNodeName : `${METRIC_LABELS[metric]} across ${nodeCount} ethPandaOps Xatu nodes`;
 
   const headerActions = (
     <div className="flex items-center gap-2">

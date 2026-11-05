@@ -241,7 +241,7 @@ export function IndexPage(): JSX.Element {
   ]);
   const headerTooltip = tooltip(keys, index => [
     {
-      title: 'First header receipt per node and block',
+      title: 'First header receipt per Xatu node and block',
       items: seriesItems(charts.header, index, value => formatSeconds(value)),
     },
   ]);
@@ -256,7 +256,7 @@ export function IndexPage(): JSX.Element {
     <Container>
       <Header
         title="Partial Columns"
-        description="How sentry nodes complete their custody data columns: cell by cell over gossipsub partial messages, from the execution layer, or as whole columns"
+        description="How Xatu nodes complete their custody data columns: cell by cell over gossipsub partial messages, from the execution layer, or as whole columns"
       />
 
       {!boundsLoading && !hasData ? (
@@ -277,10 +277,10 @@ export function IndexPage(): JSX.Element {
           </div>
 
           <InfoBox summary="How this is measured">
-            Gossipsub partial messages (EIP-8136) let peers exchange data columns cell by cell: a node fills what it can
-            from its execution layer with getBlobs, tells its peers which cells it has, and receives only the missing
-            ones. Lighthouse v8.3.0 and Prysm v7.2.1 turn it on by default. Completion and message numbers come from
-            ethPandaOps sentry nodes, one consensus client at a time: Prysm sentries capture every partial RPC on the
+            Gossipsub partial messages (EIP-8136) let peers exchange data columns cell by cell: a beacon node fills what
+            it can from its execution layer with getBlobs, tells its peers which cells it has, and receives only the
+            missing ones. Lighthouse v8.3.0 and Prysm v7.2.1 turn it on by default. Completion and message numbers come
+            from ethPandaOps Xatu nodes, one consensus client at a time: Prysm sentries capture every partial RPC on the
             wire, Lighthouse sentries what the gossipsub router passes to the client, and the two report different
             completion paths. Adoption counts the partial flags peers set when subscribing to data column topics.
           </InfoBox>

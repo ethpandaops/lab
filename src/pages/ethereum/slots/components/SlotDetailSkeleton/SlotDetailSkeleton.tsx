@@ -178,11 +178,18 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
       <div className="mt-8">
         <TabGroup selectedIndex={0}>
           <ScrollableTabs>
-            {['Timeline', 'Block', 'Attestations', 'Propagation', 'Blobs', 'Execution', 'MEV', 'Node Resources'].map(
-              label => (
-                <Tab key={label}>{label}</Tab>
-              )
-            )}
+            {[
+              'Timeline',
+              'Block',
+              'Attestations',
+              'Propagation',
+              'Blobs',
+              'Execution',
+              'MEV',
+              'Xatu Node Resources',
+            ].map(label => (
+              <Tab key={label}>{label}</Tab>
+            ))}
           </ScrollableTabs>
 
           <TabPanels className="mt-6 min-h-screen">

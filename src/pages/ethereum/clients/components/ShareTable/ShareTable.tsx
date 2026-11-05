@@ -36,8 +36,8 @@ export function ShareTable({ rows, labelHeader, countHeader, labelClassName = 'w
       </div>
       {rows.map(row => (
         <div key={row.key} className="flex items-center gap-3">
-          {/* The label gives way before the bar on narrow screens */}
-          <span className={clsx(labelClassName, 'min-w-0 truncate')}>{row.label}</span>
+          {/* The label gives way before the bar on narrow screens, wrapping rather than cutting off */}
+          <span className={clsx(labelClassName, 'min-w-0 wrap-break-word')}>{row.label}</span>
           <span className="min-w-12 flex-1">
             <ShareBar share={row.share} color={row.color} />
           </span>

@@ -1021,7 +1021,9 @@ function WinrateSection({
   return (
     <PopoutCard
       title={
-        nodeClass === REFERENCE_NODE_CLASS ? 'Execution Winrate: Reference nodes' : 'Execution Winrate: Other nodes'
+        nodeClass === REFERENCE_NODE_CLASS
+          ? 'Execution Winrate: Reference Xatu nodes'
+          : 'Execution Winrate: Other Xatu nodes'
       }
       subtitle="Fastest engine_newPayload per slot"
       anchorId={nodeClass === REFERENCE_NODE_CLASS ? 'winrate' : 'winrate-other'}

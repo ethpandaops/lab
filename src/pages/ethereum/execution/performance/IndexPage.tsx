@@ -135,12 +135,12 @@ export function IndexPage(): JSX.Element {
             className="flex cursor-pointer items-center gap-2"
           >
             <Checkbox checked={referenceNodesOnly} onChange={() => undefined} />
-            <span className="text-sm text-foreground">Reference nodes only</span>
+            <span className="text-sm text-foreground">Reference Xatu nodes only</span>
           </button>
           <button
             onClick={() => setShowRefNodeInfo(true)}
             className="rounded-xs p-0.5 text-muted transition-colors hover:text-foreground"
-            aria-label="Learn more about reference nodes"
+            aria-label="Learn more about reference Xatu nodes"
           >
             <InformationCircleIcon className="size-4" />
           </button>
@@ -254,7 +254,7 @@ function PerformanceSections({
         title="No engine_newPayload timings in this window"
         description={
           referenceNodesOnly
-            ? 'This network has no reference nodes. Turn off Reference nodes only to use every node.'
+            ? 'This network has no reference Xatu nodes. Turn off Reference Xatu nodes only to use every Xatu node.'
             : 'Try a longer time range.'
         }
       />
@@ -411,10 +411,10 @@ function PerformanceSections({
                     onChange={setBudget}
                   />
                   <SegmentedControl
-                    ariaLabel="Node percentile"
+                    ariaLabel="Xatu node percentile"
                     options={[
-                      { value: 'p50', label: 'Typical node' },
-                      { value: 'p95', label: 'Slow node' },
+                      { value: 'p50', label: 'Typical Xatu node' },
+                      { value: 'p95', label: 'Slow Xatu node' },
                     ]}
                     value={ceilingBasis}
                     onChange={setCeilingBasis}
@@ -501,7 +501,7 @@ function PerformanceSections({
       <InspectSection
         title="Opcodes"
         meta={opcodeCosts.model && fmtDayWindow(opcodeCosts.model.windowStart, opcodeCosts.model.windowEnd)}
-        note="Always reference nodes, regardless of the filter above."
+        note="Always reference Xatu nodes, regardless of the filter above."
       >
         {opcodeCosts.model ? (
           <>

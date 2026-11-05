@@ -205,7 +205,7 @@ export function SlotHud({
           <Row k="P50" v={secs(propagationP50Ms)} />
           <Row k="P90" v={secs(propagationP90Ms)} tone="text-primary" />
           <Row k="Max" v={secs(propagationMaxMs)} />
-          <Row k="Nodes" v={dash(propagationNodeCount)} />
+          <Row k="Xatu nodes" v={dash(propagationNodeCount)} />
         </Fade>
       </Section>
 
@@ -241,7 +241,7 @@ export function SlotHud({
           <Fade active={payloadActive} className="flex flex-col gap-px">
             <Row k="Reveal" v={secs(epbs.payloadFirstSeenMs)} tone="text-primary" />
             <Row k="P50" v={secs(epbs.payloadP50Ms)} />
-            <Row k="Nodes" v={dash(epbs.payloadNodeCount)} />
+            <Row k="Xatu nodes" v={dash(epbs.payloadNodeCount)} />
             <Row k="Builder" v={epbs.builderIndex != null ? `#${epbs.builderIndex}` : '—'} />
             <Row
               k="PTC"

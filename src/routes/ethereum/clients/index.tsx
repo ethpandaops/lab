@@ -14,7 +14,7 @@ export const Route = createFileRoute('/ethereum/clients/')({
       {
         name: 'description',
         content:
-          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases and nodes',
+          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases, P2P peers and Xatu nodes',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/clients` },
       { property: 'og:type', content: 'website' },
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/ethereum/clients/')({
       {
         property: 'og:description',
         content:
-          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases and nodes',
+          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases, P2P peers and Xatu nodes',
       },
       {
         property: 'og:image',
@@ -33,7 +33,7 @@ export const Route = createFileRoute('/ethereum/clients/')({
       {
         name: 'twitter:description',
         content:
-          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases and nodes',
+          'Every Ethereum consensus and execution client: share of proposed blocks, diversity, releases, P2P peers and Xatu nodes',
       },
       {
         name: 'twitter:image',

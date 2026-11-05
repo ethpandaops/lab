@@ -218,7 +218,7 @@ export function GeographicalMapView({ nodes, isLoading }: GeographicalMapViewPro
   if (pointData.length === 0) {
     return (
       <div className="flex h-[600px] items-center justify-center text-muted">
-        No node locations found. Try adjusting your filters.
+        No Xatu node locations found. Try adjusting your filters.
       </div>
     );
   }

@@ -50,7 +50,7 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
         {client && <ClientLogo client={client} size={44} />}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="truncate font-mono text-lg/7 font-semibold text-foreground">{nodeId}</h1>
+            <h1 className="min-w-0 font-mono text-lg/7 font-semibold wrap-anywhere text-foreground">{nodeId}</h1>
             <CopyToClipboard content={nodeId} />
             <NodeStatus online={online} showLabel />
             {sync && (

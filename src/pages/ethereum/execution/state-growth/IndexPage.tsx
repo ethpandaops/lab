@@ -139,7 +139,7 @@ export function IndexPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="State Growth" description="Data extracted from go-ethereum node" />
+      <Header title="State Growth" description="From go-ethereum's state size tracer" />
 
       {isLoading && <StateSizeSkeleton />}
 

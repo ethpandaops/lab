@@ -401,16 +401,16 @@ export function HomePage(): JSX.Element {
           <button
             type="button"
             onClick={handleSearch}
-            className="bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+            className="bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 sm:px-5"
           >
             Search
           </button>
           <button
             type="button"
             onClick={handleSimulate}
-            className="flex items-center gap-2 border-l border-border px-4 text-sm font-medium text-muted transition-colors hover:bg-primary/5 hover:text-foreground"
+            className="flex items-center gap-2 border-l border-border px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/5 hover:text-foreground sm:px-4"
           >
-            <BeakerIcon className="size-4" />
+            <BeakerIcon className="hidden size-4 sm:block" />
             Simulate
           </button>
         </div>

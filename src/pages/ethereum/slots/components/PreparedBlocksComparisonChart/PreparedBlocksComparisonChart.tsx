@@ -217,8 +217,8 @@ export function PreparedBlocksComparisonChart({
         <div className="space-y-4">
           {/* Disclaimer about prepared blocks */}
           <InfoBox summary="How this is measured">
-            Alternative blocks built by nodes the ethPandaOps team operates. This shows the hypothetical rewards of the
-            best prepared block for each execution client compared to the actually proposed block.
+            Alternative blocks built by ethPandaOps Xatu nodes. This shows the hypothetical rewards of the best prepared
+            block for each execution client compared to the actually proposed block.
           </InfoBox>
 
           {/* Show filter info if blocks were filtered */}

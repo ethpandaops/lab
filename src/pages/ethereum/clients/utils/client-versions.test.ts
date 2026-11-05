@@ -10,6 +10,7 @@ import {
   latestAdoption,
   latestRelease,
   matchReleaseVersion,
+  onLatestByEntity,
   opcodeCosts,
   opcodeRowsFromDaily,
   peerClient,
@@ -150,6 +151,24 @@ describe('latestAdoption', () => {
     expect(result.get('lighthouse')).toEqual({ share: 60, known: 25 });
     // No known latest release
     expect(result.has('teku')).toBe(false);
+  });
+});
+
+describe('onLatestByEntity', () => {
+  it('counts blocks with a known release and those on the latest or newer, per entity', () => {
+    const rows = [
+      { entity: 'lido', version: 'v8.3.2', count: 3 },
+      { entity: 'lido', version: 'v8.4.0', count: 1 },
+      { entity: 'lido', version: 'v8.3.1', count: 4 },
+      // Graffiti that resolves to no release
+      { entity: 'lido', version: null, count: 9 },
+      { entity: 'solo', version: null, count: 2 },
+      { version: 'v8.3.2', count: 5 },
+    ];
+    const result = onLatestByEntity(rows, 'v8.3.2');
+    expect(result.get('lido')).toEqual({ resolved: 8, onLatest: 4 });
+    expect(result.get('solo')).toEqual({ resolved: 0, onLatest: 0 });
+    expect(result.size).toBe(2);
   });
 });
 

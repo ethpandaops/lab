@@ -57,9 +57,9 @@ export function getClassificationDescription(classification: string): string {
     case 'corporate':
       return 'Public contributors (likely running in datacenters)';
     case 'internal':
-      return 'Nodes run by the ethPandaOps team in datacenters';
+      return 'Xatu nodes run by the ethPandaOps team in datacenters';
     default:
-      return 'Nodes with unknown classification';
+      return 'Xatu nodes with unknown classification';
   }
 }
 
@@ -77,10 +77,10 @@ export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; descri
   },
   internal: {
     label: 'Internal (ethPandaOps)',
-    description: 'Nodes run by the ethPandaOps team in datacenters',
+    description: 'Xatu nodes run by the ethPandaOps team in datacenters',
   },
   unclassified: {
     label: 'Unclassified',
-    description: 'Nodes with unknown classification',
+    description: 'Xatu nodes with unknown classification',
   },
 };

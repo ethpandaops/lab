@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX, useCallback, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
@@ -7,7 +7,13 @@ import { Input } from '@/components/Forms/Input';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { compareVersions } from '@/utils/version';
-import { OTHER_VERSION_COLOR, summariseVersions, versionColors, type VersionCount } from '../../utils/client-versions';
+import {
+  OTHER_VERSION_COLOR,
+  onLatestByEntity,
+  summariseVersions,
+  versionColors,
+  type VersionCount,
+} from '../../utils/client-versions';
 
 export interface EntityVersionBarsProps {
   client: string;
@@ -15,6 +21,8 @@ export interface EntityVersionBarsProps {
   blocks: VersionCount[];
   /** Newest release, for the "behind" sort and column */
   latestVersion?: string;
+  /** One day's blocks the "On latest" column and "behind" sort read instead of the window's, labelled by that day */
+  latestDay?: { label: string; blocks: VersionCount[] };
   /** Version the page is about: it is drawn first in every bar and sorts entities by default */
   focusVersion?: string;
   title: string;
@@ -55,6 +63,7 @@ export function EntityVersionBars({
   client,
   blocks,
   latestVersion,
+  latestDay,
   focusVersion,
   title,
   subtitle,
@@ -100,16 +109,28 @@ export function EntityVersionBars({
     return [...byEntity.values()];
   }, [blocks, latestVersion, focusVersion]);
 
+  const dayOnLatest = useMemo(
+    () => (latestDay ? onLatestByEntity(latestDay.blocks, latestVersion) : undefined),
+    [latestDay, latestVersion]
+  );
+  /** Blocks with a known release and those on latest that the column shows: the latest day's when given */
+  const onLatestOf = useCallback(
+    (row: EntityRow): { resolved: number; onLatest: number } =>
+      dayOnLatest ? (dayOnLatest.get(row.entity) ?? { resolved: 0, onLatest: 0 }) : row,
+    [dayOnLatest]
+  );
+
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
+    const behind = (row: EntityRow): number => onLatestOf(row).resolved - onLatestOf(row).onLatest;
     const filtered = rows.filter(row => (!needle || row.entity.toLowerCase().includes(needle)) && row.blocks > 0);
     const sorted = [...filtered].sort((a, b) => {
       if (sort === 'focus') return b.onFocus - a.onFocus || b.blocks - a.blocks;
-      if (sort === 'behind') return b.resolved - b.onLatest - (a.resolved - a.onLatest) || b.blocks - a.blocks;
+      if (sort === 'behind') return behind(b) - behind(a) || b.blocks - a.blocks;
       return b.blocks - a.blocks;
     });
     return sorted.slice(0, Number(limit));
-  }, [rows, query, sort, limit]);
+  }, [rows, query, sort, limit, onLatestOf]);
 
   const maxBlocks = Math.max(1, ...shown.map(row => row.blocks));
   /** Versions in bar order: focus first, then newest to oldest, unresolved last */
@@ -210,7 +231,11 @@ export function EntityVersionBars({
               </span>
               <span className="text-right">Blocks</span>
               <span className="text-right">
-                {focusVersion && sort === 'focus' ? `On ${focusVersion}` : 'On latest'}
+                {focusVersion && sort === 'focus'
+                  ? `On ${focusVersion}`
+                  : latestDay
+                    ? `On latest, ${latestDay.label}`
+                    : 'On latest'}
               </span>
             </div>
             {shown.map(row => {
@@ -255,7 +280,7 @@ export function EntityVersionBars({
                   <span className="text-right text-sm/6 font-medium text-foreground tabular-nums">
                     {focusVersion && sort === 'focus'
                       ? percent(row.onFocus, row.resolved)
-                      : percent(row.onLatest, row.resolved)}
+                      : percent(onLatestOf(row).onLatest, onLatestOf(row).resolved)}
                   </span>
                 </div>
               );
