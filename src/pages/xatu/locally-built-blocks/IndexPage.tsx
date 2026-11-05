@@ -58,7 +58,7 @@ export function IndexPage(): JSX.Element {
   const page = search.page ?? 0;
   const pageSize = search.pageSize ?? BLOCKS_PAGE_SIZE;
 
-  const roster = useNodeRoster();
+  const roster = useNodeRoster(query.slot_start_date_time_gte ?? windowStart, query.slot_start_date_time_lte);
   const timeline = useSlotBlocks(query, filters.slotTo === undefined);
   // All history is too slow to reread every slot; the timeline keeps following the newest slots
   const table = usePreparedBlocks(query, sort, order, page, pageSize, timeWindow !== 'all');

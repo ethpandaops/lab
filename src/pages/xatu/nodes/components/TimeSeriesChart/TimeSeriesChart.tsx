@@ -41,7 +41,7 @@ function runs(buckets: number[], starts: Set<number>): Array<[number, number]> {
 }
 
 /**
- * Hourly or daily history in a popout card: a time axis labelled in the viewer's timezone and a tooltip per bucket.
+ * Hourly, daily or weekly history in a popout card: a time axis labelled in the viewer's timezone and a tooltip per bucket.
  */
 export function TimeSeriesChart({
   title,

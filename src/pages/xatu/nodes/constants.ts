@@ -12,19 +12,19 @@ export const ONLINE_THRESHOLD_SECONDS = 15 * 60;
 /** Time ranges for the history charts */
 export type NodeRange = '24h' | '7d' | '30d' | '90d' | 'all';
 
-export type Granularity = 'hourly' | 'daily';
+export type Granularity = 'hourly' | 'daily' | 'weekly';
 
-/** Hourly rollups up to a week, daily beyond; `buckets` is null for all history */
+/** Hourly rollups up to a week, daily up to 90 days, weekly for all history, where `buckets` is null */
 export const NODE_RANGE_CONFIG: Record<NodeRange, { granularity: Granularity; buckets: number | null; label: string }> =
   {
     '24h': { granularity: 'hourly', buckets: 24, label: 'Last 24h' },
     '7d': { granularity: 'hourly', buckets: 168, label: 'Last 7 days' },
     '30d': { granularity: 'daily', buckets: 30, label: 'Last 30 days' },
     '90d': { granularity: 'daily', buckets: 90, label: 'Last 90 days' },
-    all: { granularity: 'daily', buckets: null, label: 'All time' },
+    all: { granularity: 'weekly', buckets: null, label: 'All time' },
   };
 
-export const DEFAULT_NODE_RANGE: NodeRange = '7d';
+export const DEFAULT_NODE_RANGE: NodeRange = 'all';
 
 export const NODE_RANGE_OPTIONS = [
   { value: '24h', label: '24h' },
@@ -49,8 +49,8 @@ export const contributorSearchSchema = z.object({ range: rangeSchema, seen: rang
  */
 export const BEHIND_MS = 12_000;
 
-/** Slots in an hour and a day, for counting the slots a node missed */
-export const SLOTS_PER_BUCKET: Record<Granularity, number> = { hourly: 300, daily: 7200 };
+/** Slots in an hour, a day and a week, for counting the slots a node missed */
+export const SLOTS_PER_BUCKET: Record<Granularity, number> = { hourly: 300, daily: 7200, weekly: 50400 };
 
 /** Number of columns a data column sidecar can carry (PeerDAS) */
 export const DATA_COLUMN_COUNT = 128;

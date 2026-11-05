@@ -22,12 +22,13 @@ import {
 import { DEFAULT_NODE_RANGE, NETWORK_WINDOW_SLOTS, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useBlockSlots } from './hooks/useBlockSlots';
 import { useLastSeenNodes } from './hooks/useLastSeenNodes';
+import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNetworkObservations } from './hooks/useNetworkObservations';
 import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodePerformance } from './hooks/useNodePerformance';
 import { buildNodeRows } from './hooks/useNodeRows';
-import { behindStarts, medianByStart, rangeValue } from './utils/history';
+import { behindStarts, rangeValue } from './utils/history';
 import { formatMs, getIngestedEndSlot, getSyncState } from './utils/node-stats';
 
 function Section({
@@ -76,7 +77,7 @@ export function DetailPage(): JSX.Element {
     Date.now() / 1000
   )[0];
   const dataColumn = useNodeHistory('dataColumn', range, filter);
-  const network = useNodeHistory('block', range, {});
+  const network = useNetworkHistory(range);
   const blockSlots = useBlockSlots(range);
   // Only ethPandaOps nodes report engine API calls
   const reportsEngine = row?.node.classification === 'internal';
@@ -151,7 +152,7 @@ export function DetailPage(): JSX.Element {
   const hasCustody = !!custody.data && custody.data.columns.size > 0;
   const hasRecent = !!recent.data && recent.data.block.size > 0;
   // Hours the node trailed the network by more than a slot were spent catching up after downtime or a resync
-  const behind = behindStarts(blockRows, medianByStart(network.data?.rows ?? []));
+  const behind = behindStarts(blockRows, network.data?.medians ?? new Map());
   const sync =
     row.online && recent.data && recentNetwork.data ? getSyncState(recent.data.block, recentNetwork.data.slots) : null;
   const recentEndSlot = recent.data

@@ -165,6 +165,12 @@ import type {
   FctAttestationObservationByNodeServiceListData,
   FctAttestationObservationByNodeServiceListErrors,
   FctAttestationObservationByNodeServiceListResponses,
+  FctAttestationObservationByNodeWeeklyServiceGetData,
+  FctAttestationObservationByNodeWeeklyServiceGetErrors,
+  FctAttestationObservationByNodeWeeklyServiceGetResponses,
+  FctAttestationObservationByNodeWeeklyServiceListData,
+  FctAttestationObservationByNodeWeeklyServiceListErrors,
+  FctAttestationObservationByNodeWeeklyServiceListResponses,
   FctAttestationParticipationRateDailyServiceGetData,
   FctAttestationParticipationRateDailyServiceGetErrors,
   FctAttestationParticipationRateDailyServiceGetResponses,
@@ -207,6 +213,24 @@ import type {
   FctAttestationVoteCorrectnessByClientPairDailyServiceListData,
   FctAttestationVoteCorrectnessByClientPairDailyServiceListErrors,
   FctAttestationVoteCorrectnessByClientPairDailyServiceListResponses,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetErrors,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetResponses,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListData,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListErrors,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListResponses,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetErrors,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponses,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListErrors,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponses,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetErrors,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponses,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListData,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListErrors,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListResponses,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetErrors,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponses,
@@ -291,12 +315,36 @@ import type {
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListErrors,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponses,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListErrors,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponses,
   FctBlockDataColumnSidecarFirstSeenServiceGetData,
   FctBlockDataColumnSidecarFirstSeenServiceGetErrors,
   FctBlockDataColumnSidecarFirstSeenServiceGetResponses,
   FctBlockDataColumnSidecarFirstSeenServiceListData,
   FctBlockDataColumnSidecarFirstSeenServiceListErrors,
   FctBlockDataColumnSidecarFirstSeenServiceListResponses,
+  FctBlockFirstSeenByNetworkDailyServiceGetData,
+  FctBlockFirstSeenByNetworkDailyServiceGetErrors,
+  FctBlockFirstSeenByNetworkDailyServiceGetResponses,
+  FctBlockFirstSeenByNetworkDailyServiceListData,
+  FctBlockFirstSeenByNetworkDailyServiceListErrors,
+  FctBlockFirstSeenByNetworkDailyServiceListResponses,
+  FctBlockFirstSeenByNetworkHourlyServiceGetData,
+  FctBlockFirstSeenByNetworkHourlyServiceGetErrors,
+  FctBlockFirstSeenByNetworkHourlyServiceGetResponses,
+  FctBlockFirstSeenByNetworkHourlyServiceListData,
+  FctBlockFirstSeenByNetworkHourlyServiceListErrors,
+  FctBlockFirstSeenByNetworkHourlyServiceListResponses,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetData,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetErrors,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetResponses,
+  FctBlockFirstSeenByNetworkWeeklyServiceListData,
+  FctBlockFirstSeenByNetworkWeeklyServiceListErrors,
+  FctBlockFirstSeenByNetworkWeeklyServiceListResponses,
   FctBlockFirstSeenByNodeDailyServiceGetData,
   FctBlockFirstSeenByNodeDailyServiceGetErrors,
   FctBlockFirstSeenByNodeDailyServiceGetResponses,
@@ -315,18 +363,36 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListErrors,
   FctBlockFirstSeenByNodeServiceListResponses,
+  FctBlockFirstSeenByNodeWeeklyServiceGetData,
+  FctBlockFirstSeenByNodeWeeklyServiceGetErrors,
+  FctBlockFirstSeenByNodeWeeklyServiceGetResponses,
+  FctBlockFirstSeenByNodeWeeklyServiceListData,
+  FctBlockFirstSeenByNodeWeeklyServiceListErrors,
+  FctBlockFirstSeenByNodeWeeklyServiceListResponses,
   FctBlockGraffitiClientByEntityDailyServiceGetData,
   FctBlockGraffitiClientByEntityDailyServiceGetErrors,
   FctBlockGraffitiClientByEntityDailyServiceGetResponses,
   FctBlockGraffitiClientByEntityDailyServiceListData,
   FctBlockGraffitiClientByEntityDailyServiceListErrors,
   FctBlockGraffitiClientByEntityDailyServiceListResponses,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetData,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetErrors,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetResponses,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListData,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListErrors,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListResponses,
   FctBlockGraffitiClientByEntityHourlyServiceGetData,
   FctBlockGraffitiClientByEntityHourlyServiceGetErrors,
   FctBlockGraffitiClientByEntityHourlyServiceGetResponses,
   FctBlockGraffitiClientByEntityHourlyServiceListData,
   FctBlockGraffitiClientByEntityHourlyServiceListErrors,
   FctBlockGraffitiClientByEntityHourlyServiceListResponses,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetData,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetErrors,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetResponses,
+  FctBlockGraffitiClientByEntityWeeklyServiceListData,
+  FctBlockGraffitiClientByEntityWeeklyServiceListErrors,
+  FctBlockGraffitiClientByEntityWeeklyServiceListResponses,
   FctBlockGraffitiClientDailyServiceGetData,
   FctBlockGraffitiClientDailyServiceGetErrors,
   FctBlockGraffitiClientDailyServiceGetResponses,
@@ -345,12 +411,24 @@ import type {
   FctBlockGraffitiClientVersionByEntityDailyServiceListData,
   FctBlockGraffitiClientVersionByEntityDailyServiceListErrors,
   FctBlockGraffitiClientVersionByEntityDailyServiceListResponses,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetErrors,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponses,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListErrors,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponses,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetData,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetErrors,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponses,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListData,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListErrors,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListResponses,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetErrors,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponses,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListData,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListErrors,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponses,
   FctBlockGraffitiClientVersionDailyServiceGetData,
   FctBlockGraffitiClientVersionDailyServiceGetErrors,
   FctBlockGraffitiClientVersionDailyServiceGetResponses,
@@ -459,6 +537,18 @@ import type {
   FctBlockProposalByClientPairDailyServiceListData,
   FctBlockProposalByClientPairDailyServiceListErrors,
   FctBlockProposalByClientPairDailyServiceListResponses,
+  FctBlockProposalByEntityDailyServiceGetData,
+  FctBlockProposalByEntityDailyServiceGetErrors,
+  FctBlockProposalByEntityDailyServiceGetResponses,
+  FctBlockProposalByEntityDailyServiceListData,
+  FctBlockProposalByEntityDailyServiceListErrors,
+  FctBlockProposalByEntityDailyServiceListResponses,
+  FctBlockProposalByEntityGroupDailyServiceGetData,
+  FctBlockProposalByEntityGroupDailyServiceGetErrors,
+  FctBlockProposalByEntityGroupDailyServiceGetResponses,
+  FctBlockProposalByEntityGroupDailyServiceListData,
+  FctBlockProposalByEntityGroupDailyServiceListErrors,
+  FctBlockProposalByEntityGroupDailyServiceListResponses,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetErrors,
   FctBlockProposalStatusDailyServiceGetResponses,
@@ -471,6 +561,12 @@ import type {
   FctBlockProposalStatusHourlyServiceListData,
   FctBlockProposalStatusHourlyServiceListErrors,
   FctBlockProposalStatusHourlyServiceListResponses,
+  FctBlockProposerByEntityServiceGetData,
+  FctBlockProposerByEntityServiceGetErrors,
+  FctBlockProposerByEntityServiceGetResponses,
+  FctBlockProposerByEntityServiceListData,
+  FctBlockProposerByEntityServiceListErrors,
+  FctBlockProposerByEntityServiceListResponses,
   FctBlockProposerByValidatorServiceGetData,
   FctBlockProposerByValidatorServiceGetErrors,
   FctBlockProposerByValidatorServiceGetResponses,
@@ -861,6 +957,12 @@ import type {
   FctHeadFirstSeenByNodeServiceListData,
   FctHeadFirstSeenByNodeServiceListErrors,
   FctHeadFirstSeenByNodeServiceListResponses,
+  FctHeadFirstSeenByNodeWeeklyServiceGetData,
+  FctHeadFirstSeenByNodeWeeklyServiceGetErrors,
+  FctHeadFirstSeenByNodeWeeklyServiceGetResponses,
+  FctHeadFirstSeenByNodeWeeklyServiceListData,
+  FctHeadFirstSeenByNodeWeeklyServiceListErrors,
+  FctHeadFirstSeenByNodeWeeklyServiceListResponses,
   FctHeadVoteCorrectnessRateDailyServiceGetData,
   FctHeadVoteCorrectnessRateDailyServiceGetErrors,
   FctHeadVoteCorrectnessRateDailyServiceGetResponses,
@@ -951,6 +1053,12 @@ import type {
   FctOpcodeCostByElClientVersionServiceListData,
   FctOpcodeCostByElClientVersionServiceListErrors,
   FctOpcodeCostByElClientVersionServiceListResponses,
+  FctOpcodeCostByElClientWeeklyServiceGetData,
+  FctOpcodeCostByElClientWeeklyServiceGetErrors,
+  FctOpcodeCostByElClientWeeklyServiceGetResponses,
+  FctOpcodeCostByElClientWeeklyServiceListData,
+  FctOpcodeCostByElClientWeeklyServiceListErrors,
+  FctOpcodeCostByElClientWeeklyServiceListResponses,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetErrors,
   FctOpcodeGasByOpcodeDailyServiceGetResponses,
@@ -963,6 +1071,12 @@ import type {
   FctOpcodeGasByOpcodeHourlyServiceListData,
   FctOpcodeGasByOpcodeHourlyServiceListErrors,
   FctOpcodeGasByOpcodeHourlyServiceListResponses,
+  FctOpcodeGasByOpcodeWeeklyServiceGetData,
+  FctOpcodeGasByOpcodeWeeklyServiceGetErrors,
+  FctOpcodeGasByOpcodeWeeklyServiceGetResponses,
+  FctOpcodeGasByOpcodeWeeklyServiceListData,
+  FctOpcodeGasByOpcodeWeeklyServiceListErrors,
+  FctOpcodeGasByOpcodeWeeklyServiceListResponses,
   FctOpcodeOpsDailyServiceGetData,
   FctOpcodeOpsDailyServiceGetErrors,
   FctOpcodeOpsDailyServiceGetResponses,
@@ -1065,6 +1179,12 @@ import type {
   FctPeerProtocolByClClientDailyServiceListData,
   FctPeerProtocolByClClientDailyServiceListErrors,
   FctPeerProtocolByClClientDailyServiceListResponses,
+  FctPreparedBlockByNodeDailyServiceGetData,
+  FctPreparedBlockByNodeDailyServiceGetErrors,
+  FctPreparedBlockByNodeDailyServiceGetResponses,
+  FctPreparedBlockByNodeDailyServiceListData,
+  FctPreparedBlockByNodeDailyServiceListErrors,
+  FctPreparedBlockByNodeDailyServiceListResponses,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetErrors,
   FctPreparedBlockServiceGetResponses,
@@ -1275,6 +1395,12 @@ import type {
   FctValidatorOperationWeeklyServiceListData,
   FctValidatorOperationWeeklyServiceListErrors,
   FctValidatorOperationWeeklyServiceListResponses,
+  FctValidatorPerformanceByEntityRollingServiceGetData,
+  FctValidatorPerformanceByEntityRollingServiceGetErrors,
+  FctValidatorPerformanceByEntityRollingServiceGetResponses,
+  FctValidatorPerformanceByEntityRollingServiceListData,
+  FctValidatorPerformanceByEntityRollingServiceListErrors,
+  FctValidatorPerformanceByEntityRollingServiceListResponses,
   FctValidatorQueueDailyServiceGetData,
   FctValidatorQueueDailyServiceGetErrors,
   FctValidatorQueueDailyServiceGetResponses,
@@ -1305,6 +1431,12 @@ import type {
   FctValidatorStakeByEntityDailyServiceListData,
   FctValidatorStakeByEntityDailyServiceListErrors,
   FctValidatorStakeByEntityDailyServiceListResponses,
+  FctValidatorStakeByEntityGroupDailyServiceGetData,
+  FctValidatorStakeByEntityGroupDailyServiceGetErrors,
+  FctValidatorStakeByEntityGroupDailyServiceGetResponses,
+  FctValidatorStakeByEntityGroupDailyServiceListData,
+  FctValidatorStakeByEntityGroupDailyServiceListErrors,
+  FctValidatorStakeByEntityGroupDailyServiceListResponses,
   IntAttestationAttestedCanonicalServiceGetData,
   IntAttestationAttestedCanonicalServiceGetErrors,
   IntAttestationAttestedCanonicalServiceGetResponses,
@@ -1877,6 +2009,10 @@ import {
   zFctAttestationObservationByNodeServiceGetResponse,
   zFctAttestationObservationByNodeServiceListData,
   zFctAttestationObservationByNodeServiceListResponse,
+  zFctAttestationObservationByNodeWeeklyServiceGetData,
+  zFctAttestationObservationByNodeWeeklyServiceGetResponse,
+  zFctAttestationObservationByNodeWeeklyServiceListData,
+  zFctAttestationObservationByNodeWeeklyServiceListResponse,
   zFctAttestationParticipationRateDailyServiceGetData,
   zFctAttestationParticipationRateDailyServiceGetResponse,
   zFctAttestationParticipationRateDailyServiceListData,
@@ -1905,6 +2041,18 @@ import {
   zFctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByClientPairDailyServiceListData,
   zFctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
+  zFctAttestationVoteCorrectnessByEntityDailyServiceGetData,
+  zFctAttestationVoteCorrectnessByEntityDailyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByEntityDailyServiceListData,
+  zFctAttestationVoteCorrectnessByEntityDailyServiceListResponse,
+  zFctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData,
+  zFctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByEntityGroupDailyServiceListData,
+  zFctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse,
+  zFctAttestationVoteCorrectnessByEntityHourlyServiceGetData,
+  zFctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse,
+  zFctAttestationVoteCorrectnessByEntityHourlyServiceListData,
+  zFctAttestationVoteCorrectnessByEntityHourlyServiceListResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByValidatorDailyServiceListData,
@@ -1961,10 +2109,26 @@ import {
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   zFctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse,
+  zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData,
+  zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse,
   zFctBlockDataColumnSidecarFirstSeenServiceGetData,
   zFctBlockDataColumnSidecarFirstSeenServiceGetResponse,
   zFctBlockDataColumnSidecarFirstSeenServiceListData,
   zFctBlockDataColumnSidecarFirstSeenServiceListResponse,
+  zFctBlockFirstSeenByNetworkDailyServiceGetData,
+  zFctBlockFirstSeenByNetworkDailyServiceGetResponse,
+  zFctBlockFirstSeenByNetworkDailyServiceListData,
+  zFctBlockFirstSeenByNetworkDailyServiceListResponse,
+  zFctBlockFirstSeenByNetworkHourlyServiceGetData,
+  zFctBlockFirstSeenByNetworkHourlyServiceGetResponse,
+  zFctBlockFirstSeenByNetworkHourlyServiceListData,
+  zFctBlockFirstSeenByNetworkHourlyServiceListResponse,
+  zFctBlockFirstSeenByNetworkWeeklyServiceGetData,
+  zFctBlockFirstSeenByNetworkWeeklyServiceGetResponse,
+  zFctBlockFirstSeenByNetworkWeeklyServiceListData,
+  zFctBlockFirstSeenByNetworkWeeklyServiceListResponse,
   zFctBlockFirstSeenByNodeDailyServiceGetData,
   zFctBlockFirstSeenByNodeDailyServiceGetResponse,
   zFctBlockFirstSeenByNodeDailyServiceListData,
@@ -1977,14 +2141,26 @@ import {
   zFctBlockFirstSeenByNodeServiceGetResponse,
   zFctBlockFirstSeenByNodeServiceListData,
   zFctBlockFirstSeenByNodeServiceListResponse,
+  zFctBlockFirstSeenByNodeWeeklyServiceGetData,
+  zFctBlockFirstSeenByNodeWeeklyServiceGetResponse,
+  zFctBlockFirstSeenByNodeWeeklyServiceListData,
+  zFctBlockFirstSeenByNodeWeeklyServiceListResponse,
   zFctBlockGraffitiClientByEntityDailyServiceGetData,
   zFctBlockGraffitiClientByEntityDailyServiceGetResponse,
   zFctBlockGraffitiClientByEntityDailyServiceListData,
   zFctBlockGraffitiClientByEntityDailyServiceListResponse,
+  zFctBlockGraffitiClientByEntityGroupDailyServiceGetData,
+  zFctBlockGraffitiClientByEntityGroupDailyServiceGetResponse,
+  zFctBlockGraffitiClientByEntityGroupDailyServiceListData,
+  zFctBlockGraffitiClientByEntityGroupDailyServiceListResponse,
   zFctBlockGraffitiClientByEntityHourlyServiceGetData,
   zFctBlockGraffitiClientByEntityHourlyServiceGetResponse,
   zFctBlockGraffitiClientByEntityHourlyServiceListData,
   zFctBlockGraffitiClientByEntityHourlyServiceListResponse,
+  zFctBlockGraffitiClientByEntityWeeklyServiceGetData,
+  zFctBlockGraffitiClientByEntityWeeklyServiceGetResponse,
+  zFctBlockGraffitiClientByEntityWeeklyServiceListData,
+  zFctBlockGraffitiClientByEntityWeeklyServiceListResponse,
   zFctBlockGraffitiClientDailyServiceGetData,
   zFctBlockGraffitiClientDailyServiceGetResponse,
   zFctBlockGraffitiClientDailyServiceListData,
@@ -1997,10 +2173,18 @@ import {
   zFctBlockGraffitiClientVersionByEntityDailyServiceGetResponse,
   zFctBlockGraffitiClientVersionByEntityDailyServiceListData,
   zFctBlockGraffitiClientVersionByEntityDailyServiceListResponse,
+  zFctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData,
+  zFctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse,
+  zFctBlockGraffitiClientVersionByEntityGroupDailyServiceListData,
+  zFctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse,
   zFctBlockGraffitiClientVersionByEntityHourlyServiceGetData,
   zFctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse,
   zFctBlockGraffitiClientVersionByEntityHourlyServiceListData,
   zFctBlockGraffitiClientVersionByEntityHourlyServiceListResponse,
+  zFctBlockGraffitiClientVersionByEntityWeeklyServiceGetData,
+  zFctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse,
+  zFctBlockGraffitiClientVersionByEntityWeeklyServiceListData,
+  zFctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse,
   zFctBlockGraffitiClientVersionDailyServiceGetData,
   zFctBlockGraffitiClientVersionDailyServiceGetResponse,
   zFctBlockGraffitiClientVersionDailyServiceListData,
@@ -2073,6 +2257,14 @@ import {
   zFctBlockProposalByClientPairDailyServiceGetResponse,
   zFctBlockProposalByClientPairDailyServiceListData,
   zFctBlockProposalByClientPairDailyServiceListResponse,
+  zFctBlockProposalByEntityDailyServiceGetData,
+  zFctBlockProposalByEntityDailyServiceGetResponse,
+  zFctBlockProposalByEntityDailyServiceListData,
+  zFctBlockProposalByEntityDailyServiceListResponse,
+  zFctBlockProposalByEntityGroupDailyServiceGetData,
+  zFctBlockProposalByEntityGroupDailyServiceGetResponse,
+  zFctBlockProposalByEntityGroupDailyServiceListData,
+  zFctBlockProposalByEntityGroupDailyServiceListResponse,
   zFctBlockProposalStatusDailyServiceGetData,
   zFctBlockProposalStatusDailyServiceGetResponse,
   zFctBlockProposalStatusDailyServiceListData,
@@ -2081,6 +2273,10 @@ import {
   zFctBlockProposalStatusHourlyServiceGetResponse,
   zFctBlockProposalStatusHourlyServiceListData,
   zFctBlockProposalStatusHourlyServiceListResponse,
+  zFctBlockProposerByEntityServiceGetData,
+  zFctBlockProposerByEntityServiceGetResponse,
+  zFctBlockProposerByEntityServiceListData,
+  zFctBlockProposerByEntityServiceListResponse,
   zFctBlockProposerByValidatorServiceGetData,
   zFctBlockProposerByValidatorServiceGetResponse,
   zFctBlockProposerByValidatorServiceListData,
@@ -2341,6 +2537,10 @@ import {
   zFctHeadFirstSeenByNodeServiceGetResponse,
   zFctHeadFirstSeenByNodeServiceListData,
   zFctHeadFirstSeenByNodeServiceListResponse,
+  zFctHeadFirstSeenByNodeWeeklyServiceGetData,
+  zFctHeadFirstSeenByNodeWeeklyServiceGetResponse,
+  zFctHeadFirstSeenByNodeWeeklyServiceListData,
+  zFctHeadFirstSeenByNodeWeeklyServiceListResponse,
   zFctHeadVoteCorrectnessRateDailyServiceGetData,
   zFctHeadVoteCorrectnessRateDailyServiceGetResponse,
   zFctHeadVoteCorrectnessRateDailyServiceListData,
@@ -2401,6 +2601,10 @@ import {
   zFctOpcodeCostByElClientVersionServiceGetResponse,
   zFctOpcodeCostByElClientVersionServiceListData,
   zFctOpcodeCostByElClientVersionServiceListResponse,
+  zFctOpcodeCostByElClientWeeklyServiceGetData,
+  zFctOpcodeCostByElClientWeeklyServiceGetResponse,
+  zFctOpcodeCostByElClientWeeklyServiceListData,
+  zFctOpcodeCostByElClientWeeklyServiceListResponse,
   zFctOpcodeGasByOpcodeDailyServiceGetData,
   zFctOpcodeGasByOpcodeDailyServiceGetResponse,
   zFctOpcodeGasByOpcodeDailyServiceListData,
@@ -2409,6 +2613,10 @@ import {
   zFctOpcodeGasByOpcodeHourlyServiceGetResponse,
   zFctOpcodeGasByOpcodeHourlyServiceListData,
   zFctOpcodeGasByOpcodeHourlyServiceListResponse,
+  zFctOpcodeGasByOpcodeWeeklyServiceGetData,
+  zFctOpcodeGasByOpcodeWeeklyServiceGetResponse,
+  zFctOpcodeGasByOpcodeWeeklyServiceListData,
+  zFctOpcodeGasByOpcodeWeeklyServiceListResponse,
   zFctOpcodeOpsDailyServiceGetData,
   zFctOpcodeOpsDailyServiceGetResponse,
   zFctOpcodeOpsDailyServiceListData,
@@ -2477,6 +2685,10 @@ import {
   zFctPeerProtocolByClClientDailyServiceGetResponse,
   zFctPeerProtocolByClClientDailyServiceListData,
   zFctPeerProtocolByClClientDailyServiceListResponse,
+  zFctPreparedBlockByNodeDailyServiceGetData,
+  zFctPreparedBlockByNodeDailyServiceGetResponse,
+  zFctPreparedBlockByNodeDailyServiceListData,
+  zFctPreparedBlockByNodeDailyServiceListResponse,
   zFctPreparedBlockServiceGetData,
   zFctPreparedBlockServiceGetResponse,
   zFctPreparedBlockServiceListData,
@@ -2617,6 +2829,10 @@ import {
   zFctValidatorOperationWeeklyServiceGetResponse,
   zFctValidatorOperationWeeklyServiceListData,
   zFctValidatorOperationWeeklyServiceListResponse,
+  zFctValidatorPerformanceByEntityRollingServiceGetData,
+  zFctValidatorPerformanceByEntityRollingServiceGetResponse,
+  zFctValidatorPerformanceByEntityRollingServiceListData,
+  zFctValidatorPerformanceByEntityRollingServiceListResponse,
   zFctValidatorQueueDailyServiceGetData,
   zFctValidatorQueueDailyServiceGetResponse,
   zFctValidatorQueueDailyServiceListData,
@@ -2637,6 +2853,10 @@ import {
   zFctValidatorStakeByEntityDailyServiceGetResponse,
   zFctValidatorStakeByEntityDailyServiceListData,
   zFctValidatorStakeByEntityDailyServiceListResponse,
+  zFctValidatorStakeByEntityGroupDailyServiceGetData,
+  zFctValidatorStakeByEntityGroupDailyServiceGetResponse,
+  zFctValidatorStakeByEntityGroupDailyServiceListData,
+  zFctValidatorStakeByEntityGroupDailyServiceListResponse,
   zIntAttestationAttestedCanonicalServiceGetData,
   zIntAttestationAttestedCanonicalServiceGetResponse,
   zIntAttestationAttestedCanonicalServiceListData,
@@ -3959,6 +4179,44 @@ export const fctAttestationObservationByNodeHourlyServiceGet = <ThrowOnError ext
 /**
  * List records
  *
+ * Weekly attestation arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctAttestationObservationByNodeWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationObservationByNodeWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationObservationByNodeWeeklyServiceListResponses,
+    FctAttestationObservationByNodeWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctAttestationObservationByNodeWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationObservationByNodeWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationObservationByNodeWeeklyServiceGetResponses,
+    FctAttestationObservationByNodeWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationObservationByNodeWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationObservationByNodeWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_observation_by_node_weekly/{week_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Daily aggregated attestation participation rate statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctAttestationParticipationRateDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -4225,6 +4483,128 @@ export const fctAttestationVoteCorrectnessByClientPairDailyServiceGet = <ThrowOn
     responseValidator: async data =>
       await zFctAttestationVoteCorrectnessByClientPairDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_vote_correctness_by_client_pair_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export const fctAttestationVoteCorrectnessByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByEntityDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityDailyServiceListResponses,
+    FctAttestationVoteCorrectnessByEntityDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByEntityDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByEntityDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByEntityDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityDailyServiceGetResponses,
+    FctAttestationVoteCorrectnessByEntityDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByEntityDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily attestation liveness, vote correctness and inclusion per entity group on the finalized chain: the sum of the member entities in fct_attestation_vote_correctness_by_entity_daily. Only entities in a group have rows
+ */
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponses,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityGroupDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_group_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponses,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_group_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of an hour sum to the whole network
+ */
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityHourlyServiceListResponses,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByEntityHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponses,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteCorrectnessByEntityHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_correctness_by_entity_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -4499,7 +4879,7 @@ export const fctBlockServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Blob count of a block for the finalized chain
+ * Blob count of every block that carries blobs, canonical blocks from int_block_blob_count_canonical and orphaned ones from the unfinalized chain
  */
 export const fctBlockBlobCountServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctBlockBlobCountServiceListData, ThrowOnError>
@@ -4843,6 +5223,162 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGet = <ThrowOn
 /**
  * List records
  *
+ * Weekly data column arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponses,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_data_column_sidecar_first_seen_by_node_weekly/{week_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_daily, one row per day
+ */
+export const fctBlockFirstSeenByNetworkDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNetworkDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNetworkDailyServiceListResponses,
+    FctBlockFirstSeenByNetworkDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockFirstSeenByNetworkDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNetworkDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNetworkDailyServiceGetResponses,
+    FctBlockFirstSeenByNetworkDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_hourly, one row per hour
+ */
+export const fctBlockFirstSeenByNetworkHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNetworkHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNetworkHourlyServiceListResponses,
+    FctBlockFirstSeenByNetworkHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockFirstSeenByNetworkHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNetworkHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNetworkHourlyServiceGetResponses,
+    FctBlockFirstSeenByNetworkHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Weekly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_weekly, one row per week (Monday to Sunday, UTC)
+ */
+export const fctBlockFirstSeenByNetworkWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNetworkWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNetworkWeeklyServiceListResponses,
+    FctBlockFirstSeenByNetworkWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockFirstSeenByNetworkWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNetworkWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNetworkWeeklyServiceGetResponses,
+    FctBlockFirstSeenByNetworkWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNetworkWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNetworkWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_network_weekly/{week_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * When the block was first seen on the network by a sentry node
  */
 export const fctBlockFirstSeenByNodeServiceList = <ThrowOnError extends boolean = false>(
@@ -4957,6 +5493,44 @@ export const fctBlockFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
+ * Weekly block arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctBlockFirstSeenByNodeWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockFirstSeenByNodeWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockFirstSeenByNodeWeeklyServiceListResponses,
+    FctBlockFirstSeenByNodeWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockFirstSeenByNodeWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockFirstSeenByNodeWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockFirstSeenByNodeWeeklyServiceGetResponses,
+    FctBlockFirstSeenByNodeWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockFirstSeenByNodeWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockFirstSeenByNodeWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_first_seen_by_node_weekly/{week_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Canonical beacon block graffiti with the consensus and execution clients it names, parsed from the engine API client version codes or client default graffiti
  */
 export const fctBlockGraffitiServiceList = <ThrowOnError extends boolean = false>(
@@ -5029,6 +5603,45 @@ export const fctBlockGraffitiClientByEntityDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
+ * Daily canonical block counts per entity group and consensus and execution client pair named by block graffiti: the sum of the member entities in fct_block_graffiti_client_by_entity_daily. Only entities in a group have rows
+ */
+export const fctBlockGraffitiClientByEntityGroupDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientByEntityGroupDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientByEntityGroupDailyServiceListResponses,
+    FctBlockGraffitiClientByEntityGroupDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityGroupDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientByEntityGroupDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_group_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientByEntityGroupDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientByEntityGroupDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientByEntityGroupDailyServiceGetResponses,
+    FctBlockGraffitiClientByEntityGroupDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityGroupDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityGroupDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_group_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Hourly canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
  */
 export const fctBlockGraffitiClientByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
@@ -5061,6 +5674,44 @@ export const fctBlockGraffitiClientByEntityHourlyServiceGet = <ThrowOnError exte
     requestValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockGraffitiClientByEntityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_graffiti_client_by_entity_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
+ */
+export const fctBlockGraffitiClientByEntityWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientByEntityWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientByEntityWeeklyServiceListResponses,
+    FctBlockGraffitiClientByEntityWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockGraffitiClientByEntityWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientByEntityWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientByEntityWeeklyServiceGetResponses,
+    FctBlockGraffitiClientByEntityWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientByEntityWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiClientByEntityWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_by_entity_weekly/{week_start_date}',
     ...options,
   });
 
@@ -5183,6 +5834,48 @@ export const fctBlockGraffitiClientVersionByEntityDailyServiceGet = <ThrowOnErro
 /**
  * List records
  *
+ * Daily canonical block counts per entity group, the sum of the member entities in fct_block_graffiti_client_version_by_entity_daily, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version. Only entities in a group have rows
+ */
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponses,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityGroupDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_group_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponses,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_group_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Hourly canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
  */
 export const fctBlockGraffitiClientVersionByEntityHourlyServiceList = <ThrowOnError extends boolean = false>(
@@ -5217,6 +5910,46 @@ export const fctBlockGraffitiClientVersionByEntityHourlyServiceGet = <ThrowOnErr
     responseValidator: async data =>
       await zFctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_graffiti_client_version_by_entity_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponses,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponses,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiClientVersionByEntityWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_client_version_by_entity_weekly/{week_start_date}',
     ...options,
   });
 
@@ -5838,6 +6571,82 @@ export const fctBlockProposalByClientPairDailyServiceGet = <ThrowOnError extends
 /**
  * List records
  *
+ * Daily block proposals per staking entity on the finalized chain: canonical blocks, MEV share and value, orphaned blocks and missed slots. Proposals due are block_count + orphaned_block_count + missed_slot_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export const fctBlockProposalByEntityDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalByEntityDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalByEntityDailyServiceListResponses,
+    FctBlockProposalByEntityDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByEntityDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByEntityDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_entity_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByEntityDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalByEntityDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalByEntityDailyServiceGetResponses,
+    FctBlockProposalByEntityDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByEntityDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByEntityDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_entity_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily block proposals per entity group on the finalized chain: the sum of the member entities in fct_block_proposal_by_entity_daily. Proposals due are block_count + orphaned_block_count + missed_slot_count. Only entities in a group have rows
+ */
+export const fctBlockProposalByEntityGroupDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposalByEntityGroupDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposalByEntityGroupDailyServiceListResponses,
+    FctBlockProposalByEntityGroupDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByEntityGroupDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByEntityGroupDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_entity_group_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByEntityGroupDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposalByEntityGroupDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposalByEntityGroupDailyServiceGetResponses,
+    FctBlockProposalByEntityGroupDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposalByEntityGroupDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposalByEntityGroupDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposal_by_entity_group_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Daily block proposal status counts by status type
  */
 export const fctBlockProposalStatusDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -5942,6 +6751,44 @@ export const fctBlockProposerServiceGet = <ThrowOnError extends boolean = false>
     requestValidator: async data => await zFctBlockProposerServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctBlockProposerServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_block_proposer/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Every slot of the finalized chain with the staking entity of its scheduled proposer and how the proposal ended: canonical, orphaned or missed. Validators map to their current entity in dim_node, and validators it does not name are unknown
+ */
+export const fctBlockProposerByEntityServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockProposerByEntityServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockProposerByEntityServiceListResponses,
+    FctBlockProposerByEntityServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposerByEntityServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerByEntityServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposer_by_entity',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockProposerByEntityServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockProposerByEntityServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockProposerByEntityServiceGetResponses,
+    FctBlockProposerByEntityServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockProposerByEntityServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockProposerByEntityServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_proposer_by_entity/{slot_start_date_time}',
     ...options,
   });
 
@@ -6647,7 +7494,7 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
@@ -7719,7 +8566,7 @@ export const fctEpochSummaryCanonicalServiceGet = <ThrowOnError extends boolean 
 /**
  * List records
  *
- * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasLimitDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitDailyServiceListData, ThrowOnError>
@@ -7757,7 +8604,7 @@ export const fctExecutionGasLimitDailyServiceGet = <ThrowOnError extends boolean
 /**
  * List records
  *
- * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasLimitHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasLimitHourlyServiceListData, ThrowOnError>
@@ -7871,7 +8718,7 @@ export const fctExecutionGasLimitSignallingHourlyServiceGet = <ThrowOnError exte
 /**
  * List records
  *
- * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasUsedDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasUsedDailyServiceListData, ThrowOnError>
@@ -7909,7 +8756,7 @@ export const fctExecutionGasUsedDailyServiceGet = <ThrowOnError extends boolean 
 /**
  * List records
  *
- * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasUsedHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionGasUsedHourlyServiceListData, ThrowOnError>
@@ -8023,7 +8870,7 @@ export const fctExecutionReceiptSizeHourlyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Execution layer state size metrics aggregated by day
+ * Execution layer state size at the last canonical block of each UTC day. Starts at the day of block 1, the genesis block is not given a row of its own
  */
 export const fctExecutionStateSizeDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeDailyServiceListData, ThrowOnError>
@@ -8061,7 +8908,7 @@ export const fctExecutionStateSizeDailyServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
- * Execution layer state size metrics aggregated by hour
+ * Execution layer state size at the last canonical block of each UTC hour. Starts at the hour of block 1, the genesis block is not given a row of its own
  */
 export const fctExecutionStateSizeHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionStateSizeHourlyServiceListData, ThrowOnError>
@@ -8175,7 +9022,7 @@ export const fctExecutionTpsHourlyServiceGet = <ThrowOnError extends boolean = f
 /**
  * List records
  *
- * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC day, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export const fctExecutionTransactionsDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTransactionsDailyServiceListData, ThrowOnError>
@@ -8213,7 +9060,7 @@ export const fctExecutionTransactionsDailyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC hour, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export const fctExecutionTransactionsHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctExecutionTransactionsHourlyServiceListData, ThrowOnError>
@@ -8359,6 +9206,44 @@ export const fctHeadFirstSeenByNodeHourlyServiceGet = <ThrowOnError extends bool
     requestValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctHeadFirstSeenByNodeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_head_first_seen_by_node_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Weekly head event arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctHeadFirstSeenByNodeWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctHeadFirstSeenByNodeWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctHeadFirstSeenByNodeWeeklyServiceListResponses,
+    FctHeadFirstSeenByNodeWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctHeadFirstSeenByNodeWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctHeadFirstSeenByNodeWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctHeadFirstSeenByNodeWeeklyServiceGetResponses,
+    FctHeadFirstSeenByNodeWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctHeadFirstSeenByNodeWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctHeadFirstSeenByNodeWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_head_first_seen_by_node_weekly/{week_start_date}',
     ...options,
   });
 
@@ -8929,6 +9814,44 @@ export const fctOpcodeCostByElClientVersionServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
+ * Weekly (Monday to Sunday, UTC) execution cost per opcode group by execution client, fitted from engine_newPayload durations over the whole week
+ */
+export const fctOpcodeCostByElClientWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeCostByElClientWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeCostByElClientWeeklyServiceListResponses,
+    FctOpcodeCostByElClientWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctOpcodeCostByElClientWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeCostByElClientWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeCostByElClientWeeklyServiceGetResponses,
+    FctOpcodeCostByElClientWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeCostByElClientWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeCostByElClientWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_cost_by_el_client_weekly/{week_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Daily per-opcode gas consumption for Top Opcodes by Gas charts
  */
 export const fctOpcodeGasByOpcodeDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -8999,6 +9922,44 @@ export const fctOpcodeGasByOpcodeHourlyServiceGet = <ThrowOnError extends boolea
     requestValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctOpcodeGasByOpcodeHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_opcode_gas_by_opcode_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) per-opcode gas consumption for Top Opcodes by Gas charts, summed from fct_opcode_gas_by_opcode_daily
+ */
+export const fctOpcodeGasByOpcodeWeeklyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctOpcodeGasByOpcodeWeeklyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctOpcodeGasByOpcodeWeeklyServiceListResponses,
+    FctOpcodeGasByOpcodeWeeklyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeWeeklyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeWeeklyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_weekly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctOpcodeGasByOpcodeWeeklyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctOpcodeGasByOpcodeWeeklyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctOpcodeGasByOpcodeWeeklyServiceGetResponses,
+    FctOpcodeGasByOpcodeWeeklyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctOpcodeGasByOpcodeWeeklyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctOpcodeGasByOpcodeWeeklyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_opcode_gas_by_opcode_weekly/{week_start_date}',
     ...options,
   });
 
@@ -9692,6 +10653,44 @@ export const fctPreparedBlockServiceGet = <ThrowOnError extends boolean = false>
 /**
  * List records
  *
+ * Daily locally built block counts per Xatu node and consensus client version, from fct_prepared_block
+ */
+export const fctPreparedBlockByNodeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPreparedBlockByNodeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPreparedBlockByNodeDailyServiceListResponses,
+    FctPreparedBlockByNodeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPreparedBlockByNodeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPreparedBlockByNodeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_prepared_block_by_node_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPreparedBlockByNodeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPreparedBlockByNodeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPreparedBlockByNodeDailyServiceGetResponses,
+    FctPreparedBlockByNodeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPreparedBlockByNodeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPreparedBlockByNodeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_prepared_block_by_node_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Daily aggregated MEV proposer reward statistics with percentiles, Bollinger bands, and moving averages
  */
 export const fctProposerRewardDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -10178,7 +11177,7 @@ export const fctStorageSlotStateWithExpiryByBlockHourlyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * Top 100 contracts by effective storage bytes with expiry policies applied
+ * Top 100 contracts by storage size (active_slots * 65 + effective_bytes) with expiry policies applied
  */
 export const fctStorageSlotTop100ByBytesServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctStorageSlotTop100ByBytesServiceListData, ThrowOnError>
@@ -10991,6 +11990,44 @@ export const fctValidatorOperationWeeklyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
+ * Attestation and block proposal performance per staking entity over rolling periods, refreshed every 30 minutes: one row per period and entity with duties or proposals in it. 24h sums fct_attestation_vote_correctness_by_entity_hourly and fct_block_proposer_by_entity over the last 24 complete hours. The day periods sum fct_attestation_vote_correctness_by_entity_daily and fct_block_proposal_by_entity_daily over the last complete UTC days. The rows of a period sum to the whole network
+ */
+export const fctValidatorPerformanceByEntityRollingServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorPerformanceByEntityRollingServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorPerformanceByEntityRollingServiceListResponses,
+    FctValidatorPerformanceByEntityRollingServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorPerformanceByEntityRollingServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorPerformanceByEntityRollingServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_performance_by_entity_rolling',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by period
+ */
+export const fctValidatorPerformanceByEntityRollingServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorPerformanceByEntityRollingServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorPerformanceByEntityRollingServiceGetResponses,
+    FctValidatorPerformanceByEntityRollingServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorPerformanceByEntityRollingServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorPerformanceByEntityRollingServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_performance_by_entity_rolling/{period}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Activation and exit queues and the Electra pending queues, one snapshot per day
  */
 export const fctValidatorQueueDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -11175,6 +12212,44 @@ export const fctValidatorStakeByEntityDailyServiceGet = <ThrowOnError extends bo
     requestValidator: async data => await zFctValidatorStakeByEntityDailyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctValidatorStakeByEntityDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_validator_stake_by_entity_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Active validators and stake per entity group and withdrawal credential type, one snapshot per day: the sum of the member entities in fct_validator_stake_by_entity_daily. Only entities in a group have rows
+ */
+export const fctValidatorStakeByEntityGroupDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctValidatorStakeByEntityGroupDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctValidatorStakeByEntityGroupDailyServiceListResponses,
+    FctValidatorStakeByEntityGroupDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorStakeByEntityGroupDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorStakeByEntityGroupDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_stake_by_entity_group_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctValidatorStakeByEntityGroupDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctValidatorStakeByEntityGroupDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctValidatorStakeByEntityGroupDailyServiceGetResponses,
+    FctValidatorStakeByEntityGroupDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctValidatorStakeByEntityGroupDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctValidatorStakeByEntityGroupDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_validator_stake_by_entity_group_daily/{day_start_date}',
     ...options,
   });
 
@@ -11447,7 +12522,7 @@ export const intBeaconCommitteeHeadServiceGet = <ThrowOnError extends boolean = 
 /**
  * List records
  *
- * Blob count of a block for the finalized chain
+ * Blob count of every canonical block that carries blobs, from its execution payload blob gas (blob gas used over 131072) before Gloas, from the blob KZG commitments in its execution payload bid from Gloas, and from its blob sidecars only when neither is available
  */
 export const intBlockBlobCountCanonicalServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntBlockBlobCountCanonicalServiceListData, ThrowOnError>
@@ -12732,7 +13807,7 @@ export const intEngineNewPayloadOpcodeGramHourlyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Execution blocks ordered by timestamp for efficient date range lookups
+ * Block number and block time of every canonical execution block of this network, for date range lookups. A range is only written once canonical_execution_block holds every block in it
  */
 export const intExecutionBlockByDateServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntExecutionBlockByDateServiceListData, ThrowOnError>
@@ -14025,7 +15100,7 @@ export const intTransactionOpcodeGasServiceGet = <ThrowOnError extends boolean =
 /**
  * List records
  *
- * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data. A range is only written once no block in it is missing transactions, and no block has a hole in its transaction or log indexes
  */
 export const intTransactionReceiptSizeServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntTransactionReceiptSizeServiceListData, ThrowOnError>

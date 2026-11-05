@@ -58,6 +58,8 @@ import {
   fctAttestationObservationByNodeHourlyServiceList,
   fctAttestationObservationByNodeServiceGet,
   fctAttestationObservationByNodeServiceList,
+  fctAttestationObservationByNodeWeeklyServiceGet,
+  fctAttestationObservationByNodeWeeklyServiceList,
   fctAttestationParticipationRateDailyServiceGet,
   fctAttestationParticipationRateDailyServiceList,
   fctAttestationParticipationRateHourlyServiceGet,
@@ -72,6 +74,12 @@ import {
   fctAttestationVoteCorrectnessByClientDailyServiceList,
   fctAttestationVoteCorrectnessByClientPairDailyServiceGet,
   fctAttestationVoteCorrectnessByClientPairDailyServiceList,
+  fctAttestationVoteCorrectnessByEntityDailyServiceGet,
+  fctAttestationVoteCorrectnessByEntityDailyServiceList,
+  fctAttestationVoteCorrectnessByEntityGroupDailyServiceGet,
+  fctAttestationVoteCorrectnessByEntityGroupDailyServiceList,
+  fctAttestationVoteCorrectnessByEntityHourlyServiceGet,
+  fctAttestationVoteCorrectnessByEntityHourlyServiceList,
   fctAttestationVoteCorrectnessByValidatorDailyServiceGet,
   fctAttestationVoteCorrectnessByValidatorDailyServiceList,
   fctAttestationVoteCorrectnessByValidatorHourlyServiceGet,
@@ -100,26 +108,44 @@ import {
   fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceList,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceGet,
   fctBlockDataColumnSidecarFirstSeenByNodeServiceList,
+  fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGet,
+  fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList,
   fctBlockDataColumnSidecarFirstSeenServiceGet,
   fctBlockDataColumnSidecarFirstSeenServiceList,
+  fctBlockFirstSeenByNetworkDailyServiceGet,
+  fctBlockFirstSeenByNetworkDailyServiceList,
+  fctBlockFirstSeenByNetworkHourlyServiceGet,
+  fctBlockFirstSeenByNetworkHourlyServiceList,
+  fctBlockFirstSeenByNetworkWeeklyServiceGet,
+  fctBlockFirstSeenByNetworkWeeklyServiceList,
   fctBlockFirstSeenByNodeDailyServiceGet,
   fctBlockFirstSeenByNodeDailyServiceList,
   fctBlockFirstSeenByNodeHourlyServiceGet,
   fctBlockFirstSeenByNodeHourlyServiceList,
   fctBlockFirstSeenByNodeServiceGet,
   fctBlockFirstSeenByNodeServiceList,
+  fctBlockFirstSeenByNodeWeeklyServiceGet,
+  fctBlockFirstSeenByNodeWeeklyServiceList,
   fctBlockGraffitiClientByEntityDailyServiceGet,
   fctBlockGraffitiClientByEntityDailyServiceList,
+  fctBlockGraffitiClientByEntityGroupDailyServiceGet,
+  fctBlockGraffitiClientByEntityGroupDailyServiceList,
   fctBlockGraffitiClientByEntityHourlyServiceGet,
   fctBlockGraffitiClientByEntityHourlyServiceList,
+  fctBlockGraffitiClientByEntityWeeklyServiceGet,
+  fctBlockGraffitiClientByEntityWeeklyServiceList,
   fctBlockGraffitiClientDailyServiceGet,
   fctBlockGraffitiClientDailyServiceList,
   fctBlockGraffitiClientHourlyServiceGet,
   fctBlockGraffitiClientHourlyServiceList,
   fctBlockGraffitiClientVersionByEntityDailyServiceGet,
   fctBlockGraffitiClientVersionByEntityDailyServiceList,
+  fctBlockGraffitiClientVersionByEntityGroupDailyServiceGet,
+  fctBlockGraffitiClientVersionByEntityGroupDailyServiceList,
   fctBlockGraffitiClientVersionByEntityHourlyServiceGet,
   fctBlockGraffitiClientVersionByEntityHourlyServiceList,
+  fctBlockGraffitiClientVersionByEntityWeeklyServiceGet,
+  fctBlockGraffitiClientVersionByEntityWeeklyServiceList,
   fctBlockGraffitiClientVersionDailyServiceGet,
   fctBlockGraffitiClientVersionDailyServiceList,
   fctBlockGraffitiClientVersionHourlyServiceGet,
@@ -156,10 +182,16 @@ import {
   fctBlockProposalByClientDailyServiceList,
   fctBlockProposalByClientPairDailyServiceGet,
   fctBlockProposalByClientPairDailyServiceList,
+  fctBlockProposalByEntityDailyServiceGet,
+  fctBlockProposalByEntityDailyServiceList,
+  fctBlockProposalByEntityGroupDailyServiceGet,
+  fctBlockProposalByEntityGroupDailyServiceList,
   fctBlockProposalStatusDailyServiceGet,
   fctBlockProposalStatusDailyServiceList,
   fctBlockProposalStatusHourlyServiceGet,
   fctBlockProposalStatusHourlyServiceList,
+  fctBlockProposerByEntityServiceGet,
+  fctBlockProposerByEntityServiceList,
   fctBlockProposerByValidatorServiceGet,
   fctBlockProposerByValidatorServiceList,
   fctBlockProposerEntityServiceGet,
@@ -290,6 +322,8 @@ import {
   fctHeadFirstSeenByNodeHourlyServiceList,
   fctHeadFirstSeenByNodeServiceGet,
   fctHeadFirstSeenByNodeServiceList,
+  fctHeadFirstSeenByNodeWeeklyServiceGet,
+  fctHeadFirstSeenByNodeWeeklyServiceList,
   fctHeadVoteCorrectnessRateDailyServiceGet,
   fctHeadVoteCorrectnessRateDailyServiceList,
   fctHeadVoteCorrectnessRateHourlyServiceGet,
@@ -320,10 +354,14 @@ import {
   fctOpcodeCostByElClientDailyServiceList,
   fctOpcodeCostByElClientVersionServiceGet,
   fctOpcodeCostByElClientVersionServiceList,
+  fctOpcodeCostByElClientWeeklyServiceGet,
+  fctOpcodeCostByElClientWeeklyServiceList,
   fctOpcodeGasByOpcodeDailyServiceGet,
   fctOpcodeGasByOpcodeDailyServiceList,
   fctOpcodeGasByOpcodeHourlyServiceGet,
   fctOpcodeGasByOpcodeHourlyServiceList,
+  fctOpcodeGasByOpcodeWeeklyServiceGet,
+  fctOpcodeGasByOpcodeWeeklyServiceList,
   fctOpcodeOpsDailyServiceGet,
   fctOpcodeOpsDailyServiceList,
   fctOpcodeOpsHourlyServiceGet,
@@ -358,6 +396,8 @@ import {
   fctPeerPartialMessageSupportByClientHourlyServiceList,
   fctPeerProtocolByClClientDailyServiceGet,
   fctPeerProtocolByClClientDailyServiceList,
+  fctPreparedBlockByNodeDailyServiceGet,
+  fctPreparedBlockByNodeDailyServiceList,
   fctPreparedBlockServiceGet,
   fctPreparedBlockServiceList,
   fctProposerRewardDailyServiceGet,
@@ -428,6 +468,8 @@ import {
   fctValidatorOperationDailyServiceList,
   fctValidatorOperationWeeklyServiceGet,
   fctValidatorOperationWeeklyServiceList,
+  fctValidatorPerformanceByEntityRollingServiceGet,
+  fctValidatorPerformanceByEntityRollingServiceList,
   fctValidatorQueueDailyServiceGet,
   fctValidatorQueueDailyServiceList,
   fctValidatorQueueWeeklyServiceGet,
@@ -438,6 +480,8 @@ import {
   fctValidatorRewardTotalWeeklyServiceList,
   fctValidatorStakeByEntityDailyServiceGet,
   fctValidatorStakeByEntityDailyServiceList,
+  fctValidatorStakeByEntityGroupDailyServiceGet,
+  fctValidatorStakeByEntityGroupDailyServiceList,
   intAttestationAttestedCanonicalServiceGet,
   intAttestationAttestedCanonicalServiceList,
   intAttestationAttestedHeadServiceGet,
@@ -757,6 +801,12 @@ import type {
   FctAttestationObservationByNodeServiceListData,
   FctAttestationObservationByNodeServiceListError,
   FctAttestationObservationByNodeServiceListResponse,
+  FctAttestationObservationByNodeWeeklyServiceGetData,
+  FctAttestationObservationByNodeWeeklyServiceGetError,
+  FctAttestationObservationByNodeWeeklyServiceGetResponse,
+  FctAttestationObservationByNodeWeeklyServiceListData,
+  FctAttestationObservationByNodeWeeklyServiceListError,
+  FctAttestationObservationByNodeWeeklyServiceListResponse,
   FctAttestationParticipationRateDailyServiceGetData,
   FctAttestationParticipationRateDailyServiceGetError,
   FctAttestationParticipationRateDailyServiceGetResponse,
@@ -799,6 +849,24 @@ import type {
   FctAttestationVoteCorrectnessByClientPairDailyServiceListData,
   FctAttestationVoteCorrectnessByClientPairDailyServiceListError,
   FctAttestationVoteCorrectnessByClientPairDailyServiceListResponse,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetError,
+  FctAttestationVoteCorrectnessByEntityDailyServiceGetResponse,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListData,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListError,
+  FctAttestationVoteCorrectnessByEntityDailyServiceListResponse,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetError,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListError,
+  FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetData,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetError,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListData,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListError,
+  FctAttestationVoteCorrectnessByEntityHourlyServiceListResponse,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetData,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetError,
   FctAttestationVoteCorrectnessByValidatorDailyServiceGetResponse,
@@ -883,12 +951,36 @@ import type {
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListData,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListError,
   FctBlockDataColumnSidecarFirstSeenByNodeServiceListResponse,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetError,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListError,
+  FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse,
   FctBlockDataColumnSidecarFirstSeenServiceGetData,
   FctBlockDataColumnSidecarFirstSeenServiceGetError,
   FctBlockDataColumnSidecarFirstSeenServiceGetResponse,
   FctBlockDataColumnSidecarFirstSeenServiceListData,
   FctBlockDataColumnSidecarFirstSeenServiceListError,
   FctBlockDataColumnSidecarFirstSeenServiceListResponse,
+  FctBlockFirstSeenByNetworkDailyServiceGetData,
+  FctBlockFirstSeenByNetworkDailyServiceGetError,
+  FctBlockFirstSeenByNetworkDailyServiceGetResponse,
+  FctBlockFirstSeenByNetworkDailyServiceListData,
+  FctBlockFirstSeenByNetworkDailyServiceListError,
+  FctBlockFirstSeenByNetworkDailyServiceListResponse,
+  FctBlockFirstSeenByNetworkHourlyServiceGetData,
+  FctBlockFirstSeenByNetworkHourlyServiceGetError,
+  FctBlockFirstSeenByNetworkHourlyServiceGetResponse,
+  FctBlockFirstSeenByNetworkHourlyServiceListData,
+  FctBlockFirstSeenByNetworkHourlyServiceListError,
+  FctBlockFirstSeenByNetworkHourlyServiceListResponse,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetData,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetError,
+  FctBlockFirstSeenByNetworkWeeklyServiceGetResponse,
+  FctBlockFirstSeenByNetworkWeeklyServiceListData,
+  FctBlockFirstSeenByNetworkWeeklyServiceListError,
+  FctBlockFirstSeenByNetworkWeeklyServiceListResponse,
   FctBlockFirstSeenByNodeDailyServiceGetData,
   FctBlockFirstSeenByNodeDailyServiceGetError,
   FctBlockFirstSeenByNodeDailyServiceGetResponse,
@@ -907,18 +999,36 @@ import type {
   FctBlockFirstSeenByNodeServiceListData,
   FctBlockFirstSeenByNodeServiceListError,
   FctBlockFirstSeenByNodeServiceListResponse,
+  FctBlockFirstSeenByNodeWeeklyServiceGetData,
+  FctBlockFirstSeenByNodeWeeklyServiceGetError,
+  FctBlockFirstSeenByNodeWeeklyServiceGetResponse,
+  FctBlockFirstSeenByNodeWeeklyServiceListData,
+  FctBlockFirstSeenByNodeWeeklyServiceListError,
+  FctBlockFirstSeenByNodeWeeklyServiceListResponse,
   FctBlockGraffitiClientByEntityDailyServiceGetData,
   FctBlockGraffitiClientByEntityDailyServiceGetError,
   FctBlockGraffitiClientByEntityDailyServiceGetResponse,
   FctBlockGraffitiClientByEntityDailyServiceListData,
   FctBlockGraffitiClientByEntityDailyServiceListError,
   FctBlockGraffitiClientByEntityDailyServiceListResponse,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetData,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetError,
+  FctBlockGraffitiClientByEntityGroupDailyServiceGetResponse,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListData,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListError,
+  FctBlockGraffitiClientByEntityGroupDailyServiceListResponse,
   FctBlockGraffitiClientByEntityHourlyServiceGetData,
   FctBlockGraffitiClientByEntityHourlyServiceGetError,
   FctBlockGraffitiClientByEntityHourlyServiceGetResponse,
   FctBlockGraffitiClientByEntityHourlyServiceListData,
   FctBlockGraffitiClientByEntityHourlyServiceListError,
   FctBlockGraffitiClientByEntityHourlyServiceListResponse,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetData,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetError,
+  FctBlockGraffitiClientByEntityWeeklyServiceGetResponse,
+  FctBlockGraffitiClientByEntityWeeklyServiceListData,
+  FctBlockGraffitiClientByEntityWeeklyServiceListError,
+  FctBlockGraffitiClientByEntityWeeklyServiceListResponse,
   FctBlockGraffitiClientDailyServiceGetData,
   FctBlockGraffitiClientDailyServiceGetError,
   FctBlockGraffitiClientDailyServiceGetResponse,
@@ -937,12 +1047,24 @@ import type {
   FctBlockGraffitiClientVersionByEntityDailyServiceListData,
   FctBlockGraffitiClientVersionByEntityDailyServiceListError,
   FctBlockGraffitiClientVersionByEntityDailyServiceListResponse,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetError,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListError,
+  FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetData,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetError,
   FctBlockGraffitiClientVersionByEntityHourlyServiceGetResponse,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListData,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListError,
   FctBlockGraffitiClientVersionByEntityHourlyServiceListResponse,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetError,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListData,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListError,
+  FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse,
   FctBlockGraffitiClientVersionDailyServiceGetData,
   FctBlockGraffitiClientVersionDailyServiceGetError,
   FctBlockGraffitiClientVersionDailyServiceGetResponse,
@@ -1051,6 +1173,18 @@ import type {
   FctBlockProposalByClientPairDailyServiceListData,
   FctBlockProposalByClientPairDailyServiceListError,
   FctBlockProposalByClientPairDailyServiceListResponse,
+  FctBlockProposalByEntityDailyServiceGetData,
+  FctBlockProposalByEntityDailyServiceGetError,
+  FctBlockProposalByEntityDailyServiceGetResponse,
+  FctBlockProposalByEntityDailyServiceListData,
+  FctBlockProposalByEntityDailyServiceListError,
+  FctBlockProposalByEntityDailyServiceListResponse,
+  FctBlockProposalByEntityGroupDailyServiceGetData,
+  FctBlockProposalByEntityGroupDailyServiceGetError,
+  FctBlockProposalByEntityGroupDailyServiceGetResponse,
+  FctBlockProposalByEntityGroupDailyServiceListData,
+  FctBlockProposalByEntityGroupDailyServiceListError,
+  FctBlockProposalByEntityGroupDailyServiceListResponse,
   FctBlockProposalStatusDailyServiceGetData,
   FctBlockProposalStatusDailyServiceGetError,
   FctBlockProposalStatusDailyServiceGetResponse,
@@ -1063,6 +1197,12 @@ import type {
   FctBlockProposalStatusHourlyServiceListData,
   FctBlockProposalStatusHourlyServiceListError,
   FctBlockProposalStatusHourlyServiceListResponse,
+  FctBlockProposerByEntityServiceGetData,
+  FctBlockProposerByEntityServiceGetError,
+  FctBlockProposerByEntityServiceGetResponse,
+  FctBlockProposerByEntityServiceListData,
+  FctBlockProposerByEntityServiceListError,
+  FctBlockProposerByEntityServiceListResponse,
   FctBlockProposerByValidatorServiceGetData,
   FctBlockProposerByValidatorServiceGetError,
   FctBlockProposerByValidatorServiceGetResponse,
@@ -1453,6 +1593,12 @@ import type {
   FctHeadFirstSeenByNodeServiceListData,
   FctHeadFirstSeenByNodeServiceListError,
   FctHeadFirstSeenByNodeServiceListResponse,
+  FctHeadFirstSeenByNodeWeeklyServiceGetData,
+  FctHeadFirstSeenByNodeWeeklyServiceGetError,
+  FctHeadFirstSeenByNodeWeeklyServiceGetResponse,
+  FctHeadFirstSeenByNodeWeeklyServiceListData,
+  FctHeadFirstSeenByNodeWeeklyServiceListError,
+  FctHeadFirstSeenByNodeWeeklyServiceListResponse,
   FctHeadVoteCorrectnessRateDailyServiceGetData,
   FctHeadVoteCorrectnessRateDailyServiceGetError,
   FctHeadVoteCorrectnessRateDailyServiceGetResponse,
@@ -1543,6 +1689,12 @@ import type {
   FctOpcodeCostByElClientVersionServiceListData,
   FctOpcodeCostByElClientVersionServiceListError,
   FctOpcodeCostByElClientVersionServiceListResponse,
+  FctOpcodeCostByElClientWeeklyServiceGetData,
+  FctOpcodeCostByElClientWeeklyServiceGetError,
+  FctOpcodeCostByElClientWeeklyServiceGetResponse,
+  FctOpcodeCostByElClientWeeklyServiceListData,
+  FctOpcodeCostByElClientWeeklyServiceListError,
+  FctOpcodeCostByElClientWeeklyServiceListResponse,
   FctOpcodeGasByOpcodeDailyServiceGetData,
   FctOpcodeGasByOpcodeDailyServiceGetError,
   FctOpcodeGasByOpcodeDailyServiceGetResponse,
@@ -1555,6 +1707,12 @@ import type {
   FctOpcodeGasByOpcodeHourlyServiceListData,
   FctOpcodeGasByOpcodeHourlyServiceListError,
   FctOpcodeGasByOpcodeHourlyServiceListResponse,
+  FctOpcodeGasByOpcodeWeeklyServiceGetData,
+  FctOpcodeGasByOpcodeWeeklyServiceGetError,
+  FctOpcodeGasByOpcodeWeeklyServiceGetResponse,
+  FctOpcodeGasByOpcodeWeeklyServiceListData,
+  FctOpcodeGasByOpcodeWeeklyServiceListError,
+  FctOpcodeGasByOpcodeWeeklyServiceListResponse,
   FctOpcodeOpsDailyServiceGetData,
   FctOpcodeOpsDailyServiceGetError,
   FctOpcodeOpsDailyServiceGetResponse,
@@ -1657,6 +1815,12 @@ import type {
   FctPeerProtocolByClClientDailyServiceListData,
   FctPeerProtocolByClClientDailyServiceListError,
   FctPeerProtocolByClClientDailyServiceListResponse,
+  FctPreparedBlockByNodeDailyServiceGetData,
+  FctPreparedBlockByNodeDailyServiceGetError,
+  FctPreparedBlockByNodeDailyServiceGetResponse,
+  FctPreparedBlockByNodeDailyServiceListData,
+  FctPreparedBlockByNodeDailyServiceListError,
+  FctPreparedBlockByNodeDailyServiceListResponse,
   FctPreparedBlockServiceGetData,
   FctPreparedBlockServiceGetError,
   FctPreparedBlockServiceGetResponse,
@@ -1867,6 +2031,12 @@ import type {
   FctValidatorOperationWeeklyServiceListData,
   FctValidatorOperationWeeklyServiceListError,
   FctValidatorOperationWeeklyServiceListResponse,
+  FctValidatorPerformanceByEntityRollingServiceGetData,
+  FctValidatorPerformanceByEntityRollingServiceGetError,
+  FctValidatorPerformanceByEntityRollingServiceGetResponse,
+  FctValidatorPerformanceByEntityRollingServiceListData,
+  FctValidatorPerformanceByEntityRollingServiceListError,
+  FctValidatorPerformanceByEntityRollingServiceListResponse,
   FctValidatorQueueDailyServiceGetData,
   FctValidatorQueueDailyServiceGetError,
   FctValidatorQueueDailyServiceGetResponse,
@@ -1897,6 +2067,12 @@ import type {
   FctValidatorStakeByEntityDailyServiceListData,
   FctValidatorStakeByEntityDailyServiceListError,
   FctValidatorStakeByEntityDailyServiceListResponse,
+  FctValidatorStakeByEntityGroupDailyServiceGetData,
+  FctValidatorStakeByEntityGroupDailyServiceGetError,
+  FctValidatorStakeByEntityGroupDailyServiceGetResponse,
+  FctValidatorStakeByEntityGroupDailyServiceListData,
+  FctValidatorStakeByEntityGroupDailyServiceListError,
+  FctValidatorStakeByEntityGroupDailyServiceListResponse,
   IntAttestationAttestedCanonicalServiceGetData,
   IntAttestationAttestedCanonicalServiceGetError,
   IntAttestationAttestedCanonicalServiceGetResponse,
@@ -3946,6 +4122,66 @@ export const fctAttestationObservationByNodeHourlyServiceGetOptions = (
     queryKey: fctAttestationObservationByNodeHourlyServiceGetQueryKey(options),
   });
 
+export const fctAttestationObservationByNodeWeeklyServiceListQueryKey = (
+  options?: Options<FctAttestationObservationByNodeWeeklyServiceListData>
+) => createQueryKey('fctAttestationObservationByNodeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly attestation arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctAttestationObservationByNodeWeeklyServiceListOptions = (
+  options?: Options<FctAttestationObservationByNodeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationObservationByNodeWeeklyServiceListResponse,
+    FctAttestationObservationByNodeWeeklyServiceListError,
+    FctAttestationObservationByNodeWeeklyServiceListResponse,
+    ReturnType<typeof fctAttestationObservationByNodeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationObservationByNodeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationObservationByNodeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctAttestationObservationByNodeWeeklyServiceGetQueryKey = (
+  options: Options<FctAttestationObservationByNodeWeeklyServiceGetData>
+) => createQueryKey('fctAttestationObservationByNodeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctAttestationObservationByNodeWeeklyServiceGetOptions = (
+  options: Options<FctAttestationObservationByNodeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationObservationByNodeWeeklyServiceGetResponse,
+    FctAttestationObservationByNodeWeeklyServiceGetError,
+    FctAttestationObservationByNodeWeeklyServiceGetResponse,
+    ReturnType<typeof fctAttestationObservationByNodeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationObservationByNodeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationObservationByNodeWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctAttestationParticipationRateDailyServiceListQueryKey = (
   options?: Options<FctAttestationParticipationRateDailyServiceListData>
 ) => createQueryKey('fctAttestationParticipationRateDailyServiceList', options);
@@ -4366,6 +4602,186 @@ export const fctAttestationVoteCorrectnessByClientPairDailyServiceGetOptions = (
     queryKey: fctAttestationVoteCorrectnessByClientPairDailyServiceGetQueryKey(options),
   });
 
+export const fctAttestationVoteCorrectnessByEntityDailyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityDailyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export const fctAttestationVoteCorrectnessByEntityDailyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityDailyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityDailyServiceListResponse,
+    FctAttestationVoteCorrectnessByEntityDailyServiceListError,
+    FctAttestationVoteCorrectnessByEntityDailyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityDailyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByEntityDailyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByEntityDailyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByEntityDailyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByEntityDailyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityDailyServiceGetResponse,
+    FctAttestationVoteCorrectnessByEntityDailyServiceGetError,
+    FctAttestationVoteCorrectnessByEntityDailyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityDailyServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityGroupDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily attestation liveness, vote correctness and inclusion per entity group on the finalized chain: the sum of the member entities in fct_attestation_vote_correctness_by_entity_daily. Only entities in a group have rows
+ */
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceListError,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityGroupDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityGroupDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityGroupDailyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityGroupDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctAttestationVoteCorrectnessByEntityGroupDailyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetError,
+    FctAttestationVoteCorrectnessByEntityGroupDailyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityGroupDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityGroupDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityGroupDailyServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceListQueryKey = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceListData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly attestation liveness, vote correctness and inclusion per staking entity on the finalized chain. Duties are total_duties = attested_count + missed_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of an hour sum to the whole network
+ */
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceListOptions = (
+  options?: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityHourlyServiceListResponse,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceListError,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceListResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityHourlyServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceGetQueryKey = (
+  options: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceGetData>
+) => createQueryKey('fctAttestationVoteCorrectnessByEntityHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctAttestationVoteCorrectnessByEntityHourlyServiceGetOptions = (
+  options: Options<FctAttestationVoteCorrectnessByEntityHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceGetError,
+    FctAttestationVoteCorrectnessByEntityHourlyServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteCorrectnessByEntityHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteCorrectnessByEntityHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteCorrectnessByEntityHourlyServiceGetQueryKey(options),
+  });
+
 export const fctAttestationVoteCorrectnessByValidatorServiceListQueryKey = (
   options?: Options<FctAttestationVoteCorrectnessByValidatorServiceListData>
 ) => createQueryKey('fctAttestationVoteCorrectnessByValidatorServiceList', options);
@@ -4774,7 +5190,7 @@ export const fctBlockBlobCountServiceListQueryKey = (options?: Options<FctBlockB
 /**
  * List records
  *
- * Blob count of a block for the finalized chain
+ * Blob count of every block that carries blobs, canonical blocks from int_block_blob_count_canonical and orphaned ones from the unfinalized chain
  */
 export const fctBlockBlobCountServiceListOptions = (options?: Options<FctBlockBlobCountServiceListData>) =>
   queryOptions<
@@ -5290,6 +5706,246 @@ export const fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetOptions = (
     queryKey: fctBlockDataColumnSidecarFirstSeenByNodeHourlyServiceGetQueryKey(options),
   });
 
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListQueryKey = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly data column arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListOptions = (
+  options?: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListError,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetQueryKey = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData>
+) => createQueryKey('fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetOptions = (
+  options: Options<FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetError,
+    FctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetResponse,
+    ReturnType<typeof fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockDataColumnSidecarFirstSeenByNodeWeeklyServiceGetQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkDailyServiceListQueryKey = (
+  options?: Options<FctBlockFirstSeenByNetworkDailyServiceListData>
+) => createQueryKey('fctBlockFirstSeenByNetworkDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_daily, one row per day
+ */
+export const fctBlockFirstSeenByNetworkDailyServiceListOptions = (
+  options?: Options<FctBlockFirstSeenByNetworkDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkDailyServiceListResponse,
+    FctBlockFirstSeenByNetworkDailyServiceListError,
+    FctBlockFirstSeenByNetworkDailyServiceListResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkDailyServiceGetQueryKey = (
+  options: Options<FctBlockFirstSeenByNetworkDailyServiceGetData>
+) => createQueryKey('fctBlockFirstSeenByNetworkDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockFirstSeenByNetworkDailyServiceGetOptions = (
+  options: Options<FctBlockFirstSeenByNetworkDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkDailyServiceGetResponse,
+    FctBlockFirstSeenByNetworkDailyServiceGetError,
+    FctBlockFirstSeenByNetworkDailyServiceGetResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkDailyServiceGetQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkHourlyServiceListQueryKey = (
+  options?: Options<FctBlockFirstSeenByNetworkHourlyServiceListData>
+) => createQueryKey('fctBlockFirstSeenByNetworkHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_hourly, one row per hour
+ */
+export const fctBlockFirstSeenByNetworkHourlyServiceListOptions = (
+  options?: Options<FctBlockFirstSeenByNetworkHourlyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkHourlyServiceListResponse,
+    FctBlockFirstSeenByNetworkHourlyServiceListError,
+    FctBlockFirstSeenByNetworkHourlyServiceListResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkHourlyServiceListQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkHourlyServiceGetQueryKey = (
+  options: Options<FctBlockFirstSeenByNetworkHourlyServiceGetData>
+) => createQueryKey('fctBlockFirstSeenByNetworkHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctBlockFirstSeenByNetworkHourlyServiceGetOptions = (
+  options: Options<FctBlockFirstSeenByNetworkHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkHourlyServiceGetResponse,
+    FctBlockFirstSeenByNetworkHourlyServiceGetError,
+    FctBlockFirstSeenByNetworkHourlyServiceGetResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkHourlyServiceGetQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkWeeklyServiceListQueryKey = (
+  options?: Options<FctBlockFirstSeenByNetworkWeeklyServiceListData>
+) => createQueryKey('fctBlockFirstSeenByNetworkWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly block arrival across every Xatu node: the spread of the per-node medians in fct_block_first_seen_by_node_weekly, one row per week (Monday to Sunday, UTC)
+ */
+export const fctBlockFirstSeenByNetworkWeeklyServiceListOptions = (
+  options?: Options<FctBlockFirstSeenByNetworkWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkWeeklyServiceListResponse,
+    FctBlockFirstSeenByNetworkWeeklyServiceListError,
+    FctBlockFirstSeenByNetworkWeeklyServiceListResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkWeeklyServiceListQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNetworkWeeklyServiceGetQueryKey = (
+  options: Options<FctBlockFirstSeenByNetworkWeeklyServiceGetData>
+) => createQueryKey('fctBlockFirstSeenByNetworkWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockFirstSeenByNetworkWeeklyServiceGetOptions = (
+  options: Options<FctBlockFirstSeenByNetworkWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNetworkWeeklyServiceGetResponse,
+    FctBlockFirstSeenByNetworkWeeklyServiceGetError,
+    FctBlockFirstSeenByNetworkWeeklyServiceGetResponse,
+    ReturnType<typeof fctBlockFirstSeenByNetworkWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNetworkWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNetworkWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctBlockFirstSeenByNodeServiceListQueryKey = (options?: Options<FctBlockFirstSeenByNodeServiceListData>) =>
   createQueryKey('fctBlockFirstSeenByNodeServiceList', options);
 
@@ -5464,6 +6120,66 @@ export const fctBlockFirstSeenByNodeHourlyServiceGetOptions = (
     queryKey: fctBlockFirstSeenByNodeHourlyServiceGetQueryKey(options),
   });
 
+export const fctBlockFirstSeenByNodeWeeklyServiceListQueryKey = (
+  options?: Options<FctBlockFirstSeenByNodeWeeklyServiceListData>
+) => createQueryKey('fctBlockFirstSeenByNodeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly block arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctBlockFirstSeenByNodeWeeklyServiceListOptions = (
+  options?: Options<FctBlockFirstSeenByNodeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNodeWeeklyServiceListResponse,
+    FctBlockFirstSeenByNodeWeeklyServiceListError,
+    FctBlockFirstSeenByNodeWeeklyServiceListResponse,
+    ReturnType<typeof fctBlockFirstSeenByNodeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNodeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNodeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctBlockFirstSeenByNodeWeeklyServiceGetQueryKey = (
+  options: Options<FctBlockFirstSeenByNodeWeeklyServiceGetData>
+) => createQueryKey('fctBlockFirstSeenByNodeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockFirstSeenByNodeWeeklyServiceGetOptions = (
+  options: Options<FctBlockFirstSeenByNodeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockFirstSeenByNodeWeeklyServiceGetResponse,
+    FctBlockFirstSeenByNodeWeeklyServiceGetError,
+    FctBlockFirstSeenByNodeWeeklyServiceGetResponse,
+    ReturnType<typeof fctBlockFirstSeenByNodeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockFirstSeenByNodeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockFirstSeenByNodeWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctBlockGraffitiServiceListQueryKey = (options?: Options<FctBlockGraffitiServiceListData>) =>
   createQueryKey('fctBlockGraffitiServiceList', options);
 
@@ -5578,6 +6294,66 @@ export const fctBlockGraffitiClientByEntityDailyServiceGetOptions = (
     queryKey: fctBlockGraffitiClientByEntityDailyServiceGetQueryKey(options),
   });
 
+export const fctBlockGraffitiClientByEntityGroupDailyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientByEntityGroupDailyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientByEntityGroupDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily canonical block counts per entity group and consensus and execution client pair named by block graffiti: the sum of the member entities in fct_block_graffiti_client_by_entity_daily. Only entities in a group have rows
+ */
+export const fctBlockGraffitiClientByEntityGroupDailyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientByEntityGroupDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityGroupDailyServiceListResponse,
+    FctBlockGraffitiClientByEntityGroupDailyServiceListError,
+    FctBlockGraffitiClientByEntityGroupDailyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityGroupDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityGroupDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityGroupDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityGroupDailyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientByEntityGroupDailyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientByEntityGroupDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientByEntityGroupDailyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientByEntityGroupDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityGroupDailyServiceGetResponse,
+    FctBlockGraffitiClientByEntityGroupDailyServiceGetError,
+    FctBlockGraffitiClientByEntityGroupDailyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityGroupDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityGroupDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityGroupDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockGraffitiClientByEntityHourlyServiceListQueryKey = (
   options?: Options<FctBlockGraffitiClientByEntityHourlyServiceListData>
 ) => createQueryKey('fctBlockGraffitiClientByEntityHourlyServiceList', options);
@@ -5636,6 +6412,66 @@ export const fctBlockGraffitiClientByEntityHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctBlockGraffitiClientByEntityHourlyServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityWeeklyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientByEntityWeeklyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientByEntityWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) canonical block counts per proposer entity and consensus and execution client pair named by block graffiti
+ */
+export const fctBlockGraffitiClientByEntityWeeklyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientByEntityWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityWeeklyServiceListResponse,
+    FctBlockGraffitiClientByEntityWeeklyServiceListError,
+    FctBlockGraffitiClientByEntityWeeklyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityWeeklyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientByEntityWeeklyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientByEntityWeeklyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientByEntityWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockGraffitiClientByEntityWeeklyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientByEntityWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientByEntityWeeklyServiceGetResponse,
+    FctBlockGraffitiClientByEntityWeeklyServiceGetError,
+    FctBlockGraffitiClientByEntityWeeklyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientByEntityWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientByEntityWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientByEntityWeeklyServiceGetQueryKey(options),
   });
 
 export const fctBlockGraffitiClientDailyServiceListQueryKey = (
@@ -5818,6 +6654,66 @@ export const fctBlockGraffitiClientVersionByEntityDailyServiceGetOptions = (
     queryKey: fctBlockGraffitiClientVersionByEntityDailyServiceGetQueryKey(options),
   });
 
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientVersionByEntityGroupDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily canonical block counts per entity group, the sum of the member entities in fct_block_graffiti_client_version_by_entity_daily, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version. Only entities in a group have rows
+ */
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceListError,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionByEntityGroupDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionByEntityGroupDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionByEntityGroupDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientVersionByEntityGroupDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockGraffitiClientVersionByEntityGroupDailyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetError,
+    FctBlockGraffitiClientVersionByEntityGroupDailyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionByEntityGroupDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionByEntityGroupDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionByEntityGroupDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockGraffitiClientVersionByEntityHourlyServiceListQueryKey = (
   options?: Options<FctBlockGraffitiClientVersionByEntityHourlyServiceListData>
 ) => createQueryKey('fctBlockGraffitiClientVersionByEntityHourlyServiceList', options);
@@ -5876,6 +6772,66 @@ export const fctBlockGraffitiClientVersionByEntityHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctBlockGraffitiClientVersionByEntityHourlyServiceGetQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceListQueryKey = (
+  options?: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceListData>
+) => createQueryKey('fctBlockGraffitiClientVersionByEntityWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) canonical block counts per staking entity, per consensus and execution client release resolved from block graffiti. Each block counts once per layer. release_status: commit_match (the commit is a release tag commit agreeing with any version the graffiti states), commit_untagged (a default or release branch commit between tags, version is the release it builds on, else the stated version, empty for a development build with no recent tag), commit_mismatch (the commit resolves to another release than the stated version, which some clients leave stale, version is the commit release), commit_ambiguous (the prefix matches several commits), commit_unmatched (no release or branch commit, a custom or fork build), commit_short (a 2 character commit), commit_zero (an all-zero commit), version_match or version_unmatched (a version string with no commit, matched to a release tag or not), codes_min (client codes without commits), no_commit (no version information) or none (unknown client). Rows whose commit does not resolve keep the version the graffiti states. Rows with neither have an empty version
+ */
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceListOptions = (
+  options?: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceListError,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionByEntityWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionByEntityWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionByEntityWeeklyServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceGetQueryKey = (
+  options: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData>
+) => createQueryKey('fctBlockGraffitiClientVersionByEntityWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctBlockGraffitiClientVersionByEntityWeeklyServiceGetOptions = (
+  options: Options<FctBlockGraffitiClientVersionByEntityWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceGetError,
+    FctBlockGraffitiClientVersionByEntityWeeklyServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiClientVersionByEntityWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiClientVersionByEntityWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiClientVersionByEntityWeeklyServiceGetQueryKey(options),
   });
 
 export const fctBlockGraffitiClientVersionDailyServiceListQueryKey = (
@@ -6862,6 +7818,126 @@ export const fctBlockProposalByClientPairDailyServiceGetOptions = (
     queryKey: fctBlockProposalByClientPairDailyServiceGetQueryKey(options),
   });
 
+export const fctBlockProposalByEntityDailyServiceListQueryKey = (
+  options?: Options<FctBlockProposalByEntityDailyServiceListData>
+) => createQueryKey('fctBlockProposalByEntityDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily block proposals per staking entity on the finalized chain: canonical blocks, MEV share and value, orphaned blocks and missed slots. Proposals due are block_count + orphaned_block_count + missed_slot_count. Validators map to their current entity in dim_node, and validators it does not name are unknown, so the rows of a day sum to the whole network
+ */
+export const fctBlockProposalByEntityDailyServiceListOptions = (
+  options?: Options<FctBlockProposalByEntityDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockProposalByEntityDailyServiceListResponse,
+    FctBlockProposalByEntityDailyServiceListError,
+    FctBlockProposalByEntityDailyServiceListResponse,
+    ReturnType<typeof fctBlockProposalByEntityDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByEntityDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByEntityDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockProposalByEntityDailyServiceGetQueryKey = (
+  options: Options<FctBlockProposalByEntityDailyServiceGetData>
+) => createQueryKey('fctBlockProposalByEntityDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByEntityDailyServiceGetOptions = (
+  options: Options<FctBlockProposalByEntityDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockProposalByEntityDailyServiceGetResponse,
+    FctBlockProposalByEntityDailyServiceGetError,
+    FctBlockProposalByEntityDailyServiceGetResponse,
+    ReturnType<typeof fctBlockProposalByEntityDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByEntityDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByEntityDailyServiceGetQueryKey(options),
+  });
+
+export const fctBlockProposalByEntityGroupDailyServiceListQueryKey = (
+  options?: Options<FctBlockProposalByEntityGroupDailyServiceListData>
+) => createQueryKey('fctBlockProposalByEntityGroupDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily block proposals per entity group on the finalized chain: the sum of the member entities in fct_block_proposal_by_entity_daily. Proposals due are block_count + orphaned_block_count + missed_slot_count. Only entities in a group have rows
+ */
+export const fctBlockProposalByEntityGroupDailyServiceListOptions = (
+  options?: Options<FctBlockProposalByEntityGroupDailyServiceListData>
+) =>
+  queryOptions<
+    FctBlockProposalByEntityGroupDailyServiceListResponse,
+    FctBlockProposalByEntityGroupDailyServiceListError,
+    FctBlockProposalByEntityGroupDailyServiceListResponse,
+    ReturnType<typeof fctBlockProposalByEntityGroupDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByEntityGroupDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByEntityGroupDailyServiceListQueryKey(options),
+  });
+
+export const fctBlockProposalByEntityGroupDailyServiceGetQueryKey = (
+  options: Options<FctBlockProposalByEntityGroupDailyServiceGetData>
+) => createQueryKey('fctBlockProposalByEntityGroupDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctBlockProposalByEntityGroupDailyServiceGetOptions = (
+  options: Options<FctBlockProposalByEntityGroupDailyServiceGetData>
+) =>
+  queryOptions<
+    FctBlockProposalByEntityGroupDailyServiceGetResponse,
+    FctBlockProposalByEntityGroupDailyServiceGetError,
+    FctBlockProposalByEntityGroupDailyServiceGetResponse,
+    ReturnType<typeof fctBlockProposalByEntityGroupDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposalByEntityGroupDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposalByEntityGroupDailyServiceGetQueryKey(options),
+  });
+
 export const fctBlockProposalStatusDailyServiceListQueryKey = (
   options?: Options<FctBlockProposalStatusDailyServiceListData>
 ) => createQueryKey('fctBlockProposalStatusDailyServiceList', options);
@@ -7034,6 +8110,63 @@ export const fctBlockProposerServiceGetOptions = (options: Options<FctBlockPropo
       return data;
     },
     queryKey: fctBlockProposerServiceGetQueryKey(options),
+  });
+
+export const fctBlockProposerByEntityServiceListQueryKey = (
+  options?: Options<FctBlockProposerByEntityServiceListData>
+) => createQueryKey('fctBlockProposerByEntityServiceList', options);
+
+/**
+ * List records
+ *
+ * Every slot of the finalized chain with the staking entity of its scheduled proposer and how the proposal ended: canonical, orphaned or missed. Validators map to their current entity in dim_node, and validators it does not name are unknown
+ */
+export const fctBlockProposerByEntityServiceListOptions = (
+  options?: Options<FctBlockProposerByEntityServiceListData>
+) =>
+  queryOptions<
+    FctBlockProposerByEntityServiceListResponse,
+    FctBlockProposerByEntityServiceListError,
+    FctBlockProposerByEntityServiceListResponse,
+    ReturnType<typeof fctBlockProposerByEntityServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposerByEntityServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposerByEntityServiceListQueryKey(options),
+  });
+
+export const fctBlockProposerByEntityServiceGetQueryKey = (options: Options<FctBlockProposerByEntityServiceGetData>) =>
+  createQueryKey('fctBlockProposerByEntityServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockProposerByEntityServiceGetOptions = (options: Options<FctBlockProposerByEntityServiceGetData>) =>
+  queryOptions<
+    FctBlockProposerByEntityServiceGetResponse,
+    FctBlockProposerByEntityServiceGetError,
+    FctBlockProposerByEntityServiceGetResponse,
+    ReturnType<typeof fctBlockProposerByEntityServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockProposerByEntityServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockProposerByEntityServiceGetQueryKey(options),
   });
 
 export const fctBlockProposerByValidatorServiceListQueryKey = (
@@ -8105,7 +9238,7 @@ export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
  */
 export const fctDataColumnAvailabilityDailyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityDailyServiceListData>
@@ -9774,7 +10907,7 @@ export const fctExecutionGasLimitDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasLimitDailyServiceListOptions = (
   options?: Options<FctExecutionGasLimitDailyServiceListData>
@@ -9832,7 +10965,7 @@ export const fctExecutionGasLimitHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Hourly aggregated execution layer gas limit statistics with percentiles, Bollinger bands, and moving averages
+ * Gas limit per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasLimitHourlyServiceListOptions = (
   options?: Options<FctExecutionGasLimitHourlyServiceListData>
@@ -10012,7 +11145,7 @@ export const fctExecutionGasUsedDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC day, with percentiles, Bollinger bands and a 7-day moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasUsedDailyServiceListOptions = (
   options?: Options<FctExecutionGasUsedDailyServiceListData>
@@ -10069,7 +11202,7 @@ export const fctExecutionGasUsedHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Hourly aggregated execution layer gas used statistics with percentiles, Bollinger bands, and moving averages
+ * Gas used per canonical block of this network, aggregated by UTC hour, with percentiles, Bollinger bands and a 6-hour moving average. Starts at block 1, the genesis block is excluded
  */
 export const fctExecutionGasUsedHourlyServiceListOptions = (
   options?: Options<FctExecutionGasUsedHourlyServiceListData>
@@ -10247,7 +11380,7 @@ export const fctExecutionStateSizeDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Execution layer state size metrics aggregated by day
+ * Execution layer state size at the last canonical block of each UTC day. Starts at the day of block 1, the genesis block is not given a row of its own
  */
 export const fctExecutionStateSizeDailyServiceListOptions = (
   options?: Options<FctExecutionStateSizeDailyServiceListData>
@@ -10307,7 +11440,7 @@ export const fctExecutionStateSizeHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Execution layer state size metrics aggregated by hour
+ * Execution layer state size at the last canonical block of each UTC hour. Starts at the hour of block 1, the genesis block is not given a row of its own
  */
 export const fctExecutionStateSizeHourlyServiceListOptions = (
   options?: Options<FctExecutionStateSizeHourlyServiceListData>
@@ -10475,7 +11608,7 @@ export const fctExecutionTransactionsDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC day, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export const fctExecutionTransactionsDailyServiceListOptions = (
   options?: Options<FctExecutionTransactionsDailyServiceListData>
@@ -10535,7 +11668,7 @@ export const fctExecutionTransactionsHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Hourly aggregated execution layer transaction counts with cumulative totals and per-block statistics
+ * Transactions per canonical block of this network, aggregated by UTC hour, with cumulative totals and per-block statistics. The genesis block is excluded
  */
 export const fctExecutionTransactionsHourlyServiceListOptions = (
   options?: Options<FctExecutionTransactionsHourlyServiceListData>
@@ -10760,6 +11893,66 @@ export const fctHeadFirstSeenByNodeHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctHeadFirstSeenByNodeHourlyServiceGetQueryKey(options),
+  });
+
+export const fctHeadFirstSeenByNodeWeeklyServiceListQueryKey = (
+  options?: Options<FctHeadFirstSeenByNodeWeeklyServiceListData>
+) => createQueryKey('fctHeadFirstSeenByNodeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly head event arrival per node, weeks run Monday to Sunday (UTC)
+ */
+export const fctHeadFirstSeenByNodeWeeklyServiceListOptions = (
+  options?: Options<FctHeadFirstSeenByNodeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctHeadFirstSeenByNodeWeeklyServiceListResponse,
+    FctHeadFirstSeenByNodeWeeklyServiceListError,
+    FctHeadFirstSeenByNodeWeeklyServiceListResponse,
+    ReturnType<typeof fctHeadFirstSeenByNodeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctHeadFirstSeenByNodeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctHeadFirstSeenByNodeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctHeadFirstSeenByNodeWeeklyServiceGetQueryKey = (
+  options: Options<FctHeadFirstSeenByNodeWeeklyServiceGetData>
+) => createQueryKey('fctHeadFirstSeenByNodeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctHeadFirstSeenByNodeWeeklyServiceGetOptions = (
+  options: Options<FctHeadFirstSeenByNodeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctHeadFirstSeenByNodeWeeklyServiceGetResponse,
+    FctHeadFirstSeenByNodeWeeklyServiceGetError,
+    FctHeadFirstSeenByNodeWeeklyServiceGetResponse,
+    ReturnType<typeof fctHeadFirstSeenByNodeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctHeadFirstSeenByNodeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctHeadFirstSeenByNodeWeeklyServiceGetQueryKey(options),
   });
 
 export const fctHeadVoteCorrectnessRateDailyServiceListQueryKey = (
@@ -11618,6 +12811,66 @@ export const fctOpcodeCostByElClientVersionServiceGetOptions = (
     queryKey: fctOpcodeCostByElClientVersionServiceGetQueryKey(options),
   });
 
+export const fctOpcodeCostByElClientWeeklyServiceListQueryKey = (
+  options?: Options<FctOpcodeCostByElClientWeeklyServiceListData>
+) => createQueryKey('fctOpcodeCostByElClientWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) execution cost per opcode group by execution client, fitted from engine_newPayload durations over the whole week
+ */
+export const fctOpcodeCostByElClientWeeklyServiceListOptions = (
+  options?: Options<FctOpcodeCostByElClientWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctOpcodeCostByElClientWeeklyServiceListResponse,
+    FctOpcodeCostByElClientWeeklyServiceListError,
+    FctOpcodeCostByElClientWeeklyServiceListResponse,
+    ReturnType<typeof fctOpcodeCostByElClientWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeCostByElClientWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeCostByElClientWeeklyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeCostByElClientWeeklyServiceGetQueryKey = (
+  options: Options<FctOpcodeCostByElClientWeeklyServiceGetData>
+) => createQueryKey('fctOpcodeCostByElClientWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctOpcodeCostByElClientWeeklyServiceGetOptions = (
+  options: Options<FctOpcodeCostByElClientWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctOpcodeCostByElClientWeeklyServiceGetResponse,
+    FctOpcodeCostByElClientWeeklyServiceGetError,
+    FctOpcodeCostByElClientWeeklyServiceGetResponse,
+    ReturnType<typeof fctOpcodeCostByElClientWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeCostByElClientWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeCostByElClientWeeklyServiceGetQueryKey(options),
+  });
+
 export const fctOpcodeGasByOpcodeDailyServiceListQueryKey = (
   options?: Options<FctOpcodeGasByOpcodeDailyServiceListData>
 ) => createQueryKey('fctOpcodeGasByOpcodeDailyServiceList', options);
@@ -11734,6 +12987,66 @@ export const fctOpcodeGasByOpcodeHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctOpcodeGasByOpcodeHourlyServiceGetQueryKey(options),
+  });
+
+export const fctOpcodeGasByOpcodeWeeklyServiceListQueryKey = (
+  options?: Options<FctOpcodeGasByOpcodeWeeklyServiceListData>
+) => createQueryKey('fctOpcodeGasByOpcodeWeeklyServiceList', options);
+
+/**
+ * List records
+ *
+ * Weekly (Monday to Sunday, UTC) per-opcode gas consumption for Top Opcodes by Gas charts, summed from fct_opcode_gas_by_opcode_daily
+ */
+export const fctOpcodeGasByOpcodeWeeklyServiceListOptions = (
+  options?: Options<FctOpcodeGasByOpcodeWeeklyServiceListData>
+) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeWeeklyServiceListResponse,
+    FctOpcodeGasByOpcodeWeeklyServiceListError,
+    FctOpcodeGasByOpcodeWeeklyServiceListResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeWeeklyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeWeeklyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeWeeklyServiceListQueryKey(options),
+  });
+
+export const fctOpcodeGasByOpcodeWeeklyServiceGetQueryKey = (
+  options: Options<FctOpcodeGasByOpcodeWeeklyServiceGetData>
+) => createQueryKey('fctOpcodeGasByOpcodeWeeklyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by week_start_date
+ */
+export const fctOpcodeGasByOpcodeWeeklyServiceGetOptions = (
+  options: Options<FctOpcodeGasByOpcodeWeeklyServiceGetData>
+) =>
+  queryOptions<
+    FctOpcodeGasByOpcodeWeeklyServiceGetResponse,
+    FctOpcodeGasByOpcodeWeeklyServiceGetError,
+    FctOpcodeGasByOpcodeWeeklyServiceGetResponse,
+    ReturnType<typeof fctOpcodeGasByOpcodeWeeklyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctOpcodeGasByOpcodeWeeklyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctOpcodeGasByOpcodeWeeklyServiceGetQueryKey(options),
   });
 
 export const fctOpcodeOpsDailyServiceListQueryKey = (options?: Options<FctOpcodeOpsDailyServiceListData>) =>
@@ -12798,6 +14111,66 @@ export const fctPreparedBlockServiceGetOptions = (options: Options<FctPreparedBl
     queryKey: fctPreparedBlockServiceGetQueryKey(options),
   });
 
+export const fctPreparedBlockByNodeDailyServiceListQueryKey = (
+  options?: Options<FctPreparedBlockByNodeDailyServiceListData>
+) => createQueryKey('fctPreparedBlockByNodeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily locally built block counts per Xatu node and consensus client version, from fct_prepared_block
+ */
+export const fctPreparedBlockByNodeDailyServiceListOptions = (
+  options?: Options<FctPreparedBlockByNodeDailyServiceListData>
+) =>
+  queryOptions<
+    FctPreparedBlockByNodeDailyServiceListResponse,
+    FctPreparedBlockByNodeDailyServiceListError,
+    FctPreparedBlockByNodeDailyServiceListResponse,
+    ReturnType<typeof fctPreparedBlockByNodeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPreparedBlockByNodeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPreparedBlockByNodeDailyServiceListQueryKey(options),
+  });
+
+export const fctPreparedBlockByNodeDailyServiceGetQueryKey = (
+  options: Options<FctPreparedBlockByNodeDailyServiceGetData>
+) => createQueryKey('fctPreparedBlockByNodeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPreparedBlockByNodeDailyServiceGetOptions = (
+  options: Options<FctPreparedBlockByNodeDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPreparedBlockByNodeDailyServiceGetResponse,
+    FctPreparedBlockByNodeDailyServiceGetError,
+    FctPreparedBlockByNodeDailyServiceGetResponse,
+    ReturnType<typeof fctPreparedBlockByNodeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPreparedBlockByNodeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPreparedBlockByNodeDailyServiceGetQueryKey(options),
+  });
+
 export const fctProposerRewardDailyServiceListQueryKey = (options?: Options<FctProposerRewardDailyServiceListData>) =>
   createQueryKey('fctProposerRewardDailyServiceList', options);
 
@@ -13555,7 +14928,7 @@ export const fctStorageSlotTop100ByBytesServiceListQueryKey = (
 /**
  * List records
  *
- * Top 100 contracts by effective storage bytes with expiry policies applied
+ * Top 100 contracts by storage size (active_slots * 65 + effective_bytes) with expiry policies applied
  */
 export const fctStorageSlotTop100ByBytesServiceListOptions = (
   options?: Options<FctStorageSlotTop100ByBytesServiceListData>
@@ -14789,6 +16162,66 @@ export const fctValidatorOperationWeeklyServiceGetOptions = (
     queryKey: fctValidatorOperationWeeklyServiceGetQueryKey(options),
   });
 
+export const fctValidatorPerformanceByEntityRollingServiceListQueryKey = (
+  options?: Options<FctValidatorPerformanceByEntityRollingServiceListData>
+) => createQueryKey('fctValidatorPerformanceByEntityRollingServiceList', options);
+
+/**
+ * List records
+ *
+ * Attestation and block proposal performance per staking entity over rolling periods, refreshed every 30 minutes: one row per period and entity with duties or proposals in it. 24h sums fct_attestation_vote_correctness_by_entity_hourly and fct_block_proposer_by_entity over the last 24 complete hours. The day periods sum fct_attestation_vote_correctness_by_entity_daily and fct_block_proposal_by_entity_daily over the last complete UTC days. The rows of a period sum to the whole network
+ */
+export const fctValidatorPerformanceByEntityRollingServiceListOptions = (
+  options?: Options<FctValidatorPerformanceByEntityRollingServiceListData>
+) =>
+  queryOptions<
+    FctValidatorPerformanceByEntityRollingServiceListResponse,
+    FctValidatorPerformanceByEntityRollingServiceListError,
+    FctValidatorPerformanceByEntityRollingServiceListResponse,
+    ReturnType<typeof fctValidatorPerformanceByEntityRollingServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorPerformanceByEntityRollingServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorPerformanceByEntityRollingServiceListQueryKey(options),
+  });
+
+export const fctValidatorPerformanceByEntityRollingServiceGetQueryKey = (
+  options: Options<FctValidatorPerformanceByEntityRollingServiceGetData>
+) => createQueryKey('fctValidatorPerformanceByEntityRollingServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by period
+ */
+export const fctValidatorPerformanceByEntityRollingServiceGetOptions = (
+  options: Options<FctValidatorPerformanceByEntityRollingServiceGetData>
+) =>
+  queryOptions<
+    FctValidatorPerformanceByEntityRollingServiceGetResponse,
+    FctValidatorPerformanceByEntityRollingServiceGetError,
+    FctValidatorPerformanceByEntityRollingServiceGetResponse,
+    ReturnType<typeof fctValidatorPerformanceByEntityRollingServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorPerformanceByEntityRollingServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorPerformanceByEntityRollingServiceGetQueryKey(options),
+  });
+
 export const fctValidatorQueueDailyServiceListQueryKey = (options?: Options<FctValidatorQueueDailyServiceListData>) =>
   createQueryKey('fctValidatorQueueDailyServiceList', options);
 
@@ -15075,6 +16508,66 @@ export const fctValidatorStakeByEntityDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctValidatorStakeByEntityDailyServiceGetQueryKey(options),
+  });
+
+export const fctValidatorStakeByEntityGroupDailyServiceListQueryKey = (
+  options?: Options<FctValidatorStakeByEntityGroupDailyServiceListData>
+) => createQueryKey('fctValidatorStakeByEntityGroupDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Active validators and stake per entity group and withdrawal credential type, one snapshot per day: the sum of the member entities in fct_validator_stake_by_entity_daily. Only entities in a group have rows
+ */
+export const fctValidatorStakeByEntityGroupDailyServiceListOptions = (
+  options?: Options<FctValidatorStakeByEntityGroupDailyServiceListData>
+) =>
+  queryOptions<
+    FctValidatorStakeByEntityGroupDailyServiceListResponse,
+    FctValidatorStakeByEntityGroupDailyServiceListError,
+    FctValidatorStakeByEntityGroupDailyServiceListResponse,
+    ReturnType<typeof fctValidatorStakeByEntityGroupDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorStakeByEntityGroupDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorStakeByEntityGroupDailyServiceListQueryKey(options),
+  });
+
+export const fctValidatorStakeByEntityGroupDailyServiceGetQueryKey = (
+  options: Options<FctValidatorStakeByEntityGroupDailyServiceGetData>
+) => createQueryKey('fctValidatorStakeByEntityGroupDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctValidatorStakeByEntityGroupDailyServiceGetOptions = (
+  options: Options<FctValidatorStakeByEntityGroupDailyServiceGetData>
+) =>
+  queryOptions<
+    FctValidatorStakeByEntityGroupDailyServiceGetResponse,
+    FctValidatorStakeByEntityGroupDailyServiceGetError,
+    FctValidatorStakeByEntityGroupDailyServiceGetResponse,
+    ReturnType<typeof fctValidatorStakeByEntityGroupDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctValidatorStakeByEntityGroupDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctValidatorStakeByEntityGroupDailyServiceGetQueryKey(options),
   });
 
 export const intAttestationAttestedServiceListQueryKey = (options?: Options<IntAttestationAttestedServiceListData>) =>
@@ -15480,7 +16973,7 @@ export const intBlockBlobCountCanonicalServiceListQueryKey = (
 /**
  * List records
  *
- * Blob count of a block for the finalized chain
+ * Blob count of every canonical block that carries blobs, from its execution payload blob gas (blob gas used over 131072) before Gloas, from the blob KZG commitments in its execution payload bid from Gloas, and from its blob sidecars only when neither is available
  */
 export const intBlockBlobCountCanonicalServiceListOptions = (
   options?: Options<IntBlockBlobCountCanonicalServiceListData>
@@ -17445,7 +18938,7 @@ export const intExecutionBlockByDateServiceListQueryKey = (options?: Options<Int
 /**
  * List records
  *
- * Execution blocks ordered by timestamp for efficient date range lookups
+ * Block number and block time of every canonical execution block of this network, for date range lookups. A range is only written once canonical_execution_block holds every block in it
  */
 export const intExecutionBlockByDateServiceListOptions = (options?: Options<IntExecutionBlockByDateServiceListData>) =>
   queryOptions<
@@ -19388,7 +20881,7 @@ export const intTransactionReceiptSizeServiceListQueryKey = (
 /**
  * List records
  *
- * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data.
+ * Per-transaction exact RLP-encoded receipt size derived from logs and transaction data. A range is only written once no block in it is missing transactions, and no block has a hole in its transaction or log indexes
  */
 export const intTransactionReceiptSizeServiceListOptions = (
   options?: Options<IntTransactionReceiptSizeServiceListData>

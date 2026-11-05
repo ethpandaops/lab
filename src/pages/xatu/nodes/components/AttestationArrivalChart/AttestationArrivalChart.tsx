@@ -13,7 +13,7 @@ export interface AttestationArrivalChartProps {
 }
 
 /**
- * When the node saw each slot's attestations: the median per hour or day, inside its p10–p90.
+ * When the node saw each slot's attestations: the median per hour, day or week, inside its p10–p90.
  */
 export function AttestationArrivalChart({ history, rangeLabel, behind }: AttestationArrivalChartProps): JSX.Element {
   const colors = useThemeColors();

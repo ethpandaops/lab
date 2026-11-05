@@ -23,6 +23,7 @@ import {
 import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useLatestDayNodes } from './hooks/useLatestDayNodes';
+import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
 import { formatMs } from './utils/node-stats';
 
@@ -50,6 +51,7 @@ export function IndexPage(): JSX.Element {
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const { rows, network, block, isLoading, error } = useNodeRows(range);
   const latestDay = useLatestDayNodes();
+  const networkHistory = useNetworkHistory(range);
 
   if (isLoading) {
     return (
@@ -150,10 +152,15 @@ export function IndexPage(): JSX.Element {
         </div>
 
         <h2 className="text-lg/7 font-semibold tracking-tight text-foreground">Block arrival</h2>
-        {block ? (
+        {block && networkHistory.data ? (
           <div className="-mt-2 grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <NetworkArrivalChart history={block} rangeLabel={rangeLabel} />
-            <ClientArrivalChart history={block} rangeLabel={rangeLabel} />
+            <NetworkArrivalChart
+              buckets={block.buckets}
+              granularity={block.granularity}
+              spread={networkHistory.data.spread}
+              rangeLabel={rangeLabel}
+            />
+            <ClientArrivalChart history={block} networkMedians={networkHistory.data.medians} rangeLabel={rangeLabel} />
           </div>
         ) : (
           <div className="-mt-2 grid grid-cols-1 gap-6 xl:grid-cols-2">
