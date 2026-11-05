@@ -58,7 +58,7 @@ export function DetailPage(): JSX.Element {
   }, [params.entity]);
   const entity = entityName ?? '';
 
-  const window: DetailWindow = t ?? '30d';
+  const window: DetailWindow = t ?? 'all';
   const windowDays = DETAIL_WINDOW_DAYS[window];
 
   const group = isEntityGroup(entity);

@@ -320,3 +320,28 @@ export const NoHeaderOrDescription: Story = {
     columns: basicColumns,
   },
 };
+
+/** A row expands into a full-width row of details; the caller owns which rows are open */
+export const ExpandedRow: Story = {
+  render: args => {
+    const [open, setOpen] = useState<string | null>('1');
+    return (
+      <DataTable
+        {...args}
+        onRowClick={user => setOpen(current => (current === user.id ? null : user.id))}
+        renderExpandedRow={user =>
+          open === user.id ? (
+            <p className="text-sm text-muted">
+              {user.email} joined on {user.createdAt}.
+            </p>
+          ) : null
+        }
+      />
+    );
+  },
+  args: {
+    data: sampleData,
+    columns: basicColumns,
+    title: 'Users',
+  },
+};

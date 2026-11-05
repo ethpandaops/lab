@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { EntityStake } from '../hooks/useEntityStake';
-import { countsOf, groupCounts, groupStakes } from './groups';
+import { countsOf, groupCounts, groupMembers, groupStakes } from './groups';
 import { metricById, metricValue, toCounts } from './performance';
 
 const stake = (entity: string, stakeEth: number, startEth: number): EntityStake => ({
@@ -27,6 +27,12 @@ describe('groupStakes', () => {
       ['kiln', 300, 0],
     ]);
     expect(grouped[0].series).toEqual([196, 360]);
+  });
+
+  it('lists the members of a group largest first and leaves other entities out', () => {
+    const members = groupMembers([stake('kiln', 300, 300), stake('lido', 96, 96), stake('p2porg_lido', 200, 100)]);
+    expect([...members.keys()]).toEqual(['*lido']);
+    expect(members.get('*lido')!.map(e => e.entity)).toEqual(['p2porg_lido', 'lido']);
   });
 });
 

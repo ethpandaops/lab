@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState } from 'react';
+import { Fragment, type JSX, useMemo, useState } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -44,6 +44,7 @@ export function DataTable<TData>({
   onRowClick,
   getRowId,
   getRowClassName,
+  renderExpandedRow,
   // Manual mode
   manualPagination = false,
   manualFiltering = false,
@@ -328,38 +329,49 @@ export function DataTable<TData>({
                 </tr>
               ) : (
                 // Data rows
-                table.getRowModel().rows.map(row => (
-                  <tr
-                    key={row.id}
-                    onClick={() => onRowClick?.(row.original)}
-                    className={clsx(
-                      'transition-colors',
-                      onRowClick && 'cursor-pointer hover:bg-background',
-                      getRowClassName?.(row.original, row.id)
-                    )}
-                  >
-                    {row.getVisibleCells().map((cell, cellIndex) => (
-                      <td
-                        key={cell.id}
-                        style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
+                table.getRowModel().rows.map(row => {
+                  const expanded = renderExpandedRow?.(row.original, row.id) ?? null;
+                  return (
+                    <Fragment key={row.id}>
+                      <tr
+                        onClick={() => onRowClick?.(row.original)}
                         className={clsx(
-                          'whitespace-nowrap tabular-nums',
-                          comfortable ? 'py-2.5 text-sm' : 'py-1.5 text-xs',
-                          cellIndex === 0
-                            ? `${gap.right} pl-(--table-inset)`
-                            : cellIndex === row.getVisibleCells().length - 1
-                              ? `pr-(--table-inset) ${gap.left}`
-                              : gap.both,
-                          (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName ||
-                            'text-muted',
-                          (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.columnClassName
+                          'transition-colors',
+                          onRowClick && 'cursor-pointer hover:bg-background',
+                          getRowClassName?.(row.original, row.id)
                         )}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                        {row.getVisibleCells().map((cell, cellIndex) => (
+                          <td
+                            key={cell.id}
+                            style={{ width: cell.column.getSize() !== 150 ? cell.column.getSize() : undefined }}
+                            className={clsx(
+                              'whitespace-nowrap tabular-nums',
+                              comfortable ? 'py-2.5 text-sm' : 'py-1.5 text-xs',
+                              cellIndex === 0
+                                ? `${gap.right} pl-(--table-inset)`
+                                : cellIndex === row.getVisibleCells().length - 1
+                                  ? `pr-(--table-inset) ${gap.left}`
+                                  : gap.both,
+                              (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName ||
+                                'text-muted',
+                              (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.columnClassName
+                            )}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                      {expanded !== null && (
+                        <tr className="bg-background/50">
+                          <td colSpan={row.getVisibleCells().length} className="px-(--table-inset) py-3">
+                            {expanded}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })
               )}
             </tbody>
           </table>

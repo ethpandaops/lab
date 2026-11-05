@@ -24,13 +24,8 @@ import { StakeMovers } from './components/StakeMovers';
 import { AGGREGATE_ENTITIES, ENTITIES_WINDOW_OPTIONS, type EntitiesWindow } from './constants';
 import { useEntityPerformance, useEntityStake, useStakeShareHistory } from './hooks';
 import { dayOf, entitiesToReach } from './utils/overview';
-import { entityLabel, groupCounts, groupName, groupStakes } from './utils/groups';
+import { entityLabel, groupCounts, groupMembers, groupName, groupStakes } from './utils/groups';
 import { formatPeriod } from './utils/performance';
-
-const LIDO_OPTIONS = [
-  { value: 'grouped', label: 'As one entity' },
-  { value: 'operators', label: 'By operator' },
-] as const;
 
 /** Entities drawn as their own band in the stake share chart */
 const SHARE_CHART_ENTITIES = 10;
@@ -64,23 +59,20 @@ function concentration(
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate();
   const search = useSearch({ from: '/ethereum/entities/' });
-  const window: EntitiesWindow = search.t ?? '1y';
+  const window: EntitiesWindow = search.t ?? 'all';
   const [shareMode, setShareMode] = useState<'share' | 'stake'>('share');
 
   const { CHART_CATEGORICAL_COLORS: palette, DATA_COLORS } = getDataVizColors();
   const { currentNetwork } = useNetwork();
   const { allForks } = useForks();
 
-  const grouped = search.lido !== 'operators';
   const stake = useEntityStake(window);
   const { totalStakeEth, firstDay, latestDay, startDay } = stake;
   const performance = useEntityPerformance(window);
-  // With Lido grouped, its operators count as one entity everywhere below
-  const entities = useMemo(() => (grouped ? groupStakes(stake.entities) : stake.entities), [grouped, stake.entities]);
-  const counts = useMemo(
-    () => (grouped ? groupCounts(performance.entities) : performance.entities),
-    [grouped, performance.entities]
-  );
+  // Lido's operators count as one entity everywhere below; its row in the table expands to them
+  const entities = useMemo(() => groupStakes(stake.entities), [stake.entities]);
+  const counts = useMemo(() => groupCounts(performance.entities), [performance.entities]);
+  const members = useMemo(() => groupMembers(stake.entities), [stake.entities]);
 
   // Named operators only: the aggregate buckets hold unrelated validators
   const named = entities.filter(e => e.validators > 0 && !AGGREGATE_ENTITIES.has(e.entity));
@@ -99,6 +91,11 @@ export function IndexPage(): JSX.Element {
   const start = concentration(
     entities.filter(e => !AGGREGATE_ENTITIES.has(e.entity)).map(e => e.startEth),
     startTotalEth
+  );
+  // The same figures with Lido's operators counted separately, for the note under the stats
+  const ungrouped = concentration(
+    stake.entities.filter(e => e.validators > 0 && !AGGREGATE_ENTITIES.has(e.entity)).map(e => e.stakeEth),
+    totalStakeEth
   );
   const from = (value: string | undefined): string | undefined =>
     startDay && startDay !== latestDay && value !== undefined ? `From ${value}` : undefined;
@@ -149,32 +146,15 @@ export function IndexPage(): JSX.Element {
     <Container>
       <Header title="Entities" description="Who runs Ethereum's validators, and how well they perform" />
 
-      <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <SegmentedControl
-          options={ENTITIES_WINDOW_OPTIONS}
-          value={window}
-          onChange={value =>
-            navigate({ to: '/ethereum/entities', search: { ...search, t: value }, replace: true, resetScroll: false })
-          }
-          ariaLabel="Time range"
-        />
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted">Lido</span>
-          <SegmentedControl
-            options={LIDO_OPTIONS}
-            value={grouped ? 'grouped' : 'operators'}
-            onChange={value =>
-              navigate({
-                to: '/ethereum/entities',
-                search: { ...search, lido: value === 'grouped' ? undefined : value },
-                replace: true,
-                resetScroll: false,
-              })
-            }
-            ariaLabel="Lido"
-          />
-        </div>
-      </div>
+      <SegmentedControl
+        options={ENTITIES_WINDOW_OPTIONS}
+        value={window}
+        onChange={value =>
+          navigate({ to: '/ethereum/entities', search: { ...search, t: value }, replace: true, resetScroll: false })
+        }
+        ariaLabel="Time range"
+        className="mb-6"
+      />
 
       {stake.error && <Alert variant="error" title="Could not load entities" description={stake.error.message} />}
       {!stake.error && stake.isLoading && <EntitiesSkeleton />}
@@ -227,6 +207,11 @@ export function IndexPage(): JSX.Element {
                 },
               ]}
             />
+            <p className="-mt-2 text-xs/5 text-muted">
+              Lido&apos;s operators count as one entity. Counted separately: {ungrouped.entities.toLocaleString()}{' '}
+              entities, {ungrouped.halt?.count.toLocaleString() ?? '-'} to halt finality,{' '}
+              {ungrouped.majority?.count.toLocaleString() ?? '-'} to finalize.
+            </p>
 
             <PopoutCard
               title="Stake by entity"
@@ -300,6 +285,8 @@ export function IndexPage(): JSX.Element {
             network={performance.network}
             stakeWindow={stakeWindow}
             performanceWindow={performanceWindow}
+            members={members}
+            memberPerformance={performance.entities}
           />
         </div>
       )}
