@@ -6,7 +6,7 @@ import type { BlockSource, SlotFilters, SlotSort, SlotStatus } from '../IndexPag
  * Tables that hold per-slot facts. Filters run server-side on one of them (the driver); the rest are joined by
  * slot and checked here.
  */
-export type SlotTable = 'proposer' | 'status' | 'entity' | 'block' | 'mev' | 'graffiti' | 'ptc';
+export type SlotTable = 'proposer' | 'canonical' | 'status' | 'entity' | 'block' | 'mev' | 'graffiti' | 'ptc';
 
 /** Blob gas per blob, unchanged since Deneb */
 export const GAS_PER_BLOB = 131_072;
@@ -21,7 +21,10 @@ export const SORT_COLUMNS: Record<Exclude<SlotSort, 'slot'>, string> = {
 /** Everything known about one slot, from whichever tables were read. A missing field means no row. */
 export interface SlotFacts {
   slot: number;
-  /** fct_block_proposer_head: every slot up to the head; a null root is a missed slot */
+  /**
+   * fct_block_proposer_head: every slot up to the head; int_block_proposer_canonical: every finalized slot back to
+   * genesis. A null root is a missed slot.
+   */
   proposer?: { index: number | null; blockRoot: string | null };
   /** fct_block_proposer: finalized status */
   status?: 'canonical' | 'orphaned' | 'missed';
@@ -141,6 +144,7 @@ export function serverQuery(table: SlotTable, filters: SlotFilters): Record<stri
   const query: Record<string, string | number> = {};
   switch (table) {
     case 'proposer':
+    case 'canonical':
       if (filters.proposer !== undefined) query.proposer_validator_index_eq = filters.proposer;
       break;
     case 'status':
@@ -173,7 +177,7 @@ export function serverQuery(table: SlotTable, filters: SlotFilters): Record<stri
  */
 export function matchesFilters(facts: SlotFacts, filters: SlotFilters, mevCoveredTo = Infinity): boolean {
   if (filters.proposer !== undefined && facts.proposer?.index !== filters.proposer) return false;
-  if (filters.status && toStatus(facts.status) !== filters.status) return false;
+  if (filters.status && slotStatus(facts) !== filters.status) return false;
   if (filters.entity && !matchesEntity(facts.entity, filters.entity)) return false;
   if (filters.source === 'mev' && !facts.mev) return false;
   if (filters.source === 'local' && (facts.mev || !facts.block || facts.slot > mevCoveredTo)) return false;
@@ -206,6 +210,7 @@ export function applyRow(table: SlotTable, row: Record<string, unknown>, facts: 
 
   switch (table) {
     case 'proposer':
+    case 'canonical':
       entry.proposer = { index: num(row.proposer_validator_index), blockRoot: str(row.block_root) };
       break;
     case 'status': {
@@ -254,9 +259,7 @@ export function applyRow(table: SlotTable, row: Record<string, unknown>, facts: 
 
 /** The list row for a slot's facts; see `matchesFilters` for `mevCoveredTo` */
 export function toSlotRow(facts: SlotFacts, genesisTime: number, mevCoveredTo = Infinity): SlotRow {
-  const status: SlotStatus | null =
-    toStatus(facts.status) ??
-    (facts.proposer ? (facts.proposer.blockRoot ? 'proposed' : 'missed') : facts.block ? 'proposed' : null);
+  const status = slotStatus(facts);
   return {
     slot: facts.slot,
     epoch: Math.floor(facts.slot / SLOTS_PER_EPOCH),
@@ -283,6 +286,14 @@ export function toSlotRow(facts: SlotFacts, genesisTime: number, mevCoveredTo = 
 function toStatus(status: SlotFacts['status']): SlotStatus | null {
   if (status === 'canonical') return 'proposed';
   return status ?? null;
+}
+
+/** The finalized status, else what the proposer's block root or a block says */
+function slotStatus(facts: SlotFacts): SlotStatus | null {
+  return (
+    toStatus(facts.status) ??
+    (facts.proposer ? (facts.proposer.blockRoot ? 'proposed' : 'missed') : facts.block ? 'proposed' : null)
+  );
 }
 
 function matchesEntity(entity: string | null | undefined, filter: string): boolean {

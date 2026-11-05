@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
-import { slotToTimestamp } from '@/utils/beacon';
+import { useTableBounds } from '@/hooks/useBounds';
+import { slotToTimestamp, timestampToSlot } from '@/utils/beacon';
 import {
   fctBlockGraffitiServiceList,
   fctBlockHeadServiceList,
@@ -9,6 +10,7 @@ import {
   fctBlockProposerEntityServiceList,
   fctBlockProposerHeadServiceList,
   fctBlockProposerServiceList,
+  intBlockProposerCanonicalServiceList,
 } from '@/api/sdk.gen';
 import type { SlotFilters, SlotSort } from '../IndexPage.types';
 import {
@@ -40,6 +42,7 @@ type ListFn = (options: {
 
 const TABLES: Record<SlotTable, { list: ListFn; key: string }> = {
   proposer: { list: fctBlockProposerHeadServiceList as unknown as ListFn, key: 'fct_block_proposer_head' },
+  canonical: { list: intBlockProposerCanonicalServiceList as unknown as ListFn, key: 'int_block_proposer_canonical' },
   status: { list: fctBlockProposerServiceList as unknown as ListFn, key: 'fct_block_proposer' },
   entity: { list: fctBlockProposerEntityServiceList as unknown as ListFn, key: 'fct_block_proposer_entity' },
   block: { list: fctBlockHeadServiceList as unknown as ListFn, key: 'fct_block_head' },
@@ -113,21 +116,30 @@ export interface SlotsPageResult {
  * One page of the slot list. Pages through the driver table (see `chooseDriver`) with its own filters applied
  * server-side, joins the tables the other filters need, and keeps reading until the page is full, the data
  * ends or `MAX_BATCHES` requests have been made.
+ *
+ * `headStart` is the first slot of fct_block_proposer_head. In slot order, slots before it are read from
+ * int_block_proposer_canonical instead of the proposer and status tables, so the list reaches genesis.
  */
 export async function fetchSlotsPage(
   { filters, sort, dir, pageSize, cursor: cursorParam }: SlotsPageArgs,
   genesisTime: number,
   withPtc: boolean,
+  headStart?: number,
   signal?: AbortSignal
 ): Promise<SlotsPageResult> {
   const driver = chooseDriver(filters, sort);
   const joins = filterTables(filters).filter(table => table !== driver);
-  const batchSize = joins.length > 0 ? SCAN_BATCH : pageSize;
   const bounds = slotBounds(filters, genesisTime);
   const cursor = parseCursor(cursorParam);
   const facts = new Map<number, SlotFacts>();
   const matched: SlotFacts[] = [];
-  const base = serverQuery(driver, filters);
+  // The canonical table has no orphaned blocks, so an orphaned search ends where the status table does
+  const split =
+    sort === 'slot' &&
+    headStart !== undefined &&
+    (driver === 'proposer' || (driver === 'status' && filters.status !== 'orphaned'))
+      ? headStart
+      : undefined;
   // The MEV table trails the block table by a few slots; blocks past it are not yet known to be local
   const mevLatest = listRows(
     'mev',
@@ -141,20 +153,36 @@ export async function fetchSlotsPage(
 
   let lo = bounds.min ?? 0;
   let hi = bounds.max ?? Number.POSITIVE_INFINITY;
-  const timeQuery = (): Record<string, number> => ({
-    slot_start_date_time_gte: slotToTimestamp(lo, genesisTime),
-    ...(Number.isFinite(hi) && { slot_start_date_time_lte: slotToTimestamp(hi, genesisTime) }),
-  });
 
-  /** Fetch one driver batch, join it, and add the slots that pass every filter; returns the slots read */
-  const readBatch = async (query: Record<string, unknown>): Promise<{ slots: number[]; next?: string }> => {
-    const { rows, next } = await listRows(driver, { ...base, ...timeQuery(), ...query, page_size: batchSize }, signal);
+  /**
+   * Fetch one batch of `table` in slots `from` to `to`, and join it; returns the slots read. The canonical table
+   * stands in for the status table, whose status is then taken from the block root.
+   */
+  const readBatch = async (
+    table: SlotTable,
+    from: number,
+    to: number,
+    query: Record<string, unknown>
+  ): Promise<{ slots: number[]; next?: string }> => {
+    const tableJoins = table === 'canonical' ? joins.filter(join => join !== 'status') : joins;
+    const batchSize = tableJoins.length > 0 || (table === 'canonical' && filters.status) ? SCAN_BATCH : pageSize;
+    const { rows, next } = await listRows(
+      table,
+      {
+        ...serverQuery(table, filters),
+        slot_start_date_time_gte: slotToTimestamp(from, genesisTime),
+        ...(Number.isFinite(to) && { slot_start_date_time_lte: slotToTimestamp(to, genesisTime) }),
+        ...query,
+        page_size: batchSize,
+      },
+      signal
+    );
     const slots: number[] = [];
     for (const row of rows) {
-      applyRow(driver, row, facts);
+      applyRow(table, row, facts);
       if (typeof row.slot === 'number' && slots[slots.length - 1] !== row.slot) slots.push(row.slot);
     }
-    await loadFacts(slots, joins, genesisTime, facts, signal);
+    await loadFacts(slots, tableJoins, genesisTime, facts, signal);
     return { slots, next: rows.length < batchSize ? undefined : (next ?? 'more') };
   };
 
@@ -173,7 +201,14 @@ export async function fetchSlotsPage(
         exhausted = true;
         break;
       }
-      const { slots, next } = await readBatch({ order_by: `slot ${ascending ? 'asc' : 'desc'}` });
+      // Each read stays on one side of the split
+      const below = split !== undefined && (ascending ? lo < split : hi < split);
+      const { slots, next } = await readBatch(
+        below ? 'canonical' : driver,
+        split !== undefined && !below ? Math.max(lo, split) : lo,
+        split !== undefined && below ? Math.min(hi, split - 1) : hi,
+        { order_by: `slot ${ascending ? 'asc' : 'desc'}` }
+      );
       for (const slot of slots) {
         last = slot;
         if (passes(slot)) matched.push(facts.get(slot)!);
@@ -181,6 +216,12 @@ export async function fetchSlotsPage(
       }
       if (matched.length === pageSize) break;
       if (!next || last === undefined) {
+        // One side is done; carry on across the split if the range reaches past it
+        if (split !== undefined && (ascending ? below && hi >= split : !below && lo < split)) {
+          if (ascending) lo = split;
+          else hi = split - 1;
+          continue;
+        }
         exhausted = true;
         break;
       }
@@ -212,7 +253,7 @@ export async function fetchSlotsPage(
     let partial = false;
 
     for (let batch = 0; batch < MAX_BATCHES; batch++) {
-      const { slots, next } = await readBatch({
+      const { slots, next } = await readBatch(driver, lo, hi, {
         order_by: `${SORT_COLUMNS[sort]} ${dir}, slot desc`,
         ...(token && { page_token: token }),
       });
@@ -266,13 +307,16 @@ export interface UseSlotsPageReturn {
 export function useSlotsPage(args: SlotsPageArgs, withPtc: boolean): UseSlotsPageReturn {
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time;
+  const { data: headBounds, isLoading: boundsLoading } = useTableBounds('fct_block_proposer_head');
+  const headStart =
+    headBounds && genesisTime !== undefined ? Math.max(0, timestampToSlot(headBounds.min, genesisTime)) : undefined;
   const followsHead =
     args.sort === 'slot' && !args.cursor && args.filters.slotMax === undefined && !args.filters.timeEnd;
 
   const query = useQuery({
-    queryKey: ['slots-list', currentNetwork?.name, args, withPtc],
-    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, signal),
-    enabled: genesisTime !== undefined,
+    queryKey: ['slots-list', currentNetwork?.name, args, withPtc, headStart],
+    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, headStart, signal),
+    enabled: genesisTime !== undefined && !boundsLoading,
     placeholderData: keepPreviousData,
     refetchInterval: followsHead ? 12_000 : false,
     staleTime: followsHead ? 0 : 60_000,
