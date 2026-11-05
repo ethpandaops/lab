@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 
 import { Entity } from '@/components/Ethereum/Entity';
+import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { Card } from '@/components/Layout/Card';
 
 import type { EntityStake } from '../../hooks';
@@ -39,7 +40,11 @@ export function StakeMovers({ entities, window }: StakeMoversProps): JSX.Element
         <ul className="flex flex-col gap-1">
           {rows.map(e => (
             <li key={e.entity} className="flex items-center gap-3 text-sm/6">
-              <Entity entity={e.entity} className="w-36 shrink-0 truncate text-foreground sm:w-44" />
+              <Entity
+                entity={e.entity}
+                label={entityLabel(e.entity)}
+                className="w-36 shrink-0 truncate text-foreground sm:w-44"
+              />
               <span className="relative h-2.5 min-w-8 flex-1">
                 <span
                   className={`absolute inset-y-0 left-0 rounded-xs ${barClass}`}

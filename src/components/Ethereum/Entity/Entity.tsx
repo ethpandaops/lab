@@ -18,13 +18,13 @@ import type { EntityProps } from './Entity.types';
  * // With custom styling
  * <Entity entity="Lido" className="font-bold text-primary" />
  */
-export function Entity({ entity, noLink = false, className }: EntityProps): React.JSX.Element {
+export function Entity({ entity, label, noLink = false, className }: EntityProps): React.JSX.Element {
   if (!entity) {
     return <span className={clsx('text-muted', className)}>Unknown</span>;
   }
 
   if (noLink) {
-    return <span className={className}>{entity}</span>;
+    return <span className={className}>{label ?? entity}</span>;
   }
 
   return (
@@ -34,7 +34,7 @@ export function Entity({ entity, noLink = false, className }: EntityProps): Reac
       className={clsx('hover:underline', className)}
       onClick={event => event.stopPropagation()}
     >
-      {entity}
+      {label ?? entity}
     </Link>
   );
 }

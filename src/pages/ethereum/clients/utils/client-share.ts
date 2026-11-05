@@ -273,13 +273,29 @@ export function filterRecords(
 /** Entity name the validator counts give validators without a mapping */
 const UNKNOWN_ENTITY = 'unknown';
 
-/** Prefix that marks an entity filter value as a group: every entity whose name ends with the rest */
+/** Prefix that marks an entity filter value as a group, such as "*lido" */
 const GROUP_MARKER = '*';
 
-/** Entities split per node operator that can also be filtered as a whole, by name suffix */
-export const ENTITY_GROUPS: ReadonlyArray<{ suffix: string; label: string }> = [
-  { suffix: 'lido', label: 'Lido (all operators)' },
+/**
+ * Entities split per node operator that can also be read as a whole. An entity belongs to a group when its name
+ * contains the group id, the rule xatu-cbt's *_by_entity_group_daily tables use: for Lido that is lido itself, the
+ * *_lido operators, the csm_operator*_lido Community Staking operators and the lidox* Simple DVT clusters.
+ */
+export const ENTITY_GROUPS: ReadonlyArray<{ id: string; label: string; name: string }> = [
+  { id: 'lido', label: 'Lido (all operators)', name: 'Lido' },
 ];
+
+/** Whether an entity value names a group rather than one entity */
+export function isEntityGroup(entity: string): boolean {
+  return entity.startsWith(GROUP_MARKER);
+}
+
+/** The group value ("*lido") an entity belongs to, if any; a group belongs to none */
+export function entityGroupOf(entity: string): string | undefined {
+  if (isEntityGroup(entity)) return undefined;
+  const group = ENTITY_GROUPS.find(({ id }) => entity.includes(id));
+  return group && `${GROUP_MARKER}${group.id}`;
+}
 
 /** An entity to filter by, with its active validator count */
 export interface EntityOption {
@@ -291,19 +307,19 @@ export interface EntityOption {
 }
 
 /**
- * API filter for an entity filter value: an exact match, or a suffix match for a group.
+ * API filter for an entity filter value: an exact match, or every member of a group.
  */
-export function entityQuery(entity: string): { entity_eq: string } | { entity_ends_with: string } {
-  return entity.startsWith(GROUP_MARKER) ? { entity_ends_with: entity.slice(1) } : { entity_eq: entity };
+export function entityQuery(entity: string): { entity_eq: string } | { entity_contains: string } {
+  return isEntityGroup(entity) ? { entity_contains: entity.slice(1) } : { entity_eq: entity };
 }
 
 /**
  * Display name for an entity filter value.
  */
 export function entityLabel(entity: string): string {
-  if (!entity.startsWith(GROUP_MARKER)) return entity;
-  const suffix = entity.slice(1);
-  return ENTITY_GROUPS.find(group => group.suffix === suffix)?.label ?? entity;
+  if (!isEntityGroup(entity)) return entity;
+  const id = entity.slice(1);
+  return ENTITY_GROUPS.find(group => group.id === id)?.label ?? entity;
 }
 
 /**
@@ -328,11 +344,11 @@ export function toEntityOptions(
   }
 
   const options: EntityOption[] = [...latest.entries()].map(([entity, { validators }]) => ({ entity, validators }));
-  const groups = ENTITY_GROUPS.flatMap(({ suffix, label }) => {
-    const members = options.filter(option => option.entity.endsWith(suffix));
+  const groups = ENTITY_GROUPS.flatMap(({ id, label }) => {
+    const members = options.filter(option => entityGroupOf(option.entity) === `${GROUP_MARKER}${id}`);
     if (members.length < 2) return [];
     const validators = members.reduce((sum, member) => sum + member.validators, 0);
-    return [{ entity: `${GROUP_MARKER}${suffix}`, validators, label }];
+    return [{ entity: `${GROUP_MARKER}${id}`, validators, label }];
   });
 
   return [...groups, ...options].sort((a, b) => b.validators - a.validators || a.entity.localeCompare(b.entity));

@@ -6,6 +6,8 @@ export type EntitiesWindow = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 
 export const entitiesSearchSchema = z.object({
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
+  /** Lido's operators as separate entities; absent means grouped as one */
+  lido: z.enum(['operators']).optional().catch(undefined),
 });
 
 /** Days each window spans; `null` reaches back to genesis */

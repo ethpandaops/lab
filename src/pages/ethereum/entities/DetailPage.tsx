@@ -3,6 +3,7 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 
 import { Stats } from '@/components/DataDisplay/Stats';
+import { Entity } from '@/components/Ethereum/Entity';
 import { Alert } from '@/components/Feedback/Alert';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Card } from '@/components/Layout/Card';
@@ -19,10 +20,12 @@ import { Route } from '@/routes/ethereum/entities/$entity';
 import { EntityClients } from './components/EntityClients';
 import { EntityProposals } from './components/EntityProposals';
 import { EntityStakeChart } from './components';
+import { EntitiesTable } from './components/EntitiesTable';
 import { PerformanceStats } from './components/PerformanceStats';
 import { PerformanceTrend } from './components/PerformanceTrend';
 import { DETAIL_WINDOW_DAYS, DETAIL_WINDOW_OPTIONS, type DetailWindow } from './constants';
-import { useEntityPerformance, useEntityPerformanceHistory, useEntityStakeHistory } from './hooks';
+import { useEntityPerformance, useEntityPerformanceHistory, useEntityStake, useEntityStakeHistory } from './hooks';
+import { countsOf, entityGroupOf, entityLabel, isEntityGroup } from './utils/groups';
 import { formatPeriod, formatShare } from './utils/performance';
 
 /** The window as text, for subtitles */
@@ -58,9 +61,18 @@ export function DetailPage(): JSX.Element {
   const window: DetailWindow = t ?? '30d';
   const windowDays = DETAIL_WINDOW_DAYS[window];
 
+  const group = isEntityGroup(entity);
+  const parent = entityGroupOf(entity);
+  const label = entityLabel(entity);
   const stake = useEntityStakeHistory(entity);
   const performance = useEntityPerformance(window);
-  const own = performance.entities.get(entity);
+  const own = countsOf(performance.entities, entity);
+  // A group lists its operators, from the same stake snapshots as the overview
+  const operators = useEntityStake(window, group);
+  const members = useMemo(
+    () => operators.entities.filter(e => entityGroupOf(e.entity) === entity),
+    [operators.entities, entity]
+  );
   const history = useEntityPerformanceHistory(entity, performance.start, performance.end);
   const performanceWindow =
     performance.start !== undefined && performance.end !== undefined
@@ -103,7 +115,7 @@ export function DetailPage(): JSX.Element {
   if (stake.isLoading) {
     return (
       <Container>
-        <Header title={entityName} />
+        <Header title={label} />
         <LoadingContainer className="h-96" />
       </Container>
     );
@@ -112,7 +124,7 @@ export function DetailPage(): JSX.Element {
   if (stake.error) {
     return (
       <Container>
-        <Header title={entityName} />
+        <Header title={label} />
         <Alert variant="error" title="Could not load the entity" description={stake.error.message} />
       </Container>
     );
@@ -121,7 +133,7 @@ export function DetailPage(): JSX.Element {
   if (stake.days.length === 0) {
     return (
       <Container>
-        <Header title={entityName} />
+        <Header title={label} />
         <Alert variant="info" title="No validators for this entity" />
       </Container>
     );
@@ -131,7 +143,23 @@ export function DetailPage(): JSX.Element {
 
   return (
     <Container>
-      <Card title={entityName} subtitle={latest ? `On ${formatDayLabel(latest.day)}` : undefined}>
+      <Card
+        title={label}
+        subtitle={
+          <>
+            {latest && `On ${formatDayLabel(latest.day)}`}
+            {group &&
+              members.length > 0 &&
+              `, ${members.filter(m => m.validators > 0).length.toLocaleString()} operators`}
+            {parent && (
+              <>
+                {', operator of '}
+                <Entity entity={parent} label={entityLabel(parent)} className="text-primary" />
+              </>
+            )}
+          </>
+        }
+      >
         <Stats
           gridClassName="grid grid-cols-2"
           stats={[
@@ -173,12 +201,27 @@ export function DetailPage(): JSX.Element {
               )}
               {own && (
                 <PerformanceTrend
-                  entity={entityName}
+                  entity={label}
                   days={history.days}
                   own={history.entity}
                   network={history.network}
                   window={performanceWindow}
                   isLoading={history.isLoading}
+                />
+              )}
+              {group && members.length > 0 && (
+                <EntitiesTable
+                  title="Operators"
+                  entities={members}
+                  totalStakeEth={operators.totalStakeEth}
+                  performance={performance.entities}
+                  network={performance.network}
+                  stakeWindow={
+                    operators.startDay && operators.latestDay
+                      ? `${formatDayLabel(operators.startDay)} to ${formatDayLabel(operators.latestDay)}`
+                      : ''
+                  }
+                  performanceWindow={performanceWindow}
                 />
               )}
             </TabPanel>

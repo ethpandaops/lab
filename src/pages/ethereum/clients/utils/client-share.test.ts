@@ -175,20 +175,28 @@ describe('toEntityOptions', () => {
 });
 
 describe('entity groups', () => {
-  it('adds a group for entities sharing a suffix', () => {
+  it('adds a group for every entity whose name contains its id, Simple DVT clusters included', () => {
     const options = toEntityOptions([
       { day_start_date: '2026-10-20', entity: 'kiln_lido', validator_count: 50 },
       { day_start_date: '2026-10-20', entity: 'p2porg_lido', validator_count: 40 },
+      { day_start_date: '2026-10-20', entity: 'lidoxssv_aridanubis', validator_count: 7 },
       { day_start_date: '2026-10-20', entity: 'lido', validator_count: 5 },
       { day_start_date: '2026-10-20', entity: 'kiln', validator_count: 60 },
     ]);
-    expect(options[0]).toEqual({ entity: '*lido', validators: 95, label: 'Lido (all operators)' });
-    expect(options.map(o => o.entity)).toEqual(['*lido', 'kiln', 'kiln_lido', 'p2porg_lido', 'lido']);
+    expect(options[0]).toEqual({ entity: '*lido', validators: 102, label: 'Lido (all operators)' });
+    expect(options.map(o => o.entity)).toEqual([
+      '*lido',
+      'kiln',
+      'kiln_lido',
+      'p2porg_lido',
+      'lidoxssv_aridanubis',
+      'lido',
+    ]);
   });
 
   it('builds the API filter and label for a value', () => {
     expect(entityQuery('coinbase')).toEqual({ entity_eq: 'coinbase' });
-    expect(entityQuery('*lido')).toEqual({ entity_ends_with: 'lido' });
+    expect(entityQuery('*lido')).toEqual({ entity_contains: 'lido' });
     expect(entityLabel('coinbase')).toBe('coinbase');
     expect(entityLabel('*lido')).toBe('Lido (all operators)');
   });

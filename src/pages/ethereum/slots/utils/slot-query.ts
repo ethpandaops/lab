@@ -288,7 +288,7 @@ function toStatus(status: SlotFacts['status']): SlotStatus | null {
 function matchesEntity(entity: string | null | undefined, filter: string): boolean {
   if (!entity) return false;
   const query = entityQuery(filter);
-  return 'entity_eq' in query ? entity === query.entity_eq : entity.endsWith(query.entity_ends_with);
+  return 'entity_eq' in query ? entity === query.entity_eq : entity.includes(query.entity_contains);
 }
 
 function hasRange(min: number | undefined, max: number | undefined): boolean {

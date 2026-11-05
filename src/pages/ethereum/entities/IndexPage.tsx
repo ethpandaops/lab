@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 
 import { MultiLineChart, type MarkLineConfig } from '@/components/Charts/MultiLine';
@@ -24,7 +24,13 @@ import { StakeMovers } from './components/StakeMovers';
 import { AGGREGATE_ENTITIES, ENTITIES_WINDOW_OPTIONS, type EntitiesWindow } from './constants';
 import { useEntityPerformance, useEntityStake, useStakeShareHistory } from './hooks';
 import { dayOf, entitiesToReach } from './utils/overview';
+import { entityLabel, groupCounts, groupName, groupStakes } from './utils/groups';
 import { formatPeriod } from './utils/performance';
+
+const LIDO_OPTIONS = [
+  { value: 'grouped', label: 'As one entity' },
+  { value: 'operators', label: 'By operator' },
+] as const;
 
 /** Entities drawn as their own band in the stake share chart */
 const SHARE_CHART_ENTITIES = 10;
@@ -65,9 +71,16 @@ export function IndexPage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const { allForks } = useForks();
 
+  const grouped = search.lido !== 'operators';
   const stake = useEntityStake(window);
-  const { entities, totalStakeEth, firstDay, latestDay, startDay } = stake;
+  const { totalStakeEth, firstDay, latestDay, startDay } = stake;
   const performance = useEntityPerformance(window);
+  // With Lido grouped, its operators count as one entity everywhere below
+  const entities = useMemo(() => (grouped ? groupStakes(stake.entities) : stake.entities), [grouped, stake.entities]);
+  const counts = useMemo(
+    () => (grouped ? groupCounts(performance.entities) : performance.entities),
+    [grouped, performance.entities]
+  );
 
   // Named operators only: the aggregate buckets hold unrelated validators
   const named = entities.filter(e => e.validators > 0 && !AGGREGATE_ENTITIES.has(e.entity));
@@ -122,7 +135,7 @@ export function IndexPage(): JSX.Element {
     return shareMode === 'share' ? Number(((eth / total) * 100).toFixed(2)) : Math.round(eth);
   };
   const shareSeries = chartEntities.map((entity, i) => ({
-    name: entity,
+    name: entityLabel(entity),
     data: (history.byEntity.get(entity) ?? []).map(toValue),
     color: palette[i % palette.length],
     stack: 'stake',
@@ -136,15 +149,32 @@ export function IndexPage(): JSX.Element {
     <Container>
       <Header title="Entities" description="Who runs Ethereum's validators, and how well they perform" />
 
-      <SegmentedControl
-        options={ENTITIES_WINDOW_OPTIONS}
-        value={window}
-        onChange={value =>
-          navigate({ to: '/ethereum/entities', search: { ...search, t: value }, replace: true, resetScroll: false })
-        }
-        ariaLabel="Time range"
-        className="mb-6"
-      />
+      <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <SegmentedControl
+          options={ENTITIES_WINDOW_OPTIONS}
+          value={window}
+          onChange={value =>
+            navigate({ to: '/ethereum/entities', search: { ...search, t: value }, replace: true, resetScroll: false })
+          }
+          ariaLabel="Time range"
+        />
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted">Lido</span>
+          <SegmentedControl
+            options={LIDO_OPTIONS}
+            value={grouped ? 'grouped' : 'operators'}
+            onChange={value =>
+              navigate({
+                to: '/ethereum/entities',
+                search: { ...search, lido: value === 'grouped' ? undefined : value },
+                replace: true,
+                resetScroll: false,
+              })
+            }
+            ariaLabel="Lido"
+          />
+        </div>
+      </div>
 
       {stake.error && <Alert variant="error" title="Could not load entities" description={stake.error.message} />}
       {!stake.error && stake.isLoading && <EntitiesSkeleton />}
@@ -173,9 +203,9 @@ export function IndexPage(): JSX.Element {
                 {
                   id: 'largest',
                   name: 'Largest entity',
-                  value: largest.entity,
+                  value: groupName(largest.entity) ?? largest.entity,
                   valueClassName: 'truncate',
-                  subtitle: `${percent(largest.stakeEth / totalStakeEth)} of stake`,
+                  subtitle: `${groupName(largest.entity) ? 'All operators, ' : ''}${percent(largest.stakeEth / totalStakeEth)} of stake`,
                 },
                 {
                   id: 'top10',
@@ -255,7 +285,7 @@ export function IndexPage(): JSX.Element {
                 <PerformanceStats network={performance.network} />
                 <NetworkGap
                   entities={named.map(e => e.entity)}
-                  counts={performance.entities}
+                  counts={counts}
                   network={performance.network}
                   window={performanceWindow}
                 />
@@ -266,7 +296,7 @@ export function IndexPage(): JSX.Element {
           <EntitiesTable
             entities={entities}
             totalStakeEth={totalStakeEth}
-            performance={performance.entities}
+            performance={counts}
             network={performance.network}
             stakeWindow={stakeWindow}
             performanceWindow={performanceWindow}
