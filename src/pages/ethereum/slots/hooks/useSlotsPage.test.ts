@@ -35,6 +35,11 @@ function buildTables(): void {
     execution_payload_blob_gas_used: (slot % 7) * GAS_PER_BLOB,
     execution_payload_transactions_count: slot % 11,
   }));
+  // Finalized blocks, with an orphaned block beside the canonical one in slots ending in 5
+  tables.fct_block = blocks.flatMap(slot => [
+    ...(slot % 10 === 5 ? [{ ...at(slot), status: 'orphaned', execution_payload_transactions_count: 0 }] : []),
+    { ...at(slot), status: 'canonical', execution_payload_transactions_count: 100 + (slot % 11) },
+  ]);
   tables.fct_block_mev_head = blocks
     .filter(isMev)
     .map(slot => ({ ...at(slot), relay_names: [slot % 2 === 0 ? 'Aestus' : 'Flashbots'], builder_pubkey: '0xb' }));
@@ -89,6 +94,7 @@ vi.mock('@/api/sdk.gen', () => ({
   fctBlockProposerServiceList: list('fct_block_proposer'),
   fctBlockProposerEntityServiceList: list('fct_block_proposer_entity'),
   fctBlockHeadServiceList: list('fct_block_head'),
+  fctBlockServiceList: list('fct_block'),
   fctBlockMevHeadServiceList: list('fct_block_mev_head'),
   fctBlockGraffitiServiceList: list('fct_block_graffiti'),
   fctBlockPayloadPtcVoteHeadServiceList: list('fct_block_payload_ptc_vote_head'),
@@ -203,6 +209,27 @@ describe('fetchSlotsPage', () => {
     // Previous reads back up across the split
     const back = await fetchSlotsPage({ ...args({}), cursor: old.prevCursor }, 0, false, headStart);
     expect(back.rows.map(row => row.slot)).toEqual(slotsWhere(s => s >= 2010).slice(-25));
+  });
+
+  it('shows finalized blocks from fct_block and newer ones from fct_block_head', async () => {
+    const finalTo = 3900;
+    const txs = (rows: { slot: number; txCount: number | null }[]): [number, number | null][] =>
+      rows.map(row => [row.slot, row.txCount]);
+    const finalTxs = (slot: number): number => 100 + (slot % 11);
+
+    const head = await fetchSlotsPage({ ...args({}), cursor: undefined }, 0, false, undefined, finalTo);
+    expect(txs(head.rows)).toEqual(slotsWhere(s => s > LAST - 25).map(s => [s, isMissed(s) ? null : s % 11]));
+
+    const old = await fetchSlotsPage({ ...args({}), cursor: 'lt:2010' }, 0, false, undefined, finalTo);
+    expect(txs(old.rows)).toEqual(
+      slotsWhere(s => s < 2010)
+        .slice(0, 25)
+        .map(s => [s, isMissed(s) ? null : finalTxs(s)])
+    );
+
+    // Value sorts page through fct_block_head but still show the finalized block
+    const byGas = await fetchSlotsPage({ ...args({}, 'gas'), cursor: undefined }, 0, false, undefined, finalTo);
+    for (const row of byGas.rows) expect(row.txCount).toBe(row.slot <= finalTo ? finalTxs(row.slot) : row.slot % 11);
   });
 
   it('filters by blob count from the payload blob gas', async () => {
