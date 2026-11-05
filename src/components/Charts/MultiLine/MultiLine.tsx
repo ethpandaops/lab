@@ -21,7 +21,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
-import { dateCategoryTicks } from './MultiLine.utils';
+import { dateCategoryTicks, formatUtcTime, timeAxisTicks } from './MultiLine.utils';
 import { clientLogoHtml, formatAxisNumber } from '../chartChrome';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
@@ -132,6 +132,15 @@ function valueAxisBounds(
     scale: min === 'dataMin' || max === 'dataMax' ? true : undefined,
   };
 }
+/** Tooltip params of a time axis with each point turned back from the [y, x] it is plotted as into [x, y] */
+function toXyParams(params: unknown): unknown {
+  const swap = (p: unknown): unknown => {
+    const point = p as { value?: unknown } | null;
+    return point && Array.isArray(point.value) ? { ...point, value: [point.value[1], point.value[0]] } : p;
+  };
+  return Array.isArray(params) ? params.map(swap) : swap(params);
+}
+
 /** Narrowest chart (px) that gets end labels */
 const END_LABEL_MIN_WIDTH = 480;
 /** Minimum horizontal gap (px) between two shown mark-line labels */
@@ -525,16 +534,38 @@ export function MultiLineChart({
   // Memoize based on actual data that should trigger re-animation
   const option = useMemo(() => {
     // Build x-axis configuration
-    // For time axis, use 'value' type with Unix timestamps for proper crosshair sync
+    // A time axis takes Unix seconds and ticks on UTC calendar boundaries
     const isTimeAxis = xAxis.type === 'time';
-    const timeMin = isTimeAxis && xAxis.timestamps?.length ? Math.min(...xAxis.timestamps) : undefined;
-    const timeMax = isTimeAxis && xAxis.timestamps?.length ? Math.max(...xAxis.timestamps) : undefined;
+    const timeMin = isTimeAxis
+      ? typeof xAxis.min === 'number'
+        ? xAxis.min
+        : xAxis.timestamps?.length
+          ? Math.min(...xAxis.timestamps)
+          : undefined
+      : undefined;
+    const timeMax = isTimeAxis
+      ? typeof xAxis.max === 'number'
+        ? xAxis.max
+        : xAxis.timestamps?.length
+          ? Math.max(...xAxis.timestamps)
+          : undefined
+      : undefined;
 
-    // Default time formatter: "Jan 15" format
-    const defaultTimeFormatter = (ts: number): string => {
-      const d = new Date(ts * 1000);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-    };
+    // Plot area edges; charts that share a page pass the same grid so their plots line up
+    const gridLeft = grid ? (grid.left ?? 0) : 52;
+    const gridRight = grid ? (grid.right ?? 16) : secondaryYAxis ? 56 : 16;
+
+    // Time axes tick on UTC calendar boundaries of the window in view, so zooming in refines them
+    const timeTicks =
+      isTimeAxis && timeMin !== undefined && timeMax !== undefined
+        ? (() => {
+            const span = timeMax - timeMin;
+            const viewMin = timeMin + (span * zoomRange.start) / 100;
+            const viewMax = timeMin + (span * zoomRange.end) / 100;
+            return timeAxisTicks(viewMin, viewMax, Math.max((chartWidth || 800) - gridLeft - gridRight, 1));
+          })()
+        : null;
+    const timeTickLabels = timeTicks ? new Map(timeTicks.map(t => [t.value, t.label])) : null;
 
     const xAxisHasName = xAxis.type === 'value' && Boolean(xAxis.name);
     const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
@@ -554,6 +585,8 @@ export function MultiLineChart({
       everyCategoryLabel && Math.max(...categoryLabels.map(l => l.length)) * 6.6 > categoryWidth - 4;
 
     const xAxisConfig = {
+      // A value axis of seconds: ECharts 6 time axes can't take custom ticks (customValues ticks lack the
+      // time level its label formatting reads)
       type: isTimeAxis ? ('value' as const) : xAxis.type,
       // Dates and category labels describe themselves; only numeric axes keep a name
       name: xAxisHasName ? xAxis.name : undefined,
@@ -571,6 +604,7 @@ export function MultiLineChart({
         color: themeColors.muted,
         fontSize: 11,
         hideOverlap: !everyCategoryLabel,
+        ...(timeTicks ? { customValues: timeTicks.map(t => t.value) } : {}),
         // Hourly series repeat each day's label; show only the first point of each run
         interval: dateTicks
           ? (index: number): boolean => dateTicks.has(index)
@@ -581,15 +615,15 @@ export function MultiLineChart({
           xAxis.formatter ||
           (staggerLabels ? (value: string, index: number) => (index % 2 ? `\n${value}` : value) : undefined) ||
           (dateTicks ? (value: string, index: number) => dateTicks.get(index) ?? value : undefined) ||
-          (isTimeAxis ? defaultTimeFormatter : undefined) ||
+          (timeTickLabels ? (value: number) => timeTickLabels.get(value) ?? '' : undefined) ||
           (relativeSlots ? (value: number) => formatSlotLabel(value) : undefined),
       },
       splitLine: {
         show: false,
       },
-      min: isTimeAxis ? (xAxis.min ?? timeMin) : xAxis.type === 'value' ? xAxis.min : undefined,
-      max: isTimeAxis ? (xAxis.max ?? timeMax) : xAxis.type === 'value' ? xAxis.max : undefined,
-      interval: xAxis.type === 'category' ? undefined : xAxis.interval,
+      min: isTimeAxis ? timeMin : xAxis.type === 'value' ? xAxis.min : undefined,
+      max: isTimeAxis ? timeMax : xAxis.type === 'value' ? xAxis.max : undefined,
+      interval: xAxis.type === 'category' || isTimeAxis ? undefined : xAxis.interval,
     };
 
     // Build y-axis configuration (primary)
@@ -684,7 +718,14 @@ export function MultiLineChart({
       const baseConfig = {
         name: s.name,
         type: chartType as 'line' | 'bar',
-        data: s.data,
+        // On a value x-axis ECharts stacks the first numeric dimension of each point, which for [x, y]
+        // would be x; time-axis points go in as [y, x] so bands and share stacks stack y
+        ...(isTimeAxis
+          ? {
+              data: (s.data as unknown[]).map(point => (Array.isArray(point) ? [point[1], point[0]] : point)),
+              encode: { x: 1, y: 0 },
+            }
+          : { data: s.data }),
         smooth: s.smooth ?? false,
         step: s.step ?? false,
         connectNulls,
@@ -809,11 +850,11 @@ export function MultiLineChart({
     const visibleMarkLabels = new Set<number>();
     const mergedMarkLabels = new Map<number, string[]>();
     if (hasMarkLines) {
-      const plotWidth = Math.max((chartWidth || 800) - 52 - 16 - endLabelMargin, 1);
+      const plotWidth = Math.max((chartWidth || 800) - gridLeft - gridRight - endLabelMargin, 1);
       const categoryLabels = xAxis.type === 'category' ? xAxis.labels : undefined;
       const numericXs = markLines!.map(ml => Number(ml.xValue)).filter(Number.isFinite);
-      const xMin = Number(xAxis.min ?? (isTimeAxis ? timeMin : undefined) ?? Math.min(...numericXs));
-      const xMax = Number(xAxis.max ?? (isTimeAxis ? timeMax : undefined) ?? Math.max(...numericXs));
+      const xMin = Number((isTimeAxis ? timeMin : xAxis.min) ?? Math.min(...numericXs));
+      const xMax = Number((isTimeAxis ? timeMax : xAxis.max) ?? Math.max(...numericXs));
       const fraction = (value: number | string): number | null => {
         if (categoryLabels) {
           const index = categoryLabels.indexOf(String(value));
@@ -970,9 +1011,11 @@ export function MultiLineChart({
               if (firstPoint.axisValue !== undefined) {
                 const axisLabel =
                   typeof firstPoint.axisValue === 'number'
-                    ? relativeSlots
-                      ? formatSlotTooltip(firstPoint.axisValue)
-                      : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
+                    ? isTimeAxis
+                      ? formatUtcTime(firstPoint.axisValue)
+                      : relativeSlots
+                        ? formatSlotTooltip(firstPoint.axisValue)
+                        : formatSmartDecimal(firstPoint.axisValue, 0) // 0 decimals = integers only
                     : firstPoint.axisValue;
                 html += `<div style="margin-bottom: 4px; font-weight: 600;">${axisLabel}</div>`;
               }
@@ -1080,7 +1123,9 @@ export function MultiLineChart({
               snap: true, // Snap to data points for better step chart interaction
             }
           : undefined,
-      formatter: tooltipFormatter || defaultTooltipFormatter,
+      formatter: isTimeAxis
+        ? (params: unknown) => (tooltipFormatter || defaultTooltipFormatter)?.(toXyParams(params)) ?? ''
+        : tooltipFormatter || defaultTooltipFormatter,
       appendToBody: true, // Render tooltip in document body to prevent container clipping
     };
 

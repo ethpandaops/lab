@@ -128,12 +128,14 @@ function titleCase(name: string): string {
 export interface ForkMarkLinesOptions {
   /** All forks from useForks() */
   forks: ForkInfo[];
-  /** Chart x-axis labels (formatted date strings) */
-  labels: string[];
+  /** Chart x-axis labels (formatted date strings), for a category axis */
+  labels?: string[];
+  /** Domain of a time axis, [min, max] in Unix seconds; marks then sit at their exact time */
+  range?: [number, number];
   /** Network genesis time (seconds) */
   genesisTime: number;
   /** Whether chart uses daily (true) or hourly (false) format */
-  isDaily: boolean;
+  isDaily?: boolean;
   /** Optional: filter to specific fork names */
   includeForks?: string[];
 }
@@ -160,10 +162,24 @@ function formatDateLabel(date: Date): string {
   return `${month} ${day} '${year}`;
 }
 
-export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConfig[] {
-  const { forks, labels, genesisTime, includeForks } = options;
+/**
+ * Where a mark at `timestamp` (seconds) goes: its exact time on a time axis whose range holds it, or
+ * its date label on a category axis that has that label; null when the chart doesn't cover it
+ */
+function markX(
+  timestamp: number,
+  labels: string[] | undefined,
+  range: [number, number] | undefined
+): number | string | null {
+  if (range) return timestamp >= range[0] && timestamp <= range[1] ? timestamp : null;
+  const label = formatDateLabel(new Date(timestamp * 1000));
+  return labels?.includes(label) ? label : null;
+}
 
-  if (!forks.length || !labels.length) return [];
+export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConfig[] {
+  const { forks, labels, range, genesisTime, includeForks } = options;
+
+  if (!forks.length || (!labels?.length && !range)) return [];
 
   const markLines: MarkLineConfig[] = [];
 
@@ -176,15 +192,11 @@ export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConf
 
     // Convert fork epoch to timestamp
     const forkTimestamp = epochToTimestamp(fork.epoch, genesisTime);
-    const forkDate = new Date(forkTimestamp * 1000);
+    const xValue = markX(forkTimestamp, labels, range);
 
-    // Format to match chart label format: "Jan 15 '24"
-    const forkLabel = formatDateLabel(forkDate);
-
-    // Check if this label exists in chart range
-    if (labels.includes(forkLabel)) {
+    if (xValue !== null) {
       markLines.push({
-        xValue: forkLabel,
+        xValue,
         label: fork.combinedName ? titleCase(fork.combinedName) : fork.displayName,
         labelPosition: 'end',
         color: getDataVizColors().DATA_COLORS.violet, // Violet for consensus forks
@@ -200,8 +212,10 @@ export function createForkMarkLines(options: ForkMarkLinesOptions): MarkLineConf
 export interface ExecutionForkMarkLinesOptions {
   /** Execution forks from network.forks.execution */
   executionForks: ExecutionForks;
-  /** Chart x-axis labels (formatted date strings) */
-  labels: string[];
+  /** Chart x-axis labels (formatted date strings), for a category axis */
+  labels?: string[];
+  /** Domain of a time axis, [min, max] in Unix seconds; marks then sit at their exact time */
+  range?: [number, number];
 }
 
 /**
@@ -216,9 +230,9 @@ export interface ExecutionForkMarkLinesOptions {
  * });
  */
 export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOptions): MarkLineConfig[] {
-  const { executionForks, labels } = options;
+  const { executionForks, labels, range } = options;
 
-  if (!executionForks || !labels.length) return [];
+  if (!executionForks || (!labels?.length && !range)) return [];
 
   const markLines: MarkLineConfig[] = [];
 
@@ -228,18 +242,14 @@ export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOpti
   for (const [forkName, forkData] of Object.entries(executionForks)) {
     if (!forkData || skipForks.has(forkName)) continue;
 
-    const forkDate = new Date(forkData.timestamp * 1000);
+    const xValue = markX(forkData.timestamp, labels, range);
 
-    // Format to match chart label format: "Jan 15 '24"
-    const forkLabel = formatDateLabel(forkDate);
-
-    // Check if this label exists in chart range
-    if (labels.includes(forkLabel)) {
+    if (xValue !== null) {
       // snake_case to Title Case (e.g., "tangerine_whistle" -> "Tangerine Whistle")
       const displayName = forkName === 'dao' ? 'DAO' : titleCase(forkName.replace(/_/g, ' '));
 
       markLines.push({
-        xValue: forkLabel,
+        xValue,
         label: displayName,
         labelPosition: 'end',
         color: getDataVizColors().DATA_COLORS.amber, // Amber for execution forks
@@ -255,8 +265,10 @@ export function createExecutionForkMarkLines(options: ExecutionForkMarkLinesOpti
 export interface BlobScheduleMarkLinesOptions {
   /** Blob schedule items from network.blob_schedule */
   blobSchedule: BlobScheduleItem[];
-  /** Chart x-axis labels (formatted date strings) */
-  labels: string[];
+  /** Chart x-axis labels (formatted date strings), for a category axis */
+  labels?: string[];
+  /** Domain of a time axis, [min, max] in Unix seconds; marks then sit at their exact time */
+  range?: [number, number];
   /** Network genesis time (seconds) */
   genesisTime: number;
 }
@@ -274,9 +286,9 @@ export interface BlobScheduleMarkLinesOptions {
  * });
  */
 export function createBlobScheduleMarkLines(options: BlobScheduleMarkLinesOptions): MarkLineConfig[] {
-  const { blobSchedule, labels, genesisTime } = options;
+  const { blobSchedule, labels, range, genesisTime } = options;
 
-  if (!blobSchedule?.length || !labels.length) return [];
+  if (!blobSchedule?.length || (!labels?.length && !range)) return [];
 
   const markLines: MarkLineConfig[] = [];
 
@@ -286,15 +298,11 @@ export function createBlobScheduleMarkLines(options: BlobScheduleMarkLinesOption
   sortedSchedule.forEach((item, index) => {
     // Convert epoch to timestamp
     const timestamp = epochToTimestamp(item.epoch, genesisTime);
-    const blobDate = new Date(timestamp * 1000);
+    const xValue = markX(timestamp, labels, range);
 
-    // Format to match chart label format: "Jan 15 '24"
-    const blobLabel = formatDateLabel(blobDate);
-
-    // Check if this label exists in chart range
-    if (labels.includes(blobLabel)) {
+    if (xValue !== null) {
       markLines.push({
-        xValue: blobLabel,
+        xValue,
         label: `BPO${index + 1}`,
         labelPosition: 'end',
         color: getDataVizColors().DATA_COLORS.emerald, // Emerald for blob schedule
@@ -387,4 +395,100 @@ export function dateCategoryTicks(labels: string[], maxTicks: number): Map<numbe
     );
   });
   return ticks;
+}
+
+const DAY_SECONDS = 86_400;
+/** Unix day number of Monday 1970-01-05, the first Monday after the epoch */
+const FIRST_MONDAY = 4;
+
+/** Calendar unit for time-axis ticks, with the multiples it may step by when labels don't fit */
+const TIME_TICK_UNITS = [
+  { unit: 'day', maxSpanDays: 14, steps: [1, 2, 3] },
+  { unit: 'week', maxSpanDays: 120, steps: [1, 2, 4] },
+  { unit: 'month', maxSpanDays: 1_000, steps: [1, 2, 3, 6] },
+  { unit: 'year', maxSpanDays: Infinity, steps: [1, 2, 5, 10] },
+] as const;
+
+/** A tick on a time axis: Unix seconds and its label */
+export interface TimeAxisTick {
+  value: number;
+  label: string;
+}
+
+/**
+ * Calendar ticks, in UTC, for a time axis of Unix seconds from `min` to `max`. The unit follows the
+ * span: days up to two weeks, Monday-start weeks up to about four months, months up to about
+ * three years, years beyond. When the labels would not fit `plotWidth` pixels, ticks step by a
+ * multiple of the unit (2 weeks, a quarter, 5 years), aligned to the calendar so every chart with the
+ * same domain ticks at the same places. Labels carry the year only when the window spans more than
+ * one calendar year: on the first tick and the first tick of each new year ("Dec 29 2025",
+ * "Jan 5 2026"), and as the label of each January on a month axis ("2026").
+ */
+export function timeAxisTicks(min: number, max: number, plotWidth: number): TimeAxisTick[] {
+  if (!(max > min)) return [];
+  const spanDays = (max - min) / DAY_SECONDS;
+  const { unit, steps } = TIME_TICK_UNITS.find(u => spanDays <= u.maxSpanDays)!;
+  const spansYears = new Date(min * 1000).getUTCFullYear() !== new Date(max * 1000).getUTCFullYear();
+
+  /** Tick times for a step of `step` units */
+  const tickTimes = (step: number): number[] => {
+    const times: number[] = [];
+    if (unit === 'day' || unit === 'week') {
+      const stepDays = unit === 'day' ? step : step * 7;
+      const anchor = unit === 'day' ? 0 : FIRST_MONDAY;
+      let day = Math.ceil(min / DAY_SECONDS);
+      day += (((anchor - day) % stepDays) + stepDays) % stepDays;
+      for (; day * DAY_SECONDS <= max; day += stepDays) times.push(day * DAY_SECONDS);
+      return times;
+    }
+    const start = new Date(min * 1000);
+    if (unit === 'month') {
+      let month = start.getUTCFullYear() * 12 + start.getUTCMonth();
+      if (Date.UTC(Math.floor(month / 12), month % 12, 1) / 1000 < min) month++;
+      month += (step - (month % step)) % step;
+      for (; ; month += step) {
+        const t = Date.UTC(Math.floor(month / 12), month % 12, 1) / 1000;
+        if (t > max) break;
+        times.push(t);
+      }
+      return times;
+    }
+    let year = start.getUTCFullYear();
+    if (Date.UTC(year, 0, 1) / 1000 < min) year++;
+    year += (step - (year % step)) % step;
+    for (; Date.UTC(year, 0, 1) / 1000 <= max; year += step) times.push(Date.UTC(year, 0, 1) / 1000);
+    return times;
+  };
+
+  const label = (t: number, index: number, previous: number | undefined): string => {
+    const d = new Date(t * 1000);
+    const year = d.getUTCFullYear();
+    const month = MONTHS[d.getUTCMonth()];
+    if (unit === 'year') return String(year);
+    const newYear =
+      spansYears && (index === 0 || previous === undefined || new Date(previous * 1000).getUTCFullYear() !== year);
+    if (unit === 'month') {
+      if (d.getUTCMonth() === 0) return String(year);
+      return newYear ? `${month} ${year}` : month;
+    }
+    return newYear ? `${month} ${d.getUTCDate()} ${year}` : `${month} ${d.getUTCDate()}`;
+  };
+
+  let ticks: TimeAxisTick[] = [];
+  for (const step of steps) {
+    const times = tickTimes(step);
+    ticks = times.map((t, i) => ({ value: t, label: label(t, i, times[i - 1]) }));
+    // About 6.6px per character at 11px, plus a gap between neighbours
+    const width = ticks.reduce((sum, t) => sum + t.label.length * 6.6 + 16, 0);
+    if (width <= plotWidth) break;
+  }
+  return ticks;
+}
+
+/** A Unix-seconds time as a UTC date, with the hour when it is not midnight: "Nov 4, 2026" or "Nov 4, 2026 13:00 UTC" */
+export function formatUtcTime(seconds: number): string {
+  const d = new Date(seconds * 1000);
+  const date = `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  if (seconds % DAY_SECONDS === 0) return date;
+  return `${date} ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')} UTC`;
 }

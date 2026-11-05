@@ -1,7 +1,8 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
-import { completeBucketEnd, currentUtcDate } from '@/utils/time';
+import clsx from 'clsx';
 import { useSearch, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
@@ -11,23 +12,28 @@ import {
   createBlobScheduleMarkLines,
   createExecutionForkMarkLines,
   createForkMarkLines,
+  type MultiLineChartProps,
 } from '@/components/Charts/MultiLine';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useForks } from '@/hooks/useForks';
 import { Toggle } from '@/components/Forms/Toggle';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import {
-  fctExecutionTpsHourlyServiceListOptions,
-  fctExecutionTpsDailyServiceListOptions,
-  fctExecutionGasUsedHourlyServiceListOptions,
-  fctExecutionGasUsedDailyServiceListOptions,
-  fctExecutionGasLimitHourlyServiceListOptions,
-  fctExecutionGasLimitDailyServiceListOptions,
-  fctExecutionGasLimitSignallingHourlyServiceListOptions,
-  fctExecutionGasLimitSignallingDailyServiceListOptions,
-  fctExecutionTransactionsHourlyServiceListOptions,
-  fctExecutionTransactionsDailyServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
+  fctExecutionTpsHourlyServiceList,
+  fctExecutionTpsDailyServiceList,
+  fctExecutionGasUsedHourlyServiceList,
+  fctExecutionGasUsedDailyServiceList,
+  fctExecutionGasLimitHourlyServiceList,
+  fctExecutionGasLimitDailyServiceList,
+  fctExecutionGasLimitSignallingHourlyServiceList,
+  fctExecutionGasLimitSignallingDailyServiceList,
+  fctExecutionTransactionsHourlyServiceList,
+  fctExecutionTransactionsDailyServiceList,
+  fctExecutionReceiptSizeHourlyServiceList,
+  fctExecutionReceiptSizeDailyServiceList,
+  fctOpcodeOpsHourlyServiceList,
+  fctOpcodeOpsDailyServiceList,
+} from '@/api/sdk.gen';
 import type {
   FctExecutionTpsHourly,
   FctExecutionTpsDaily,
@@ -39,271 +45,541 @@ import type {
   FctExecutionGasLimitSignallingDaily,
   FctExecutionTransactionsHourly,
   FctExecutionTransactionsDaily,
+  FctExecutionReceiptSizeHourly,
+  FctExecutionReceiptSizeDaily,
+  FctOpcodeOpsHourly,
+  FctOpcodeOpsDaily,
 } from '@/api/types.gen';
+import { hexToRgba } from '@/utils';
+import { getDataVizColors } from '@/utils/dataVizColors';
 import { ExecutionOverviewSkeleton } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, GAS_BANDS } from './constants';
 import {
-  fillTimeKeys,
-  formatTooltipDate,
+  FIRST_BLOCK_DAY,
+  buildSignallingSeries,
+  buildStatSeries,
   buildTooltipHtml,
-  formatTpsBand,
-  formatGas,
-  formatGasBand,
-  formatCumulativeGas,
-  formatCompact,
+  bucketSeconds,
   formatBigNum,
-  buildTpsChartConfig,
-  buildGasChartConfig,
-  buildSignallingChartConfig,
-  buildTransactionsChartConfig,
+  formatBucket,
+  formatBytesDecimal,
+  formatCompact,
+  formatCumulativeGas,
+  periodOps,
   periodTps,
-  type TooltipItem,
+  rowTime,
+  statTooltipSections,
+  timedRows,
+  tooltipTime,
   type TooltipSection,
 } from './overview.utils';
-import { hexToRgba } from '@/utils';
-import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
 
+const DAY_SECONDS = 86_400;
+
 /**
- * IndexPage - Execution Overview page showing TPS, Gas Used, and Gas Limit charts
+ * Every chart on the page draws its plot between the same edges, so the time axes, fork lines and the
+ * shared crosshair line up from one chart to the next. The right edge leaves room for a secondary axis.
+ */
+const CHART_GRID = { left: 52, right: 56, top: 32, bottom: 28 };
+
+/** Compact labels for a cumulative axis */
+function formatCumulativeAxis(val: number): string {
+  if (val >= 1e18) return `${(val / 1e18).toFixed(1)}E`;
+  if (val >= 1e15) return `${(val / 1e15).toFixed(1)}P`;
+  if (val >= 1e12) return `${(val / 1e12).toFixed(1)}T`;
+  if (val >= 1e9) return `${(val / 1e9).toFixed(1)}B`;
+  if (val >= 1e6) return `${(val / 1e6).toFixed(0)}M`;
+  if (val >= 1e3) return `${(val / 1e3).toFixed(0)}K`;
+  return String(val);
+}
+
+/** Rows of every table the page charts, for one time period */
+interface OverviewData {
+  period: TimePeriod;
+  tps?: (FctExecutionTpsHourly | FctExecutionTpsDaily)[];
+  gasUsed?: (FctExecutionGasUsedHourly | FctExecutionGasUsedDaily)[];
+  gasLimit?: (FctExecutionGasLimitHourly | FctExecutionGasLimitDaily)[];
+  transactions?: (FctExecutionTransactionsHourly | FctExecutionTransactionsDaily)[];
+  receiptSize?: (FctExecutionReceiptSizeHourly | FctExecutionReceiptSizeDaily)[];
+  opcodeOps?: (FctOpcodeOpsHourly | FctOpcodeOpsDaily)[];
+  signalling?: (FctExecutionGasLimitSignallingHourly | FctExecutionGasLimitSignallingDaily)[];
+  /** Newest signalling row before the period in progress, wherever the window ends */
+  signallingLatest?: FctExecutionGasLimitSignallingHourly | FctExecutionGasLimitSignallingDaily;
+}
+
+/**
+ * Reads every table the page charts for one time period, in parallel. Hourly periods read the
+ * complete hours of the window; daily periods read complete UTC days, up to but never including today.
+ */
+async function fetchOverview(period: TimePeriod, signal: AbortSignal): Promise<OverviewData> {
+  const config = TIME_RANGE_CONFIG[period];
+  const hourlyEnd = completeBucketEnd('hour');
+  const today = currentUtcDate();
+  const hourly = {
+    hour_start_date_time_gte: hourlyEnd - (config.days ?? 0) * DAY_SECONDS,
+    hour_start_date_time_lt: hourlyEnd,
+    order_by: 'hour_start_date_time asc',
+    page_size: config.pageSize,
+  };
+  const daily = { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize };
+  const latestHour = { hour_start_date_time_lt: hourlyEnd, order_by: 'hour_start_date_time desc', page_size: 1 };
+  const latestDay = { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: 1 };
+  const opts = { signal, throwOnError: true as const };
+
+  if (config.dataType === 'daily') {
+    const [tps, gasUsed, gasLimit, transactions, receiptSize, opcodeOps, signalling, signallingLatest] =
+      await Promise.all([
+        fctExecutionTpsDailyServiceList({ query: daily, ...opts }).then(r => r.data.fct_execution_tps_daily),
+        fctExecutionGasUsedDailyServiceList({ query: daily, ...opts }).then(r => r.data.fct_execution_gas_used_daily),
+        fctExecutionGasLimitDailyServiceList({ query: daily, ...opts }).then(r => r.data.fct_execution_gas_limit_daily),
+        fctExecutionTransactionsDailyServiceList({ query: daily, ...opts }).then(
+          r => r.data.fct_execution_transactions_daily
+        ),
+        fctExecutionReceiptSizeDailyServiceList({ query: daily, ...opts }).then(
+          r => r.data.fct_execution_receipt_size_daily
+        ),
+        fctOpcodeOpsDailyServiceList({ query: daily, ...opts }).then(r => r.data.fct_opcode_ops_daily),
+        fctExecutionGasLimitSignallingDailyServiceList({ query: daily, ...opts }).then(
+          r => r.data.fct_execution_gas_limit_signalling_daily
+        ),
+        fctExecutionGasLimitSignallingDailyServiceList({ query: latestDay, ...opts }).then(
+          r => r.data.fct_execution_gas_limit_signalling_daily?.[0]
+        ),
+      ]);
+    return { period, tps, gasUsed, gasLimit, transactions, receiptSize, opcodeOps, signalling, signallingLatest };
+  }
+
+  const [tps, gasUsed, gasLimit, transactions, receiptSize, opcodeOps, signalling, signallingLatest] =
+    await Promise.all([
+      fctExecutionTpsHourlyServiceList({ query: hourly, ...opts }).then(r => r.data.fct_execution_tps_hourly),
+      fctExecutionGasUsedHourlyServiceList({ query: hourly, ...opts }).then(r => r.data.fct_execution_gas_used_hourly),
+      fctExecutionGasLimitHourlyServiceList({ query: hourly, ...opts }).then(
+        r => r.data.fct_execution_gas_limit_hourly
+      ),
+      fctExecutionTransactionsHourlyServiceList({ query: hourly, ...opts }).then(
+        r => r.data.fct_execution_transactions_hourly
+      ),
+      fctExecutionReceiptSizeHourlyServiceList({ query: hourly, ...opts }).then(
+        r => r.data.fct_execution_receipt_size_hourly
+      ),
+      fctOpcodeOpsHourlyServiceList({ query: hourly, ...opts }).then(r => r.data.fct_opcode_ops_hourly),
+      fctExecutionGasLimitSignallingHourlyServiceList({ query: hourly, ...opts }).then(
+        r => r.data.fct_execution_gas_limit_signalling_hourly
+      ),
+      fctExecutionGasLimitSignallingHourlyServiceList({ query: latestHour, ...opts }).then(
+        r => r.data.fct_execution_gas_limit_signalling_hourly?.[0]
+      ),
+    ]);
+  return { period, tps, gasUsed, gasLimit, transactions, receiptSize, opcodeOps, signalling, signallingLatest };
+}
+
+/**
+ * IndexPage - Execution Overview: throughput and per-block charts on one shared time axis
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/execution/overview' });
   const { t } = useSearch({ from: '/ethereum/execution/overview' });
   const timePeriod: TimePeriod = t ?? 'all';
   const [showAnnotations, setShowAnnotations] = useState(true);
-  const config = TIME_RANGE_CONFIG[timePeriod];
-  const isDaily = config.dataType === 'daily';
 
   const { currentNetwork } = useNetwork();
   const { allForks } = useForks();
 
-  // Rollups are read up to the hour or UTC day in progress, never including it
-  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
-  const today = useMemo(() => currentUtcDate(), []);
-  const startTimestamp = config.days === null ? undefined : hourlyEnd - config.days * 24 * 60 * 60;
-
-  // TPS Queries
-  const tpsHourlyQuery = useQuery({
-    ...fctExecutionTpsHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
-    enabled: !isDaily,
+  // One query for every table, so a range change keeps the previous range's charts, complete and
+  // consistent, on screen until the new range has loaded; the page doesn't collapse and jump
+  const query = useQuery({
+    queryKey: ['execution-overview', currentNetwork?.name, timePeriod],
+    queryFn: ({ signal }) => fetchOverview(timePeriod, signal),
+    placeholderData: keepPreviousData,
+    enabled: !!currentNetwork,
   });
+  const data = query.data;
 
-  const tpsDailyQuery = useQuery({
-    ...fctExecutionTpsDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
+  // Everything below describes the period of the data on screen, which lags the selection while it loads
+  const shownPeriod = data?.period ?? timePeriod;
+  const config = TIME_RANGE_CONFIG[shownPeriod];
+  const isDaily = config.dataType === 'daily';
+  const bucket = bucketSeconds(isDaily);
+
+  const rows = useMemo(
+    () => ({
+      tps: timedRows(data?.tps, bucket),
+      gasUsed: timedRows(data?.gasUsed, bucket),
+      gasLimit: timedRows(data?.gasLimit, bucket),
+      transactions: timedRows(data?.transactions, bucket),
+      receiptSize: timedRows(data?.receiptSize, bucket),
+      opcodeOps: timedRows(data?.opcodeOps, bucket),
+      signalling: timedRows(data?.signalling, bucket),
     }),
-    enabled: isDaily,
-  });
-
-  // Gas Used Queries
-  const gasHourlyQuery = useQuery({
-    ...fctExecutionGasUsedHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
-    enabled: !isDaily,
-  });
-
-  const gasDailyQuery = useQuery({
-    ...fctExecutionGasUsedDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-    }),
-    enabled: isDaily,
-  });
-
-  // Gas Limit Queries
-  const gasLimitHourlyQuery = useQuery({
-    ...fctExecutionGasLimitHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
-    enabled: !isDaily,
-  });
-
-  const gasLimitDailyQuery = useQuery({
-    ...fctExecutionGasLimitDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-    }),
-    enabled: isDaily,
-  });
-
-  // Gas Limit Signalling Queries
-  const signallingHourlyQuery = useQuery({
-    ...fctExecutionGasLimitSignallingHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
-    enabled: !isDaily,
-  });
-
-  const signallingDailyQuery = useQuery({
-    ...fctExecutionGasLimitSignallingDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-    }),
-    enabled: isDaily,
-  });
-
-  // Latest signalling row, to show where its data ends when it stops before the other charts
-  const signallingLatestHourlyQuery = useQuery({
-    ...fctExecutionGasLimitSignallingHourlyServiceListOptions({
-      query: { hour_start_date_time_lt: hourlyEnd, order_by: 'hour_start_date_time desc', page_size: 1 },
-    }),
-    enabled: !isDaily,
-  });
-
-  const signallingLatestDailyQuery = useQuery({
-    ...fctExecutionGasLimitSignallingDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: 1 },
-    }),
-    enabled: isDaily,
-  });
-
-  // Transactions Queries
-  const transactionsHourlyQuery = useQuery({
-    ...fctExecutionTransactionsHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: config.pageSize,
-      },
-    }),
-    enabled: !isDaily,
-  });
-
-  const transactionsDailyQuery = useQuery({
-    ...fctExecutionTransactionsDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
-    }),
-    enabled: isDaily,
-  });
-
-  // Memoize record arrays to prevent unnecessary recomputes
-  const tpsRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(tpsDailyQuery.data?.fct_execution_tps_daily ?? [])].reverse()
-        : tpsHourlyQuery.data?.fct_execution_tps_hourly,
-    [isDaily, tpsDailyQuery.data, tpsHourlyQuery.data]
+    [data, bucket]
   );
 
-  const gasRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(gasDailyQuery.data?.fct_execution_gas_used_daily ?? [])].reverse()
-        : gasHourlyQuery.data?.fct_execution_gas_used_hourly,
-    [isDaily, gasDailyQuery.data, gasHourlyQuery.data]
-  );
-
-  const gasLimitRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(gasLimitDailyQuery.data?.fct_execution_gas_limit_daily ?? [])].reverse()
-        : gasLimitHourlyQuery.data?.fct_execution_gas_limit_hourly,
-    [isDaily, gasLimitDailyQuery.data, gasLimitHourlyQuery.data]
-  );
-
-  const transactionsRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(transactionsDailyQuery.data?.fct_execution_transactions_daily ?? [])].reverse()
-        : transactionsHourlyQuery.data?.fct_execution_transactions_hourly,
-    [isDaily, transactionsDailyQuery.data, transactionsHourlyQuery.data]
-  );
-
-  const signallingRecords = useMemo(
-    () =>
-      isDaily
-        ? [...(signallingDailyQuery.data?.fct_execution_gas_limit_signalling_daily ?? [])].reverse()
-        : signallingHourlyQuery.data?.fct_execution_gas_limit_signalling_hourly,
-    [isDaily, signallingDailyQuery.data, signallingHourlyQuery.data]
-  );
-
-  // Compute unified time keys for synchronized chart labels
-  const unifiedTimeKeys = useMemo(() => {
-    const allKeys = new Set<string>();
-
+  // The time axis every chart shares: the selected window, or for All from the earliest row of any chart.
+  // Points sit at the start of their hour or day, so the axis ends at the last complete one.
+  const domain = useMemo((): [number, number] | null => {
+    if (!data) return null;
     if (!isDaily) {
-      (tpsRecords as FctExecutionTpsHourly[] | undefined)?.forEach(r =>
-        allKeys.add(String(r.hour_start_date_time ?? ''))
-      );
-      (gasRecords as FctExecutionGasUsedHourly[] | undefined)?.forEach(r =>
-        allKeys.add(String(r.hour_start_date_time ?? ''))
-      );
-      (signallingRecords as FctExecutionGasLimitSignallingHourly[] | undefined)?.forEach(r =>
-        allKeys.add(String(r.hour_start_date_time ?? ''))
-      );
-      (transactionsRecords as FctExecutionTransactionsHourly[] | undefined)?.forEach(r =>
-        allKeys.add(String(r.hour_start_date_time ?? ''))
-      );
-    } else {
-      (tpsRecords as FctExecutionTpsDaily[] | undefined)?.forEach(r => allKeys.add(r.day_start_date ?? ''));
-      (gasRecords as FctExecutionGasUsedDaily[] | undefined)?.forEach(r => allKeys.add(r.day_start_date ?? ''));
-      (signallingRecords as FctExecutionGasLimitSignallingDaily[] | undefined)?.forEach(r =>
-        allKeys.add(r.day_start_date ?? '')
-      );
-      (transactionsRecords as FctExecutionTransactionsDaily[] | undefined)?.forEach(r =>
-        allKeys.add(r.day_start_date ?? '')
-      );
+      const end = completeBucketEnd('hour');
+      return [end - (config.days ?? 0) * DAY_SECONDS, end - 3600];
     }
+    const lastDay = completeBucketEnd('day') - DAY_SECONDS;
+    if (config.days !== null) return [Date.parse(`${completeUtcDays(config.days)[0]}T00:00:00Z`) / 1000, lastDay];
+    const firsts = Object.values(rows)
+      .map(r => r.times[0])
+      .filter((v): v is number => v !== undefined);
+    return firsts.length ? [Math.max(FIRST_BLOCK_DAY, Math.min(...firsts)), lastDay] : null;
+  }, [data, isDaily, config.days, rows]);
 
-    allKeys.delete('');
-    const sortedKeys = [...allKeys].sort();
-    return fillTimeKeys(sortedKeys, isDaily);
-  }, [tpsRecords, gasRecords, signallingRecords, transactionsRecords, isDaily]);
+  const xAxis = useMemo(
+    (): MultiLineChartProps['xAxis'] | null => (domain ? { type: 'time', min: domain[0], max: domain[1] } : null),
+    [domain]
+  );
 
-  const isLoading = isDaily
-    ? tpsDailyQuery.isLoading ||
-      gasDailyQuery.isLoading ||
-      gasLimitDailyQuery.isLoading ||
-      signallingDailyQuery.isLoading ||
-      transactionsDailyQuery.isLoading
-    : tpsHourlyQuery.isLoading ||
-      gasHourlyQuery.isLoading ||
-      gasLimitHourlyQuery.isLoading ||
-      signallingHourlyQuery.isLoading ||
-      transactionsHourlyQuery.isLoading;
+  // Fork, upgrade and blob schedule lines at their exact times, the same on every chart
+  const forkMarkLines = useMemo(() => {
+    if (!currentNetwork || !domain) return [];
+    return [
+      ...(allForks.length
+        ? createForkMarkLines({ forks: allForks, range: domain, genesisTime: currentNetwork.genesis_time })
+        : []),
+      ...(currentNetwork.forks?.execution
+        ? createExecutionForkMarkLines({ executionForks: currentNetwork.forks.execution, range: domain })
+        : []),
+      ...(currentNetwork.blob_schedule?.length
+        ? createBlobScheduleMarkLines({
+            blobSchedule: currentNetwork.blob_schedule,
+            range: domain,
+            genesisTime: currentNetwork.genesis_time,
+          })
+        : []),
+    ];
+  }, [currentNetwork, allForks, domain]);
 
-  const error = isDaily
-    ? tpsDailyQuery.error || gasDailyQuery.error || gasLimitDailyQuery.error
-    : tpsHourlyQuery.error || gasHourlyQuery.error || gasLimitHourlyQuery.error;
-
-  // When signalling data stops more than a day before the other charts, name where it ends
+  // When signalling data stops more than a day before the axis ends, name where it ends
   const signallingEnd = useMemo(() => {
-    const lastKey = unifiedTimeKeys[unifiedTimeKeys.length - 1];
-    if (!lastKey) return null;
-    if (isDaily) {
-      const latest = signallingLatestDailyQuery.data?.fct_execution_gas_limit_signalling_daily?.[0]?.day_start_date;
-      if (!latest) return null;
-      const lagDays = (Date.parse(lastKey) - Date.parse(latest)) / 86_400_000;
-      return lagDays > 1 ? formatTooltipDate(latest, true) : null;
-    }
-    const latest =
-      signallingLatestHourlyQuery.data?.fct_execution_gas_limit_signalling_hourly?.[0]?.hour_start_date_time;
-    if (!latest) return null;
-    return Number(lastKey) - latest > 86_400 ? formatTooltipDate(latest, false) : null;
-  }, [unifiedTimeKeys, isDaily, signallingLatestDailyQuery.data, signallingLatestHourlyQuery.data]);
+    const latest = data?.signallingLatest ? rowTime(data.signallingLatest) : null;
+    if (latest === null || !domain) return null;
+    return domain[1] - latest > DAY_SECONDS ? formatBucket(latest, isDaily) : null;
+  }, [data?.signallingLatest, domain, isDaily]);
+
+  // ==========================================================================
+  // Series
+  // ==========================================================================
+
+  const tpsSeries = useMemo(
+    () =>
+      buildStatSeries(
+        rows.tps,
+        r => ({
+          avg: periodTps(r),
+          movingAvg: r.moving_avg_tps,
+          median: r.p50_tps,
+          p05: r.p05_tps,
+          p95: r.p95_tps,
+          lowerBand: r.lower_band_tps,
+          upperBand: r.upper_band_tps,
+          min: r.min_tps,
+          max: r.max_tps,
+        }),
+        'tps'
+      ),
+    [rows.tps]
+  );
+
+  const opsSeries = useMemo(
+    () =>
+      buildStatSeries(
+        rows.opcodeOps,
+        r => ({
+          avg: periodOps(r),
+          movingAvg: r.moving_avg_ops,
+          median: r.p50_ops,
+          p05: r.p05_ops,
+          p95: r.p95_ops,
+          lowerBand: r.lower_band_ops,
+          upperBand: r.upper_band_ops,
+          min: r.min_ops,
+          max: r.max_ops,
+        }),
+        'ops'
+      ),
+    [rows.opcodeOps]
+  );
+
+  const gasSeries = useMemo(
+    () =>
+      buildStatSeries(
+        rows.gasUsed,
+        r => ({
+          avg: r.avg_gas_used ?? 0,
+          movingAvg: r.moving_avg_gas_used,
+          median: r.p50_gas_used,
+          p05: r.p05_gas_used,
+          p95: r.p95_gas_used,
+          lowerBand: r.lower_band_gas_used,
+          upperBand: r.upper_band_gas_used,
+          min: r.min_gas_used,
+          max: r.max_gas_used,
+        }),
+        'gas',
+        [
+          {
+            series: { name: 'Cumulative', color: hexToRgba(DATA_COLORS.slate, 0.6), lineWidth: 1.5, yAxisIndex: 1 },
+            value: (t: number) => Number(rows.gasUsed.byTime.get(t)?.cumulative_gas_used ?? 0),
+          },
+          ...(rows.gasLimit.byTime.size
+            ? [
+                {
+                  series: { name: 'Gas Limit', color: DATA_COLORS.red, lineWidth: 2, lineStyle: 'dashed' as const },
+                  value: (t: number) => rows.gasLimit.byTime.get(t)?.max_gas_limit ?? null,
+                },
+              ]
+            : []),
+        ].map(line => ({ ...line, series: { ...line.series, group: 'Statistics' } }))
+      ),
+    [rows.gasUsed, rows.gasLimit]
+  );
+
+  const transactionsSeries = useMemo(
+    () =>
+      buildStatSeries(
+        rows.transactions,
+        r => ({
+          avg: r.avg_txn_per_block ?? 0,
+          movingAvg: r.moving_avg_txn_per_block,
+          median: r.p50_txn_per_block,
+          p05: r.p05_txn_per_block,
+          p95: r.p95_txn_per_block,
+          lowerBand: r.lower_band_txn_per_block,
+          upperBand: r.upper_band_txn_per_block,
+          min: r.min_txn_per_block,
+          max: r.max_txn_per_block,
+        }),
+        'txn',
+        [
+          {
+            series: {
+              name: 'Cumulative',
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
+              lineWidth: 1.5,
+              yAxisIndex: 1,
+              group: 'Statistics',
+            },
+            value: t => Number(rows.transactions.byTime.get(t)?.cumulative_transactions ?? 0),
+          },
+        ]
+      ),
+    [rows.transactions]
+  );
+
+  const receiptSeries = useMemo(
+    () =>
+      buildStatSeries(
+        rows.receiptSize,
+        r => ({
+          avg: r.avg_receipt_bytes_per_block ?? 0,
+          movingAvg: r.moving_avg_receipt_bytes_per_block,
+          median: r.p50_receipt_bytes_per_block,
+          p05: r.p05_receipt_bytes_per_block,
+          p95: r.p95_receipt_bytes_per_block,
+          lowerBand: r.lower_band_receipt_bytes_per_block,
+          upperBand: r.upper_band_receipt_bytes_per_block,
+          min: r.min_receipt_bytes_per_block,
+          max: r.max_receipt_bytes_per_block,
+        }),
+        'receipt'
+      ),
+    [rows.receiptSize]
+  );
+
+  const signallingSeries = useMemo(() => buildSignallingSeries(rows.signalling), [rows.signalling]);
+
+  // ==========================================================================
+  // Tooltips
+  // ==========================================================================
+
+  /** Tooltip for the bucket under the cursor, or nothing when the chart has no row there */
+  const tooltip = useCallback(
+    <T,>(byTime: Map<number, T>, sections: (row: T, t: number) => TooltipSection[]) =>
+      (params: unknown): string => {
+        const t = tooltipTime(params);
+        const row = t === null ? undefined : byTime.get(t);
+        if (t === null || !row) return '';
+        return buildTooltipHtml(formatBucket(t, isDaily), sections(row, t));
+      },
+    [isDaily]
+  );
+
+  const tpsTooltip = useMemo(
+    () =>
+      tooltip(rows.tps.byTime, r =>
+        statTooltipSections(
+          {
+            avg: periodTps(r),
+            movingAvg: r.moving_avg_tps,
+            median: r.p50_tps,
+            p05: r.p05_tps,
+            p95: r.p95_tps,
+            lowerBand: r.lower_band_tps,
+            upperBand: r.upper_band_tps,
+            min: r.min_tps,
+            max: r.max_tps,
+          },
+          v => v.toFixed(2)
+        )
+      ),
+    [tooltip, rows.tps]
+  );
+
+  const opsTooltip = useMemo(
+    () =>
+      tooltip(rows.opcodeOps.byTime, r =>
+        statTooltipSections(
+          {
+            avg: periodOps(r),
+            movingAvg: r.moving_avg_ops,
+            median: r.p50_ops,
+            p05: r.p05_ops,
+            p95: r.p95_ops,
+            lowerBand: r.lower_band_ops,
+            upperBand: r.upper_band_ops,
+            min: r.min_ops,
+            max: r.max_ops,
+          },
+          formatCompact
+        )
+      ),
+    [tooltip, rows.opcodeOps]
+  );
+
+  const gasTooltip = useMemo(
+    () =>
+      tooltip(rows.gasUsed.byTime, (r, t) => {
+        const limit = rows.gasLimit.byTime.get(t)?.max_gas_limit;
+        return statTooltipSections(
+          {
+            avg: r.avg_gas_used ?? 0,
+            movingAvg: r.moving_avg_gas_used,
+            median: r.p50_gas_used,
+            p05: r.p05_gas_used,
+            p95: r.p95_gas_used,
+            lowerBand: r.lower_band_gas_used,
+            upperBand: r.upper_band_gas_used,
+            min: r.min_gas_used,
+            max: r.max_gas_used,
+          },
+          formatCompact,
+          [
+            {
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
+              label: 'Cumulative',
+              value: formatCumulativeGas(r.cumulative_gas_used ?? 0),
+            },
+            ...(limit !== undefined
+              ? [{ color: DATA_COLORS.red, label: 'Gas Limit', value: formatCompact(limit), style: 'dashed' as const }]
+              : []),
+          ]
+        );
+      }),
+    [tooltip, rows.gasUsed, rows.gasLimit]
+  );
+
+  const transactionsTooltip = useMemo(
+    () =>
+      tooltip(rows.transactions.byTime, r =>
+        statTooltipSections(
+          {
+            avg: r.avg_txn_per_block ?? 0,
+            movingAvg: r.moving_avg_txn_per_block,
+            median: r.p50_txn_per_block,
+            p05: r.p05_txn_per_block,
+            p95: r.p95_txn_per_block,
+            lowerBand: r.lower_band_txn_per_block,
+            upperBand: r.upper_band_txn_per_block,
+            min: r.min_txn_per_block,
+            max: r.max_txn_per_block,
+          },
+          v => v.toLocaleString(),
+          [
+            {
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
+              label: 'Cumulative',
+              value: formatBigNum(r.cumulative_transactions),
+            },
+            {
+              color: hexToRgba(DATA_COLORS.slate, 0.6),
+              label: 'Period Total',
+              value: formatBigNum(r.total_transactions),
+            },
+          ]
+        )
+      ),
+    [tooltip, rows.transactions]
+  );
+
+  const receiptTooltip = useMemo(
+    () =>
+      tooltip(rows.receiptSize.byTime, r =>
+        statTooltipSections(
+          {
+            avg: r.avg_receipt_bytes_per_block ?? 0,
+            movingAvg: r.moving_avg_receipt_bytes_per_block,
+            median: r.p50_receipt_bytes_per_block,
+            p05: r.p05_receipt_bytes_per_block,
+            p95: r.p95_receipt_bytes_per_block,
+            lowerBand: r.lower_band_receipt_bytes_per_block,
+            upperBand: r.upper_band_receipt_bytes_per_block,
+            min: r.min_receipt_bytes_per_block,
+            max: r.max_receipt_bytes_per_block,
+          },
+          v => formatBytesDecimal(v, 1)
+        )
+      ),
+    [tooltip, rows.receiptSize]
+  );
+
+  const signallingTooltip = useCallback(
+    (params: unknown): string => {
+      const t = tooltipTime(params);
+      if (t === null || !rows.signalling.byTime.has(t)) return '';
+      type TooltipParam = { value?: [number, number | null]; seriesName?: string };
+      const byName = new Map<string, number>();
+      for (const p of (Array.isArray(params) ? params : [params]) as TooltipParam[]) {
+        if (p.seriesName) byName.set(p.seriesName, p.value?.[1] ?? 0);
+      }
+      const sections: TooltipSection[] = [
+        {
+          title: 'Gas Limits',
+          items: [...GAS_BANDS].reverse().map(band => ({
+            color: band.color,
+            label: band.label,
+            value: `${(byName.get(band.label) ?? 0).toFixed(1)}%`,
+            style: 'area' as const,
+          })),
+        },
+      ];
+      if (byName.has('Relay Registered Validators')) {
+        sections.push({
+          title: 'Total',
+          items: [
+            {
+              color: DATA_COLORS.purple,
+              label: 'Relay Registered Validators',
+              value: formatCompact(byName.get('Relay Registered Validators') ?? 0),
+            },
+          ],
+        });
+      }
+      return buildTooltipHtml(formatBucket(t, isDaily), sections);
+    },
+    [rows.signalling, isDaily]
+  );
+
+  // ==========================================================================
+  // Render
+  // ==========================================================================
 
   const period = isDaily ? 'UTC day' : 'hour';
   const movingAvgWindow = isDaily ? '7 days' : '6 hours';
@@ -316,402 +592,20 @@ export function IndexPage(): JSX.Element {
     .filter(Boolean)
     .join(' ');
 
-  // Build chart configs using unified time keys
-  const tpsChartConfig = useMemo(() => {
-    if (!tpsRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildTpsChartConfig(tpsRecords, unifiedTimeKeys, isDaily);
-  }, [tpsRecords, unifiedTimeKeys, isDaily]);
+  /** Props every chart on the page shares, so they read as one stack on one time axis */
+  const shared = (inModal: boolean): Omit<MultiLineChartProps, 'series' | 'xAxis'> => ({
+    height: inModal ? 600 : 240,
+    showLegend: true,
+    legendPosition: 'top',
+    enableDataZoom: true,
+    showDataZoomSlider: inModal,
+    endLabels: false,
+    grid: inModal ? undefined : CHART_GRID,
+    markLines: showAnnotations ? forkMarkLines : [],
+    syncGroup: inModal ? undefined : 'execution-overview',
+  });
 
-  const gasChartConfig = useMemo(() => {
-    if (!gasRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildGasChartConfig(gasRecords, unifiedTimeKeys, isDaily, gasLimitRecords);
-  }, [gasRecords, unifiedTimeKeys, isDaily, gasLimitRecords]);
-
-  const signallingChartConfig = useMemo(() => {
-    if (!signallingRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildSignallingChartConfig(signallingRecords, unifiedTimeKeys, isDaily);
-  }, [signallingRecords, unifiedTimeKeys, isDaily]);
-
-  const transactionsChartConfig = useMemo(() => {
-    if (!transactionsRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildTransactionsChartConfig(transactionsRecords, unifiedTimeKeys, isDaily);
-  }, [transactionsRecords, unifiedTimeKeys, isDaily]);
-
-  // Fork annotation mark lines
-  const consensusForkMarkLines = useMemo(() => {
-    if (!currentNetwork || !allForks.length) return [];
-    const labels = tpsChartConfig?.labels ?? gasChartConfig?.labels ?? [];
-    return createForkMarkLines({
-      forks: allForks,
-      labels,
-      genesisTime: currentNetwork.genesis_time,
-      isDaily,
-    });
-  }, [currentNetwork, allForks, tpsChartConfig?.labels, gasChartConfig?.labels, isDaily]);
-
-  const executionForkMarkLines = useMemo(() => {
-    if (!currentNetwork?.forks?.execution) return [];
-    const labels = tpsChartConfig?.labels ?? gasChartConfig?.labels ?? [];
-    return createExecutionForkMarkLines({
-      executionForks: currentNetwork.forks.execution,
-      labels,
-    });
-  }, [currentNetwork, tpsChartConfig?.labels, gasChartConfig?.labels]);
-
-  const blobScheduleMarkLines = useMemo(() => {
-    if (!currentNetwork?.blob_schedule?.length) return [];
-    const labels = tpsChartConfig?.labels ?? gasChartConfig?.labels ?? [];
-    return createBlobScheduleMarkLines({
-      blobSchedule: currentNetwork.blob_schedule,
-      labels,
-      genesisTime: currentNetwork.genesis_time,
-    });
-  }, [currentNetwork, tpsChartConfig?.labels, gasChartConfig?.labels]);
-
-  const forkMarkLines = useMemo(
-    () => [...consensusForkMarkLines, ...executionForkMarkLines, ...blobScheduleMarkLines],
-    [consensusForkMarkLines, executionForkMarkLines, blobScheduleMarkLines]
-  );
-
-  const signallingForkMarkLines = useMemo(() => {
-    if (!currentNetwork || !allForks.length || !signallingChartConfig?.labels.length) return [];
-
-    const consensusLines = createForkMarkLines({
-      forks: allForks,
-      labels: signallingChartConfig.labels,
-      genesisTime: currentNetwork.genesis_time,
-      isDaily,
-    });
-
-    const executionLines = currentNetwork.forks?.execution
-      ? createExecutionForkMarkLines({
-          executionForks: currentNetwork.forks.execution,
-          labels: signallingChartConfig.labels,
-        })
-      : [];
-
-    const blobLines = currentNetwork.blob_schedule?.length
-      ? createBlobScheduleMarkLines({
-          blobSchedule: currentNetwork.blob_schedule,
-          labels: signallingChartConfig.labels,
-          genesisTime: currentNetwork.genesis_time,
-        })
-      : [];
-
-    return [...consensusLines, ...executionLines, ...blobLines];
-  }, [currentNetwork, allForks, signallingChartConfig?.labels, isDaily]);
-
-  // TPS tooltip formatter
-  const tpsTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!tpsRecords?.length || !unifiedTimeKeys.length) return '';
-
-      const recordsByKey = new Map<string, FctExecutionTpsHourly | FctExecutionTpsDaily>();
-      for (const r of tpsRecords) {
-        const key = isDaily
-          ? ((r as FctExecutionTpsDaily).day_start_date ?? '')
-          : String((r as FctExecutionTpsHourly).hour_start_date_time ?? '');
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctExecutionTpsDaily).day_start_date ?? '')
-        : ((record as FctExecutionTpsHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const sections: TooltipSection[] = [
-        {
-          title: 'STATISTICS',
-          items: [
-            { color: DATA_COLORS.emerald, label: 'Average', value: periodTps(record)?.toFixed(4) ?? '-' },
-            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: (record.moving_avg_tps ?? 0).toFixed(4) },
-            { color: DATA_COLORS.purple, label: 'Median', value: (record.p50_tps ?? 0).toFixed(4), style: 'dotted' },
-          ],
-        },
-        {
-          title: 'BANDS',
-          items: [
-            {
-              color: DATA_COLORS.amber,
-              label: 'Bollinger',
-              value: formatTpsBand(record.lower_band_tps, record.upper_band_tps),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.indigo,
-              label: 'P5/P95',
-              value: formatTpsBand(record.p05_tps, record.p95_tps),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.slate,
-              label: 'Min/Max',
-              value: formatTpsBand(record.min_tps, record.max_tps),
-              style: 'area',
-            },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [tpsRecords, unifiedTimeKeys, isDaily]
-  );
-
-  // Gas tooltip formatter
-  const gasTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!gasRecords?.length || !unifiedTimeKeys.length) return '';
-
-      const recordsByKey = new Map<string, FctExecutionGasUsedHourly | FctExecutionGasUsedDaily>();
-      for (const r of gasRecords) {
-        const key = isDaily
-          ? ((r as FctExecutionGasUsedDaily).day_start_date ?? '')
-          : String((r as FctExecutionGasUsedHourly).hour_start_date_time ?? '');
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctExecutionGasUsedDaily).day_start_date ?? '')
-        : ((record as FctExecutionGasUsedHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const statsItems: TooltipItem[] = [
-        { color: DATA_COLORS.emerald, label: 'Average', value: formatGas(record.avg_gas_used ?? 0) },
-        { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatGas(record.moving_avg_gas_used ?? 0) },
-        { color: DATA_COLORS.purple, label: 'Median', value: formatGas(record.p50_gas_used ?? 0), style: 'dotted' },
-        {
-          color: hexToRgba(DATA_COLORS.slate, 0.6),
-          label: 'Cumulative',
-          value: formatCumulativeGas(record.cumulative_gas_used ?? 0),
-        },
-      ];
-
-      // Add gas limit if available
-      if (gasLimitRecords?.length) {
-        const dateKey = isDaily
-          ? ((record as FctExecutionGasUsedDaily).day_start_date ?? '')
-          : String((record as FctExecutionGasUsedHourly).hour_start_date_time ?? 0);
-        const gasLimitRecord = gasLimitRecords.find(r => {
-          const rDateKey = isDaily
-            ? ((r as FctExecutionGasLimitDaily).day_start_date ?? '')
-            : String((r as FctExecutionGasLimitHourly).hour_start_date_time ?? 0);
-          return rDateKey === dateKey;
-        });
-        if (gasLimitRecord) {
-          statsItems.push({
-            color: DATA_COLORS.red,
-            label: 'Gas Limit',
-            value: formatGas(gasLimitRecord.max_gas_limit ?? 0),
-            style: 'dashed',
-          });
-        }
-      }
-
-      const sections: TooltipSection[] = [
-        { title: 'STATISTICS', items: statsItems },
-        {
-          title: 'BANDS',
-          items: [
-            {
-              color: DATA_COLORS.amber,
-              label: 'Bollinger',
-              value: formatGasBand(record.lower_band_gas_used, record.upper_band_gas_used),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.indigo,
-              label: 'P5/P95',
-              value: formatGasBand(record.p05_gas_used, record.p95_gas_used),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.slate,
-              label: 'Min/Max',
-              value: formatGasBand(record.min_gas_used, record.max_gas_used),
-              style: 'area',
-            },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [gasRecords, gasLimitRecords, unifiedTimeKeys, isDaily]
-  );
-
-  // Signalling tooltip formatter
-  const signallingTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!signallingRecords?.length || !unifiedTimeKeys.length) return '';
-
-      const recordsByKey = new Map<
-        string,
-        FctExecutionGasLimitSignallingHourly | FctExecutionGasLimitSignallingDaily
-      >();
-      for (const r of signallingRecords) {
-        const key = isDaily
-          ? ((r as FctExecutionGasLimitSignallingDaily).day_start_date ?? '')
-          : String((r as FctExecutionGasLimitSignallingHourly).hour_start_date_time ?? '');
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctExecutionGasLimitSignallingDaily).day_start_date ?? '')
-        : ((record as FctExecutionGasLimitSignallingHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      type TooltipParam = { value?: number; marker?: string; seriesName?: string };
-      const byName = new Map<string, TooltipParam>();
-      for (const p of dataPoints as TooltipParam[]) {
-        if (p.seriesName) byName.set(p.seriesName, p);
-      }
-
-      const gasLimitItems = [...GAS_BANDS].reverse().map(band => {
-        const p = byName.get(band.label);
-        const value = p?.value ?? 0;
-        return { color: band.color, label: band.label, value: `${value.toFixed(1)}%`, style: 'area' as const };
-      });
-
-      const sections: TooltipSection[] = [{ title: 'Gas Limits', items: gasLimitItems }];
-
-      const mevData = byName.get('Relay Registered Validators');
-      if (mevData) {
-        sections.push({
-          title: 'Total',
-          items: [
-            {
-              color: DATA_COLORS.purple,
-              label: 'Relay Registered Validators',
-              value: formatCompact(mevData.value ?? 0),
-            },
-          ],
-        });
-      }
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [signallingRecords, unifiedTimeKeys, isDaily]
-  );
-
-  // Transactions tooltip formatter
-  const transactionsTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!transactionsRecords?.length || !unifiedTimeKeys.length) return '';
-
-      const recordsByKey = new Map<string, FctExecutionTransactionsHourly | FctExecutionTransactionsDaily>();
-      for (const r of transactionsRecords) {
-        const key = isDaily
-          ? ((r as FctExecutionTransactionsDaily).day_start_date ?? '')
-          : String((r as FctExecutionTransactionsHourly).hour_start_date_time ?? '');
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-
-      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
-
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily
-        ? ((record as FctExecutionTransactionsDaily).day_start_date ?? '')
-        : ((record as FctExecutionTransactionsHourly).hour_start_date_time ?? 0);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const formatNum = (n: number | undefined): string => (n ?? 0).toLocaleString();
-      const formatBand = (lower: number | undefined, upper: number | undefined): string =>
-        `${formatNum(lower)} – ${formatNum(upper)}`;
-
-      const sections: TooltipSection[] = [
-        {
-          title: 'STATISTICS',
-          items: [
-            { color: DATA_COLORS.emerald, label: 'Average', value: formatNum(record.avg_txn_per_block) },
-            { color: DATA_COLORS.cyan, label: 'Moving Avg', value: formatNum(record.moving_avg_txn_per_block) },
-            { color: DATA_COLORS.purple, label: 'Median', value: formatNum(record.p50_txn_per_block), style: 'dotted' },
-            {
-              color: hexToRgba(DATA_COLORS.slate, 0.6),
-              label: 'Cumulative',
-              value: formatBigNum(record.cumulative_transactions),
-            },
-            {
-              color: hexToRgba(DATA_COLORS.slate, 0.6),
-              label: 'Period Total',
-              value: formatBigNum(record.total_transactions),
-            },
-          ],
-        },
-        {
-          title: 'BANDS',
-          items: [
-            {
-              color: DATA_COLORS.amber,
-              label: 'Bollinger',
-              value: formatBand(record.lower_band_txn_per_block, record.upper_band_txn_per_block),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.indigo,
-              label: 'P5/P95',
-              value: formatBand(record.p05_txn_per_block, record.p95_txn_per_block),
-              style: 'area',
-            },
-            {
-              color: DATA_COLORS.slate,
-              label: 'Min/Max',
-              value: formatBand(record.min_txn_per_block, record.max_txn_per_block),
-              style: 'area',
-            },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [transactionsRecords, unifiedTimeKeys, isDaily]
-  );
+  const hasRows = (r: { byTime: Map<number, unknown> }): boolean => r.byTime.size > 0;
 
   return (
     <Container>
@@ -722,7 +616,7 @@ export function IndexPage(): JSX.Element {
         <SegmentedControl
           options={TIME_PERIOD_OPTIONS}
           value={timePeriod}
-          onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true })}
+          onChange={value => navigate({ search: prev => ({ ...prev, t: value }), replace: true, resetScroll: false })}
           ariaLabel="Time window"
         />
 
@@ -733,19 +627,20 @@ export function IndexPage(): JSX.Element {
         </div>
       </div>
 
-      {isLoading && <ExecutionOverviewSkeleton />}
+      {!data && !query.error && <ExecutionOverviewSkeleton />}
 
-      {error && (
+      {query.error && (
         <Card rounded className="p-6">
-          <p className="text-danger">Failed to load data: {error.message}</p>
+          <p className="text-danger">Failed to load data: {query.error.message}</p>
         </Card>
       )}
 
-      {/* Charts */}
-      {!isLoading && (
-        <div className="flex flex-col gap-4">
-          {/* TPS Chart */}
-          {tpsChartConfig && (
+      {data && xAxis && (
+        <div
+          className={clsx('flex flex-col gap-4 transition-opacity', query.isPlaceholderData && 'opacity-60')}
+          aria-busy={query.isPlaceholderData}
+        >
+          {hasRows(rows.tps) && (
             <PopoutCard
               title="Transactions Per Second"
               subtitle={`Canonical blocks per ${period}. Average is transactions ÷ seconds; median and bands are over per-block TPS; moving average over ${movingAvgWindow}.`}
@@ -754,31 +649,37 @@ export function IndexPage(): JSX.Element {
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={tpsChartConfig.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: tpsChartConfig.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'TPS',
-                    min: 0,
-                  }}
+                  {...shared(inModal)}
                   height={inModal ? 600 : 320}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  showDataZoomSlider={inModal}
-                  tooltipFormatter={tpsTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'execution-overview'}
+                  series={tpsSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'TPS', min: 0 }}
+                  tooltipFormatter={tpsTooltip}
                 />
               )}
             </PopoutCard>
           )}
 
-          {/* Gas Used Chart */}
-          {gasChartConfig && (
+          {hasRows(rows.opcodeOps) && (
+            <PopoutCard
+              title="Opcodes Per Second"
+              subtitle={`EVM opcodes executed in canonical blocks per ${period}. Average is opcodes ÷ seconds; median and bands are over per-block rates; moving average over ${movingAvgWindow}.`}
+              anchorId="ops-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  {...shared(inModal)}
+                  series={opsSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'Ops/s', min: 0, formatter: formatCompact }}
+                  tooltipFormatter={opsTooltip}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {hasRows(rows.gasUsed) && (
             <PopoutCard
               title="Gas Used Per Block"
               subtitle={`Canonical blocks per ${period}. Average, median and bands are over blocks; moving average over ${movingAvgWindow}.`}
@@ -787,43 +688,18 @@ export function IndexPage(): JSX.Element {
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={gasChartConfig.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: gasChartConfig.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'Gas',
-                    min: 0,
-                  }}
-                  secondaryYAxis={{
-                    name: 'Cumulative',
-                    min: 0,
-                    formatter: (val: number) => {
-                      if (val >= 1e18) return `${(val / 1e18).toFixed(1)}E`;
-                      if (val >= 1e15) return `${(val / 1e15).toFixed(1)}P`;
-                      if (val >= 1e12) return `${(val / 1e12).toFixed(1)}T`;
-                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
-                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
-                      return String(val);
-                    },
-                  }}
-                  height={inModal ? 600 : 240}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  showDataZoomSlider={inModal}
-                  tooltipFormatter={gasTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'execution-overview'}
+                  {...shared(inModal)}
+                  series={gasSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'Gas', min: 0 }}
+                  secondaryYAxis={{ name: 'Cumulative', min: 0, formatter: formatCumulativeAxis }}
+                  tooltipFormatter={gasTooltip}
                 />
               )}
             </PopoutCard>
           )}
 
-          {/* Transactions Chart */}
-          {transactionsChartConfig && (
+          {hasRows(rows.transactions) && (
             <PopoutCard
               title="Transactions Per Block"
               subtitle={`Canonical blocks per ${period}. Average, median and bands are over blocks; moving average over ${movingAvgWindow}.`}
@@ -832,45 +708,42 @@ export function IndexPage(): JSX.Element {
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={transactionsChartConfig.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: transactionsChartConfig.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'Txn/Block',
-                    min: 0,
-                  }}
-                  secondaryYAxis={{
-                    name: 'Cumulative',
-                    min: 0,
-                    formatter: (val: number) => {
-                      if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
-                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)}M`;
-                      return String(val);
-                    },
-                  }}
-                  height={inModal ? 600 : 240}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  showDataZoomSlider={inModal}
-                  tooltipFormatter={transactionsTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'execution-overview'}
+                  {...shared(inModal)}
+                  series={transactionsSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'Txn/Block', min: 0 }}
+                  secondaryYAxis={{ name: 'Cumulative', min: 0, formatter: formatCumulativeAxis }}
+                  tooltipFormatter={transactionsTooltip}
                 />
               )}
             </PopoutCard>
           )}
 
-          {/* Gas Limit Signalling Chart */}
-          {!signallingChartConfig && signallingEnd && (
+          {hasRows(rows.receiptSize) && (
+            <PopoutCard
+              title="Receipt Size Per Block"
+              subtitle={`Receipt bytes per canonical block, per ${period}. Average, median and bands are over blocks; moving average over ${movingAvgWindow}.`}
+              anchorId="receipt-size-chart"
+              modalSize="full"
+            >
+              {({ inModal }) => (
+                <MultiLineChart
+                  {...shared(inModal)}
+                  series={receiptSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'Bytes', min: 0, formatter: v => formatBytesDecimal(v) }}
+                  tooltipFormatter={receiptTooltip}
+                />
+              )}
+            </PopoutCard>
+          )}
+
+          {!hasRows(rows.signalling) && signallingEnd && (
             <Card rounded title="Gas Limit Signalling">
               <p className="text-sm text-muted">Data ends {signallingEnd}.</p>
             </Card>
           )}
-          {signallingChartConfig && (
+          {hasRows(rows.signalling) && (
             <PopoutCard
               title="Gas Limit Signalling"
               subtitle={signallingSubtitle}
@@ -879,33 +752,12 @@ export function IndexPage(): JSX.Element {
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={signallingChartConfig.series}
-                  xAxis={{
-                    type: 'category',
-                    labels: signallingChartConfig.labels,
-                    name: 'Date',
-                  }}
-                  yAxis={{
-                    name: 'Share (%)',
-                    min: 0,
-                    max: 100,
-                  }}
-                  secondaryYAxis={{
-                    name: 'Validators',
-                    min: 0,
-                    formatter: (val: number) => {
-                      if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                      if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
-                      return String(val);
-                    },
-                  }}
-                  height={inModal ? 600 : 240}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  tooltipFormatter={signallingTooltipFormatter}
-                  markLines={showAnnotations ? signallingForkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'execution-overview'}
+                  {...shared(inModal)}
+                  series={signallingSeries}
+                  xAxis={xAxis}
+                  yAxis={{ name: 'Share (%)', min: 0, max: 100 }}
+                  secondaryYAxis={{ name: 'Validators', min: 0, formatter: formatCompact }}
+                  tooltipFormatter={signallingTooltip}
                 />
               )}
             </PopoutCard>

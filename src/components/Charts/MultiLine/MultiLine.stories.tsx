@@ -889,3 +889,42 @@ export const InitiallyVisible: Story = {
     );
   },
 };
+
+/** Daily points on a time axis: years across all of history, with a stacked band that stacks on y */
+export const TimeAxis: Story = {
+  render: () => {
+    const start = Date.UTC(2015, 6, 30) / 1000;
+    const days = Array.from({ length: 4100 }, (_, i) => start + i * 86_400);
+    const avg = days.map((t, i) => [t, 10 + 8 * Math.sin(i / 200) + i / 400] as [number, number]);
+    return (
+      <MultiLineChart
+        series={[
+          { name: 'Average', data: avg, color: colors.emerald[500], lineWidth: 2 },
+          {
+            name: '_band_base',
+            data: avg.map(([t, v]) => [t, v - 4]),
+            stack: 'band',
+            showArea: true,
+            areaOpacity: 0,
+            lineWidth: 0,
+            visible: false,
+          },
+          {
+            name: 'Band',
+            data: avg.map(([t]) => [t, 8]),
+            stack: 'band',
+            showArea: true,
+            areaOpacity: 0.15,
+            lineWidth: 0,
+            color: colors.indigo[500],
+          },
+        ]}
+        xAxis={{ type: 'time', min: days[0], max: days[days.length - 1] }}
+        yAxis={{ name: 'Value', min: 0 }}
+        markLines={[{ xValue: Date.UTC(2022, 8, 15) / 1000, label: 'Merge' }]}
+        showLegend
+        height={300}
+      />
+    );
+  },
+};

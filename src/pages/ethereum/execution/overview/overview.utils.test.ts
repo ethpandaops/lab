@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getChunkIndex, getChunkLabel, periodTps } from './overview.utils';
+import { getChunkIndex, getChunkLabel, periodTps, timedRows } from './overview.utils';
 
 describe('getChunkIndex', () => {
   it('puts a round gas limit target in the band that starts at it', () => {
@@ -21,5 +21,31 @@ describe('periodTps', () => {
 
   it('has no value for a period without elapsed time', () => {
     expect(periodTps({ total_transactions: 10, total_seconds: 0 })).toBeNull();
+  });
+});
+
+describe('timedRows', () => {
+  it('drops a row dated before the first Ethereum block instead of stretching the axis back to 1970', () => {
+    // mainnet fct_execution_gas_used_daily had a 1970-01-01 row for the genesis block (timestamp 0)
+    const { times } = timedRows(
+      [{ day_start_date: '1970-01-01' }, { day_start_date: '2015-07-30' }, { day_start_date: '2015-07-31' }],
+      86_400
+    );
+    expect(times).toEqual([Date.UTC(2015, 6, 30) / 1000, Date.UTC(2015, 6, 31) / 1000]);
+  });
+
+  it('breaks the line at a gap with one empty point, not one per missing bucket', () => {
+    const hour = 3600;
+    const start = Date.UTC(2026, 10, 1) / 1000;
+    const { times, byTime } = timedRows(
+      [
+        { hour_start_date_time: start + 10 * hour },
+        { hour_start_date_time: start },
+        { hour_start_date_time: start + hour },
+      ],
+      hour
+    );
+    expect(times).toEqual([start, start + hour, start + 2 * hour, start + 10 * hour]);
+    expect(byTime.has(start + 2 * hour)).toBe(false);
   });
 });

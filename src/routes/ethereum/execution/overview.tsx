@@ -13,14 +13,16 @@ export const Route = createFileRoute('/ethereum/execution/overview')({
       { title: `Execution Overview | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'description',
-        content: 'Ethereum execution layer overview with transaction throughput metrics and TPS charts',
+        content:
+          'Ethereum execution layer throughput, gas, transactions, receipt size and gas limit signalling over time',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/execution/overview` },
       { property: 'og:type', content: 'website' },
       { property: 'og:title', content: `Execution Overview | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         property: 'og:description',
-        content: 'Ethereum execution layer overview with transaction throughput metrics and TPS charts',
+        content:
+          'Ethereum execution layer throughput, gas, transactions, receipt size and gas limit signalling over time',
       },
       {
         property: 'og:image',
@@ -30,7 +32,8 @@ export const Route = createFileRoute('/ethereum/execution/overview')({
       { name: 'twitter:title', content: `Execution Overview | ${import.meta.env.VITE_BASE_TITLE}` },
       {
         name: 'twitter:description',
-        content: 'Ethereum execution layer overview with transaction throughput metrics and TPS charts',
+        content:
+          'Ethereum execution layer throughput, gas, transactions, receipt size and gas limit signalling over time',
       },
       {
         name: 'twitter:image',
