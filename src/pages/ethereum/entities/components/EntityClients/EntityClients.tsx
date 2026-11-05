@@ -119,13 +119,22 @@ export function EntityClients({ entity, days, window }: EntityClientsProps): JSX
   const todayDay = new Date(today * 1000).toISOString().slice(0, 10);
   const sinceDay = since === undefined ? '' : new Date(since * 1000).toISOString().slice(0, 10);
 
+  // The window's days, so a short window does not read the entity's whole history
+  const dayFilter =
+    since === undefined
+      ? // The daily table only filters its date key by value; every date starts with 20
+        { day_start_date_like: '20%' }
+      : {
+          day_start_date_in_values: Array.from({ length: days ?? 0 }, (_, i) =>
+            new Date((since + i * 86400) * 1000).toISOString().slice(0, 10)
+          ).join(','),
+        };
   const counts = useQuery({
-    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity],
+    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity, days],
     queryFn: ({ signal }) =>
       fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
         fctBlockGraffitiClientByEntityDailyServiceList,
-        // The daily table only filters its date key by value; every date starts with 20
-        { query: { ...entityQuery(entity), day_start_date_like: '20%', page_size: 10000 } },
+        { query: { ...entityQuery(entity), ...dayFilter, page_size: 10000 } },
         'fct_block_graffiti_client_by_entity_daily',
         signal
       ),
