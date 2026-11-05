@@ -215,9 +215,9 @@ export function useNodeHistory(
       const table = `${source.table}_${granularity}`;
       const bucketFilter =
         granularity === 'hourly'
-          ? { hour_start_date_time_gte: buckets[0] }
+          ? { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: buckets[buckets.length - 1] + 3600 }
           : range === 'all'
-            ? { day_start_date_like: '20%' }
+            ? { day_start_date_ne: toDateString(buckets[buckets.length - 1] + 86400) }
             : { day_start_date_in_values: buckets.map(toDateString).join(',') };
       const raw = await fetchAllPages<RawRow>(
         granularity === 'hourly' ? source.hourly : source.daily,

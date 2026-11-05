@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { currentUtcDate } from '@/utils/time';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fctExecutionStateSizeDailyServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctExecutionStateSizeDaily } from '@/api/types.gen';
@@ -60,12 +61,10 @@ function normalizeDailyData(data: FctExecutionStateSizeDaily[]): NormalizedDataP
  * Hook that fetches daily state size data.
  */
 export function useStateSizeData(): UseStateSizeDataResult {
+  const today = currentUtcDate();
   const dailyQuery = useQuery({
     ...fctExecutionStateSizeDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
+      query: { day_start_date_ne: today, page_size: 10000 },
     }),
     placeholderData: keepPreviousData,
   });

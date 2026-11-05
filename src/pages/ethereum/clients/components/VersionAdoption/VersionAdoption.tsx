@@ -429,11 +429,7 @@ export function VersionAdoption({
   // A P2P census that starts inside the range has no change over the whole range to show
   const peersFromRange = peers.dataStart === undefined || peers.dataStart <= rangeStart;
 
-  // Today is still filling, so the chart stops at the last full day
-  const today = new Date().toISOString().slice(0, 10);
-  const days = [...new Set([...blockDays, ...peerDays, ...xatuDays].map(day => day.day))]
-    .filter(day => day < today)
-    .sort();
+  const days = [...new Set([...blockDays, ...peerDays, ...xatuDays].map(day => day.day))].sort();
   const seriesFor = (points: AdoptionPoint[]): Array<number | null> => {
     const byDay = new Map(points.map(point => [point.day, point[mode]]));
     return days.map(day => {

@@ -124,3 +124,52 @@ export function formatTimeRange(start: number, end: number): string {
     timeZoneName: 'short',
   }).formatRange(new Date(start * 1000), new Date(end * 1000));
 }
+
+/** Bucket length of an hourly, daily or weekly rollup */
+export type RollupGrain = 'hour' | 'day' | 'week';
+
+const HOUR_SECONDS = 3600;
+const DAY_SECONDS = 86_400;
+
+/**
+ * Start (unix seconds) of the UTC hour, day or week (Monday) in progress, which is the exclusive end of the last
+ * complete one. Rollup queries end here so the partial bucket is never read.
+ *
+ * @example
+ * ```ts
+ * // 2026-11-05 13:20 UTC (a Thursday)
+ * completeBucketEnd('hour'); // 2026-11-05 13:00
+ * completeBucketEnd('day'); // 2026-11-05 00:00
+ * completeBucketEnd('week'); // 2026-11-02 00:00
+ * ```
+ */
+export function completeBucketEnd(grain: RollupGrain, nowMs: number = Date.now()): number {
+  const now = Math.floor(nowMs / 1000);
+  if (grain === 'hour') return Math.floor(now / HOUR_SECONDS) * HOUR_SECONDS;
+  const day = Math.floor(now / DAY_SECONDS) * DAY_SECONDS;
+  if (grain === 'day') return day;
+  // The epoch fell on a Thursday, so Monday is three days into the 7-day cycle
+  const daysSinceMonday = (Math.floor(day / DAY_SECONDS) + 3) % 7;
+  return day - daysSinceMonday * DAY_SECONDS;
+}
+
+/** UTC date ("2026-11-05") of a unix-seconds time, the key of daily and weekly rollup rows */
+export function toUtcDate(seconds: number): string {
+  return new Date(seconds * 1000).toISOString().slice(0, 10);
+}
+
+/** UTC date of the day in progress, whose daily rollup rows are partial */
+export function currentUtcDate(nowMs: number = Date.now()): string {
+  return toUtcDate(completeBucketEnd('day', nowMs));
+}
+
+/** UTC date of the Monday starting the week in progress, whose weekly rollup rows are partial */
+export function currentUtcWeek(nowMs: number = Date.now()): string {
+  return toUtcDate(completeBucketEnd('week', nowMs));
+}
+
+/** The last `days` complete UTC days, oldest first, ending yesterday, e.g. for day_start_date_in_values */
+export function completeUtcDays(days: number, nowMs: number = Date.now()): string[] {
+  const end = completeBucketEnd('day', nowMs);
+  return Array.from({ length: Math.max(0, days) }, (_, i) => toUtcDate(end - (days - i) * DAY_SECONDS));
+}

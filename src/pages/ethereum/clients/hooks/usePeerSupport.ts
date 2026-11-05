@@ -5,7 +5,7 @@ import type { FctPeerPartialMessageSupportByClientDaily } from '@/api/types.gen'
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { PAGE_SIZE } from '../constants';
-import { dailyDateValues } from '../utils/client-share';
+import { completeUtcDays } from '@/utils/time';
 import { peerClient } from '../utils/client-versions';
 
 export interface UsePeerSupportResult {
@@ -20,7 +20,7 @@ export interface UsePeerSupportResult {
  */
 export function usePeerSupport(client: string | undefined, enabled: boolean): UsePeerSupportResult {
   const { currentNetwork } = useNetwork();
-  const dates = useMemo(() => dailyDateValues(3), []);
+  const dates = useMemo(() => completeUtcDays(3).join(','), []);
   const on = !!currentNetwork && !!client && enabled;
 
   const partial = useQuery({

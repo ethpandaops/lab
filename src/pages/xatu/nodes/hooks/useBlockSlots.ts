@@ -22,9 +22,9 @@ export function useBlockSlots(range: NodeRange): { data: Map<number, number> | n
     queryFn: async ({ signal }) => {
       const hourly = granularity === 'hourly';
       const bucketFilter = hourly
-        ? { hour_start_date_time_gte: buckets[0] }
+        ? { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: buckets[buckets.length - 1] + 3600 }
         : range === 'all'
-          ? { day_start_date_like: '20%' }
+          ? { day_start_date_ne: toDateString(buckets[buckets.length - 1] + 86400) }
           : { day_start_date_in_values: buckets.map(toDateString).join(',') };
       const rows = await fetchAllPages<FctBlockProposalStatusHourly & FctBlockProposalStatusDaily>(
         (hourly ? fctBlockProposalStatusHourlyServiceList : fctBlockProposalStatusDailyServiceList) as ListFn,

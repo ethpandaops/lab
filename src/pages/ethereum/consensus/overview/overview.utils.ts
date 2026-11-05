@@ -2,6 +2,7 @@ import { createBandSeries, createStatisticSeries } from '@/components/Charts/Mul
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import type { ThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
+import { completeUtcDays } from '@/utils/time';
 import type {
   FctBlobCountHourly,
   FctBlobCountDaily,
@@ -44,13 +45,12 @@ export function formatBand(lower: number | undefined, upper: number | undefined)
 }
 
 /**
- * Computes the inclusive start date (YYYY-MM-DD, UTC) for a daily window of `days` calendar days.
- * The window spans exactly `days` buckets ending on the current UTC day (today and the `days - 1`
- * preceding days). Returns undefined for an unbounded ("all") window.
+ * Computes the inclusive start date (YYYY-MM-DD, UTC) for a daily window of `days` complete UTC days, ending
+ * yesterday. Returns undefined for an unbounded ("all") window.
  */
 export function dailyWindowStartDate(days: number | null, now: number = Date.now()): string | undefined {
   if (days === null) return undefined;
-  return new Date(now - (days - 1) * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return completeUtcDays(days, now)[0];
 }
 
 /**

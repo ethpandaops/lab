@@ -8,6 +8,7 @@ import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
 import { Badge } from '@/components/Elements/Badge';
 import { useTableBounds } from '@/hooks/useBounds';
+import { completeBucketEnd } from '@/utils/time';
 import { useValidatorsData, useValidatorResolver, useValidatorStatus, useValidatorIdentity } from './hooks';
 import {
   ValidatorInput,
@@ -72,15 +73,17 @@ export function InspectPage(): JSX.Element {
     hourTimestamp: null,
   });
 
-  const today = startOfDay(Date.now() / 1000);
-  const to = range.to ?? today;
-  const from = range.from ?? to - DEFAULT_RANGE_DAYS * DAY;
-  // Only a range that also ends today can skip listing its periods; an earlier end must cut rows off
-  const allHistory = earliest !== undefined && from <= earliest && to >= today;
+  // Start of the last complete UTC day, and the Sunday ending the last complete week
+  const lastDay = completeBucketEnd('day') - DAY;
+  const lastWeekDay = completeBucketEnd('week') - DAY;
+  const to = range.to ?? lastDay;
+  const from = range.from ?? to - (DEFAULT_RANGE_DAYS - 1) * DAY;
+  // Only a range that also ends on the last complete day can skip listing its periods; an earlier end must cut rows off
+  const allHistory = earliest !== undefined && from <= earliest && to >= lastDay;
   const resolution = (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
-  // Weekly rows cover Monday to Sunday, so the data spans every week the range touches
+  // Weekly rows cover Monday to Sunday, so the data spans every complete week the range touches
   const dataFrom = resolution === 'week' ? mondayOf(from) : from;
-  const dataTo = resolution === 'week' ? Math.min(today, mondayOf(to) + 6 * DAY) : to;
+  const dataTo = resolution === 'week' ? Math.min(lastWeekDay, mondayOf(to) + 6 * DAY) : to;
 
   const { valid: parsedIndices, pubkeys: parsedPubkeys } = useMemo(() => parseValidatorIndices(tags), [tags]);
   const {
@@ -120,8 +123,8 @@ export function InspectPage(): JSX.Element {
     [resolvedIndices, identities]
   );
   const pubkeys = new Map(identityList.map(v => [v.index, v.pubkey]));
-  // dim_validator holds today's state; a range that ends earlier shows each validator as it was on its last day
-  const endsEarlier = dataTo < today;
+  // dim_validator holds the current state; a range that ends earlier shows each validator as it was on its last day
+  const endsEarlier = dataTo < lastDay;
   const balanceAtEnd = new Map(validators.map(v => [v.validatorIndex, v.balance]));
   const endStates =
     endsEarlier && !isLoading

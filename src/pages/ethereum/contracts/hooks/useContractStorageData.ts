@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { currentUtcDate } from '@/utils/time';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fctContractStorageStateByAddressDailyServiceListOptions,
@@ -64,7 +65,6 @@ interface UseContractStorageDataResult {
 /** Query for the newest day in a whole table, so a series isn't carried past where its table stops */
 const TABLE_END_QUERY = {
   address_like: '0x%',
-  day_start_date_like: '20%',
   order_by: 'day_start_date desc',
   page_size: 1,
 };
@@ -76,13 +76,15 @@ const TABLE_END_QUERY = {
 export function useContractStorageData(address: string): UseContractStorageDataResult {
   // Normalize address to lowercase for API requests
   const normalizedAddress = address.toLowerCase();
+  const today = currentUtcDate();
+  const tableEndQuery = { ...TABLE_END_QUERY, day_start_date_ne: today };
 
   // Fetch current state for this address (no expiry)
   const currentStateQuery = useQuery({
     ...fctContractStorageStateByAddressDailyServiceListOptions({
       query: {
         address_eq: normalizedAddress,
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -95,7 +97,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
       query: {
         address_eq: normalizedAddress,
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -107,7 +109,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
       query: {
         address_eq: normalizedAddress,
         expiry_policy_eq: '24m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -119,7 +121,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     ...fctStorageSlotStateByAddressDailyServiceListOptions({
       query: {
         address_eq: normalizedAddress,
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -132,7 +134,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
       query: {
         address_eq: normalizedAddress,
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -144,7 +146,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
       query: {
         address_eq: normalizedAddress,
         expiry_policy_eq: '24m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -154,19 +156,19 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   // Newest day in each table. Rows are only written on days a contract changes, so a contract's own
   // rows can't tell a quiet contract from a table that stopped updating.
   const contractCurrentEndQuery = useQuery({
-    ...fctContractStorageStateByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    ...fctContractStorageStateByAddressDailyServiceListOptions({ query: tableEndQuery }),
     select: res => res.fct_contract_storage_state_by_address_daily?.[0]?.day_start_date ?? null,
   });
   const contractExpiryEndQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({ query: tableEndQuery }),
     select: res => res.fct_contract_storage_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
   });
   const slotCurrentEndQuery = useQuery({
-    ...fctStorageSlotStateByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    ...fctStorageSlotStateByAddressDailyServiceListOptions({ query: tableEndQuery }),
     select: res => res.fct_storage_slot_state_by_address_daily?.[0]?.day_start_date ?? null,
   });
   const slotExpiryEndQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({ query: TABLE_END_QUERY }),
+    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({ query: tableEndQuery }),
     select: res => res.fct_storage_slot_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
   });
 

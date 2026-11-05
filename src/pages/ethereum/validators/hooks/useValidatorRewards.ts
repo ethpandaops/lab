@@ -16,6 +16,7 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
+import { currentUtcDate, currentUtcWeek } from '@/utils/time';
 
 const GWEI = 1e9;
 const PAGE = 10_000;
@@ -62,7 +63,9 @@ export function useValidatorRewards({
   const enabled = indices.length > 0 && from > 0;
   const weekly = resolution === 'week';
   const column = weekly ? 'week_start_date' : 'day_start_date';
-  const periodFilter = allHistory ? { [`${column}_like`]: '20%' } : { [`${column}_in_values`]: periodKeys.join(',') };
+  const periodFilter = allHistory
+    ? { [`${column}_ne`]: weekly ? currentUtcWeek() : currentUtcDate() }
+    : { [`${column}_in_values`]: periodKeys.join(',') };
   // Validators per request, so a chunk's rows fit in about one page; page tokens pick up the rest
   const periodCount = allHistory ? Math.ceil((to - from) / 86_400 / (weekly ? 7 : 1)) + 1 : periodKeys.length;
   const chunkSize = Math.max(1, Math.floor(PAGE / Math.max(1, periodCount)));

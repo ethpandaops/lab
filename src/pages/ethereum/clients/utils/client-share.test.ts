@@ -4,7 +4,6 @@ import {
   bucketShares,
   buildShareChartConfig,
   computeCoverage,
-  dailyDateValues,
   entityLabel,
   entityQuery,
   filterRecords,
@@ -137,12 +136,6 @@ describe('formatClientName', () => {
     expect(formatClientName('unknown')).toBe('Unknown');
     expect(formatClientName('nimbusel')).toBe('Nimbus EL');
     expect(formatClientName('trin-execution')).toBe('Trin Execution');
-  });
-});
-
-describe('dailyDateValues', () => {
-  it('should list the last N UTC days ending today', () => {
-    expect(dailyDateValues(3, Date.UTC(2026, 9, 19, 7, 0, 0))).toBe('2026-10-17,2026-10-18,2026-10-19');
   });
 });
 

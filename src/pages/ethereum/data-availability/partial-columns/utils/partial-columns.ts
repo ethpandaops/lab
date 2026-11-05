@@ -436,23 +436,11 @@ export interface LatestAdoption {
   requestsPartial: number;
 }
 
-/** Start of the bucket that contains `now`, the one still filling up */
-export function currentBucketKey(isDaily: boolean, now: number = Date.now()): string {
-  if (isDaily) return new Date(now).toISOString().slice(0, 10);
-  return String(Math.floor(now / 1000 / 3600) * 3600);
-}
-
-/** Adoption in the latest complete bucket with subscribing peers, the current one only when it is the only one */
-export function latestAdoption(
-  records: PeerRecord[],
-  isDaily: boolean,
-  now: number = Date.now()
-): LatestAdoption | null {
+/** Adoption in the latest bucket with subscribing peers */
+export function latestAdoption(records: PeerRecord[]): LatestAdoption | null {
   const grouped = byKey(records.filter(r => r.subscribed > 0));
   const keys = [...grouped.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-  const current = currentBucketKey(isDaily, now);
-  const complete = keys.filter(key => key !== current);
-  const key = complete.at(-1) ?? keys.at(-1);
+  const key = keys.at(-1);
   if (key === undefined) return null;
   const bucket = grouped.get(key) ?? [];
   return {

@@ -6,6 +6,7 @@ import type {
 } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
+import { completeBucketEnd } from '@/utils/time';
 import { findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
 import { RESOLVED_STATUSES, type ReleaseStatus } from '../api/client-models';
 
@@ -227,14 +228,14 @@ export function formatDataDate(seconds: number): string {
   });
 }
 
-/** Start (unix seconds, UTC midnight) of a window of `days` whole days ending today */
+/** Start (unix seconds, UTC midnight) of a window of `days` complete UTC days ending yesterday */
 export function windowStart(days: number, now: number = Date.now()): number {
-  return Math.floor(now / 1000 / 86400) * 86400 - (days - 1) * 86400;
+  return completeBucketEnd('day', now) - days * 86400;
 }
 
-/** Start of the trailing 24 hours, on the hour so the query stays cached */
+/** Start of the last 24 complete hours */
 export function last24hStart(now: number = Date.now()): number {
-  return Math.floor(now / 1000 / 3600) * 3600 - 24 * 3600;
+  return completeBucketEnd('hour', now) - 24 * 3600;
 }
 
 /** A client's blocks over a window against its latest release */

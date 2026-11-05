@@ -4,7 +4,8 @@ import { Card } from '@/components/Layout/Card';
 import { useTimezone } from '@/hooks/useTimezone';
 import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
 import { formatMs } from '../../utils/node-stats';
-import { bucketHeading, expectedSlots } from '../../utils/time-buckets';
+import { SLOTS_PER_BUCKET } from '../../constants';
+import { bucketHeading } from '../../utils/time-buckets';
 
 export interface ActivityStripProps {
   /** The node's block rollups */
@@ -19,8 +20,6 @@ interface Bar {
   start: number;
   /** Before the node's first report in the range */
   before: boolean;
-  /** Still in progress, so recent slots may not be ingested yet */
-  current: boolean;
   /** Trailing the network by more than a slot: the node was catching up */
   behind: boolean;
   seen: number;
@@ -36,7 +35,6 @@ const GAP_THRESHOLD = 0.9;
 
 function barClass(bar: Bar): string {
   if (bar.before) return 'bg-border/60';
-  if (bar.current) return 'bg-muted/45 group-hover:bg-muted';
   if (bar.seen === 0) return 'bg-danger';
   if (bar.behind) return 'bg-warning';
   if (bar.seen / bar.total < GAP_THRESHOLD) return 'bg-warning';
@@ -49,24 +47,21 @@ function barClass(bar: Bar): string {
 export function ActivityStrip({ block, blockSlots, behind }: ActivityStripProps): JSX.Element {
   const { timezone } = useTimezone();
   const [hovered, setHovered] = useState<Bar | null>(null);
-  const now = Date.now() / 1000;
   const byBucket = rowsByBucket(block.rows);
   const first = block.rows.length > 0 ? Math.min(...block.rows.map(row => row.start)) : Infinity;
   const bars: Bar[] = block.buckets
-    .map((start, index) => ({
+    .map(start => ({
       start,
       before: start < first,
-      current: index === block.buckets.length - 1,
       behind: behind?.has(start) ?? false,
       seen: byBucket.get(start)?.count ?? 0,
-      total: blockSlots.get(start) ?? expectedSlots(start, block.granularity, now),
+      total: blockSlots.get(start) ?? SLOTS_PER_BUCKET[block.granularity],
       counted: blockSlots.has(start),
       p50: byBucket.get(start)?.p50 ?? null,
     }))
-    // The bucket in progress may not be ingested yet
+    // The newest bucket may not be ingested yet
     .filter((bar, index, all) => bar.total > 0 && !(index === all.length - 1 && bar.seen === 0));
-  // The bucket in progress lags ingestion, so leave it out of the share
-  const settled = bars.filter(bar => !bar.current && bar.counted);
+  const settled = bars.filter(bar => bar.counted);
   const settledSeen = settled.reduce((sum, bar) => sum + bar.seen, 0);
   const settledTotal = settled.reduce((sum, bar) => sum + (bar.before ? 0 : bar.total), 0);
 

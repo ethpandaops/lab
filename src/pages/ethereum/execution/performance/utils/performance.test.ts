@@ -85,14 +85,23 @@ describe('blockSlices', () => {
 
 describe('rangeDays', () => {
   const day = Date.UTC(2026, 10, 2) / 1000;
+  // Two days later, so `day` and the day after are complete
+  const later = (day + 2 * 86400 + 3600) * 1000;
 
   it('widens an hour inside one day to that day', () => {
-    expect(rangeDays(day + 5 * 3600, day + 6 * 3600)).toEqual({ start: day, end: day + 86400 });
+    expect(rangeDays(day + 5 * 3600, day + 6 * 3600, later)).toEqual({ start: day, end: day + 86400 });
   });
 
   it('takes both days a range crossing midnight touches, and no more when it ends at midnight', () => {
-    expect(rangeDays(day - 3600, day + 3600)).toEqual({ start: day - 86400, end: day + 86400 });
-    expect(rangeDays(day - 86400, day)).toEqual({ start: day - 86400, end: day });
+    expect(rangeDays(day - 3600, day + 3600, later)).toEqual({ start: day - 86400, end: day + 86400 });
+    expect(rangeDays(day - 86400, day, later)).toEqual({ start: day - 86400, end: day });
+  });
+
+  it('leaves out the day in progress', () => {
+    const now = (day + 13 * 3600) * 1000;
+    expect(rangeDays(day - 86400 - 3600, day + 12 * 3600, now)).toEqual({ start: day - 2 * 86400, end: day });
+    // A range inside the day in progress takes the last complete day
+    expect(rangeDays(day + 11 * 3600, day + 12 * 3600, now)).toEqual({ start: day - 86400, end: day });
   });
 });
 

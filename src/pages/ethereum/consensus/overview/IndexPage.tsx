@@ -18,6 +18,7 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 import { Toggle } from '@/components/Forms/Toggle';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { epochToTimestamp } from '@/utils/beacon';
+import { completeBucketEnd, currentUtcDate } from '@/utils/time';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useTableBounds } from '@/hooks/useBounds';
 import {
@@ -97,11 +98,10 @@ export function IndexPage(): JSX.Element {
   const themeColors = useThemeColors();
   const { allForks } = useForks();
 
-  const startTimestamp = useMemo(() => {
-    if (config.days === null) return undefined;
-    const now = Math.floor(Date.now() / 1000);
-    return now - config.days * 24 * 60 * 60;
-  }, [config.days]);
+  // Rollups are read up to the hour or UTC day in progress, never including it
+  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
+  const today = useMemo(() => currentUtcDate(), []);
+  const startTimestamp = config.days === null ? undefined : hourlyEnd - config.days * 24 * 60 * 60;
 
   // Daily endpoints have no server-side range filter on their primary key, so the
   // selected window is applied to daily records client-side via this cutoff date.
@@ -113,6 +113,7 @@ export function IndexPage(): JSX.Element {
     ...fctBlobCountHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -121,7 +122,7 @@ export function IndexPage(): JSX.Element {
   });
   const blobDailyQuery = useQuery({
     ...fctBlobCountDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -130,6 +131,7 @@ export function IndexPage(): JSX.Element {
     ...fctAttestationParticipationRateHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -138,7 +140,7 @@ export function IndexPage(): JSX.Element {
   });
   const attnDailyQuery = useQuery({
     ...fctAttestationParticipationRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -147,6 +149,7 @@ export function IndexPage(): JSX.Element {
     ...fctHeadVoteCorrectnessRateHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -155,7 +158,7 @@ export function IndexPage(): JSX.Element {
   });
   const hvDailyQuery = useQuery({
     ...fctHeadVoteCorrectnessRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -163,13 +166,14 @@ export function IndexPage(): JSX.Element {
   // Reorg tables write a zero row for every depth in every bucket, so only non-zero rows are read, across
   // every page: their count grows with reorgs, not with time.
   const reorgHourlyQuery = useQuery({
-    queryKey: ['consensus-overview', 'reorg-hourly', currentNetwork?.name, startTimestamp],
+    queryKey: ['consensus-overview', 'reorg-hourly', currentNetwork?.name, startTimestamp, hourlyEnd],
     queryFn: ({ signal }) =>
       fetchAllPages<FctReorgHourly>(
         fctReorgHourlyServiceList,
         {
           query: {
             hour_start_date_time_gte: startTimestamp,
+            hour_start_date_time_lt: hourlyEnd,
             reorg_count_gt: 0,
             order_by: 'hour_start_date_time asc',
             page_size: PAGE_SIZE,
@@ -181,17 +185,12 @@ export function IndexPage(): JSX.Element {
     enabled: !isDaily,
   });
   const reorgDailyQuery = useQuery({
-    queryKey: ['consensus-overview', 'reorg-daily', currentNetwork?.name],
+    queryKey: ['consensus-overview', 'reorg-daily', currentNetwork?.name, today],
     queryFn: ({ signal }) =>
       fetchAllPages<FctReorgDaily>(
         fctReorgDailyServiceList,
         {
-          query: {
-            day_start_date_like: '20%',
-            reorg_count_gt: 0,
-            order_by: 'day_start_date desc',
-            page_size: PAGE_SIZE,
-          },
+          query: { day_start_date_ne: today, reorg_count_gt: 0, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
         },
         'fct_reorg_daily',
         signal
@@ -204,6 +203,7 @@ export function IndexPage(): JSX.Element {
     ...fctMissedSlotRateHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -212,7 +212,7 @@ export function IndexPage(): JSX.Element {
   });
   const missedSlotDailyQuery = useQuery({
     ...fctMissedSlotRateDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -221,6 +221,7 @@ export function IndexPage(): JSX.Element {
     ...fctBlockProposalStatusHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -229,7 +230,7 @@ export function IndexPage(): JSX.Element {
   });
   const proposalStatusDailyQuery = useQuery({
     ...fctBlockProposalStatusDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -240,6 +241,7 @@ export function IndexPage(): JSX.Element {
     ...fctBlockPayloadStatusHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -248,7 +250,7 @@ export function IndexPage(): JSX.Element {
   });
   const payloadStatusDailyQuery = useQuery({
     ...fctBlockPayloadStatusDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -257,6 +259,7 @@ export function IndexPage(): JSX.Element {
     ...fctAttestationInclusionDelayHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -265,7 +268,7 @@ export function IndexPage(): JSX.Element {
   });
   const inclusionDelayDailyQuery = useQuery({
     ...fctAttestationInclusionDelayDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });
@@ -274,6 +277,7 @@ export function IndexPage(): JSX.Element {
     ...fctProposerRewardHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: PAGE_SIZE,
       },
@@ -282,7 +286,7 @@ export function IndexPage(): JSX.Element {
   });
   const proposerRewardDailyQuery = useQuery({
     ...fctProposerRewardDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: PAGE_SIZE },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
     }),
     enabled: isDaily,
   });

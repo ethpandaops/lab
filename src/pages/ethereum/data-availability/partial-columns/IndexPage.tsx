@@ -131,7 +131,7 @@ export function IndexPage(): JSX.Element {
 
   const completion = useMemo(() => summariseCompletions(sentryPaths), [sentryPaths]);
   const partials = useMemo(() => summarisePartials(sentryPartials), [sentryPartials]);
-  const adoption = useMemo(() => latestAdoption(peerRecords, isDaily), [peerRecords, isDaily]);
+  const adoption = useMemo(() => latestAdoption(peerRecords), [peerRecords]);
   const versions = useMemo(() => summariseVersions(peerRecords), [peerRecords]);
 
   const labels = useMemo(() => keys.map(key => formatBucketLabel(key, isDaily)), [keys, isDaily]);

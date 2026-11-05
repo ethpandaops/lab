@@ -10,7 +10,7 @@ import {
 } from '@/api/sdk.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { dailyDateValues } from '@/pages/ethereum/clients/utils/client-share';
+import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
 import { PAGE_SIZE, QUERY_RETRIES, TIME_RANGE_CONFIG } from '../constants';
 import type { PartialRecord, PathRecord, PeerRecord, TimePeriod } from '../IndexPage.types';
 import { bucketKeys, toPartialRecords, toPathRecords, toPeerRecords } from '../utils/partial-columns';
@@ -40,11 +40,9 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
   const config = TIME_RANGE_CONFIG[timePeriod];
   const isDaily = config.dataType === 'daily';
 
-  // Hour aligned so the window always starts on a whole bucket.
-  const hourlyStart = useMemo(() => {
-    const hourNow = Math.floor(Date.now() / 1000 / 3600) * 3600;
-    return hourNow - (config.days ?? 0) * 24 * 3600;
-  }, [config.days]);
+  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
+  const today = useMemo(() => currentUtcDate(), []);
+  const hourlyStart = hourlyEnd - (config.days ?? 0) * 24 * 3600;
 
   const fetchRows = async <T>(
     hourly: { fn: ListFn; key: string },
@@ -55,7 +53,12 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
       return fetchAllPages<T>(
         hourly.fn,
         {
-          query: { hour_start_date_time_gte: hourlyStart, order_by: 'hour_start_date_time asc', page_size: PAGE_SIZE },
+          query: {
+            hour_start_date_time_gte: hourlyStart,
+            hour_start_date_time_lt: hourlyEnd,
+            order_by: 'hour_start_date_time asc',
+            page_size: PAGE_SIZE,
+          },
         },
         hourly.key,
         signal
@@ -64,8 +67,8 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
     // The daily tables only filter their date key by value, so bounded windows list their dates.
     const dateFilter =
       config.days === null
-        ? { day_start_date_like: '20%' }
-        : { day_start_date_in_values: dailyDateValues(config.days) };
+        ? { day_start_date_ne: today }
+        : { day_start_date_in_values: completeUtcDays(config.days).join(',') };
     return fetchAllPages<T>(
       daily.fn,
       { query: { ...dateFilter, order_by: 'day_start_date asc', page_size: PAGE_SIZE } },
@@ -74,7 +77,7 @@ export function usePartialColumnRollups(timePeriod: TimePeriod): UsePartialColum
     );
   };
 
-  const queryKey = ['partial-columns', currentNetwork?.name, timePeriod, isDaily ? 'daily' : hourlyStart];
+  const queryKey = ['partial-columns', currentNetwork?.name, timePeriod, isDaily ? today : hourlyStart];
 
   const paths = useQuery({
     queryKey: [...queryKey, 'paths'],

@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { completeUtcDays } from '@/utils/time';
 import { fctValidatorCountByEntityByStatusDailyServiceList } from '@/api/sdk.gen';
 import type { FctValidatorCountByEntityByStatusDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { ENTITY_OPTIONS_STATUS, PAGE_SIZE } from '../constants';
-import { dailyDateValues, toEntityOptions, type EntityOption } from '../utils/client-share';
+import { toEntityOptions, type EntityOption } from '../utils/client-share';
 
 export interface UseEntityOptionsResult {
   /** Entities with active validators, largest first */
@@ -25,7 +26,7 @@ export function useEntityOptions(): UseEntityOptionsResult {
         fctValidatorCountByEntityByStatusDailyServiceList,
         {
           query: {
-            day_start_date_in_values: dailyDateValues(3),
+            day_start_date_in_values: completeUtcDays(3).join(','),
             status_eq: ENTITY_OPTIONS_STATUS,
             page_size: PAGE_SIZE,
           },

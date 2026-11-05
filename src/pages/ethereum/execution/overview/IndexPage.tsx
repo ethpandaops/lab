@@ -1,4 +1,5 @@
 import { type JSX, useMemo, useCallback, useState } from 'react';
+import { completeBucketEnd, currentUtcDate } from '@/utils/time';
 import { useSearch, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Container } from '@/components/Layout/Container';
@@ -78,18 +79,17 @@ export function IndexPage(): JSX.Element {
   const { currentNetwork } = useNetwork();
   const { allForks } = useForks();
 
-  // Calculate timestamp for start of selected time range (for hourly queries)
-  const startTimestamp = useMemo(() => {
-    if (config.days === null) return undefined;
-    const now = Math.floor(Date.now() / 1000);
-    return now - config.days * 24 * 60 * 60;
-  }, [config.days]);
+  // Rollups are read up to the hour or UTC day in progress, never including it
+  const hourlyEnd = useMemo(() => completeBucketEnd('hour'), []);
+  const today = useMemo(() => currentUtcDate(), []);
+  const startTimestamp = config.days === null ? undefined : hourlyEnd - config.days * 24 * 60 * 60;
 
   // TPS Queries
   const tpsHourlyQuery = useQuery({
     ...fctExecutionTpsHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: config.pageSize,
       },
@@ -99,11 +99,7 @@ export function IndexPage(): JSX.Element {
 
   const tpsDailyQuery = useQuery({
     ...fctExecutionTpsDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
   });
@@ -113,6 +109,7 @@ export function IndexPage(): JSX.Element {
     ...fctExecutionGasUsedHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: config.pageSize,
       },
@@ -122,11 +119,7 @@ export function IndexPage(): JSX.Element {
 
   const gasDailyQuery = useQuery({
     ...fctExecutionGasUsedDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
   });
@@ -136,6 +129,7 @@ export function IndexPage(): JSX.Element {
     ...fctExecutionGasLimitHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: config.pageSize,
       },
@@ -145,11 +139,7 @@ export function IndexPage(): JSX.Element {
 
   const gasLimitDailyQuery = useQuery({
     ...fctExecutionGasLimitDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
   });
@@ -159,6 +149,7 @@ export function IndexPage(): JSX.Element {
     ...fctExecutionGasLimitSignallingHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: config.pageSize,
       },
@@ -168,11 +159,7 @@ export function IndexPage(): JSX.Element {
 
   const signallingDailyQuery = useQuery({
     ...fctExecutionGasLimitSignallingDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
   });
@@ -180,14 +167,14 @@ export function IndexPage(): JSX.Element {
   // Latest signalling row, to show where its data ends when it stops before the other charts
   const signallingLatestHourlyQuery = useQuery({
     ...fctExecutionGasLimitSignallingHourlyServiceListOptions({
-      query: { hour_start_date_time_gte: 0, order_by: 'hour_start_date_time desc', page_size: 1 },
+      query: { hour_start_date_time_lt: hourlyEnd, order_by: 'hour_start_date_time desc', page_size: 1 },
     }),
     enabled: !isDaily,
   });
 
   const signallingLatestDailyQuery = useQuery({
     ...fctExecutionGasLimitSignallingDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: 1 },
     }),
     enabled: isDaily,
   });
@@ -197,6 +184,7 @@ export function IndexPage(): JSX.Element {
     ...fctExecutionTransactionsHourlyServiceListOptions({
       query: {
         hour_start_date_time_gte: startTimestamp,
+        hour_start_date_time_lt: hourlyEnd,
         order_by: 'hour_start_date_time asc',
         page_size: config.pageSize,
       },
@@ -206,11 +194,7 @@ export function IndexPage(): JSX.Element {
 
   const transactionsDailyQuery = useQuery({
     ...fctExecutionTransactionsDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        order_by: 'day_start_date desc',
-        page_size: config.pageSize,
-      },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: config.pageSize },
     }),
     enabled: isDaily,
   });

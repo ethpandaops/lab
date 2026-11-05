@@ -1,5 +1,6 @@
 import type { TimezoneMode } from '@/contexts/TimezoneContext';
-import { NODE_RANGE_CONFIG, SLOTS_PER_BUCKET, type Granularity, type NodeRange } from '../constants';
+import { completeBucketEnd } from '@/utils/time';
+import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
 
 const HOUR = 3600;
 const DAY = 86400;
@@ -10,22 +11,22 @@ export function bucketSeconds(granularity: Granularity): number {
 }
 
 /**
- * Start (unix seconds, UTC) of every bucket in a range, oldest first, ending with the bucket in progress.
+ * Start (unix seconds, UTC) of every bucket in a range, oldest first, ending with the last complete bucket.
  *
  * @param earliest - First bucket with data; only used for all history, which has no fixed length
  */
 export function getBuckets(range: NodeRange, nowSeconds: number, earliest?: number): number[] {
   const { granularity, buckets } = NODE_RANGE_CONFIG[range];
   const size = bucketSeconds(granularity);
-  const current = Math.floor(nowSeconds / size) * size;
+  const last = completeBucketEnd(granularity === 'hourly' ? 'hour' : 'day', nowSeconds * 1000) - size;
   const first =
     buckets === null
       ? earliest === undefined
-        ? current
-        : Math.min(current, Math.floor(earliest / size) * size)
-      : current - (buckets - 1) * size;
+        ? last
+        : Math.min(last, Math.floor(earliest / size) * size)
+      : last - (buckets - 1) * size;
   const starts: number[] = [];
-  for (let start = first; start <= current; start += size) starts.push(start);
+  for (let start = first; start <= last; start += size) starts.push(start);
   return starts;
 }
 
@@ -40,15 +41,6 @@ export function parseBucket(value: number | string | undefined): number | null {
   if (typeof value === 'number') return value;
   const parsed = Date.parse(`${value}T00:00:00Z`);
   return Number.isNaN(parsed) ? null : parsed / 1000;
-}
-
-/**
- * Slots a bucket can hold so far: a whole hour or day, or the slots elapsed in the bucket in progress.
- */
-export function expectedSlots(start: number, granularity: Granularity, nowSeconds: number): number {
-  const full = SLOTS_PER_BUCKET[granularity];
-  const elapsed = Math.floor((nowSeconds - start) / 12);
-  return Math.max(0, Math.min(full, elapsed));
 }
 
 /** Timezone option for a bucket: daily buckets are UTC days, so they always render in UTC */

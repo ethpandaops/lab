@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { censusList, type CensusTable } from '../api/client-models';
-import { latestFullDay } from '../utils/census';
+import { latestDay } from '../utils/census';
 import { windowStart } from '../utils/client-versions';
 import { useDailyByClient } from './useDailyByClient';
 
@@ -19,8 +19,8 @@ export interface UseCensusResult<T> {
 }
 
 /**
- * A census table's rows matching `filters` over a window (the last few days when `from` is omitted, ending now
- * unless `to` is earlier), with the latest full day picked out. Pass null filters to skip loading.
+ * A census table's rows matching `filters` over a window (the last few complete days when `from` is omitted, ending
+ * yesterday unless `to` is earlier), with the latest day picked out. Pass null filters to skip loading.
  */
 export function useCensus<T extends { day_start_date?: string; client?: string }>(
   table: CensusTable,
@@ -30,9 +30,7 @@ export function useCensus<T extends { day_start_date?: string; client?: string }
 ): UseCensusResult<T> {
   const start = useMemo(() => from ?? windowStart(LATEST_DAYS), [from]);
   const { rows, dataStart, isLoading } = useDailyByClient<T>(censusList(table), table, filters, start, to);
-  const day = useMemo(() => latestFullDay(rows), [rows]);
-  // Today is still filling, so trends stop at the latest full day
-  const fullRows = useMemo(() => (day ? rows.filter(row => (row.day_start_date ?? '') <= day) : rows), [rows, day]);
+  const day = useMemo(() => latestDay(rows), [rows]);
   const latest = useMemo(() => rows.filter(row => row.day_start_date === day), [rows, day]);
-  return { rows: fullRows, latest, day, dataStart, isLoading };
+  return { rows, latest, day, dataStart, isLoading };
 }

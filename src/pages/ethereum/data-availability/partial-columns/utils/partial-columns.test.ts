@@ -25,6 +25,7 @@ import {
 
 const H1 = '1792465200';
 const H2 = '1792468800';
+const H3 = '1792472400';
 
 function path(overrides: Partial<PathRecord>): PathRecord {
   return {
@@ -243,17 +244,10 @@ describe('peer adoption', () => {
     expect(series[2].data).toEqual([30, 50]);
   });
 
-  it('should report the latest complete bucket and fall back to the current one', () => {
-    const now = (Number(H2) + 600) * 1000;
-    expect(latestAdoption(peers, false, now)).toEqual({ key: H1, subscribed: 500, requestsPartial: 150 });
-    expect(
-      latestAdoption(
-        peers.filter(r => r.key === H2),
-        false,
-        now
-      )?.key
-    ).toBe(H2);
-    expect(latestAdoption([], false, now)).toBeNull();
+  it('should report the latest bucket with subscribing peers', () => {
+    expect(latestAdoption(peers)).toEqual({ key: H2, subscribed: 400, requestsPartial: 200 });
+    expect(latestAdoption([...peers, peer({ key: H3, subscribed: 0, requestsPartial: 0 })])?.key).toBe(H2);
+    expect(latestAdoption([])).toBeNull();
   });
 
   it('should average versions over the buckets, grouped by client and newest first', () => {

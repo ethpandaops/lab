@@ -7,7 +7,7 @@ import {
   forkIdNextLabel,
   groupForkIdNext,
   groupNextForkDigests,
-  latestFullDay,
+  latestDay,
   peerShareChart,
   unifiedClientRows,
 } from './census';
@@ -23,12 +23,11 @@ const network = {
   },
 } as unknown as Network;
 
-describe('latestFullDay', () => {
-  it('should skip today while an earlier day exists', () => {
-    const rows = [{ day_start_date: '2026-11-01' }, { day_start_date: '2026-11-02' }];
-    expect(latestFullDay(rows, '2026-11-02')).toBe('2026-11-01');
-    expect(latestFullDay([{ day_start_date: '2026-11-02' }], '2026-11-02')).toBe('2026-11-02');
-    expect(latestFullDay([], '2026-11-02')).toBeNull();
+describe('latestDay', () => {
+  it('should pick the newest day', () => {
+    const rows = [{ day_start_date: '2026-11-02' }, { day_start_date: '2026-11-01' }, {}];
+    expect(latestDay(rows)).toBe('2026-11-02');
+    expect(latestDay([])).toBeNull();
   });
 });
 

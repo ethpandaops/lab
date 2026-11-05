@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { currentUtcDate } from '@/utils/time';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fctStorageSlotStateByBlockDailyServiceListOptions,
@@ -67,13 +68,11 @@ interface UseStateExpiryDataResult {
  * Returns daily data with overlaid comparison between current state and states with various expiry policies.
  */
 export function useStateExpiryData(): UseStateExpiryDataResult {
+  const today = currentUtcDate();
   // Fetch current state daily data (baseline)
   const currentStateQuery = useQuery({
     ...fctStorageSlotStateByBlockDailyServiceListOptions({
-      query: {
-        day_start_date_like: '20%',
-        page_size: 10000,
-      },
+      query: { day_start_date_ne: today, page_size: 10000 },
     }),
     placeholderData: keepPreviousData,
   });
@@ -83,7 +82,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -94,7 +93,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '24m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -106,7 +105,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     ...fctContractStorageStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '12m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),
@@ -117,7 +116,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     ...fctContractStorageStateWithExpiryByBlockDailyServiceListOptions({
       query: {
         expiry_policy_eq: '24m',
-        day_start_date_like: '20%',
+        day_start_date_ne: today,
         page_size: 10000,
       },
     }),

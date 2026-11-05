@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { currentUtcDate } from '@/utils/time';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   fctStorageSlotStateByBlockDailyServiceListOptions,
@@ -56,6 +57,7 @@ interface UseContractTop100DataResult {
  * Returns contracts grouped with base state and 1y/2y expiry policy data.
  */
 export function useContractTop100Data(): UseContractTop100DataResult {
+  const today = currentUtcDate();
   const query = useQuery({
     ...fctStorageSlotTop100ByBytesServiceListOptions({
       query: {
@@ -69,13 +71,18 @@ export function useContractTop100Data(): UseContractTop100DataResult {
 
   const latestBaseQuery = useQuery({
     ...fctStorageSlotStateByBlockDailyServiceListOptions({
-      query: { day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: 1 },
     }),
   });
 
   const latestExpiryQuery = useQuery({
     ...fctStorageSlotStateWithExpiryByBlockDailyServiceListOptions({
-      query: { expiry_policy_eq: '12m', day_start_date_like: '20%', order_by: 'day_start_date desc', page_size: 1 },
+      query: {
+        expiry_policy_eq: '12m',
+        day_start_date_ne: today,
+        order_by: 'day_start_date desc',
+        page_size: 1,
+      },
     }),
   });
 
