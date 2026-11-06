@@ -8,7 +8,6 @@ import { getDataVizColors } from '@/utils';
 import type { FctValidatorBalanceDaily } from '@/api/types.gen';
 import { useValidatorRewards } from '../../hooks/useValidatorRewards';
 import { formatDayLabel } from '../../utils/overview';
-import { weekStartOf } from '../../utils/week';
 
 interface ValidatorBalanceProps {
   balances: FctValidatorBalanceDaily[];
@@ -16,9 +15,7 @@ interface ValidatorBalanceProps {
   /** Range start and end day (unix seconds, start of day UTC); the end day is included */
   from: number;
   to: number;
-  /** The range starts at the earliest data */
-  allHistory: boolean;
-  /** Days covered by each row: 1 for daily rows, 7 for weekly */
+  /** Days covered by each row: 1 for daily rows, 7 for weekly (partial at either end of the range) */
   daysPerRow: 1 | 7;
 }
 
@@ -46,7 +43,6 @@ export function ValidatorBalance({
   validatorIndices,
   from,
   to,
-  allHistory,
   daysPerRow,
 }: ValidatorBalanceProps): JSX.Element {
   const [view, setView] = useState<View>('balance');
@@ -93,16 +89,11 @@ export function ValidatorBalance({
           },
         ];
 
-  const dayKeys: string[] = [];
-  for (let t = from; t <= to; t += 86_400) dayKeys.push(new Date(t * 1000).toISOString().slice(0, 10));
-  const periodKeys = daysPerRow === 7 ? [...new Set(dayKeys.map(weekStartOf))] : dayKeys;
   const rewards = useValidatorRewards({
     indices: validatorIndices,
     from,
     to,
     resolution: daysPerRow === 7 ? 'week' : 'day',
-    periodKeys,
-    allHistory,
     enabled: view === 'rewards',
   });
   const rewardRows = rewards.periods;

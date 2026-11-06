@@ -6,6 +6,7 @@ import {
   fctAttestationRewardByValidatorServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type { FctAttestationVoteCorrectnessByValidatorServiceListData } from '@/api/types.gen';
+import { useTableBounds } from '@/hooks/useBounds';
 
 export type AttestationOutcome = 'all' | 'missed' | 'head' | 'target' | 'source' | 'late';
 
@@ -47,16 +48,17 @@ const OUTCOME_FILTERS: Record<AttestationOutcome, Partial<DutyQuery>> = {
 export function useAttestationDuties({
   indices,
   from,
-  to,
+  end,
   outcome,
   slot,
   pageSize,
   pageToken,
 }: {
   indices: number[];
-  /** Range start and end day (unix seconds, start of day UTC); the end day is included */
+  /** Range start (unix seconds) */
   from: number;
-  to: number;
+  /** Exclusive end (unix seconds) */
+  end: number;
   outcome: AttestationOutcome;
   slot: number | null;
   pageSize: number;
@@ -68,12 +70,14 @@ export function useAttestationDuties({
   isPlaceholderData: boolean;
   error: Error | null;
 } {
+  // Start no earlier than the table's first day, so the read never reaches back past its data
+  const bounds = useTableBounds('fct_attestation_vote_correctness_by_validator').data;
   const duties = useQuery({
     ...fctAttestationVoteCorrectnessByValidatorServiceListOptions({
       query: {
         validator_index_in_values: indices.join(','),
-        slot_start_date_time_gte: from,
-        slot_start_date_time_lt: to + 86_400,
+        slot_start_date_time_gte: Math.max(from, Math.floor((bounds?.min ?? from) / 86_400) * 86_400),
+        slot_start_date_time_lt: end,
         order_by: 'slot DESC, validator_index ASC',
         page_size: pageSize,
         page_token: pageToken,
@@ -81,7 +85,7 @@ export function useAttestationDuties({
         ...OUTCOME_FILTERS[outcome],
       },
     }),
-    enabled: indices.length > 0,
+    enabled: indices.length > 0 && bounds !== undefined,
     placeholderData: keepPreviousData,
   });
 

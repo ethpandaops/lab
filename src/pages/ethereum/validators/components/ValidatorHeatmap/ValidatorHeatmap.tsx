@@ -12,6 +12,9 @@ import type { AttestationDailyDataPoint, BlockProposalDataPoint } from '../../ho
 import { useHourlyData, useSlotData } from '../../hooks';
 import type { AttestationSlotDataPoint } from '../../hooks';
 import { formatStatusLabel } from '../../hooks/useValidatorStatus';
+import { weekSpan } from '../../utils/range';
+
+const DAY = 86_400;
 
 /** Available metrics for the heatmap */
 export type HeatmapMetric = 'inclusion' | 'head' | 'target' | 'source' | 'delay' | 'proposals';
@@ -231,6 +234,13 @@ function formatDayLabel(timestamp: number): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
+/** A column's label: its day, its week's Monday, or the days of a week the range cuts short */
+function columnLabel(timestamp: number, from: number, to: number, stepDays: number): string {
+  const [first, last] = weekSpan(timestamp, from, to);
+  if (stepDays !== 7 || last - first === 6 * DAY) return formatDayLabel(timestamp);
+  return first === last ? formatDayLabel(first) : `${formatDayLabel(first)} – ${formatDayLabel(last)}`;
+}
+
 /**
  * Format timestamp as full date label for the drill-down header
  */
@@ -338,7 +348,7 @@ export function ValidatorHeatmap({
     const uniqueValidators = [...new Set([...data.map(d => d.validatorIndex), ...validatorIndicesProp])].sort(
       (a, b) => a - b
     );
-    const dayLabels = allTimestamps.map(t => formatDayLabel(t));
+    const dayLabels = allTimestamps.map(t => columnLabel(t, from, to, stepDays));
     const validatorLabels = uniqueValidators.map(v => formatSlot(v));
 
     const timestampToIndex = new Map(allTimestamps.map((t, i) => [t, i]));
@@ -455,7 +465,7 @@ export function ValidatorHeatmap({
     const attestationValidators = [...new Set(data.map(d => d.validatorIndex))];
     const allValidators = [...new Set([...attestationValidators, ...inputSet])].sort((a, b) => a - b);
 
-    const dayLabels = allTimestamps.map(t => formatDayLabel(t));
+    const dayLabels = allTimestamps.map(t => columnLabel(t, from, to, stepDays));
     const validatorLabels = allValidators.map(v => formatSlot(v));
 
     const timestampToIndex = new Map(allTimestamps.map((t, i) => [t, i]));
@@ -790,15 +800,23 @@ export function ValidatorHeatmap({
     const [dayIdx, validatorIdx, value] = params.value;
     const timestamp = activeDailyTimestamps[dayIdx];
     const validatorIndex = activeDailyValidators[validatorIdx];
-    const date = new Date(timestamp * 1000);
-    const dayText = date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'UTC',
-    });
-    const fullDate = stepDays === 7 ? `Week of ${dayText}` : dayText;
+    const dayText = (ts: number): string =>
+      new Date(ts * 1000).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+      });
+    const [first, last] = weekSpan(timestamp, from, to);
+    const fullDate =
+      stepDays !== 7
+        ? dayText(timestamp)
+        : last - first === 6 * DAY
+          ? `Week of ${dayText(timestamp)}`
+          : first === last
+            ? dayText(first)
+            : `${dayText(first)} – ${dayText(last)}`;
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       let statusLine = '';

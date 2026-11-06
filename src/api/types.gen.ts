@@ -1966,6 +1966,10 @@ export type FctAttestationVoteCorrectnessByValidatorDaily = {
    */
   source_correct_count?: number;
   /**
+   * Number of source votes that were incorrect, from attestations seen on gossip
+   */
+  source_incorrect_count?: number;
+  /**
    * Number of target votes that were correct
    */
   target_correct_count?: number;
@@ -2012,6 +2016,10 @@ export type FctAttestationVoteCorrectnessByValidatorHourly = {
    */
   source_correct_count?: number;
   /**
+   * Number of source votes that were incorrect, from attestations seen on gossip
+   */
+  source_incorrect_count?: number;
+  /**
    * Number of target votes that were correct
    */
   target_correct_count?: number;
@@ -2053,6 +2061,10 @@ export type FctAttestationVoteCorrectnessByValidatorWeekly = {
    * Number of source votes that were correct
    */
   source_correct_count?: number;
+  /**
+   * Number of source votes that were incorrect, from attestations seen on gossip
+   */
+  source_incorrect_count?: number;
   /**
    * Number of target votes that were correct
    */
@@ -40982,6 +40994,46 @@ export type FctAttestationVoteCorrectnessByValidatorDailyServiceListData = {
      */
     avg_inclusion_distance_value?: number;
     /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: eq)
+     */
+    source_incorrect_count_eq?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: ne)
+     */
+    source_incorrect_count_ne?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lt)
+     */
+    source_incorrect_count_lt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lte)
+     */
+    source_incorrect_count_lte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gt)
+     */
+    source_incorrect_count_gt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gte)
+     */
+    source_incorrect_count_gte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_min)
+     */
+    source_incorrect_count_between_min?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_incorrect_count_between_max_value?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_incorrect_count_in_values?: string;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_incorrect_count_not_in_values?: string;
+    /**
      * The maximum number of fct_attestation_vote_correctness_by_validator_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
@@ -41418,6 +41470,46 @@ export type FctAttestationVoteCorrectnessByValidatorHourlyServiceListData = {
      */
     avg_inclusion_distance_value?: number;
     /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: eq)
+     */
+    source_incorrect_count_eq?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: ne)
+     */
+    source_incorrect_count_ne?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lt)
+     */
+    source_incorrect_count_lt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lte)
+     */
+    source_incorrect_count_lte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gt)
+     */
+    source_incorrect_count_gt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gte)
+     */
+    source_incorrect_count_gte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_min)
+     */
+    source_incorrect_count_between_min?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_incorrect_count_between_max_value?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_incorrect_count_in_values?: string;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_incorrect_count_not_in_values?: string;
+    /**
      * The maximum number of fct_attestation_vote_correctness_by_validator_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
     page_size?: number;
@@ -41849,6 +41941,46 @@ export type FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData = {
      * Filter avg_inclusion_distance using value
      */
     avg_inclusion_distance_value?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: eq)
+     */
+    source_incorrect_count_eq?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: ne)
+     */
+    source_incorrect_count_ne?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lt)
+     */
+    source_incorrect_count_lt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: lte)
+     */
+    source_incorrect_count_lte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gt)
+     */
+    source_incorrect_count_gt?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: gte)
+     */
+    source_incorrect_count_gte?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_min)
+     */
+    source_incorrect_count_between_min?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: between_max_value)
+     */
+    source_incorrect_count_between_max_value?: number;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: in_values) (comma-separated list)
+     */
+    source_incorrect_count_in_values?: string;
+    /**
+     * Number of source votes that were incorrect, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
+     */
+    source_incorrect_count_not_in_values?: string;
     /**
      * The maximum number of fct_attestation_vote_correctness_by_validator_weekly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
      */
@@ -158575,46 +158707,6 @@ export type IntCustodyProbeOrderBySlotServiceListData = {
      */
     error_not_in_values?: string;
     /**
-     * Timestamp when the record was last updated (filter: eq)
-     */
-    updated_date_time_eq?: number;
-    /**
-     * Timestamp when the record was last updated (filter: ne)
-     */
-    updated_date_time_ne?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lt)
-     */
-    updated_date_time_lt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: lte)
-     */
-    updated_date_time_lte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gt)
-     */
-    updated_date_time_gt?: number;
-    /**
-     * Timestamp when the record was last updated (filter: gte)
-     */
-    updated_date_time_gte?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_min)
-     */
-    updated_date_time_between_min?: number;
-    /**
-     * Timestamp when the record was last updated (filter: between_max_value)
-     */
-    updated_date_time_between_max_value?: number;
-    /**
-     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
-     */
-    updated_date_time_in_values?: string;
-    /**
-     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
-     */
-    updated_date_time_not_in_values?: string;
-    /**
      * Earliest event time for this probe batch (filter: eq)
      */
     probe_date_time_eq?: number;
@@ -158654,6 +158746,46 @@ export type IntCustodyProbeOrderBySlotServiceListData = {
      * Earliest event time for this probe batch (filter: not_in_values) (comma-separated list)
      */
     probe_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
     /**
      * Array of column indices probed (filter: has)
      */
