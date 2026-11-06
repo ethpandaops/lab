@@ -8,6 +8,7 @@ import {
   QuestionMarkCircleIcon,
   EyeIcon,
   ArrowDownTrayIcon,
+  CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -54,7 +55,6 @@ import { SlotColumnCompletionCard } from './components/SlotColumnCompletionCard'
 import { SlotProgressTimeline } from './components/SlotProgressTimeline';
 import { useSlotEngineTimings } from './hooks/useSlotEngineTimings';
 import { useSlotColumnCompletion } from './hooks/useSlotColumnCompletion';
-import { NodeResourcesPanel } from './components/NodeResources';
 
 /**
  * Detail page for a specific slot.
@@ -232,7 +232,6 @@ export function DetailPage(): JSX.Element {
     ...(isGloas ? [{ id: 'payload' }] : []),
     { id: 'execution' },
     { id: 'mev' },
-    { id: 'resources' },
   ]);
 
   // Validate slot number
@@ -468,6 +467,16 @@ export function DetailPage(): JSX.Element {
               </Link>
             );
           })()}
+        <Link
+          to="/xatu/nodes/resources"
+          search={{ slot }}
+          aria-label="Xatu node resources"
+          title="Xatu node resources"
+          className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+        >
+          <CpuChipIcon className="size-4" />
+          <span className="hidden sm:inline">Xatu node resources</span>
+        </Link>
         <Button
           variant="secondary"
           size="sm"
@@ -510,7 +519,6 @@ export function DetailPage(): JSX.Element {
             {isGloas && <Tab>Payload</Tab>}
             <Tab>Execution</Tab>
             <Tab>MEV</Tab>
-            <Tab>Xatu Node Resources</Tab>
           </ScrollableTabs>
 
           {/* At least a viewport tall, so a tab still loading does not shorten the page and lose the scroll position */}
@@ -1090,16 +1098,6 @@ export function DetailPage(): JSX.Element {
                   )}
                 </div>
               )}
-            </TabPanel>
-
-            {/* Node Resources Tab */}
-            <TabPanel>
-              <NodeResourcesPanel
-                slot={slot}
-                blockPropagation={data.blockPropagation}
-                headPropagation={data.headPropagation}
-                dataColumnPropagation={data.dataColumnPropagation}
-              />
             </TabPanel>
           </TabPanels>
         </TabGroup>

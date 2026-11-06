@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { FctNodeLastSeen } from '@/api/types.gen';
 import type { NodeRange } from '../constants';
 import { summarizeByNode } from '../utils/history';
-import { isNodeOnline, median } from '../utils/node-stats';
+import { isNodeOnline } from '../utils/node-stats';
 import { useLastSeenNodes } from './useLastSeenNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 
@@ -28,8 +28,6 @@ export interface NodeRow {
 
 export interface UseNodeRowsResult {
   rows: NodeRow[];
-  /** Median across nodes of each node's median over the range: the median node, not the median block */
-  network: { blockP50: number | null; attestationP50: number | null };
   /** Block rollups of every node over the range */
   block: NodeHistory | null;
   isLoading: boolean;
@@ -105,22 +103,13 @@ export function useNodeRows(range: NodeRange): UseNodeRowsResult {
   const block = useNodeHistory('block', range, {});
   const attestation = useNodeHistory('attestation', range, {});
 
-  const { rows, network } = useMemo(() => {
-    const rows = buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000);
-    return {
-      rows,
-      network: {
-        blockP50: median(rows.flatMap(row => (row.observation?.blockP50 == null ? [] : [row.observation.blockP50]))),
-        attestationP50: median(
-          rows.flatMap(row => (row.observation?.attestationP50 == null ? [] : [row.observation.attestationP50]))
-        ),
-      },
-    };
-  }, [lastSeen.nodes, block.data, attestation.data]);
+  const rows = useMemo(
+    () => buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000),
+    [lastSeen.nodes, block.data, attestation.data]
+  );
 
   return {
     rows,
-    network,
     block: block.data,
     // The node list depends on the range's rollups, so wait for them before listing nodes
     isLoading: lastSeen.isLoading || block.isLoading || attestation.isLoading,

@@ -38,10 +38,23 @@ const rangeSchema = z.enum(['24h', '7d', '30d', '90d', 'all']).optional();
 
 export const nodeDetailSearchSchema = z.object({ range: rangeSchema });
 
-export const nodesSearchSchema = z.object({ range: rangeSchema });
+/** `contributor` narrows the page to one contributor's Xatu nodes */
+export const nodesSearchSchema = z.object({ range: rangeSchema, contributor: z.string().optional() });
 
-/** `seen` scopes a contributor's Xatu nodes; `range` scopes their observation timings */
-export const contributorSearchSchema = z.object({ range: rangeSchema, seen: rangeSchema });
+/** The slot shown and the resource panel's controls; no slot means a recent slot */
+export const nodeResourcesSearchSchema = z.object({
+  slot: z.coerce.number().optional(),
+  node: z.string().optional(),
+  metric: z.enum(['mean', 'min', 'max']).optional(),
+  memMetric: z.enum(['vm_rss', 'rss_anon', 'rss_file', 'vm_swap']).optional(),
+  refNodes: z
+    .preprocess(value => {
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return value;
+    }, z.boolean())
+    .optional(),
+});
 
 /**
  * How far a node's median arrival can trail the network's median before the node counts as behind: one slot.

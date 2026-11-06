@@ -17,15 +17,19 @@ export interface UseLatestDayNodesResult {
 /**
  * Xatu nodes that reported on the latest complete UTC day. Node IDs of hashed nodes rotate, so counting IDs over a
  * longer range counts one node many times.
+ *
+ * @param username - Count one contributor's Xatu nodes only
  */
-export function useLatestDayNodes(): UseLatestDayNodesResult {
+export function useLatestDayNodes(username?: string): UseLatestDayNodesResult {
   const { currentNetwork } = useNetwork();
   const day = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['xatu-nodes', 'latest-day', currentNetwork?.name, day],
+    queryKey: ['xatu-nodes', 'latest-day', currentNetwork?.name, day, username],
     queryFn: async ({ signal }) => {
-      const query = { query: { day_start_date_eq: day, page_size: 10000 } };
+      const query = {
+        query: { day_start_date_eq: day, ...(username ? { username_eq: username } : {}), page_size: 10000 },
+      };
       const [block, attestation] = await Promise.all([
         fetchAllPages<{ node_id?: string }>(
           fctBlockFirstSeenByNodeDailyServiceList,

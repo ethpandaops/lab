@@ -20,7 +20,6 @@ import {
   BoltIcon,
   ClockIcon,
   CpuChipIcon,
-  MapIcon,
   ServerStackIcon,
   SignalIcon,
   CircleStackIcon,
@@ -233,11 +232,7 @@ const ethereumExecutionPages: NavItem[] = [
   { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ArchiveBoxXMarkIcon },
 ];
 
-const xatuPages: NavItem[] = [
-  { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
-  { name: 'Xatu nodes', to: '/xatu/nodes', icon: ServerIcon },
-  { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
-];
+const xatuPages: NavItem[] = [{ name: 'Xatu nodes', to: '/xatu/nodes', icon: ServerIcon }];
 
 /**
  * Helper function to check if a page is enabled for the current network.

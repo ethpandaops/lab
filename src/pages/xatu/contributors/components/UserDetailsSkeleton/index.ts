@@ -1,1 +1,0 @@
-export { UserDetailsSkeleton } from './UserDetailsSkeleton';

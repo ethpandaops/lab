@@ -1,1 +1,0 @@
-export { GeographicalChecklistSkeleton } from './GeographicalChecklistSkeleton';
