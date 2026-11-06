@@ -1,24 +1,119 @@
 import { describe, expect, it } from 'vitest';
+import type { FctEngineNewPayloadByElClient } from '@/api/types.gen';
 import {
-  blockSlices,
   chainDemand,
+  clientPerformance,
   clientThroughput,
+  fitFromSums,
   gasCeiling,
-  linearFit,
+  histogramQuantile,
   mgasPerSecond,
   normalizeClient,
   rangeBounds,
   rangeDays,
+  rollupBlocks,
+  sensitivityCuts,
 } from './performance';
 
-describe('linearFit', () => {
-  it('recovers overhead and marginal cost from noisy-free points', () => {
-    // 7 ms overhead + 1.5 ms per Mgas
-    const points: [number, number][] = [5, 12, 30, 47, 60].map(g => [g, 7 + 1.5 * g]);
-    const fit = linearFit(points);
-    expect(fit.intercept).toBeCloseTo(7, 10);
-    expect(fit.slope).toBeCloseTo(1.5, 10);
-    expect(fit.r2).toBeCloseTo(1, 10);
+describe('fitFromSums', () => {
+  it('matches least squares on the points the sums came from', () => {
+    // y = 10 + 2x with residuals +1, -1, -1, +1 at x = 0, 10, 20, 30, which have no slope: the fit is y = 10 + 2x,
+    // with R² = 1 - 4 / 2004
+    const points: [number, number][] = [
+      [0, 11],
+      [10, 29],
+      [20, 49],
+      [30, 71],
+    ];
+    const sum = (f: (p: [number, number]) => number): number => points.reduce((s, p) => s + f(p), 0);
+    const fit = fitFromSums(
+      points.length,
+      sum(([x]) => x),
+      sum(([x]) => x * x),
+      sum(([, y]) => y),
+      sum(([, y]) => y * y),
+      sum(([x, y]) => x * y)
+    );
+    expect(fit.slope).toBeCloseTo(2, 10);
+    expect(fit.intercept).toBeCloseTo(10, 10);
+    expect(fit.r2).toBeCloseTo(1 - 4 / 2004, 6);
+  });
+});
+
+describe('histogramQuantile', () => {
+  it('interpolates inside the 1.04^k bucket holding the quantile', () => {
+    // 10 blocks in bucket 100 and 30 in bucket 110: the median is the 20th block, 10 blocks into bucket 110
+    const buckets = [
+      { client: 'geth', bucket_index: 110, block_count: 30 },
+      { client: 'geth', bucket_index: 100, block_count: 10 },
+    ];
+    const lower = 1.04 ** 110;
+    expect(histogramQuantile(buckets, 0.5)).toBeCloseTo(lower + (lower * 0.04 * 10) / 30, 6);
+    // The 10th block is the last of bucket 100, so P25 is that bucket's upper edge
+    expect(histogramQuantile(buckets, 0.25)).toBeCloseTo(1.04 ** 101, 6);
+  });
+});
+
+describe('sensitivityCuts', () => {
+  it('takes the buckets up to the 20th percentile and from the 80th, or either side of one bucket holding both', () => {
+    const cuts = sensitivityCuts([
+      // compute: 10% of blocks at 20, 30% at 40, 40% at 50, 20% at 70 → 20th percentile in 40, 80th in 50
+      { resource: 'compute', share_bucket_pct: 20, block_count: 10 },
+      { resource: 'compute', share_bucket_pct: 40, block_count: 30 },
+      { resource: 'compute', share_bucket_pct: 50, block_count: 40 },
+      { resource: 'compute', share_bucket_pct: 70, block_count: 20 },
+      // state access: 74% of blocks at 20, so both fifths fall there
+      { resource: 'address_access', share_bucket_pct: 10, block_count: 7 },
+      { resource: 'address_access', share_bucket_pct: 20, block_count: 74 },
+      { resource: 'address_access', share_bucket_pct: 30, block_count: 19 },
+      // memory: every block under 10%, so nothing is lighter
+      { resource: 'memory', share_bucket_pct: 0, block_count: 100 },
+    ]);
+    expect(cuts.get('gas_compute')).toEqual({ low: 40, high: 50 });
+    expect(cuts.get('gas_address_access')).toEqual({ low: 10, high: 30 });
+    expect(cuts.has('gas_memory')).toBe(false);
+  });
+});
+
+describe('rollupBlocks and clientPerformance', () => {
+  // Reth versions a and b on the same slot fold into one block weighted 1:3; geth has its own blocks
+  const block = (
+    slot: number,
+    client: string,
+    gasM: number,
+    p50: number,
+    version = 'a',
+    obs = 1
+  ): FctEngineNewPayloadByElClient => ({
+    slot,
+    meta_execution_implementation: client,
+    meta_execution_version: version,
+    gas_used: gasM * 1e6,
+    median_duration_ms: p50,
+    avg_duration_ms: p50,
+    p95_duration_ms: p50 * 2,
+    observation_count: obs,
+  });
+
+  it('folds versions per block and derives throughput and cost model from sums', () => {
+    const rollup = rollupBlocks(
+      [
+        block(1, 'Reth', 20, 40, 'a', 1),
+        block(1, 'Reth', 20, 80, 'b', 3),
+        block(2, 'Reth', 40, 100),
+        block(1, 'go-ethereum', 20, 50),
+      ],
+      [],
+      []
+    );
+    const reth = clientPerformance(rollup).find(c => c.client === 'reth')!;
+    // Slot 1 folds to 70 ms: (40·1 + 80·3) / 4
+    expect(reth.blockCount).toBe(2);
+    expect(reth.throughput).toBeCloseTo(mgasPerSecond(60e6, 170));
+    // Two points (20, 70) and (40, 100): slope 1.5 ms per Mgas, overhead 40 ms
+    expect(reth.fitP50.slope).toBeCloseTo(1.5);
+    expect(reth.fitP50.intercept).toBeCloseTo(40);
+    expect(rollup.gasBuckets.filter(r => r.client === 'reth').map(r => r.gas_bucket_mgas)).toEqual([20, 40]);
   });
 });
 
@@ -63,24 +158,6 @@ describe('clientThroughput', () => {
     expect(result.map(r => r.client)).toEqual(['reth', 'geth']);
     expect(result[0].throughput).toBeCloseTo(1000);
     expect(result[1].throughput).toBeCloseTo(150_000 / 350);
-  });
-});
-
-describe('blockSlices', () => {
-  const H = 3600;
-
-  it('reads the whole range up to 6 hours', () => {
-    expect(blockSlices(1000, 1000 + 6 * H)).toEqual([[1000, 1000 + 6 * H]]);
-  });
-
-  it('spreads 28 fifteen-minute slices evenly, the last ending at the range end', () => {
-    const start = 1_700_000_000;
-    const end = start + 7 * 24 * H;
-    const slices = blockSlices(start, end);
-    expect(slices).toHaveLength(28);
-    expect(slices.every(([s, e]) => e - s === 900 && s >= start && e <= end)).toBe(true);
-    expect(slices[0]).toEqual([start + 6 * H - 900, start + 6 * H]);
-    expect(slices[27][1]).toBe(end);
   });
 });
 

@@ -21,14 +21,17 @@ import { InspectSection } from '@/pages/ethereum/validators/components/InspectSe
 import { useTableBounds } from '@/hooks/useBounds';
 import { SLOWEST_MAX_DAYS, usePerformanceData } from './hooks/usePerformanceData';
 import { useOpcodeCostData } from './hooks/useOpcodeCostData';
-import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 import {
-  BLOCK_SLICE_COUNT,
-  BLOCK_SLICE_SECONDS,
+  DEFAULT_TIME_RANGE,
+  PER_SLOT_CHART_RANGES,
+  ROLLUP_WINDOW,
+  TIME_RANGE_CONFIG,
+  type TimeRange,
+} from './IndexPage.types';
+import {
   GAS_BUCKET_MGAS,
   RESOURCES,
-  blockSlices,
-  buildClientPerformance,
+  clientPerformance,
   bucketedThroughputSeries,
   chainDemand,
   clientThroughput,
@@ -159,6 +162,16 @@ export function IndexPage(): JSX.Element {
   );
 }
 
+/** The resource shares' window, as "Dec 29, 2025 – Nov 5" (UTC days) on daily ranges or "to Nov 6, 06:00" */
+function fmtShareWindow(start: number, end: number, daily: boolean): string {
+  if (!daily) {
+    return `to ${new Date(end * 1000).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+  }
+  const fmt = (t: number): string =>
+    new Date(t * 1000).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  return `${fmt(start)} – ${fmt(end - 86400)}`;
+}
+
 /** UTC days a model's daily fits span, as "Oct 26 – Nov 1", or "Nov 2" for one day */
 function fmtDayWindow(start: number, end: number): string {
   const fmt = (t: number): string =>
@@ -202,14 +215,21 @@ function PerformanceSections({
     [timeRange, firstDataTime]
   );
   const opcodeCosts = useOpcodeCostData(start, end, daily);
-  const { hourly, blocks, slowBlocks } = usePerformanceData({ start, end, daily, referenceNodesOnly });
+  const { hourly, blocks, rollup, shareWindow, slowBlocks } = usePerformanceData({
+    start,
+    end,
+    daily,
+    window: ROLLUP_WINDOW[timeRange],
+    referenceNodesOnly,
+  });
   const usePerSlotTrend = PER_SLOT_CHART_RANGES.includes(timeRange);
-  const sampled = blockSlices(start, end).length > 1;
 
-  const model = useMemo(
-    () => (blocks ? buildClientPerformance(blocks.perClientBlocks, blocks.blocks, blocks.resourceGas) : null),
-    [blocks]
-  );
+  const clients = useMemo(() => (rollup ? clientPerformance(rollup) : null), [rollup]);
+  // Resource shares wait for block traces, so their window can end, or start, inside the range
+  const shareWindowNote =
+    shareWindow && (shareWindow.start > start || shareWindow.end < end)
+      ? fmtShareWindow(shareWindow.start, shareWindow.end, daily)
+      : null;
 
   // The hourly gas table lags an hour or two, so short ranges, which read every block, take demand
   // from their blocks. Each row carries its block's gas, so a mean over rows is gas per block.
@@ -259,9 +279,8 @@ function PerformanceSections({
 
   const fastest = rangeClients[0];
   const slowest = rangeClients[rangeClients.length - 1];
-  const clients = model?.clients ?? [];
   const budgetMs = Number(budget);
-  const ceilings = clients
+  const ceilings = (clients ?? [])
     .map(c => ({ client: c, mgas: gasCeiling(ceilingBasis === 'p50' ? c.fitP50 : c.fitP95, budgetMs) }))
     .sort((a, b) => b.mgas - a.mgas);
 
@@ -369,11 +388,8 @@ function PerformanceSections({
         </PopoutCard>
       </InspectSection>
 
-      <InspectSection
-        title="Blocks"
-        meta={sampled && `${BLOCK_SLICE_COUNT} × ${BLOCK_SLICE_SECONDS / 60} min spread across the range`}
-      >
-        {!model ? (
+      <InspectSection title="Blocks">
+        {!clients ? (
           <>
             <div className={clsx('h-80', SKELETON)} />
             <div className={clsx('h-96', SKELETON)} />
@@ -429,7 +445,7 @@ function PerformanceSections({
               {/* Scaling curve */}
               <PopoutCard
                 title="Throughput by Block Size"
-                subtitle="Median Mgas/s per block, grouped by gas used"
+                subtitle="Gas executed per second of P50 execution, grouped by gas used"
                 headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
                 anchorId="scaling-curve"
                 modalSize="full"
@@ -469,17 +485,21 @@ function PerformanceSections({
               {/* Workload sensitivity */}
               <PopoutCard
                 title="Workload Sensitivity"
-                subtitle="Throughput on blocks heaviest in each gas resource vs blocks lightest in it"
+                subtitle={
+                  shareWindowNote
+                    ? `Throughput on blocks heaviest in each gas resource vs blocks lightest in it, ${shareWindowNote}`
+                    : 'Throughput on blocks heaviest in each gas resource vs blocks lightest in it'
+                }
                 headerActions={<MethodologyButton onClick={() => openMethodology('workload')} />}
                 anchorId="workload-sensitivity"
                 modalSize="full"
               >
-                {blocks?.resourceGas.length === 0 ? (
+                {rollup?.shares.length === 0 ? (
                   <p className="py-12 text-center text-sm text-muted">
                     No resource gas breakdown for these blocks yet.
                   </p>
                 ) : (
-                  <WorkloadSensitivity clients={clients} avgShares={model.avgShares} />
+                  <WorkloadSensitivity clients={clients} />
                 )}
               </PopoutCard>
             </div>
@@ -644,16 +664,15 @@ function GasCeiling({
   );
 }
 
-/** Scatter of gas vs duration with each client's fitted line and a summary table */
+/** Scatter of each gas bucket's mean duration with each client's fitted line and a summary table */
 function CostModel({ clients, inModal }: { clients: ClientPerformance[]; inModal: boolean }): JSX.Element {
   const maxGas = Math.max(...clients.flatMap(c => c.points.map(p => p[0])), 1);
   const xMax = Math.ceil(maxGas / 10) * 10;
-  // Thin the scatter so the fitted lines stay readable
   const scatter = clients.map(c => ({
     name: c.client,
-    data: c.points.filter((_, i) => i % 3 === 0),
-    color: `${c.color}55`,
-    symbolSize: 3,
+    data: c.points,
+    color: `${c.color}99`,
+    symbolSize: 5,
   }));
   const lines = clients.map(c => ({
     name: `${c.client} fit`,
@@ -711,7 +730,7 @@ function CostModel({ clients, inModal }: { clients: ClientPerformance[]; inModal
   );
 }
 
-/** Median throughput per gas bucket: fixed overhead dominates small blocks */
+/** Throughput per gas bucket: fixed overhead dominates small blocks */
 function ScalingCurve({
   clients,
   inModal,
@@ -734,7 +753,7 @@ function ScalingCurve({
         smooth: true,
       }))}
       xAxis={{ type: 'category', labels, name: 'Gas used' }}
-      yAxis={{ name: 'Median Mgas/s', min: 0 }}
+      yAxis={{ name: 'Mgas/s', min: 0 }}
       height={inModal ? 600 : 470}
       showLegend
       connectNulls
@@ -743,14 +762,9 @@ function ScalingCurve({
 }
 
 /** Client × resource grid of throughput change on resource-heavy blocks */
-function WorkloadSensitivity({
-  clients,
-  avgShares,
-}: {
-  clients: ClientPerformance[];
-  avgShares: Map<string, number>;
-}): JSX.Element {
-  const resources = RESOURCES.filter(r => (avgShares.get(r.key) ?? 0) >= 0.01);
+function WorkloadSensitivity({ clients }: { clients: ClientPerformance[] }): JSX.Element {
+  // A resource whose share barely varies between blocks has no heaviest and lightest blocks to compare
+  const resources = RESOURCES.filter(r => clients.some(c => c.sensitivity.has(r.key)));
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-separate border-spacing-1 text-sm">
@@ -760,7 +774,6 @@ function WorkloadSensitivity({
             {resources.map(r => (
               <th key={r.key} className="px-1 pb-1 text-center align-bottom text-xs font-medium text-muted">
                 <div className="text-foreground">{r.label}</div>
-                <div className="font-normal tabular-nums">{((avgShares.get(r.key) ?? 0) * 100).toFixed(0)}% of gas</div>
               </th>
             ))}
           </tr>

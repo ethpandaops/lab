@@ -891,6 +891,12 @@ import type {
   FctEngineNewPayloadDurationHistogramHourlyServiceListData,
   FctEngineNewPayloadDurationHistogramHourlyServiceListErrors,
   FctEngineNewPayloadDurationHistogramHourlyServiceListResponses,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetData,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetErrors,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetResponses,
+  FctEngineNewPayloadDurationPercentileWindowServiceListData,
+  FctEngineNewPayloadDurationPercentileWindowServiceListErrors,
+  FctEngineNewPayloadDurationPercentileWindowServiceListResponses,
   FctEngineNewPayloadGasBucketDailyServiceGetData,
   FctEngineNewPayloadGasBucketDailyServiceGetErrors,
   FctEngineNewPayloadGasBucketDailyServiceGetResponses,
@@ -903,6 +909,12 @@ import type {
   FctEngineNewPayloadGasBucketHourlyServiceListData,
   FctEngineNewPayloadGasBucketHourlyServiceListErrors,
   FctEngineNewPayloadGasBucketHourlyServiceListResponses,
+  FctEngineNewPayloadGasBucketWindowServiceGetData,
+  FctEngineNewPayloadGasBucketWindowServiceGetErrors,
+  FctEngineNewPayloadGasBucketWindowServiceGetResponses,
+  FctEngineNewPayloadGasBucketWindowServiceListData,
+  FctEngineNewPayloadGasBucketWindowServiceListErrors,
+  FctEngineNewPayloadGasBucketWindowServiceListResponses,
   FctEngineNewPayloadResourceShareDailyServiceGetData,
   FctEngineNewPayloadResourceShareDailyServiceGetErrors,
   FctEngineNewPayloadResourceShareDailyServiceGetResponses,
@@ -915,6 +927,12 @@ import type {
   FctEngineNewPayloadResourceShareHourlyServiceListData,
   FctEngineNewPayloadResourceShareHourlyServiceListErrors,
   FctEngineNewPayloadResourceShareHourlyServiceListResponses,
+  FctEngineNewPayloadResourceShareWindowServiceGetData,
+  FctEngineNewPayloadResourceShareWindowServiceGetErrors,
+  FctEngineNewPayloadResourceShareWindowServiceGetResponses,
+  FctEngineNewPayloadResourceShareWindowServiceListData,
+  FctEngineNewPayloadResourceShareWindowServiceListErrors,
+  FctEngineNewPayloadResourceShareWindowServiceListResponses,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetData,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses,
@@ -927,6 +945,12 @@ import type {
   FctEngineNewPayloadThroughputHistogramHourlyServiceListData,
   FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors,
   FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetData,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetErrors,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetResponses,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListData,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListErrors,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListResponses,
   FctEngineNewPayloadWinrateDailyServiceGetData,
   FctEngineNewPayloadWinrateDailyServiceGetErrors,
   FctEngineNewPayloadWinrateDailyServiceGetResponses,
@@ -2637,6 +2661,10 @@ import {
   zFctEngineNewPayloadDurationHistogramHourlyServiceGetResponse,
   zFctEngineNewPayloadDurationHistogramHourlyServiceListData,
   zFctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+  zFctEngineNewPayloadDurationPercentileWindowServiceGetData,
+  zFctEngineNewPayloadDurationPercentileWindowServiceGetResponse,
+  zFctEngineNewPayloadDurationPercentileWindowServiceListData,
+  zFctEngineNewPayloadDurationPercentileWindowServiceListResponse,
   zFctEngineNewPayloadGasBucketDailyServiceGetData,
   zFctEngineNewPayloadGasBucketDailyServiceGetResponse,
   zFctEngineNewPayloadGasBucketDailyServiceListData,
@@ -2645,6 +2673,10 @@ import {
   zFctEngineNewPayloadGasBucketHourlyServiceGetResponse,
   zFctEngineNewPayloadGasBucketHourlyServiceListData,
   zFctEngineNewPayloadGasBucketHourlyServiceListResponse,
+  zFctEngineNewPayloadGasBucketWindowServiceGetData,
+  zFctEngineNewPayloadGasBucketWindowServiceGetResponse,
+  zFctEngineNewPayloadGasBucketWindowServiceListData,
+  zFctEngineNewPayloadGasBucketWindowServiceListResponse,
   zFctEngineNewPayloadResourceShareDailyServiceGetData,
   zFctEngineNewPayloadResourceShareDailyServiceGetResponse,
   zFctEngineNewPayloadResourceShareDailyServiceListData,
@@ -2653,6 +2685,10 @@ import {
   zFctEngineNewPayloadResourceShareHourlyServiceGetResponse,
   zFctEngineNewPayloadResourceShareHourlyServiceListData,
   zFctEngineNewPayloadResourceShareHourlyServiceListResponse,
+  zFctEngineNewPayloadResourceShareWindowServiceGetData,
+  zFctEngineNewPayloadResourceShareWindowServiceGetResponse,
+  zFctEngineNewPayloadResourceShareWindowServiceListData,
+  zFctEngineNewPayloadResourceShareWindowServiceListResponse,
   zFctEngineNewPayloadThroughputHistogramDailyServiceGetData,
   zFctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
   zFctEngineNewPayloadThroughputHistogramDailyServiceListData,
@@ -2661,6 +2697,10 @@ import {
   zFctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse,
   zFctEngineNewPayloadThroughputHistogramHourlyServiceListData,
   zFctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
+  zFctEngineNewPayloadThroughputHistogramWindowServiceGetData,
+  zFctEngineNewPayloadThroughputHistogramWindowServiceGetResponse,
+  zFctEngineNewPayloadThroughputHistogramWindowServiceListData,
+  zFctEngineNewPayloadThroughputHistogramWindowServiceListResponse,
   zFctEngineNewPayloadWinrateDailyServiceGetData,
   zFctEngineNewPayloadWinrateDailyServiceGetResponse,
   zFctEngineNewPayloadWinrateDailyServiceListData,
@@ -9034,6 +9074,46 @@ export const fctEngineNewPayloadDurationHistogramHourlyServiceGet = <ThrowOnErro
 /**
  * List records
  *
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ */
+export const fctEngineNewPayloadDurationPercentileWindowServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationPercentileWindowServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationPercentileWindowServiceListResponses,
+    FctEngineNewPayloadDurationPercentileWindowServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationPercentileWindowServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationPercentileWindowServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_percentile_window',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadDurationPercentileWindowServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationPercentileWindowServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationPercentileWindowServiceGetResponses,
+    FctEngineNewPayloadDurationPercentileWindowServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationPercentileWindowServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationPercentileWindowServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_percentile_window/{window_grain}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * engine_newPayload timings of VALID payloads per UTC day, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
  */
 export const fctEngineNewPayloadGasBucketDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -9104,6 +9184,44 @@ export const fctEngineNewPayloadGasBucketHourlyServiceGet = <ThrowOnError extend
     requestValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_gas_bucket_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload cost-model sums per 5 Mgas block size bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_gas_bucket_hourly and _daily
+ */
+export const fctEngineNewPayloadGasBucketWindowServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadGasBucketWindowServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadGasBucketWindowServiceListResponses,
+    FctEngineNewPayloadGasBucketWindowServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketWindowServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketWindowServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_window',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadGasBucketWindowServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadGasBucketWindowServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadGasBucketWindowServiceGetResponses,
+    FctEngineNewPayloadGasBucketWindowServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketWindowServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketWindowServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_window/{window_grain}',
     ...options,
   });
 
@@ -9186,6 +9304,44 @@ export const fctEngineNewPayloadResourceShareHourlyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
+ * engine_newPayload throughput sums per gas resource and 10% resource share bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_resource_share_hourly and _daily
+ */
+export const fctEngineNewPayloadResourceShareWindowServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadResourceShareWindowServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadResourceShareWindowServiceListResponses,
+    FctEngineNewPayloadResourceShareWindowServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareWindowServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareWindowServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_window',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadResourceShareWindowServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadResourceShareWindowServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadResourceShareWindowServiceGetResponses,
+    FctEngineNewPayloadResourceShareWindowServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareWindowServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareWindowServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_window/{window_grain}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per UTC day, node scope and execution client
  */
 export const fctEngineNewPayloadThroughputHistogramDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -9260,6 +9416,46 @@ export const fctEngineNewPayloadThroughputHistogramHourlyServiceGet = <ThrowOnEr
     responseValidator: async data =>
       await zFctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_throughput_histogram_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload per-block throughput histogram buckets summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_throughput_histogram_hourly and _daily
+ */
+export const fctEngineNewPayloadThroughputHistogramWindowServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadThroughputHistogramWindowServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramWindowServiceListResponses,
+    FctEngineNewPayloadThroughputHistogramWindowServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramWindowServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramWindowServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_window',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadThroughputHistogramWindowServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadThroughputHistogramWindowServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramWindowServiceGetResponses,
+    FctEngineNewPayloadThroughputHistogramWindowServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramWindowServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramWindowServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_window/{window_grain}',
     ...options,
   });
 
