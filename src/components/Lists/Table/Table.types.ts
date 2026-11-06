@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 
 export interface Column<T = unknown> {
   /**
-   * The header text for this column
+   * The header content for this column
    */
-  header: string;
+  header: ReactNode;
   /**
    * How to access the data for this column
    * Can be a key of the data object or a function that returns a ReactNode

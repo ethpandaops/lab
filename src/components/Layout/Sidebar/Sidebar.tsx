@@ -21,7 +21,6 @@ import {
   ClockIcon,
   CpuChipIcon,
   MapIcon,
-  WrenchScrewdriverIcon,
   ServerStackIcon,
   SignalIcon,
   CircleStackIcon,
@@ -238,7 +237,6 @@ const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
   { name: 'Xatu nodes', to: '/xatu/nodes', icon: ServerIcon },
   { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
-  { name: 'Fork Readiness', to: '/xatu/fork-readiness', icon: WrenchScrewdriverIcon },
 ];
 
 /**
