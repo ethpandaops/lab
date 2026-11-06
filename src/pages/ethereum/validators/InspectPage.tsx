@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
+import { Card } from '@/components/Layout/Card';
 import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
 import { Badge } from '@/components/Elements/Badge';
@@ -17,6 +18,7 @@ import {
   DateRangeSelector,
   PerformanceSummary,
   ValidatorTable,
+  DailyBreakdownTable,
   ValidatorsSkeleton,
   ValidatorHeatmap,
   NewValidatorsCard,
@@ -321,6 +323,37 @@ export function InspectPage(): JSX.Element {
               />
               {loading ? (
                 <ValidatorsSkeleton />
+              ) : hasData && knownIndices.length === 1 ? (
+                // One validator: the cards above already summarise it, so only its day-by-day rows follow
+                <Card title="Daily breakdown">
+                  <DailyBreakdownTable
+                    attestationData={attestationDaily}
+                    balanceData={balanceDaily}
+                    syncCommitteeData={syncCommitteeDaily}
+                    blockProposals={blockProposals}
+                    validatorIndex={knownIndices[0]}
+                    from={performanceFrom}
+                    to={dataTo}
+                    stepDays={resolution === 'week' ? 7 : 1}
+                    onWeekSelect={weekStart => {
+                      applyRange({ from: weekStart, to: weekStart + 6 * DAY });
+                      setSelection({ validatorIndex: knownIndices[0], dayTimestamp: null, hourTimestamp: null });
+                    }}
+                    getStatusAtTimestamp={getStatusAtTimestamp}
+                    selectedDayTimestamp={selection.dayTimestamp}
+                    selectedHourTimestamp={selection.hourTimestamp}
+                    onDaySelect={dayTs =>
+                      setSelection({ validatorIndex: knownIndices[0], dayTimestamp: dayTs, hourTimestamp: null })
+                    }
+                    onHourSelect={hourTs =>
+                      setSelection({
+                        validatorIndex: knownIndices[0],
+                        dayTimestamp: selection.dayTimestamp,
+                        hourTimestamp: hourTs,
+                      })
+                    }
+                  />
+                </Card>
               ) : hasData ? (
                 <ValidatorTable
                   validators={validators}

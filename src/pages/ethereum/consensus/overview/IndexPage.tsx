@@ -36,8 +36,6 @@ import {
   fctBlockPayloadStatusDailyServiceListOptions,
   fctAttestationInclusionDelayHourlyServiceListOptions,
   fctAttestationInclusionDelayDailyServiceListOptions,
-  fctProposerRewardHourlyServiceListOptions,
-  fctProposerRewardDailyServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import { fctReorgDailyServiceList, fctReorgHourlyServiceList } from '@/api/sdk.gen';
 import type {
@@ -55,8 +53,6 @@ import type {
   FctBlockProposalStatusDaily,
   FctAttestationInclusionDelayHourly,
   FctAttestationInclusionDelayDaily,
-  FctProposerRewardHourly,
-  FctProposerRewardDaily,
 } from '@/api/types.gen';
 import { ConsensusOverviewSkeleton } from './components';
 import { type TimePeriod, TIME_RANGE_CONFIG, TIME_PERIOD_OPTIONS, PAGE_SIZE } from './constants';
@@ -75,7 +71,6 @@ import {
   buildMissedSlotRateChartConfig,
   buildBlockProposalStatusChartConfig,
   buildAttestationInclusionDelayChartConfig,
-  buildProposerRewardChartConfig,
   DEPTH_COLORS,
   STATUS_COLORS,
   type TooltipSection,
@@ -273,24 +268,6 @@ export function IndexPage(): JSX.Element {
     enabled: isDaily,
   });
 
-  const proposerRewardHourlyQuery = useQuery({
-    ...fctProposerRewardHourlyServiceListOptions({
-      query: {
-        hour_start_date_time_gte: startTimestamp,
-        hour_start_date_time_lt: hourlyEnd,
-        order_by: 'hour_start_date_time asc',
-        page_size: PAGE_SIZE,
-      },
-    }),
-    enabled: !isDaily,
-  });
-  const proposerRewardDailyQuery = useQuery({
-    ...fctProposerRewardDailyServiceListOptions({
-      query: { day_start_date_ne: today, order_by: 'day_start_date desc', page_size: PAGE_SIZE },
-    }),
-    enabled: isDaily,
-  });
-
   // --- Records ---
 
   const blobRecords = useMemo(
@@ -359,17 +336,6 @@ export function IndexPage(): JSX.Element {
     [isDaily, inclusionDelayDailyQuery.data, inclusionDelayHourlyQuery.data, dailyStartDate]
   );
 
-  const proposerRewardRecords = useMemo(
-    () =>
-      isDaily
-        ? trimDailyRecords(
-            [...(proposerRewardDailyQuery.data?.fct_proposer_reward_daily ?? [])].reverse(),
-            dailyStartDate
-          )
-        : proposerRewardHourlyQuery.data?.fct_proposer_reward_hourly,
-    [isDaily, proposerRewardDailyQuery.data, proposerRewardHourlyQuery.data, dailyStartDate]
-  );
-
   // --- Unified time keys from all datasets ---
 
   const unifiedTimeKeys = useMemo(() => {
@@ -390,7 +356,6 @@ export function IndexPage(): JSX.Element {
       addHourlyKeys(missedSlotRecords as FctMissedSlotRateHourly[] | undefined);
       addHourlyKeys(proposalStatusRecords as FctBlockProposalStatusHourly[] | undefined);
       addHourlyKeys(inclusionDelayRecords as FctAttestationInclusionDelayHourly[] | undefined);
-      addHourlyKeys(proposerRewardRecords as FctProposerRewardHourly[] | undefined);
     } else {
       addDailyKeys(blobRecords as FctBlobCountDaily[] | undefined);
       addDailyKeys(attnRecords as FctAttestationParticipationRateDaily[] | undefined);
@@ -399,7 +364,6 @@ export function IndexPage(): JSX.Element {
       addDailyKeys(missedSlotRecords as FctMissedSlotRateDaily[] | undefined);
       addDailyKeys(proposalStatusRecords as FctBlockProposalStatusDaily[] | undefined);
       addDailyKeys(inclusionDelayRecords as FctAttestationInclusionDelayDaily[] | undefined);
-      addDailyKeys(proposerRewardRecords as FctProposerRewardDaily[] | undefined);
     }
 
     allKeys.delete('');
@@ -413,7 +377,6 @@ export function IndexPage(): JSX.Element {
     missedSlotRecords,
     proposalStatusRecords,
     inclusionDelayRecords,
-    proposerRewardRecords,
     isDaily,
   ]);
 
@@ -427,8 +390,7 @@ export function IndexPage(): JSX.Element {
     reorgBounds.isLoading ||
     missedSlotHourlyQuery.isLoading ||
     proposalStatusHourlyQuery.isLoading ||
-    inclusionDelayHourlyQuery.isLoading ||
-    proposerRewardHourlyQuery.isLoading;
+    inclusionDelayHourlyQuery.isLoading;
   const dailyLoading =
     blobDailyQuery.isLoading ||
     attnDailyQuery.isLoading ||
@@ -437,8 +399,7 @@ export function IndexPage(): JSX.Element {
     reorgBounds.isLoading ||
     missedSlotDailyQuery.isLoading ||
     proposalStatusDailyQuery.isLoading ||
-    inclusionDelayDailyQuery.isLoading ||
-    proposerRewardDailyQuery.isLoading;
+    inclusionDelayDailyQuery.isLoading;
   const isLoading = isDaily ? dailyLoading : hourlyLoading;
   const error = isDaily
     ? (blobDailyQuery.error ??
@@ -447,16 +408,14 @@ export function IndexPage(): JSX.Element {
       reorgDailyQuery.error ??
       missedSlotDailyQuery.error ??
       proposalStatusDailyQuery.error ??
-      inclusionDelayDailyQuery.error ??
-      proposerRewardDailyQuery.error)
+      inclusionDelayDailyQuery.error)
     : (blobHourlyQuery.error ??
       attnHourlyQuery.error ??
       hvHourlyQuery.error ??
       reorgHourlyQuery.error ??
       missedSlotHourlyQuery.error ??
       proposalStatusHourlyQuery.error ??
-      inclusionDelayHourlyQuery.error ??
-      proposerRewardHourlyQuery.error);
+      inclusionDelayHourlyQuery.error);
 
   // --- Max blob values for reference line ---
   // Base limits from consensus forks + BPO overrides from blob_schedule
@@ -565,11 +524,6 @@ export function IndexPage(): JSX.Element {
     if (!inclusionDelayRecords?.length || !unifiedTimeKeys.length) return null;
     return buildAttestationInclusionDelayChartConfig(inclusionDelayRecords, unifiedTimeKeys, isDaily);
   }, [inclusionDelayRecords, unifiedTimeKeys, isDaily]);
-
-  const proposerRewardChartConfig = useMemo(() => {
-    if (!proposerRewardRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildProposerRewardChartConfig(proposerRewardRecords, unifiedTimeKeys, isDaily);
-  }, [proposerRewardRecords, unifiedTimeKeys, isDaily]);
 
   // --- Fork mark lines ---
 
@@ -913,26 +867,6 @@ export function IndexPage(): JSX.Element {
     [makeStatsTooltipFormatter, inclusionDelayRecords]
   );
 
-  const proposerRewardTooltipFormatter = useMemo(
-    () =>
-      makeStatsTooltipFormatter(
-        proposerRewardRecords as Record<string, unknown>[] | undefined,
-        {
-          avg: 'avg_reward_eth',
-          movingAvg: 'moving_avg_reward_eth',
-          median: 'p50_reward_eth',
-          lowerBand: 'lower_band_reward_eth',
-          upperBand: 'upper_band_reward_eth',
-          p05: 'p05_reward_eth',
-          p95: 'p95_reward_eth',
-          min: 'min_reward_eth',
-          max: 'max_reward_eth',
-        },
-        ' ETH'
-      ),
-    [makeStatsTooltipFormatter, proposerRewardRecords]
-  );
-
   const bucket = isDaily ? 'UTC days' : 'UTC hours';
   const movingAvg = isDaily ? '7d moving average' : '6h moving average';
 
@@ -1166,31 +1100,6 @@ export function IndexPage(): JSX.Element {
                   legendPosition="top"
                   enableDataZoom
                   showDataZoomSlider={inModal}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'consensus-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
-          {/* Proposer Reward (MEV Relay) */}
-          {proposerRewardChartConfig && (
-            <PopoutCard
-              title="Proposer Reward (MEV Relay)"
-              subtitle={`Per canonical MEV block, ${bucket}, ${movingAvg}`}
-              anchorId="proposer-reward-chart"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={proposerRewardChartConfig.series}
-                  xAxis={{ type: 'category', labels: proposerRewardChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Reward (ETH)', min: 'dataMin' }}
-                  height={inModal ? 600 : 200}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  tooltipFormatter={proposerRewardTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
