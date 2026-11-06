@@ -1,44 +1,26 @@
-import { type JSX, useMemo, useCallback } from 'react';
+import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatTimeRange } from '@/utils/time';
-import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import { intEngineNewPayloadServiceList } from '@/api/sdk.gen';
 import { useTableBounds } from '@/hooks/useBounds';
 import { encodeTimeCursor, fetchNewestFirst, nowEnd, parseTimeCursor } from '@/utils/widening-window';
 import type { PayloadsSearch, FilterValues } from './IndexPage.types';
-import { DEFAULT_DURATION_MIN, DEFAULT_PAGE_SIZE, LIVE_MODE_ENABLED } from './IndexPage.types';
+import { DEFAULT_DURATION_MIN, DEFAULT_ORDER, DEFAULT_PAGE_SIZE, RANKED_MAX_DAYS } from './IndexPage.types';
 import { PayloadsView } from './components/PayloadsView';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import type { SortingState } from '@tanstack/react-table';
-import { useLivePayloadsStream } from './hooks';
 import { NEWEST_FIRST_ORDER, payloadFilters, payloadTimeBounds, payloadWindowQuery } from './utils/payload-query';
 
 /**
- * Payloads page showing individual engine_newPayload observations
- * Focuses on blocks that took abnormally long to validate
+ * Payloads page showing individual engine_newPayload observations, slowest first. Rankings read at most the last
+ * week of the URL's time range; newest first reads widening windows back from now.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/execution/payloads/' });
   const search = useSearch({ from: '/ethereum/execution/payloads/' }) as PayloadsSearch;
   const { currentNetwork } = useNetwork();
-
-  // The table covers every observation unless the URL bounds it. A block number deep-link reads the block wherever it
-  // falls. slot_start_date_time is a required filter, so the start is 0 when unbounded.
-  const timeRange = useMemo(() => {
-    const bounded = search.blockNumber === undefined;
-    const start = bounded ? (search.timeStart ?? 0) : 0;
-    const end = bounded ? search.timeEnd : undefined;
-    return {
-      start,
-      end,
-      label: start > 0 && end !== undefined ? formatTimeRange(start, end) : undefined,
-    };
-  }, [search.timeStart, search.timeEnd, search.blockNumber]);
-
-  // Check if live mode is enabled from URL (only if feature is enabled)
-  const isLive = LIVE_MODE_ENABLED && (search.isLive ?? false);
 
   // Duration threshold (default 500ms)
   const durationMin = search.durationMin ?? DEFAULT_DURATION_MIN;
@@ -47,18 +29,15 @@ export function IndexPage(): JSX.Element {
   const referenceNodes = search.referenceNodes ?? true;
 
   // Build order_by string for API
-  const orderBy = useMemo(() => {
-    const field = search.orderBy?.split(' ')[0] ?? 'slot';
-    const order = search.orderBy?.split(' ')[1] ?? 'desc';
-    return `${field} ${order}`;
-  }, [search.orderBy]);
+  const orderBy = search.orderBy ?? DEFAULT_ORDER;
 
   const filterQuery = payloadFilters(search, durationMin, referenceNodes);
   const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
 
-  // Newest first, the default, reads widening windows back from now or the page cursor (`pageToken` holds a time
-  // cursor in this sort), never the whole table at once
-  const isNewestFirst = orderBy === 'slot desc';
+  // Newest first reads widening windows back from now or the page cursor (`pageToken` holds a time cursor in this
+  // sort), never the whole table at once. A block number has no time to bound a ranking by, so it reads this way too
+  // and its few rows are sorted here.
+  const isNewestFirst = orderBy === 'slot desc' || search.blockNumber !== undefined;
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds('int_engine_new_payload');
   const timeBounds = payloadTimeBounds(search, currentNetwork?.genesis_time ?? 0, tableBounds?.min);
   const cursor = parseTimeCursor(search.pageToken);
@@ -80,31 +59,54 @@ export function IndexPage(): JSX.Element {
           return data.int_engine_new_payload ?? [];
         },
       }),
-    enabled: !!currentNetwork && !isLive && isNewestFirst && !boundsLoading,
+    enabled: !!currentNetwork && isNewestFirst && !boundsLoading,
     placeholderData: keepPreviousData,
   });
 
-  // Fetch data from the API with server-side filtering and sorting
-  // Disabled in live mode - live mode uses its own polling
+  // Any other sort ranks within the URL's time range, at most its last RANKED_MAX_DAYS days, so it never sorts the
+  // whole table
+  // Pinned at page load, so the query stays put; a reload ranks up to the new now
+  const [loadedAt] = useState(nowEnd);
+  const rankedEnd = timeBounds.end ?? loadedAt;
+  const rankedEarliest = rankedEnd - RANKED_MAX_DAYS * 86_400;
+  const rankedWindow = { gte: Math.max(timeBounds.floor ?? 0, rankedEarliest), lt: rankedEnd };
+  const rankedCapped = !search.slot && (timeBounds.floor ?? 0) < rankedEarliest;
   const sortedQuery = useQuery({
-    ...intEngineNewPayloadServiceListOptions({
-      query: {
-        slot_start_date_time_gte: timeRange.start,
-        ...(timeRange.end !== undefined && { slot_start_date_time_lte: timeRange.end }),
-        ...filterQuery,
-        page_size: pageSize,
-        page_token: search.pageToken,
-        order_by: orderBy,
-      },
-    }),
-    enabled: !!currentNetwork && !isLive && !isNewestFirst,
+    queryKey: [
+      'payloads',
+      'ranked',
+      currentNetwork?.name,
+      filterQuery,
+      rankedWindow,
+      orderBy,
+      pageSize,
+      search.pageToken,
+    ],
+    queryFn: async ({ signal }) => {
+      const { data } = await intEngineNewPayloadServiceList({
+        query: {
+          ...payloadWindowQuery(filterQuery, rankedWindow, `${orderBy}, ${NEWEST_FIRST_ORDER}`, pageSize),
+          page_token: search.pageToken,
+        },
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    enabled: !!currentNetwork && !isNewestFirst && !boundsLoading,
     // Keep the table in place while a filter change loads, so the page keeps its scroll position
     placeholderData: keepPreviousData,
   });
+  const windowLabel =
+    !isNewestFirst && rankedCapped
+      ? `Slowest in the last ${RANKED_MAX_DAYS} days`
+      : search.timeStart !== undefined && search.timeEnd !== undefined && search.blockNumber === undefined
+        ? formatTimeRange(search.timeStart, search.timeEnd)
+        : undefined;
   const isLoading = isNewestFirst ? boundsLoading || newestQuery.isLoading : sortedQuery.isLoading;
   const error = isNewestFirst ? newestQuery.error : sortedQuery.error;
 
-  // Build current filter values from URL for live mode hook
+  // Current filter values from the URL, for the filter panel
   const currentFilterValues: FilterValues = useMemo(
     () => ({
       timeStart: search.timeStart,
@@ -121,26 +123,22 @@ export function IndexPage(): JSX.Element {
     [search, referenceNodes]
   );
 
-  // Live streaming mode - fetches on bounds change and animates items in
-  const {
-    displayedItems: liveItems,
-    newItemIdsRef,
-    hitPageLimitRef,
-    error: liveError,
-  } = useLivePayloadsStream({
-    enabled: isLive && !!currentNetwork,
-    filters: currentFilterValues,
-    durationMin,
-  });
-
-  // Use API data directly (for non-live mode)
-  const paginatedData = useMemo(
-    () => (isNewestFirst ? newestQuery.data?.rows : sortedQuery.data?.int_engine_new_payload) ?? [],
-    [isNewestFirst, newestQuery.data, sortedQuery.data]
-  );
-
-  // Choose which data to display based on mode
-  const data = isLive ? liveItems : paginatedData;
+  const data = useMemo(() => {
+    if (!isNewestFirst) return sortedQuery.data?.int_engine_new_payload ?? [];
+    const rows = newestQuery.data?.rows ?? [];
+    if (orderBy === 'slot desc') return rows;
+    // A block number's rows, sorted by the chosen column
+    const [field, direction] = orderBy.split(' ') as [keyof IntEngineNewPayload, string];
+    const sign = direction === 'asc' ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const left = a[field];
+      const right = b[field];
+      if (left === right) return 0;
+      if (left === undefined || left === null) return 1;
+      if (right === undefined || right === null) return -1;
+      return (left > right ? 1 : -1) * sign;
+    });
+  }, [isNewestFirst, orderBy, newestQuery.data, sortedQuery.data]);
 
   // Store the next page token for pagination
   const nextPageToken = isNewestFirst
@@ -259,23 +257,9 @@ export function IndexPage(): JSX.Element {
 
   // Build current sorting state from URL
   const currentSorting: SortingState = useMemo(() => {
-    if (!search.orderBy) return [{ id: 'slot', desc: true }];
-    const parts = search.orderBy.split(' ');
+    const parts = orderBy.split(' ');
     return [{ id: parts[0], desc: parts[1] === 'desc' }];
-  }, [search.orderBy]);
-
-  // Handle live mode toggle
-  const handleLiveModeToggle = useCallback((): void => {
-    navigate({
-      search: prev => ({
-        ...prev,
-        isLive: !prev.isLive,
-        page: 0,
-        pageToken: undefined,
-      }),
-      resetScroll: false,
-    });
-  }, [navigate]);
+  }, [orderBy]);
 
   // Handle filter panel changes
   const handleFiltersChange = useCallback(
@@ -364,8 +348,8 @@ export function IndexPage(): JSX.Element {
   return (
     <PayloadsView
       data={data}
-      isLoading={isLoading && !isLive}
-      error={isLive ? liveError : (error as Error | null)}
+      isLoading={isLoading}
+      error={error as Error | null}
       pagination={{
         pageIndex: currentPage,
         pageSize: search.pageSize ?? DEFAULT_PAGE_SIZE,
@@ -381,13 +365,8 @@ export function IndexPage(): JSX.Element {
       selectedBlock={selectedBlock}
       onBlockSelect={handleBlockSelect}
       durationThreshold={durationMin}
-      windowLabel={timeRange.label}
+      windowLabel={windowLabel}
       tracoorUrl={tracoorUrl}
-      // Live mode props (disabled when LIVE_MODE_ENABLED is false)
-      isLive={isLive}
-      onLiveModeToggle={LIVE_MODE_ENABLED ? handleLiveModeToggle : undefined}
-      newItemIdsRef={newItemIdsRef}
-      liveHitPageLimitRef={hitPageLimitRef}
     />
   );
 }

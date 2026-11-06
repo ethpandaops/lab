@@ -25,6 +25,9 @@ import { blockSlices, buildClientPerformance, type SlowBlock } from '../utils/pe
 /** Rows of the per-slot timing table read to find the slowest blocks' candidate slots */
 const SLOWEST_CANDIDATE_ROWS = 100;
 
+/** Most days the slowest-blocks ranking reads, ending at the range's end; longer ranges rank only their last days */
+export const SLOWEST_MAX_DAYS = 7;
+
 /** Rows per hour, or per day (keyed by the day's start in hour_start_date_time) on daily ranges */
 export interface HourlyData {
   /** Per-client, per-version newPayload timings per hour over the range */
@@ -85,8 +88,9 @@ async function fetchBlocks(
 }
 
 /**
- * The slowest blocks across the whole range: the server orders per-slot client timings by
- * duration, then every client's timing, the summary and resource gas are read for those slots.
+ * The slowest blocks of [start, end): the server orders per-slot client timings by duration, then every client's
+ * timing, the summary and resource gas are read for those slots. Callers keep the range within SLOWEST_MAX_DAYS,
+ * since ordering by duration sorts every row in the range.
  */
 async function fetchSlowestBlocks(
   start: number,
@@ -254,9 +258,10 @@ export function usePerformanceData({
   const [shownBlocks, setShownBlocks] = useState<BlockData | null>(null);
   if (blocks && blocks !== shownBlocks) setShownBlocks(blocks);
 
+  const slowestStart = Math.max(start, end - SLOWEST_MAX_DAYS * 86_400);
   const slowBlocks = useQuery({
-    queryKey: ['engine-perf', 'slowest-blocks', network, start, end, referenceNodesOnly],
-    queryFn: ({ signal }) => fetchSlowestBlocks(start, end, refNodeFilter, signal),
+    queryKey: ['engine-perf', 'slowest-blocks', network, slowestStart, end, referenceNodesOnly],
+    queryFn: ({ signal }) => fetchSlowestBlocks(slowestStart, end, refNodeFilter, signal),
     enabled: on,
     placeholderData: keepPreviousData,
   });

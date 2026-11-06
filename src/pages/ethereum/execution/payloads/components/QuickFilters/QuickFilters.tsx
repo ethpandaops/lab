@@ -1,14 +1,6 @@
 import type { JSX } from 'react';
 import { clsx } from 'clsx';
-import {
-  ClockIcon,
-  XCircleIcon,
-  BeakerIcon,
-  FireIcon,
-  QueueListIcon,
-  PlayIcon,
-  PauseIcon,
-} from '@heroicons/react/24/outline';
+import { ClockIcon, XCircleIcon, BeakerIcon, FireIcon, QueueListIcon } from '@heroicons/react/24/outline';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { FilterValues } from '../../IndexPage.types';
 import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
@@ -111,21 +103,12 @@ type QuickFiltersProps = {
   currentFilters: FilterValues;
   onApplyPreset: (filters: Partial<FilterValues>) => void;
   onClearFilters: () => void;
-  // Live mode props
-  isLive?: boolean;
-  onLiveModeToggle?: () => void;
 };
 
 /**
- * Unified toolbar with quick filters, live toggle, and reference nodes
+ * Unified toolbar with quick filters and reference nodes
  */
-export function QuickFilters({
-  currentFilters,
-  onApplyPreset,
-  onClearFilters,
-  isLive,
-  onLiveModeToggle,
-}: QuickFiltersProps): JSX.Element {
+export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: QuickFiltersProps): JSX.Element {
   const handlePresetClick = (preset: QuickFilterPreset): void => {
     if (isPresetActive(preset, currentFilters)) {
       onClearFilters();
@@ -160,36 +143,6 @@ export function QuickFilters({
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      {/* Live mode toggle */}
-      {onLiveModeToggle && (
-        <>
-          <button
-            type="button"
-            onClick={onLiveModeToggle}
-            className={clsx(
-              'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
-              isLive
-                ? 'border-success bg-success/10 text-success'
-                : 'border-border bg-surface text-muted hover:border-primary/40'
-            )}
-          >
-            {isLive ? (
-              <>
-                <span className="size-2 rounded-full bg-success" />
-                <PauseIcon className="size-3.5" />
-                <span>Live</span>
-              </>
-            ) : (
-              <>
-                <PlayIcon className="size-3.5" />
-                <span>Go Live</span>
-              </>
-            )}
-          </button>
-          <div className="hidden h-5 w-px bg-border sm:block" />
-        </>
-      )}
-
       {/* Core Presets - always visible */}
       <div className="flex flex-wrap items-center gap-1.5">
         {CORE_PRESETS.map(preset => {
