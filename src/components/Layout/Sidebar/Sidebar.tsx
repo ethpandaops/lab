@@ -10,7 +10,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CubeIcon,
-  DocumentTextIcon,
+  CubeTransparentIcon,
   FireIcon,
   PlayCircleIcon,
   PresentationChartLineIcon,
@@ -197,12 +197,8 @@ function clientGroup(label: string, clients: readonly string[]): NavGroup {
   };
 }
 
-const ethereumConsensusPages: NavItem[] = [
-  { name: 'Overview', to: '/ethereum/consensus/overview', icon: PresentationChartLineIcon },
-  { name: 'Live', to: '/ethereum/live', icon: PlayCircleIcon },
-  { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
-  { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
-  { name: 'Validators', to: '/ethereum/validators', icon: ShieldCheckIcon },
+/** Who runs Ethereum: the entities staking, the clients they run and the forks those clients ship */
+const ethereumNetworkPages: NavItem[] = [
   { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },
   {
     name: 'Clients',
@@ -211,6 +207,14 @@ const ethereumConsensusPages: NavItem[] = [
     children: [clientGroup('Consensus', CONSENSUS_CLIENTS), clientGroup('Execution', EXECUTION_CLIENTS)],
   },
   { name: 'Forks', to: '/ethereum/forks', icon: SignalIcon },
+];
+
+const ethereumConsensusPages: NavItem[] = [
+  { name: 'Overview', to: '/ethereum/consensus/overview', icon: PresentationChartLineIcon },
+  { name: 'Live', to: '/ethereum/live', icon: PlayCircleIcon },
+  { name: 'Epochs', to: '/ethereum/epochs', icon: ClockIcon },
+  { name: 'Slots', to: '/ethereum/slots', icon: Square3Stack3DIcon },
+  { name: 'Validators', to: '/ethereum/validators', icon: ShieldCheckIcon },
 ];
 
 const ethereumDataAvailabilityPages: NavItem[] = [
@@ -224,17 +228,16 @@ const ethereumExecutionPages: NavItem[] = [
   { name: 'Timings', to: '/ethereum/execution/timings', icon: ClockIcon },
   { name: 'Performance', to: '/ethereum/execution/performance', icon: BoltIcon },
   { name: 'Payloads', to: '/ethereum/execution/payloads', icon: CubeIcon },
+  { name: 'Local Blocks', to: '/ethereum/execution/locally-built-blocks', icon: CubeTransparentIcon },
   { name: 'Gas Profiler', to: '/ethereum/execution/gas-profiler', icon: FireIcon },
   { name: 'State Growth', to: '/ethereum/execution/state-growth', icon: ServerStackIcon },
   { name: 'State Expiry', to: '/ethereum/execution/state-expiry', icon: ArchiveBoxXMarkIcon },
-  { name: 'Contracts', to: '/ethereum/contracts', icon: DocumentTextIcon },
 ];
 
 const xatuPages: NavItem[] = [
   { name: 'Contributors', to: '/xatu/contributors', icon: UserGroupIcon },
   { name: 'Xatu nodes', to: '/xatu/nodes', icon: ServerIcon },
   { name: 'Geo Checklist', to: '/xatu/geographical-checklist', icon: MapIcon },
-  { name: 'Local Blocks', to: '/xatu/locally-built-blocks', icon: CubeIcon },
   { name: 'Fork Readiness', to: '/xatu/fork-readiness', icon: WrenchScrewdriverIcon },
 ];
 
@@ -431,6 +434,11 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
   const { data: config } = useConfig();
   const { currentNetwork } = useNetwork();
 
+  const filteredEthereumNetworkPages = useMemo(
+    () => ethereumNetworkPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
+    [config?.features, currentNetwork?.name]
+  );
+
   const filteredEthereumConsensusPages = useMemo(
     () => ethereumConsensusPages.filter(page => isPageEnabled(page.to, config?.features, currentNetwork?.name)),
     [config?.features, currentNetwork?.name]
@@ -475,6 +483,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                   <div>
                     <SectionHeader title="Ethereum" collapsed={false} type="ethereum" />
                     <div className="mt-2 space-y-3">
+                      {filteredEthereumNetworkPages.length > 0 && (
+                        <div>
+                          <SubsectionHeader title="Network" collapsed={false} />
+                          <div className="space-y-0.5">
+                            {filteredEthereumNetworkPages.map(page => (
+                              <NavLink key={page.to} page={page} collapsed={false} inDrawer />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {filteredEthereumConsensusPages.length > 0 && (
                         <div>
                           <SubsectionHeader title="Consensus" collapsed={false} />
@@ -596,6 +614,16 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             <div>
               <SectionHeader title="Ethereum" collapsed={collapsed} type="ethereum" />
               <div className={clsx('space-y-2', !collapsed && 'mt-1.5')}>
+                {filteredEthereumNetworkPages.length > 0 && (
+                  <div>
+                    <SubsectionHeader title="Network" collapsed={collapsed} />
+                    <div className={clsx(collapsed ? 'space-y-1' : 'space-y-0.5')}>
+                      {filteredEthereumNetworkPages.map(page => (
+                        <NavLink key={page.to} page={page} collapsed={collapsed} />
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {filteredEthereumConsensusPages.length > 0 && (
                   <div>
                     <SubsectionHeader title="Consensus" collapsed={collapsed} />

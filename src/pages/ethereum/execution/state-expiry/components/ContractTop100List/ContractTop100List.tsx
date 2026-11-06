@@ -12,11 +12,6 @@ import { TableColGroup } from './TableColGroup';
 type SortColumn = 'size' | 'slots' | 'expiry1y' | 'expiry2y';
 type SortDirection = 'asc' | 'desc';
 
-interface ContractTop100ListProps {
-  /** Display variant - 'contained' uses Card with fixed height ScrollArea, 'full' renders without container */
-  variant?: 'contained' | 'full';
-}
-
 /** Sort data by column */
 function sortData(
   data: ContractTop100Item[],
@@ -123,10 +118,8 @@ function SortHeader({
 /**
  * Component displaying the top 100 contracts by storage bytes.
  * Shows a table on desktop and card layout on mobile.
- *
- * @param variant - 'contained' (default) wraps in Card with ScrollArea, 'full' renders directly
  */
-export function ContractTop100List({ variant = 'contained' }: ContractTop100ListProps): JSX.Element {
+export function ContractTop100List(): JSX.Element {
   const { data, expiryEndDate, isLoading, error } = useContractTop100Data();
   const hideSavings = expiryEndDate !== null;
   const expiryNote = expiryEndDate
@@ -235,18 +228,6 @@ export function ContractTop100List({ variant = 'contained' }: ContractTop100List
       )}
     </>
   );
-
-  if (variant === 'full') {
-    return (
-      <>
-        {expiryNote && <p className="px-3 pb-2 text-sm text-muted">{expiryNote}</p>}
-        {/* Mobile: Card layout */}
-        <div className="md:hidden">{mobileContent}</div>
-        {/* Desktop: Table layout */}
-        <div className="hidden overflow-x-auto md:block">{tableContent}</div>
-      </>
-    );
-  }
 
   return (
     <Card title="Top 100 Contracts" subtitle={expiryNote} className="h-120 overflow-hidden rounded-sm">
