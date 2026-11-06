@@ -23,7 +23,9 @@ export const DataAvailabilityLegend = ({
 
   return (
     <div className={clsx('flex', directionClass, className)}>
-      <div className="text-xs/4 whitespace-nowrap text-muted">Availability %</div>
+      <div className="text-xs/4 whitespace-nowrap text-muted">
+        Availability %, counting gossip sightings as available
+      </div>
       <div className="flex flex-wrap gap-1">
         {BANDS.map(band => (
           <div
