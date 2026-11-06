@@ -318,6 +318,9 @@ export function HeatmapChart({
         option={option}
         style={{ height, width: '100%', minHeight: height }}
         notMerge={false}
+        // The no-data and highlight series (and their dummy visual maps) come and go with the data; replace both lists so
+        // a series dropped from the option is removed from the chart instead of lingering over the new cells
+        replaceMerge={['series', 'visualMap']}
         lazyUpdate={true}
         onEvents={onEvents}
       />
