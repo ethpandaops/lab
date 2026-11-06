@@ -27,6 +27,9 @@ export function IndexPage(): JSX.Element {
   // timeStart/timeEnd scope the list to probes of slots in that window (the custody drill-down's
   // range), read from the slot-ordered table. Without them, every probe since Fulu.
   const hasSlotWindow = search.timeStart !== undefined && search.timeEnd !== undefined;
+  // A slot filter also reads the slot-ordered table: int_custody_probe is sorted by probe time, so a slot
+  // lookup there scans every probe since Fulu.
+  const bySlot = hasSlotWindow || search.slot !== undefined;
 
   // Bounded by now so ClickHouse can cut off early with ORDER BY; fixed on mount so opening a probe keeps the page
   const [now] = useState(() => Math.floor(Date.now() / 1000));
@@ -82,7 +85,7 @@ export function IndexPage(): JSX.Element {
         ...listQuery,
       },
     }),
-    enabled: !!currentNetwork && !!fuluActivation && !isLive && !hasSlotWindow,
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && !bySlot,
     // Keep the table while a filter or page loads, so the page keeps its height and scroll position
     placeholderData: keepPreviousData,
   });
@@ -91,16 +94,19 @@ export function IndexPage(): JSX.Element {
       query: {
         // From Fulu on (PeerDAS only exists after it). Bounded by time, not slot_gte: the API drops the
         // slot_start_date_time filters when a slot range filter is present.
-        slot_start_date_time_gte: Math.max(search.timeStart ?? 0, fuluActivation?.dateTime ?? 0),
-        slot_start_date_time_lt: search.timeEnd,
+        // A slot filter is narrower than the window and becomes a slot_start_date_time filter itself.
+        ...(search.slot === undefined && {
+          slot_start_date_time_gte: Math.max(search.timeStart ?? 0, fuluActivation?.dateTime ?? 0),
+          slot_start_date_time_lt: search.timeEnd,
+        }),
         ...listQuery,
       },
     }),
-    enabled: !!currentNetwork && !!fuluActivation && !isLive && hasSlotWindow,
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && bySlot,
     placeholderData: keepPreviousData,
   });
-  const { isLoading, error } = hasSlotWindow ? slotWindowQuery : probeTimeQuery;
-  const nextPageToken = hasSlotWindow ? slotWindowQuery.data?.next_page_token : probeTimeQuery.data?.next_page_token;
+  const { isLoading, error } = bySlot ? slotWindowQuery : probeTimeQuery;
+  const nextPageToken = bySlot ? slotWindowQuery.data?.next_page_token : probeTimeQuery.data?.next_page_token;
 
   // Build current filter values from URL for live mode hook
   const currentFilterValues: FilterValues = useMemo(
@@ -140,10 +146,8 @@ export function IndexPage(): JSX.Element {
   // Use API data directly (for non-live mode)
   const paginatedData = useMemo(
     (): IntCustodyProbe[] =>
-      (hasSlotWindow
-        ? slotWindowQuery.data?.int_custody_probe_order_by_slot
-        : probeTimeQuery.data?.int_custody_probe) ?? [],
-    [hasSlotWindow, slotWindowQuery.data, probeTimeQuery.data]
+      (bySlot ? slotWindowQuery.data?.int_custody_probe_order_by_slot : probeTimeQuery.data?.int_custody_probe) ?? [],
+    [bySlot, slotWindowQuery.data, probeTimeQuery.data]
   );
 
   // Choose which data to display based on mode
