@@ -8456,6 +8456,60 @@ export type FctEngineNewPayloadDurationHistogramHourly = {
 };
 
 /**
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ */
+export type FctEngineNewPayloadDurationPercentileWindow = {
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload calls in the window, 0 for a key that left the window
+   */
+  observation_count?: number;
+  /**
+   * Median engine_newPayload duration in milliseconds over the window, interpolated inside its log-scaled bucket (about 4% wide)
+   */
+  p50_duration_ms?: number;
+  /**
+   * 95th percentile engine_newPayload duration in milliseconds over the window, interpolated inside its log-scaled bucket (about 4% wide)
+   */
+  p95_duration_ms?: number;
+  /**
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * End of the window, exclusive
+   */
+  window_end_date_time?: number;
+  /**
+   * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday
+   */
+  window_grain?: string;
+  /**
+   * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history
+   */
+  window_length?: number;
+  /**
+   * Start of the window, inclusive
+   */
+  window_start_date_time?: number;
+};
+
+/**
  * engine_newPayload timings of VALID payloads per UTC day, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
  */
 export type FctEngineNewPayloadGasBucketDaily = {
@@ -8588,6 +8642,84 @@ export type FctEngineNewPayloadGasBucketHourly = {
 };
 
 /**
+ * engine_newPayload cost-model sums per 5 Mgas block size bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_gas_bucket_hourly and _daily
+ */
+export type FctEngineNewPayloadGasBucketWindow = {
+  /**
+   * Sum over blocks of the mean engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  avg_ms_sum?: number;
+  /**
+   * Number of blocks
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket
+   */
+  gas_bucket_mgas?: number;
+  /**
+   * Sum of squared block gas used in Mgas
+   */
+  gas_mgas_sq_sum?: number;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the median duration
+   */
+  gas_p50_product_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the 95th percentile duration
+   */
+  gas_p95_product_sum?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the squared median duration
+   */
+  p50_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p50_ms_sum?: number;
+  /**
+   * Sum over blocks of the squared 95th percentile duration
+   */
+  p95_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the 95th percentile engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p95_ms_sum?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted
+   */
+  window_end_date_time?: number;
+  /**
+   * hour for windows of hours, day for all history in complete UTC days ending yesterday
+   */
+  window_grain?: string;
+  /**
+   * Window length in hours (24, 168 or 744), 0 for all history
+   */
+  window_length?: number;
+  /**
+   * Start of the window, inclusive
+   */
+  window_start_date_time?: number;
+};
+
+/**
  * engine_newPayload throughput of VALID payloads of at least 10 Mgas per UTC day, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
  */
 export type FctEngineNewPayloadResourceShareDaily = {
@@ -8672,6 +8804,60 @@ export type FctEngineNewPayloadResourceShareHourly = {
 };
 
 /**
+ * engine_newPayload throughput sums per gas resource and 10% resource share bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_resource_share_hourly and _daily
+ */
+export type FctEngineNewPayloadResourceShareWindow = {
+  /**
+   * Number of blocks of at least 10 Mgas in the bucket
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds. gas_mgas_sum over p50_ms_sum times 1000 is the throughput in Mgas/s
+   */
+  p50_ms_sum?: number;
+  /**
+   * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size
+   */
+  resource?: string;
+  /**
+   * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90)
+   */
+  share_bucket_pct?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted
+   */
+  window_end_date_time?: number;
+  /**
+   * hour for windows of hours, day for all history in complete UTC days ending yesterday
+   */
+  window_grain?: string;
+  /**
+   * Window length in hours (24, 168 or 744), 0 for all history
+   */
+  window_length?: number;
+  /**
+   * Start of the window, inclusive
+   */
+  window_start_date_time?: number;
+};
+
+/**
  * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per UTC day, node scope and execution client
  */
 export type FctEngineNewPayloadThroughputHistogramDaily = {
@@ -8745,6 +8931,56 @@ export type FctEngineNewPayloadThroughputHistogramHourly = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload per-block throughput histogram buckets summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_throughput_histogram_hourly and _daily
+ */
+export type FctEngineNewPayloadThroughputHistogramWindow = {
+  /**
+   * Number of blocks of at least 5 Mgas whose throughput falls in the bucket
+   */
+  block_count?: number;
+  /**
+   * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in Mgas/s, inclusive
+   */
+  bucket_lower_mgas_per_second?: number;
+  /**
+   * Upper bound of the bucket in Mgas/s, exclusive
+   */
+  bucket_upper_mgas_per_second?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted
+   */
+  window_end_date_time?: number;
+  /**
+   * hour for windows of hours, day for all history in complete UTC days ending yesterday
+   */
+  window_grain?: string;
+  /**
+   * Window length in hours (24, 168 or 744), 0 for all history
+   */
+  window_length?: number;
+  /**
+   * Start of the window, inclusive
+   */
+  window_start_date_time?: number;
 };
 
 /**
@@ -14828,6 +15064,13 @@ export type GetFctEngineNewPayloadDurationHistogramHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_new_payload_duration_percentile_window record
+ */
+export type GetFctEngineNewPayloadDurationPercentileWindowResponse = {
+  item?: FctEngineNewPayloadDurationPercentileWindow;
+};
+
+/**
  * Response for getting a single fct_engine_new_payload_gas_bucket_daily record
  */
 export type GetFctEngineNewPayloadGasBucketDailyResponse = {
@@ -14839,6 +15082,13 @@ export type GetFctEngineNewPayloadGasBucketDailyResponse = {
  */
 export type GetFctEngineNewPayloadGasBucketHourlyResponse = {
   item?: FctEngineNewPayloadGasBucketHourly;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_gas_bucket_window record
+ */
+export type GetFctEngineNewPayloadGasBucketWindowResponse = {
+  item?: FctEngineNewPayloadGasBucketWindow;
 };
 
 /**
@@ -14856,6 +15106,13 @@ export type GetFctEngineNewPayloadResourceShareHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_engine_new_payload_resource_share_window record
+ */
+export type GetFctEngineNewPayloadResourceShareWindowResponse = {
+  item?: FctEngineNewPayloadResourceShareWindow;
+};
+
+/**
  * Response for getting a single fct_engine_new_payload_throughput_histogram_daily record
  */
 export type GetFctEngineNewPayloadThroughputHistogramDailyResponse = {
@@ -14867,6 +15124,13 @@ export type GetFctEngineNewPayloadThroughputHistogramDailyResponse = {
  */
 export type GetFctEngineNewPayloadThroughputHistogramHourlyResponse = {
   item?: FctEngineNewPayloadThroughputHistogramHourly;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_throughput_histogram_window record
+ */
+export type GetFctEngineNewPayloadThroughputHistogramWindowResponse = {
+  item?: FctEngineNewPayloadThroughputHistogramWindow;
 };
 
 /**
@@ -22213,6 +22477,20 @@ export type ListFctEngineNewPayloadDurationHistogramHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_engine_new_payload_duration_percentile_window records
+ */
+export type ListFctEngineNewPayloadDurationPercentileWindowResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_percentile_window.
+   */
+  fct_engine_new_payload_duration_percentile_window?: Array<FctEngineNewPayloadDurationPercentileWindow>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_new_payload_gas_bucket_daily records
  */
 export type ListFctEngineNewPayloadGasBucketDailyResponse = {
@@ -22234,6 +22512,20 @@ export type ListFctEngineNewPayloadGasBucketHourlyResponse = {
    * The list of fct_engine_new_payload_gas_bucket_hourly.
    */
   fct_engine_new_payload_gas_bucket_hourly?: Array<FctEngineNewPayloadGasBucketHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_gas_bucket_window records
+ */
+export type ListFctEngineNewPayloadGasBucketWindowResponse = {
+  /**
+   * The list of fct_engine_new_payload_gas_bucket_window.
+   */
+  fct_engine_new_payload_gas_bucket_window?: Array<FctEngineNewPayloadGasBucketWindow>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22269,6 +22561,20 @@ export type ListFctEngineNewPayloadResourceShareHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_engine_new_payload_resource_share_window records
+ */
+export type ListFctEngineNewPayloadResourceShareWindowResponse = {
+  /**
+   * The list of fct_engine_new_payload_resource_share_window.
+   */
+  fct_engine_new_payload_resource_share_window?: Array<FctEngineNewPayloadResourceShareWindow>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_engine_new_payload_throughput_histogram_daily records
  */
 export type ListFctEngineNewPayloadThroughputHistogramDailyResponse = {
@@ -22290,6 +22596,20 @@ export type ListFctEngineNewPayloadThroughputHistogramHourlyResponse = {
    * The list of fct_engine_new_payload_throughput_histogram_hourly.
    */
   fct_engine_new_payload_throughput_histogram_hourly?: Array<FctEngineNewPayloadThroughputHistogramHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_throughput_histogram_window records
+ */
+export type ListFctEngineNewPayloadThroughputHistogramWindowResponse = {
+  /**
+   * The list of fct_engine_new_payload_throughput_histogram_window.
+   */
+  fct_engine_new_payload_throughput_histogram_window?: Array<FctEngineNewPayloadThroughputHistogramWindow>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -103914,6 +104234,466 @@ export type FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses = {
 export type FctEngineNewPayloadDurationHistogramHourlyServiceGetResponse =
   FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses[keyof FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses];
 
+export type FctEngineNewPayloadDurationPercentileWindowServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: eq)
+     */
+    window_grain_eq?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: ne)
+     */
+    window_grain_ne?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: contains)
+     */
+    window_grain_contains?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: starts_with)
+     */
+    window_grain_starts_with?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: ends_with)
+     */
+    window_grain_ends_with?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: like)
+     */
+    window_grain_like?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: not_like)
+     */
+    window_grain_not_like?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: in_values) (comma-separated list)
+     */
+    window_grain_in_values?: string;
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday (filter: not_in_values) (comma-separated list)
+     */
+    window_grain_not_in_values?: string;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: eq)
+     */
+    window_length_eq?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: ne)
+     */
+    window_length_ne?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: lt)
+     */
+    window_length_lt?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: lte)
+     */
+    window_length_lte?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: gt)
+     */
+    window_length_gt?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: gte)
+     */
+    window_length_gte?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: between_min)
+     */
+    window_length_between_min?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: between_max_value)
+     */
+    window_length_between_max_value?: number;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: in_values) (comma-separated list)
+     */
+    window_length_in_values?: string;
+    /**
+     * Window length in hours (1, 6, 24, 168 or 744) or days (7, 14, 30, 60, 90, 180 or 365), 0 for all history (filter: not_in_values) (comma-separated list)
+     */
+    window_length_not_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: eq)
+     */
+    window_start_date_time_eq?: number;
+    /**
+     * Start of the window, inclusive (filter: ne)
+     */
+    window_start_date_time_ne?: number;
+    /**
+     * Start of the window, inclusive (filter: lt)
+     */
+    window_start_date_time_lt?: number;
+    /**
+     * Start of the window, inclusive (filter: lte)
+     */
+    window_start_date_time_lte?: number;
+    /**
+     * Start of the window, inclusive (filter: gt)
+     */
+    window_start_date_time_gt?: number;
+    /**
+     * Start of the window, inclusive (filter: gte)
+     */
+    window_start_date_time_gte?: number;
+    /**
+     * Start of the window, inclusive (filter: between_min)
+     */
+    window_start_date_time_between_min?: number;
+    /**
+     * Start of the window, inclusive (filter: between_max_value)
+     */
+    window_start_date_time_between_max_value?: number;
+    /**
+     * Start of the window, inclusive (filter: in_values) (comma-separated list)
+     */
+    window_start_date_time_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    window_start_date_time_not_in_values?: string;
+    /**
+     * End of the window, exclusive (filter: eq)
+     */
+    window_end_date_time_eq?: number;
+    /**
+     * End of the window, exclusive (filter: ne)
+     */
+    window_end_date_time_ne?: number;
+    /**
+     * End of the window, exclusive (filter: lt)
+     */
+    window_end_date_time_lt?: number;
+    /**
+     * End of the window, exclusive (filter: lte)
+     */
+    window_end_date_time_lte?: number;
+    /**
+     * End of the window, exclusive (filter: gt)
+     */
+    window_end_date_time_gt?: number;
+    /**
+     * End of the window, exclusive (filter: gte)
+     */
+    window_end_date_time_gte?: number;
+    /**
+     * End of the window, exclusive (filter: between_min)
+     */
+    window_end_date_time_between_min?: number;
+    /**
+     * End of the window, exclusive (filter: between_max_value)
+     */
+    window_end_date_time_between_max_value?: number;
+    /**
+     * End of the window, exclusive (filter: in_values) (comma-separated list)
+     */
+    window_end_date_time_in_values?: string;
+    /**
+     * End of the window, exclusive (filter: not_in_values) (comma-separated list)
+     */
+    window_end_date_time_not_in_values?: string;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload calls in the window, 0 for a key that left the window (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * Filter p50_duration_ms using value
+     */
+    p50_duration_ms_value?: number;
+    /**
+     * Filter p95_duration_ms using value
+     */
+    p95_duration_ms_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_percentile_window to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationPercentileWindow` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_percentile_window';
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceListError =
+  FctEngineNewPayloadDurationPercentileWindowServiceListErrors[keyof FctEngineNewPayloadDurationPercentileWindowServiceListErrors];
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationPercentileWindowResponse;
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceListResponse =
+  FctEngineNewPayloadDurationPercentileWindowServiceListResponses[keyof FctEngineNewPayloadDurationPercentileWindowServiceListResponses];
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * hour for windows ending at the last complete hour, day for windows of complete UTC days ending yesterday
+     */
+    window_grain: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_percentile_window/{window_grain}';
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceGetError =
+  FctEngineNewPayloadDurationPercentileWindowServiceGetErrors[keyof FctEngineNewPayloadDurationPercentileWindowServiceGetErrors];
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationPercentileWindowResponse;
+};
+
+export type FctEngineNewPayloadDurationPercentileWindowServiceGetResponse =
+  FctEngineNewPayloadDurationPercentileWindowServiceGetResponses[keyof FctEngineNewPayloadDurationPercentileWindowServiceGetResponses];
+
 export type FctEngineNewPayloadGasBucketDailyServiceListData = {
   body?: never;
   path?: never;
@@ -104589,6 +105369,462 @@ export type FctEngineNewPayloadGasBucketHourlyServiceGetResponses = {
 
 export type FctEngineNewPayloadGasBucketHourlyServiceGetResponse =
   FctEngineNewPayloadGasBucketHourlyServiceGetResponses[keyof FctEngineNewPayloadGasBucketHourlyServiceGetResponses];
+
+export type FctEngineNewPayloadGasBucketWindowServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: eq)
+     */
+    window_grain_eq?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ne)
+     */
+    window_grain_ne?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: contains)
+     */
+    window_grain_contains?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: starts_with)
+     */
+    window_grain_starts_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ends_with)
+     */
+    window_grain_ends_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: like)
+     */
+    window_grain_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_like)
+     */
+    window_grain_not_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: in_values) (comma-separated list)
+     */
+    window_grain_in_values?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_in_values) (comma-separated list)
+     */
+    window_grain_not_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: eq)
+     */
+    window_length_eq?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: ne)
+     */
+    window_length_ne?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lt)
+     */
+    window_length_lt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lte)
+     */
+    window_length_lte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gt)
+     */
+    window_length_gt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gte)
+     */
+    window_length_gte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_min)
+     */
+    window_length_between_min?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_max_value)
+     */
+    window_length_between_max_value?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: in_values) (comma-separated list)
+     */
+    window_length_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: not_in_values) (comma-separated list)
+     */
+    window_length_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: eq)
+     */
+    gas_bucket_mgas_eq?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: ne)
+     */
+    gas_bucket_mgas_ne?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lt)
+     */
+    gas_bucket_mgas_lt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lte)
+     */
+    gas_bucket_mgas_lte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gt)
+     */
+    gas_bucket_mgas_gt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gte)
+     */
+    gas_bucket_mgas_gte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_min)
+     */
+    gas_bucket_mgas_between_min?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_max_value)
+     */
+    gas_bucket_mgas_between_max_value?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: not_in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: eq)
+     */
+    window_start_date_time_eq?: number;
+    /**
+     * Start of the window, inclusive (filter: ne)
+     */
+    window_start_date_time_ne?: number;
+    /**
+     * Start of the window, inclusive (filter: lt)
+     */
+    window_start_date_time_lt?: number;
+    /**
+     * Start of the window, inclusive (filter: lte)
+     */
+    window_start_date_time_lte?: number;
+    /**
+     * Start of the window, inclusive (filter: gt)
+     */
+    window_start_date_time_gt?: number;
+    /**
+     * Start of the window, inclusive (filter: gte)
+     */
+    window_start_date_time_gte?: number;
+    /**
+     * Start of the window, inclusive (filter: between_min)
+     */
+    window_start_date_time_between_min?: number;
+    /**
+     * Start of the window, inclusive (filter: between_max_value)
+     */
+    window_start_date_time_between_max_value?: number;
+    /**
+     * Start of the window, inclusive (filter: in_values) (comma-separated list)
+     */
+    window_start_date_time_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    window_start_date_time_not_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: eq)
+     */
+    window_end_date_time_eq?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: ne)
+     */
+    window_end_date_time_ne?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lt)
+     */
+    window_end_date_time_lt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lte)
+     */
+    window_end_date_time_lte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gt)
+     */
+    window_end_date_time_gt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gte)
+     */
+    window_end_date_time_gte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_min)
+     */
+    window_end_date_time_between_min?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_max_value)
+     */
+    window_end_date_time_between_max_value?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: in_values) (comma-separated list)
+     */
+    window_end_date_time_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: not_in_values) (comma-separated list)
+     */
+    window_end_date_time_not_in_values?: string;
+    /**
+     * Number of blocks (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter gas_mgas_sq_sum using value
+     */
+    gas_mgas_sq_sum_value?: number;
+    /**
+     * Filter avg_ms_sum using value
+     */
+    avg_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sq_sum using value
+     */
+    p50_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p50_product_sum using value
+     */
+    gas_p50_product_sum_value?: number;
+    /**
+     * Filter p95_ms_sum using value
+     */
+    p95_ms_sum_value?: number;
+    /**
+     * Filter p95_ms_sq_sum using value
+     */
+    p95_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p95_product_sum using value
+     */
+    gas_p95_product_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_gas_bucket_window to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadGasBucketWindow` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_window';
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceListError =
+  FctEngineNewPayloadGasBucketWindowServiceListErrors[keyof FctEngineNewPayloadGasBucketWindowServiceListErrors];
+
+export type FctEngineNewPayloadGasBucketWindowServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadGasBucketWindowResponse;
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceListResponse =
+  FctEngineNewPayloadGasBucketWindowServiceListResponses[keyof FctEngineNewPayloadGasBucketWindowServiceListResponses];
+
+export type FctEngineNewPayloadGasBucketWindowServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday
+     */
+    window_grain: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_window/{window_grain}';
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceGetError =
+  FctEngineNewPayloadGasBucketWindowServiceGetErrors[keyof FctEngineNewPayloadGasBucketWindowServiceGetErrors];
+
+export type FctEngineNewPayloadGasBucketWindowServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadGasBucketWindowResponse;
+};
+
+export type FctEngineNewPayloadGasBucketWindowServiceGetResponse =
+  FctEngineNewPayloadGasBucketWindowServiceGetResponses[keyof FctEngineNewPayloadGasBucketWindowServiceGetResponses];
 
 export type FctEngineNewPayloadResourceShareDailyServiceListData = {
   body?: never;
@@ -105282,6 +106518,470 @@ export type FctEngineNewPayloadResourceShareHourlyServiceGetResponses = {
 export type FctEngineNewPayloadResourceShareHourlyServiceGetResponse =
   FctEngineNewPayloadResourceShareHourlyServiceGetResponses[keyof FctEngineNewPayloadResourceShareHourlyServiceGetResponses];
 
+export type FctEngineNewPayloadResourceShareWindowServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: eq)
+     */
+    window_grain_eq?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ne)
+     */
+    window_grain_ne?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: contains)
+     */
+    window_grain_contains?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: starts_with)
+     */
+    window_grain_starts_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ends_with)
+     */
+    window_grain_ends_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: like)
+     */
+    window_grain_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_like)
+     */
+    window_grain_not_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: in_values) (comma-separated list)
+     */
+    window_grain_in_values?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_in_values) (comma-separated list)
+     */
+    window_grain_not_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: eq)
+     */
+    window_length_eq?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: ne)
+     */
+    window_length_ne?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lt)
+     */
+    window_length_lt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lte)
+     */
+    window_length_lte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gt)
+     */
+    window_length_gt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gte)
+     */
+    window_length_gte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_min)
+     */
+    window_length_between_min?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_max_value)
+     */
+    window_length_between_max_value?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: in_values) (comma-separated list)
+     */
+    window_length_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: not_in_values) (comma-separated list)
+     */
+    window_length_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: eq)
+     */
+    resource_eq?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ne)
+     */
+    resource_ne?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: contains)
+     */
+    resource_contains?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: starts_with)
+     */
+    resource_starts_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ends_with)
+     */
+    resource_ends_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: like)
+     */
+    resource_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_like)
+     */
+    resource_not_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: in_values) (comma-separated list)
+     */
+    resource_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_in_values) (comma-separated list)
+     */
+    resource_not_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: eq)
+     */
+    share_bucket_pct_eq?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: ne)
+     */
+    share_bucket_pct_ne?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lt)
+     */
+    share_bucket_pct_lt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lte)
+     */
+    share_bucket_pct_lte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gt)
+     */
+    share_bucket_pct_gt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gte)
+     */
+    share_bucket_pct_gte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_min)
+     */
+    share_bucket_pct_between_min?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_max_value)
+     */
+    share_bucket_pct_between_max_value?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: in_values) (comma-separated list)
+     */
+    share_bucket_pct_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: not_in_values) (comma-separated list)
+     */
+    share_bucket_pct_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: eq)
+     */
+    window_start_date_time_eq?: number;
+    /**
+     * Start of the window, inclusive (filter: ne)
+     */
+    window_start_date_time_ne?: number;
+    /**
+     * Start of the window, inclusive (filter: lt)
+     */
+    window_start_date_time_lt?: number;
+    /**
+     * Start of the window, inclusive (filter: lte)
+     */
+    window_start_date_time_lte?: number;
+    /**
+     * Start of the window, inclusive (filter: gt)
+     */
+    window_start_date_time_gt?: number;
+    /**
+     * Start of the window, inclusive (filter: gte)
+     */
+    window_start_date_time_gte?: number;
+    /**
+     * Start of the window, inclusive (filter: between_min)
+     */
+    window_start_date_time_between_min?: number;
+    /**
+     * Start of the window, inclusive (filter: between_max_value)
+     */
+    window_start_date_time_between_max_value?: number;
+    /**
+     * Start of the window, inclusive (filter: in_values) (comma-separated list)
+     */
+    window_start_date_time_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    window_start_date_time_not_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: eq)
+     */
+    window_end_date_time_eq?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: ne)
+     */
+    window_end_date_time_ne?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lt)
+     */
+    window_end_date_time_lt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lte)
+     */
+    window_end_date_time_lte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gt)
+     */
+    window_end_date_time_gt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gte)
+     */
+    window_end_date_time_gte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_min)
+     */
+    window_end_date_time_between_min?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_max_value)
+     */
+    window_end_date_time_between_max_value?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: in_values) (comma-separated list)
+     */
+    window_end_date_time_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: not_in_values) (comma-separated list)
+     */
+    window_end_date_time_not_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_resource_share_window to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadResourceShareWindow` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_resource_share_window';
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceListError =
+  FctEngineNewPayloadResourceShareWindowServiceListErrors[keyof FctEngineNewPayloadResourceShareWindowServiceListErrors];
+
+export type FctEngineNewPayloadResourceShareWindowServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadResourceShareWindowResponse;
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceListResponse =
+  FctEngineNewPayloadResourceShareWindowServiceListResponses[keyof FctEngineNewPayloadResourceShareWindowServiceListResponses];
+
+export type FctEngineNewPayloadResourceShareWindowServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday
+     */
+    window_grain: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_resource_share_window/{window_grain}';
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceGetError =
+  FctEngineNewPayloadResourceShareWindowServiceGetErrors[keyof FctEngineNewPayloadResourceShareWindowServiceGetErrors];
+
+export type FctEngineNewPayloadResourceShareWindowServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadResourceShareWindowResponse;
+};
+
+export type FctEngineNewPayloadResourceShareWindowServiceGetResponse =
+  FctEngineNewPayloadResourceShareWindowServiceGetResponses[keyof FctEngineNewPayloadResourceShareWindowServiceGetResponses];
+
 export type FctEngineNewPayloadThroughputHistogramDailyServiceListData = {
   body?: never;
   path?: never;
@@ -105901,6 +107601,434 @@ export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses = {
 
 export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse =
   FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses[keyof FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses];
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: eq)
+     */
+    window_grain_eq?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ne)
+     */
+    window_grain_ne?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: contains)
+     */
+    window_grain_contains?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: starts_with)
+     */
+    window_grain_starts_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: ends_with)
+     */
+    window_grain_ends_with?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: like)
+     */
+    window_grain_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_like)
+     */
+    window_grain_not_like?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: in_values) (comma-separated list)
+     */
+    window_grain_in_values?: string;
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday (filter: not_in_values) (comma-separated list)
+     */
+    window_grain_not_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: eq)
+     */
+    window_length_eq?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: ne)
+     */
+    window_length_ne?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lt)
+     */
+    window_length_lt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: lte)
+     */
+    window_length_lte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gt)
+     */
+    window_length_gt?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: gte)
+     */
+    window_length_gte?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_min)
+     */
+    window_length_between_min?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: between_max_value)
+     */
+    window_length_between_max_value?: number;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: in_values) (comma-separated list)
+     */
+    window_length_in_values?: string;
+    /**
+     * Window length in hours (24, 168 or 744), 0 for all history (filter: not_in_values) (comma-separated list)
+     */
+    window_length_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: eq)
+     */
+    window_start_date_time_eq?: number;
+    /**
+     * Start of the window, inclusive (filter: ne)
+     */
+    window_start_date_time_ne?: number;
+    /**
+     * Start of the window, inclusive (filter: lt)
+     */
+    window_start_date_time_lt?: number;
+    /**
+     * Start of the window, inclusive (filter: lte)
+     */
+    window_start_date_time_lte?: number;
+    /**
+     * Start of the window, inclusive (filter: gt)
+     */
+    window_start_date_time_gt?: number;
+    /**
+     * Start of the window, inclusive (filter: gte)
+     */
+    window_start_date_time_gte?: number;
+    /**
+     * Start of the window, inclusive (filter: between_min)
+     */
+    window_start_date_time_between_min?: number;
+    /**
+     * Start of the window, inclusive (filter: between_max_value)
+     */
+    window_start_date_time_between_max_value?: number;
+    /**
+     * Start of the window, inclusive (filter: in_values) (comma-separated list)
+     */
+    window_start_date_time_in_values?: string;
+    /**
+     * Start of the window, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    window_start_date_time_not_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: eq)
+     */
+    window_end_date_time_eq?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: ne)
+     */
+    window_end_date_time_ne?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lt)
+     */
+    window_end_date_time_lt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: lte)
+     */
+    window_end_date_time_lte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gt)
+     */
+    window_end_date_time_gt?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: gte)
+     */
+    window_end_date_time_gte?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_min)
+     */
+    window_end_date_time_between_min?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: between_max_value)
+     */
+    window_end_date_time_between_max_value?: number;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: in_values) (comma-separated list)
+     */
+    window_end_date_time_in_values?: string;
+    /**
+     * End of the window, exclusive. Hour windows end at the last complete hour, or for resource share at the last hour its hourly table has counted (filter: not_in_values) (comma-separated list)
+     */
+    window_end_date_time_not_in_values?: string;
+    /**
+     * Filter bucket_lower_mgas_per_second using value
+     */
+    bucket_lower_mgas_per_second_value?: number;
+    /**
+     * Filter bucket_upper_mgas_per_second using value
+     */
+    bucket_upper_mgas_per_second_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_throughput_histogram_window to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadThroughputHistogramWindow` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_window';
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceListError =
+  FctEngineNewPayloadThroughputHistogramWindowServiceListErrors[keyof FctEngineNewPayloadThroughputHistogramWindowServiceListErrors];
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadThroughputHistogramWindowResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceListResponse =
+  FctEngineNewPayloadThroughputHistogramWindowServiceListResponses[keyof FctEngineNewPayloadThroughputHistogramWindowServiceListResponses];
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * hour for windows of hours, day for all history in complete UTC days ending yesterday
+     */
+    window_grain: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_window/{window_grain}';
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceGetError =
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetErrors[keyof FctEngineNewPayloadThroughputHistogramWindowServiceGetErrors];
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadThroughputHistogramWindowResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramWindowServiceGetResponse =
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetResponses[keyof FctEngineNewPayloadThroughputHistogramWindowServiceGetResponses];
 
 export type FctEngineNewPayloadWinrateDailyServiceListData = {
   body?: never;

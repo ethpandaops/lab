@@ -300,18 +300,26 @@ import {
   fctEngineNewPayloadDurationHistogramDailyServiceList,
   fctEngineNewPayloadDurationHistogramHourlyServiceGet,
   fctEngineNewPayloadDurationHistogramHourlyServiceList,
+  fctEngineNewPayloadDurationPercentileWindowServiceGet,
+  fctEngineNewPayloadDurationPercentileWindowServiceList,
   fctEngineNewPayloadGasBucketDailyServiceGet,
   fctEngineNewPayloadGasBucketDailyServiceList,
   fctEngineNewPayloadGasBucketHourlyServiceGet,
   fctEngineNewPayloadGasBucketHourlyServiceList,
+  fctEngineNewPayloadGasBucketWindowServiceGet,
+  fctEngineNewPayloadGasBucketWindowServiceList,
   fctEngineNewPayloadResourceShareDailyServiceGet,
   fctEngineNewPayloadResourceShareDailyServiceList,
   fctEngineNewPayloadResourceShareHourlyServiceGet,
   fctEngineNewPayloadResourceShareHourlyServiceList,
+  fctEngineNewPayloadResourceShareWindowServiceGet,
+  fctEngineNewPayloadResourceShareWindowServiceList,
   fctEngineNewPayloadThroughputHistogramDailyServiceGet,
   fctEngineNewPayloadThroughputHistogramDailyServiceList,
   fctEngineNewPayloadThroughputHistogramHourlyServiceGet,
   fctEngineNewPayloadThroughputHistogramHourlyServiceList,
+  fctEngineNewPayloadThroughputHistogramWindowServiceGet,
+  fctEngineNewPayloadThroughputHistogramWindowServiceList,
   fctEngineNewPayloadWinrateDailyServiceGet,
   fctEngineNewPayloadWinrateDailyServiceList,
   fctEngineNewPayloadWinrateHourlyServiceGet,
@@ -1575,6 +1583,12 @@ import type {
   FctEngineNewPayloadDurationHistogramHourlyServiceListData,
   FctEngineNewPayloadDurationHistogramHourlyServiceListError,
   FctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetData,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetError,
+  FctEngineNewPayloadDurationPercentileWindowServiceGetResponse,
+  FctEngineNewPayloadDurationPercentileWindowServiceListData,
+  FctEngineNewPayloadDurationPercentileWindowServiceListError,
+  FctEngineNewPayloadDurationPercentileWindowServiceListResponse,
   FctEngineNewPayloadGasBucketDailyServiceGetData,
   FctEngineNewPayloadGasBucketDailyServiceGetError,
   FctEngineNewPayloadGasBucketDailyServiceGetResponse,
@@ -1587,6 +1601,12 @@ import type {
   FctEngineNewPayloadGasBucketHourlyServiceListData,
   FctEngineNewPayloadGasBucketHourlyServiceListError,
   FctEngineNewPayloadGasBucketHourlyServiceListResponse,
+  FctEngineNewPayloadGasBucketWindowServiceGetData,
+  FctEngineNewPayloadGasBucketWindowServiceGetError,
+  FctEngineNewPayloadGasBucketWindowServiceGetResponse,
+  FctEngineNewPayloadGasBucketWindowServiceListData,
+  FctEngineNewPayloadGasBucketWindowServiceListError,
+  FctEngineNewPayloadGasBucketWindowServiceListResponse,
   FctEngineNewPayloadResourceShareDailyServiceGetData,
   FctEngineNewPayloadResourceShareDailyServiceGetError,
   FctEngineNewPayloadResourceShareDailyServiceGetResponse,
@@ -1599,6 +1619,12 @@ import type {
   FctEngineNewPayloadResourceShareHourlyServiceListData,
   FctEngineNewPayloadResourceShareHourlyServiceListError,
   FctEngineNewPayloadResourceShareHourlyServiceListResponse,
+  FctEngineNewPayloadResourceShareWindowServiceGetData,
+  FctEngineNewPayloadResourceShareWindowServiceGetError,
+  FctEngineNewPayloadResourceShareWindowServiceGetResponse,
+  FctEngineNewPayloadResourceShareWindowServiceListData,
+  FctEngineNewPayloadResourceShareWindowServiceListError,
+  FctEngineNewPayloadResourceShareWindowServiceListResponse,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetData,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetError,
   FctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
@@ -1611,6 +1637,12 @@ import type {
   FctEngineNewPayloadThroughputHistogramHourlyServiceListData,
   FctEngineNewPayloadThroughputHistogramHourlyServiceListError,
   FctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetData,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetError,
+  FctEngineNewPayloadThroughputHistogramWindowServiceGetResponse,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListData,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListError,
+  FctEngineNewPayloadThroughputHistogramWindowServiceListResponse,
   FctEngineNewPayloadWinrateDailyServiceGetData,
   FctEngineNewPayloadWinrateDailyServiceGetError,
   FctEngineNewPayloadWinrateDailyServiceGetResponse,
@@ -11443,6 +11475,66 @@ export const fctEngineNewPayloadDurationHistogramHourlyServiceGetOptions = (
     queryKey: fctEngineNewPayloadDurationHistogramHourlyServiceGetQueryKey(options),
   });
 
+export const fctEngineNewPayloadDurationPercentileWindowServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationPercentileWindowServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationPercentileWindowServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ */
+export const fctEngineNewPayloadDurationPercentileWindowServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationPercentileWindowServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationPercentileWindowServiceListResponse,
+    FctEngineNewPayloadDurationPercentileWindowServiceListError,
+    FctEngineNewPayloadDurationPercentileWindowServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationPercentileWindowServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationPercentileWindowServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationPercentileWindowServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationPercentileWindowServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationPercentileWindowServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationPercentileWindowServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadDurationPercentileWindowServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationPercentileWindowServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationPercentileWindowServiceGetResponse,
+    FctEngineNewPayloadDurationPercentileWindowServiceGetError,
+    FctEngineNewPayloadDurationPercentileWindowServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationPercentileWindowServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationPercentileWindowServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationPercentileWindowServiceGetQueryKey(options),
+  });
+
 export const fctEngineNewPayloadGasBucketDailyServiceListQueryKey = (
   options?: Options<FctEngineNewPayloadGasBucketDailyServiceListData>
 ) => createQueryKey('fctEngineNewPayloadGasBucketDailyServiceList', options);
@@ -11561,6 +11653,66 @@ export const fctEngineNewPayloadGasBucketHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctEngineNewPayloadGasBucketHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketWindowServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadGasBucketWindowServiceListData>
+) => createQueryKey('fctEngineNewPayloadGasBucketWindowServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload cost-model sums per 5 Mgas block size bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_gas_bucket_hourly and _daily
+ */
+export const fctEngineNewPayloadGasBucketWindowServiceListOptions = (
+  options?: Options<FctEngineNewPayloadGasBucketWindowServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketWindowServiceListResponse,
+    FctEngineNewPayloadGasBucketWindowServiceListError,
+    FctEngineNewPayloadGasBucketWindowServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketWindowServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketWindowServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketWindowServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketWindowServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadGasBucketWindowServiceGetData>
+) => createQueryKey('fctEngineNewPayloadGasBucketWindowServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadGasBucketWindowServiceGetOptions = (
+  options: Options<FctEngineNewPayloadGasBucketWindowServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketWindowServiceGetResponse,
+    FctEngineNewPayloadGasBucketWindowServiceGetError,
+    FctEngineNewPayloadGasBucketWindowServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketWindowServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketWindowServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketWindowServiceGetQueryKey(options),
   });
 
 export const fctEngineNewPayloadResourceShareDailyServiceListQueryKey = (
@@ -11683,6 +11835,66 @@ export const fctEngineNewPayloadResourceShareHourlyServiceGetOptions = (
     queryKey: fctEngineNewPayloadResourceShareHourlyServiceGetQueryKey(options),
   });
 
+export const fctEngineNewPayloadResourceShareWindowServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadResourceShareWindowServiceListData>
+) => createQueryKey('fctEngineNewPayloadResourceShareWindowServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload throughput sums per gas resource and 10% resource share bucket summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_resource_share_hourly and _daily
+ */
+export const fctEngineNewPayloadResourceShareWindowServiceListOptions = (
+  options?: Options<FctEngineNewPayloadResourceShareWindowServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareWindowServiceListResponse,
+    FctEngineNewPayloadResourceShareWindowServiceListError,
+    FctEngineNewPayloadResourceShareWindowServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareWindowServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareWindowServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareWindowServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadResourceShareWindowServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadResourceShareWindowServiceGetData>
+) => createQueryKey('fctEngineNewPayloadResourceShareWindowServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadResourceShareWindowServiceGetOptions = (
+  options: Options<FctEngineNewPayloadResourceShareWindowServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareWindowServiceGetResponse,
+    FctEngineNewPayloadResourceShareWindowServiceGetError,
+    FctEngineNewPayloadResourceShareWindowServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareWindowServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareWindowServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareWindowServiceGetQueryKey(options),
+  });
+
 export const fctEngineNewPayloadThroughputHistogramDailyServiceListQueryKey = (
   options?: Options<FctEngineNewPayloadThroughputHistogramDailyServiceListData>
 ) => createQueryKey('fctEngineNewPayloadThroughputHistogramDailyServiceList', options);
@@ -11801,6 +12013,66 @@ export const fctEngineNewPayloadThroughputHistogramHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctEngineNewPayloadThroughputHistogramHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramWindowServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramWindowServiceListData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramWindowServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload per-block throughput histogram buckets summed over the last 24, 168 and 744 hours and all history, recomputed hourly from fct_engine_new_payload_throughput_histogram_hourly and _daily
+ */
+export const fctEngineNewPayloadThroughputHistogramWindowServiceListOptions = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramWindowServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramWindowServiceListResponse,
+    FctEngineNewPayloadThroughputHistogramWindowServiceListError,
+    FctEngineNewPayloadThroughputHistogramWindowServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramWindowServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramWindowServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramWindowServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramWindowServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadThroughputHistogramWindowServiceGetData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramWindowServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_grain
+ */
+export const fctEngineNewPayloadThroughputHistogramWindowServiceGetOptions = (
+  options: Options<FctEngineNewPayloadThroughputHistogramWindowServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramWindowServiceGetResponse,
+    FctEngineNewPayloadThroughputHistogramWindowServiceGetError,
+    FctEngineNewPayloadThroughputHistogramWindowServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramWindowServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramWindowServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramWindowServiceGetQueryKey(options),
   });
 
 export const fctEngineNewPayloadWinrateDailyServiceListQueryKey = (

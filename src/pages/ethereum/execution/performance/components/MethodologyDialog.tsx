@@ -80,9 +80,9 @@ export function MethodologyDialog({
         <Section id="cost-model" title="Cost model and gas limit ceiling">
           <Formula>duration ms = overhead + marginal cost × Mgas</Formula>
           <p>
-            Fitted by least squares to every block in the range, per client; ranges over 6 hours use 28 15-minute slices
-            spread evenly across the range. Typical Xatu node uses each block&apos;s median duration across reference
-            Xatu nodes, slow Xatu node its 95th percentile.
+            Fitted by least squares to every block in the range, per client. Typical Xatu node uses each block&apos;s
+            median duration across reference Xatu nodes, slow Xatu node its 95th percentile. The dots are the mean of
+            each 5 Mgas bucket.
           </p>
           <Formula>ceiling = (budget − overhead) ÷ marginal cost</Formula>
           <p>
@@ -94,13 +94,15 @@ export function MethodologyDialog({
 
         <Section id="workload" title="Throughput by block size and workload">
           <p>
-            Throughput by block size is the median per-block Mgas/s in 5 Mgas buckets. The distribution covers blocks
-            above 5 Mgas, where fixed overhead no longer dominates.
+            Throughput by block size is total gas over total median duration in 5 Mgas buckets. The distribution of
+            per-block Mgas/s covers blocks above 5 Mgas, where fixed overhead no longer dominates.
           </p>
           <p>
             Workload sensitivity splits each block&apos;s gas into resources (compute, state access, state growth,
-            history, block size, logs, memory). For each resource, blocks in the top fifth by that resource&apos;s share
-            of gas are compared with blocks in the bottom fifth. Only blocks above 10 Mgas count.
+            history, block size, logs, memory). Blocks are grouped by each resource&apos;s share of their gas in
+            10-point steps. For each resource, throughput on the steps holding the top fifth of blocks is compared with
+            the steps holding the bottom fifth; when one step holds both fifths, the steps either side of it. Only
+            blocks above 10 Mgas count.
           </p>
         </Section>
 
