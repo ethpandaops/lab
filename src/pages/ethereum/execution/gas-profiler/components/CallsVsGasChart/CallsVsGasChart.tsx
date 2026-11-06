@@ -50,7 +50,7 @@ function formatCompact(value: number): string {
  *
  * Used on:
  * - BlockPage: Shows calls vs gas for all transactions in a block
- * - TransactionPage: Shows internal txs vs gas for contracts within a transaction
+ * - TransactionPage: Shows calls vs gas for contracts within a transaction
  */
 export function CallsVsGasChart({
   data,

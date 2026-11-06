@@ -767,7 +767,7 @@ export function TransactionPage(): JSX.Element {
             <CodeBracketIcon className="size-5 text-blob-0" />
             <div>
               <div className="text-xl font-semibold text-foreground">{internalCallCount}</div>
-              <div className="text-xs text-muted">Internal Txs</div>
+              <div className="text-xs text-muted">Calls</div>
             </div>
           </div>
         </Card>
@@ -828,7 +828,7 @@ export function TransactionPage(): JSX.Element {
             {!isSimpleTransfer && <Tab hash="trace">Trace</Tab>}
             {!isSimpleTransfer && <Tab hash="opcodes">Opcodes</Tab>}
             {!isSimpleTransfer && <Tab hash="resources">Resources</Tab>}
-            {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Internal Txs</Tab>}
+            {!isSimpleTransfer && callTypeChartData.length > 0 && <Tab hash="calls">Calls</Tab>}
           </ScrollableTabs>
           {selectedTabIndex === 3 && <ResourceGasHelp />}
         </div>
@@ -1064,7 +1064,7 @@ export function TransactionPage(): JSX.Element {
               {/* Opcode bar charts (by gas and by count) */}
               {txData.opcodeStats.length > 0 && (
                 <div className="mb-6">
-                  <OpcodeAnalysis opcodeStats={txData.opcodeStats} showTable={false} showHeatmap />
+                  <OpcodeAnalysis opcodeStats={txData.opcodeStats} showHeatmap />
                 </div>
               )}
 
@@ -1088,10 +1088,7 @@ export function TransactionPage(): JSX.Element {
                 />
               </div>
 
-              {/* Opcode table */}
-              {txData.opcodeStats.length > 0 ? (
-                <OpcodeAnalysis opcodeStats={txData.opcodeStats} showCharts={false} />
-              ) : (
+              {txData.opcodeStats.length === 0 && (
                 <Card className="p-8 text-center">
                   <p className="text-muted">No opcode data available</p>
                 </Card>
@@ -1113,11 +1110,11 @@ export function TransactionPage(): JSX.Element {
             </HeadlessTab.Panel>
           )}
 
-          {/* Internal Txs Tab - only show if not a simple transfer and there are internal txs */}
+          {/* Calls Tab - only show if not a simple transfer and there are calls */}
           {!isSimpleTransfer && callTypeChartData.length > 0 && (
             <HeadlessTab.Panel>
               <div className="space-y-6">
-                {/* Gas Distribution + Top Internal Txs */}
+                {/* Gas Distribution + Top Calls */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <PopoutCard title="Gas by Contract" modalSize="xl">
                     {({ inModal }) => (
@@ -1141,13 +1138,13 @@ export function TransactionPage(): JSX.Element {
                   />
                 </div>
 
-                {/* Internal Tx Type Distribution */}
+                {/* Call Type Distribution */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <CategoryPieChart
                     data={callTypeChartData}
                     colorMap={CALL_TYPE_COLORS}
-                    title="Internal Tx Type Distribution"
-                    percentLabel="of internal txs"
+                    title="Call Type Distribution"
+                    percentLabel="of calls"
                     emptyMessage="No call data"
                     innerRadius={50}
                     outerRadius={75}
@@ -1156,8 +1153,8 @@ export function TransactionPage(): JSX.Element {
                   <CategoryPieChart
                     data={callTypeGasChartData}
                     colorMap={CALL_TYPE_COLORS}
-                    title="Gas by Internal Tx Type"
-                    percentLabel="of internal tx gas"
+                    title="Gas by Call Type"
+                    percentLabel="of call gas"
                     emptyMessage="No call data"
                     innerRadius={50}
                     outerRadius={75}

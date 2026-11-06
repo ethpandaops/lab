@@ -515,7 +515,7 @@ export function HomePage(): JSX.Element {
         {isOpcodeGasLoading ? (
           <LoadingContainer className="h-[320px] rounded-sm" />
         ) : opcodeStats.length > 0 ? (
-          <OpcodeAnalysis opcodeStats={opcodeStats} maxOpcodes={10} showTable={false} />
+          <OpcodeAnalysis opcodeStats={opcodeStats} maxOpcodes={10} />
         ) : (
           <div className="flex h-[320px] items-center justify-center rounded-sm border border-border text-muted">
             No opcode data available

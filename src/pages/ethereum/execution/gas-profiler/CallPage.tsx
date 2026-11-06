@@ -82,7 +82,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string; border
 }
 
 /**
- * Internal tx detail page - full gas analysis for a specific internal transaction
+ * Call detail page - full gas analysis for a specific call
  */
 export function CallPage(): JSX.Element {
   const { txHash, callId } = useParams({ from: '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId' });
@@ -335,7 +335,7 @@ export function CallPage(): JSX.Element {
   if (isLoading) {
     return (
       <Container>
-        <Header title="Internal Tx Details" />
+        <Header title="Call Details" />
         <GasProfilerSkeleton />
       </Container>
     );
@@ -345,8 +345,8 @@ export function CallPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <Header title="Internal Tx Details" />
-        <Alert variant="error" title="Error loading internal tx" description={error.message} />
+        <Header title="Call Details" />
+        <Alert variant="error" title="Error loading call" description={error.message} />
       </Container>
     );
   }
@@ -355,7 +355,7 @@ export function CallPage(): JSX.Element {
   if (!txData) {
     return (
       <Container>
-        <Header title="Internal Tx Details" />
+        <Header title="Call Details" />
         <Alert
           variant="warning"
           title="Transaction not found"
@@ -378,11 +378,11 @@ export function CallPage(): JSX.Element {
   if (!currentFrame) {
     return (
       <Container>
-        <Header title="Internal Tx Details" />
+        <Header title="Call Details" />
         <Alert
           variant="warning"
-          title="Internal tx not found"
-          description={`Internal tx ${callId} was not found in this transaction.`}
+          title="Call not found"
+          description={`Call ${callId} was not found in this transaction.`}
         />
         <div className="mt-4">
           <Link
@@ -411,9 +411,9 @@ export function CallPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title="Internal Tx Details" />
+      <Header title="Call Details" />
 
-      {/* Internal Tx Path Navigation */}
+      {/* Call Path Navigation */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
         <div className="flex min-w-0 items-center gap-2">
           <Link
@@ -446,7 +446,7 @@ export function CallPage(): JSX.Element {
                 {/* Dropdown on hover */}
                 <div className="absolute top-full left-0 z-50 hidden min-w-56 pt-1 group-hover:block">
                   <div className="rounded-xs border border-border bg-background p-2">
-                    <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full internal tx path</div>
+                    <div className="mb-1.5 border-b border-border pb-1.5 text-xs text-muted">Full call path</div>
                     <div className="space-y-1 text-xs">
                       <Link
                         to="/ethereum/execution/gas-profiler/tx/$txHash"
@@ -610,7 +610,7 @@ export function CallPage(): JSX.Element {
             <CodeBracketIcon className="size-5 text-accent" />
             <div>
               <div className="text-xl font-semibold text-foreground">{childFrames.length}</div>
-              <div className="text-xs text-muted">Child Internal Txs</div>
+              <div className="text-xs text-muted">Child Calls</div>
             </div>
           </div>
         </Card>
@@ -650,12 +650,8 @@ export function CallPage(): JSX.Element {
         <HeadlessTab.Panels>
           {/* Overview Tab */}
           <HeadlessTab.Panel>
-            {/* Internal Tx Gas Breakdown */}
-            <Card
-              className="mb-6"
-              title="Internal Tx Gas Breakdown"
-              subtitle={`Internal Tx #${currentFrame.call_frame_id}`}
-            >
+            {/* Call Gas Breakdown */}
+            <Card className="mb-6" title="Call Gas Breakdown" subtitle={`Call #${currentFrame.call_frame_id}`}>
               {/* Gas Formula */}
               <div className="py-1">
                 <GasFormula
@@ -667,7 +663,7 @@ export function CallPage(): JSX.Element {
                       tooltip: <GasTooltip type="self" context="call" size="md" />,
                     },
                     {
-                      label: 'Child Internal Txs',
+                      label: 'Child Calls',
                       value: childGas,
                       color: 'purple',
                       operator: '+',
@@ -683,7 +679,7 @@ export function CallPage(): JSX.Element {
                 />
               </div>
 
-              {/* Internal tx details - subtle inline display */}
+              {/* Call details - subtle inline display */}
               <div className="mt-4 border-t border-border pt-3 text-center">
                 <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                   <span
@@ -780,12 +776,12 @@ export function CallPage(): JSX.Element {
               />
             </div>
 
-            {/* Opcode Analysis - Charts and Table */}
+            {/* Opcode charts; the per-opcode table is on the Resources tab */}
             {frameOpcodes.length > 0 ? (
               <OpcodeAnalysis opcodeStats={frameOpcodes} />
             ) : (
               <Card className="p-8 text-center">
-                <p className="text-muted">No opcode data available for this internal tx</p>
+                <p className="text-muted">No opcode data available for this call</p>
               </Card>
             )}
           </HeadlessTab.Panel>

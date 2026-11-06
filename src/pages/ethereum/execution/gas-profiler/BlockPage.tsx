@@ -49,6 +49,7 @@ import type { ContractInteractionItem, TopGasItem } from './components';
 import { useBlockResourceGas } from './hooks/useBlockResourceGas';
 import { useBlockReceiptSizes } from './hooks/useBlockReceiptSizes';
 import { useCallFrameResourceGas } from './hooks/useCallFrameResourceGas';
+import { useBlockSlot } from './hooks/useBlockSlot';
 import { useNetwork } from '@/hooks/useNetwork';
 import {
   CATEGORY_COLORS,
@@ -147,6 +148,7 @@ export function BlockPage(): JSX.Element {
   });
 
   // Fetch receipt sizes for all transactions in the block
+  const slot = useBlockSlot(isNaN(blockNumber) ? null : blockNumber);
   const { receiptsByTxHash, totalReceiptBytes } = useBlockReceiptSizes({
     blockNumber: isNaN(blockNumber) ? null : blockNumber,
   });
@@ -893,6 +895,15 @@ export function BlockPage(): JSX.Element {
         </Link>
 
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
+          {slot !== undefined && (
+            <Link
+              to="/ethereum/slots/$slot"
+              params={{ slot: String(slot) }}
+              className="text-sm text-primary hover:underline"
+            >
+              Slot {slot}
+            </Link>
+          )}
           <ExplorerLinks
             etherscan={{
               href: `${getEtherscanBaseUrl(currentNetwork?.name)}/block/${blockNumber}`,
@@ -1136,7 +1147,7 @@ export function BlockPage(): JSX.Element {
               />
             </div>
 
-            {/* Opcode charts and table */}
+            {/* Opcode charts; the per-opcode table is on the Resources tab */}
             {opcodeStats.length > 0 ? (
               <OpcodeAnalysis opcodeStats={opcodeStats} maxOpcodes={10} />
             ) : (

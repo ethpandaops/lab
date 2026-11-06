@@ -1,8 +1,6 @@
 import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { BarChart } from '@/components/Charts/Bar';
-import { Button } from '@/components/Elements/Button';
-import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -25,12 +23,8 @@ export interface OpcodeAnalysisProps {
   opcodeStats: OpcodeStats[];
   /** Maximum number of opcodes to show in charts */
   maxOpcodes?: number;
-  /** Whether to show internal section headers (default: true) */
-  showHeader?: boolean;
   /** Whether to show the bar charts (default: true) */
   showCharts?: boolean;
-  /** Whether to show the table (default: true) */
-  showTable?: boolean;
   /** Whether to show the heatmap visualization (default: false) */
   showHeatmap?: boolean;
 }
@@ -327,175 +321,23 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
   );
 }
 
-const INITIAL_VISIBLE_COUNT = 10;
-
-/**
- * Sortable table view for opcode data
- */
-function OpcodeTable({ opcodeStats, searchTerm }: { opcodeStats: OpcodeStats[]; searchTerm: string }): JSX.Element {
-  const [sortField, setSortField] = useState<'opcode' | 'count' | 'totalGas'>('totalGas');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-
-  const totalGas = useMemo(() => opcodeStats.reduce((sum, op) => sum + op.totalGas, 0), [opcodeStats]);
-
-  const sortedData = useMemo(() => {
-    const searchLower = searchTerm.toLowerCase();
-    return [...opcodeStats]
-      .map(op => ({
-        ...op,
-        percentage: totalGas > 0 ? (op.totalGas / totalGas) * 100 : 0,
-        category: getOpcodeCategory(op.opcode),
-      }))
-      .filter(op => {
-        if (!searchTerm) return true;
-        return op.opcode.toLowerCase().includes(searchLower) || op.category.toLowerCase().includes(searchLower);
-      })
-      .sort((a, b) => {
-        const aVal = a[sortField];
-        const bVal = b[sortField];
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
-          return sortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        }
-        return sortDir === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
-      });
-  }, [opcodeStats, sortField, sortDir, totalGas, searchTerm]);
-
-  // Reset visible count when search changes
-  const prevSearchTerm = useRef(searchTerm);
-  if (prevSearchTerm.current !== searchTerm) {
-    prevSearchTerm.current = searchTerm;
-    setVisibleCount(INITIAL_VISIBLE_COUNT);
-  }
-
-  const visibleData = sortedData.slice(0, visibleCount);
-  const hasMore = sortedData.length > visibleCount;
-  const remainingCount = sortedData.length - visibleCount;
-
-  const handleSort = (field: typeof sortField): void => {
-    if (sortField === field) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDir('desc');
-    }
-  };
-
-  const SortHeader = ({
-    field,
-    children,
-    align = 'left',
-  }: {
-    field: typeof sortField;
-    children: React.ReactNode;
-    align?: 'left' | 'right';
-  }): JSX.Element => (
-    <th
-      scope="col"
-      className={`cursor-pointer px-3 py-3.5 text-sm font-semibold whitespace-nowrap text-foreground transition-colors hover:text-primary ${align === 'right' ? 'text-right' : 'text-left'}`}
-      onClick={() => handleSort(field)}
-    >
-      <span className={`inline-flex items-center gap-1 ${align === 'right' ? 'justify-end' : ''}`}>
-        {children}
-        {sortField === field && <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-      </span>
-    </th>
-  );
-
-  return (
-    <div className="overflow-auto">
-      <table className="min-w-full divide-y divide-border">
-        <thead className="sticky top-0 bg-surface">
-          <tr>
-            <SortHeader field="opcode">Opcode</SortHeader>
-            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold whitespace-nowrap text-foreground">
-              Category
-            </th>
-            <SortHeader field="count" align="right">
-              Count
-            </SortHeader>
-            <SortHeader field="totalGas" align="right">
-              Total Gas
-            </SortHeader>
-            <th scope="col" className="px-3 py-3.5 text-right text-sm font-semibold whitespace-nowrap text-foreground">
-              %
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border bg-surface">
-          {visibleData.map(op => (
-            <tr key={op.opcode} className="transition-colors hover:bg-background">
-              <td className="px-3 py-3 font-mono text-sm text-foreground">{op.opcode}</td>
-              <td className="px-3 py-3 text-sm text-muted">
-                <span
-                  className="rounded-xs px-1.5 py-0.5 text-xs"
-                  style={{
-                    backgroundColor: `${CATEGORY_COLORS[op.category] ?? DATA_COLORS.slate}20`,
-                    color: CATEGORY_COLORS[op.category] ?? DATA_COLORS.slate,
-                  }}
-                >
-                  {op.category}
-                </span>
-              </td>
-              <td className="px-3 py-3 text-right font-mono text-sm text-muted">{op.count.toLocaleString()}</td>
-              <td className="px-3 py-3 text-right font-mono text-sm text-foreground">{formatGas(op.totalGas)}</td>
-              <td className="px-3 py-3 text-right text-sm text-muted">
-                <div className="flex items-center justify-end gap-2">
-                  <div className="h-1.5 w-10 overflow-hidden rounded-full bg-border">
-                    <div className="h-full bg-primary" style={{ width: `${Math.min(op.percentage, 100)}%` }} />
-                  </div>
-                  <span className="w-12 text-right text-xs">{op.percentage.toFixed(1)}%</span>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Show More Button */}
-      {hasMore && (
-        <div className="flex justify-center border-t border-border py-4">
-          <Button variant="secondary" size="sm" onClick={() => setVisibleCount(sortedData.length)}>
-            Show All ({remainingCount} more)
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /**
  * OpcodeAnalysis - Combined charts and table for opcode distribution
  *
  * Displays:
  * - Two bar charts side by side (by gas and by count)
- * - Full-width sortable table below
  */
 export function OpcodeAnalysis({
   opcodeStats,
   maxOpcodes = 15,
-  showHeader = true,
   showCharts = true,
-  showTable = true,
   showHeatmap = false,
 }: OpcodeAnalysisProps): JSX.Element {
-  const [searchTerm, setSearchTerm] = useState('');
-
   if (opcodeStats.length === 0) {
     return (
       <div className="rounded-sm border border-border p-8 text-center text-sm text-muted">No opcode data available</div>
     );
   }
-
-  const searchInput = (
-    <input
-      type="text"
-      placeholder="Search opcodes..."
-      value={searchTerm}
-      onChange={e => setSearchTerm(e.target.value)}
-      className="h-8 rounded-sm border border-border bg-surface px-3 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
-    />
-  );
 
   return (
     <div className="space-y-6">
@@ -521,16 +363,6 @@ export function OpcodeAnalysis({
         <PopoutCard title="Opcode Heatmap" subtitle="Gas consumption by category and opcode" allowContentOverflow>
           {() => <OpcodeHeatmapChart opcodeStats={opcodeStats} />}
         </PopoutCard>
-      )}
-
-      {/* Full-width table */}
-      {showTable && (
-        <Card title={showHeader ? 'Opcode Details' : undefined} actions={searchInput}>
-          {!showHeader && <div className="mb-4 flex justify-end">{searchInput}</div>}
-          <div className="overflow-hidden rounded-sm border border-border">
-            <OpcodeTable opcodeStats={opcodeStats} searchTerm={searchTerm} />
-          </div>
-        </Card>
       )}
     </div>
   );
