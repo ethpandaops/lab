@@ -159,13 +159,13 @@ export function IndexPage(): JSX.Element {
               id: 'block',
               name: 'Block arrival',
               value: formatMs(median(nodeMedians)),
-              subtitle: `Median Xatu node, ${rangeLabel.toLowerCase()}`,
+              subtitle: `Median node ID, ${rangeLabel.toLowerCase()}`,
             },
             {
               id: 'attestation',
               name: 'Attestation arrival',
               value: formatMs(median(attestationMedians)),
-              subtitle: `Median Xatu node, ${rangeLabel.toLowerCase()}`,
+              subtitle: `Median node ID, ${rangeLabel.toLowerCase()}`,
             },
           ]}
         />
@@ -178,7 +178,7 @@ export function IndexPage(): JSX.Element {
         </div>
 
         <h2 className="text-lg/7 font-semibold tracking-tight text-foreground">
-          {contributor ? 'Arrival by Xatu node' : 'Block arrival'}
+          {contributor ? 'Arrival by node ID' : 'Block arrival'}
         </h2>
         {contributor ? (
           <div className="-mt-2">

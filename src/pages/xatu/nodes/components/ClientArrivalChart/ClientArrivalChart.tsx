@@ -24,7 +24,7 @@ export function ClientArrivalChart({ history, networkMedians, rangeLabel }: Clie
   return (
     <TimeSeriesChart
       title="Block arrival by consensus client"
-      subtitle={`Median of each client's Xatu nodes, ${rangeLabel.toLowerCase()}`}
+      subtitle={`Median of each client's node IDs, ${rangeLabel.toLowerCase()}`}
       anchorId="client-block-arrival"
       buckets={history.buckets}
       granularity={history.granularity}

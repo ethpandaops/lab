@@ -30,8 +30,8 @@ export function NetworkArrivalChart({
 
   return (
     <TimeSeriesChart
-      title="Block arrival across Xatu nodes"
-      subtitle={`Each Xatu node's median, ${rangeLabel.toLowerCase()}`}
+      title="Block arrival across node IDs"
+      subtitle={`Each node ID's median, ${rangeLabel.toLowerCase()}`}
       anchorId="network-block-arrival"
       buckets={buckets}
       granularity={granularity}
@@ -56,7 +56,7 @@ export function NetworkArrivalChart({
           { color: colors.primary, label: 'P90', value: formatMs(bucket.p90) },
           { color: colors.primary, label: 'Median', value: formatMs(bucket.p50) },
           { color: colors.primary, label: 'P10', value: formatMs(bucket.p10) },
-          { label: 'Xatu nodes', value: String(bucket.nodeCount) },
+          { label: 'Node IDs', value: String(bucket.nodeCount) },
         ];
       }}
       syncGroup="nodes-overview"

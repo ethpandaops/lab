@@ -27,7 +27,7 @@ export interface BucketSpread {
 }
 
 export interface NetworkHistory {
-  /** p10, median and p90 across Xatu nodes of each node's median block arrival, by bucket start */
+  /** p10, median and p90 across node IDs of each node ID's median block arrival, by bucket start */
   spread: Map<number, BucketSpread>;
   /** The median alone, by bucket start: the network's typical arrival, to tell when a node trailed it */
   medians: Map<number, number>;
