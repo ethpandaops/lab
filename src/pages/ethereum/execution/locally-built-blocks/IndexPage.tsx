@@ -37,8 +37,8 @@ function pickBlockFilters(search: BlockFilters): BlockFilters {
 
 /** Blocks built locally by sentry nodes: the newest matching slots per client, client pairings and every block. */
 export function IndexPage(): JSX.Element {
-  const search = useSearch({ from: '/xatu/locally-built-blocks' });
-  const navigate = useNavigate({ from: '/xatu/locally-built-blocks' });
+  const search = useSearch({ from: '/ethereum/execution/locally-built-blocks' });
+  const navigate = useNavigate({ from: '/ethereum/execution/locally-built-blocks' });
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time ?? 0;
 

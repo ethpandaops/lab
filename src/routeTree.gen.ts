@@ -61,6 +61,7 @@ import { Route as EthereumExecutionStateExpiryRouteImport } from './routes/ether
 import { Route as EthereumExecutionPerformanceRouteImport } from './routes/ethereum/execution/performance'
 import { Route as EthereumExecutionPayloadsRouteImport } from './routes/ethereum/execution/payloads'
 import { Route as EthereumExecutionOverviewRouteImport } from './routes/ethereum/execution/overview'
+import { Route as EthereumExecutionLocallyBuiltBlocksRouteImport } from './routes/ethereum/execution/locally-built-blocks'
 import { Route as EthereumExecutionGasProfilerRouteImport } from './routes/ethereum/execution/gas-profiler'
 import { Route as EthereumEpochsEpochRouteImport } from './routes/ethereum/epochs/$epoch'
 import { Route as EthereumEntitiesEntityRouteImport } from './routes/ethereum/entities/$entity'
@@ -357,6 +358,12 @@ const EthereumExecutionOverviewRoute =
     path: '/overview',
     getParentRoute: () => EthereumExecutionRoute,
   } as any)
+const EthereumExecutionLocallyBuiltBlocksRoute =
+  EthereumExecutionLocallyBuiltBlocksRouteImport.update({
+    id: '/locally-built-blocks',
+    path: '/locally-built-blocks',
+    getParentRoute: () => EthereumExecutionRoute,
+  } as any)
 const EthereumExecutionGasProfilerRoute =
   EthereumExecutionGasProfilerRouteImport.update({
     id: '/gas-profiler',
@@ -527,6 +534,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerRouteWithChildren
+  '/ethereum/execution/locally-built-blocks': typeof EthereumExecutionLocallyBuiltBlocksRoute
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
@@ -584,6 +592,7 @@ export interface FileRoutesByTo {
   '/ethereum/data-availability/partial-columns': typeof EthereumDataAvailabilityPartialColumnsRoute
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
+  '/ethereum/execution/locally-built-blocks': typeof EthereumExecutionLocallyBuiltBlocksRoute
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
   '/ethereum/execution/state-expiry': typeof EthereumExecutionStateExpiryRoute
@@ -659,6 +668,7 @@ export interface FileRoutesById {
   '/ethereum/entities/$entity': typeof EthereumEntitiesEntityRoute
   '/ethereum/epochs/$epoch': typeof EthereumEpochsEpochRoute
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerRouteWithChildren
+  '/ethereum/execution/locally-built-blocks': typeof EthereumExecutionLocallyBuiltBlocksRoute
   '/ethereum/execution/overview': typeof EthereumExecutionOverviewRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsRouteWithChildren
   '/ethereum/execution/performance': typeof EthereumExecutionPerformanceRoute
@@ -737,6 +747,7 @@ export interface FileRouteTypes {
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/gas-profiler'
+    | '/ethereum/execution/locally-built-blocks'
     | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
     | '/ethereum/execution/performance'
@@ -794,6 +805,7 @@ export interface FileRouteTypes {
     | '/ethereum/data-availability/partial-columns'
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
+    | '/ethereum/execution/locally-built-blocks'
     | '/ethereum/execution/overview'
     | '/ethereum/execution/performance'
     | '/ethereum/execution/state-expiry'
@@ -868,6 +880,7 @@ export interface FileRouteTypes {
     | '/ethereum/entities/$entity'
     | '/ethereum/epochs/$epoch'
     | '/ethereum/execution/gas-profiler'
+    | '/ethereum/execution/locally-built-blocks'
     | '/ethereum/execution/overview'
     | '/ethereum/execution/payloads'
     | '/ethereum/execution/performance'
@@ -1283,6 +1296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumExecutionOverviewRouteImport
       parentRoute: typeof EthereumExecutionRoute
     }
+    '/ethereum/execution/locally-built-blocks': {
+      id: '/ethereum/execution/locally-built-blocks'
+      path: '/locally-built-blocks'
+      fullPath: '/ethereum/execution/locally-built-blocks'
+      preLoaderRoute: typeof EthereumExecutionLocallyBuiltBlocksRouteImport
+      parentRoute: typeof EthereumExecutionRoute
+    }
     '/ethereum/execution/gas-profiler': {
       id: '/ethereum/execution/gas-profiler'
       path: '/gas-profiler'
@@ -1632,6 +1652,7 @@ const EthereumExecutionTimingsRouteWithChildren =
 
 interface EthereumExecutionRouteChildren {
   EthereumExecutionGasProfilerRoute: typeof EthereumExecutionGasProfilerRouteWithChildren
+  EthereumExecutionLocallyBuiltBlocksRoute: typeof EthereumExecutionLocallyBuiltBlocksRoute
   EthereumExecutionOverviewRoute: typeof EthereumExecutionOverviewRoute
   EthereumExecutionPayloadsRoute: typeof EthereumExecutionPayloadsRouteWithChildren
   EthereumExecutionPerformanceRoute: typeof EthereumExecutionPerformanceRoute
@@ -1644,6 +1665,8 @@ interface EthereumExecutionRouteChildren {
 const EthereumExecutionRouteChildren: EthereumExecutionRouteChildren = {
   EthereumExecutionGasProfilerRoute:
     EthereumExecutionGasProfilerRouteWithChildren,
+  EthereumExecutionLocallyBuiltBlocksRoute:
+    EthereumExecutionLocallyBuiltBlocksRoute,
   EthereumExecutionOverviewRoute: EthereumExecutionOverviewRoute,
   EthereumExecutionPayloadsRoute: EthereumExecutionPayloadsRouteWithChildren,
   EthereumExecutionPerformanceRoute: EthereumExecutionPerformanceRoute,
