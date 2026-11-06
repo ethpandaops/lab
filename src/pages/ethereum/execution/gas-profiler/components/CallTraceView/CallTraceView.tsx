@@ -44,7 +44,7 @@ function getCallTypeStyles(callType: string): { bg: string; text: string } {
 }
 
 /**
- * Build tree structure from flat internal tx frames
+ * Build tree structure from flat call frames
  *
  * Handles both full transaction traces (root has parent_call_frame_id = null)
  * and subtrees (root's parent doesn't exist in the passed frames array).
@@ -609,7 +609,7 @@ function TraceRow({
 }
 
 /**
- * CallTraceView - Hierarchical tree view of internal transaction trace
+ * CallTraceView - Hierarchical tree view of call trace
  *
  * Shows the execution flow with visual tree structure.
  * Extensible to show calldata, return values, etc. when data is available.
@@ -705,12 +705,12 @@ export function CallTraceView({
   if (!rootNode) {
     return (
       <div className="rounded-sm border border-border bg-surface/30 p-8 text-center text-sm text-muted">
-        No internal tx trace data
+        No call trace data
       </div>
     );
   }
 
-  // Count total internal txs (excluding root if it has no call_type)
+  // Count total calls (excluding root if it has no call_type)
   const totalCalls = callFrames.filter(f => f.call_type).length;
 
   return (
@@ -719,7 +719,7 @@ export function CallTraceView({
       <div className="flex items-center justify-between border-b border-border bg-surface px-3 py-2">
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-foreground">Execution Trace</span>
-          <span className="text-xs text-muted">{totalCalls} internal txs</span>
+          <span className="text-xs text-muted">{totalCalls} calls</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -739,7 +739,7 @@ export function CallTraceView({
 
       {/* Column headers */}
       <div className="flex items-center gap-2 border-b border-border bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted">
-        <span className="flex-1">Internal Tx</span>
+        <span className="flex-1">Call</span>
         <span className="w-20 text-right">Gas</span>
         <span className="w-2" />
       </div>

@@ -130,7 +130,7 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
 
   return (
     <Card
-      title="Resource Details"
+      title="Gas by opcode"
       actions={
         <input
           type="text"

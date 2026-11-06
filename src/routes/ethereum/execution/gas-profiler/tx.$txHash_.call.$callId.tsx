@@ -11,7 +11,7 @@ export const Route = createFileRoute('/ethereum/execution/gas-profiler/tx/$txHas
   component: CallPage,
 
   beforeLoad: ({ params }) => ({
-    getBreadcrumb: () => ({ label: `Internal Tx ${params.callId}` }),
+    getBreadcrumb: () => ({ label: `Call ${params.callId}` }),
     redirectOnNetworkChange: '/ethereum/execution/gas-profiler',
   }),
 
