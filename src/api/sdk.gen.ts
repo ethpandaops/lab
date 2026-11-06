@@ -75,6 +75,12 @@ import type {
   DimValidatorStatusServiceListData,
   DimValidatorStatusServiceListErrors,
   DimValidatorStatusServiceListResponses,
+  DimXatuNodeServiceGetData,
+  DimXatuNodeServiceGetErrors,
+  DimXatuNodeServiceGetResponses,
+  DimXatuNodeServiceListData,
+  DimXatuNodeServiceListErrors,
+  DimXatuNodeServiceListResponses,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetData,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetErrors,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetResponses,
@@ -201,6 +207,18 @@ import type {
   FctAttestationRewardByValidatorWeeklyServiceListData,
   FctAttestationRewardByValidatorWeeklyServiceListErrors,
   FctAttestationRewardByValidatorWeeklyServiceListResponses,
+  FctAttestationVoteByBlockRootHeadServiceGetData,
+  FctAttestationVoteByBlockRootHeadServiceGetErrors,
+  FctAttestationVoteByBlockRootHeadServiceGetResponses,
+  FctAttestationVoteByBlockRootHeadServiceListData,
+  FctAttestationVoteByBlockRootHeadServiceListErrors,
+  FctAttestationVoteByBlockRootHeadServiceListResponses,
+  FctAttestationVoteByBlockRootServiceGetData,
+  FctAttestationVoteByBlockRootServiceGetErrors,
+  FctAttestationVoteByBlockRootServiceGetResponses,
+  FctAttestationVoteByBlockRootServiceListData,
+  FctAttestationVoteByBlockRootServiceListErrors,
+  FctAttestationVoteByBlockRootServiceListResponses,
   FctAttestationVoteCorrectnessByClientDailyServiceGetData,
   FctAttestationVoteCorrectnessByClientDailyServiceGetErrors,
   FctAttestationVoteCorrectnessByClientDailyServiceGetResponses,
@@ -447,6 +465,12 @@ import type {
   FctBlockGraffitiClientVersionPairDailyServiceListData,
   FctBlockGraffitiClientVersionPairDailyServiceListErrors,
   FctBlockGraffitiClientVersionPairDailyServiceListResponses,
+  FctBlockGraffitiHeadServiceGetData,
+  FctBlockGraffitiHeadServiceGetErrors,
+  FctBlockGraffitiHeadServiceGetResponses,
+  FctBlockGraffitiHeadServiceListData,
+  FctBlockGraffitiHeadServiceListErrors,
+  FctBlockGraffitiHeadServiceListResponses,
   FctBlockGraffitiServiceGetData,
   FctBlockGraffitiServiceGetErrors,
   FctBlockGraffitiServiceGetResponses,
@@ -669,6 +693,18 @@ import type {
   FctCustodyProbeByClientDailyServiceListData,
   FctCustodyProbeByClientDailyServiceListErrors,
   FctCustodyProbeByClientDailyServiceListResponses,
+  FctCustodyProbeBySlotAgeDailyServiceGetData,
+  FctCustodyProbeBySlotAgeDailyServiceGetErrors,
+  FctCustodyProbeBySlotAgeDailyServiceGetResponses,
+  FctCustodyProbeBySlotAgeDailyServiceListData,
+  FctCustodyProbeBySlotAgeDailyServiceListErrors,
+  FctCustodyProbeBySlotAgeDailyServiceListResponses,
+  FctCustodyProbeBySlotAgeHourlyServiceGetData,
+  FctCustodyProbeBySlotAgeHourlyServiceGetErrors,
+  FctCustodyProbeBySlotAgeHourlyServiceGetResponses,
+  FctCustodyProbeBySlotAgeHourlyServiceListData,
+  FctCustodyProbeBySlotAgeHourlyServiceListErrors,
+  FctCustodyProbeBySlotAgeHourlyServiceListResponses,
   FctDataColumnAvailabilityByEpochServiceGetData,
   FctDataColumnAvailabilityByEpochServiceGetErrors,
   FctDataColumnAvailabilityByEpochServiceGetResponses,
@@ -837,6 +873,60 @@ import type {
   FctEngineNewPayloadDurationChunked50MsServiceListData,
   FctEngineNewPayloadDurationChunked50MsServiceListErrors,
   FctEngineNewPayloadDurationChunked50MsServiceListResponses,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetErrors,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponses,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListErrors,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponses,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetData,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetErrors,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetResponses,
+  FctEngineNewPayloadDurationHistogramDailyServiceListData,
+  FctEngineNewPayloadDurationHistogramDailyServiceListErrors,
+  FctEngineNewPayloadDurationHistogramDailyServiceListResponses,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetData,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetErrors,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListData,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListErrors,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListResponses,
+  FctEngineNewPayloadGasBucketDailyServiceGetData,
+  FctEngineNewPayloadGasBucketDailyServiceGetErrors,
+  FctEngineNewPayloadGasBucketDailyServiceGetResponses,
+  FctEngineNewPayloadGasBucketDailyServiceListData,
+  FctEngineNewPayloadGasBucketDailyServiceListErrors,
+  FctEngineNewPayloadGasBucketDailyServiceListResponses,
+  FctEngineNewPayloadGasBucketHourlyServiceGetData,
+  FctEngineNewPayloadGasBucketHourlyServiceGetErrors,
+  FctEngineNewPayloadGasBucketHourlyServiceGetResponses,
+  FctEngineNewPayloadGasBucketHourlyServiceListData,
+  FctEngineNewPayloadGasBucketHourlyServiceListErrors,
+  FctEngineNewPayloadGasBucketHourlyServiceListResponses,
+  FctEngineNewPayloadResourceShareDailyServiceGetData,
+  FctEngineNewPayloadResourceShareDailyServiceGetErrors,
+  FctEngineNewPayloadResourceShareDailyServiceGetResponses,
+  FctEngineNewPayloadResourceShareDailyServiceListData,
+  FctEngineNewPayloadResourceShareDailyServiceListErrors,
+  FctEngineNewPayloadResourceShareDailyServiceListResponses,
+  FctEngineNewPayloadResourceShareHourlyServiceGetData,
+  FctEngineNewPayloadResourceShareHourlyServiceGetErrors,
+  FctEngineNewPayloadResourceShareHourlyServiceGetResponses,
+  FctEngineNewPayloadResourceShareHourlyServiceListData,
+  FctEngineNewPayloadResourceShareHourlyServiceListErrors,
+  FctEngineNewPayloadResourceShareHourlyServiceListResponses,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetData,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListData,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListErrors,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListResponses,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetData,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetErrors,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListData,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses,
   FctEngineNewPayloadWinrateDailyServiceGetData,
   FctEngineNewPayloadWinrateDailyServiceGetErrors,
   FctEngineNewPayloadWinrateDailyServiceGetResponses,
@@ -1011,6 +1101,18 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListErrors,
   FctNodeActiveLast24hServiceListResponses,
+  FctNodeCountByClClientVersionDailyServiceGetData,
+  FctNodeCountByClClientVersionDailyServiceGetErrors,
+  FctNodeCountByClClientVersionDailyServiceGetResponses,
+  FctNodeCountByClClientVersionDailyServiceListData,
+  FctNodeCountByClClientVersionDailyServiceListErrors,
+  FctNodeCountByClClientVersionDailyServiceListResponses,
+  FctNodeCountByClClientVersionWindowServiceGetData,
+  FctNodeCountByClClientVersionWindowServiceGetErrors,
+  FctNodeCountByClClientVersionWindowServiceGetResponses,
+  FctNodeCountByClClientVersionWindowServiceListData,
+  FctNodeCountByClClientVersionWindowServiceListErrors,
+  FctNodeCountByClClientVersionWindowServiceListResponses,
   FctNodeCpuUtilizationByProcessServiceGetData,
   FctNodeCpuUtilizationByProcessServiceGetErrors,
   FctNodeCpuUtilizationByProcessServiceGetResponses,
@@ -1221,6 +1323,12 @@ import type {
   FctRocketpoolValidatorServiceListData,
   FctRocketpoolValidatorServiceListErrors,
   FctRocketpoolValidatorServiceListResponses,
+  FctSlotSummaryServiceGetData,
+  FctSlotSummaryServiceGetErrors,
+  FctSlotSummaryServiceGetResponses,
+  FctSlotSummaryServiceListData,
+  FctSlotSummaryServiceListErrors,
+  FctSlotSummaryServiceListResponses,
   FctStorageSlotStateByAddressDailyServiceGetData,
   FctStorageSlotStateByAddressDailyServiceGetErrors,
   FctStorageSlotStateByAddressDailyServiceGetResponses,
@@ -1485,12 +1593,24 @@ import type {
   IntBlockBlobCountCanonicalServiceListData,
   IntBlockBlobCountCanonicalServiceListErrors,
   IntBlockBlobCountCanonicalServiceListResponses,
+  IntBlockCallTypeGasServiceGetData,
+  IntBlockCallTypeGasServiceGetErrors,
+  IntBlockCallTypeGasServiceGetResponses,
+  IntBlockCallTypeGasServiceListData,
+  IntBlockCallTypeGasServiceListErrors,
+  IntBlockCallTypeGasServiceListResponses,
   IntBlockCanonicalServiceGetData,
   IntBlockCanonicalServiceGetErrors,
   IntBlockCanonicalServiceGetResponses,
   IntBlockCanonicalServiceListData,
   IntBlockCanonicalServiceListErrors,
   IntBlockCanonicalServiceListResponses,
+  IntBlockContractGasServiceGetData,
+  IntBlockContractGasServiceGetErrors,
+  IntBlockContractGasServiceGetResponses,
+  IntBlockContractGasServiceListData,
+  IntBlockContractGasServiceListErrors,
+  IntBlockContractGasServiceListResponses,
   IntBlockGraffitiReleaseServiceGetData,
   IntBlockGraffitiReleaseServiceGetErrors,
   IntBlockGraffitiReleaseServiceGetResponses,
@@ -1509,6 +1629,12 @@ import type {
   IntBlockOpcodeGasServiceListData,
   IntBlockOpcodeGasServiceListErrors,
   IntBlockOpcodeGasServiceListResponses,
+  IntBlockOpcodeResourceGasServiceGetData,
+  IntBlockOpcodeResourceGasServiceGetErrors,
+  IntBlockOpcodeResourceGasServiceGetResponses,
+  IntBlockOpcodeResourceGasServiceListData,
+  IntBlockOpcodeResourceGasServiceListErrors,
+  IntBlockOpcodeResourceGasServiceListResponses,
   IntBlockPayloadPtcVoteCanonicalServiceGetData,
   IntBlockPayloadPtcVoteCanonicalServiceGetErrors,
   IntBlockPayloadPtcVoteCanonicalServiceGetResponses,
@@ -1533,6 +1659,18 @@ import type {
   IntBlockResourceGasServiceListData,
   IntBlockResourceGasServiceListErrors,
   IntBlockResourceGasServiceListResponses,
+  IntBlockTransactionContractGasServiceGetData,
+  IntBlockTransactionContractGasServiceGetErrors,
+  IntBlockTransactionContractGasServiceGetResponses,
+  IntBlockTransactionContractGasServiceListData,
+  IntBlockTransactionContractGasServiceListErrors,
+  IntBlockTransactionContractGasServiceListResponses,
+  IntBlockTransactionSummaryServiceGetData,
+  IntBlockTransactionSummaryServiceGetErrors,
+  IntBlockTransactionSummaryServiceGetResponses,
+  IntBlockTransactionSummaryServiceListData,
+  IntBlockTransactionSummaryServiceListErrors,
+  IntBlockTransactionSummaryServiceListResponses,
   IntContractCreationServiceGetData,
   IntContractCreationServiceGetErrors,
   IntContractCreationServiceGetResponses,
@@ -1659,6 +1797,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListErrors,
   IntCustodyProbeServiceListResponses,
+  IntDataColumnGossipBySlotServiceGetData,
+  IntDataColumnGossipBySlotServiceGetErrors,
+  IntDataColumnGossipBySlotServiceGetResponses,
+  IntDataColumnGossipBySlotServiceListData,
+  IntDataColumnGossipBySlotServiceListErrors,
+  IntDataColumnGossipBySlotServiceListResponses,
   IntEngineGetBlobsServiceGetData,
   IntEngineGetBlobsServiceGetErrors,
   IntEngineGetBlobsServiceGetResponses,
@@ -1949,6 +2093,10 @@ import {
   zDimValidatorStatusServiceGetResponse,
   zDimValidatorStatusServiceListData,
   zDimValidatorStatusServiceListResponse,
+  zDimXatuNodeServiceGetData,
+  zDimXatuNodeServiceGetResponse,
+  zDimXatuNodeServiceListData,
+  zDimXatuNodeServiceListResponse,
   zFctAttestationCorrectnessByValidatorCanonicalServiceGetData,
   zFctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
   zFctAttestationCorrectnessByValidatorCanonicalServiceListData,
@@ -2033,6 +2181,14 @@ import {
   zFctAttestationRewardByValidatorWeeklyServiceGetResponse,
   zFctAttestationRewardByValidatorWeeklyServiceListData,
   zFctAttestationRewardByValidatorWeeklyServiceListResponse,
+  zFctAttestationVoteByBlockRootHeadServiceGetData,
+  zFctAttestationVoteByBlockRootHeadServiceGetResponse,
+  zFctAttestationVoteByBlockRootHeadServiceListData,
+  zFctAttestationVoteByBlockRootHeadServiceListResponse,
+  zFctAttestationVoteByBlockRootServiceGetData,
+  zFctAttestationVoteByBlockRootServiceGetResponse,
+  zFctAttestationVoteByBlockRootServiceListData,
+  zFctAttestationVoteByBlockRootServiceListResponse,
   zFctAttestationVoteCorrectnessByClientDailyServiceGetData,
   zFctAttestationVoteCorrectnessByClientDailyServiceGetResponse,
   zFctAttestationVoteCorrectnessByClientDailyServiceListData,
@@ -2197,6 +2353,10 @@ import {
   zFctBlockGraffitiClientVersionPairDailyServiceGetResponse,
   zFctBlockGraffitiClientVersionPairDailyServiceListData,
   zFctBlockGraffitiClientVersionPairDailyServiceListResponse,
+  zFctBlockGraffitiHeadServiceGetData,
+  zFctBlockGraffitiHeadServiceGetResponse,
+  zFctBlockGraffitiHeadServiceListData,
+  zFctBlockGraffitiHeadServiceListResponse,
   zFctBlockGraffitiServiceGetData,
   zFctBlockGraffitiServiceGetResponse,
   zFctBlockGraffitiServiceListData,
@@ -2345,6 +2505,14 @@ import {
   zFctCustodyProbeByClientDailyServiceGetResponse,
   zFctCustodyProbeByClientDailyServiceListData,
   zFctCustodyProbeByClientDailyServiceListResponse,
+  zFctCustodyProbeBySlotAgeDailyServiceGetData,
+  zFctCustodyProbeBySlotAgeDailyServiceGetResponse,
+  zFctCustodyProbeBySlotAgeDailyServiceListData,
+  zFctCustodyProbeBySlotAgeDailyServiceListResponse,
+  zFctCustodyProbeBySlotAgeHourlyServiceGetData,
+  zFctCustodyProbeBySlotAgeHourlyServiceGetResponse,
+  zFctCustodyProbeBySlotAgeHourlyServiceListData,
+  zFctCustodyProbeBySlotAgeHourlyServiceListResponse,
   zFctDataColumnAvailabilityByEpochServiceGetData,
   zFctDataColumnAvailabilityByEpochServiceGetResponse,
   zFctDataColumnAvailabilityByEpochServiceListData,
@@ -2457,6 +2625,42 @@ import {
   zFctEngineNewPayloadDurationChunked50MsServiceGetResponse,
   zFctEngineNewPayloadDurationChunked50MsServiceListData,
   zFctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  zFctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData,
+  zFctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse,
+  zFctEngineNewPayloadDurationHistogramByVersionDailyServiceListData,
+  zFctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse,
+  zFctEngineNewPayloadDurationHistogramDailyServiceGetData,
+  zFctEngineNewPayloadDurationHistogramDailyServiceGetResponse,
+  zFctEngineNewPayloadDurationHistogramDailyServiceListData,
+  zFctEngineNewPayloadDurationHistogramDailyServiceListResponse,
+  zFctEngineNewPayloadDurationHistogramHourlyServiceGetData,
+  zFctEngineNewPayloadDurationHistogramHourlyServiceGetResponse,
+  zFctEngineNewPayloadDurationHistogramHourlyServiceListData,
+  zFctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+  zFctEngineNewPayloadGasBucketDailyServiceGetData,
+  zFctEngineNewPayloadGasBucketDailyServiceGetResponse,
+  zFctEngineNewPayloadGasBucketDailyServiceListData,
+  zFctEngineNewPayloadGasBucketDailyServiceListResponse,
+  zFctEngineNewPayloadGasBucketHourlyServiceGetData,
+  zFctEngineNewPayloadGasBucketHourlyServiceGetResponse,
+  zFctEngineNewPayloadGasBucketHourlyServiceListData,
+  zFctEngineNewPayloadGasBucketHourlyServiceListResponse,
+  zFctEngineNewPayloadResourceShareDailyServiceGetData,
+  zFctEngineNewPayloadResourceShareDailyServiceGetResponse,
+  zFctEngineNewPayloadResourceShareDailyServiceListData,
+  zFctEngineNewPayloadResourceShareDailyServiceListResponse,
+  zFctEngineNewPayloadResourceShareHourlyServiceGetData,
+  zFctEngineNewPayloadResourceShareHourlyServiceGetResponse,
+  zFctEngineNewPayloadResourceShareHourlyServiceListData,
+  zFctEngineNewPayloadResourceShareHourlyServiceListResponse,
+  zFctEngineNewPayloadThroughputHistogramDailyServiceGetData,
+  zFctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
+  zFctEngineNewPayloadThroughputHistogramDailyServiceListData,
+  zFctEngineNewPayloadThroughputHistogramDailyServiceListResponse,
+  zFctEngineNewPayloadThroughputHistogramHourlyServiceGetData,
+  zFctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse,
+  zFctEngineNewPayloadThroughputHistogramHourlyServiceListData,
+  zFctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
   zFctEngineNewPayloadWinrateDailyServiceGetData,
   zFctEngineNewPayloadWinrateDailyServiceGetResponse,
   zFctEngineNewPayloadWinrateDailyServiceListData,
@@ -2573,6 +2777,14 @@ import {
   zFctNodeActiveLast24hServiceGetResponse,
   zFctNodeActiveLast24hServiceListData,
   zFctNodeActiveLast24hServiceListResponse,
+  zFctNodeCountByClClientVersionDailyServiceGetData,
+  zFctNodeCountByClClientVersionDailyServiceGetResponse,
+  zFctNodeCountByClClientVersionDailyServiceListData,
+  zFctNodeCountByClClientVersionDailyServiceListResponse,
+  zFctNodeCountByClClientVersionWindowServiceGetData,
+  zFctNodeCountByClClientVersionWindowServiceGetResponse,
+  zFctNodeCountByClClientVersionWindowServiceListData,
+  zFctNodeCountByClClientVersionWindowServiceListResponse,
   zFctNodeCpuUtilizationByProcessServiceGetData,
   zFctNodeCpuUtilizationByProcessServiceGetResponse,
   zFctNodeCpuUtilizationByProcessServiceListData,
@@ -2713,6 +2925,10 @@ import {
   zFctRocketpoolValidatorServiceGetResponse,
   zFctRocketpoolValidatorServiceListData,
   zFctRocketpoolValidatorServiceListResponse,
+  zFctSlotSummaryServiceGetData,
+  zFctSlotSummaryServiceGetResponse,
+  zFctSlotSummaryServiceListData,
+  zFctSlotSummaryServiceListResponse,
   zFctStorageSlotStateByAddressDailyServiceGetData,
   zFctStorageSlotStateByAddressDailyServiceGetResponse,
   zFctStorageSlotStateByAddressDailyServiceListData,
@@ -2889,10 +3105,18 @@ import {
   zIntBlockBlobCountCanonicalServiceGetResponse,
   zIntBlockBlobCountCanonicalServiceListData,
   zIntBlockBlobCountCanonicalServiceListResponse,
+  zIntBlockCallTypeGasServiceGetData,
+  zIntBlockCallTypeGasServiceGetResponse,
+  zIntBlockCallTypeGasServiceListData,
+  zIntBlockCallTypeGasServiceListResponse,
   zIntBlockCanonicalServiceGetData,
   zIntBlockCanonicalServiceGetResponse,
   zIntBlockCanonicalServiceListData,
   zIntBlockCanonicalServiceListResponse,
+  zIntBlockContractGasServiceGetData,
+  zIntBlockContractGasServiceGetResponse,
+  zIntBlockContractGasServiceListData,
+  zIntBlockContractGasServiceListResponse,
   zIntBlockGraffitiReleaseServiceGetData,
   zIntBlockGraffitiReleaseServiceGetResponse,
   zIntBlockGraffitiReleaseServiceListData,
@@ -2905,6 +3129,10 @@ import {
   zIntBlockOpcodeGasServiceGetResponse,
   zIntBlockOpcodeGasServiceListData,
   zIntBlockOpcodeGasServiceListResponse,
+  zIntBlockOpcodeResourceGasServiceGetData,
+  zIntBlockOpcodeResourceGasServiceGetResponse,
+  zIntBlockOpcodeResourceGasServiceListData,
+  zIntBlockOpcodeResourceGasServiceListResponse,
   zIntBlockPayloadPtcVoteCanonicalServiceGetData,
   zIntBlockPayloadPtcVoteCanonicalServiceGetResponse,
   zIntBlockPayloadPtcVoteCanonicalServiceListData,
@@ -2921,6 +3149,14 @@ import {
   zIntBlockResourceGasServiceGetResponse,
   zIntBlockResourceGasServiceListData,
   zIntBlockResourceGasServiceListResponse,
+  zIntBlockTransactionContractGasServiceGetData,
+  zIntBlockTransactionContractGasServiceGetResponse,
+  zIntBlockTransactionContractGasServiceListData,
+  zIntBlockTransactionContractGasServiceListResponse,
+  zIntBlockTransactionSummaryServiceGetData,
+  zIntBlockTransactionSummaryServiceGetResponse,
+  zIntBlockTransactionSummaryServiceListData,
+  zIntBlockTransactionSummaryServiceListResponse,
   zIntContractCreationServiceGetData,
   zIntContractCreationServiceGetResponse,
   zIntContractCreationServiceListData,
@@ -3005,6 +3241,10 @@ import {
   zIntCustodyProbeServiceGetResponse,
   zIntCustodyProbeServiceListData,
   zIntCustodyProbeServiceListResponse,
+  zIntDataColumnGossipBySlotServiceGetData,
+  zIntDataColumnGossipBySlotServiceGetResponse,
+  zIntDataColumnGossipBySlotServiceListData,
+  zIntDataColumnGossipBySlotServiceListResponse,
   zIntEngineGetBlobsServiceGetData,
   zIntEngineGetBlobsServiceGetResponse,
   zIntEngineGetBlobsServiceListData,
@@ -3599,6 +3839,36 @@ export const dimValidatorStatusServiceGet = <ThrowOnError extends boolean = fals
     requestValidator: async data => await zDimValidatorStatusServiceGetData.parseAsync(data),
     responseValidator: async data => await zDimValidatorStatusServiceGetResponse.parseAsync(data),
     url: '/api/v1/dim_validator_status/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Maps every Xatu node name to a stable node: hashed names that rotate on beacon node restarts are chained into one node. Count uniqExact(stable_node_id) to count Xatu nodes
+ */
+export const dimXatuNodeServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<DimXatuNodeServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<DimXatuNodeServiceListResponses, DimXatuNodeServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zDimXatuNodeServiceListData.parseAsync(data),
+    responseValidator: async data => await zDimXatuNodeServiceListResponse.parseAsync(data),
+    url: '/api/v1/dim_xatu_node',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by meta_client_name
+ */
+export const dimXatuNodeServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<DimXatuNodeServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<DimXatuNodeServiceGetResponses, DimXatuNodeServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zDimXatuNodeServiceGetData.parseAsync(data),
+    responseValidator: async data => await zDimXatuNodeServiceGetResponse.parseAsync(data),
+    url: '/api/v1/dim_xatu_node/{meta_client_name}',
     ...options,
   });
 
@@ -4401,6 +4671,82 @@ export const fctAttestationRewardByValidatorWeeklyServiceGet = <ThrowOnError ext
     requestValidator: async data => await zFctAttestationRewardByValidatorWeeklyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctAttestationRewardByValidatorWeeklyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_attestation_reward_by_validator_weekly/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Head votes per slot and voted block root, preferring finalized canonical attestations and falling back to real-time head data for slots not yet finalized
+ */
+export const fctAttestationVoteByBlockRootServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteByBlockRootServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteByBlockRootServiceListResponses,
+    FctAttestationVoteByBlockRootServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteByBlockRootServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationVoteByBlockRootServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_by_block_root',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationVoteByBlockRootServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteByBlockRootServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteByBlockRootServiceGetResponses,
+    FctAttestationVoteByBlockRootServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteByBlockRootServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationVoteByBlockRootServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_by_block_root/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Head votes per slot and voted block root, from real-time gossip and beacon API attestations of the unfinalized chain
+ */
+export const fctAttestationVoteByBlockRootHeadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctAttestationVoteByBlockRootHeadServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctAttestationVoteByBlockRootHeadServiceListResponses,
+    FctAttestationVoteByBlockRootHeadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteByBlockRootHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationVoteByBlockRootHeadServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_by_block_root_head',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationVoteByBlockRootHeadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctAttestationVoteByBlockRootHeadServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctAttestationVoteByBlockRootHeadServiceGetResponses,
+    FctAttestationVoteByBlockRootHeadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctAttestationVoteByBlockRootHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctAttestationVoteByBlockRootHeadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_attestation_vote_by_block_root_head/{slot_start_date_time}',
     ...options,
   });
 
@@ -6070,6 +6416,44 @@ export const fctBlockGraffitiClientVersionPairDailyServiceGet = <ThrowOnError ex
 /**
  * List records
  *
+ * Graffiti of every block of the unfinalized chain with the consensus and execution clients it names, parsed as fct_block_graffiti does. Forks may put several block roots at one slot
+ */
+export const fctBlockGraffitiHeadServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctBlockGraffitiHeadServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctBlockGraffitiHeadServiceListResponses,
+    FctBlockGraffitiHeadServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiHeadServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiHeadServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_head',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockGraffitiHeadServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctBlockGraffitiHeadServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctBlockGraffitiHeadServiceGetResponses,
+    FctBlockGraffitiHeadServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctBlockGraffitiHeadServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctBlockGraffitiHeadServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_block_graffiti_head/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export const fctBlockHeadServiceList = <ThrowOnError extends boolean = false>(
@@ -7380,7 +7764,83 @@ export const fctCustodyProbeByClientDailyServiceGet = <ThrowOnError extends bool
 /**
  * List records
  *
- * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
+ * Data column custody probes per UTC day the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export const fctCustodyProbeBySlotAgeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctCustodyProbeBySlotAgeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctCustodyProbeBySlotAgeDailyServiceListResponses,
+    FctCustodyProbeBySlotAgeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeBySlotAgeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeBySlotAgeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_slot_age_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctCustodyProbeBySlotAgeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctCustodyProbeBySlotAgeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctCustodyProbeBySlotAgeDailyServiceGetResponses,
+    FctCustodyProbeBySlotAgeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeBySlotAgeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeBySlotAgeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_slot_age_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Data column custody probes per hour the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export const fctCustodyProbeBySlotAgeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctCustodyProbeBySlotAgeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctCustodyProbeBySlotAgeHourlyServiceListResponses,
+    FctCustodyProbeBySlotAgeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeBySlotAgeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeBySlotAgeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_slot_age_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctCustodyProbeBySlotAgeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctCustodyProbeBySlotAgeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctCustodyProbeBySlotAgeHourlyServiceGetResponses,
+    FctCustodyProbeBySlotAgeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctCustodyProbeBySlotAgeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctCustodyProbeBySlotAgeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_custody_probe_by_slot_age_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Custody probe results by epoch and column index, rolled up from fct_data_column_availability_by_slot. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityByEpochServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData, ThrowOnError>
@@ -7418,7 +7878,7 @@ export const fctDataColumnAvailabilityByEpochServiceGet = <ThrowOnError extends 
 /**
  * List records
  *
- * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
+ * Custody probe results by slot and column index. Only custody probes count towards success, failure, missing and availability. Gossipsub sightings are counted separately in gossipsub_count. Probes keep arriving for about 18 days after a slot, so the last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData, ThrowOnError>
@@ -7456,7 +7916,7 @@ export const fctDataColumnAvailabilityBySlotServiceGet = <ThrowOnError extends b
 /**
  * List records
  *
- * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
+ * Custody probe results by slot and column index, repeated once per blob index of the slot. Probes are per column, so every blob of a slot carries the same counts. Recounted every 6 hours over the last 19 days
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData, ThrowOnError>
@@ -7494,7 +7954,7 @@ export const fctDataColumnAvailabilityBySlotBlobServiceGet = <ThrowOnError exten
 /**
  * List records
  *
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by UTC day and column index, rolled up from fct_data_column_availability_hourly. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityDailyServiceListData, ThrowOnError>
@@ -7532,7 +7992,7 @@ export const fctDataColumnAvailabilityDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by hour and column index, rolled up from fct_data_column_availability_by_epoch. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityHourlyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData, ThrowOnError>
@@ -8446,6 +8906,360 @@ export const fctEngineNewPayloadDurationChunked50MsHourlyServiceGet = <ThrowOnEr
     responseValidator: async data =>
       await zFctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_engine_new_payload_duration_chunked_50ms_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client, execution client version and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponses,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramByVersionDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_by_version_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponses,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_by_version_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationHistogramDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramDailyServiceListResponses,
+    FctEngineNewPayloadDurationHistogramDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationHistogramDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationHistogramDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationHistogramDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramDailyServiceGetResponses,
+    FctEngineNewPayloadDurationHistogramDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationHistogramDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per hour, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadDurationHistogramHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramHourlyServiceListResponses,
+    FctEngineNewPayloadDurationHistogramHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationHistogramHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadDurationHistogramHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadDurationHistogramHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses,
+    FctEngineNewPayloadDurationHistogramHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadDurationHistogramHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadDurationHistogramHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_duration_histogram_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload timings of VALID payloads per UTC day, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export const fctEngineNewPayloadGasBucketDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadGasBucketDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadGasBucketDailyServiceListResponses,
+    FctEngineNewPayloadGasBucketDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadGasBucketDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadGasBucketDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadGasBucketDailyServiceGetResponses,
+    FctEngineNewPayloadGasBucketDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload timings of VALID payloads per hour, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export const fctEngineNewPayloadGasBucketHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadGasBucketHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadGasBucketHourlyServiceListResponses,
+    FctEngineNewPayloadGasBucketHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadGasBucketHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadGasBucketHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadGasBucketHourlyServiceGetResponses,
+    FctEngineNewPayloadGasBucketHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadGasBucketHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_gas_bucket_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per UTC day, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export const fctEngineNewPayloadResourceShareDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadResourceShareDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadResourceShareDailyServiceListResponses,
+    FctEngineNewPayloadResourceShareDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadResourceShareDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadResourceShareDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadResourceShareDailyServiceGetResponses,
+    FctEngineNewPayloadResourceShareDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per hour, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export const fctEngineNewPayloadResourceShareHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadResourceShareHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadResourceShareHourlyServiceListResponses,
+    FctEngineNewPayloadResourceShareHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadResourceShareHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadResourceShareHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadResourceShareHourlyServiceGetResponses,
+    FctEngineNewPayloadResourceShareHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadResourceShareHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctEngineNewPayloadResourceShareHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_resource_share_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per UTC day, node scope and execution client
+ */
+export const fctEngineNewPayloadThroughputHistogramDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadThroughputHistogramDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramDailyServiceListResponses,
+    FctEngineNewPayloadThroughputHistogramDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramDailyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadThroughputHistogramDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadThroughputHistogramDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses,
+    FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramDailyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per hour, node scope and execution client
+ */
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramHourlyServiceListData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctEngineNewPayloadThroughputHistogramHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data =>
+      await zFctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_engine_new_payload_throughput_histogram_hourly/{hour_start_date_time}',
     ...options,
   });
 
@@ -9550,6 +10364,82 @@ export const fctNodeActiveLast24hServiceGet = <ThrowOnError extends boolean = fa
     requestValidator: async data => await zFctNodeActiveLast24hServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctNodeActiveLast24hServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_node_active_last_24h/{meta_client_name}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Xatu nodes per day, consensus client and consensus client version, from the heads each node saw
+ */
+export const fctNodeCountByClClientVersionDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCountByClClientVersionDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeCountByClClientVersionDailyServiceListResponses,
+    FctNodeCountByClClientVersionDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCountByClClientVersionDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCountByClClientVersionDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_count_by_cl_client_version_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeCountByClClientVersionDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCountByClClientVersionDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeCountByClClientVersionDailyServiceGetResponses,
+    FctNodeCountByClClientVersionDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCountByClClientVersionDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCountByClClientVersionDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_count_by_cl_client_version_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Distinct Xatu nodes per consensus client and version over the last 30, 90 and 365 complete UTC days and all history, recomputed hourly
+ */
+export const fctNodeCountByClClientVersionWindowServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctNodeCountByClClientVersionWindowServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctNodeCountByClClientVersionWindowServiceListResponses,
+    FctNodeCountByClClientVersionWindowServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCountByClClientVersionWindowServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCountByClClientVersionWindowServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_node_count_by_cl_client_version_window',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_name
+ */
+export const fctNodeCountByClClientVersionWindowServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctNodeCountByClClientVersionWindowServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctNodeCountByClClientVersionWindowServiceGetResponses,
+    FctNodeCountByClClientVersionWindowServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctNodeCountByClClientVersionWindowServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctNodeCountByClClientVersionWindowServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_node_count_by_cl_client_version_window/{window_name}',
     ...options,
   });
 
@@ -10859,6 +11749,36 @@ export const fctRocketpoolValidatorServiceGet = <ThrowOnError extends boolean = 
     requestValidator: async data => await zFctRocketpoolValidatorServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctRocketpoolValidatorServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_rocketpool_validator/{validator_index}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per slot from fct_block_proposer: proposed, missed or orphaned, the proposer and entity, the block number, gas, transactions, blobs and the proposer clients from the graffiti. MEV relays, builder and value are in int_block_mev_canonical
+ */
+export const fctSlotSummaryServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctSlotSummaryServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<FctSlotSummaryServiceListResponses, FctSlotSummaryServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zFctSlotSummaryServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctSlotSummaryServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_slot_summary',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctSlotSummaryServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctSlotSummaryServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<FctSlotSummaryServiceGetResponses, FctSlotSummaryServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zFctSlotSummaryServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctSlotSummaryServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_slot_summary/{slot_start_date_time}',
     ...options,
   });
 
@@ -12560,6 +13480,44 @@ export const intBlockBlobCountCanonicalServiceGet = <ThrowOnError extends boolea
 /**
  * List records
  *
+ * Internal calls per call type in a block, every call frame except the transaction root frames
+ */
+export const intBlockCallTypeGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockCallTypeGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockCallTypeGasServiceListResponses,
+    IntBlockCallTypeGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockCallTypeGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockCallTypeGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_call_type_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockCallTypeGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockCallTypeGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockCallTypeGasServiceGetResponses,
+    IntBlockCallTypeGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockCallTypeGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockCallTypeGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_call_type_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Block details for the finalized chain
  */
 export const intBlockCanonicalServiceList = <ThrowOnError extends boolean = false>(
@@ -12592,6 +13550,44 @@ export const intBlockCanonicalServiceGet = <ThrowOnError extends boolean = false
       ...options,
     }
   );
+
+/**
+ * List records
+ *
+ * Gas each contract used in a block, summed over every call frame that targeted it, root frames included. Contracts that used no gas are left out
+ */
+export const intBlockContractGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockContractGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockContractGasServiceListResponses,
+    IntBlockContractGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockContractGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockContractGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_contract_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockContractGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockContractGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockContractGasServiceGetResponses,
+    IntBlockContractGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockContractGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockContractGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_contract_gas/{block_number}',
+    ...options,
+  });
 
 /**
  * List records
@@ -12704,6 +13700,44 @@ export const intBlockOpcodeGasServiceGet = <ThrowOnError extends boolean = false
       ...options,
     }
   );
+
+/**
+ * List records
+ *
+ * Per-opcode resource gas per block, summed over every transaction and call frame in the block
+ */
+export const intBlockOpcodeResourceGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockOpcodeResourceGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockOpcodeResourceGasServiceListResponses,
+    IntBlockOpcodeResourceGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockOpcodeResourceGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockOpcodeResourceGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_opcode_resource_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockOpcodeResourceGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockOpcodeResourceGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockOpcodeResourceGasServiceGetResponses,
+    IntBlockOpcodeResourceGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockOpcodeResourceGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockOpcodeResourceGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_opcode_resource_gas/{block_number}',
+    ...options,
+  });
 
 /**
  * List records
@@ -12854,6 +13888,82 @@ export const intBlockResourceGasServiceGet = <ThrowOnError extends boolean = fal
     requestValidator: async data => await zIntBlockResourceGasServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntBlockResourceGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_block_resource_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Gas each contract used within each transaction of a block, the flows from transactions to contracts. Contracts that used no gas in the transaction are left out
+ */
+export const intBlockTransactionContractGasServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockTransactionContractGasServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockTransactionContractGasServiceListResponses,
+    IntBlockTransactionContractGasServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockTransactionContractGasServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockTransactionContractGasServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_transaction_contract_gas',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockTransactionContractGasServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockTransactionContractGasServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockTransactionContractGasServiceGetResponses,
+    IntBlockTransactionContractGasServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockTransactionContractGasServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockTransactionContractGasServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_transaction_contract_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per transaction in a block with its call tree summarised: receipt and intrinsic gas from the root frame, and the frame count, deepest call and target from the whole tree
+ */
+export const intBlockTransactionSummaryServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntBlockTransactionSummaryServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntBlockTransactionSummaryServiceListResponses,
+    IntBlockTransactionSummaryServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockTransactionSummaryServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntBlockTransactionSummaryServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_block_transaction_summary',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockTransactionSummaryServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntBlockTransactionSummaryServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntBlockTransactionSummaryServiceGetResponses,
+    IntBlockTransactionSummaryServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntBlockTransactionSummaryServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntBlockTransactionSummaryServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_block_transaction_summary/{block_number}',
     ...options,
   });
 
@@ -13615,7 +14725,7 @@ export const intCustodyProbeServiceGet = <ThrowOnError extends boolean = false>(
 /**
  * List records
  *
- * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
+ * Custody probe results per slot with aggregated column indices
  */
 export const intCustodyProbeOrderBySlotServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<IntCustodyProbeOrderBySlotServiceListData, ThrowOnError>
@@ -13647,6 +14757,44 @@ export const intCustodyProbeOrderBySlotServiceGet = <ThrowOnError extends boolea
     requestValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntCustodyProbeOrderBySlotServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_custody_probe_order_by_slot/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Gossipsub data column sidecar sightings per slot and column, from libp2p sentries, counting only sidecars whose block root a beacon node accepted
+ */
+export const intDataColumnGossipBySlotServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntDataColumnGossipBySlotServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntDataColumnGossipBySlotServiceListResponses,
+    IntDataColumnGossipBySlotServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntDataColumnGossipBySlotServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntDataColumnGossipBySlotServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_data_column_gossip_by_slot',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intDataColumnGossipBySlotServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntDataColumnGossipBySlotServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntDataColumnGossipBySlotServiceGetResponses,
+    IntDataColumnGossipBySlotServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntDataColumnGossipBySlotServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntDataColumnGossipBySlotServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_data_column_gossip_by_slot/{slot_start_date_time}',
     ...options,
   });
 

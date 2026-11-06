@@ -19,6 +19,8 @@ import { useTableBounds } from '@/hooks/useBounds';
 import { formatEpoch, formatSlot } from '@/utils';
 import { SECONDS_PER_SLOT, epochToTimestamp, slotToTimestamp } from '@/utils/beacon';
 import { useFuluActivation } from './hooks/useFuluActivation';
+import { useProbeAge } from './hooks/useProbeAge';
+import { ProbeAgeAvailability } from './components/ProbeAgeAvailability';
 import {
   ChevronRightIcon,
   ArrowLeftIcon,
@@ -297,6 +299,9 @@ export function IndexPage(): JSX.Element {
     }),
     enabled: currentLevel.type === 'window' && !!currentNetwork,
   });
+
+  // Probes by the age of the slot they tested, beside the window grid
+  const probeAge = useProbeAge(currentLevel.type === 'window');
 
   // Day Level: 24 hours for a specific day
   const dayQuery = useQuery({
@@ -991,6 +996,16 @@ export function IndexPage(): JSX.Element {
           )}
         </div>
       </Card>
+
+      {currentLevel.type === 'window' && (
+        <div className="mt-6">
+          <ProbeAgeAvailability
+            data={probeAge.data}
+            isLoading={probeAge.isLoading}
+            subtitle={sinceLabel(windowStart)}
+          />
+        </div>
+      )}
 
       {/* Cell Probe Dialog */}
       <CellProbeDialog

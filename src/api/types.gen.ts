@@ -472,6 +472,40 @@ export type DimValidatorStatus = {
 };
 
 /**
+ * Maps every Xatu node name to a stable node: hashed names that rotate on beacon node restarts are chained into one node. Count uniqExact(stable_node_id) to count Xatu nodes
+ */
+export type DimXatuNode = {
+  /**
+   * Start of the first hour this name reported a block
+   */
+  first_seen_date_time?: number;
+  /**
+   * Start of the latest hour this name reported a block
+   */
+  last_seen_date_time?: number;
+  /**
+   * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables
+   */
+  meta_client_name?: string;
+  /**
+   * Consensus client of the Xatu node at its latest observation
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves
+   */
+  stable_node_id?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Contributor username of the Xatu node
+   */
+  username?: string;
+};
+
+/**
  * Attestation correctness of a block, preferring finalized canonical data and falling back to real-time head data for slots not yet finalized. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export type FctAttestationCorrectness = {
@@ -1638,6 +1672,74 @@ export type FctAttestationRewardByValidatorWeekly = {
 };
 
 /**
+ * Head votes per slot and voted block root, preferring finalized canonical attestations and falling back to real-time head data for slots not yet finalized
+ */
+export type FctAttestationVoteByBlockRoot = {
+  /**
+   * The beacon block root the validators voted for as head, which can be a block from an earlier slot
+   */
+  block_root?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The slot the attestations were for
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The number of validators that voted for this block root as head in this slot
+   */
+  vote_count?: number;
+};
+
+/**
+ * Head votes per slot and voted block root, from real-time gossip and beacon API attestations of the unfinalized chain
+ */
+export type FctAttestationVoteByBlockRootHead = {
+  /**
+   * The beacon block root the validators voted for as head, which can be a block from an earlier slot
+   */
+  block_root?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The slot the attestations were for
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The number of validators that voted for this block root as head in this slot
+   */
+  vote_count?: number;
+};
+
+/**
  * Daily attestation vote correctness and inclusion per consensus and execution client. Validators map to the clients of their most recent identifying graffiti (a proposed block naming the client) in the 365 days before the end of the day. Only validators that proposed with identifying graffiti are covered, the rest are the unknown client.
  */
 export type FctAttestationVoteCorrectnessByClientDaily = {
@@ -1670,7 +1772,7 @@ export type FctAttestationVoteCorrectnessByClientDaily = {
    */
   missed_count?: number;
   /**
-   * Source votes that were correct
+   * Source votes that were correct, from attestations seen on gossip
    */
   source_correct_count?: number;
   /**
@@ -1724,7 +1826,7 @@ export type FctAttestationVoteCorrectnessByClientPairDaily = {
    */
   missed_count?: number;
   /**
-   * Source votes that were correct
+   * Source votes that were correct, from attestations seen on gossip
    */
   source_correct_count?: number;
   /**
@@ -1920,7 +2022,7 @@ export type FctAttestationVoteCorrectnessByValidator = {
    */
   slot_start_date_time?: number;
   /**
-   * Whether the source vote was correct. NULL if not attested
+   * Whether the source vote was correct, from the attestation seen on gossip. NULL if gossip did not see it, which is every slot before gossip collection began
    */
   source_correct?: boolean | null;
   /**
@@ -1962,7 +2064,7 @@ export type FctAttestationVoteCorrectnessByValidatorDaily = {
    */
   missed_count?: number;
   /**
-   * Number of source votes that were correct
+   * Number of source votes that were correct, from attestations seen on gossip
    */
   source_correct_count?: number;
   /**
@@ -2012,7 +2114,7 @@ export type FctAttestationVoteCorrectnessByValidatorHourly = {
    */
   missed_count?: number;
   /**
-   * Number of source votes that were correct
+   * Number of source votes that were correct, from attestations seen on gossip
    */
   source_correct_count?: number;
   /**
@@ -2058,7 +2160,7 @@ export type FctAttestationVoteCorrectnessByValidatorWeekly = {
    */
   missed_count?: number;
   /**
-   * Number of source votes that were correct
+   * Number of source votes that were correct, from attestations seen on gossip
    */
   source_correct_count?: number;
   /**
@@ -4084,6 +4186,72 @@ export type FctBlockGraffitiClientVersionPairDaily = {
 };
 
 /**
+ * Graffiti of every block of the unfinalized chain with the consensus and execution clients it names, parsed as fct_block_graffiti does. Forks may put several block roots at one slot
+ */
+export type FctBlockGraffitiHead = {
+  /**
+   * The root of the beacon block, one of possibly several at the slot on the unfinalized chain
+   */
+  block_root?: string;
+  /**
+   * Consensus client named by the graffiti, e.g. lighthouse, or unknown
+   */
+  consensus_client?: string;
+  /**
+   * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none
+   */
+  consensus_client_commit?: string;
+  /**
+   * Consensus client version from a version_string graffiti, empty when the graffiti carries none
+   */
+  consensus_client_version?: string;
+  /**
+   * Staking entity of the proposer from dim_node, empty when the validator has none
+   */
+  entity?: string;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Execution client named by the graffiti, e.g. geth, or unknown
+   */
+  execution_client?: string;
+  /**
+   * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none
+   */
+  execution_client_commit?: string;
+  /**
+   * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty
+   */
+  graffiti_format?: string;
+  /**
+   * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti
+   */
+  graffiti_text?: string;
+  /**
+   * The validator index of the block proposer
+   */
+  proposer_index?: number;
+  /**
+   * The slot number of the block
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Block details for the unfinalized chain. Forks in the chain may cause multiple block roots for the same slot to be present
  */
 export type FctBlockHead = {
@@ -5786,7 +5954,91 @@ export type FctCustodyProbeByClientDaily = {
 };
 
 /**
- * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
+ * Data column custody probes per UTC day the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export type FctCustodyProbeBySlotAgeDaily = {
+  /**
+   * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty)
+   */
+  client?: string;
+  /**
+   * The UTC day the probes ran
+   */
+  day_start_date?: string;
+  /**
+   * Column probes that failed
+   */
+  failure_count?: number;
+  /**
+   * Column probes the peer answered without the column
+   */
+  missing_count?: number;
+  /**
+   * Number of column probes, one per column a probe asked for
+   */
+  probe_count?: number;
+  /**
+   * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days)
+   */
+  slot_age_bucket?: string;
+  /**
+   * Start of the slot age bucket in days, for ordering the buckets
+   */
+  slot_age_min_days?: number;
+  /**
+   * Column probes the peer answered with the column
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Data column custody probes per hour the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export type FctCustodyProbeBySlotAgeHourly = {
+  /**
+   * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty)
+   */
+  client?: string;
+  /**
+   * Column probes that failed
+   */
+  failure_count?: number;
+  /**
+   * The hour the probes ran
+   */
+  hour_start_date_time?: number;
+  /**
+   * Column probes the peer answered without the column
+   */
+  missing_count?: number;
+  /**
+   * Number of column probes, one per column a probe asked for
+   */
+  probe_count?: number;
+  /**
+   * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days)
+   */
+  slot_age_bucket?: string;
+  /**
+   * Start of the slot age bucket in days, for ordering the buckets
+   */
+  slot_age_min_days?: number;
+  /**
+   * Column probes the peer answered with the column
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Custody probe results by epoch and column index, rolled up from fct_data_column_availability_by_slot. Only custody probes count. The last 19 days are recounted every hour
  */
 export type FctDataColumnAvailabilityByEpoch = {
   /**
@@ -5868,23 +6120,23 @@ export type FctDataColumnAvailabilityByEpoch = {
 };
 
 /**
- * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
+ * Custody probe results by slot and column index. Only custody probes count towards success, failure, missing and availability. Gossipsub sightings are counted separately in gossipsub_count. Probes keep arriving for about 18 days after a slot, so the last 19 days are recounted every hour
  */
 export type FctDataColumnAvailabilityBySlot = {
   /**
-   * Availability percentage (success / total * 100) rounded to 2 decimal places
+   * Share of custody probes that returned the column (success / probe_count * 100), rounded to 2 decimal places
    */
   availability_pct?: number;
   /**
-   * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable)
+   * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped
    */
   beacon_block_root?: string | null;
   /**
-   * Number of unique block roots observed (>1 indicates reorg/fork)
+   * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped
    */
   beacon_block_root_variants?: number;
   /**
-   * Number of blobs in the slot (max column_rows_count)
+   * Number of blobs in the slot, from the probes and the gossipsub sightings
    */
   blob_count?: number;
   /**
@@ -5892,7 +6144,7 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   column_index?: number;
   /**
-   * Count of observations from active RPC custody probes
+   * Number of custody probes, the same as probe_count
    */
   custody_probe_count?: number;
   /**
@@ -5904,11 +6156,11 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   epoch_start_date_time?: number;
   /**
-   * Count of failed probes (result = failure)
+   * Number of custody probes that failed (result = failure)
    */
   failure_count?: number;
   /**
-   * Count of observations from passive gossipsub propagation
+   * Number of gossipsub sightings of the column, which do not count towards availability
    */
   gossipsub_count?: number;
   /**
@@ -5920,7 +6172,7 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   min_response_time_ms?: number;
   /**
-   * Count of missing probes (result = missing)
+   * Number of custody probes the peer answered without the column (result = missing)
    */
   missing_count?: number;
   /**
@@ -5936,7 +6188,7 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   p99_response_time_ms?: number;
   /**
-   * Total count of probes
+   * Number of custody probes of the column for this slot
    */
   probe_count?: number;
   /**
@@ -5948,19 +6200,19 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   slot_start_date_time?: number;
   /**
-   * Count of successful probes
+   * Number of custody probes that returned the column
    */
   success_count?: number;
   /**
-   * Count of unique client names
+   * Number of distinct Xatu nodes that sent the probes
    */
   unique_client_count?: number;
   /**
-   * Count of unique client implementations
+   * Number of distinct client implementations that sent the probes
    */
   unique_implementation_count?: number;
   /**
-   * Count of unique peers probed
+   * Number of distinct P2P peers probed
    */
   unique_peer_count?: number;
   /**
@@ -5968,25 +6220,25 @@ export type FctDataColumnAvailabilityBySlot = {
    */
   updated_date_time?: number;
   /**
-   * The wallclock epoch when the request was sent
+   * The epoch of the slot the probes tested, the same as epoch
    */
   wallclock_request_epoch?: number;
   /**
-   * The start time for the wallclock epoch when the request was sent
+   * The start time of the epoch the probes tested, the same as epoch_start_date_time
    */
   wallclock_request_epoch_start_date_time?: number;
   /**
-   * The wallclock slot when the request was sent
+   * The slot the probes tested, the same as slot
    */
   wallclock_request_slot?: number;
   /**
-   * The start time for the slot when the request was sent
+   * The start time of the slot the probes tested, the same as slot_start_date_time
    */
   wallclock_request_slot_start_date_time?: number;
 };
 
 /**
- * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
+ * Custody probe results by slot and column index, repeated once per blob index of the slot. Probes are per column, so every blob of a slot carries the same counts. Recounted every 6 hours over the last 19 days
  */
 export type FctDataColumnAvailabilityBySlotBlob = {
   /**
@@ -6092,7 +6344,7 @@ export type FctDataColumnAvailabilityBySlotBlob = {
 };
 
 /**
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by UTC day and column index, rolled up from fct_data_column_availability_hourly. Only custody probes count. The last 19 days are recounted every hour
  */
 export type FctDataColumnAvailabilityDaily = {
   /**
@@ -6166,7 +6418,7 @@ export type FctDataColumnAvailabilityDaily = {
 };
 
 /**
- * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by hour and column index, rolled up from fct_data_column_availability_by_epoch. Only custody probes count. The last 19 days are recounted every hour
  */
 export type FctDataColumnAvailabilityHourly = {
   /**
@@ -8074,6 +8326,428 @@ export type FctEngineNewPayloadDurationChunked50MsHourly = {
 };
 
 /**
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client, execution client version and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export type FctEngineNewPayloadDurationHistogramByVersionDaily = {
+  /**
+   * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in milliseconds, inclusive
+   */
+  bucket_lower_ms?: number;
+  /**
+   * Upper bound of the bucket in milliseconds, exclusive
+   */
+  bucket_upper_ms?: number;
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Full execution client version string from web3_clientVersion RPC
+   */
+  meta_execution_version?: string;
+  /**
+   * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload calls whose duration falls in the bucket
+   */
+  observation_count?: number;
+  /**
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export type FctEngineNewPayloadDurationHistogramDaily = {
+  /**
+   * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in milliseconds, inclusive
+   */
+  bucket_lower_ms?: number;
+  /**
+   * Upper bound of the bucket in milliseconds, exclusive
+   */
+  bucket_upper_ms?: number;
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload calls whose duration falls in the bucket
+   */
+  observation_count?: number;
+  /**
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per hour, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export type FctEngineNewPayloadDurationHistogramHourly = {
+  /**
+   * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in milliseconds, inclusive
+   */
+  bucket_lower_ms?: number;
+  /**
+   * Upper bound of the bucket in milliseconds, exclusive
+   */
+  bucket_upper_ms?: number;
+  /**
+   * Start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
+   */
+  meta_execution_implementation?: string;
+  /**
+   * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes)
+   */
+  node_class?: string;
+  /**
+   * Number of engine_newPayload calls whose duration falls in the bucket
+   */
+  observation_count?: number;
+  /**
+   * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
+   */
+  status?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload timings of VALID payloads per UTC day, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export type FctEngineNewPayloadGasBucketDaily = {
+  /**
+   * Sum over blocks of the mean engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  avg_ms_sum?: number;
+  /**
+   * Number of blocks
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket
+   */
+  gas_bucket_mgas?: number;
+  /**
+   * Sum of squared block gas used in Mgas
+   */
+  gas_mgas_sq_sum?: number;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the median duration
+   */
+  gas_p50_product_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the 95th percentile duration
+   */
+  gas_p95_product_sum?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the squared median duration
+   */
+  p50_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p50_ms_sum?: number;
+  /**
+   * Sum over blocks of the squared 95th percentile duration
+   */
+  p95_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the 95th percentile engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p95_ms_sum?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload timings of VALID payloads per hour, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export type FctEngineNewPayloadGasBucketHourly = {
+  /**
+   * Sum over blocks of the mean engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  avg_ms_sum?: number;
+  /**
+   * Number of blocks
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket
+   */
+  gas_bucket_mgas?: number;
+  /**
+   * Sum of squared block gas used in Mgas
+   */
+  gas_mgas_sq_sum?: number;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the median duration
+   */
+  gas_p50_product_sum?: number;
+  /**
+   * Sum over blocks of Mgas times the 95th percentile duration
+   */
+  gas_p95_product_sum?: number;
+  /**
+   * Start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the squared median duration
+   */
+  p50_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p50_ms_sum?: number;
+  /**
+   * Sum over blocks of the squared 95th percentile duration
+   */
+  p95_ms_sq_sum?: number;
+  /**
+   * Sum over blocks of the 95th percentile engine_newPayload duration across Xatu nodes, in milliseconds
+   */
+  p95_ms_sum?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per UTC day, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export type FctEngineNewPayloadResourceShareDaily = {
+  /**
+   * Number of blocks of at least 10 Mgas in the bucket
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds. gas_mgas_sum over p50_ms_sum times 1000 is the throughput in Mgas/s
+   */
+  p50_ms_sum?: number;
+  /**
+   * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size
+   */
+  resource?: string;
+  /**
+   * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90)
+   */
+  share_bucket_pct?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per hour, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export type FctEngineNewPayloadResourceShareHourly = {
+  /**
+   * Number of blocks of at least 10 Mgas in the bucket
+   */
+  block_count?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Sum of block gas used in Mgas
+   */
+  gas_mgas_sum?: number;
+  /**
+   * Start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Sum over blocks of the median engine_newPayload duration across Xatu nodes, in milliseconds. gas_mgas_sum over p50_ms_sum times 1000 is the throughput in Mgas/s
+   */
+  p50_ms_sum?: number;
+  /**
+   * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size
+   */
+  resource?: string;
+  /**
+   * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90)
+   */
+  share_bucket_pct?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per UTC day, node scope and execution client
+ */
+export type FctEngineNewPayloadThroughputHistogramDaily = {
+  /**
+   * Number of blocks of at least 5 Mgas whose throughput falls in the bucket
+   */
+  block_count?: number;
+  /**
+   * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in Mgas/s, inclusive
+   */
+  bucket_lower_mgas_per_second?: number;
+  /**
+   * Upper bound of the bucket in Mgas/s, exclusive
+   */
+  bucket_upper_mgas_per_second?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per hour, node scope and execution client
+ */
+export type FctEngineNewPayloadThroughputHistogramHourly = {
+  /**
+   * Number of blocks of at least 5 Mgas whose throughput falls in the bucket
+   */
+  block_count?: number;
+  /**
+   * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s
+   */
+  bucket_index?: number;
+  /**
+   * Lower bound of the bucket in Mgas/s, inclusive
+   */
+  bucket_lower_mgas_per_second?: number;
+  /**
+   * Upper bound of the bucket in Mgas/s, exclusive
+   */
+  bucket_upper_mgas_per_second?: number;
+  /**
+   * Execution client, lowercased, with go-ethereum as geth
+   */
+  client?: string;
+  /**
+   * Start of the hour
+   */
+  hour_start_date_time?: number;
+  /**
+   * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node
+   */
+  node_scope?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily execution client winrate based on fastest engine_newPayload duration per slot
  */
 export type FctEngineNewPayloadWinrateDaily = {
@@ -9707,6 +10381,66 @@ export type FctNodeActiveLast24h = {
    * Username of the node
    */
   username?: string;
+};
+
+/**
+ * Xatu nodes per day, consensus client and consensus client version, from the heads each node saw
+ */
+export type FctNodeCountByClClientVersionDaily = {
+  /**
+   * The UTC day
+   */
+  day_start_date?: string;
+  /**
+   * The consensus client the Xatu nodes ran
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * The consensus client version the Xatu nodes reported, as the client reports it
+   */
+  meta_consensus_version?: string;
+  /**
+   * The number of distinct Xatu nodes whose last reported version that day was this one
+   */
+  node_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Distinct Xatu nodes per consensus client and version over the last 30, 90 and 365 complete UTC days and all history, recomputed hourly
+ */
+export type FctNodeCountByClClientVersionWindow = {
+  /**
+   * The consensus client the Xatu nodes ran
+   */
+  meta_consensus_implementation?: string;
+  /**
+   * The consensus client version the Xatu nodes reported, as the client reports it
+   */
+  meta_consensus_version?: string;
+  /**
+   * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did
+   */
+  node_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The last UTC day in the window, the last complete day
+   */
+  window_end_date?: string;
+  /**
+   * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history
+   */
+  window_name?: string;
+  /**
+   * The first UTC day in the window
+   */
+  window_start_date?: string;
 };
 
 /**
@@ -11508,6 +12242,76 @@ export type FctRocketpoolValidator = {
 };
 
 /**
+ * One row per slot from fct_block_proposer: proposed, missed or orphaned, the proposer and entity, the block number, gas, transactions, blobs and the proposer clients from the graffiti. MEV relays, builder and value are in int_block_mev_canonical
+ */
+export type FctSlotSummary = {
+  /**
+   * Number of blobs in the block, NULL for a missed or orphaned slot
+   */
+  blob_count?: number | null;
+  /**
+   * The execution block number, NULL for a missed slot or a block without an execution payload
+   */
+  block_number?: number | null;
+  /**
+   * The beacon block root, NULL for a missed slot
+   */
+  block_root?: string | null;
+  /**
+   * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot
+   */
+  consensus_client?: string | null;
+  /**
+   * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown
+   */
+  entity?: string | null;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot
+   */
+  execution_client?: string | null;
+  /**
+   * Execution gas limit of the block, NULL for a missed slot
+   */
+  gas_limit?: number | null;
+  /**
+   * Execution gas used by the block, NULL for a missed slot
+   */
+  gas_used?: number | null;
+  /**
+   * The validator index of the proposer
+   */
+  proposer_validator_index?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed)
+   */
+  status?: string;
+  /**
+   * Number of transactions in the block, NULL for a missed slot
+   */
+  transaction_count?: number | null;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Storage slot state metrics per address aggregated by day
  */
 export type FctStorageSlotStateByAddressDaily = {
@@ -13072,6 +13876,13 @@ export type GetDimValidatorStatusResponse = {
 };
 
 /**
+ * Response for getting a single dim_xatu_node record
+ */
+export type GetDimXatuNodeResponse = {
+  item?: DimXatuNode;
+};
+
+/**
  * Response for getting a single fct_attestation_correctness_by_validator_canonical record
  */
 export type GetFctAttestationCorrectnessByValidatorCanonicalResponse = {
@@ -13216,6 +14027,20 @@ export type GetFctAttestationRewardByValidatorResponse = {
  */
 export type GetFctAttestationRewardByValidatorWeeklyResponse = {
   item?: FctAttestationRewardByValidatorWeekly;
+};
+
+/**
+ * Response for getting a single fct_attestation_vote_by_block_root_head record
+ */
+export type GetFctAttestationVoteByBlockRootHeadResponse = {
+  item?: FctAttestationVoteByBlockRootHead;
+};
+
+/**
+ * Response for getting a single fct_attestation_vote_by_block_root record
+ */
+export type GetFctAttestationVoteByBlockRootResponse = {
+  item?: FctAttestationVoteByBlockRoot;
 };
 
 /**
@@ -13506,6 +14331,13 @@ export type GetFctBlockGraffitiClientVersionPairDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_block_graffiti_head record
+ */
+export type GetFctBlockGraffitiHeadResponse = {
+  item?: FctBlockGraffitiHead;
+};
+
+/**
  * Response for getting a single fct_block_graffiti record
  */
 export type GetFctBlockGraffitiResponse = {
@@ -13765,6 +14597,20 @@ export type GetFctCustodyProbeByClientDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_custody_probe_by_slot_age_daily record
+ */
+export type GetFctCustodyProbeBySlotAgeDailyResponse = {
+  item?: FctCustodyProbeBySlotAgeDaily;
+};
+
+/**
+ * Response for getting a single fct_custody_probe_by_slot_age_hourly record
+ */
+export type GetFctCustodyProbeBySlotAgeHourlyResponse = {
+  item?: FctCustodyProbeBySlotAgeHourly;
+};
+
+/**
  * Response for getting a single fct_data_column_availability_by_epoch record
  */
 export type GetFctDataColumnAvailabilityByEpochResponse = {
@@ -13958,6 +14804,69 @@ export type GetFctEngineNewPayloadDurationChunked50MsHourlyResponse = {
  */
 export type GetFctEngineNewPayloadDurationChunked50MsResponse = {
   item?: FctEngineNewPayloadDurationChunked50Ms;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_duration_histogram_by_version_daily record
+ */
+export type GetFctEngineNewPayloadDurationHistogramByVersionDailyResponse = {
+  item?: FctEngineNewPayloadDurationHistogramByVersionDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_duration_histogram_daily record
+ */
+export type GetFctEngineNewPayloadDurationHistogramDailyResponse = {
+  item?: FctEngineNewPayloadDurationHistogramDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_duration_histogram_hourly record
+ */
+export type GetFctEngineNewPayloadDurationHistogramHourlyResponse = {
+  item?: FctEngineNewPayloadDurationHistogramHourly;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_gas_bucket_daily record
+ */
+export type GetFctEngineNewPayloadGasBucketDailyResponse = {
+  item?: FctEngineNewPayloadGasBucketDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_gas_bucket_hourly record
+ */
+export type GetFctEngineNewPayloadGasBucketHourlyResponse = {
+  item?: FctEngineNewPayloadGasBucketHourly;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_resource_share_daily record
+ */
+export type GetFctEngineNewPayloadResourceShareDailyResponse = {
+  item?: FctEngineNewPayloadResourceShareDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_resource_share_hourly record
+ */
+export type GetFctEngineNewPayloadResourceShareHourlyResponse = {
+  item?: FctEngineNewPayloadResourceShareHourly;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_throughput_histogram_daily record
+ */
+export type GetFctEngineNewPayloadThroughputHistogramDailyResponse = {
+  item?: FctEngineNewPayloadThroughputHistogramDaily;
+};
+
+/**
+ * Response for getting a single fct_engine_new_payload_throughput_histogram_hourly record
+ */
+export type GetFctEngineNewPayloadThroughputHistogramHourlyResponse = {
+  item?: FctEngineNewPayloadThroughputHistogramHourly;
 };
 
 /**
@@ -14161,6 +15070,20 @@ export type GetFctMissedSlotRateHourlyResponse = {
  */
 export type GetFctNodeActiveLast24hResponse = {
   item?: FctNodeActiveLast24h;
+};
+
+/**
+ * Response for getting a single fct_node_count_by_cl_client_version_daily record
+ */
+export type GetFctNodeCountByClClientVersionDailyResponse = {
+  item?: FctNodeCountByClClientVersionDaily;
+};
+
+/**
+ * Response for getting a single fct_node_count_by_cl_client_version_window record
+ */
+export type GetFctNodeCountByClClientVersionWindowResponse = {
+  item?: FctNodeCountByClClientVersionWindow;
 };
 
 /**
@@ -14406,6 +15329,13 @@ export type GetFctReorgHourlyResponse = {
  */
 export type GetFctRocketpoolValidatorResponse = {
   item?: FctRocketpoolValidator;
+};
+
+/**
+ * Response for getting a single fct_slot_summary record
+ */
+export type GetFctSlotSummaryResponse = {
+  item?: FctSlotSummary;
 };
 
 /**
@@ -14717,10 +15647,24 @@ export type GetIntBlockBlobCountCanonicalResponse = {
 };
 
 /**
+ * Response for getting a single int_block_call_type_gas record
+ */
+export type GetIntBlockCallTypeGasResponse = {
+  item?: IntBlockCallTypeGas;
+};
+
+/**
  * Response for getting a single int_block_canonical record
  */
 export type GetIntBlockCanonicalResponse = {
   item?: IntBlockCanonical;
+};
+
+/**
+ * Response for getting a single int_block_contract_gas record
+ */
+export type GetIntBlockContractGasResponse = {
+  item?: IntBlockContractGas;
 };
 
 /**
@@ -14742,6 +15686,13 @@ export type GetIntBlockMevCanonicalResponse = {
  */
 export type GetIntBlockOpcodeGasResponse = {
   item?: IntBlockOpcodeGas;
+};
+
+/**
+ * Response for getting a single int_block_opcode_resource_gas record
+ */
+export type GetIntBlockOpcodeResourceGasResponse = {
+  item?: IntBlockOpcodeResourceGas;
 };
 
 /**
@@ -14770,6 +15721,20 @@ export type GetIntBlockReceiptSizeResponse = {
  */
 export type GetIntBlockResourceGasResponse = {
   item?: IntBlockResourceGas;
+};
+
+/**
+ * Response for getting a single int_block_transaction_contract_gas record
+ */
+export type GetIntBlockTransactionContractGasResponse = {
+  item?: IntBlockTransactionContractGas;
+};
+
+/**
+ * Response for getting a single int_block_transaction_summary record
+ */
+export type GetIntBlockTransactionSummaryResponse = {
+  item?: IntBlockTransactionSummary;
 };
 
 /**
@@ -14917,6 +15882,13 @@ export type GetIntCustodyProbeOrderBySlotResponse = {
  */
 export type GetIntCustodyProbeResponse = {
   item?: IntCustodyProbe;
+};
+
+/**
+ * Response for getting a single int_data_column_gossip_by_slot record
+ */
+export type GetIntDataColumnGossipBySlotResponse = {
+  item?: IntDataColumnGossipBySlot;
 };
 
 /**
@@ -15691,6 +16663,32 @@ export type IntBlockBlobCountCanonical = {
 };
 
 /**
+ * Internal calls per call type in a block, every call frame except the transaction root frames
+ */
+export type IntBlockCallTypeGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of internal call frames of this type in the block
+   */
+  call_count?: number;
+  /**
+   * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2)
+   */
+  call_type?: string;
+  /**
+   * Gas used by those frames themselves, excluding their child frames
+   */
+  gas?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Block details for the finalized chain
  */
 export type IntBlockCanonical = {
@@ -15798,6 +16796,40 @@ export type IntBlockCanonical = {
    * The root hash of the beacon state at this block
    */
   state_root?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Gas each contract used in a block, summed over every call frame that targeted it, root frames included. Contracts that used no gas are left out
+ */
+export type IntBlockContractGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of call frames that targeted the contract in the block
+   */
+  call_count?: number;
+  /**
+   * The call types used to call the contract in the block, a transaction calling it directly counts as CALL
+   */
+  call_types?: Array<string>;
+  /**
+   * The first transaction in the block that called the contract
+   */
+  first_transaction_hash?: string;
+  /**
+   * Gas used by those frames themselves, excluding their child frames
+   */
+  gas?: number;
+  /**
+   * The contract address (hex encoded with 0x prefix)
+   */
+  target_address?: string;
   /**
    * Timestamp when the record was last updated
    */
@@ -15976,6 +17008,64 @@ export type IntBlockOpcodeGas = {
    * Total gas consumed by this opcode across all transactions in the block
    */
   gas?: number;
+  /**
+   * The name of the network
+   */
+  meta_network_name?: string;
+  /**
+   * The EVM opcode name (e.g., SLOAD, ADD, CALL)
+   */
+  opcode?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Per-opcode resource gas per block, summed over every transaction and call frame in the block
+ */
+export type IntBlockOpcodeResourceGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of times this opcode was executed in the block
+   */
+  count?: number;
+  /**
+   * Total gas consumed by this opcode in the block
+   */
+  gas?: number;
+  /**
+   * Gas attributed to cold address and storage access (EIP-2929)
+   */
+  gas_address_access?: number;
+  /**
+   * Gas attributed to block size (always 0 at opcode level)
+   */
+  gas_block_size?: number;
+  /**
+   * Gas attributed to bloom filter topic indexing
+   */
+  gas_bloom_topics?: number;
+  /**
+   * Gas attributed to pure computation
+   */
+  gas_compute?: number;
+  /**
+   * Gas attributed to history and log data storage
+   */
+  gas_history?: number;
+  /**
+   * Gas attributed to memory expansion
+   */
+  gas_memory?: number;
+  /**
+   * Gas attributed to state growth (new storage slots, contract creation)
+   */
+  gas_state_growth?: number;
   /**
    * The name of the network
    */
@@ -16180,6 +17270,98 @@ export type IntBlockResourceGas = {
    * The name of the network
    */
   meta_network_name?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Gas each contract used within each transaction of a block, the flows from transactions to contracts. Contracts that used no gas in the transaction are left out
+ */
+export type IntBlockTransactionContractGas = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of call frames in the transaction that targeted the contract
+   */
+  call_count?: number;
+  /**
+   * Gas used by those frames themselves, excluding their child frames
+   */
+  gas?: number;
+  /**
+   * The contract address (hex encoded with 0x prefix)
+   */
+  target_address?: string;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * Position of the transaction within the block
+   */
+  transaction_index?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * One row per transaction in a block with its call tree summarised: receipt and intrinsic gas from the root frame, and the frame count, deepest call and target from the whole tree
+ */
+export type IntBlockTransactionSummary = {
+  /**
+   * The block number
+   */
+  block_number?: number;
+  /**
+   * Number of call frames in the transaction, including the root frame
+   */
+  call_frame_count?: number;
+  /**
+   * EVM execution gas of the whole call tree (the root frame cumulative gas)
+   */
+  evm_gas?: number;
+  /**
+   * Gas refunded to the transaction, 0 for failed transactions
+   */
+  gas_refund?: number;
+  /**
+   * Whether the root frame had an opcode that resulted in an error
+   */
+  has_errors?: boolean;
+  /**
+   * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions
+   */
+  intrinsic_gas?: number | null;
+  /**
+   * Deepest call depth in the transaction (0 = root only)
+   */
+  max_depth?: number;
+  /**
+   * Gas used from the transaction receipt, the total gas the transaction used
+   */
+  receipt_gas_used?: number | null;
+  /**
+   * How the transaction started: CALL, CREATE, or the root frame call type
+   */
+  root_call_type?: string;
+  /**
+   * The address the transaction called (hex encoded with 0x prefix), null for contract creation
+   */
+  target_address?: string | null;
+  /**
+   * The transaction hash (hex encoded with 0x prefix)
+   */
+  transaction_hash?: string;
+  /**
+   * Position of the transaction within the block
+   */
+  transaction_index?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -16971,7 +18153,7 @@ export type IntCustodyProbe = {
 };
 
 /**
- * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
+ * Custody probe results per slot with aggregated column indices
  */
 export type IntCustodyProbeOrderBySlot = {
   /**
@@ -17114,6 +18296,52 @@ export type IntCustodyProbeOrderBySlot = {
    * Username extracted from client name
    */
   username?: string;
+};
+
+/**
+ * Gossipsub data column sidecar sightings per slot and column, from libp2p sentries, counting only sidecars whose block root a beacon node accepted
+ */
+export type IntDataColumnGossipBySlot = {
+  /**
+   * Beacon block root of the earliest gossipsub sighting of the column
+   */
+  beacon_block_root?: string;
+  /**
+   * Number of block roots in the sightings (more than 1 means a fork)
+   */
+  beacon_block_root_variants?: number;
+  /**
+   * Number of blobs in the slot, the most KZG commitments a sighting carried
+   */
+  blob_count?: number;
+  /**
+   * Data column index (0-127)
+   */
+  column_index?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * Number of gossipsub sightings of the column whose block root a beacon node accepted
+   */
+  gossipsub_count?: number;
+  /**
+   * The slot number
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 /**
@@ -19081,6 +20309,20 @@ export type ListDimValidatorStatusResponse = {
 };
 
 /**
+ * Response for listing dim_xatu_node records
+ */
+export type ListDimXatuNodeResponse = {
+  /**
+   * The list of dim_xatu_node.
+   */
+  dim_xatu_node?: Array<DimXatuNode>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_attestation_correctness_by_validator_canonical records
  */
 export type ListFctAttestationCorrectnessByValidatorCanonicalResponse = {
@@ -19368,6 +20610,34 @@ export type ListFctAttestationRewardByValidatorWeeklyResponse = {
    * The list of fct_attestation_reward_by_validator_weekly.
    */
   fct_attestation_reward_by_validator_weekly?: Array<FctAttestationRewardByValidatorWeekly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_vote_by_block_root_head records
+ */
+export type ListFctAttestationVoteByBlockRootHeadResponse = {
+  /**
+   * The list of fct_attestation_vote_by_block_root_head.
+   */
+  fct_attestation_vote_by_block_root_head?: Array<FctAttestationVoteByBlockRootHead>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_attestation_vote_by_block_root records
+ */
+export type ListFctAttestationVoteByBlockRootResponse = {
+  /**
+   * The list of fct_attestation_vote_by_block_root.
+   */
+  fct_attestation_vote_by_block_root?: Array<FctAttestationVoteByBlockRoot>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -19949,6 +21219,20 @@ export type ListFctBlockGraffitiClientVersionPairDailyResponse = {
 };
 
 /**
+ * Response for listing fct_block_graffiti_head records
+ */
+export type ListFctBlockGraffitiHeadResponse = {
+  /**
+   * The list of fct_block_graffiti_head.
+   */
+  fct_block_graffiti_head?: Array<FctBlockGraffitiHead>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_block_graffiti records
  */
 export type ListFctBlockGraffitiResponse = {
@@ -20467,6 +21751,34 @@ export type ListFctCustodyProbeByClientDailyResponse = {
 };
 
 /**
+ * Response for listing fct_custody_probe_by_slot_age_daily records
+ */
+export type ListFctCustodyProbeBySlotAgeDailyResponse = {
+  /**
+   * The list of fct_custody_probe_by_slot_age_daily.
+   */
+  fct_custody_probe_by_slot_age_daily?: Array<FctCustodyProbeBySlotAgeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_custody_probe_by_slot_age_hourly records
+ */
+export type ListFctCustodyProbeBySlotAgeHourlyResponse = {
+  /**
+   * The list of fct_custody_probe_by_slot_age_hourly.
+   */
+  fct_custody_probe_by_slot_age_hourly?: Array<FctCustodyProbeBySlotAgeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_data_column_availability_by_epoch records
  */
 export type ListFctDataColumnAvailabilityByEpochResponse = {
@@ -20852,6 +22164,132 @@ export type ListFctEngineNewPayloadDurationChunked50MsResponse = {
    * The list of fct_engine_new_payload_duration_chunked_50ms.
    */
   fct_engine_new_payload_duration_chunked_50ms?: Array<FctEngineNewPayloadDurationChunked50Ms>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_duration_histogram_by_version_daily records
+ */
+export type ListFctEngineNewPayloadDurationHistogramByVersionDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_histogram_by_version_daily.
+   */
+  fct_engine_new_payload_duration_histogram_by_version_daily?: Array<FctEngineNewPayloadDurationHistogramByVersionDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_duration_histogram_daily records
+ */
+export type ListFctEngineNewPayloadDurationHistogramDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_histogram_daily.
+   */
+  fct_engine_new_payload_duration_histogram_daily?: Array<FctEngineNewPayloadDurationHistogramDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_duration_histogram_hourly records
+ */
+export type ListFctEngineNewPayloadDurationHistogramHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_duration_histogram_hourly.
+   */
+  fct_engine_new_payload_duration_histogram_hourly?: Array<FctEngineNewPayloadDurationHistogramHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_gas_bucket_daily records
+ */
+export type ListFctEngineNewPayloadGasBucketDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_gas_bucket_daily.
+   */
+  fct_engine_new_payload_gas_bucket_daily?: Array<FctEngineNewPayloadGasBucketDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_gas_bucket_hourly records
+ */
+export type ListFctEngineNewPayloadGasBucketHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_gas_bucket_hourly.
+   */
+  fct_engine_new_payload_gas_bucket_hourly?: Array<FctEngineNewPayloadGasBucketHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_resource_share_daily records
+ */
+export type ListFctEngineNewPayloadResourceShareDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_resource_share_daily.
+   */
+  fct_engine_new_payload_resource_share_daily?: Array<FctEngineNewPayloadResourceShareDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_resource_share_hourly records
+ */
+export type ListFctEngineNewPayloadResourceShareHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_resource_share_hourly.
+   */
+  fct_engine_new_payload_resource_share_hourly?: Array<FctEngineNewPayloadResourceShareHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_throughput_histogram_daily records
+ */
+export type ListFctEngineNewPayloadThroughputHistogramDailyResponse = {
+  /**
+   * The list of fct_engine_new_payload_throughput_histogram_daily.
+   */
+  fct_engine_new_payload_throughput_histogram_daily?: Array<FctEngineNewPayloadThroughputHistogramDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_engine_new_payload_throughput_histogram_hourly records
+ */
+export type ListFctEngineNewPayloadThroughputHistogramHourlyResponse = {
+  /**
+   * The list of fct_engine_new_payload_throughput_histogram_hourly.
+   */
+  fct_engine_new_payload_throughput_histogram_hourly?: Array<FctEngineNewPayloadThroughputHistogramHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -21258,6 +22696,34 @@ export type ListFctNodeActiveLast24hResponse = {
    * The list of fct_node_active_last_24h.
    */
   fct_node_active_last_24h?: Array<FctNodeActiveLast24h>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_count_by_cl_client_version_daily records
+ */
+export type ListFctNodeCountByClClientVersionDailyResponse = {
+  /**
+   * The list of fct_node_count_by_cl_client_version_daily.
+   */
+  fct_node_count_by_cl_client_version_daily?: Array<FctNodeCountByClClientVersionDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_node_count_by_cl_client_version_window records
+ */
+export type ListFctNodeCountByClClientVersionWindowResponse = {
+  /**
+   * The list of fct_node_count_by_cl_client_version_window.
+   */
+  fct_node_count_by_cl_client_version_window?: Array<FctNodeCountByClClientVersionWindow>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -21748,6 +23214,20 @@ export type ListFctRocketpoolValidatorResponse = {
    * The list of fct_rocketpool_validator.
    */
   fct_rocketpool_validator?: Array<FctRocketpoolValidator>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_slot_summary records
+ */
+export type ListFctSlotSummaryResponse = {
+  /**
+   * The list of fct_slot_summary.
+   */
+  fct_slot_summary?: Array<FctSlotSummary>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22371,6 +23851,20 @@ export type ListIntBlockBlobCountCanonicalResponse = {
 };
 
 /**
+ * Response for listing int_block_call_type_gas records
+ */
+export type ListIntBlockCallTypeGasResponse = {
+  /**
+   * The list of int_block_call_type_gas.
+   */
+  int_block_call_type_gas?: Array<IntBlockCallTypeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing int_block_canonical records
  */
 export type ListIntBlockCanonicalResponse = {
@@ -22378,6 +23872,20 @@ export type ListIntBlockCanonicalResponse = {
    * The list of int_block_canonical.
    */
   int_block_canonical?: Array<IntBlockCanonical>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_contract_gas records
+ */
+export type ListIntBlockContractGasResponse = {
+  /**
+   * The list of int_block_contract_gas.
+   */
+  int_block_contract_gas?: Array<IntBlockContractGas>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22420,6 +23928,20 @@ export type ListIntBlockOpcodeGasResponse = {
    * The list of int_block_opcode_gas.
    */
   int_block_opcode_gas?: Array<IntBlockOpcodeGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_opcode_resource_gas records
+ */
+export type ListIntBlockOpcodeResourceGasResponse = {
+  /**
+   * The list of int_block_opcode_resource_gas.
+   */
+  int_block_opcode_resource_gas?: Array<IntBlockOpcodeResourceGas>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22476,6 +23998,34 @@ export type ListIntBlockResourceGasResponse = {
    * The list of int_block_resource_gas.
    */
   int_block_resource_gas?: Array<IntBlockResourceGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_transaction_contract_gas records
+ */
+export type ListIntBlockTransactionContractGasResponse = {
+  /**
+   * The list of int_block_transaction_contract_gas.
+   */
+  int_block_transaction_contract_gas?: Array<IntBlockTransactionContractGas>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_block_transaction_summary records
+ */
+export type ListIntBlockTransactionSummaryResponse = {
+  /**
+   * The list of int_block_transaction_summary.
+   */
+  int_block_transaction_summary?: Array<IntBlockTransactionSummary>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22770,6 +24320,20 @@ export type ListIntCustodyProbeResponse = {
    * The list of int_custody_probe.
    */
   int_custody_probe?: Array<IntCustodyProbe>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_data_column_gossip_by_slot records
+ */
+export type ListIntDataColumnGossipBySlotResponse = {
+  /**
+   * The list of int_data_column_gossip_by_slot.
+   */
+  int_data_column_gossip_by_slot?: Array<IntDataColumnGossipBySlot>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -27752,6 +29316,338 @@ export type DimValidatorStatusServiceGetResponses = {
 
 export type DimValidatorStatusServiceGetResponse =
   DimValidatorStatusServiceGetResponses[keyof DimValidatorStatusServiceGetResponses];
+
+export type DimXatuNodeServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: eq)
+     */
+    meta_client_name_eq?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: ne)
+     */
+    meta_client_name_ne?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: contains)
+     */
+    meta_client_name_contains?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: starts_with)
+     */
+    meta_client_name_starts_with?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: ends_with)
+     */
+    meta_client_name_ends_with?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: like)
+     */
+    meta_client_name_like?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: not_like)
+     */
+    meta_client_name_not_like?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: in_values) (comma-separated list)
+     */
+    meta_client_name_in_values?: string;
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables (filter: not_in_values) (comma-separated list)
+     */
+    meta_client_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: eq)
+     */
+    stable_node_id_eq?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: ne)
+     */
+    stable_node_id_ne?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: contains)
+     */
+    stable_node_id_contains?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: starts_with)
+     */
+    stable_node_id_starts_with?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: ends_with)
+     */
+    stable_node_id_ends_with?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: like)
+     */
+    stable_node_id_like?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: not_like)
+     */
+    stable_node_id_not_like?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: in_values) (comma-separated list)
+     */
+    stable_node_id_in_values?: string;
+    /**
+     * The Xatu node this name belongs to: the meta_client_name of the first ID in its chain. Hashed IDs change when the beacon node's p2p key changes (every restart on nimbus without --netkey-file). IDs with the same username and consensus client chain when one starts in or after the hour the previous one was last seen. IDs active at the same time stay separate. Named IDs map to themselves (filter: not_in_values) (comma-separated list)
+     */
+    stable_node_id_not_in_values?: string;
+    /**
+     * Contributor username of the Xatu node (filter: eq)
+     */
+    username_eq?: string;
+    /**
+     * Contributor username of the Xatu node (filter: ne)
+     */
+    username_ne?: string;
+    /**
+     * Contributor username of the Xatu node (filter: contains)
+     */
+    username_contains?: string;
+    /**
+     * Contributor username of the Xatu node (filter: starts_with)
+     */
+    username_starts_with?: string;
+    /**
+     * Contributor username of the Xatu node (filter: ends_with)
+     */
+    username_ends_with?: string;
+    /**
+     * Contributor username of the Xatu node (filter: like)
+     */
+    username_like?: string;
+    /**
+     * Contributor username of the Xatu node (filter: not_like)
+     */
+    username_not_like?: string;
+    /**
+     * Contributor username of the Xatu node (filter: in_values) (comma-separated list)
+     */
+    username_in_values?: string;
+    /**
+     * Contributor username of the Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    username_not_in_values?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * Consensus client of the Xatu node at its latest observation (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * Start of the first hour this name reported a block (filter: eq)
+     */
+    first_seen_date_time_eq?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: ne)
+     */
+    first_seen_date_time_ne?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: lt)
+     */
+    first_seen_date_time_lt?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: lte)
+     */
+    first_seen_date_time_lte?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: gt)
+     */
+    first_seen_date_time_gt?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: gte)
+     */
+    first_seen_date_time_gte?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: between_min)
+     */
+    first_seen_date_time_between_min?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: between_max_value)
+     */
+    first_seen_date_time_between_max_value?: number;
+    /**
+     * Start of the first hour this name reported a block (filter: in_values) (comma-separated list)
+     */
+    first_seen_date_time_in_values?: string;
+    /**
+     * Start of the first hour this name reported a block (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_date_time_not_in_values?: string;
+    /**
+     * Start of the latest hour this name reported a block (filter: eq)
+     */
+    last_seen_date_time_eq?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: ne)
+     */
+    last_seen_date_time_ne?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: lt)
+     */
+    last_seen_date_time_lt?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: lte)
+     */
+    last_seen_date_time_lte?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: gt)
+     */
+    last_seen_date_time_gt?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: gte)
+     */
+    last_seen_date_time_gte?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: between_min)
+     */
+    last_seen_date_time_between_min?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: between_max_value)
+     */
+    last_seen_date_time_between_max_value?: number;
+    /**
+     * Start of the latest hour this name reported a block (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_time_in_values?: string;
+    /**
+     * Start of the latest hour this name reported a block (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_time_not_in_values?: string;
+    /**
+     * The maximum number of dim_xatu_node to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimXatuNode` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_xatu_node';
+};
+
+export type DimXatuNodeServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimXatuNodeServiceListError = DimXatuNodeServiceListErrors[keyof DimXatuNodeServiceListErrors];
+
+export type DimXatuNodeServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimXatuNodeResponse;
+};
+
+export type DimXatuNodeServiceListResponse = DimXatuNodeServiceListResponses[keyof DimXatuNodeServiceListResponses];
+
+export type DimXatuNodeServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Name of the Xatu node as reported, e.g. pub-asn-city/<user>/hashed-<id>. Join key for the by_node tables
+     */
+    meta_client_name: string;
+  };
+  query?: never;
+  url: '/api/v1/dim_xatu_node/{meta_client_name}';
+};
+
+export type DimXatuNodeServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimXatuNodeServiceGetError = DimXatuNodeServiceGetErrors[keyof DimXatuNodeServiceGetErrors];
+
+export type DimXatuNodeServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimXatuNodeResponse;
+};
+
+export type DimXatuNodeServiceGetResponse = DimXatuNodeServiceGetResponses[keyof DimXatuNodeServiceGetResponses];
 
 export type FctAttestationCorrectnessServiceListData = {
   body?: never;
@@ -37909,6 +39805,702 @@ export type FctAttestationRewardByValidatorWeeklyServiceGetResponses = {
 export type FctAttestationRewardByValidatorWeeklyServiceGetResponse =
   FctAttestationRewardByValidatorWeeklyServiceGetResponses[keyof FctAttestationRewardByValidatorWeeklyServiceGetResponses];
 
+export type FctAttestationVoteByBlockRootServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot the attestations were for (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot the attestations were for (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot the attestations were for (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot the attestations were for (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot the attestations were for (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot the attestations were for (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot the attestations were for (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot the attestations were for (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot the attestations were for (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot the attestations were for (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: eq)
+     */
+    vote_count_eq?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: ne)
+     */
+    vote_count_ne?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: lt)
+     */
+    vote_count_lt?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: lte)
+     */
+    vote_count_lte?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: gt)
+     */
+    vote_count_gt?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: gte)
+     */
+    vote_count_gte?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: between_min)
+     */
+    vote_count_between_min?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: between_max_value)
+     */
+    vote_count_between_max_value?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: in_values) (comma-separated list)
+     */
+    vote_count_in_values?: string;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: not_in_values) (comma-separated list)
+     */
+    vote_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_vote_by_block_root to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteByBlockRoot` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_by_block_root';
+};
+
+export type FctAttestationVoteByBlockRootServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteByBlockRootServiceListError =
+  FctAttestationVoteByBlockRootServiceListErrors[keyof FctAttestationVoteByBlockRootServiceListErrors];
+
+export type FctAttestationVoteByBlockRootServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteByBlockRootResponse;
+};
+
+export type FctAttestationVoteByBlockRootServiceListResponse =
+  FctAttestationVoteByBlockRootServiceListResponses[keyof FctAttestationVoteByBlockRootServiceListResponses];
+
+export type FctAttestationVoteByBlockRootServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_by_block_root/{slot_start_date_time}';
+};
+
+export type FctAttestationVoteByBlockRootServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteByBlockRootServiceGetError =
+  FctAttestationVoteByBlockRootServiceGetErrors[keyof FctAttestationVoteByBlockRootServiceGetErrors];
+
+export type FctAttestationVoteByBlockRootServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteByBlockRootResponse;
+};
+
+export type FctAttestationVoteByBlockRootServiceGetResponse =
+  FctAttestationVoteByBlockRootServiceGetResponses[keyof FctAttestationVoteByBlockRootServiceGetResponses];
+
+export type FctAttestationVoteByBlockRootHeadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root the validators voted for as head, which can be a block from an earlier slot (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot the attestations were for (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot the attestations were for (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot the attestations were for (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot the attestations were for (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot the attestations were for (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot the attestations were for (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot the attestations were for (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot the attestations were for (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot the attestations were for (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot the attestations were for (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: eq)
+     */
+    vote_count_eq?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: ne)
+     */
+    vote_count_ne?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: lt)
+     */
+    vote_count_lt?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: lte)
+     */
+    vote_count_lte?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: gt)
+     */
+    vote_count_gt?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: gte)
+     */
+    vote_count_gte?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: between_min)
+     */
+    vote_count_between_min?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: between_max_value)
+     */
+    vote_count_between_max_value?: number;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: in_values) (comma-separated list)
+     */
+    vote_count_in_values?: string;
+    /**
+     * The number of validators that voted for this block root as head in this slot (filter: not_in_values) (comma-separated list)
+     */
+    vote_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_attestation_vote_by_block_root_head to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctAttestationVoteByBlockRootHead` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_attestation_vote_by_block_root_head';
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceListError =
+  FctAttestationVoteByBlockRootHeadServiceListErrors[keyof FctAttestationVoteByBlockRootHeadServiceListErrors];
+
+export type FctAttestationVoteByBlockRootHeadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctAttestationVoteByBlockRootHeadResponse;
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceListResponse =
+  FctAttestationVoteByBlockRootHeadServiceListResponses[keyof FctAttestationVoteByBlockRootHeadServiceListResponses];
+
+export type FctAttestationVoteByBlockRootHeadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_attestation_vote_by_block_root_head/{slot_start_date_time}';
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceGetError =
+  FctAttestationVoteByBlockRootHeadServiceGetErrors[keyof FctAttestationVoteByBlockRootHeadServiceGetErrors];
+
+export type FctAttestationVoteByBlockRootHeadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctAttestationVoteByBlockRootHeadResponse;
+};
+
+export type FctAttestationVoteByBlockRootHeadServiceGetResponse =
+  FctAttestationVoteByBlockRootHeadServiceGetResponses[keyof FctAttestationVoteByBlockRootHeadServiceGetResponses];
+
 export type FctAttestationVoteCorrectnessByClientDailyServiceListData = {
   body?: never;
   path?: never;
@@ -38302,43 +40894,43 @@ export type FctAttestationVoteCorrectnessByClientDailyServiceListData = {
      */
     target_correct_count_not_in_values?: string;
     /**
-     * Source votes that were correct (filter: eq)
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
      */
     source_correct_count_eq?: number;
     /**
-     * Source votes that were correct (filter: ne)
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
      */
     source_correct_count_ne?: number;
     /**
-     * Source votes that were correct (filter: lt)
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
      */
     source_correct_count_lt?: number;
     /**
-     * Source votes that were correct (filter: lte)
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
      */
     source_correct_count_lte?: number;
     /**
-     * Source votes that were correct (filter: gt)
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
      */
     source_correct_count_gt?: number;
     /**
-     * Source votes that were correct (filter: gte)
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
      */
     source_correct_count_gte?: number;
     /**
-     * Source votes that were correct (filter: between_min)
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
      */
     source_correct_count_between_min?: number;
     /**
-     * Source votes that were correct (filter: between_max_value)
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
      */
     source_correct_count_between_max_value?: number;
     /**
-     * Source votes that were correct (filter: in_values) (comma-separated list)
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
      */
     source_correct_count_in_values?: string;
     /**
-     * Source votes that were correct (filter: not_in_values) (comma-separated list)
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
      */
     source_correct_count_not_in_values?: string;
     /**
@@ -38806,43 +41398,43 @@ export type FctAttestationVoteCorrectnessByClientPairDailyServiceListData = {
      */
     target_correct_count_not_in_values?: string;
     /**
-     * Source votes that were correct (filter: eq)
+     * Source votes that were correct, from attestations seen on gossip (filter: eq)
      */
     source_correct_count_eq?: number;
     /**
-     * Source votes that were correct (filter: ne)
+     * Source votes that were correct, from attestations seen on gossip (filter: ne)
      */
     source_correct_count_ne?: number;
     /**
-     * Source votes that were correct (filter: lt)
+     * Source votes that were correct, from attestations seen on gossip (filter: lt)
      */
     source_correct_count_lt?: number;
     /**
-     * Source votes that were correct (filter: lte)
+     * Source votes that were correct, from attestations seen on gossip (filter: lte)
      */
     source_correct_count_lte?: number;
     /**
-     * Source votes that were correct (filter: gt)
+     * Source votes that were correct, from attestations seen on gossip (filter: gt)
      */
     source_correct_count_gt?: number;
     /**
-     * Source votes that were correct (filter: gte)
+     * Source votes that were correct, from attestations seen on gossip (filter: gte)
      */
     source_correct_count_gte?: number;
     /**
-     * Source votes that were correct (filter: between_min)
+     * Source votes that were correct, from attestations seen on gossip (filter: between_min)
      */
     source_correct_count_between_min?: number;
     /**
-     * Source votes that were correct (filter: between_max_value)
+     * Source votes that were correct, from attestations seen on gossip (filter: between_max_value)
      */
     source_correct_count_between_max_value?: number;
     /**
-     * Source votes that were correct (filter: in_values) (comma-separated list)
+     * Source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
      */
     source_correct_count_in_values?: string;
     /**
-     * Source votes that were correct (filter: not_in_values) (comma-separated list)
+     * Source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
      */
     source_correct_count_not_in_values?: string;
     /**
@@ -40514,11 +43106,11 @@ export type FctAttestationVoteCorrectnessByValidatorServiceListData = {
      */
     target_correct_ne?: boolean;
     /**
-     * Whether the source vote was correct. NULL if not attested (filter: eq)
+     * Whether the source vote was correct, from the attestation seen on gossip. NULL if gossip did not see it, which is every slot before gossip collection began (filter: eq)
      */
     source_correct_eq?: boolean;
     /**
-     * Whether the source vote was correct. NULL if not attested (filter: ne)
+     * Whether the source vote was correct, from the attestation seen on gossip. NULL if gossip did not see it, which is every slot before gossip collection began (filter: ne)
      */
     source_correct_ne?: boolean;
     /**
@@ -40950,43 +43542,43 @@ export type FctAttestationVoteCorrectnessByValidatorDailyServiceListData = {
      */
     target_correct_count_not_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: eq)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: eq)
      */
     source_correct_count_eq?: number;
     /**
-     * Number of source votes that were correct (filter: ne)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: ne)
      */
     source_correct_count_ne?: number;
     /**
-     * Number of source votes that were correct (filter: lt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lt)
      */
     source_correct_count_lt?: number;
     /**
-     * Number of source votes that were correct (filter: lte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lte)
      */
     source_correct_count_lte?: number;
     /**
-     * Number of source votes that were correct (filter: gt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gt)
      */
     source_correct_count_gt?: number;
     /**
-     * Number of source votes that were correct (filter: gte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gte)
      */
     source_correct_count_gte?: number;
     /**
-     * Number of source votes that were correct (filter: between_min)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_min)
      */
     source_correct_count_between_min?: number;
     /**
-     * Number of source votes that were correct (filter: between_max_value)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_max_value)
      */
     source_correct_count_between_max_value?: number;
     /**
-     * Number of source votes that were correct (filter: in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
      */
     source_correct_count_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: not_in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
      */
     source_correct_count_not_in_values?: string;
     /**
@@ -41426,43 +44018,43 @@ export type FctAttestationVoteCorrectnessByValidatorHourlyServiceListData = {
      */
     target_correct_count_not_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: eq)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: eq)
      */
     source_correct_count_eq?: number;
     /**
-     * Number of source votes that were correct (filter: ne)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: ne)
      */
     source_correct_count_ne?: number;
     /**
-     * Number of source votes that were correct (filter: lt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lt)
      */
     source_correct_count_lt?: number;
     /**
-     * Number of source votes that were correct (filter: lte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lte)
      */
     source_correct_count_lte?: number;
     /**
-     * Number of source votes that were correct (filter: gt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gt)
      */
     source_correct_count_gt?: number;
     /**
-     * Number of source votes that were correct (filter: gte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gte)
      */
     source_correct_count_gte?: number;
     /**
-     * Number of source votes that were correct (filter: between_min)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_min)
      */
     source_correct_count_between_min?: number;
     /**
-     * Number of source votes that were correct (filter: between_max_value)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_max_value)
      */
     source_correct_count_between_max_value?: number;
     /**
-     * Number of source votes that were correct (filter: in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
      */
     source_correct_count_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: not_in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
      */
     source_correct_count_not_in_values?: string;
     /**
@@ -41898,43 +44490,43 @@ export type FctAttestationVoteCorrectnessByValidatorWeeklyServiceListData = {
      */
     target_correct_count_not_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: eq)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: eq)
      */
     source_correct_count_eq?: number;
     /**
-     * Number of source votes that were correct (filter: ne)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: ne)
      */
     source_correct_count_ne?: number;
     /**
-     * Number of source votes that were correct (filter: lt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lt)
      */
     source_correct_count_lt?: number;
     /**
-     * Number of source votes that were correct (filter: lte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: lte)
      */
     source_correct_count_lte?: number;
     /**
-     * Number of source votes that were correct (filter: gt)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gt)
      */
     source_correct_count_gt?: number;
     /**
-     * Number of source votes that were correct (filter: gte)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: gte)
      */
     source_correct_count_gte?: number;
     /**
-     * Number of source votes that were correct (filter: between_min)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_min)
      */
     source_correct_count_between_min?: number;
     /**
-     * Number of source votes that were correct (filter: between_max_value)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: between_max_value)
      */
     source_correct_count_between_max_value?: number;
     /**
-     * Number of source votes that were correct (filter: in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: in_values) (comma-separated list)
      */
     source_correct_count_in_values?: string;
     /**
-     * Number of source votes that were correct (filter: not_in_values) (comma-separated list)
+     * Number of source votes that were correct, from attestations seen on gossip (filter: not_in_values) (comma-separated list)
      */
     source_correct_count_not_in_values?: string;
     /**
@@ -60275,6 +62867,642 @@ export type FctBlockGraffitiClientVersionPairDailyServiceGetResponses = {
 export type FctBlockGraffitiClientVersionPairDailyServiceGetResponse =
   FctBlockGraffitiClientVersionPairDailyServiceGetResponses[keyof FctBlockGraffitiClientVersionPairDailyServiceGetResponses];
 
+export type FctBlockGraffitiHeadServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The root of the beacon block, one of possibly several at the slot on the unfinalized chain (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number of the block (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the block (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the block (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the block (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the block (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the block (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the block (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the block (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the block (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the block (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The validator index of the block proposer (filter: eq)
+     */
+    proposer_index_eq?: number;
+    /**
+     * The validator index of the block proposer (filter: ne)
+     */
+    proposer_index_ne?: number;
+    /**
+     * The validator index of the block proposer (filter: lt)
+     */
+    proposer_index_lt?: number;
+    /**
+     * The validator index of the block proposer (filter: lte)
+     */
+    proposer_index_lte?: number;
+    /**
+     * The validator index of the block proposer (filter: gt)
+     */
+    proposer_index_gt?: number;
+    /**
+     * The validator index of the block proposer (filter: gte)
+     */
+    proposer_index_gte?: number;
+    /**
+     * The validator index of the block proposer (filter: between_min)
+     */
+    proposer_index_between_min?: number;
+    /**
+     * The validator index of the block proposer (filter: between_max_value)
+     */
+    proposer_index_between_max_value?: number;
+    /**
+     * The validator index of the block proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_index_in_values?: string;
+    /**
+     * The validator index of the block proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_index_not_in_values?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: eq)
+     */
+    graffiti_text_eq?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: ne)
+     */
+    graffiti_text_ne?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: contains)
+     */
+    graffiti_text_contains?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: starts_with)
+     */
+    graffiti_text_starts_with?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: ends_with)
+     */
+    graffiti_text_ends_with?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: like)
+     */
+    graffiti_text_like?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: not_like)
+     */
+    graffiti_text_not_like?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: in_values) (comma-separated list)
+     */
+    graffiti_text_in_values?: string;
+    /**
+     * The block graffiti decoded as UTF-8 with trailing null bytes removed, from the sentries, or from cannon for blocks the sentries recorded before they kept graffiti (filter: not_in_values) (comma-separated list)
+     */
+    graffiti_text_not_in_values?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: eq)
+     */
+    graffiti_format_eq?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: ne)
+     */
+    graffiti_format_ne?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: contains)
+     */
+    graffiti_format_contains?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: starts_with)
+     */
+    graffiti_format_starts_with?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: ends_with)
+     */
+    graffiti_format_ends_with?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: like)
+     */
+    graffiti_format_like?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: not_like)
+     */
+    graffiti_format_not_like?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: in_values) (comma-separated list)
+     */
+    graffiti_format_in_values?: string;
+    /**
+     * Which graffiti format identified the clients, as in fct_block_graffiti: codes_full, codes_long, codes_short, codes_min, version_string, rocketpool, none or empty (filter: not_in_values) (comma-separated list)
+     */
+    graffiti_format_not_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client named by the graffiti, e.g. lighthouse, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: eq)
+     */
+    consensus_client_version_eq?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: ne)
+     */
+    consensus_client_version_ne?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: contains)
+     */
+    consensus_client_version_contains?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: starts_with)
+     */
+    consensus_client_version_starts_with?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: ends_with)
+     */
+    consensus_client_version_ends_with?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: like)
+     */
+    consensus_client_version_like?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: not_like)
+     */
+    consensus_client_version_not_like?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: in_values) (comma-separated list)
+     */
+    consensus_client_version_in_values?: string;
+    /**
+     * Consensus client version from a version_string graffiti, empty when the graffiti carries none (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_version_not_in_values?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: eq)
+     */
+    consensus_client_commit_eq?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: ne)
+     */
+    consensus_client_commit_ne?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: contains)
+     */
+    consensus_client_commit_contains?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: starts_with)
+     */
+    consensus_client_commit_starts_with?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: ends_with)
+     */
+    consensus_client_commit_ends_with?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: like)
+     */
+    consensus_client_commit_like?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: not_like)
+     */
+    consensus_client_commit_not_like?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: in_values) (comma-separated list)
+     */
+    consensus_client_commit_in_values?: string;
+    /**
+     * Consensus client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_commit_not_in_values?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client named by the graffiti, e.g. geth, or unknown (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: eq)
+     */
+    execution_client_commit_eq?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: ne)
+     */
+    execution_client_commit_ne?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: contains)
+     */
+    execution_client_commit_contains?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: starts_with)
+     */
+    execution_client_commit_starts_with?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: ends_with)
+     */
+    execution_client_commit_ends_with?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: like)
+     */
+    execution_client_commit_like?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: not_like)
+     */
+    execution_client_commit_not_like?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: in_values) (comma-separated list)
+     */
+    execution_client_commit_in_values?: string;
+    /**
+     * Execution client commit prefix carried by the graffiti, empty when the graffiti carries none (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_commit_not_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * Staking entity of the proposer from dim_node, empty when the validator has none (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * The maximum number of fct_block_graffiti_head to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctBlockGraffitiHead` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_block_graffiti_head';
+};
+
+export type FctBlockGraffitiHeadServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiHeadServiceListError =
+  FctBlockGraffitiHeadServiceListErrors[keyof FctBlockGraffitiHeadServiceListErrors];
+
+export type FctBlockGraffitiHeadServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctBlockGraffitiHeadResponse;
+};
+
+export type FctBlockGraffitiHeadServiceListResponse =
+  FctBlockGraffitiHeadServiceListResponses[keyof FctBlockGraffitiHeadServiceListResponses];
+
+export type FctBlockGraffitiHeadServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_block_graffiti_head/{slot_start_date_time}';
+};
+
+export type FctBlockGraffitiHeadServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctBlockGraffitiHeadServiceGetError =
+  FctBlockGraffitiHeadServiceGetErrors[keyof FctBlockGraffitiHeadServiceGetErrors];
+
+export type FctBlockGraffitiHeadServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctBlockGraffitiHeadResponse;
+};
+
+export type FctBlockGraffitiHeadServiceGetResponse =
+  FctBlockGraffitiHeadServiceGetResponses[keyof FctBlockGraffitiHeadServiceGetResponses];
+
 export type FctBlockHeadServiceListData = {
   body?: never;
   path?: never;
@@ -76546,6 +79774,850 @@ export type FctCustodyProbeByClientDailyServiceGetResponses = {
 export type FctCustodyProbeByClientDailyServiceGetResponse =
   FctCustodyProbeByClientDailyServiceGetResponses[keyof FctCustodyProbeByClientDailyServiceGetResponses];
 
+export type FctCustodyProbeBySlotAgeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day the probes ran (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day the probes ran (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day the probes ran (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day the probes ran (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day the probes ran (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day the probes ran (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day the probes ran (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day the probes ran (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day the probes ran (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: eq)
+     */
+    slot_age_bucket_eq?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: ne)
+     */
+    slot_age_bucket_ne?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: contains)
+     */
+    slot_age_bucket_contains?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: starts_with)
+     */
+    slot_age_bucket_starts_with?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: ends_with)
+     */
+    slot_age_bucket_ends_with?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: like)
+     */
+    slot_age_bucket_like?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: not_like)
+     */
+    slot_age_bucket_not_like?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: in_values) (comma-separated list)
+     */
+    slot_age_bucket_in_values?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: not_in_values) (comma-separated list)
+     */
+    slot_age_bucket_not_in_values?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: eq)
+     */
+    slot_age_min_days_eq?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: ne)
+     */
+    slot_age_min_days_ne?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: lt)
+     */
+    slot_age_min_days_lt?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: lte)
+     */
+    slot_age_min_days_lte?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: gt)
+     */
+    slot_age_min_days_gt?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: gte)
+     */
+    slot_age_min_days_gte?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: between_min)
+     */
+    slot_age_min_days_between_min?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: between_max_value)
+     */
+    slot_age_min_days_between_max_value?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: in_values) (comma-separated list)
+     */
+    slot_age_min_days_in_values?: string;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: not_in_values) (comma-separated list)
+     */
+    slot_age_min_days_not_in_values?: string;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: eq)
+     */
+    probe_count_eq?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: ne)
+     */
+    probe_count_ne?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: lt)
+     */
+    probe_count_lt?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: lte)
+     */
+    probe_count_lte?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: gt)
+     */
+    probe_count_gt?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: gte)
+     */
+    probe_count_gte?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: between_min)
+     */
+    probe_count_between_min?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: between_max_value)
+     */
+    probe_count_between_max_value?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: in_values) (comma-separated list)
+     */
+    probe_count_in_values?: string;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: not_in_values) (comma-separated list)
+     */
+    probe_count_not_in_values?: string;
+    /**
+     * Column probes the peer answered with the column (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Column probes the peer answered with the column (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Column probes the peer answered with the column (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Column probes the peer answered with the column (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Column probes the peer answered with the column (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Column probes the peer answered with the column (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Column probes the peer answered with the column (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Column probes the peer answered with the column (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Column probes the peer answered with the column (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Column probes the peer answered with the column (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Column probes the peer answered without the column (filter: eq)
+     */
+    missing_count_eq?: number;
+    /**
+     * Column probes the peer answered without the column (filter: ne)
+     */
+    missing_count_ne?: number;
+    /**
+     * Column probes the peer answered without the column (filter: lt)
+     */
+    missing_count_lt?: number;
+    /**
+     * Column probes the peer answered without the column (filter: lte)
+     */
+    missing_count_lte?: number;
+    /**
+     * Column probes the peer answered without the column (filter: gt)
+     */
+    missing_count_gt?: number;
+    /**
+     * Column probes the peer answered without the column (filter: gte)
+     */
+    missing_count_gte?: number;
+    /**
+     * Column probes the peer answered without the column (filter: between_min)
+     */
+    missing_count_between_min?: number;
+    /**
+     * Column probes the peer answered without the column (filter: between_max_value)
+     */
+    missing_count_between_max_value?: number;
+    /**
+     * Column probes the peer answered without the column (filter: in_values) (comma-separated list)
+     */
+    missing_count_in_values?: string;
+    /**
+     * Column probes the peer answered without the column (filter: not_in_values) (comma-separated list)
+     */
+    missing_count_not_in_values?: string;
+    /**
+     * Column probes that failed (filter: eq)
+     */
+    failure_count_eq?: number;
+    /**
+     * Column probes that failed (filter: ne)
+     */
+    failure_count_ne?: number;
+    /**
+     * Column probes that failed (filter: lt)
+     */
+    failure_count_lt?: number;
+    /**
+     * Column probes that failed (filter: lte)
+     */
+    failure_count_lte?: number;
+    /**
+     * Column probes that failed (filter: gt)
+     */
+    failure_count_gt?: number;
+    /**
+     * Column probes that failed (filter: gte)
+     */
+    failure_count_gte?: number;
+    /**
+     * Column probes that failed (filter: between_min)
+     */
+    failure_count_between_min?: number;
+    /**
+     * Column probes that failed (filter: between_max_value)
+     */
+    failure_count_between_max_value?: number;
+    /**
+     * Column probes that failed (filter: in_values) (comma-separated list)
+     */
+    failure_count_in_values?: string;
+    /**
+     * Column probes that failed (filter: not_in_values) (comma-separated list)
+     */
+    failure_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_custody_probe_by_slot_age_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctCustodyProbeBySlotAgeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_custody_probe_by_slot_age_daily';
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceListError =
+  FctCustodyProbeBySlotAgeDailyServiceListErrors[keyof FctCustodyProbeBySlotAgeDailyServiceListErrors];
+
+export type FctCustodyProbeBySlotAgeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctCustodyProbeBySlotAgeDailyResponse;
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceListResponse =
+  FctCustodyProbeBySlotAgeDailyServiceListResponses[keyof FctCustodyProbeBySlotAgeDailyServiceListResponses];
+
+export type FctCustodyProbeBySlotAgeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day the probes ran
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_custody_probe_by_slot_age_daily/{day_start_date}';
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceGetError =
+  FctCustodyProbeBySlotAgeDailyServiceGetErrors[keyof FctCustodyProbeBySlotAgeDailyServiceGetErrors];
+
+export type FctCustodyProbeBySlotAgeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctCustodyProbeBySlotAgeDailyResponse;
+};
+
+export type FctCustodyProbeBySlotAgeDailyServiceGetResponse =
+  FctCustodyProbeBySlotAgeDailyServiceGetResponses[keyof FctCustodyProbeBySlotAgeDailyServiceGetResponses];
+
+export type FctCustodyProbeBySlotAgeHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The hour the probes ran (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The hour the probes ran (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The hour the probes ran (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The hour the probes ran (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The hour the probes ran (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The hour the probes ran (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The hour the probes ran (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The hour the probes ran (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The hour the probes ran (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The hour the probes ran (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: eq)
+     */
+    slot_age_bucket_eq?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: ne)
+     */
+    slot_age_bucket_ne?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: contains)
+     */
+    slot_age_bucket_contains?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: starts_with)
+     */
+    slot_age_bucket_starts_with?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: ends_with)
+     */
+    slot_age_bucket_ends_with?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: like)
+     */
+    slot_age_bucket_like?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: not_like)
+     */
+    slot_age_bucket_not_like?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: in_values) (comma-separated list)
+     */
+    slot_age_bucket_in_values?: string;
+    /**
+     * Age of the probed slot when the probe ran: 0-1d, 1-3d, 3-7d, 7-14d, 14-18d, or 18d+ (past the 4096-epoch retention of about 18.2 days) (filter: not_in_values) (comma-separated list)
+     */
+    slot_age_bucket_not_in_values?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client of the probed P2P peer, from its agent (erigon is caplin, unknown when the agent is empty) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: eq)
+     */
+    slot_age_min_days_eq?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: ne)
+     */
+    slot_age_min_days_ne?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: lt)
+     */
+    slot_age_min_days_lt?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: lte)
+     */
+    slot_age_min_days_lte?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: gt)
+     */
+    slot_age_min_days_gt?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: gte)
+     */
+    slot_age_min_days_gte?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: between_min)
+     */
+    slot_age_min_days_between_min?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: between_max_value)
+     */
+    slot_age_min_days_between_max_value?: number;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: in_values) (comma-separated list)
+     */
+    slot_age_min_days_in_values?: string;
+    /**
+     * Start of the slot age bucket in days, for ordering the buckets (filter: not_in_values) (comma-separated list)
+     */
+    slot_age_min_days_not_in_values?: string;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: eq)
+     */
+    probe_count_eq?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: ne)
+     */
+    probe_count_ne?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: lt)
+     */
+    probe_count_lt?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: lte)
+     */
+    probe_count_lte?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: gt)
+     */
+    probe_count_gt?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: gte)
+     */
+    probe_count_gte?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: between_min)
+     */
+    probe_count_between_min?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: between_max_value)
+     */
+    probe_count_between_max_value?: number;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: in_values) (comma-separated list)
+     */
+    probe_count_in_values?: string;
+    /**
+     * Number of column probes, one per column a probe asked for (filter: not_in_values) (comma-separated list)
+     */
+    probe_count_not_in_values?: string;
+    /**
+     * Column probes the peer answered with the column (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Column probes the peer answered with the column (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Column probes the peer answered with the column (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Column probes the peer answered with the column (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Column probes the peer answered with the column (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Column probes the peer answered with the column (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Column probes the peer answered with the column (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Column probes the peer answered with the column (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Column probes the peer answered with the column (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Column probes the peer answered with the column (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Column probes the peer answered without the column (filter: eq)
+     */
+    missing_count_eq?: number;
+    /**
+     * Column probes the peer answered without the column (filter: ne)
+     */
+    missing_count_ne?: number;
+    /**
+     * Column probes the peer answered without the column (filter: lt)
+     */
+    missing_count_lt?: number;
+    /**
+     * Column probes the peer answered without the column (filter: lte)
+     */
+    missing_count_lte?: number;
+    /**
+     * Column probes the peer answered without the column (filter: gt)
+     */
+    missing_count_gt?: number;
+    /**
+     * Column probes the peer answered without the column (filter: gte)
+     */
+    missing_count_gte?: number;
+    /**
+     * Column probes the peer answered without the column (filter: between_min)
+     */
+    missing_count_between_min?: number;
+    /**
+     * Column probes the peer answered without the column (filter: between_max_value)
+     */
+    missing_count_between_max_value?: number;
+    /**
+     * Column probes the peer answered without the column (filter: in_values) (comma-separated list)
+     */
+    missing_count_in_values?: string;
+    /**
+     * Column probes the peer answered without the column (filter: not_in_values) (comma-separated list)
+     */
+    missing_count_not_in_values?: string;
+    /**
+     * Column probes that failed (filter: eq)
+     */
+    failure_count_eq?: number;
+    /**
+     * Column probes that failed (filter: ne)
+     */
+    failure_count_ne?: number;
+    /**
+     * Column probes that failed (filter: lt)
+     */
+    failure_count_lt?: number;
+    /**
+     * Column probes that failed (filter: lte)
+     */
+    failure_count_lte?: number;
+    /**
+     * Column probes that failed (filter: gt)
+     */
+    failure_count_gt?: number;
+    /**
+     * Column probes that failed (filter: gte)
+     */
+    failure_count_gte?: number;
+    /**
+     * Column probes that failed (filter: between_min)
+     */
+    failure_count_between_min?: number;
+    /**
+     * Column probes that failed (filter: between_max_value)
+     */
+    failure_count_between_max_value?: number;
+    /**
+     * Column probes that failed (filter: in_values) (comma-separated list)
+     */
+    failure_count_in_values?: string;
+    /**
+     * Column probes that failed (filter: not_in_values) (comma-separated list)
+     */
+    failure_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_custody_probe_by_slot_age_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctCustodyProbeBySlotAgeHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_custody_probe_by_slot_age_hourly';
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceListError =
+  FctCustodyProbeBySlotAgeHourlyServiceListErrors[keyof FctCustodyProbeBySlotAgeHourlyServiceListErrors];
+
+export type FctCustodyProbeBySlotAgeHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctCustodyProbeBySlotAgeHourlyResponse;
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceListResponse =
+  FctCustodyProbeBySlotAgeHourlyServiceListResponses[keyof FctCustodyProbeBySlotAgeHourlyServiceListResponses];
+
+export type FctCustodyProbeBySlotAgeHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The hour the probes ran
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_custody_probe_by_slot_age_hourly/{hour_start_date_time}';
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceGetError =
+  FctCustodyProbeBySlotAgeHourlyServiceGetErrors[keyof FctCustodyProbeBySlotAgeHourlyServiceGetErrors];
+
+export type FctCustodyProbeBySlotAgeHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctCustodyProbeBySlotAgeHourlyResponse;
+};
+
+export type FctCustodyProbeBySlotAgeHourlyServiceGetResponse =
+  FctCustodyProbeBySlotAgeHourlyServiceGetResponses[keyof FctCustodyProbeBySlotAgeHourlyServiceGetResponses];
+
 export type FctDataColumnAvailabilityByEpochServiceListData = {
   body?: never;
   path?: never;
@@ -77515,439 +81587,439 @@ export type FctDataColumnAvailabilityBySlotServiceListData = {
      */
     epoch_start_date_time_not_in_values?: string;
     /**
-     * The wallclock slot when the request was sent (filter: eq)
+     * The slot the probes tested, the same as slot (filter: eq)
      */
     wallclock_request_slot_eq?: number;
     /**
-     * The wallclock slot when the request was sent (filter: ne)
+     * The slot the probes tested, the same as slot (filter: ne)
      */
     wallclock_request_slot_ne?: number;
     /**
-     * The wallclock slot when the request was sent (filter: lt)
+     * The slot the probes tested, the same as slot (filter: lt)
      */
     wallclock_request_slot_lt?: number;
     /**
-     * The wallclock slot when the request was sent (filter: lte)
+     * The slot the probes tested, the same as slot (filter: lte)
      */
     wallclock_request_slot_lte?: number;
     /**
-     * The wallclock slot when the request was sent (filter: gt)
+     * The slot the probes tested, the same as slot (filter: gt)
      */
     wallclock_request_slot_gt?: number;
     /**
-     * The wallclock slot when the request was sent (filter: gte)
+     * The slot the probes tested, the same as slot (filter: gte)
      */
     wallclock_request_slot_gte?: number;
     /**
-     * The wallclock slot when the request was sent (filter: between_min)
+     * The slot the probes tested, the same as slot (filter: between_min)
      */
     wallclock_request_slot_between_min?: number;
     /**
-     * The wallclock slot when the request was sent (filter: between_max_value)
+     * The slot the probes tested, the same as slot (filter: between_max_value)
      */
     wallclock_request_slot_between_max_value?: number;
     /**
-     * The wallclock slot when the request was sent (filter: in_values) (comma-separated list)
+     * The slot the probes tested, the same as slot (filter: in_values) (comma-separated list)
      */
     wallclock_request_slot_in_values?: string;
     /**
-     * The wallclock slot when the request was sent (filter: not_in_values) (comma-separated list)
+     * The slot the probes tested, the same as slot (filter: not_in_values) (comma-separated list)
      */
     wallclock_request_slot_not_in_values?: string;
     /**
-     * The start time for the slot when the request was sent (filter: eq)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: eq)
      */
     wallclock_request_slot_start_date_time_eq?: number;
     /**
-     * The start time for the slot when the request was sent (filter: ne)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: ne)
      */
     wallclock_request_slot_start_date_time_ne?: number;
     /**
-     * The start time for the slot when the request was sent (filter: lt)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: lt)
      */
     wallclock_request_slot_start_date_time_lt?: number;
     /**
-     * The start time for the slot when the request was sent (filter: lte)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: lte)
      */
     wallclock_request_slot_start_date_time_lte?: number;
     /**
-     * The start time for the slot when the request was sent (filter: gt)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: gt)
      */
     wallclock_request_slot_start_date_time_gt?: number;
     /**
-     * The start time for the slot when the request was sent (filter: gte)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: gte)
      */
     wallclock_request_slot_start_date_time_gte?: number;
     /**
-     * The start time for the slot when the request was sent (filter: between_min)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: between_min)
      */
     wallclock_request_slot_start_date_time_between_min?: number;
     /**
-     * The start time for the slot when the request was sent (filter: between_max_value)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: between_max_value)
      */
     wallclock_request_slot_start_date_time_between_max_value?: number;
     /**
-     * The start time for the slot when the request was sent (filter: in_values) (comma-separated list)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: in_values) (comma-separated list)
      */
     wallclock_request_slot_start_date_time_in_values?: string;
     /**
-     * The start time for the slot when the request was sent (filter: not_in_values) (comma-separated list)
+     * The start time of the slot the probes tested, the same as slot_start_date_time (filter: not_in_values) (comma-separated list)
      */
     wallclock_request_slot_start_date_time_not_in_values?: string;
     /**
-     * The wallclock epoch when the request was sent (filter: eq)
+     * The epoch of the slot the probes tested, the same as epoch (filter: eq)
      */
     wallclock_request_epoch_eq?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: ne)
+     * The epoch of the slot the probes tested, the same as epoch (filter: ne)
      */
     wallclock_request_epoch_ne?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: lt)
+     * The epoch of the slot the probes tested, the same as epoch (filter: lt)
      */
     wallclock_request_epoch_lt?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: lte)
+     * The epoch of the slot the probes tested, the same as epoch (filter: lte)
      */
     wallclock_request_epoch_lte?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: gt)
+     * The epoch of the slot the probes tested, the same as epoch (filter: gt)
      */
     wallclock_request_epoch_gt?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: gte)
+     * The epoch of the slot the probes tested, the same as epoch (filter: gte)
      */
     wallclock_request_epoch_gte?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: between_min)
+     * The epoch of the slot the probes tested, the same as epoch (filter: between_min)
      */
     wallclock_request_epoch_between_min?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: between_max_value)
+     * The epoch of the slot the probes tested, the same as epoch (filter: between_max_value)
      */
     wallclock_request_epoch_between_max_value?: number;
     /**
-     * The wallclock epoch when the request was sent (filter: in_values) (comma-separated list)
+     * The epoch of the slot the probes tested, the same as epoch (filter: in_values) (comma-separated list)
      */
     wallclock_request_epoch_in_values?: string;
     /**
-     * The wallclock epoch when the request was sent (filter: not_in_values) (comma-separated list)
+     * The epoch of the slot the probes tested, the same as epoch (filter: not_in_values) (comma-separated list)
      */
     wallclock_request_epoch_not_in_values?: string;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: eq)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: eq)
      */
     wallclock_request_epoch_start_date_time_eq?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: ne)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: ne)
      */
     wallclock_request_epoch_start_date_time_ne?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: lt)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: lt)
      */
     wallclock_request_epoch_start_date_time_lt?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: lte)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: lte)
      */
     wallclock_request_epoch_start_date_time_lte?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: gt)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: gt)
      */
     wallclock_request_epoch_start_date_time_gt?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: gte)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: gte)
      */
     wallclock_request_epoch_start_date_time_gte?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: between_min)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: between_min)
      */
     wallclock_request_epoch_start_date_time_between_min?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: between_max_value)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: between_max_value)
      */
     wallclock_request_epoch_start_date_time_between_max_value?: number;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: in_values) (comma-separated list)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: in_values) (comma-separated list)
      */
     wallclock_request_epoch_start_date_time_in_values?: string;
     /**
-     * The start time for the wallclock epoch when the request was sent (filter: not_in_values) (comma-separated list)
+     * The start time of the epoch the probes tested, the same as epoch_start_date_time (filter: not_in_values) (comma-separated list)
      */
     wallclock_request_epoch_start_date_time_not_in_values?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: eq)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: eq)
      */
     beacon_block_root_eq?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: ne)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: ne)
      */
     beacon_block_root_ne?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: contains)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: contains)
      */
     beacon_block_root_contains?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: starts_with)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: starts_with)
      */
     beacon_block_root_starts_with?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: ends_with)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: ends_with)
      */
     beacon_block_root_ends_with?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: like)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: like)
      */
     beacon_block_root_like?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: not_like)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: not_like)
      */
     beacon_block_root_not_like?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: in_values) (comma-separated list)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: in_values) (comma-separated list)
      */
     beacon_block_root_in_values?: string;
     /**
-     * Beacon block root for this slot (from earliest observation, handles reorgs, NULL if unavailable) (filter: not_in_values) (comma-separated list)
+     * Beacon block root from the earliest gossipsub sighting of the column, NULL when it was not gossiped (filter: not_in_values) (comma-separated list)
      */
     beacon_block_root_not_in_values?: string;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: eq)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: eq)
      */
     beacon_block_root_variants_eq?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: ne)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: ne)
      */
     beacon_block_root_variants_ne?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: lt)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: lt)
      */
     beacon_block_root_variants_lt?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: lte)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: lte)
      */
     beacon_block_root_variants_lte?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: gt)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: gt)
      */
     beacon_block_root_variants_gt?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: gte)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: gte)
      */
     beacon_block_root_variants_gte?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: between_min)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: between_min)
      */
     beacon_block_root_variants_between_min?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: between_max_value)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: between_max_value)
      */
     beacon_block_root_variants_between_max_value?: number;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: in_values) (comma-separated list)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: in_values) (comma-separated list)
      */
     beacon_block_root_variants_in_values?: string;
     /**
-     * Number of unique block roots observed (>1 indicates reorg/fork) (filter: not_in_values) (comma-separated list)
+     * Number of block roots in the gossipsub sightings (more than 1 means a fork), 0 when not gossiped (filter: not_in_values) (comma-separated list)
      */
     beacon_block_root_variants_not_in_values?: string;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: eq)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: eq)
      */
     blob_count_eq?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: ne)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: ne)
      */
     blob_count_ne?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: lt)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: lt)
      */
     blob_count_lt?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: lte)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: lte)
      */
     blob_count_lte?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: gt)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: gt)
      */
     blob_count_gt?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: gte)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: gte)
      */
     blob_count_gte?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: between_min)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: between_min)
      */
     blob_count_between_min?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: between_max_value)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: between_max_value)
      */
     blob_count_between_max_value?: number;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: in_values) (comma-separated list)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: in_values) (comma-separated list)
      */
     blob_count_in_values?: string;
     /**
-     * Number of blobs in the slot (max column_rows_count) (filter: not_in_values) (comma-separated list)
+     * Number of blobs in the slot, from the probes and the gossipsub sightings (filter: not_in_values) (comma-separated list)
      */
     blob_count_not_in_values?: string;
     /**
-     * Count of successful probes (filter: eq)
+     * Number of custody probes that returned the column (filter: eq)
      */
     success_count_eq?: number;
     /**
-     * Count of successful probes (filter: ne)
+     * Number of custody probes that returned the column (filter: ne)
      */
     success_count_ne?: number;
     /**
-     * Count of successful probes (filter: lt)
+     * Number of custody probes that returned the column (filter: lt)
      */
     success_count_lt?: number;
     /**
-     * Count of successful probes (filter: lte)
+     * Number of custody probes that returned the column (filter: lte)
      */
     success_count_lte?: number;
     /**
-     * Count of successful probes (filter: gt)
+     * Number of custody probes that returned the column (filter: gt)
      */
     success_count_gt?: number;
     /**
-     * Count of successful probes (filter: gte)
+     * Number of custody probes that returned the column (filter: gte)
      */
     success_count_gte?: number;
     /**
-     * Count of successful probes (filter: between_min)
+     * Number of custody probes that returned the column (filter: between_min)
      */
     success_count_between_min?: number;
     /**
-     * Count of successful probes (filter: between_max_value)
+     * Number of custody probes that returned the column (filter: between_max_value)
      */
     success_count_between_max_value?: number;
     /**
-     * Count of successful probes (filter: in_values) (comma-separated list)
+     * Number of custody probes that returned the column (filter: in_values) (comma-separated list)
      */
     success_count_in_values?: string;
     /**
-     * Count of successful probes (filter: not_in_values) (comma-separated list)
+     * Number of custody probes that returned the column (filter: not_in_values) (comma-separated list)
      */
     success_count_not_in_values?: string;
     /**
-     * Count of failed probes (result = failure) (filter: eq)
+     * Number of custody probes that failed (result = failure) (filter: eq)
      */
     failure_count_eq?: number;
     /**
-     * Count of failed probes (result = failure) (filter: ne)
+     * Number of custody probes that failed (result = failure) (filter: ne)
      */
     failure_count_ne?: number;
     /**
-     * Count of failed probes (result = failure) (filter: lt)
+     * Number of custody probes that failed (result = failure) (filter: lt)
      */
     failure_count_lt?: number;
     /**
-     * Count of failed probes (result = failure) (filter: lte)
+     * Number of custody probes that failed (result = failure) (filter: lte)
      */
     failure_count_lte?: number;
     /**
-     * Count of failed probes (result = failure) (filter: gt)
+     * Number of custody probes that failed (result = failure) (filter: gt)
      */
     failure_count_gt?: number;
     /**
-     * Count of failed probes (result = failure) (filter: gte)
+     * Number of custody probes that failed (result = failure) (filter: gte)
      */
     failure_count_gte?: number;
     /**
-     * Count of failed probes (result = failure) (filter: between_min)
+     * Number of custody probes that failed (result = failure) (filter: between_min)
      */
     failure_count_between_min?: number;
     /**
-     * Count of failed probes (result = failure) (filter: between_max_value)
+     * Number of custody probes that failed (result = failure) (filter: between_max_value)
      */
     failure_count_between_max_value?: number;
     /**
-     * Count of failed probes (result = failure) (filter: in_values) (comma-separated list)
+     * Number of custody probes that failed (result = failure) (filter: in_values) (comma-separated list)
      */
     failure_count_in_values?: string;
     /**
-     * Count of failed probes (result = failure) (filter: not_in_values) (comma-separated list)
+     * Number of custody probes that failed (result = failure) (filter: not_in_values) (comma-separated list)
      */
     failure_count_not_in_values?: string;
     /**
-     * Count of missing probes (result = missing) (filter: eq)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: eq)
      */
     missing_count_eq?: number;
     /**
-     * Count of missing probes (result = missing) (filter: ne)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: ne)
      */
     missing_count_ne?: number;
     /**
-     * Count of missing probes (result = missing) (filter: lt)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: lt)
      */
     missing_count_lt?: number;
     /**
-     * Count of missing probes (result = missing) (filter: lte)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: lte)
      */
     missing_count_lte?: number;
     /**
-     * Count of missing probes (result = missing) (filter: gt)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: gt)
      */
     missing_count_gt?: number;
     /**
-     * Count of missing probes (result = missing) (filter: gte)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: gte)
      */
     missing_count_gte?: number;
     /**
-     * Count of missing probes (result = missing) (filter: between_min)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: between_min)
      */
     missing_count_between_min?: number;
     /**
-     * Count of missing probes (result = missing) (filter: between_max_value)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: between_max_value)
      */
     missing_count_between_max_value?: number;
     /**
-     * Count of missing probes (result = missing) (filter: in_values) (comma-separated list)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: in_values) (comma-separated list)
      */
     missing_count_in_values?: string;
     /**
-     * Count of missing probes (result = missing) (filter: not_in_values) (comma-separated list)
+     * Number of custody probes the peer answered without the column (result = missing) (filter: not_in_values) (comma-separated list)
      */
     missing_count_not_in_values?: string;
     /**
-     * Total count of probes (filter: eq)
+     * Number of custody probes of the column for this slot (filter: eq)
      */
     probe_count_eq?: number;
     /**
-     * Total count of probes (filter: ne)
+     * Number of custody probes of the column for this slot (filter: ne)
      */
     probe_count_ne?: number;
     /**
-     * Total count of probes (filter: lt)
+     * Number of custody probes of the column for this slot (filter: lt)
      */
     probe_count_lt?: number;
     /**
-     * Total count of probes (filter: lte)
+     * Number of custody probes of the column for this slot (filter: lte)
      */
     probe_count_lte?: number;
     /**
-     * Total count of probes (filter: gt)
+     * Number of custody probes of the column for this slot (filter: gt)
      */
     probe_count_gt?: number;
     /**
-     * Total count of probes (filter: gte)
+     * Number of custody probes of the column for this slot (filter: gte)
      */
     probe_count_gte?: number;
     /**
-     * Total count of probes (filter: between_min)
+     * Number of custody probes of the column for this slot (filter: between_min)
      */
     probe_count_between_min?: number;
     /**
-     * Total count of probes (filter: between_max_value)
+     * Number of custody probes of the column for this slot (filter: between_max_value)
      */
     probe_count_between_max_value?: number;
     /**
-     * Total count of probes (filter: in_values) (comma-separated list)
+     * Number of custody probes of the column for this slot (filter: in_values) (comma-separated list)
      */
     probe_count_in_values?: string;
     /**
-     * Total count of probes (filter: not_in_values) (comma-separated list)
+     * Number of custody probes of the column for this slot (filter: not_in_values) (comma-separated list)
      */
     probe_count_not_in_values?: string;
     /**
@@ -78155,203 +82227,203 @@ export type FctDataColumnAvailabilityBySlotServiceListData = {
      */
     max_response_time_ms_not_in_values?: string;
     /**
-     * Count of unique peers probed (filter: eq)
+     * Number of distinct P2P peers probed (filter: eq)
      */
     unique_peer_count_eq?: number;
     /**
-     * Count of unique peers probed (filter: ne)
+     * Number of distinct P2P peers probed (filter: ne)
      */
     unique_peer_count_ne?: number;
     /**
-     * Count of unique peers probed (filter: lt)
+     * Number of distinct P2P peers probed (filter: lt)
      */
     unique_peer_count_lt?: number;
     /**
-     * Count of unique peers probed (filter: lte)
+     * Number of distinct P2P peers probed (filter: lte)
      */
     unique_peer_count_lte?: number;
     /**
-     * Count of unique peers probed (filter: gt)
+     * Number of distinct P2P peers probed (filter: gt)
      */
     unique_peer_count_gt?: number;
     /**
-     * Count of unique peers probed (filter: gte)
+     * Number of distinct P2P peers probed (filter: gte)
      */
     unique_peer_count_gte?: number;
     /**
-     * Count of unique peers probed (filter: between_min)
+     * Number of distinct P2P peers probed (filter: between_min)
      */
     unique_peer_count_between_min?: number;
     /**
-     * Count of unique peers probed (filter: between_max_value)
+     * Number of distinct P2P peers probed (filter: between_max_value)
      */
     unique_peer_count_between_max_value?: number;
     /**
-     * Count of unique peers probed (filter: in_values) (comma-separated list)
+     * Number of distinct P2P peers probed (filter: in_values) (comma-separated list)
      */
     unique_peer_count_in_values?: string;
     /**
-     * Count of unique peers probed (filter: not_in_values) (comma-separated list)
+     * Number of distinct P2P peers probed (filter: not_in_values) (comma-separated list)
      */
     unique_peer_count_not_in_values?: string;
     /**
-     * Count of unique client names (filter: eq)
+     * Number of distinct Xatu nodes that sent the probes (filter: eq)
      */
     unique_client_count_eq?: number;
     /**
-     * Count of unique client names (filter: ne)
+     * Number of distinct Xatu nodes that sent the probes (filter: ne)
      */
     unique_client_count_ne?: number;
     /**
-     * Count of unique client names (filter: lt)
+     * Number of distinct Xatu nodes that sent the probes (filter: lt)
      */
     unique_client_count_lt?: number;
     /**
-     * Count of unique client names (filter: lte)
+     * Number of distinct Xatu nodes that sent the probes (filter: lte)
      */
     unique_client_count_lte?: number;
     /**
-     * Count of unique client names (filter: gt)
+     * Number of distinct Xatu nodes that sent the probes (filter: gt)
      */
     unique_client_count_gt?: number;
     /**
-     * Count of unique client names (filter: gte)
+     * Number of distinct Xatu nodes that sent the probes (filter: gte)
      */
     unique_client_count_gte?: number;
     /**
-     * Count of unique client names (filter: between_min)
+     * Number of distinct Xatu nodes that sent the probes (filter: between_min)
      */
     unique_client_count_between_min?: number;
     /**
-     * Count of unique client names (filter: between_max_value)
+     * Number of distinct Xatu nodes that sent the probes (filter: between_max_value)
      */
     unique_client_count_between_max_value?: number;
     /**
-     * Count of unique client names (filter: in_values) (comma-separated list)
+     * Number of distinct Xatu nodes that sent the probes (filter: in_values) (comma-separated list)
      */
     unique_client_count_in_values?: string;
     /**
-     * Count of unique client names (filter: not_in_values) (comma-separated list)
+     * Number of distinct Xatu nodes that sent the probes (filter: not_in_values) (comma-separated list)
      */
     unique_client_count_not_in_values?: string;
     /**
-     * Count of unique client implementations (filter: eq)
+     * Number of distinct client implementations that sent the probes (filter: eq)
      */
     unique_implementation_count_eq?: number;
     /**
-     * Count of unique client implementations (filter: ne)
+     * Number of distinct client implementations that sent the probes (filter: ne)
      */
     unique_implementation_count_ne?: number;
     /**
-     * Count of unique client implementations (filter: lt)
+     * Number of distinct client implementations that sent the probes (filter: lt)
      */
     unique_implementation_count_lt?: number;
     /**
-     * Count of unique client implementations (filter: lte)
+     * Number of distinct client implementations that sent the probes (filter: lte)
      */
     unique_implementation_count_lte?: number;
     /**
-     * Count of unique client implementations (filter: gt)
+     * Number of distinct client implementations that sent the probes (filter: gt)
      */
     unique_implementation_count_gt?: number;
     /**
-     * Count of unique client implementations (filter: gte)
+     * Number of distinct client implementations that sent the probes (filter: gte)
      */
     unique_implementation_count_gte?: number;
     /**
-     * Count of unique client implementations (filter: between_min)
+     * Number of distinct client implementations that sent the probes (filter: between_min)
      */
     unique_implementation_count_between_min?: number;
     /**
-     * Count of unique client implementations (filter: between_max_value)
+     * Number of distinct client implementations that sent the probes (filter: between_max_value)
      */
     unique_implementation_count_between_max_value?: number;
     /**
-     * Count of unique client implementations (filter: in_values) (comma-separated list)
+     * Number of distinct client implementations that sent the probes (filter: in_values) (comma-separated list)
      */
     unique_implementation_count_in_values?: string;
     /**
-     * Count of unique client implementations (filter: not_in_values) (comma-separated list)
+     * Number of distinct client implementations that sent the probes (filter: not_in_values) (comma-separated list)
      */
     unique_implementation_count_not_in_values?: string;
     /**
-     * Count of observations from active RPC custody probes (filter: eq)
+     * Number of custody probes, the same as probe_count (filter: eq)
      */
     custody_probe_count_eq?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: ne)
+     * Number of custody probes, the same as probe_count (filter: ne)
      */
     custody_probe_count_ne?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: lt)
+     * Number of custody probes, the same as probe_count (filter: lt)
      */
     custody_probe_count_lt?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: lte)
+     * Number of custody probes, the same as probe_count (filter: lte)
      */
     custody_probe_count_lte?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: gt)
+     * Number of custody probes, the same as probe_count (filter: gt)
      */
     custody_probe_count_gt?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: gte)
+     * Number of custody probes, the same as probe_count (filter: gte)
      */
     custody_probe_count_gte?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: between_min)
+     * Number of custody probes, the same as probe_count (filter: between_min)
      */
     custody_probe_count_between_min?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: between_max_value)
+     * Number of custody probes, the same as probe_count (filter: between_max_value)
      */
     custody_probe_count_between_max_value?: number;
     /**
-     * Count of observations from active RPC custody probes (filter: in_values) (comma-separated list)
+     * Number of custody probes, the same as probe_count (filter: in_values) (comma-separated list)
      */
     custody_probe_count_in_values?: string;
     /**
-     * Count of observations from active RPC custody probes (filter: not_in_values) (comma-separated list)
+     * Number of custody probes, the same as probe_count (filter: not_in_values) (comma-separated list)
      */
     custody_probe_count_not_in_values?: string;
     /**
-     * Count of observations from passive gossipsub propagation (filter: eq)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: eq)
      */
     gossipsub_count_eq?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: ne)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: ne)
      */
     gossipsub_count_ne?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: lt)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: lt)
      */
     gossipsub_count_lt?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: lte)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: lte)
      */
     gossipsub_count_lte?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: gt)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: gt)
      */
     gossipsub_count_gt?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: gte)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: gte)
      */
     gossipsub_count_gte?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: between_min)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: between_min)
      */
     gossipsub_count_between_min?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: between_max_value)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: between_max_value)
      */
     gossipsub_count_between_max_value?: number;
     /**
-     * Count of observations from passive gossipsub propagation (filter: in_values) (comma-separated list)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: in_values) (comma-separated list)
      */
     gossipsub_count_in_values?: string;
     /**
-     * Count of observations from passive gossipsub propagation (filter: not_in_values) (comma-separated list)
+     * Number of gossipsub sightings of the column, which do not count towards availability (filter: not_in_values) (comma-separated list)
      */
     gossipsub_count_not_in_values?: string;
     /**
@@ -98554,6 +102626,3282 @@ export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses = {
 export type FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponse =
   FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses[keyof FctEngineNewPayloadDurationChunked50MsHourlyServiceGetResponses];
 
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: eq)
+     */
+    meta_execution_version_eq?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ne)
+     */
+    meta_execution_version_ne?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: contains)
+     */
+    meta_execution_version_contains?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: starts_with)
+     */
+    meta_execution_version_starts_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: ends_with)
+     */
+    meta_execution_version_ends_with?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: like)
+     */
+    meta_execution_version_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_like)
+     */
+    meta_execution_version_not_like?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: in_values) (comma-separated list)
+     */
+    meta_execution_version_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_version_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: eq)
+     */
+    bucket_lower_ms_eq?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: ne)
+     */
+    bucket_lower_ms_ne?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lt)
+     */
+    bucket_lower_ms_lt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lte)
+     */
+    bucket_lower_ms_lte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gt)
+     */
+    bucket_lower_ms_gt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gte)
+     */
+    bucket_lower_ms_gte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_min)
+     */
+    bucket_lower_ms_between_min?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_max_value)
+     */
+    bucket_lower_ms_between_max_value?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_lower_ms_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_lower_ms_not_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: eq)
+     */
+    bucket_upper_ms_eq?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: ne)
+     */
+    bucket_upper_ms_ne?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lt)
+     */
+    bucket_upper_ms_lt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lte)
+     */
+    bucket_upper_ms_lte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gt)
+     */
+    bucket_upper_ms_gt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gte)
+     */
+    bucket_upper_ms_gte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_min)
+     */
+    bucket_upper_ms_between_min?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_max_value)
+     */
+    bucket_upper_ms_between_max_value?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_upper_ms_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_upper_ms_not_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_histogram_by_version_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationHistogramByVersionDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_by_version_daily';
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceListError =
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListErrors[keyof FctEngineNewPayloadDurationHistogramByVersionDailyServiceListErrors];
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationHistogramByVersionDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse =
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponses[keyof FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponses];
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_by_version_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetError =
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetErrors[keyof FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetErrors];
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationHistogramByVersionDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse =
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponses[keyof FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponses];
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: eq)
+     */
+    bucket_lower_ms_eq?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: ne)
+     */
+    bucket_lower_ms_ne?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lt)
+     */
+    bucket_lower_ms_lt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lte)
+     */
+    bucket_lower_ms_lte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gt)
+     */
+    bucket_lower_ms_gt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gte)
+     */
+    bucket_lower_ms_gte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_min)
+     */
+    bucket_lower_ms_between_min?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_max_value)
+     */
+    bucket_lower_ms_between_max_value?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_lower_ms_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_lower_ms_not_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: eq)
+     */
+    bucket_upper_ms_eq?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: ne)
+     */
+    bucket_upper_ms_ne?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lt)
+     */
+    bucket_upper_ms_lt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lte)
+     */
+    bucket_upper_ms_lte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gt)
+     */
+    bucket_upper_ms_gt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gte)
+     */
+    bucket_upper_ms_gte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_min)
+     */
+    bucket_upper_ms_between_min?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_max_value)
+     */
+    bucket_upper_ms_between_max_value?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_upper_ms_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_upper_ms_not_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_histogram_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationHistogramDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_daily';
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceListError =
+  FctEngineNewPayloadDurationHistogramDailyServiceListErrors[keyof FctEngineNewPayloadDurationHistogramDailyServiceListErrors];
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationHistogramDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceListResponse =
+  FctEngineNewPayloadDurationHistogramDailyServiceListResponses[keyof FctEngineNewPayloadDurationHistogramDailyServiceListResponses];
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceGetError =
+  FctEngineNewPayloadDurationHistogramDailyServiceGetErrors[keyof FctEngineNewPayloadDurationHistogramDailyServiceGetErrors];
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationHistogramDailyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramDailyServiceGetResponse =
+  FctEngineNewPayloadDurationHistogramDailyServiceGetResponses[keyof FctEngineNewPayloadDurationHistogramDailyServiceGetResponses];
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: eq)
+     */
+    node_class_eq?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ne)
+     */
+    node_class_ne?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: contains)
+     */
+    node_class_contains?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: starts_with)
+     */
+    node_class_starts_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ends_with)
+     */
+    node_class_ends_with?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: like)
+     */
+    node_class_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_like)
+     */
+    node_class_not_like?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: in_values) (comma-separated list)
+     */
+    node_class_in_values?: string;
+    /**
+     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_in_values) (comma-separated list)
+     */
+    node_class_not_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: eq)
+     */
+    meta_execution_implementation_eq?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ne)
+     */
+    meta_execution_implementation_ne?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: contains)
+     */
+    meta_execution_implementation_contains?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: starts_with)
+     */
+    meta_execution_implementation_starts_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: ends_with)
+     */
+    meta_execution_implementation_ends_with?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: like)
+     */
+    meta_execution_implementation_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_like)
+     */
+    meta_execution_implementation_not_like?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: in_values) (comma-separated list)
+     */
+    meta_execution_implementation_in_values?: string;
+    /**
+     * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth) (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_implementation_not_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * Engine API response status (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Duration bucket: 0 to 24 are 1ms wide, from 25 each bucket is about 4% wider than the last (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: eq)
+     */
+    bucket_lower_ms_eq?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: ne)
+     */
+    bucket_lower_ms_ne?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lt)
+     */
+    bucket_lower_ms_lt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: lte)
+     */
+    bucket_lower_ms_lte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gt)
+     */
+    bucket_lower_ms_gt?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: gte)
+     */
+    bucket_lower_ms_gte?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_min)
+     */
+    bucket_lower_ms_between_min?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: between_max_value)
+     */
+    bucket_lower_ms_between_max_value?: number;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_lower_ms_in_values?: string;
+    /**
+     * Lower bound of the bucket in milliseconds, inclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_lower_ms_not_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: eq)
+     */
+    bucket_upper_ms_eq?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: ne)
+     */
+    bucket_upper_ms_ne?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lt)
+     */
+    bucket_upper_ms_lt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: lte)
+     */
+    bucket_upper_ms_lte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gt)
+     */
+    bucket_upper_ms_gt?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: gte)
+     */
+    bucket_upper_ms_gte?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_min)
+     */
+    bucket_upper_ms_between_min?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: between_max_value)
+     */
+    bucket_upper_ms_between_max_value?: number;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: in_values) (comma-separated list)
+     */
+    bucket_upper_ms_in_values?: string;
+    /**
+     * Upper bound of the bucket in milliseconds, exclusive (filter: not_in_values) (comma-separated list)
+     */
+    bucket_upper_ms_not_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: eq)
+     */
+    observation_count_eq?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: ne)
+     */
+    observation_count_ne?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lt)
+     */
+    observation_count_lt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: lte)
+     */
+    observation_count_lte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gt)
+     */
+    observation_count_gt?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: gte)
+     */
+    observation_count_gte?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_min)
+     */
+    observation_count_between_min?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: between_max_value)
+     */
+    observation_count_between_max_value?: number;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    observation_count_in_values?: string;
+    /**
+     * Number of engine_newPayload calls whose duration falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    observation_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_duration_histogram_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadDurationHistogramHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_hourly';
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceListError =
+  FctEngineNewPayloadDurationHistogramHourlyServiceListErrors[keyof FctEngineNewPayloadDurationHistogramHourlyServiceListErrors];
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadDurationHistogramHourlyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceListResponse =
+  FctEngineNewPayloadDurationHistogramHourlyServiceListResponses[keyof FctEngineNewPayloadDurationHistogramHourlyServiceListResponses];
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_duration_histogram_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceGetError =
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetErrors[keyof FctEngineNewPayloadDurationHistogramHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadDurationHistogramHourlyResponse;
+};
+
+export type FctEngineNewPayloadDurationHistogramHourlyServiceGetResponse =
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses[keyof FctEngineNewPayloadDurationHistogramHourlyServiceGetResponses];
+
+export type FctEngineNewPayloadGasBucketDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: eq)
+     */
+    gas_bucket_mgas_eq?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: ne)
+     */
+    gas_bucket_mgas_ne?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lt)
+     */
+    gas_bucket_mgas_lt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lte)
+     */
+    gas_bucket_mgas_lte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gt)
+     */
+    gas_bucket_mgas_gt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gte)
+     */
+    gas_bucket_mgas_gte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_min)
+     */
+    gas_bucket_mgas_between_min?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_max_value)
+     */
+    gas_bucket_mgas_between_max_value?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: not_in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter gas_mgas_sq_sum using value
+     */
+    gas_mgas_sq_sum_value?: number;
+    /**
+     * Filter avg_ms_sum using value
+     */
+    avg_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sq_sum using value
+     */
+    p50_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p50_product_sum using value
+     */
+    gas_p50_product_sum_value?: number;
+    /**
+     * Filter p95_ms_sum using value
+     */
+    p95_ms_sum_value?: number;
+    /**
+     * Filter p95_ms_sq_sum using value
+     */
+    p95_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p95_product_sum using value
+     */
+    gas_p95_product_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_gas_bucket_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadGasBucketDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_daily';
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceListError =
+  FctEngineNewPayloadGasBucketDailyServiceListErrors[keyof FctEngineNewPayloadGasBucketDailyServiceListErrors];
+
+export type FctEngineNewPayloadGasBucketDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadGasBucketDailyResponse;
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceListResponse =
+  FctEngineNewPayloadGasBucketDailyServiceListResponses[keyof FctEngineNewPayloadGasBucketDailyServiceListResponses];
+
+export type FctEngineNewPayloadGasBucketDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceGetError =
+  FctEngineNewPayloadGasBucketDailyServiceGetErrors[keyof FctEngineNewPayloadGasBucketDailyServiceGetErrors];
+
+export type FctEngineNewPayloadGasBucketDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadGasBucketDailyResponse;
+};
+
+export type FctEngineNewPayloadGasBucketDailyServiceGetResponse =
+  FctEngineNewPayloadGasBucketDailyServiceGetResponses[keyof FctEngineNewPayloadGasBucketDailyServiceGetResponses];
+
+export type FctEngineNewPayloadGasBucketHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: eq)
+     */
+    gas_bucket_mgas_eq?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: ne)
+     */
+    gas_bucket_mgas_ne?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lt)
+     */
+    gas_bucket_mgas_lt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: lte)
+     */
+    gas_bucket_mgas_lte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gt)
+     */
+    gas_bucket_mgas_gt?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: gte)
+     */
+    gas_bucket_mgas_gte?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_min)
+     */
+    gas_bucket_mgas_between_min?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: between_max_value)
+     */
+    gas_bucket_mgas_between_max_value?: number;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_in_values?: string;
+    /**
+     * Block size bucket, the lower bound in Mgas of a 5 Mgas wide bucket (filter: not_in_values) (comma-separated list)
+     */
+    gas_bucket_mgas_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter gas_mgas_sq_sum using value
+     */
+    gas_mgas_sq_sum_value?: number;
+    /**
+     * Filter avg_ms_sum using value
+     */
+    avg_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * Filter p50_ms_sq_sum using value
+     */
+    p50_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p50_product_sum using value
+     */
+    gas_p50_product_sum_value?: number;
+    /**
+     * Filter p95_ms_sum using value
+     */
+    p95_ms_sum_value?: number;
+    /**
+     * Filter p95_ms_sq_sum using value
+     */
+    p95_ms_sq_sum_value?: number;
+    /**
+     * Filter gas_p95_product_sum using value
+     */
+    gas_p95_product_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_gas_bucket_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadGasBucketHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_hourly';
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceListError =
+  FctEngineNewPayloadGasBucketHourlyServiceListErrors[keyof FctEngineNewPayloadGasBucketHourlyServiceListErrors];
+
+export type FctEngineNewPayloadGasBucketHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadGasBucketHourlyResponse;
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceListResponse =
+  FctEngineNewPayloadGasBucketHourlyServiceListResponses[keyof FctEngineNewPayloadGasBucketHourlyServiceListResponses];
+
+export type FctEngineNewPayloadGasBucketHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_gas_bucket_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceGetError =
+  FctEngineNewPayloadGasBucketHourlyServiceGetErrors[keyof FctEngineNewPayloadGasBucketHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadGasBucketHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadGasBucketHourlyResponse;
+};
+
+export type FctEngineNewPayloadGasBucketHourlyServiceGetResponse =
+  FctEngineNewPayloadGasBucketHourlyServiceGetResponses[keyof FctEngineNewPayloadGasBucketHourlyServiceGetResponses];
+
+export type FctEngineNewPayloadResourceShareDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: eq)
+     */
+    resource_eq?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ne)
+     */
+    resource_ne?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: contains)
+     */
+    resource_contains?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: starts_with)
+     */
+    resource_starts_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ends_with)
+     */
+    resource_ends_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: like)
+     */
+    resource_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_like)
+     */
+    resource_not_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: in_values) (comma-separated list)
+     */
+    resource_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_in_values) (comma-separated list)
+     */
+    resource_not_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: eq)
+     */
+    share_bucket_pct_eq?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: ne)
+     */
+    share_bucket_pct_ne?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lt)
+     */
+    share_bucket_pct_lt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lte)
+     */
+    share_bucket_pct_lte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gt)
+     */
+    share_bucket_pct_gt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gte)
+     */
+    share_bucket_pct_gte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_min)
+     */
+    share_bucket_pct_between_min?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_max_value)
+     */
+    share_bucket_pct_between_max_value?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: in_values) (comma-separated list)
+     */
+    share_bucket_pct_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: not_in_values) (comma-separated list)
+     */
+    share_bucket_pct_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_resource_share_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadResourceShareDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_resource_share_daily';
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceListError =
+  FctEngineNewPayloadResourceShareDailyServiceListErrors[keyof FctEngineNewPayloadResourceShareDailyServiceListErrors];
+
+export type FctEngineNewPayloadResourceShareDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadResourceShareDailyResponse;
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceListResponse =
+  FctEngineNewPayloadResourceShareDailyServiceListResponses[keyof FctEngineNewPayloadResourceShareDailyServiceListResponses];
+
+export type FctEngineNewPayloadResourceShareDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_resource_share_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceGetError =
+  FctEngineNewPayloadResourceShareDailyServiceGetErrors[keyof FctEngineNewPayloadResourceShareDailyServiceGetErrors];
+
+export type FctEngineNewPayloadResourceShareDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadResourceShareDailyResponse;
+};
+
+export type FctEngineNewPayloadResourceShareDailyServiceGetResponse =
+  FctEngineNewPayloadResourceShareDailyServiceGetResponses[keyof FctEngineNewPayloadResourceShareDailyServiceGetResponses];
+
+export type FctEngineNewPayloadResourceShareHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: eq)
+     */
+    resource_eq?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ne)
+     */
+    resource_ne?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: contains)
+     */
+    resource_contains?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: starts_with)
+     */
+    resource_starts_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: ends_with)
+     */
+    resource_ends_with?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: like)
+     */
+    resource_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_like)
+     */
+    resource_not_like?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: in_values) (comma-separated list)
+     */
+    resource_in_values?: string;
+    /**
+     * Gas resource: compute, memory, address_access, state_growth, history, bloom_topics or block_size (filter: not_in_values) (comma-separated list)
+     */
+    resource_not_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: eq)
+     */
+    share_bucket_pct_eq?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: ne)
+     */
+    share_bucket_pct_ne?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lt)
+     */
+    share_bucket_pct_lt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: lte)
+     */
+    share_bucket_pct_lte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gt)
+     */
+    share_bucket_pct_gt?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: gte)
+     */
+    share_bucket_pct_gte?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_min)
+     */
+    share_bucket_pct_between_min?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: between_max_value)
+     */
+    share_bucket_pct_between_max_value?: number;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: in_values) (comma-separated list)
+     */
+    share_bucket_pct_in_values?: string;
+    /**
+     * Share of the block resource gas this resource took, the lower bound of a 10 percentage point bucket (0 to 90) (filter: not_in_values) (comma-separated list)
+     */
+    share_bucket_pct_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 10 Mgas in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * Filter gas_mgas_sum using value
+     */
+    gas_mgas_sum_value?: number;
+    /**
+     * Filter p50_ms_sum using value
+     */
+    p50_ms_sum_value?: number;
+    /**
+     * The maximum number of fct_engine_new_payload_resource_share_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadResourceShareHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_resource_share_hourly';
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceListError =
+  FctEngineNewPayloadResourceShareHourlyServiceListErrors[keyof FctEngineNewPayloadResourceShareHourlyServiceListErrors];
+
+export type FctEngineNewPayloadResourceShareHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadResourceShareHourlyResponse;
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceListResponse =
+  FctEngineNewPayloadResourceShareHourlyServiceListResponses[keyof FctEngineNewPayloadResourceShareHourlyServiceListResponses];
+
+export type FctEngineNewPayloadResourceShareHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_resource_share_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceGetError =
+  FctEngineNewPayloadResourceShareHourlyServiceGetErrors[keyof FctEngineNewPayloadResourceShareHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadResourceShareHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadResourceShareHourlyResponse;
+};
+
+export type FctEngineNewPayloadResourceShareHourlyServiceGetResponse =
+  FctEngineNewPayloadResourceShareHourlyServiceGetResponses[keyof FctEngineNewPayloadResourceShareHourlyServiceGetResponses];
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Filter bucket_lower_mgas_per_second using value
+     */
+    bucket_lower_mgas_per_second_value?: number;
+    /**
+     * Filter bucket_upper_mgas_per_second using value
+     */
+    bucket_upper_mgas_per_second_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_throughput_histogram_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadThroughputHistogramDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_daily';
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceListError =
+  FctEngineNewPayloadThroughputHistogramDailyServiceListErrors[keyof FctEngineNewPayloadThroughputHistogramDailyServiceListErrors];
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadThroughputHistogramDailyResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceListResponse =
+  FctEngineNewPayloadThroughputHistogramDailyServiceListResponses[keyof FctEngineNewPayloadThroughputHistogramDailyServiceListResponses];
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_daily/{day_start_date}';
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceGetError =
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors[keyof FctEngineNewPayloadThroughputHistogramDailyServiceGetErrors];
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadThroughputHistogramDailyResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramDailyServiceGetResponse =
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses[keyof FctEngineNewPayloadThroughputHistogramDailyServiceGetResponses];
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: eq)
+     */
+    node_scope_eq?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ne)
+     */
+    node_scope_ne?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: contains)
+     */
+    node_scope_contains?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: starts_with)
+     */
+    node_scope_starts_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: ends_with)
+     */
+    node_scope_ends_with?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: like)
+     */
+    node_scope_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_like)
+     */
+    node_scope_not_like?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: in_values) (comma-separated list)
+     */
+    node_scope_in_values?: string;
+    /**
+     * Which Xatu nodes the timings come from: reference for reference nodes (node_class eip7870-block-builder), all for every Xatu node (filter: not_in_values) (comma-separated list)
+     */
+    node_scope_not_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client, lowercased, with go-ethereum as geth (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: eq)
+     */
+    bucket_index_eq?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: ne)
+     */
+    bucket_index_ne?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lt)
+     */
+    bucket_index_lt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: lte)
+     */
+    bucket_index_lte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gt)
+     */
+    bucket_index_gt?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: gte)
+     */
+    bucket_index_gte?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_min)
+     */
+    bucket_index_between_min?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: between_max_value)
+     */
+    bucket_index_between_max_value?: number;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: in_values) (comma-separated list)
+     */
+    bucket_index_in_values?: string;
+    /**
+     * Throughput bucket k, covering 1.04^k to 1.04^(k+1) Mgas/s (filter: not_in_values) (comma-separated list)
+     */
+    bucket_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Filter bucket_lower_mgas_per_second using value
+     */
+    bucket_lower_mgas_per_second_value?: number;
+    /**
+     * Filter bucket_upper_mgas_per_second using value
+     */
+    bucket_upper_mgas_per_second_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: eq)
+     */
+    block_count_eq?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: ne)
+     */
+    block_count_ne?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lt)
+     */
+    block_count_lt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: lte)
+     */
+    block_count_lte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gt)
+     */
+    block_count_gt?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: gte)
+     */
+    block_count_gte?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_min)
+     */
+    block_count_between_min?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: between_max_value)
+     */
+    block_count_between_max_value?: number;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: in_values) (comma-separated list)
+     */
+    block_count_in_values?: string;
+    /**
+     * Number of blocks of at least 5 Mgas whose throughput falls in the bucket (filter: not_in_values) (comma-separated list)
+     */
+    block_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_engine_new_payload_throughput_histogram_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctEngineNewPayloadThroughputHistogramHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_hourly';
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceListError =
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors[keyof FctEngineNewPayloadThroughputHistogramHourlyServiceListErrors];
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctEngineNewPayloadThroughputHistogramHourlyResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceListResponse =
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses[keyof FctEngineNewPayloadThroughputHistogramHourlyServiceListResponses];
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_engine_new_payload_throughput_histogram_hourly/{hour_start_date_time}';
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetError =
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetErrors[keyof FctEngineNewPayloadThroughputHistogramHourlyServiceGetErrors];
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctEngineNewPayloadThroughputHistogramHourlyResponse;
+};
+
+export type FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse =
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses[keyof FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponses];
+
 export type FctEngineNewPayloadWinrateDailyServiceListData = {
   body?: never;
   path?: never;
@@ -112507,6 +119855,598 @@ export type FctNodeActiveLast24hServiceGetResponses = {
 
 export type FctNodeActiveLast24hServiceGetResponse =
   FctNodeActiveLast24hServiceGetResponses[keyof FctNodeActiveLast24hServiceGetResponses];
+
+export type FctNodeCountByClClientVersionDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The UTC day (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * The UTC day (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * The UTC day (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * The UTC day (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * The UTC day (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * The UTC day (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * The UTC day (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * The UTC day (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * The UTC day (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * The number of distinct Xatu nodes whose last reported version that day was this one (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_count_by_cl_client_version_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeCountByClClientVersionDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_count_by_cl_client_version_daily';
+};
+
+export type FctNodeCountByClClientVersionDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCountByClClientVersionDailyServiceListError =
+  FctNodeCountByClClientVersionDailyServiceListErrors[keyof FctNodeCountByClClientVersionDailyServiceListErrors];
+
+export type FctNodeCountByClClientVersionDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeCountByClClientVersionDailyResponse;
+};
+
+export type FctNodeCountByClClientVersionDailyServiceListResponse =
+  FctNodeCountByClClientVersionDailyServiceListResponses[keyof FctNodeCountByClClientVersionDailyServiceListResponses];
+
+export type FctNodeCountByClClientVersionDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The UTC day
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_count_by_cl_client_version_daily/{day_start_date}';
+};
+
+export type FctNodeCountByClClientVersionDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCountByClClientVersionDailyServiceGetError =
+  FctNodeCountByClClientVersionDailyServiceGetErrors[keyof FctNodeCountByClClientVersionDailyServiceGetErrors];
+
+export type FctNodeCountByClClientVersionDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeCountByClClientVersionDailyResponse;
+};
+
+export type FctNodeCountByClClientVersionDailyServiceGetResponse =
+  FctNodeCountByClClientVersionDailyServiceGetResponses[keyof FctNodeCountByClClientVersionDailyServiceGetResponses];
+
+export type FctNodeCountByClClientVersionWindowServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: eq)
+     */
+    window_name_eq?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: ne)
+     */
+    window_name_ne?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: contains)
+     */
+    window_name_contains?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: starts_with)
+     */
+    window_name_starts_with?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: ends_with)
+     */
+    window_name_ends_with?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: like)
+     */
+    window_name_like?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: not_like)
+     */
+    window_name_not_like?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: in_values) (comma-separated list)
+     */
+    window_name_in_values?: string;
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history (filter: not_in_values) (comma-separated list)
+     */
+    window_name_not_in_values?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: eq)
+     */
+    meta_consensus_implementation_eq?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: ne)
+     */
+    meta_consensus_implementation_ne?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: contains)
+     */
+    meta_consensus_implementation_contains?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: starts_with)
+     */
+    meta_consensus_implementation_starts_with?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: ends_with)
+     */
+    meta_consensus_implementation_ends_with?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: like)
+     */
+    meta_consensus_implementation_like?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: not_like)
+     */
+    meta_consensus_implementation_not_like?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_in_values?: string;
+    /**
+     * The consensus client the Xatu nodes ran (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_implementation_not_in_values?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: eq)
+     */
+    meta_consensus_version_eq?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: ne)
+     */
+    meta_consensus_version_ne?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: contains)
+     */
+    meta_consensus_version_contains?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: starts_with)
+     */
+    meta_consensus_version_starts_with?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: ends_with)
+     */
+    meta_consensus_version_ends_with?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: like)
+     */
+    meta_consensus_version_like?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: not_like)
+     */
+    meta_consensus_version_not_like?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: in_values) (comma-separated list)
+     */
+    meta_consensus_version_in_values?: string;
+    /**
+     * The consensus client version the Xatu nodes reported, as the client reports it (filter: not_in_values) (comma-separated list)
+     */
+    meta_consensus_version_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The first UTC day in the window (filter: eq)
+     */
+    window_start_date_eq?: string;
+    /**
+     * The first UTC day in the window (filter: ne)
+     */
+    window_start_date_ne?: string;
+    /**
+     * The first UTC day in the window (filter: contains)
+     */
+    window_start_date_contains?: string;
+    /**
+     * The first UTC day in the window (filter: starts_with)
+     */
+    window_start_date_starts_with?: string;
+    /**
+     * The first UTC day in the window (filter: ends_with)
+     */
+    window_start_date_ends_with?: string;
+    /**
+     * The first UTC day in the window (filter: like)
+     */
+    window_start_date_like?: string;
+    /**
+     * The first UTC day in the window (filter: not_like)
+     */
+    window_start_date_not_like?: string;
+    /**
+     * The first UTC day in the window (filter: in_values) (comma-separated list)
+     */
+    window_start_date_in_values?: string;
+    /**
+     * The first UTC day in the window (filter: not_in_values) (comma-separated list)
+     */
+    window_start_date_not_in_values?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: eq)
+     */
+    window_end_date_eq?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: ne)
+     */
+    window_end_date_ne?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: contains)
+     */
+    window_end_date_contains?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: starts_with)
+     */
+    window_end_date_starts_with?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: ends_with)
+     */
+    window_end_date_ends_with?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: like)
+     */
+    window_end_date_like?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: not_like)
+     */
+    window_end_date_not_like?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: in_values) (comma-separated list)
+     */
+    window_end_date_in_values?: string;
+    /**
+     * The last UTC day in the window, the last complete day (filter: not_in_values) (comma-separated list)
+     */
+    window_end_date_not_in_values?: string;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: eq)
+     */
+    node_count_eq?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: ne)
+     */
+    node_count_ne?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: lt)
+     */
+    node_count_lt?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: lte)
+     */
+    node_count_lte?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: gt)
+     */
+    node_count_gt?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: gte)
+     */
+    node_count_gte?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: between_min)
+     */
+    node_count_between_min?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: between_max_value)
+     */
+    node_count_between_max_value?: number;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: in_values) (comma-separated list)
+     */
+    node_count_in_values?: string;
+    /**
+     * The number of distinct Xatu nodes that reported this version on any day of the window, 0 when none did (filter: not_in_values) (comma-separated list)
+     */
+    node_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_node_count_by_cl_client_version_window to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctNodeCountByClClientVersionWindow` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_node_count_by_cl_client_version_window';
+};
+
+export type FctNodeCountByClClientVersionWindowServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCountByClClientVersionWindowServiceListError =
+  FctNodeCountByClClientVersionWindowServiceListErrors[keyof FctNodeCountByClClientVersionWindowServiceListErrors];
+
+export type FctNodeCountByClClientVersionWindowServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctNodeCountByClClientVersionWindowResponse;
+};
+
+export type FctNodeCountByClClientVersionWindowServiceListResponse =
+  FctNodeCountByClClientVersionWindowServiceListResponses[keyof FctNodeCountByClClientVersionWindowServiceListResponses];
+
+export type FctNodeCountByClClientVersionWindowServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The window: 30d, 90d or 1y for the last 30, 90 or 365 complete UTC days, or all for all history
+     */
+    window_name: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_node_count_by_cl_client_version_window/{window_name}';
+};
+
+export type FctNodeCountByClClientVersionWindowServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctNodeCountByClClientVersionWindowServiceGetError =
+  FctNodeCountByClClientVersionWindowServiceGetErrors[keyof FctNodeCountByClClientVersionWindowServiceGetErrors];
+
+export type FctNodeCountByClClientVersionWindowServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctNodeCountByClClientVersionWindowResponse;
+};
+
+export type FctNodeCountByClClientVersionWindowServiceGetResponse =
+  FctNodeCountByClClientVersionWindowServiceGetResponses[keyof FctNodeCountByClClientVersionWindowServiceGetResponses];
 
 export type FctNodeCpuUtilizationByProcessServiceListData = {
   body?: never;
@@ -126595,6 +134535,696 @@ export type FctRocketpoolValidatorServiceGetResponses = {
 
 export type FctRocketpoolValidatorServiceGetResponse =
   FctRocketpoolValidatorServiceGetResponses[keyof FctRocketpoolValidatorServiceGetResponses];
+
+export type FctSlotSummaryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: eq)
+     */
+    status_eq?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: ne)
+     */
+    status_ne?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: contains)
+     */
+    status_contains?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: starts_with)
+     */
+    status_starts_with?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: ends_with)
+     */
+    status_ends_with?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: like)
+     */
+    status_like?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: not_like)
+     */
+    status_not_like?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: in_values) (comma-separated list)
+     */
+    status_in_values?: string;
+    /**
+     * canonical when the block is on the finalized chain, missed when no block was proposed, orphaned when the head saw a block the chain did not keep (before the head data starts an orphaned slot shows as missed) (filter: not_in_values) (comma-separated list)
+     */
+    status_not_in_values?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root, NULL for a missed slot (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * The validator index of the proposer (filter: eq)
+     */
+    proposer_validator_index_eq?: number;
+    /**
+     * The validator index of the proposer (filter: ne)
+     */
+    proposer_validator_index_ne?: number;
+    /**
+     * The validator index of the proposer (filter: lt)
+     */
+    proposer_validator_index_lt?: number;
+    /**
+     * The validator index of the proposer (filter: lte)
+     */
+    proposer_validator_index_lte?: number;
+    /**
+     * The validator index of the proposer (filter: gt)
+     */
+    proposer_validator_index_gt?: number;
+    /**
+     * The validator index of the proposer (filter: gte)
+     */
+    proposer_validator_index_gte?: number;
+    /**
+     * The validator index of the proposer (filter: between_min)
+     */
+    proposer_validator_index_between_min?: number;
+    /**
+     * The validator index of the proposer (filter: between_max_value)
+     */
+    proposer_validator_index_between_max_value?: number;
+    /**
+     * The validator index of the proposer (filter: in_values) (comma-separated list)
+     */
+    proposer_validator_index_in_values?: string;
+    /**
+     * The validator index of the proposer (filter: not_in_values) (comma-separated list)
+     */
+    proposer_validator_index_not_in_values?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: eq)
+     */
+    entity_eq?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: ne)
+     */
+    entity_ne?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: contains)
+     */
+    entity_contains?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: starts_with)
+     */
+    entity_starts_with?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: ends_with)
+     */
+    entity_ends_with?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: like)
+     */
+    entity_like?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: not_like)
+     */
+    entity_not_like?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: in_values) (comma-separated list)
+     */
+    entity_in_values?: string;
+    /**
+     * The staking entity of the proposer, from its current dim_node mapping, NULL when unknown (filter: not_in_values) (comma-separated list)
+     */
+    entity_not_in_values?: string;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The execution block number, NULL for a missed slot or a block without an execution payload (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: eq)
+     */
+    gas_used_eq?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: ne)
+     */
+    gas_used_ne?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: lt)
+     */
+    gas_used_lt?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: lte)
+     */
+    gas_used_lte?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: gt)
+     */
+    gas_used_gt?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: gte)
+     */
+    gas_used_gte?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: between_min)
+     */
+    gas_used_between_min?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: between_max_value)
+     */
+    gas_used_between_max_value?: number;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: in_values) (comma-separated list)
+     */
+    gas_used_in_values?: string;
+    /**
+     * Execution gas used by the block, NULL for a missed slot (filter: not_in_values) (comma-separated list)
+     */
+    gas_used_not_in_values?: string;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: eq)
+     */
+    gas_limit_eq?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: ne)
+     */
+    gas_limit_ne?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: lt)
+     */
+    gas_limit_lt?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: lte)
+     */
+    gas_limit_lte?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: gt)
+     */
+    gas_limit_gt?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: gte)
+     */
+    gas_limit_gte?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: between_min)
+     */
+    gas_limit_between_min?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: between_max_value)
+     */
+    gas_limit_between_max_value?: number;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: in_values) (comma-separated list)
+     */
+    gas_limit_in_values?: string;
+    /**
+     * Execution gas limit of the block, NULL for a missed slot (filter: not_in_values) (comma-separated list)
+     */
+    gas_limit_not_in_values?: string;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: eq)
+     */
+    transaction_count_eq?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: ne)
+     */
+    transaction_count_ne?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: lt)
+     */
+    transaction_count_lt?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: lte)
+     */
+    transaction_count_lte?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: gt)
+     */
+    transaction_count_gt?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: gte)
+     */
+    transaction_count_gte?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: between_min)
+     */
+    transaction_count_between_min?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: between_max_value)
+     */
+    transaction_count_between_max_value?: number;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: in_values) (comma-separated list)
+     */
+    transaction_count_in_values?: string;
+    /**
+     * Number of transactions in the block, NULL for a missed slot (filter: not_in_values) (comma-separated list)
+     */
+    transaction_count_not_in_values?: string;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of blobs in the block, NULL for a missed or orphaned slot (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: eq)
+     */
+    consensus_client_eq?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: ne)
+     */
+    consensus_client_ne?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: contains)
+     */
+    consensus_client_contains?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: starts_with)
+     */
+    consensus_client_starts_with?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: ends_with)
+     */
+    consensus_client_ends_with?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: like)
+     */
+    consensus_client_like?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: not_like)
+     */
+    consensus_client_not_like?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: in_values) (comma-separated list)
+     */
+    consensus_client_in_values?: string;
+    /**
+     * Consensus client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: not_in_values) (comma-separated list)
+     */
+    consensus_client_not_in_values?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: eq)
+     */
+    execution_client_eq?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: ne)
+     */
+    execution_client_ne?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: contains)
+     */
+    execution_client_contains?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: starts_with)
+     */
+    execution_client_starts_with?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: ends_with)
+     */
+    execution_client_ends_with?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: like)
+     */
+    execution_client_like?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: not_like)
+     */
+    execution_client_not_like?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: in_values) (comma-separated list)
+     */
+    execution_client_in_values?: string;
+    /**
+     * Execution client of the proposer, parsed from the block graffiti (unknown when the graffiti does not say), NULL for a missed or orphaned slot (filter: not_in_values) (comma-separated list)
+     */
+    execution_client_not_in_values?: string;
+    /**
+     * The maximum number of fct_slot_summary to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctSlotSummary` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_slot_summary';
+};
+
+export type FctSlotSummaryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSlotSummaryServiceListError = FctSlotSummaryServiceListErrors[keyof FctSlotSummaryServiceListErrors];
+
+export type FctSlotSummaryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctSlotSummaryResponse;
+};
+
+export type FctSlotSummaryServiceListResponse =
+  FctSlotSummaryServiceListResponses[keyof FctSlotSummaryServiceListResponses];
+
+export type FctSlotSummaryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_slot_summary/{slot_start_date_time}';
+};
+
+export type FctSlotSummaryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctSlotSummaryServiceGetError = FctSlotSummaryServiceGetErrors[keyof FctSlotSummaryServiceGetErrors];
+
+export type FctSlotSummaryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctSlotSummaryResponse;
+};
+
+export type FctSlotSummaryServiceGetResponse =
+  FctSlotSummaryServiceGetResponses[keyof FctSlotSummaryServiceGetResponses];
 
 export type FctStorageSlotStateByAddressDailyServiceListData = {
   body?: never;
@@ -145992,6 +154622,274 @@ export type IntBlockBlobCountCanonicalServiceGetResponses = {
 export type IntBlockBlobCountCanonicalServiceGetResponse =
   IntBlockBlobCountCanonicalServiceGetResponses[keyof IntBlockBlobCountCanonicalServiceGetResponses];
 
+export type IntBlockCallTypeGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: eq)
+     */
+    call_type_eq?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ne)
+     */
+    call_type_ne?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: contains)
+     */
+    call_type_contains?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: starts_with)
+     */
+    call_type_starts_with?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: ends_with)
+     */
+    call_type_ends_with?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: like)
+     */
+    call_type_like?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_like)
+     */
+    call_type_not_like?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: in_values) (comma-separated list)
+     */
+    call_type_in_values?: string;
+    /**
+     * The call opcode (CALL, DELEGATECALL, STATICCALL, CALLCODE, CREATE, CREATE2) (filter: not_in_values) (comma-separated list)
+     */
+    call_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of internal call frames of this type in the block (filter: eq)
+     */
+    call_count_eq?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: ne)
+     */
+    call_count_ne?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: lt)
+     */
+    call_count_lt?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: lte)
+     */
+    call_count_lte?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: gt)
+     */
+    call_count_gt?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: gte)
+     */
+    call_count_gte?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: between_min)
+     */
+    call_count_between_min?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: between_max_value)
+     */
+    call_count_between_max_value?: number;
+    /**
+     * Number of internal call frames of this type in the block (filter: in_values) (comma-separated list)
+     */
+    call_count_in_values?: string;
+    /**
+     * Number of internal call frames of this type in the block (filter: not_in_values) (comma-separated list)
+     */
+    call_count_not_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The maximum number of int_block_call_type_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockCallTypeGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_call_type_gas';
+};
+
+export type IntBlockCallTypeGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockCallTypeGasServiceListError =
+  IntBlockCallTypeGasServiceListErrors[keyof IntBlockCallTypeGasServiceListErrors];
+
+export type IntBlockCallTypeGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockCallTypeGasResponse;
+};
+
+export type IntBlockCallTypeGasServiceListResponse =
+  IntBlockCallTypeGasServiceListResponses[keyof IntBlockCallTypeGasServiceListResponses];
+
+export type IntBlockCallTypeGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_call_type_gas/{block_number}';
+};
+
+export type IntBlockCallTypeGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockCallTypeGasServiceGetError =
+  IntBlockCallTypeGasServiceGetErrors[keyof IntBlockCallTypeGasServiceGetErrors];
+
+export type IntBlockCallTypeGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockCallTypeGasResponse;
+};
+
+export type IntBlockCallTypeGasServiceGetResponse =
+  IntBlockCallTypeGasServiceGetResponses[keyof IntBlockCallTypeGasServiceGetResponses];
+
 export type IntBlockCanonicalServiceListData = {
   body?: never;
   path?: never;
@@ -147099,6 +155997,342 @@ export type IntBlockCanonicalServiceGetResponses = {
 
 export type IntBlockCanonicalServiceGetResponse =
   IntBlockCanonicalServiceGetResponses[keyof IntBlockCanonicalServiceGetResponses];
+
+export type IntBlockContractGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: eq)
+     */
+    target_address_eq?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: ne)
+     */
+    target_address_ne?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: contains)
+     */
+    target_address_contains?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    target_address_starts_with?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    target_address_ends_with?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: like)
+     */
+    target_address_like?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: not_like)
+     */
+    target_address_not_like?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    target_address_in_values?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    target_address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: has)
+     */
+    call_types_has?: string;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: has_all_values)
+     */
+    call_types_has_all_values?: Array<string>;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: has_any_values)
+     */
+    call_types_has_any_values?: Array<string>;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: length_eq)
+     */
+    call_types_length_eq?: number;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: length_gt)
+     */
+    call_types_length_gt?: number;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: length_gte)
+     */
+    call_types_length_gte?: number;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: length_lt)
+     */
+    call_types_length_lt?: number;
+    /**
+     * The call types used to call the contract in the block, a transaction calling it directly counts as CALL (filter: length_lte)
+     */
+    call_types_length_lte?: number;
+    /**
+     * The first transaction in the block that called the contract (filter: eq)
+     */
+    first_transaction_hash_eq?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: ne)
+     */
+    first_transaction_hash_ne?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: contains)
+     */
+    first_transaction_hash_contains?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: starts_with)
+     */
+    first_transaction_hash_starts_with?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: ends_with)
+     */
+    first_transaction_hash_ends_with?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: like)
+     */
+    first_transaction_hash_like?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: not_like)
+     */
+    first_transaction_hash_not_like?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: in_values) (comma-separated list)
+     */
+    first_transaction_hash_in_values?: string;
+    /**
+     * The first transaction in the block that called the contract (filter: not_in_values) (comma-separated list)
+     */
+    first_transaction_hash_not_in_values?: string;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: eq)
+     */
+    call_count_eq?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: ne)
+     */
+    call_count_ne?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: lt)
+     */
+    call_count_lt?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: lte)
+     */
+    call_count_lte?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: gt)
+     */
+    call_count_gt?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: gte)
+     */
+    call_count_gte?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: between_min)
+     */
+    call_count_between_min?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: between_max_value)
+     */
+    call_count_between_max_value?: number;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: in_values) (comma-separated list)
+     */
+    call_count_in_values?: string;
+    /**
+     * Number of call frames that targeted the contract in the block (filter: not_in_values) (comma-separated list)
+     */
+    call_count_not_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The maximum number of int_block_contract_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockContractGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_contract_gas';
+};
+
+export type IntBlockContractGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockContractGasServiceListError =
+  IntBlockContractGasServiceListErrors[keyof IntBlockContractGasServiceListErrors];
+
+export type IntBlockContractGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockContractGasResponse;
+};
+
+export type IntBlockContractGasServiceListResponse =
+  IntBlockContractGasServiceListResponses[keyof IntBlockContractGasServiceListResponses];
+
+export type IntBlockContractGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_contract_gas/{block_number}';
+};
+
+export type IntBlockContractGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockContractGasServiceGetError =
+  IntBlockContractGasServiceGetErrors[keyof IntBlockContractGasServiceGetErrors];
+
+export type IntBlockContractGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockContractGasResponse;
+};
+
+export type IntBlockContractGasServiceGetResponse =
+  IntBlockContractGasServiceGetResponses[keyof IntBlockContractGasServiceGetResponses];
 
 export type IntBlockGraffitiReleaseServiceListData = {
   body?: never;
@@ -148907,6 +158141,590 @@ export type IntBlockOpcodeGasServiceGetResponses = {
 
 export type IntBlockOpcodeGasServiceGetResponse =
   IntBlockOpcodeGasServiceGetResponses[keyof IntBlockOpcodeGasServiceGetResponses];
+
+export type IntBlockOpcodeResourceGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: eq)
+     */
+    opcode_eq?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ne)
+     */
+    opcode_ne?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: contains)
+     */
+    opcode_contains?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: starts_with)
+     */
+    opcode_starts_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: ends_with)
+     */
+    opcode_ends_with?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: like)
+     */
+    opcode_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_like)
+     */
+    opcode_not_like?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: in_values) (comma-separated list)
+     */
+    opcode_in_values?: string;
+    /**
+     * The EVM opcode name (e.g., SLOAD, ADD, CALL) (filter: not_in_values) (comma-separated list)
+     */
+    opcode_not_in_values?: string;
+    /**
+     * The name of the network (filter: eq)
+     */
+    meta_network_name_eq?: string;
+    /**
+     * The name of the network (filter: ne)
+     */
+    meta_network_name_ne?: string;
+    /**
+     * The name of the network (filter: contains)
+     */
+    meta_network_name_contains?: string;
+    /**
+     * The name of the network (filter: starts_with)
+     */
+    meta_network_name_starts_with?: string;
+    /**
+     * The name of the network (filter: ends_with)
+     */
+    meta_network_name_ends_with?: string;
+    /**
+     * The name of the network (filter: like)
+     */
+    meta_network_name_like?: string;
+    /**
+     * The name of the network (filter: not_like)
+     */
+    meta_network_name_not_like?: string;
+    /**
+     * The name of the network (filter: in_values) (comma-separated list)
+     */
+    meta_network_name_in_values?: string;
+    /**
+     * The name of the network (filter: not_in_values) (comma-separated list)
+     */
+    meta_network_name_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the block (filter: eq)
+     */
+    count_eq?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: ne)
+     */
+    count_ne?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: lt)
+     */
+    count_lt?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: lte)
+     */
+    count_lte?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: gt)
+     */
+    count_gt?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: gte)
+     */
+    count_gte?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: between_min)
+     */
+    count_between_min?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: between_max_value)
+     */
+    count_between_max_value?: number;
+    /**
+     * Number of times this opcode was executed in the block (filter: in_values) (comma-separated list)
+     */
+    count_in_values?: string;
+    /**
+     * Number of times this opcode was executed in the block (filter: not_in_values) (comma-separated list)
+     */
+    count_not_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in the block (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Total gas consumed by this opcode in the block (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Total gas consumed by this opcode in the block (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * Gas attributed to pure computation (filter: eq)
+     */
+    gas_compute_eq?: number;
+    /**
+     * Gas attributed to pure computation (filter: ne)
+     */
+    gas_compute_ne?: number;
+    /**
+     * Gas attributed to pure computation (filter: lt)
+     */
+    gas_compute_lt?: number;
+    /**
+     * Gas attributed to pure computation (filter: lte)
+     */
+    gas_compute_lte?: number;
+    /**
+     * Gas attributed to pure computation (filter: gt)
+     */
+    gas_compute_gt?: number;
+    /**
+     * Gas attributed to pure computation (filter: gte)
+     */
+    gas_compute_gte?: number;
+    /**
+     * Gas attributed to pure computation (filter: between_min)
+     */
+    gas_compute_between_min?: number;
+    /**
+     * Gas attributed to pure computation (filter: between_max_value)
+     */
+    gas_compute_between_max_value?: number;
+    /**
+     * Gas attributed to pure computation (filter: in_values) (comma-separated list)
+     */
+    gas_compute_in_values?: string;
+    /**
+     * Gas attributed to pure computation (filter: not_in_values) (comma-separated list)
+     */
+    gas_compute_not_in_values?: string;
+    /**
+     * Gas attributed to memory expansion (filter: eq)
+     */
+    gas_memory_eq?: number;
+    /**
+     * Gas attributed to memory expansion (filter: ne)
+     */
+    gas_memory_ne?: number;
+    /**
+     * Gas attributed to memory expansion (filter: lt)
+     */
+    gas_memory_lt?: number;
+    /**
+     * Gas attributed to memory expansion (filter: lte)
+     */
+    gas_memory_lte?: number;
+    /**
+     * Gas attributed to memory expansion (filter: gt)
+     */
+    gas_memory_gt?: number;
+    /**
+     * Gas attributed to memory expansion (filter: gte)
+     */
+    gas_memory_gte?: number;
+    /**
+     * Gas attributed to memory expansion (filter: between_min)
+     */
+    gas_memory_between_min?: number;
+    /**
+     * Gas attributed to memory expansion (filter: between_max_value)
+     */
+    gas_memory_between_max_value?: number;
+    /**
+     * Gas attributed to memory expansion (filter: in_values) (comma-separated list)
+     */
+    gas_memory_in_values?: string;
+    /**
+     * Gas attributed to memory expansion (filter: not_in_values) (comma-separated list)
+     */
+    gas_memory_not_in_values?: string;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: eq)
+     */
+    gas_address_access_eq?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: ne)
+     */
+    gas_address_access_ne?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: lt)
+     */
+    gas_address_access_lt?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: lte)
+     */
+    gas_address_access_lte?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: gt)
+     */
+    gas_address_access_gt?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: gte)
+     */
+    gas_address_access_gte?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: between_min)
+     */
+    gas_address_access_between_min?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: between_max_value)
+     */
+    gas_address_access_between_max_value?: number;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: in_values) (comma-separated list)
+     */
+    gas_address_access_in_values?: string;
+    /**
+     * Gas attributed to cold address and storage access (EIP-2929) (filter: not_in_values) (comma-separated list)
+     */
+    gas_address_access_not_in_values?: string;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: eq)
+     */
+    gas_state_growth_eq?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: ne)
+     */
+    gas_state_growth_ne?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: lt)
+     */
+    gas_state_growth_lt?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: lte)
+     */
+    gas_state_growth_lte?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: gt)
+     */
+    gas_state_growth_gt?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: gte)
+     */
+    gas_state_growth_gte?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: between_min)
+     */
+    gas_state_growth_between_min?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: between_max_value)
+     */
+    gas_state_growth_between_max_value?: number;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: in_values) (comma-separated list)
+     */
+    gas_state_growth_in_values?: string;
+    /**
+     * Gas attributed to state growth (new storage slots, contract creation) (filter: not_in_values) (comma-separated list)
+     */
+    gas_state_growth_not_in_values?: string;
+    /**
+     * Gas attributed to history and log data storage (filter: eq)
+     */
+    gas_history_eq?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: ne)
+     */
+    gas_history_ne?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: lt)
+     */
+    gas_history_lt?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: lte)
+     */
+    gas_history_lte?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: gt)
+     */
+    gas_history_gt?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: gte)
+     */
+    gas_history_gte?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: between_min)
+     */
+    gas_history_between_min?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: between_max_value)
+     */
+    gas_history_between_max_value?: number;
+    /**
+     * Gas attributed to history and log data storage (filter: in_values) (comma-separated list)
+     */
+    gas_history_in_values?: string;
+    /**
+     * Gas attributed to history and log data storage (filter: not_in_values) (comma-separated list)
+     */
+    gas_history_not_in_values?: string;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: eq)
+     */
+    gas_bloom_topics_eq?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: ne)
+     */
+    gas_bloom_topics_ne?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: lt)
+     */
+    gas_bloom_topics_lt?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: lte)
+     */
+    gas_bloom_topics_lte?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: gt)
+     */
+    gas_bloom_topics_gt?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: gte)
+     */
+    gas_bloom_topics_gte?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: between_min)
+     */
+    gas_bloom_topics_between_min?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: between_max_value)
+     */
+    gas_bloom_topics_between_max_value?: number;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: in_values) (comma-separated list)
+     */
+    gas_bloom_topics_in_values?: string;
+    /**
+     * Gas attributed to bloom filter topic indexing (filter: not_in_values) (comma-separated list)
+     */
+    gas_bloom_topics_not_in_values?: string;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: eq)
+     */
+    gas_block_size_eq?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: ne)
+     */
+    gas_block_size_ne?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: lt)
+     */
+    gas_block_size_lt?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: lte)
+     */
+    gas_block_size_lte?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: gt)
+     */
+    gas_block_size_gt?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: gte)
+     */
+    gas_block_size_gte?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: between_min)
+     */
+    gas_block_size_between_min?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: between_max_value)
+     */
+    gas_block_size_between_max_value?: number;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: in_values) (comma-separated list)
+     */
+    gas_block_size_in_values?: string;
+    /**
+     * Gas attributed to block size (always 0 at opcode level) (filter: not_in_values) (comma-separated list)
+     */
+    gas_block_size_not_in_values?: string;
+    /**
+     * The maximum number of int_block_opcode_resource_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockOpcodeResourceGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_opcode_resource_gas';
+};
+
+export type IntBlockOpcodeResourceGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockOpcodeResourceGasServiceListError =
+  IntBlockOpcodeResourceGasServiceListErrors[keyof IntBlockOpcodeResourceGasServiceListErrors];
+
+export type IntBlockOpcodeResourceGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockOpcodeResourceGasResponse;
+};
+
+export type IntBlockOpcodeResourceGasServiceListResponse =
+  IntBlockOpcodeResourceGasServiceListResponses[keyof IntBlockOpcodeResourceGasServiceListResponses];
+
+export type IntBlockOpcodeResourceGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_opcode_resource_gas/{block_number}';
+};
+
+export type IntBlockOpcodeResourceGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockOpcodeResourceGasServiceGetError =
+  IntBlockOpcodeResourceGasServiceGetErrors[keyof IntBlockOpcodeResourceGasServiceGetErrors];
+
+export type IntBlockOpcodeResourceGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockOpcodeResourceGasResponse;
+};
+
+export type IntBlockOpcodeResourceGasServiceGetResponse =
+  IntBlockOpcodeResourceGasServiceGetResponses[keyof IntBlockOpcodeResourceGasServiceGetResponses];
 
 export type IntBlockPayloadPtcVoteCanonicalServiceListData = {
   body?: never;
@@ -150851,6 +160669,898 @@ export type IntBlockResourceGasServiceGetResponses = {
 
 export type IntBlockResourceGasServiceGetResponse =
   IntBlockResourceGasServiceGetResponses[keyof IntBlockResourceGasServiceGetResponses];
+
+export type IntBlockTransactionContractGasServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: eq)
+     */
+    target_address_eq?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: ne)
+     */
+    target_address_ne?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: contains)
+     */
+    target_address_contains?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    target_address_starts_with?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    target_address_ends_with?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: like)
+     */
+    target_address_like?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: not_like)
+     */
+    target_address_not_like?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    target_address_in_values?: string;
+    /**
+     * The contract address (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    target_address_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: eq)
+     */
+    call_count_eq?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: ne)
+     */
+    call_count_ne?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: lt)
+     */
+    call_count_lt?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: lte)
+     */
+    call_count_lte?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: gt)
+     */
+    call_count_gt?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: gte)
+     */
+    call_count_gte?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: between_min)
+     */
+    call_count_between_min?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: between_max_value)
+     */
+    call_count_between_max_value?: number;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: in_values) (comma-separated list)
+     */
+    call_count_in_values?: string;
+    /**
+     * Number of call frames in the transaction that targeted the contract (filter: not_in_values) (comma-separated list)
+     */
+    call_count_not_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * Gas used by those frames themselves, excluding their child frames (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The maximum number of int_block_transaction_contract_gas to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockTransactionContractGas` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_transaction_contract_gas';
+};
+
+export type IntBlockTransactionContractGasServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockTransactionContractGasServiceListError =
+  IntBlockTransactionContractGasServiceListErrors[keyof IntBlockTransactionContractGasServiceListErrors];
+
+export type IntBlockTransactionContractGasServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockTransactionContractGasResponse;
+};
+
+export type IntBlockTransactionContractGasServiceListResponse =
+  IntBlockTransactionContractGasServiceListResponses[keyof IntBlockTransactionContractGasServiceListResponses];
+
+export type IntBlockTransactionContractGasServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_transaction_contract_gas/{block_number}';
+};
+
+export type IntBlockTransactionContractGasServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockTransactionContractGasServiceGetError =
+  IntBlockTransactionContractGasServiceGetErrors[keyof IntBlockTransactionContractGasServiceGetErrors];
+
+export type IntBlockTransactionContractGasServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockTransactionContractGasResponse;
+};
+
+export type IntBlockTransactionContractGasServiceGetResponse =
+  IntBlockTransactionContractGasServiceGetResponses[keyof IntBlockTransactionContractGasServiceGetResponses];
+
+export type IntBlockTransactionSummaryServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The block number (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The block number (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The block number (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The block number (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The block number (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The block number (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The block number (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The block number (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The block number (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The block number (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: eq)
+     */
+    transaction_hash_eq?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ne)
+     */
+    transaction_hash_ne?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: contains)
+     */
+    transaction_hash_contains?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: starts_with)
+     */
+    transaction_hash_starts_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: ends_with)
+     */
+    transaction_hash_ends_with?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: like)
+     */
+    transaction_hash_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_like)
+     */
+    transaction_hash_not_like?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: in_values) (comma-separated list)
+     */
+    transaction_hash_in_values?: string;
+    /**
+     * The transaction hash (hex encoded with 0x prefix) (filter: not_in_values) (comma-separated list)
+     */
+    transaction_hash_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: eq)
+     */
+    transaction_index_eq?: number;
+    /**
+     * Position of the transaction within the block (filter: ne)
+     */
+    transaction_index_ne?: number;
+    /**
+     * Position of the transaction within the block (filter: lt)
+     */
+    transaction_index_lt?: number;
+    /**
+     * Position of the transaction within the block (filter: lte)
+     */
+    transaction_index_lte?: number;
+    /**
+     * Position of the transaction within the block (filter: gt)
+     */
+    transaction_index_gt?: number;
+    /**
+     * Position of the transaction within the block (filter: gte)
+     */
+    transaction_index_gte?: number;
+    /**
+     * Position of the transaction within the block (filter: between_min)
+     */
+    transaction_index_between_min?: number;
+    /**
+     * Position of the transaction within the block (filter: between_max_value)
+     */
+    transaction_index_between_max_value?: number;
+    /**
+     * Position of the transaction within the block (filter: in_values) (comma-separated list)
+     */
+    transaction_index_in_values?: string;
+    /**
+     * Position of the transaction within the block (filter: not_in_values) (comma-separated list)
+     */
+    transaction_index_not_in_values?: string;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: eq)
+     */
+    receipt_gas_used_eq?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: ne)
+     */
+    receipt_gas_used_ne?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: lt)
+     */
+    receipt_gas_used_lt?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: lte)
+     */
+    receipt_gas_used_lte?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: gt)
+     */
+    receipt_gas_used_gt?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: gte)
+     */
+    receipt_gas_used_gte?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: between_min)
+     */
+    receipt_gas_used_between_min?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: between_max_value)
+     */
+    receipt_gas_used_between_max_value?: number;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: in_values) (comma-separated list)
+     */
+    receipt_gas_used_in_values?: string;
+    /**
+     * Gas used from the transaction receipt, the total gas the transaction used (filter: not_in_values) (comma-separated list)
+     */
+    receipt_gas_used_not_in_values?: string;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: eq)
+     */
+    intrinsic_gas_eq?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: ne)
+     */
+    intrinsic_gas_ne?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: lt)
+     */
+    intrinsic_gas_lt?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: lte)
+     */
+    intrinsic_gas_lte?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: gt)
+     */
+    intrinsic_gas_gt?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: gte)
+     */
+    intrinsic_gas_gte?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: between_min)
+     */
+    intrinsic_gas_between_min?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: between_max_value)
+     */
+    intrinsic_gas_between_max_value?: number;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: in_values) (comma-separated list)
+     */
+    intrinsic_gas_in_values?: string;
+    /**
+     * Intrinsic transaction cost (21000 plus calldata). Null for failed transactions (filter: not_in_values) (comma-separated list)
+     */
+    intrinsic_gas_not_in_values?: string;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: eq)
+     */
+    gas_refund_eq?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: ne)
+     */
+    gas_refund_ne?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: lt)
+     */
+    gas_refund_lt?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: lte)
+     */
+    gas_refund_lte?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: gt)
+     */
+    gas_refund_gt?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: gte)
+     */
+    gas_refund_gte?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: between_min)
+     */
+    gas_refund_between_min?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: between_max_value)
+     */
+    gas_refund_between_max_value?: number;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: in_values) (comma-separated list)
+     */
+    gas_refund_in_values?: string;
+    /**
+     * Gas refunded to the transaction, 0 for failed transactions (filter: not_in_values) (comma-separated list)
+     */
+    gas_refund_not_in_values?: string;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: eq)
+     */
+    evm_gas_eq?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: ne)
+     */
+    evm_gas_ne?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: lt)
+     */
+    evm_gas_lt?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: lte)
+     */
+    evm_gas_lte?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: gt)
+     */
+    evm_gas_gt?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: gte)
+     */
+    evm_gas_gte?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: between_min)
+     */
+    evm_gas_between_min?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: between_max_value)
+     */
+    evm_gas_between_max_value?: number;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: in_values) (comma-separated list)
+     */
+    evm_gas_in_values?: string;
+    /**
+     * EVM execution gas of the whole call tree (the root frame cumulative gas) (filter: not_in_values) (comma-separated list)
+     */
+    evm_gas_not_in_values?: string;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: eq)
+     */
+    call_frame_count_eq?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: ne)
+     */
+    call_frame_count_ne?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: lt)
+     */
+    call_frame_count_lt?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: lte)
+     */
+    call_frame_count_lte?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: gt)
+     */
+    call_frame_count_gt?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: gte)
+     */
+    call_frame_count_gte?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: between_min)
+     */
+    call_frame_count_between_min?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: between_max_value)
+     */
+    call_frame_count_between_max_value?: number;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: in_values) (comma-separated list)
+     */
+    call_frame_count_in_values?: string;
+    /**
+     * Number of call frames in the transaction, including the root frame (filter: not_in_values) (comma-separated list)
+     */
+    call_frame_count_not_in_values?: string;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: eq)
+     */
+    max_depth_eq?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: ne)
+     */
+    max_depth_ne?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: lt)
+     */
+    max_depth_lt?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: lte)
+     */
+    max_depth_lte?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: gt)
+     */
+    max_depth_gt?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: gte)
+     */
+    max_depth_gte?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: between_min)
+     */
+    max_depth_between_min?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: between_max_value)
+     */
+    max_depth_between_max_value?: number;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: in_values) (comma-separated list)
+     */
+    max_depth_in_values?: string;
+    /**
+     * Deepest call depth in the transaction (0 = root only) (filter: not_in_values) (comma-separated list)
+     */
+    max_depth_not_in_values?: string;
+    /**
+     * Whether the root frame had an opcode that resulted in an error (filter: eq)
+     */
+    has_errors_eq?: boolean;
+    /**
+     * Whether the root frame had an opcode that resulted in an error (filter: ne)
+     */
+    has_errors_ne?: boolean;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: eq)
+     */
+    root_call_type_eq?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: ne)
+     */
+    root_call_type_ne?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: contains)
+     */
+    root_call_type_contains?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: starts_with)
+     */
+    root_call_type_starts_with?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: ends_with)
+     */
+    root_call_type_ends_with?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: like)
+     */
+    root_call_type_like?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: not_like)
+     */
+    root_call_type_not_like?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: in_values) (comma-separated list)
+     */
+    root_call_type_in_values?: string;
+    /**
+     * How the transaction started: CALL, CREATE, or the root frame call type (filter: not_in_values) (comma-separated list)
+     */
+    root_call_type_not_in_values?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: eq)
+     */
+    target_address_eq?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: ne)
+     */
+    target_address_ne?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: contains)
+     */
+    target_address_contains?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: starts_with)
+     */
+    target_address_starts_with?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: ends_with)
+     */
+    target_address_ends_with?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: like)
+     */
+    target_address_like?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: not_like)
+     */
+    target_address_not_like?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: in_values) (comma-separated list)
+     */
+    target_address_in_values?: string;
+    /**
+     * The address the transaction called (hex encoded with 0x prefix), null for contract creation (filter: not_in_values) (comma-separated list)
+     */
+    target_address_not_in_values?: string;
+    /**
+     * The maximum number of int_block_transaction_summary to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntBlockTransactionSummary` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_block_transaction_summary';
+};
+
+export type IntBlockTransactionSummaryServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockTransactionSummaryServiceListError =
+  IntBlockTransactionSummaryServiceListErrors[keyof IntBlockTransactionSummaryServiceListErrors];
+
+export type IntBlockTransactionSummaryServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntBlockTransactionSummaryResponse;
+};
+
+export type IntBlockTransactionSummaryServiceListResponse =
+  IntBlockTransactionSummaryServiceListResponses[keyof IntBlockTransactionSummaryServiceListResponses];
+
+export type IntBlockTransactionSummaryServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The block number
+     */
+    block_number: number;
+  };
+  query?: never;
+  url: '/api/v1/int_block_transaction_summary/{block_number}';
+};
+
+export type IntBlockTransactionSummaryServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntBlockTransactionSummaryServiceGetError =
+  IntBlockTransactionSummaryServiceGetErrors[keyof IntBlockTransactionSummaryServiceGetErrors];
+
+export type IntBlockTransactionSummaryServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntBlockTransactionSummaryResponse;
+};
+
+export type IntBlockTransactionSummaryServiceGetResponse =
+  IntBlockTransactionSummaryServiceGetResponses[keyof IntBlockTransactionSummaryServiceGetResponses];
 
 export type IntContractCreationServiceListData = {
   body?: never;
@@ -159737,6 +170447,474 @@ export type IntCustodyProbeOrderBySlotServiceGetResponses = {
 
 export type IntCustodyProbeOrderBySlotServiceGetResponse =
   IntCustodyProbeOrderBySlotServiceGetResponses[keyof IntCustodyProbeOrderBySlotServiceGetResponses];
+
+export type IntDataColumnGossipBySlotServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * Data column index (0-127) (filter: eq)
+     */
+    column_index_eq?: number;
+    /**
+     * Data column index (0-127) (filter: ne)
+     */
+    column_index_ne?: number;
+    /**
+     * Data column index (0-127) (filter: lt)
+     */
+    column_index_lt?: number;
+    /**
+     * Data column index (0-127) (filter: lte)
+     */
+    column_index_lte?: number;
+    /**
+     * Data column index (0-127) (filter: gt)
+     */
+    column_index_gt?: number;
+    /**
+     * Data column index (0-127) (filter: gte)
+     */
+    column_index_gte?: number;
+    /**
+     * Data column index (0-127) (filter: between_min)
+     */
+    column_index_between_min?: number;
+    /**
+     * Data column index (0-127) (filter: between_max_value)
+     */
+    column_index_between_max_value?: number;
+    /**
+     * Data column index (0-127) (filter: in_values) (comma-separated list)
+     */
+    column_index_in_values?: string;
+    /**
+     * Data column index (0-127) (filter: not_in_values) (comma-separated list)
+     */
+    column_index_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: eq)
+     */
+    beacon_block_root_eq?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: ne)
+     */
+    beacon_block_root_ne?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: contains)
+     */
+    beacon_block_root_contains?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: starts_with)
+     */
+    beacon_block_root_starts_with?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: ends_with)
+     */
+    beacon_block_root_ends_with?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: like)
+     */
+    beacon_block_root_like?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: not_like)
+     */
+    beacon_block_root_not_like?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: in_values) (comma-separated list)
+     */
+    beacon_block_root_in_values?: string;
+    /**
+     * Beacon block root of the earliest gossipsub sighting of the column (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_root_not_in_values?: string;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: eq)
+     */
+    beacon_block_root_variants_eq?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: ne)
+     */
+    beacon_block_root_variants_ne?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: lt)
+     */
+    beacon_block_root_variants_lt?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: lte)
+     */
+    beacon_block_root_variants_lte?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: gt)
+     */
+    beacon_block_root_variants_gt?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: gte)
+     */
+    beacon_block_root_variants_gte?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: between_min)
+     */
+    beacon_block_root_variants_between_min?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: between_max_value)
+     */
+    beacon_block_root_variants_between_max_value?: number;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: in_values) (comma-separated list)
+     */
+    beacon_block_root_variants_in_values?: string;
+    /**
+     * Number of block roots in the sightings (more than 1 means a fork) (filter: not_in_values) (comma-separated list)
+     */
+    beacon_block_root_variants_not_in_values?: string;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Number of blobs in the slot, the most KZG commitments a sighting carried (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: eq)
+     */
+    gossipsub_count_eq?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: ne)
+     */
+    gossipsub_count_ne?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: lt)
+     */
+    gossipsub_count_lt?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: lte)
+     */
+    gossipsub_count_lte?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: gt)
+     */
+    gossipsub_count_gt?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: gte)
+     */
+    gossipsub_count_gte?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: between_min)
+     */
+    gossipsub_count_between_min?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: between_max_value)
+     */
+    gossipsub_count_between_max_value?: number;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: in_values) (comma-separated list)
+     */
+    gossipsub_count_in_values?: string;
+    /**
+     * Number of gossipsub sightings of the column whose block root a beacon node accepted (filter: not_in_values) (comma-separated list)
+     */
+    gossipsub_count_not_in_values?: string;
+    /**
+     * The maximum number of int_data_column_gossip_by_slot to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntDataColumnGossipBySlot` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_data_column_gossip_by_slot';
+};
+
+export type IntDataColumnGossipBySlotServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntDataColumnGossipBySlotServiceListError =
+  IntDataColumnGossipBySlotServiceListErrors[keyof IntDataColumnGossipBySlotServiceListErrors];
+
+export type IntDataColumnGossipBySlotServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntDataColumnGossipBySlotResponse;
+};
+
+export type IntDataColumnGossipBySlotServiceListResponse =
+  IntDataColumnGossipBySlotServiceListResponses[keyof IntDataColumnGossipBySlotServiceListResponses];
+
+export type IntDataColumnGossipBySlotServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_data_column_gossip_by_slot/{slot_start_date_time}';
+};
+
+export type IntDataColumnGossipBySlotServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntDataColumnGossipBySlotServiceGetError =
+  IntDataColumnGossipBySlotServiceGetErrors[keyof IntDataColumnGossipBySlotServiceGetErrors];
+
+export type IntDataColumnGossipBySlotServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntDataColumnGossipBySlotResponse;
+};
+
+export type IntDataColumnGossipBySlotServiceGetResponse =
+  IntDataColumnGossipBySlotServiceGetResponses[keyof IntDataColumnGossipBySlotServiceGetResponses];
 
 export type IntEngineGetBlobsServiceListData = {
   body?: never;
