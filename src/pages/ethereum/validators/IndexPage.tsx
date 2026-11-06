@@ -227,12 +227,14 @@ export function IndexPage(): JSX.Element {
             title="Latest day"
             meta={snapshot.day}
             actions={
-              <Link
-                to="/ethereum/validators/inspect"
-                className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
-              >
-                Inspect validators
-              </Link>
+              currentNetwork?.name !== 'mainnet' && (
+                <Link
+                  to="/ethereum/validators/inspect"
+                  className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
+                >
+                  Inspect validators
+                </Link>
+              )
             }
           >
             <Stats
