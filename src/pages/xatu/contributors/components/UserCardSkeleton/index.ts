@@ -1,1 +1,0 @@
-export { UserCardSkeleton } from './UserCardSkeleton';

@@ -1,9 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { createRedirect } from '@/utils/redirect';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 /**
- * Legacy redirect: /xatu-data/geographical-checklist → /xatu/geographical-checklist
+ * Legacy redirect: /xatu-data/geographical-checklist → the Locations card on /xatu/nodes
  */
-export const Route = createFileRoute('/xatu-data/geographical-checklist')(
-  createRedirect('/xatu/geographical-checklist')
-);
+export const Route = createFileRoute('/xatu-data/geographical-checklist')({
+  beforeLoad: () => {
+    throw redirect({ to: '/xatu/nodes', hash: 'locations' });
+  },
+});

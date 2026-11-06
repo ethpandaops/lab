@@ -1,5 +1,5 @@
 import { type JSX, useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { DataTable } from '@/components/DataTable';
 import { Input } from '@/components/Forms/Input';
@@ -34,7 +34,22 @@ const columns: DataTableColumn<NodeRow>[] = [
     id: 'contributor',
     header: 'Contributor',
     accessorFn: row => row.node.username ?? '',
-    cell: ({ getValue }) => <span className="block max-w-32 truncate">{getValue() as string}</span>,
+    cell: ({ getValue }) => {
+      const username = getValue() as string;
+      if (!username) return '–';
+      return (
+        <Link
+          from="/xatu/nodes/"
+          to="/xatu/nodes"
+          search={prev => ({ ...prev, contributor: username })}
+          resetScroll={false}
+          onClick={event => event.stopPropagation()}
+          className="block max-w-32 truncate text-primary hover:underline"
+        >
+          {username}
+        </Link>
+      );
+    },
   },
   {
     id: 'client',

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 import { DetailPage } from '@/pages/ethereum/slots';
 
@@ -14,6 +14,7 @@ const slotSearchSchema = z.object({
       'payload',
       'execution',
       'mev',
+      // Moved to /xatu/nodes/resources; old links redirect there with the four params below
       'resources',
     ])
     .default('overview'),
@@ -33,10 +34,19 @@ const slotSearchSchema = z.object({
 export const Route = createFileRoute('/ethereum/slots/$slot')({
   component: DetailPage,
   validateSearch: slotSearchSchema,
-  beforeLoad: ({ params }) => ({
-    getBreadcrumb: () => ({ label: params.slot }),
-    redirectOnNetworkChange: '/ethereum/slots',
-  }),
+  beforeLoad: ({ params, search }) => {
+    if (search.tab === 'resources') {
+      const { node, metric, memMetric, refNodes } = search;
+      throw redirect({
+        to: '/xatu/nodes/resources',
+        search: { slot: Number(params.slot), node, metric, memMetric, refNodes },
+      });
+    }
+    return {
+      getBreadcrumb: () => ({ label: params.slot }),
+      redirectOnNetworkChange: '/ethereum/slots',
+    };
+  },
   head: ctx => ({
     meta: [
       {

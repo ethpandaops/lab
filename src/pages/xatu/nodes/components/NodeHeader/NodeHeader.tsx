@@ -72,8 +72,8 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
               <>
                 <span>Run by</span>
                 <Link
-                  to="/xatu/contributors/$id"
-                  params={{ id: node.username }}
+                  to="/xatu/nodes"
+                  search={{ contributor: node.username }}
                   className="font-medium text-foreground hover:text-primary"
                 >
                   {node.username}

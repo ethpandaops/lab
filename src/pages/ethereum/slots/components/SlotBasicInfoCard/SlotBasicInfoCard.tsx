@@ -16,6 +16,7 @@ import { DoraIcon } from '@/components/Ethereum/DoraIcon';
 import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
+import { useIsPageEnabled } from '@/hooks/useIsPageEnabled';
 import { useNetwork } from '@/hooks/useNetwork';
 import { GRAFFITI_FORMAT_LABELS, formatClientName } from '@/utils/graffiti';
 import { useSlotProposerClient, type ProposerClientField } from '../../hooks/useSlotProposerClient';
@@ -176,6 +177,8 @@ export function SlotBasicInfoCard({
     }
   };
 
+  const gasProfilerEnabled = useIsPageEnabled('/ethereum/execution/gas-profiler');
+
   // Build explorer links data
   const serviceUrls = currentNetwork?.service_urls;
   const explorerLinks = [
@@ -303,7 +306,17 @@ export function SlotBasicInfoCard({
                   <div>
                     <dt className="text-xs font-medium text-muted">Execution Block</dt>
                     <dd className="mt-1 text-base/7 font-semibold text-foreground">
-                      {blockHead.execution_payload_block_number}
+                      {gasProfilerEnabled ? (
+                        <Link
+                          to="/ethereum/execution/gas-profiler/block/$blockNumber"
+                          params={{ blockNumber: String(blockHead.execution_payload_block_number) }}
+                          className="text-primary hover:underline"
+                        >
+                          {blockHead.execution_payload_block_number}
+                        </Link>
+                      ) : (
+                        blockHead.execution_payload_block_number
+                      )}
                     </dd>
                   </div>
                 )}

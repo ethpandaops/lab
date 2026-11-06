@@ -44,7 +44,13 @@ export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
     <PopoutCard title="Xatu node locations" subtitle={rangeLabel} anchorId="node-map" modalSize="full">
       {({ inModal }) => (
         <div style={{ height: inModal ? 720 : 440 }}>
-          <Map2DChart points={points} height={inModal ? 720 : 440} pointSizeMultiplier={3} />
+          <Map2DChart
+            points={points}
+            height={inModal ? 720 : 440}
+            pointSizeMultiplier={3}
+            // The chart keeps every point it has seen; a new range or contributor replaces them
+            resetKey={points.map(point => `${point.coords}:${point.value}`).join('|')}
+          />
         </div>
       )}
     </PopoutCard>
