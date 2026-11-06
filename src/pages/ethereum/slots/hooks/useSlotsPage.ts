@@ -1,7 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useTableBounds } from '@/hooks/useBounds';
+import { useBounds } from '@/hooks/useBounds';
 import { slotToTimestamp, timestampToSlot } from '@/utils/beacon';
+import { fetchWidening, nowEnd, wideningWindows } from '@/utils/widening-window';
 import {
   fctBlockGraffitiServiceList,
   fctBlockHeadServiceList,
@@ -24,6 +25,7 @@ import {
   parseCursor,
   serverQuery,
   slotBounds,
+  VALUE_SORT_SECONDS,
   toSlotRow,
   type SlotFacts,
   type SlotRow,
@@ -135,6 +137,10 @@ export interface SlotsPageResult {
  * `headStart` is the first slot of fct_block_proposer_head. In slot order, slots before it are read from
  * int_block_proposer_canonical instead of the proposer and status tables, so the list reaches genesis.
  * `finalTo` is the last slot of fct_block; blocks up to it are shown from there (see `loadFacts`).
+ * `tableStarts` holds each table's first time from `/bounds`, by table name.
+ *
+ * Slot order reads each batch through widening windows from where the page starts, never the whole range at once.
+ * Value sorts read every row of their range, so without a slot or time range they cover the last `VALUE_SORT_SECONDS`.
  */
 export async function fetchSlotsPage(
   { filters, sort, dir, pageSize, cursor: cursorParam }: SlotsPageArgs,
@@ -142,6 +148,7 @@ export async function fetchSlotsPage(
   withPtc: boolean,
   headStart?: number,
   finalTo?: number,
+  tableStarts: Record<string, number | undefined> = {},
   signal?: AbortSignal
 ): Promise<SlotsPageResult> {
   const driver = chooseDriver(filters, sort);
@@ -158,17 +165,21 @@ export async function fetchSlotsPage(
       ? headStart
       : undefined;
   // The MEV table trails the block table by a few slots; blocks past it are not yet known to be local
-  const mevLatest = listRows(
-    'mev',
-    { slot_start_date_time_gte: genesisTime, order_by: 'slot desc', page_size: 1 },
-    signal
-  )
+  const mevLatest = fetchWidening(wideningWindows(nowEnd(), tableStarts[TABLES.mev.key]), 1, async window => {
+    const { rows } = await listRows(
+      'mev',
+      { slot_start_date_time_gte: window.gte, slot_start_date_time_lt: window.lt, order_by: 'slot desc', page_size: 1 },
+      signal
+    );
+    return rows;
+  })
     .then(({ rows }) => (typeof rows[0]?.slot === 'number' ? rows[0].slot : -1))
     .catch(() => Number.POSITIVE_INFINITY);
   const mevCoveredTo = filters.source === 'local' ? await mevLatest : Infinity;
   const passes = (slot: number): boolean => matchesFilters(facts.get(slot)!, filters, mevCoveredTo);
 
-  let lo = bounds.min ?? 0;
+  const recentOnly = sort !== 'slot' && bounds.min === undefined && bounds.max === undefined;
+  let lo = bounds.min ?? (recentOnly ? Math.max(0, timestampToSlot(nowEnd() - VALUE_SORT_SECONDS, genesisTime)) : 0);
   let hi = bounds.max ?? Number.POSITIVE_INFINITY;
 
   /**
@@ -183,17 +194,33 @@ export async function fetchSlotsPage(
   ): Promise<{ slots: number[]; next?: string }> => {
     const tableJoins = table === 'canonical' ? joins.filter(join => join !== 'status') : joins;
     const batchSize = tableJoins.length > 0 || (table === 'canonical' && filters.status) ? SCAN_BATCH : pageSize;
-    const { rows, next } = await listRows(
-      table,
-      {
-        ...serverQuery(table, filters),
-        slot_start_date_time_gte: slotToTimestamp(from, genesisTime),
-        ...(Number.isFinite(to) && { slot_start_date_time_lte: slotToTimestamp(to, genesisTime) }),
-        ...query,
-        page_size: batchSize,
-      },
-      signal
-    );
+    const base = { ...serverQuery(table, filters), ...query, page_size: batchSize };
+    let rows: Record<string, unknown>[];
+    let next: string | undefined;
+    if (sort === 'slot') {
+      // From the page's edge outwards: down from `to` (or now) newest first, up from `from` oldest first
+      const floor = Math.max(slotToTimestamp(from, genesisTime), tableStarts[TABLES[table].key] ?? 0);
+      const end = Number.isFinite(to) ? slotToTimestamp(to, genesisTime) + 1 : nowEnd();
+      const windows = query.order_by === 'slot asc' ? wideningWindows(floor, end, 'asc') : wideningWindows(end, floor);
+      ({ rows } = await fetchWidening(windows, batchSize, async window => {
+        const page = await listRows(
+          table,
+          { ...base, slot_start_date_time_gte: window.gte, slot_start_date_time_lt: window.lt },
+          signal
+        );
+        return page.rows;
+      }));
+    } else {
+      ({ rows, next } = await listRows(
+        table,
+        {
+          ...base,
+          slot_start_date_time_gte: slotToTimestamp(from, genesisTime),
+          ...(Number.isFinite(to) && { slot_start_date_time_lte: slotToTimestamp(to, genesisTime) }),
+        },
+        signal
+      ));
+    }
     const slots: number[] = [];
     for (const row of rows) {
       applyRow(table, row, facts);
@@ -327,18 +354,20 @@ export interface UseSlotsPageReturn {
 export function useSlotsPage(args: SlotsPageArgs, withPtc: boolean): UseSlotsPageReturn {
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time;
-  const { data: headBounds, isLoading: boundsLoading } = useTableBounds('fct_block_proposer_head');
-  const { data: finalBounds, isLoading: finalLoading } = useTableBounds('fct_block');
+  const { data: allBounds, isLoading: boundsLoading } = useBounds();
+  const headBounds = allBounds?.fct_block_proposer_head;
+  const finalBounds = allBounds?.fct_block;
   const headStart =
     headBounds && genesisTime !== undefined ? Math.max(0, timestampToSlot(headBounds.min, genesisTime)) : undefined;
   const finalTo = finalBounds && genesisTime !== undefined ? timestampToSlot(finalBounds.max, genesisTime) : undefined;
+  const tableStarts = Object.fromEntries(Object.values(TABLES).map(({ key }) => [key, allBounds?.[key]?.min]));
   const followsHead =
     args.sort === 'slot' && !args.cursor && args.filters.slotMax === undefined && !args.filters.timeEnd;
 
   const query = useQuery({
-    queryKey: ['slots-list', currentNetwork?.name, args, withPtc, headStart, finalTo],
-    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, headStart, finalTo, signal),
-    enabled: genesisTime !== undefined && !boundsLoading && !finalLoading,
+    queryKey: ['slots-list', currentNetwork?.name, args, withPtc, headStart, finalTo, tableStarts],
+    queryFn: ({ signal }) => fetchSlotsPage(args, genesisTime!, withPtc, headStart, finalTo, tableStarts, signal),
+    enabled: genesisTime !== undefined && !boundsLoading,
     placeholderData: keepPreviousData,
     refetchInterval: followsHead ? 12_000 : false,
     staleTime: followsHead ? 0 : 60_000,

@@ -22,6 +22,8 @@ export interface PreparedBlocksTableProps {
   error: Error | null;
   hasNextPage: boolean;
   isFiltered: boolean;
+  /** Whether the columns sort; off leaves the newest blocks first */
+  sortable: boolean;
   sort: BlockSortKey;
   order: 'asc' | 'desc';
   onSortChange: (sort: BlockSortKey | undefined, order: 'asc' | 'desc' | undefined) => void;
@@ -128,6 +130,8 @@ const columns: DataTableColumn<FctPreparedBlock>[] = [
   },
 ];
 
+const unsortedColumns = columns.map(column => ({ ...column, enableSorting: false }));
+
 /**
  * Locally built blocks, one per node and slot, filtered, sorted and paged by the API.
  */
@@ -137,6 +141,7 @@ export function PreparedBlocksTable({
   error,
   hasNextPage,
   isFiltered,
+  sortable,
   sort,
   order,
   onSortChange,
@@ -151,7 +156,7 @@ export function PreparedBlocksTable({
       ) : (
         <DataTable
           data={blocks}
-          columns={columns}
+          columns={sortable ? columns : unsortedColumns}
           isLoading={isLoading}
           getRowId={row => `${row.slot}-${row.meta_client_name}`}
           sorting={[{ id: sort, desc: order === 'desc' }] satisfies SortingState}

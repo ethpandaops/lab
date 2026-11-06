@@ -1,5 +1,7 @@
-import type { FctPreparedBlockServiceListData } from '@/api/types.gen';
+import { fctPreparedBlockServiceList } from '@/api/sdk.gen';
+import type { FctPreparedBlock, FctPreparedBlockServiceListData } from '@/api/types.gen';
 import { slotToTimestamp } from '@/utils/beacon';
+import { fetchNewestFirst, nowEnd, type NewestFirstPage, type TimeCursor } from '@/utils/widening-window';
 import type { BlockFilters, BlockSortKey } from '../IndexPage.types';
 
 export type PreparedBlockQuery = NonNullable<FctPreparedBlockServiceListData['query']>;
@@ -17,12 +19,13 @@ const scale = (value: number | undefined, factor: number): number | undefined =>
   value === undefined ? undefined : Math.round(value * factor);
 
 /**
- * API filters for prepared blocks. A slot range replaces the time window, which starts at `windowStart`.
- * The execution client only appears in the node name, so it matches the name's client segment.
+ * API filters for prepared blocks. A slot range replaces the time window, which starts at `windowStart`: the table's
+ * start for all history, undefined until it is known. The execution client only appears in the node name, so it
+ * matches the name's client segment.
  */
 export function preparedBlockFilters(
   filters: BlockFilters,
-  windowStart: number,
+  windowStart: number | undefined,
   genesisTime: number
 ): PreparedBlockQuery {
   const query: PreparedBlockQuery = {
@@ -49,6 +52,40 @@ export function preparedBlockOrder(sort: BlockSortKey, order: 'asc' | 'desc'): s
   if (sort !== 'slot') keys.push('slot_start_date_time desc');
   if (sort !== 'node') keys.push('meta_client_name asc');
   return keys.join(', ');
+}
+
+/**
+ * One page of the newest prepared blocks matching `filters`, read through widening windows from the end of their
+ * range, or now, back to its start; `cursor` continues from an earlier page.
+ */
+export function fetchNewestPreparedBlocks(
+  filters: PreparedBlockQuery,
+  pageSize: number,
+  cursor: TimeCursor | undefined,
+  signal?: AbortSignal
+): Promise<NewestFirstPage<FctPreparedBlock>> {
+  const { slot_start_date_time_gte: floor, slot_start_date_time_lte: last, ...rest } = filters;
+  return fetchNewestFirst({
+    pageSize,
+    end: cursor?.end ?? (last !== undefined ? last + 1 : nowEnd()),
+    skip: cursor?.skip,
+    floor,
+    timeOf: row => row.slot_start_date_time,
+    fetchWindow: async (window, limit) => {
+      const { data } = await fctPreparedBlockServiceList({
+        query: {
+          ...rest,
+          slot_start_date_time_gte: window.gte,
+          slot_start_date_time_lt: window.lt,
+          order_by: preparedBlockOrder('slot', 'desc'),
+          page_size: limit,
+        },
+        signal,
+        throwOnError: true,
+      });
+      return data.fct_prepared_block ?? [];
+    },
+  });
 }
 
 /** Node id from a node name such as ethpandaops/mainnet/utility-mainnet-teku-erigon-001 */

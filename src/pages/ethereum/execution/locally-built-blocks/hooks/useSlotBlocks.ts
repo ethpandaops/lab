@@ -1,9 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fctPreparedBlockServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { parseExecutionClient } from '../utils';
-import type { PreparedBlockQuery } from '../utils/block-query';
+import { type PreparedBlockQuery, fetchNewestPreparedBlocks } from '../utils/block-query';
 
 /**
  * Extended block data with client names: execution from the node name, consensus from meta_consensus_implementation
@@ -76,15 +75,14 @@ export function useSlotBlocks(filters: PreparedBlockQuery, live: boolean): UseSl
   const { currentNetwork } = useNetwork();
 
   const { data, error, isPending, isFetching } = useQuery({
-    ...fctPreparedBlockServiceListOptions({
-      query: { ...filters, page_size: TIMELINE_ROWS, order_by: 'slot_start_date_time desc' },
-    }),
+    queryKey: ['locally-built-blocks', 'timeline', currentNetwork?.name, filters],
+    queryFn: ({ signal }) => fetchNewestPreparedBlocks(filters, TIMELINE_ROWS, undefined, signal),
     enabled: !!currentNetwork && filters.slot_start_date_time_gte !== undefined,
     placeholderData: keepPreviousData,
     refetchInterval: live ? LIVE_REFETCH_MS : false,
   });
 
-  const parsedBlocks: ParsedBlock[] = (data?.fct_prepared_block ?? []).map(block => ({
+  const parsedBlocks: ParsedBlock[] = (data?.rows ?? []).map(block => ({
     ...block,
     parsedExecutionClient: parseExecutionClient(block.meta_client_name),
     parsedConsensusClient: block.meta_consensus_implementation?.toLowerCase() || null,
