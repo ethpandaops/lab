@@ -18,9 +18,9 @@ The API describes itself. Use these endpoints to find what data exists, what eac
 - Each table's endpoint is `GET /api/v1/{network}/{table}`, the `path` in the table list. It returns JSON with the rows in an array named after the table.
 - Filters are query parameters named `<field>_<operator>`, using the operators in the field's `filters`. `in_values` and `not_in_values` take comma-separated lists.
 - Send at least one filter on a `primary_key` field, or the API answers `{"code":3,"message":"primary key field <field> is required"}`.
+- Filter that `primary_key` field to a small window inside the table's `bounds`, such as `slot_start_date_time_gte=<now - 3600>&slot_start_date_time_lt=<now>` or one `_eq` value. An open range like `slot_start_date_time_gte=0` or `validator_index_gte=0` makes the server read the whole table even with a small `page_size`, and the request times out.
 - `page_size`, `page_token` and `order_by` control paging and order; each response's `next_page_token` fetches the next page.
 - Read the error messages; they say what is missing or invalid.
-- Please keep requests bounded with filters and reasonable page sizes.
 
 ## Raw data
 
