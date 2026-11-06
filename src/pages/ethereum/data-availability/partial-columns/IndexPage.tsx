@@ -18,10 +18,10 @@ import {
   formatTooltipDate,
   type TooltipItem,
 } from '@/pages/ethereum/execution/overview/overview.utils';
-import { CompletionBlocksTable, PartialColumnsSkeleton, SentryFilter, VersionAdoption } from './components';
-import { useCompletionBlocks, usePartialColumnRollups } from './hooks';
+import { PartialColumnsSkeleton, SentryFilter, SlowestBlocks, VersionAdoption } from './components';
+import { useSlowestBlocks, usePartialColumnRollups } from './hooks';
 import {
-  BLOCKS_PAGE_SIZE,
+  SLOWEST_BLOCKS_MAX_DAYS,
   COMPLETION_HOURLY_TABLE,
   COMPLETION_PATHS,
   DEFAULT_TIME_PERIOD,
@@ -30,13 +30,7 @@ import {
   TIME_PERIOD_OPTIONS,
   TIME_RANGE_CONFIG,
 } from './constants';
-import {
-  BLOCK_FILTER_KEYS,
-  type BlockFilters,
-  type BlockSortKey,
-  type PartialColumnsSearch,
-  type TimePeriod,
-} from './IndexPage.types';
+import { type PartialColumnsSearch, type TimePeriod } from './IndexPage.types';
 import {
   buildAdoptionSeries,
   buildCellSourceSeries,
@@ -81,12 +75,7 @@ function seriesItems(
   });
 }
 
-/** The blocks table filters out of a search, every key present so a navigation also clears removed filters */
-function pickBlockFilters(search: BlockFilters): BlockFilters {
-  return Object.fromEntries(BLOCK_FILTER_KEYS.map(key => [key, search[key]]));
-}
-
-/** Partial columns page: partial message adoption, how sentry nodes complete their columns, and recent blocks. */
+/** Partial columns page: partial message adoption, how sentry nodes complete their columns, and the slowest blocks. */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/data-availability/partial-columns' });
   const search = useSearch({ from: '/ethereum/data-availability/partial-columns' });
@@ -122,20 +111,7 @@ export function IndexPage(): JSX.Element {
     tableBounds && (config.days === null || windowStart < tableBounds.min)
       ? formatTooltipDate(new Date(tableBounds.min * 1000).toISOString().slice(0, 10), true)
       : null;
-  const blockFilters = pickBlockFilters(search);
-  const blockSort: BlockSortKey = search.sort ?? 'slot';
-  const blockOrder = search.order ?? 'desc';
-  const blockPage = search.page ?? 0;
-  const blockPageSize = search.pageSize ?? BLOCKS_PAGE_SIZE;
-  const blocks = useCompletionBlocks({
-    since: windowStart,
-    until: windowEnd,
-    filters: blockFilters,
-    sort: blockSort,
-    order: blockOrder,
-    page: blockPage,
-    pageSize: blockPageSize,
-  });
+  const slowest = useSlowestBlocks(windowStart, windowEnd);
 
   const completion = useMemo(() => summariseCompletions(sentryPaths), [sentryPaths]);
   const partials = useMemo(() => summarisePartials(sentryPartials), [sentryPartials]);
@@ -269,7 +245,7 @@ export function IndexPage(): JSX.Element {
             <SegmentedControl
               options={TIME_PERIOD_OPTIONS}
               value={timePeriod}
-              onChange={value => setSearch({ t: value, page: undefined })}
+              onChange={value => setSearch({ t: value })}
               ariaLabel="Time window"
             />
             <SentryFilter clients={sentryClients} value={sentry} onChange={client => setSearch({ sentry: client })} />
@@ -551,30 +527,15 @@ export function IndexPage(): JSX.Element {
           )}
 
           {hasData && !error && (
-            <CompletionBlocksTable
-              blocks={blocks.blocks}
-              isLoading={blocks.isLoading}
-              error={blocks.error}
-              hasNextPage={blocks.hasNextPage}
-              filters={blockFilters}
-              onFiltersChange={filters => setSearch({ ...pickBlockFilters(filters), page: undefined })}
-              sort={blockSort}
-              order={blockOrder}
-              onSortChange={(sort, order) =>
-                setSearch({
-                  sort: sort === 'slot' && order === 'desc' ? undefined : sort,
-                  order: sort === 'slot' && order === 'desc' ? undefined : order,
-                  page: undefined,
-                })
+            <SlowestBlocks
+              blocks={slowest.blocks}
+              scope={
+                slowest.capped
+                  ? `By p90 column completion, last ${SLOWEST_BLOCKS_MAX_DAYS} days`
+                  : 'By p90 column completion'
               }
-              page={blockPage}
-              pageSize={blockPageSize}
-              onPageChange={(page, pageSize) =>
-                setSearch({
-                  page: pageSize === blockPageSize && page > 0 ? page : undefined,
-                  pageSize: pageSize === BLOCKS_PAGE_SIZE ? undefined : pageSize,
-                })
-              }
+              isLoading={slowest.isLoading}
+              error={slowest.error}
             />
           )}
         </div>
