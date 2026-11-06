@@ -11,13 +11,15 @@ export interface NodeMapProps {
 }
 
 /**
- * Node locations, one point per city sized by node count. Every Xatu node that reported in the range carries its latest location.
+ * Xatu node locations, one point per city sized by its Xatu nodes. Every Xatu node that reported in the range carries its latest location.
  */
 export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
   const points = useMemo(() => {
     const byLocation = new Map<string, PointData>();
+    // Points are sized by Xatu nodes, not by their rotating node IDs
+    const xatuNodesAt = new Map<string, Set<string>>();
 
-    rows.forEach(({ node, nodeId }) => {
+    rows.forEach(({ node, nodeId, xatuNode }) => {
       const { meta_client_geo_latitude: lat, meta_client_geo_longitude: lon } = node;
       // 0,0 is the geo lookup's fallback for a node it couldn't place
       if (lat == null || lon == null || (lat === 0 && lon === 0)) return;
@@ -28,6 +30,7 @@ export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
           coords: [lon, lat],
           nodes: [],
         });
+        xatuNodesAt.set(key, new Set());
       }
       byLocation.get(key)!.nodes!.push({
         nodeId,
@@ -35,9 +38,10 @@ export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
         client: node.meta_consensus_implementation,
         country: node.meta_client_geo_country,
       });
+      xatuNodesAt.get(key)!.add(xatuNode);
     });
 
-    return [...byLocation.values()].map(point => ({ ...point, value: point.nodes!.length }));
+    return [...byLocation.entries()].map(([key, point]) => ({ ...point, value: xatuNodesAt.get(key)!.size }));
   }, [rows]);
 
   return (

@@ -41,7 +41,7 @@ function groupBy(rows: NodeRow[], levels: Array<(row: NodeRow) => { key: string;
     .map(([key, group]) => ({
       key,
       label: group.label,
-      count: group.rows.length,
+      count: new Set(group.rows.map(row => row.xatuNode)).size,
       children: groupBy(group.rows, rest),
     }))
     .sort((a, b) => b.count - a.count);
@@ -109,7 +109,8 @@ function GroupList({ groups, total }: { groups: Group[]; total: number }): JSX.E
 }
 
 /**
- * Node IDs by continent, then country, then city; each level opens the next.
+ * Xatu nodes by continent, then country, then city; each level opens the next. A node counts where its node IDs were
+ * last seen, so a node that moved counts in both places.
  */
 export function LocationsBreakdown({ rows, rangeLabel }: LocationsBreakdownProps): JSX.Element {
   const continents = groupBy(rows, LEVELS);
@@ -118,9 +119,9 @@ export function LocationsBreakdown({ rows, rangeLabel }: LocationsBreakdownProps
     <PopoutCard title="Locations" subtitle={rangeLabel} anchorId="locations" enableDownload={false}>
       <div className="mb-2 flex gap-3 text-xs/5 font-medium text-muted">
         <span className="flex-1" />
-        <span className="text-right">Node IDs</span>
+        <span className="text-right">Xatu nodes</span>
       </div>
-      <GroupList groups={continents} total={rows.length} />
+      <GroupList groups={continents} total={new Set(rows.map(row => row.xatuNode)).size} />
     </PopoutCard>
   );
 }

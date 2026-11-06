@@ -5,12 +5,17 @@ import { useNetwork } from '@/hooks/useNetwork';
 /** Hashed node names start with these; named nodes never rotate and are their own node */
 const HASHED_NAME_PREFIXES = ['pub-', 'corp-'] as const;
 
+export interface UseStableNodesResult {
+  /** Node ID → the Xatu node it belongs to; an ID missing from it is its own node */
+  stable: Map<string, string>;
+  isLoading: boolean;
+}
+
 /**
  * Maps each Xatu node ID to the node it belongs to. A hashed node ID changes whenever the beacon node's p2p key
  * changes (every restart on nimbus without --netkey-file), and dim_xatu_node chains those IDs back into one node.
- * Returns null while loading; an ID missing from the map is its own node.
  */
-export function useStableNodes(): Map<string, string> | null {
+export function useStableNodes(): UseStableNodesResult {
   const { currentNetwork } = useNetwork();
 
   return useQueries({
@@ -19,7 +24,6 @@ export function useStableNodes(): Map<string, string> | null {
       enabled: !!currentNetwork,
     })),
     combine: results => {
-      if (results.some(result => !result.data)) return null;
       const stable = new Map<string, string>();
       results.forEach(result =>
         result.data?.dim_xatu_node?.forEach(row => {
@@ -28,7 +32,7 @@ export function useStableNodes(): Map<string, string> | null {
           }
         })
       );
-      return stable;
+      return { stable, isLoading: results.some(result => result.isLoading) };
     },
   });
 }

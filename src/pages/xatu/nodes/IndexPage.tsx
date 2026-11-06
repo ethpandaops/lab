@@ -27,21 +27,17 @@ import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
-import { useStableNodes } from './hooks/useStableNodes';
 import { formatMs, median } from './utils/node-stats';
 
-/** Count rows by key */
-function groupRows(
-  rows: NodeRow[],
-  keyOf: (row: NodeRow) => string | undefined
-): Map<string, { count: number; sample: NodeRow }> {
-  const groups = new Map<string, { count: number; sample: NodeRow }>();
+/** Count Xatu nodes by key */
+function groupRows(rows: NodeRow[], keyOf: (row: NodeRow) => string | undefined): Map<string, { count: number }> {
+  const groups = new Map<string, Set<string>>();
   rows.forEach(row => {
     const key = keyOf(row) || 'unknown';
-    if (!groups.has(key)) groups.set(key, { count: 0, sample: row });
-    groups.get(key)!.count++;
+    if (!groups.has(key)) groups.set(key, new Set());
+    groups.get(key)!.add(row.xatuNode);
   });
-  return groups;
+  return new Map([...groups].map(([key, nodes]) => [key, { count: nodes.size }]));
 }
 
 /**
@@ -55,7 +51,6 @@ export function IndexPage(): JSX.Element {
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const contributor = search.contributor;
   const { rows: allRows, block, isLoading, error } = useNodeRows(range);
-  const stableNodes = useStableNodes();
   const networkHistory = useNetworkHistory(range);
 
   if (isLoading) {
@@ -82,8 +77,7 @@ export function IndexPage(): JSX.Element {
     .sort((a, b) => a.localeCompare(b));
 
   // Node IDs that rotate on restart are one Xatu node
-  const countNodes = (nodeRows: NodeRow[]): number | string =>
-    stableNodes ? new Set(nodeRows.map(row => stableNodes.get(row.nodeId) ?? row.nodeId)).size : '–';
+  const countNodes = (nodeRows: NodeRow[]): number => new Set(nodeRows.map(row => row.xatuNode)).size;
   const online = countNodes(rows.filter(row => row.online));
   const contributors = new Set(rows.map(row => row.node.username).filter(Boolean)).size;
   const countries = new Set(rows.map(row => row.node.meta_client_geo_country_code).filter(Boolean)).size;

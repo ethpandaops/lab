@@ -39,7 +39,7 @@ export function BreakdownList({ title, subtitle, items, limit = 8 }: BreakdownLi
     <Card title={title} subtitle={subtitle}>
       <div className="mb-2 flex gap-3 text-xs/5 font-medium text-muted">
         <span className="flex-1" />
-        <span className="text-right">Node IDs</span>
+        <span className="text-right">Xatu nodes</span>
       </div>
       <ul className="flex flex-col gap-2.5">
         {shown.map(item => (
