@@ -8,13 +8,10 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { DataTable } from '@/components/DataTable';
 import { Epoch } from '@/components/Ethereum/Epoch';
-import { TopEntitiesChart } from '@/components/Ethereum/TopEntitiesChart';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { noDataBefore } from '@/pages/ethereum/slots/hooks/useSlotTableCoverage';
 
 import { useEpochsData } from './hooks';
 import { EpochsFilters } from './components/EpochsFilters';
-import { OfflineValidatorsTable } from './components/OfflineValidatorsTable';
 import type { EpochRow } from './utils/epoch-query';
 import { DEFAULT_PAGE_SIZE, EPOCH_FILTER_KEYS, type EpochFilters, type EpochsSearch } from './IndexPage.types';
 
@@ -22,7 +19,7 @@ const column = createColumnHelper<EpochRow>();
 
 /**
  * Epochs list: the latest epochs by default, narrowed by range, participation and missed-slot filters that live
- * in the URL, with the offline validators for the epochs on the page.
+ * in the URL.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/epochs/' });
@@ -35,15 +32,12 @@ export function IndexPage(): JSX.Element {
   const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
   const pageIndex = search.page ?? 0;
 
-  const { data, missedAttestationsByEntity, offlineDataStart, isLoading, isPlaceholderData, error, currentEpoch } =
-    useEpochsData({
-      filters,
-      pageSize,
-      cursor: search.cursor,
-    });
+  const { data, isLoading, isPlaceholderData, error, currentEpoch } = useEpochsData({
+    filters,
+    pageSize,
+    cursor: search.cursor,
+  });
   const rows = data?.rows ?? [];
-  const epochs = rows.map(row => row.epoch);
-  const offlineEmpty = offlineDataStart ? noDataBefore(offlineDataStart) : 'No offline validators in these epochs';
 
   const setFilters = useCallback(
     (next: EpochFilters) =>
@@ -167,22 +161,6 @@ export function IndexPage(): JSX.Element {
             paginationPosition="both"
           />
         </div>
-
-        {epochs.length > 0 && (
-          <>
-            <TopEntitiesChart
-              data={missedAttestationsByEntity.map(m => ({ x: m.epoch, entity: m.entity, count: m.count }))}
-              xAxis={{ name: 'Epoch', min: Math.min(...epochs), max: Math.max(...epochs) }}
-              yAxis={{ name: 'Missed' }}
-              title="Offline Validators"
-              topN={10}
-              anchorId="offline-validators-chart"
-              emptyMessage={offlineEmpty}
-            />
-
-            <OfflineValidatorsTable data={missedAttestationsByEntity} epochs={epochs} emptyMessage={offlineEmpty} />
-          </>
-        )}
       </div>
     </Container>
   );

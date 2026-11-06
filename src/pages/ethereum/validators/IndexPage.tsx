@@ -15,11 +15,8 @@ import { useForks } from '@/hooks/useForks';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { epochToTimestamp, getDataVizColors } from '@/utils';
-import {
-  fctAttestationParticipationRateDailyServiceListOptions,
-  fctHeadVoteCorrectnessRateDailyServiceListOptions,
-  fctMissedSlotRateDailyServiceListOptions,
-} from '@/api/@tanstack/react-query.gen';
+import { fctProposerRewardDailyServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { buildProposerRewardChartConfig } from '@/pages/ethereum/consensus/overview/overview.utils';
 import { Alert } from '@/components/Feedback/Alert';
 import { InspectSection, ValidatorsSkeleton } from './components';
 import { useOverviewData } from './hooks/useOverviewData';
@@ -169,35 +166,26 @@ export function IndexPage(): JSX.Element {
     : null;
   const exitEth = queue ? (queue.exit_queue_effective_balance ?? 0) / 1e9 : null;
 
-  // --- Real duty performance from existing daily tables ---
+  // MEV relay reward per canonical MEV block: one row per day, plotted on its own daily axis
   const dailyQuery = { day_start_date_ne: currentUtcDate(), order_by: 'day_start_date desc', page_size: 10_000 };
-  const participation = useQuery(fctAttestationParticipationRateDailyServiceListOptions({ query: dailyQuery }));
-  const headVote = useQuery(fctHeadVoteCorrectnessRateDailyServiceListOptions({ query: dailyQuery }));
-  const missed = useQuery(fctMissedSlotRateDailyServiceListOptions({ query: dailyQuery }));
-  // Network-level daily rates: one row per day, plotted on their own daily axis
+  const proposerReward = useQuery(fctProposerRewardDailyServiceListOptions({ query: dailyQuery }));
   const firstDay = days[0]?.day ?? '';
-  const dutyDays = [
-    ...new Set(
-      (participation.data?.fct_attestation_participation_rate_daily ?? [])
-        .map(r => r.day_start_date ?? '')
-        .filter(d => d >= firstDay)
-    ),
-  ].sort();
-  const dutyLabels = dutyDays.map(formatDayLabel);
-  const dutyForkMarks = forkMarks(dutyDays, dutyLabels);
-  const byDay = <T extends { day_start_date?: string }>(
-    rows: T[] | undefined,
-    pick: (r: T) => number | undefined
-  ): (number | null)[] => {
-    const m = new Map(rows?.map(r => [r.day_start_date ?? '', pick(r)]));
-    return dutyDays.map(d => m.get(d) ?? null);
-  };
-  const participationSeries = byDay(
-    participation.data?.fct_attestation_participation_rate_daily,
-    r => r.avg_participation_rate
-  );
-  const headVoteSeries = byDay(headVote.data?.fct_head_vote_correctness_rate_daily, r => r.avg_head_vote_rate);
-  const missedSeries = byDay(missed.data?.fct_missed_slot_rate_daily, r => r.missed_rate);
+  const rewardRows = (proposerReward.data?.fct_proposer_reward_daily ?? [])
+    .filter(r => (r.day_start_date ?? '') >= firstDay)
+    .sort((a, b) => (a.day_start_date ?? '').localeCompare(b.day_start_date ?? ''));
+  const rewardDays = rewardRows.map(r => r.day_start_date ?? '');
+  const rewardChart = buildProposerRewardChartConfig(rewardRows, rewardDays, true);
+  const rewardForkMarks = forkMarks(rewardDays, rewardChart.labels);
+  // The reward table starts inside long windows; weekly windows start on a Monday, so allow a week's slack
+  const rewardStart =
+    rewardDays[0] && firstDay && Date.parse(rewardDays[0]) - Date.parse(firstDay) > 7 * 86_400_000
+      ? new Date(`${rewardDays[0]}T00:00:00Z`).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: 'UTC',
+        })
+      : undefined;
 
   const rangeControls = (
     <div className="flex flex-wrap items-center gap-4">
@@ -612,38 +600,21 @@ export function IndexPage(): JSX.Element {
               </PopoutCard>
 
               <PopoutCard
-                title="Duty performance"
-                subtitle="Head vote correct is the share of each slot's committee that voted for that slot's block, from attestations on the canonical chain, averaged over slots. A missed slot counts as 0%."
-                anchorId="duty-performance"
+                title="Proposer reward (MEV relay)"
+                subtitle={`Per canonical MEV block, per day${rewardStart ? `. Data starts ${rewardStart}` : ''}`}
+                anchorId="proposer-reward"
                 modalSize="full"
               >
                 {({ inModal }) => (
                   <MultiLineChart
-                    series={[
-                      {
-                        name: 'Attestation participation',
-                        data: participationSeries,
-                        color: palette[0],
-                        showSymbol: false,
-                      },
-                      { name: 'Head vote correct', data: headVoteSeries, color: palette[1], showSymbol: false },
-                      {
-                        name: 'Missed slots',
-                        data: missedSeries,
-                        color: themeColors.danger,
-                        showSymbol: false,
-                        yAxisIndex: 1,
-                      },
-                    ]}
-                    xAxis={{ type: 'category', labels: dutyLabels }}
-                    yAxis={{ name: 'Rate (%)', min: 'dataMin', max: 100 }}
-                    secondaryYAxis={{ name: 'Missed (%)', min: 0 }}
+                    series={rewardChart.series}
+                    xAxis={{ type: 'category', labels: rewardChart.labels }}
+                    yAxis={{ name: 'Reward (ETH)', min: 0 }}
                     height={inModal ? 600 : 280}
                     showLegend
                     legendPosition="top"
                     enableDataZoom
-                    connectNulls
-                    markLines={dutyForkMarks}
+                    markLines={rewardForkMarks}
                     syncGroup={inModal ? undefined : 'validators-overview'}
                   />
                 )}

@@ -1,15 +1,10 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctAttestationCorrectnessHeadServiceList,
-  fctAttestationLivenessByEntityHeadServiceList,
   fctBlockProposerHeadServiceList,
   fctEpochSummaryCanonicalServiceList,
 } from '@/api/sdk.gen';
-import type {
-  FctAttestationCorrectnessHead,
-  FctAttestationLivenessByEntityHead,
-  FctBlockProposerHead,
-} from '@/api/types.gen';
+import type { FctAttestationCorrectnessHead, FctBlockProposerHead } from '@/api/types.gen';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
@@ -28,7 +23,6 @@ import {
   summaryQuery,
   type EpochRow,
 } from '../utils/epoch-query';
-import type { MissedAttestationByEntity } from './useEpochsData.types';
 
 /**
  * Extra finalized epochs read with a participation range, for those the server keeps by basis points that fall just
@@ -178,44 +172,8 @@ export async function fetchEpochsPage(
   };
 }
 
-/** Missed attestations per entity per epoch, for the offline validators chart and table */
-async function fetchOfflineValidators(
-  epochs: number[],
-  genesisTime: number,
-  signal?: AbortSignal
-): Promise<MissedAttestationByEntity[]> {
-  if (epochs.length === 0) return [];
-  const rows = await fetchAllPages<FctAttestationLivenessByEntityHead>(
-    fctAttestationLivenessByEntityHeadServiceList,
-    {
-      query: {
-        epoch_in_values: epochs.join(','),
-        slot_start_date_time_gte: slotToTimestamp(Math.min(...epochs) * SLOTS_PER_EPOCH, genesisTime),
-        slot_start_date_time_lte: slotToTimestamp((Math.max(...epochs) + 1) * SLOTS_PER_EPOCH - 1, genesisTime),
-        missed_count_gt: 0,
-        page_size: 10_000,
-      },
-    },
-    'fct_attestation_liveness_by_entity_head',
-    signal
-  );
-  const totals = new Map<string, MissedAttestationByEntity>();
-  for (const row of rows) {
-    if (row.epoch === undefined) continue;
-    const entity = row.entity ?? 'unknown';
-    const key = `${entity}|${row.epoch}`;
-    const entry = totals.get(key) ?? { entity, epoch: row.epoch, count: 0 };
-    entry.count += row.missed_count ?? 0;
-    totals.set(key, entry);
-  }
-  return [...totals.values()];
-}
-
 export interface UseEpochsDataReturn {
   data: EpochsPageResult | undefined;
-  missedAttestationsByEntity: MissedAttestationByEntity[];
-  /** First slot time of the offline validators table when the page's epochs start before it */
-  offlineDataStart?: number;
   isLoading: boolean;
   isPlaceholderData: boolean;
   error: Error | null;
@@ -223,13 +181,12 @@ export interface UseEpochsDataReturn {
 }
 
 /**
- * One page of epochs for the given filters and cursor, plus the offline validators in those epochs.
+ * One page of epochs for the given filters and cursor.
  */
 export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
   const { currentNetwork } = useNetwork();
   const { epoch: currentEpoch } = useBeaconClock();
   const { data: summaryBounds } = useTableBounds('fct_epoch_summary_canonical');
-  const { data: livenessBounds } = useTableBounds('fct_attestation_liveness_by_entity_head');
   const genesisTime = currentNetwork?.genesis_time;
   const summary: SummaryEpochs | undefined =
     summaryBounds && genesisTime !== undefined
@@ -246,29 +203,11 @@ export function useEpochsData(args: EpochsPageArgs): UseEpochsDataReturn {
     placeholderData: keepPreviousData,
   });
 
-  const epochs = page.data?.rows.map(row => row.epoch) ?? [];
-  const offline = useQuery({
-    queryKey: ['epochs-list-offline', currentNetwork?.name, epochs],
-    queryFn: ({ signal }) => fetchOfflineValidators(epochs, genesisTime!, signal),
-    enabled: genesisTime !== undefined && epochs.length > 0,
-    placeholderData: keepPreviousData,
-  });
-
-  const firstEpochStart =
-    epochs.length > 0 && genesisTime !== undefined
-      ? slotToTimestamp(Math.min(...epochs) * SLOTS_PER_EPOCH, genesisTime)
-      : undefined;
-
   return {
     data: page.data,
-    missedAttestationsByEntity: offline.data ?? [],
-    offlineDataStart:
-      livenessBounds && firstEpochStart !== undefined && firstEpochStart < livenessBounds.min
-        ? livenessBounds.min
-        : undefined,
     isLoading: page.isLoading || (genesisTime !== undefined && summary === undefined),
     isPlaceholderData: page.isPlaceholderData,
-    error: page.error ?? offline.error,
+    error: page.error,
     currentEpoch,
   };
 }
