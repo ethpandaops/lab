@@ -28,6 +28,8 @@ import {
   dimValidatorServiceList,
   dimValidatorStatusServiceGet,
   dimValidatorStatusServiceList,
+  dimXatuNodeServiceGet,
+  dimXatuNodeServiceList,
   fctAttestationCorrectnessByValidatorCanonicalServiceGet,
   fctAttestationCorrectnessByValidatorCanonicalServiceList,
   fctAttestationCorrectnessByValidatorHeadServiceGet,
@@ -70,6 +72,10 @@ import {
   fctAttestationRewardByValidatorServiceList,
   fctAttestationRewardByValidatorWeeklyServiceGet,
   fctAttestationRewardByValidatorWeeklyServiceList,
+  fctAttestationVoteByBlockRootHeadServiceGet,
+  fctAttestationVoteByBlockRootHeadServiceList,
+  fctAttestationVoteByBlockRootServiceGet,
+  fctAttestationVoteByBlockRootServiceList,
   fctAttestationVoteCorrectnessByClientDailyServiceGet,
   fctAttestationVoteCorrectnessByClientDailyServiceList,
   fctAttestationVoteCorrectnessByClientPairDailyServiceGet,
@@ -152,6 +158,8 @@ import {
   fctBlockGraffitiClientVersionHourlyServiceList,
   fctBlockGraffitiClientVersionPairDailyServiceGet,
   fctBlockGraffitiClientVersionPairDailyServiceList,
+  fctBlockGraffitiHeadServiceGet,
+  fctBlockGraffitiHeadServiceList,
   fctBlockGraffitiServiceGet,
   fctBlockGraffitiServiceList,
   fctBlockHeadServiceGet,
@@ -226,6 +234,10 @@ import {
   fctContractStorageStateWithExpiryByBlockHourlyServiceList,
   fctCustodyProbeByClientDailyServiceGet,
   fctCustodyProbeByClientDailyServiceList,
+  fctCustodyProbeBySlotAgeDailyServiceGet,
+  fctCustodyProbeBySlotAgeDailyServiceList,
+  fctCustodyProbeBySlotAgeHourlyServiceGet,
+  fctCustodyProbeBySlotAgeHourlyServiceList,
   fctDataColumnAvailabilityByEpochServiceGet,
   fctDataColumnAvailabilityByEpochServiceList,
   fctDataColumnAvailabilityBySlotBlobServiceGet,
@@ -282,6 +294,24 @@ import {
   fctEngineNewPayloadDurationChunked50MsHourlyServiceList,
   fctEngineNewPayloadDurationChunked50MsServiceGet,
   fctEngineNewPayloadDurationChunked50MsServiceList,
+  fctEngineNewPayloadDurationHistogramByVersionDailyServiceGet,
+  fctEngineNewPayloadDurationHistogramByVersionDailyServiceList,
+  fctEngineNewPayloadDurationHistogramDailyServiceGet,
+  fctEngineNewPayloadDurationHistogramDailyServiceList,
+  fctEngineNewPayloadDurationHistogramHourlyServiceGet,
+  fctEngineNewPayloadDurationHistogramHourlyServiceList,
+  fctEngineNewPayloadGasBucketDailyServiceGet,
+  fctEngineNewPayloadGasBucketDailyServiceList,
+  fctEngineNewPayloadGasBucketHourlyServiceGet,
+  fctEngineNewPayloadGasBucketHourlyServiceList,
+  fctEngineNewPayloadResourceShareDailyServiceGet,
+  fctEngineNewPayloadResourceShareDailyServiceList,
+  fctEngineNewPayloadResourceShareHourlyServiceGet,
+  fctEngineNewPayloadResourceShareHourlyServiceList,
+  fctEngineNewPayloadThroughputHistogramDailyServiceGet,
+  fctEngineNewPayloadThroughputHistogramDailyServiceList,
+  fctEngineNewPayloadThroughputHistogramHourlyServiceGet,
+  fctEngineNewPayloadThroughputHistogramHourlyServiceList,
   fctEngineNewPayloadWinrateDailyServiceGet,
   fctEngineNewPayloadWinrateDailyServiceList,
   fctEngineNewPayloadWinrateHourlyServiceGet,
@@ -340,6 +370,10 @@ import {
   fctMissedSlotRateHourlyServiceList,
   fctNodeActiveLast24hServiceGet,
   fctNodeActiveLast24hServiceList,
+  fctNodeCountByClClientVersionDailyServiceGet,
+  fctNodeCountByClClientVersionDailyServiceList,
+  fctNodeCountByClClientVersionWindowServiceGet,
+  fctNodeCountByClClientVersionWindowServiceList,
   fctNodeCpuUtilizationByProcessServiceGet,
   fctNodeCpuUtilizationByProcessServiceList,
   fctNodeDiskIoByProcessServiceGet,
@@ -410,6 +444,8 @@ import {
   fctReorgHourlyServiceList,
   fctRocketpoolValidatorServiceGet,
   fctRocketpoolValidatorServiceList,
+  fctSlotSummaryServiceGet,
+  fctSlotSummaryServiceList,
   fctStorageSlotStateByAddressDailyServiceGet,
   fctStorageSlotStateByAddressDailyServiceList,
   fctStorageSlotStateByAddressHourlyServiceGet,
@@ -498,14 +534,20 @@ import {
   intBeaconCommitteeServiceList,
   intBlockBlobCountCanonicalServiceGet,
   intBlockBlobCountCanonicalServiceList,
+  intBlockCallTypeGasServiceGet,
+  intBlockCallTypeGasServiceList,
   intBlockCanonicalServiceGet,
   intBlockCanonicalServiceList,
+  intBlockContractGasServiceGet,
+  intBlockContractGasServiceList,
   intBlockGraffitiReleaseServiceGet,
   intBlockGraffitiReleaseServiceList,
   intBlockMevCanonicalServiceGet,
   intBlockMevCanonicalServiceList,
   intBlockOpcodeGasServiceGet,
   intBlockOpcodeGasServiceList,
+  intBlockOpcodeResourceGasServiceGet,
+  intBlockOpcodeResourceGasServiceList,
   intBlockPayloadPtcVoteCanonicalServiceGet,
   intBlockPayloadPtcVoteCanonicalServiceList,
   intBlockProposerCanonicalServiceGet,
@@ -514,6 +556,10 @@ import {
   intBlockReceiptSizeServiceList,
   intBlockResourceGasServiceGet,
   intBlockResourceGasServiceList,
+  intBlockTransactionContractGasServiceGet,
+  intBlockTransactionContractGasServiceList,
+  intBlockTransactionSummaryServiceGet,
+  intBlockTransactionSummaryServiceList,
   intContractCreationServiceGet,
   intContractCreationServiceList,
   intContractSelfdestructServiceGet,
@@ -556,6 +602,8 @@ import {
   intCustodyProbeOrderBySlotServiceList,
   intCustodyProbeServiceGet,
   intCustodyProbeServiceList,
+  intDataColumnGossipBySlotServiceGet,
+  intDataColumnGossipBySlotServiceList,
   intEngineGetBlobsServiceGet,
   intEngineGetBlobsServiceList,
   intEngineNewPayloadFastestExecutionByNodeClassServiceGet,
@@ -711,6 +759,12 @@ import type {
   DimValidatorStatusServiceListData,
   DimValidatorStatusServiceListError,
   DimValidatorStatusServiceListResponse,
+  DimXatuNodeServiceGetData,
+  DimXatuNodeServiceGetError,
+  DimXatuNodeServiceGetResponse,
+  DimXatuNodeServiceListData,
+  DimXatuNodeServiceListError,
+  DimXatuNodeServiceListResponse,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetData,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetError,
   FctAttestationCorrectnessByValidatorCanonicalServiceGetResponse,
@@ -837,6 +891,18 @@ import type {
   FctAttestationRewardByValidatorWeeklyServiceListData,
   FctAttestationRewardByValidatorWeeklyServiceListError,
   FctAttestationRewardByValidatorWeeklyServiceListResponse,
+  FctAttestationVoteByBlockRootHeadServiceGetData,
+  FctAttestationVoteByBlockRootHeadServiceGetError,
+  FctAttestationVoteByBlockRootHeadServiceGetResponse,
+  FctAttestationVoteByBlockRootHeadServiceListData,
+  FctAttestationVoteByBlockRootHeadServiceListError,
+  FctAttestationVoteByBlockRootHeadServiceListResponse,
+  FctAttestationVoteByBlockRootServiceGetData,
+  FctAttestationVoteByBlockRootServiceGetError,
+  FctAttestationVoteByBlockRootServiceGetResponse,
+  FctAttestationVoteByBlockRootServiceListData,
+  FctAttestationVoteByBlockRootServiceListError,
+  FctAttestationVoteByBlockRootServiceListResponse,
   FctAttestationVoteCorrectnessByClientDailyServiceGetData,
   FctAttestationVoteCorrectnessByClientDailyServiceGetError,
   FctAttestationVoteCorrectnessByClientDailyServiceGetResponse,
@@ -1083,6 +1149,12 @@ import type {
   FctBlockGraffitiClientVersionPairDailyServiceListData,
   FctBlockGraffitiClientVersionPairDailyServiceListError,
   FctBlockGraffitiClientVersionPairDailyServiceListResponse,
+  FctBlockGraffitiHeadServiceGetData,
+  FctBlockGraffitiHeadServiceGetError,
+  FctBlockGraffitiHeadServiceGetResponse,
+  FctBlockGraffitiHeadServiceListData,
+  FctBlockGraffitiHeadServiceListError,
+  FctBlockGraffitiHeadServiceListResponse,
   FctBlockGraffitiServiceGetData,
   FctBlockGraffitiServiceGetError,
   FctBlockGraffitiServiceGetResponse,
@@ -1305,6 +1377,18 @@ import type {
   FctCustodyProbeByClientDailyServiceListData,
   FctCustodyProbeByClientDailyServiceListError,
   FctCustodyProbeByClientDailyServiceListResponse,
+  FctCustodyProbeBySlotAgeDailyServiceGetData,
+  FctCustodyProbeBySlotAgeDailyServiceGetError,
+  FctCustodyProbeBySlotAgeDailyServiceGetResponse,
+  FctCustodyProbeBySlotAgeDailyServiceListData,
+  FctCustodyProbeBySlotAgeDailyServiceListError,
+  FctCustodyProbeBySlotAgeDailyServiceListResponse,
+  FctCustodyProbeBySlotAgeHourlyServiceGetData,
+  FctCustodyProbeBySlotAgeHourlyServiceGetError,
+  FctCustodyProbeBySlotAgeHourlyServiceGetResponse,
+  FctCustodyProbeBySlotAgeHourlyServiceListData,
+  FctCustodyProbeBySlotAgeHourlyServiceListError,
+  FctCustodyProbeBySlotAgeHourlyServiceListResponse,
   FctDataColumnAvailabilityByEpochServiceGetData,
   FctDataColumnAvailabilityByEpochServiceGetError,
   FctDataColumnAvailabilityByEpochServiceGetResponse,
@@ -1473,6 +1557,60 @@ import type {
   FctEngineNewPayloadDurationChunked50MsServiceListData,
   FctEngineNewPayloadDurationChunked50MsServiceListError,
   FctEngineNewPayloadDurationChunked50MsServiceListResponse,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetError,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListError,
+  FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetData,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetError,
+  FctEngineNewPayloadDurationHistogramDailyServiceGetResponse,
+  FctEngineNewPayloadDurationHistogramDailyServiceListData,
+  FctEngineNewPayloadDurationHistogramDailyServiceListError,
+  FctEngineNewPayloadDurationHistogramDailyServiceListResponse,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetData,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetError,
+  FctEngineNewPayloadDurationHistogramHourlyServiceGetResponse,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListData,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListError,
+  FctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+  FctEngineNewPayloadGasBucketDailyServiceGetData,
+  FctEngineNewPayloadGasBucketDailyServiceGetError,
+  FctEngineNewPayloadGasBucketDailyServiceGetResponse,
+  FctEngineNewPayloadGasBucketDailyServiceListData,
+  FctEngineNewPayloadGasBucketDailyServiceListError,
+  FctEngineNewPayloadGasBucketDailyServiceListResponse,
+  FctEngineNewPayloadGasBucketHourlyServiceGetData,
+  FctEngineNewPayloadGasBucketHourlyServiceGetError,
+  FctEngineNewPayloadGasBucketHourlyServiceGetResponse,
+  FctEngineNewPayloadGasBucketHourlyServiceListData,
+  FctEngineNewPayloadGasBucketHourlyServiceListError,
+  FctEngineNewPayloadGasBucketHourlyServiceListResponse,
+  FctEngineNewPayloadResourceShareDailyServiceGetData,
+  FctEngineNewPayloadResourceShareDailyServiceGetError,
+  FctEngineNewPayloadResourceShareDailyServiceGetResponse,
+  FctEngineNewPayloadResourceShareDailyServiceListData,
+  FctEngineNewPayloadResourceShareDailyServiceListError,
+  FctEngineNewPayloadResourceShareDailyServiceListResponse,
+  FctEngineNewPayloadResourceShareHourlyServiceGetData,
+  FctEngineNewPayloadResourceShareHourlyServiceGetError,
+  FctEngineNewPayloadResourceShareHourlyServiceGetResponse,
+  FctEngineNewPayloadResourceShareHourlyServiceListData,
+  FctEngineNewPayloadResourceShareHourlyServiceListError,
+  FctEngineNewPayloadResourceShareHourlyServiceListResponse,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetData,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetError,
+  FctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListData,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListError,
+  FctEngineNewPayloadThroughputHistogramDailyServiceListResponse,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetData,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetError,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListData,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListError,
+  FctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
   FctEngineNewPayloadWinrateDailyServiceGetData,
   FctEngineNewPayloadWinrateDailyServiceGetError,
   FctEngineNewPayloadWinrateDailyServiceGetResponse,
@@ -1647,6 +1785,18 @@ import type {
   FctNodeActiveLast24hServiceListData,
   FctNodeActiveLast24hServiceListError,
   FctNodeActiveLast24hServiceListResponse,
+  FctNodeCountByClClientVersionDailyServiceGetData,
+  FctNodeCountByClClientVersionDailyServiceGetError,
+  FctNodeCountByClClientVersionDailyServiceGetResponse,
+  FctNodeCountByClClientVersionDailyServiceListData,
+  FctNodeCountByClClientVersionDailyServiceListError,
+  FctNodeCountByClClientVersionDailyServiceListResponse,
+  FctNodeCountByClClientVersionWindowServiceGetData,
+  FctNodeCountByClClientVersionWindowServiceGetError,
+  FctNodeCountByClClientVersionWindowServiceGetResponse,
+  FctNodeCountByClClientVersionWindowServiceListData,
+  FctNodeCountByClClientVersionWindowServiceListError,
+  FctNodeCountByClClientVersionWindowServiceListResponse,
   FctNodeCpuUtilizationByProcessServiceGetData,
   FctNodeCpuUtilizationByProcessServiceGetError,
   FctNodeCpuUtilizationByProcessServiceGetResponse,
@@ -1857,6 +2007,12 @@ import type {
   FctRocketpoolValidatorServiceListData,
   FctRocketpoolValidatorServiceListError,
   FctRocketpoolValidatorServiceListResponse,
+  FctSlotSummaryServiceGetData,
+  FctSlotSummaryServiceGetError,
+  FctSlotSummaryServiceGetResponse,
+  FctSlotSummaryServiceListData,
+  FctSlotSummaryServiceListError,
+  FctSlotSummaryServiceListResponse,
   FctStorageSlotStateByAddressDailyServiceGetData,
   FctStorageSlotStateByAddressDailyServiceGetError,
   FctStorageSlotStateByAddressDailyServiceGetResponse,
@@ -2121,12 +2277,24 @@ import type {
   IntBlockBlobCountCanonicalServiceListData,
   IntBlockBlobCountCanonicalServiceListError,
   IntBlockBlobCountCanonicalServiceListResponse,
+  IntBlockCallTypeGasServiceGetData,
+  IntBlockCallTypeGasServiceGetError,
+  IntBlockCallTypeGasServiceGetResponse,
+  IntBlockCallTypeGasServiceListData,
+  IntBlockCallTypeGasServiceListError,
+  IntBlockCallTypeGasServiceListResponse,
   IntBlockCanonicalServiceGetData,
   IntBlockCanonicalServiceGetError,
   IntBlockCanonicalServiceGetResponse,
   IntBlockCanonicalServiceListData,
   IntBlockCanonicalServiceListError,
   IntBlockCanonicalServiceListResponse,
+  IntBlockContractGasServiceGetData,
+  IntBlockContractGasServiceGetError,
+  IntBlockContractGasServiceGetResponse,
+  IntBlockContractGasServiceListData,
+  IntBlockContractGasServiceListError,
+  IntBlockContractGasServiceListResponse,
   IntBlockGraffitiReleaseServiceGetData,
   IntBlockGraffitiReleaseServiceGetError,
   IntBlockGraffitiReleaseServiceGetResponse,
@@ -2145,6 +2313,12 @@ import type {
   IntBlockOpcodeGasServiceListData,
   IntBlockOpcodeGasServiceListError,
   IntBlockOpcodeGasServiceListResponse,
+  IntBlockOpcodeResourceGasServiceGetData,
+  IntBlockOpcodeResourceGasServiceGetError,
+  IntBlockOpcodeResourceGasServiceGetResponse,
+  IntBlockOpcodeResourceGasServiceListData,
+  IntBlockOpcodeResourceGasServiceListError,
+  IntBlockOpcodeResourceGasServiceListResponse,
   IntBlockPayloadPtcVoteCanonicalServiceGetData,
   IntBlockPayloadPtcVoteCanonicalServiceGetError,
   IntBlockPayloadPtcVoteCanonicalServiceGetResponse,
@@ -2169,6 +2343,18 @@ import type {
   IntBlockResourceGasServiceListData,
   IntBlockResourceGasServiceListError,
   IntBlockResourceGasServiceListResponse,
+  IntBlockTransactionContractGasServiceGetData,
+  IntBlockTransactionContractGasServiceGetError,
+  IntBlockTransactionContractGasServiceGetResponse,
+  IntBlockTransactionContractGasServiceListData,
+  IntBlockTransactionContractGasServiceListError,
+  IntBlockTransactionContractGasServiceListResponse,
+  IntBlockTransactionSummaryServiceGetData,
+  IntBlockTransactionSummaryServiceGetError,
+  IntBlockTransactionSummaryServiceGetResponse,
+  IntBlockTransactionSummaryServiceListData,
+  IntBlockTransactionSummaryServiceListError,
+  IntBlockTransactionSummaryServiceListResponse,
   IntContractCreationServiceGetData,
   IntContractCreationServiceGetError,
   IntContractCreationServiceGetResponse,
@@ -2295,6 +2481,12 @@ import type {
   IntCustodyProbeServiceListData,
   IntCustodyProbeServiceListError,
   IntCustodyProbeServiceListResponse,
+  IntDataColumnGossipBySlotServiceGetData,
+  IntDataColumnGossipBySlotServiceGetError,
+  IntDataColumnGossipBySlotServiceGetResponse,
+  IntDataColumnGossipBySlotServiceListData,
+  IntDataColumnGossipBySlotServiceListError,
+  IntDataColumnGossipBySlotServiceListResponse,
   IntEngineGetBlobsServiceGetData,
   IntEngineGetBlobsServiceGetError,
   IntEngineGetBlobsServiceGetResponse,
@@ -3222,6 +3414,60 @@ export const dimValidatorStatusServiceGetOptions = (options: Options<DimValidato
       return data;
     },
     queryKey: dimValidatorStatusServiceGetQueryKey(options),
+  });
+
+export const dimXatuNodeServiceListQueryKey = (options?: Options<DimXatuNodeServiceListData>) =>
+  createQueryKey('dimXatuNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Maps every Xatu node name to a stable node: hashed names that rotate on beacon node restarts are chained into one node. Count uniqExact(stable_node_id) to count Xatu nodes
+ */
+export const dimXatuNodeServiceListOptions = (options?: Options<DimXatuNodeServiceListData>) =>
+  queryOptions<
+    DimXatuNodeServiceListResponse,
+    DimXatuNodeServiceListError,
+    DimXatuNodeServiceListResponse,
+    ReturnType<typeof dimXatuNodeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimXatuNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimXatuNodeServiceListQueryKey(options),
+  });
+
+export const dimXatuNodeServiceGetQueryKey = (options: Options<DimXatuNodeServiceGetData>) =>
+  createQueryKey('dimXatuNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by meta_client_name
+ */
+export const dimXatuNodeServiceGetOptions = (options: Options<DimXatuNodeServiceGetData>) =>
+  queryOptions<
+    DimXatuNodeServiceGetResponse,
+    DimXatuNodeServiceGetError,
+    DimXatuNodeServiceGetResponse,
+    ReturnType<typeof dimXatuNodeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimXatuNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimXatuNodeServiceGetQueryKey(options),
   });
 
 export const fctAttestationCorrectnessServiceListQueryKey = (
@@ -4480,6 +4726,126 @@ export const fctAttestationRewardByValidatorWeeklyServiceGetOptions = (
       return data;
     },
     queryKey: fctAttestationRewardByValidatorWeeklyServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteByBlockRootServiceListQueryKey = (
+  options?: Options<FctAttestationVoteByBlockRootServiceListData>
+) => createQueryKey('fctAttestationVoteByBlockRootServiceList', options);
+
+/**
+ * List records
+ *
+ * Head votes per slot and voted block root, preferring finalized canonical attestations and falling back to real-time head data for slots not yet finalized
+ */
+export const fctAttestationVoteByBlockRootServiceListOptions = (
+  options?: Options<FctAttestationVoteByBlockRootServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteByBlockRootServiceListResponse,
+    FctAttestationVoteByBlockRootServiceListError,
+    FctAttestationVoteByBlockRootServiceListResponse,
+    ReturnType<typeof fctAttestationVoteByBlockRootServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteByBlockRootServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteByBlockRootServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteByBlockRootServiceGetQueryKey = (
+  options: Options<FctAttestationVoteByBlockRootServiceGetData>
+) => createQueryKey('fctAttestationVoteByBlockRootServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationVoteByBlockRootServiceGetOptions = (
+  options: Options<FctAttestationVoteByBlockRootServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteByBlockRootServiceGetResponse,
+    FctAttestationVoteByBlockRootServiceGetError,
+    FctAttestationVoteByBlockRootServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteByBlockRootServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteByBlockRootServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteByBlockRootServiceGetQueryKey(options),
+  });
+
+export const fctAttestationVoteByBlockRootHeadServiceListQueryKey = (
+  options?: Options<FctAttestationVoteByBlockRootHeadServiceListData>
+) => createQueryKey('fctAttestationVoteByBlockRootHeadServiceList', options);
+
+/**
+ * List records
+ *
+ * Head votes per slot and voted block root, from real-time gossip and beacon API attestations of the unfinalized chain
+ */
+export const fctAttestationVoteByBlockRootHeadServiceListOptions = (
+  options?: Options<FctAttestationVoteByBlockRootHeadServiceListData>
+) =>
+  queryOptions<
+    FctAttestationVoteByBlockRootHeadServiceListResponse,
+    FctAttestationVoteByBlockRootHeadServiceListError,
+    FctAttestationVoteByBlockRootHeadServiceListResponse,
+    ReturnType<typeof fctAttestationVoteByBlockRootHeadServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteByBlockRootHeadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteByBlockRootHeadServiceListQueryKey(options),
+  });
+
+export const fctAttestationVoteByBlockRootHeadServiceGetQueryKey = (
+  options: Options<FctAttestationVoteByBlockRootHeadServiceGetData>
+) => createQueryKey('fctAttestationVoteByBlockRootHeadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctAttestationVoteByBlockRootHeadServiceGetOptions = (
+  options: Options<FctAttestationVoteByBlockRootHeadServiceGetData>
+) =>
+  queryOptions<
+    FctAttestationVoteByBlockRootHeadServiceGetResponse,
+    FctAttestationVoteByBlockRootHeadServiceGetError,
+    FctAttestationVoteByBlockRootHeadServiceGetResponse,
+    ReturnType<typeof fctAttestationVoteByBlockRootHeadServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctAttestationVoteByBlockRootHeadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctAttestationVoteByBlockRootHeadServiceGetQueryKey(options),
   });
 
 export const fctAttestationVoteCorrectnessByClientDailyServiceListQueryKey = (
@@ -7014,6 +7380,60 @@ export const fctBlockGraffitiClientVersionPairDailyServiceGetOptions = (
     queryKey: fctBlockGraffitiClientVersionPairDailyServiceGetQueryKey(options),
   });
 
+export const fctBlockGraffitiHeadServiceListQueryKey = (options?: Options<FctBlockGraffitiHeadServiceListData>) =>
+  createQueryKey('fctBlockGraffitiHeadServiceList', options);
+
+/**
+ * List records
+ *
+ * Graffiti of every block of the unfinalized chain with the consensus and execution clients it names, parsed as fct_block_graffiti does. Forks may put several block roots at one slot
+ */
+export const fctBlockGraffitiHeadServiceListOptions = (options?: Options<FctBlockGraffitiHeadServiceListData>) =>
+  queryOptions<
+    FctBlockGraffitiHeadServiceListResponse,
+    FctBlockGraffitiHeadServiceListError,
+    FctBlockGraffitiHeadServiceListResponse,
+    ReturnType<typeof fctBlockGraffitiHeadServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiHeadServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiHeadServiceListQueryKey(options),
+  });
+
+export const fctBlockGraffitiHeadServiceGetQueryKey = (options: Options<FctBlockGraffitiHeadServiceGetData>) =>
+  createQueryKey('fctBlockGraffitiHeadServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctBlockGraffitiHeadServiceGetOptions = (options: Options<FctBlockGraffitiHeadServiceGetData>) =>
+  queryOptions<
+    FctBlockGraffitiHeadServiceGetResponse,
+    FctBlockGraffitiHeadServiceGetError,
+    FctBlockGraffitiHeadServiceGetResponse,
+    ReturnType<typeof fctBlockGraffitiHeadServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctBlockGraffitiHeadServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctBlockGraffitiHeadServiceGetQueryKey(options),
+  });
+
 export const fctBlockHeadServiceListQueryKey = (options?: Options<FctBlockHeadServiceListData>) =>
   createQueryKey('fctBlockHeadServiceList', options);
 
@@ -9051,6 +9471,126 @@ export const fctCustodyProbeByClientDailyServiceGetOptions = (
     queryKey: fctCustodyProbeByClientDailyServiceGetQueryKey(options),
   });
 
+export const fctCustodyProbeBySlotAgeDailyServiceListQueryKey = (
+  options?: Options<FctCustodyProbeBySlotAgeDailyServiceListData>
+) => createQueryKey('fctCustodyProbeBySlotAgeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Data column custody probes per UTC day the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export const fctCustodyProbeBySlotAgeDailyServiceListOptions = (
+  options?: Options<FctCustodyProbeBySlotAgeDailyServiceListData>
+) =>
+  queryOptions<
+    FctCustodyProbeBySlotAgeDailyServiceListResponse,
+    FctCustodyProbeBySlotAgeDailyServiceListError,
+    FctCustodyProbeBySlotAgeDailyServiceListResponse,
+    ReturnType<typeof fctCustodyProbeBySlotAgeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeBySlotAgeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeBySlotAgeDailyServiceListQueryKey(options),
+  });
+
+export const fctCustodyProbeBySlotAgeDailyServiceGetQueryKey = (
+  options: Options<FctCustodyProbeBySlotAgeDailyServiceGetData>
+) => createQueryKey('fctCustodyProbeBySlotAgeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctCustodyProbeBySlotAgeDailyServiceGetOptions = (
+  options: Options<FctCustodyProbeBySlotAgeDailyServiceGetData>
+) =>
+  queryOptions<
+    FctCustodyProbeBySlotAgeDailyServiceGetResponse,
+    FctCustodyProbeBySlotAgeDailyServiceGetError,
+    FctCustodyProbeBySlotAgeDailyServiceGetResponse,
+    ReturnType<typeof fctCustodyProbeBySlotAgeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeBySlotAgeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeBySlotAgeDailyServiceGetQueryKey(options),
+  });
+
+export const fctCustodyProbeBySlotAgeHourlyServiceListQueryKey = (
+  options?: Options<FctCustodyProbeBySlotAgeHourlyServiceListData>
+) => createQueryKey('fctCustodyProbeBySlotAgeHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Data column custody probes per hour the probes ran, age of the probed slot and P2P peer client. Late age buckets show peers that stop custodying columns before retention ends
+ */
+export const fctCustodyProbeBySlotAgeHourlyServiceListOptions = (
+  options?: Options<FctCustodyProbeBySlotAgeHourlyServiceListData>
+) =>
+  queryOptions<
+    FctCustodyProbeBySlotAgeHourlyServiceListResponse,
+    FctCustodyProbeBySlotAgeHourlyServiceListError,
+    FctCustodyProbeBySlotAgeHourlyServiceListResponse,
+    ReturnType<typeof fctCustodyProbeBySlotAgeHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeBySlotAgeHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeBySlotAgeHourlyServiceListQueryKey(options),
+  });
+
+export const fctCustodyProbeBySlotAgeHourlyServiceGetQueryKey = (
+  options: Options<FctCustodyProbeBySlotAgeHourlyServiceGetData>
+) => createQueryKey('fctCustodyProbeBySlotAgeHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctCustodyProbeBySlotAgeHourlyServiceGetOptions = (
+  options: Options<FctCustodyProbeBySlotAgeHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctCustodyProbeBySlotAgeHourlyServiceGetResponse,
+    FctCustodyProbeBySlotAgeHourlyServiceGetError,
+    FctCustodyProbeBySlotAgeHourlyServiceGetResponse,
+    ReturnType<typeof fctCustodyProbeBySlotAgeHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeBySlotAgeHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeBySlotAgeHourlyServiceGetQueryKey(options),
+  });
+
 export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
 ) => createQueryKey('fctDataColumnAvailabilityByEpochServiceList', options);
@@ -9058,7 +9598,7 @@ export const fctDataColumnAvailabilityByEpochServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by epoch and column index, rolled up from fct_data_column_availability_by_slot: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by epoch and column index, rolled up from fct_data_column_availability_by_slot. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityByEpochServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityByEpochServiceListData>
@@ -9118,7 +9658,7 @@ export const fctDataColumnAvailabilityBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by slot and column index, from custody probe results and gossipsub data column sidecar sightings. A gossipsub sighting always counts as a success. A custody probe only counts if it was recorded before the slot was processed, and probes usually arrive hours later, so almost all rows are gossipsub sightings
+ * Custody probe results by slot and column index. Only custody probes count towards success, failure, missing and availability. Gossipsub sightings are counted separately in gossipsub_count. Probes keep arriving for about 18 days after a slot, so the last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityBySlotServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotServiceListData>
@@ -9178,7 +9718,7 @@ export const fctDataColumnAvailabilityBySlotBlobServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by slot and column index, repeated once per blob index of the slot. Probes and sightings are per column, so every blob of a slot carries the same counts. Sources as fct_data_column_availability_by_slot: almost all rows are gossipsub sightings, which always count as a success
+ * Custody probe results by slot and column index, repeated once per blob index of the slot. Probes are per column, so every blob of a slot carries the same counts. Recounted every 6 hours over the last 19 days
  */
 export const fctDataColumnAvailabilityBySlotBlobServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityBySlotBlobServiceListData>
@@ -9238,7 +9778,7 @@ export const fctDataColumnAvailabilityDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by UTC day and column index, rolled up from fct_data_column_availability_by_epoch through its hours like fct_data_column_availability_hourly: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by UTC day and column index, rolled up from fct_data_column_availability_hourly. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityDailyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityDailyServiceListData>
@@ -9298,7 +9838,7 @@ export const fctDataColumnAvailabilityHourlyServiceListQueryKey = (
 /**
  * List records
  *
- * Data column availability by hour and column index, rolled up from fct_data_column_availability_by_epoch: almost all observations are gossipsub sightings, which always count as a success
+ * Custody probe results by hour and column index, rolled up from fct_data_column_availability_by_epoch. Only custody probes count. The last 19 days are recounted every hour
  */
 export const fctDataColumnAvailabilityHourlyServiceListOptions = (
   options?: Options<FctDataColumnAvailabilityHourlyServiceListData>
@@ -10721,6 +11261,546 @@ export const fctEngineNewPayloadDurationChunked50MsHourlyServiceGetOptions = (
       return data;
     },
     queryKey: fctEngineNewPayloadDurationChunked50MsHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramByVersionDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client, execution client version and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceListError,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramByVersionDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramByVersionDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramByVersionDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramByVersionDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationHistogramByVersionDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetError,
+    FctEngineNewPayloadDurationHistogramByVersionDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramByVersionDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramByVersionDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramByVersionDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationHistogramDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per UTC day, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationHistogramDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramDailyServiceListResponse,
+    FctEngineNewPayloadDurationHistogramDailyServiceListError,
+    FctEngineNewPayloadDurationHistogramDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationHistogramDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadDurationHistogramDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationHistogramDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramDailyServiceGetResponse,
+    FctEngineNewPayloadDurationHistogramDailyServiceGetError,
+    FctEngineNewPayloadDurationHistogramDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadDurationHistogramHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload duration histogram with log-scaled buckets, 1ms wide below 25ms and about 4% wide above, per hour, node class, execution client and status, from int_engine_new_payload. Summed over any range it gives the range percentiles within one bucket
+ */
+export const fctEngineNewPayloadDurationHistogramHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadDurationHistogramHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+    FctEngineNewPayloadDurationHistogramHourlyServiceListError,
+    FctEngineNewPayloadDurationHistogramHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadDurationHistogramHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadDurationHistogramHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadDurationHistogramHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadDurationHistogramHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadDurationHistogramHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadDurationHistogramHourlyServiceGetResponse,
+    FctEngineNewPayloadDurationHistogramHourlyServiceGetError,
+    FctEngineNewPayloadDurationHistogramHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadDurationHistogramHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadDurationHistogramHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadDurationHistogramHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadGasBucketDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadGasBucketDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload timings of VALID payloads per UTC day, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export const fctEngineNewPayloadGasBucketDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadGasBucketDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketDailyServiceListResponse,
+    FctEngineNewPayloadGasBucketDailyServiceListError,
+    FctEngineNewPayloadGasBucketDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadGasBucketDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadGasBucketDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadGasBucketDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadGasBucketDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketDailyServiceGetResponse,
+    FctEngineNewPayloadGasBucketDailyServiceGetError,
+    FctEngineNewPayloadGasBucketDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadGasBucketHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadGasBucketHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload timings of VALID payloads per hour, node scope, execution client and 5 Mgas block size bucket, as counts and sums from which a least-squares cost model and throughput can be computed exactly over any range
+ */
+export const fctEngineNewPayloadGasBucketHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadGasBucketHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketHourlyServiceListResponse,
+    FctEngineNewPayloadGasBucketHourlyServiceListError,
+    FctEngineNewPayloadGasBucketHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadGasBucketHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadGasBucketHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadGasBucketHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadGasBucketHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadGasBucketHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadGasBucketHourlyServiceGetResponse,
+    FctEngineNewPayloadGasBucketHourlyServiceGetError,
+    FctEngineNewPayloadGasBucketHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadGasBucketHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadGasBucketHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadGasBucketHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadResourceShareDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadResourceShareDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadResourceShareDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per UTC day, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export const fctEngineNewPayloadResourceShareDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadResourceShareDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareDailyServiceListResponse,
+    FctEngineNewPayloadResourceShareDailyServiceListError,
+    FctEngineNewPayloadResourceShareDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadResourceShareDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadResourceShareDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadResourceShareDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadResourceShareDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadResourceShareDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareDailyServiceGetResponse,
+    FctEngineNewPayloadResourceShareDailyServiceGetError,
+    FctEngineNewPayloadResourceShareDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadResourceShareHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadResourceShareHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadResourceShareHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * engine_newPayload throughput of VALID payloads of at least 10 Mgas per hour, node scope, execution client, gas resource and fixed 10% bucket of the share of block resource gas that resource took
+ */
+export const fctEngineNewPayloadResourceShareHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadResourceShareHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareHourlyServiceListResponse,
+    FctEngineNewPayloadResourceShareHourlyServiceListError,
+    FctEngineNewPayloadResourceShareHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadResourceShareHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadResourceShareHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadResourceShareHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadResourceShareHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadResourceShareHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadResourceShareHourlyServiceGetResponse,
+    FctEngineNewPayloadResourceShareHourlyServiceGetError,
+    FctEngineNewPayloadResourceShareHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadResourceShareHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadResourceShareHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadResourceShareHourlyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramDailyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramDailyServiceListData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per UTC day, node scope and execution client
+ */
+export const fctEngineNewPayloadThroughputHistogramDailyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramDailyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramDailyServiceListResponse,
+    FctEngineNewPayloadThroughputHistogramDailyServiceListError,
+    FctEngineNewPayloadThroughputHistogramDailyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramDailyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramDailyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadThroughputHistogramDailyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctEngineNewPayloadThroughputHistogramDailyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadThroughputHistogramDailyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
+    FctEngineNewPayloadThroughputHistogramDailyServiceGetError,
+    FctEngineNewPayloadThroughputHistogramDailyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramDailyServiceGetQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceListQueryKey = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceListData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Per-block engine_newPayload throughput histogram (Mgas/s, buckets about 4% wide) of VALID payloads of at least 5 Mgas per hour, node scope and execution client
+ */
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceListOptions = (
+  options?: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceListData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceListError,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceListResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramHourlyServiceListQueryKey(options),
+  });
+
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceGetQueryKey = (
+  options: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceGetData>
+) => createQueryKey('fctEngineNewPayloadThroughputHistogramHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctEngineNewPayloadThroughputHistogramHourlyServiceGetOptions = (
+  options: Options<FctEngineNewPayloadThroughputHistogramHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceGetError,
+    FctEngineNewPayloadThroughputHistogramHourlyServiceGetResponse,
+    ReturnType<typeof fctEngineNewPayloadThroughputHistogramHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctEngineNewPayloadThroughputHistogramHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctEngineNewPayloadThroughputHistogramHourlyServiceGetQueryKey(options),
   });
 
 export const fctEngineNewPayloadWinrateDailyServiceListQueryKey = (
@@ -12403,6 +13483,126 @@ export const fctNodeActiveLast24hServiceGetOptions = (options: Options<FctNodeAc
       return data;
     },
     queryKey: fctNodeActiveLast24hServiceGetQueryKey(options),
+  });
+
+export const fctNodeCountByClClientVersionDailyServiceListQueryKey = (
+  options?: Options<FctNodeCountByClClientVersionDailyServiceListData>
+) => createQueryKey('fctNodeCountByClClientVersionDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Xatu nodes per day, consensus client and consensus client version, from the heads each node saw
+ */
+export const fctNodeCountByClClientVersionDailyServiceListOptions = (
+  options?: Options<FctNodeCountByClClientVersionDailyServiceListData>
+) =>
+  queryOptions<
+    FctNodeCountByClClientVersionDailyServiceListResponse,
+    FctNodeCountByClClientVersionDailyServiceListError,
+    FctNodeCountByClClientVersionDailyServiceListResponse,
+    ReturnType<typeof fctNodeCountByClClientVersionDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCountByClClientVersionDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCountByClClientVersionDailyServiceListQueryKey(options),
+  });
+
+export const fctNodeCountByClClientVersionDailyServiceGetQueryKey = (
+  options: Options<FctNodeCountByClClientVersionDailyServiceGetData>
+) => createQueryKey('fctNodeCountByClClientVersionDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctNodeCountByClClientVersionDailyServiceGetOptions = (
+  options: Options<FctNodeCountByClClientVersionDailyServiceGetData>
+) =>
+  queryOptions<
+    FctNodeCountByClClientVersionDailyServiceGetResponse,
+    FctNodeCountByClClientVersionDailyServiceGetError,
+    FctNodeCountByClClientVersionDailyServiceGetResponse,
+    ReturnType<typeof fctNodeCountByClClientVersionDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCountByClClientVersionDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCountByClClientVersionDailyServiceGetQueryKey(options),
+  });
+
+export const fctNodeCountByClClientVersionWindowServiceListQueryKey = (
+  options?: Options<FctNodeCountByClClientVersionWindowServiceListData>
+) => createQueryKey('fctNodeCountByClClientVersionWindowServiceList', options);
+
+/**
+ * List records
+ *
+ * Distinct Xatu nodes per consensus client and version over the last 30, 90 and 365 complete UTC days and all history, recomputed hourly
+ */
+export const fctNodeCountByClClientVersionWindowServiceListOptions = (
+  options?: Options<FctNodeCountByClClientVersionWindowServiceListData>
+) =>
+  queryOptions<
+    FctNodeCountByClClientVersionWindowServiceListResponse,
+    FctNodeCountByClClientVersionWindowServiceListError,
+    FctNodeCountByClClientVersionWindowServiceListResponse,
+    ReturnType<typeof fctNodeCountByClClientVersionWindowServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCountByClClientVersionWindowServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCountByClClientVersionWindowServiceListQueryKey(options),
+  });
+
+export const fctNodeCountByClClientVersionWindowServiceGetQueryKey = (
+  options: Options<FctNodeCountByClClientVersionWindowServiceGetData>
+) => createQueryKey('fctNodeCountByClClientVersionWindowServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by window_name
+ */
+export const fctNodeCountByClClientVersionWindowServiceGetOptions = (
+  options: Options<FctNodeCountByClClientVersionWindowServiceGetData>
+) =>
+  queryOptions<
+    FctNodeCountByClClientVersionWindowServiceGetResponse,
+    FctNodeCountByClClientVersionWindowServiceGetError,
+    FctNodeCountByClClientVersionWindowServiceGetResponse,
+    ReturnType<typeof fctNodeCountByClClientVersionWindowServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctNodeCountByClClientVersionWindowServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctNodeCountByClClientVersionWindowServiceGetQueryKey(options),
   });
 
 export const fctNodeCpuUtilizationByProcessServiceListQueryKey = (
@@ -14439,6 +15639,60 @@ export const fctRocketpoolValidatorServiceGetOptions = (options: Options<FctRock
       return data;
     },
     queryKey: fctRocketpoolValidatorServiceGetQueryKey(options),
+  });
+
+export const fctSlotSummaryServiceListQueryKey = (options?: Options<FctSlotSummaryServiceListData>) =>
+  createQueryKey('fctSlotSummaryServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per slot from fct_block_proposer: proposed, missed or orphaned, the proposer and entity, the block number, gas, transactions, blobs and the proposer clients from the graffiti. MEV relays, builder and value are in int_block_mev_canonical
+ */
+export const fctSlotSummaryServiceListOptions = (options?: Options<FctSlotSummaryServiceListData>) =>
+  queryOptions<
+    FctSlotSummaryServiceListResponse,
+    FctSlotSummaryServiceListError,
+    FctSlotSummaryServiceListResponse,
+    ReturnType<typeof fctSlotSummaryServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSlotSummaryServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSlotSummaryServiceListQueryKey(options),
+  });
+
+export const fctSlotSummaryServiceGetQueryKey = (options: Options<FctSlotSummaryServiceGetData>) =>
+  createQueryKey('fctSlotSummaryServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctSlotSummaryServiceGetOptions = (options: Options<FctSlotSummaryServiceGetData>) =>
+  queryOptions<
+    FctSlotSummaryServiceGetResponse,
+    FctSlotSummaryServiceGetError,
+    FctSlotSummaryServiceGetResponse,
+    ReturnType<typeof fctSlotSummaryServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctSlotSummaryServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctSlotSummaryServiceGetQueryKey(options),
   });
 
 export const fctStorageSlotStateByAddressDailyServiceListQueryKey = (
@@ -17026,6 +18280,60 @@ export const intBlockBlobCountCanonicalServiceGetOptions = (
     queryKey: intBlockBlobCountCanonicalServiceGetQueryKey(options),
   });
 
+export const intBlockCallTypeGasServiceListQueryKey = (options?: Options<IntBlockCallTypeGasServiceListData>) =>
+  createQueryKey('intBlockCallTypeGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Internal calls per call type in a block, every call frame except the transaction root frames
+ */
+export const intBlockCallTypeGasServiceListOptions = (options?: Options<IntBlockCallTypeGasServiceListData>) =>
+  queryOptions<
+    IntBlockCallTypeGasServiceListResponse,
+    IntBlockCallTypeGasServiceListError,
+    IntBlockCallTypeGasServiceListResponse,
+    ReturnType<typeof intBlockCallTypeGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockCallTypeGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockCallTypeGasServiceListQueryKey(options),
+  });
+
+export const intBlockCallTypeGasServiceGetQueryKey = (options: Options<IntBlockCallTypeGasServiceGetData>) =>
+  createQueryKey('intBlockCallTypeGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockCallTypeGasServiceGetOptions = (options: Options<IntBlockCallTypeGasServiceGetData>) =>
+  queryOptions<
+    IntBlockCallTypeGasServiceGetResponse,
+    IntBlockCallTypeGasServiceGetError,
+    IntBlockCallTypeGasServiceGetResponse,
+    ReturnType<typeof intBlockCallTypeGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockCallTypeGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockCallTypeGasServiceGetQueryKey(options),
+  });
+
 export const intBlockCanonicalServiceListQueryKey = (options?: Options<IntBlockCanonicalServiceListData>) =>
   createQueryKey('intBlockCanonicalServiceList', options);
 
@@ -17078,6 +18386,60 @@ export const intBlockCanonicalServiceGetOptions = (options: Options<IntBlockCano
       return data;
     },
     queryKey: intBlockCanonicalServiceGetQueryKey(options),
+  });
+
+export const intBlockContractGasServiceListQueryKey = (options?: Options<IntBlockContractGasServiceListData>) =>
+  createQueryKey('intBlockContractGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Gas each contract used in a block, summed over every call frame that targeted it, root frames included. Contracts that used no gas are left out
+ */
+export const intBlockContractGasServiceListOptions = (options?: Options<IntBlockContractGasServiceListData>) =>
+  queryOptions<
+    IntBlockContractGasServiceListResponse,
+    IntBlockContractGasServiceListError,
+    IntBlockContractGasServiceListResponse,
+    ReturnType<typeof intBlockContractGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockContractGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockContractGasServiceListQueryKey(options),
+  });
+
+export const intBlockContractGasServiceGetQueryKey = (options: Options<IntBlockContractGasServiceGetData>) =>
+  createQueryKey('intBlockContractGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockContractGasServiceGetOptions = (options: Options<IntBlockContractGasServiceGetData>) =>
+  queryOptions<
+    IntBlockContractGasServiceGetResponse,
+    IntBlockContractGasServiceGetError,
+    IntBlockContractGasServiceGetResponse,
+    ReturnType<typeof intBlockContractGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockContractGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockContractGasServiceGetQueryKey(options),
   });
 
 export const intBlockGraffitiReleaseServiceListQueryKey = (options?: Options<IntBlockGraffitiReleaseServiceListData>) =>
@@ -17240,6 +18602,64 @@ export const intBlockOpcodeGasServiceGetOptions = (options: Options<IntBlockOpco
       return data;
     },
     queryKey: intBlockOpcodeGasServiceGetQueryKey(options),
+  });
+
+export const intBlockOpcodeResourceGasServiceListQueryKey = (
+  options?: Options<IntBlockOpcodeResourceGasServiceListData>
+) => createQueryKey('intBlockOpcodeResourceGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Per-opcode resource gas per block, summed over every transaction and call frame in the block
+ */
+export const intBlockOpcodeResourceGasServiceListOptions = (
+  options?: Options<IntBlockOpcodeResourceGasServiceListData>
+) =>
+  queryOptions<
+    IntBlockOpcodeResourceGasServiceListResponse,
+    IntBlockOpcodeResourceGasServiceListError,
+    IntBlockOpcodeResourceGasServiceListResponse,
+    ReturnType<typeof intBlockOpcodeResourceGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockOpcodeResourceGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockOpcodeResourceGasServiceListQueryKey(options),
+  });
+
+export const intBlockOpcodeResourceGasServiceGetQueryKey = (
+  options: Options<IntBlockOpcodeResourceGasServiceGetData>
+) => createQueryKey('intBlockOpcodeResourceGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockOpcodeResourceGasServiceGetOptions = (options: Options<IntBlockOpcodeResourceGasServiceGetData>) =>
+  queryOptions<
+    IntBlockOpcodeResourceGasServiceGetResponse,
+    IntBlockOpcodeResourceGasServiceGetError,
+    IntBlockOpcodeResourceGasServiceGetResponse,
+    ReturnType<typeof intBlockOpcodeResourceGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockOpcodeResourceGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockOpcodeResourceGasServiceGetQueryKey(options),
   });
 
 export const intBlockPayloadPtcVoteCanonicalServiceListQueryKey = (
@@ -17466,6 +18886,126 @@ export const intBlockResourceGasServiceGetOptions = (options: Options<IntBlockRe
       return data;
     },
     queryKey: intBlockResourceGasServiceGetQueryKey(options),
+  });
+
+export const intBlockTransactionContractGasServiceListQueryKey = (
+  options?: Options<IntBlockTransactionContractGasServiceListData>
+) => createQueryKey('intBlockTransactionContractGasServiceList', options);
+
+/**
+ * List records
+ *
+ * Gas each contract used within each transaction of a block, the flows from transactions to contracts. Contracts that used no gas in the transaction are left out
+ */
+export const intBlockTransactionContractGasServiceListOptions = (
+  options?: Options<IntBlockTransactionContractGasServiceListData>
+) =>
+  queryOptions<
+    IntBlockTransactionContractGasServiceListResponse,
+    IntBlockTransactionContractGasServiceListError,
+    IntBlockTransactionContractGasServiceListResponse,
+    ReturnType<typeof intBlockTransactionContractGasServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockTransactionContractGasServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockTransactionContractGasServiceListQueryKey(options),
+  });
+
+export const intBlockTransactionContractGasServiceGetQueryKey = (
+  options: Options<IntBlockTransactionContractGasServiceGetData>
+) => createQueryKey('intBlockTransactionContractGasServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockTransactionContractGasServiceGetOptions = (
+  options: Options<IntBlockTransactionContractGasServiceGetData>
+) =>
+  queryOptions<
+    IntBlockTransactionContractGasServiceGetResponse,
+    IntBlockTransactionContractGasServiceGetError,
+    IntBlockTransactionContractGasServiceGetResponse,
+    ReturnType<typeof intBlockTransactionContractGasServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockTransactionContractGasServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockTransactionContractGasServiceGetQueryKey(options),
+  });
+
+export const intBlockTransactionSummaryServiceListQueryKey = (
+  options?: Options<IntBlockTransactionSummaryServiceListData>
+) => createQueryKey('intBlockTransactionSummaryServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per transaction in a block with its call tree summarised: receipt and intrinsic gas from the root frame, and the frame count, deepest call and target from the whole tree
+ */
+export const intBlockTransactionSummaryServiceListOptions = (
+  options?: Options<IntBlockTransactionSummaryServiceListData>
+) =>
+  queryOptions<
+    IntBlockTransactionSummaryServiceListResponse,
+    IntBlockTransactionSummaryServiceListError,
+    IntBlockTransactionSummaryServiceListResponse,
+    ReturnType<typeof intBlockTransactionSummaryServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockTransactionSummaryServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockTransactionSummaryServiceListQueryKey(options),
+  });
+
+export const intBlockTransactionSummaryServiceGetQueryKey = (
+  options: Options<IntBlockTransactionSummaryServiceGetData>
+) => createQueryKey('intBlockTransactionSummaryServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by block_number
+ */
+export const intBlockTransactionSummaryServiceGetOptions = (
+  options: Options<IntBlockTransactionSummaryServiceGetData>
+) =>
+  queryOptions<
+    IntBlockTransactionSummaryServiceGetResponse,
+    IntBlockTransactionSummaryServiceGetError,
+    IntBlockTransactionSummaryServiceGetResponse,
+    ReturnType<typeof intBlockTransactionSummaryServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intBlockTransactionSummaryServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intBlockTransactionSummaryServiceGetQueryKey(options),
   });
 
 export const intContractCreationServiceListQueryKey = (options?: Options<IntContractCreationServiceListData>) =>
@@ -18651,7 +20191,7 @@ export const intCustodyProbeOrderBySlotServiceListQueryKey = (
 /**
  * List records
  *
- * Custody probe results with aggregated column indices, ordered by the probed slot time. A probe usually runs hours after the slot it asks about
+ * Custody probe results per slot with aggregated column indices
  */
 export const intCustodyProbeOrderBySlotServiceListOptions = (
   options?: Options<IntCustodyProbeOrderBySlotServiceListData>
@@ -18702,6 +20242,64 @@ export const intCustodyProbeOrderBySlotServiceGetOptions = (
       return data;
     },
     queryKey: intCustodyProbeOrderBySlotServiceGetQueryKey(options),
+  });
+
+export const intDataColumnGossipBySlotServiceListQueryKey = (
+  options?: Options<IntDataColumnGossipBySlotServiceListData>
+) => createQueryKey('intDataColumnGossipBySlotServiceList', options);
+
+/**
+ * List records
+ *
+ * Gossipsub data column sidecar sightings per slot and column, from libp2p sentries, counting only sidecars whose block root a beacon node accepted
+ */
+export const intDataColumnGossipBySlotServiceListOptions = (
+  options?: Options<IntDataColumnGossipBySlotServiceListData>
+) =>
+  queryOptions<
+    IntDataColumnGossipBySlotServiceListResponse,
+    IntDataColumnGossipBySlotServiceListError,
+    IntDataColumnGossipBySlotServiceListResponse,
+    ReturnType<typeof intDataColumnGossipBySlotServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intDataColumnGossipBySlotServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intDataColumnGossipBySlotServiceListQueryKey(options),
+  });
+
+export const intDataColumnGossipBySlotServiceGetQueryKey = (
+  options: Options<IntDataColumnGossipBySlotServiceGetData>
+) => createQueryKey('intDataColumnGossipBySlotServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const intDataColumnGossipBySlotServiceGetOptions = (options: Options<IntDataColumnGossipBySlotServiceGetData>) =>
+  queryOptions<
+    IntDataColumnGossipBySlotServiceGetResponse,
+    IntDataColumnGossipBySlotServiceGetError,
+    IntDataColumnGossipBySlotServiceGetResponse,
+    ReturnType<typeof intDataColumnGossipBySlotServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intDataColumnGossipBySlotServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intDataColumnGossipBySlotServiceGetQueryKey(options),
   });
 
 export const intEngineGetBlobsServiceListQueryKey = (options?: Options<IntEngineGetBlobsServiceListData>) =>
