@@ -165,11 +165,13 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
   });
 
   const records = useMemo(() => query.data ?? [], [query.data]);
+  // While another window loads, the previous window's records stay, keyed by their own bucket: days have dashes
+  const recordsDaily = query.isPlaceholderData && records.length > 0 ? records[0].key.includes('-') : isDaily;
 
   const keys = useMemo(() => {
     const unique = [...new Set(records.map(record => record.key))].sort();
-    return fillTimeKeys(unique, isDaily);
-  }, [records, isDaily]);
+    return fillTimeKeys(unique, recordsDaily);
+  }, [records, recordsDaily]);
 
-  return { records, keys, isDaily, isLoading: query.isLoading, error: query.error };
+  return { records, keys, isDaily: recordsDaily, isLoading: query.isLoading, error: query.error };
 }

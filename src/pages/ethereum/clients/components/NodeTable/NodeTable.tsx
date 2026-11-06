@@ -5,12 +5,10 @@ import type { Column } from '@/components/Lists/Table/Table.types';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { getCountryFlag } from '@/utils/country';
-import type { ClientLayer } from '../../utils/client-share';
 import { matchReleaseVersion, shortVersion } from '../../utils/client-versions';
 
 export interface NodeTableProps {
   client: string;
-  layer: ClientLayer;
   nodes: FctNodeActiveLast24h[];
   releases: DimClientRelease[];
 }
@@ -18,7 +16,7 @@ export interface NodeTableProps {
 /**
  * Xatu nodes running the client, linked to their node and contributor pages, most recently seen first.
  */
-export function NodeTable({ client, layer, nodes, releases }: NodeTableProps): JSX.Element {
+export function NodeTable({ client, nodes, releases }: NodeTableProps): JSX.Element {
   const columns: Column<FctNodeActiveLast24h>[] = [
     {
       header: 'Xatu node',
@@ -54,7 +52,6 @@ export function NodeTable({ client, layer, nodes, releases }: NodeTableProps): J
     {
       header: 'Version',
       accessor: row => {
-        if (layer !== 'consensus') return <span className="text-muted">-</span>;
         const release = matchReleaseVersion(row.meta_consensus_version, releases);
         return release?.version ? (
           <Link

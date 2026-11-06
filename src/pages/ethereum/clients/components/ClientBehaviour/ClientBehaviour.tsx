@@ -15,7 +15,8 @@ import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from 
 import { useAttestationRows, useProposalRows } from '../../hooks/usePerformanceRows';
 
 export interface ClientBehaviourProps {
-  client: string;
+  /** Client the page is about, highlighted; none on the clients overview */
+  client?: string;
   layer: ClientLayer;
   /** Window start (unix seconds); all history when omitted */
   from?: number;

@@ -6,7 +6,7 @@ import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT } from '../../constants';
-import { useVersionCounts } from '../../hooks';
+import { useNodesByVersion, useVersionCounts } from '../../hooks';
 import {
   UNRESOLVED_LABELS,
   adoptionByDay,
@@ -20,7 +20,7 @@ import {
 import { Table } from '@/components/Lists/Table';
 import { Entity } from '@/components/Ethereum/Entity';
 import { VersionShareChart } from '../VersionShareChart';
-import { VersionTable } from '../VersionTable';
+import { ReleasesTable } from '../ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */
@@ -29,12 +29,14 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Versions in the client's blocks: share over time and per version, linked to version pages.
+ * Versions in the client's blocks: share over time, and every release with its blocks and Xatu nodes, linked to
+ * version pages.
  */
 export function VersionsTab({
   client,
   layer,
   releases,
+  releasesLoading,
   latest,
   shareWindow,
   onShareWindowChange,
@@ -45,6 +47,7 @@ export function VersionsTab({
   const history = useVersionCounts({ grain: 'daily', client, layer, from });
   // Unresolved blocks per entity are few enough to read over any window
   const unresolvedRows = useVersionCounts({ grain: 'entity-daily', client, layer, unresolvedOnly: true, from });
+  const nodes = useNodesByVersion(client, releases, windowDays, layer === 'consensus');
   const blocks = history.rows;
   const total = useMemo(() => blocks.reduce((sum, row) => sum + row.count, 0), [blocks]);
   const versions = useMemo(() => summariseVersions(blocks), [blocks]);
@@ -54,7 +57,7 @@ export function VersionsTab({
     () => blocks.filter(block => block.version).reduce((sum, row) => sum + row.count, 0),
     [blocks]
   );
-  const blocksLoading = history.isLoading;
+  const blocksLoading = history.isLoading || releasesLoading || nodes.isLoading;
   const latestPoints = useMemo(
     () => (latest?.version ? adoptionByDay(days, latest.version) : []),
     [days, latest?.version]
@@ -105,15 +108,16 @@ export function VersionsTab({
           >
             {({ inModal }) => <VersionShareChart days={days} height={inModal ? 600 : 320} />}
           </PopoutCard>
-          <Card rounded title="Versions">
-            {versions.length === 0 ? (
-              <p className="text-sm text-muted">No block in this window resolved to a release.</p>
+          <Card rounded title="Releases">
+            {releases.length === 0 && versions.length === 0 ? (
+              <p className="text-sm text-muted">No published releases.</p>
             ) : (
-              <VersionTable
+              <ReleasesTable
                 client={client}
-                versions={versions}
                 releases={releases}
                 latest={latest}
+                versions={versions}
+                nodesByVersion={layer === 'consensus' ? nodes.nodesByVersion : undefined}
                 minVersion={requirement?.minVersion}
               />
             )}

@@ -6,6 +6,8 @@ export interface TabConfig {
   id: string;
   /** Optional array of anchor IDs that belong to this tab for deep linking */
   anchors?: string[];
+  /** Old ids that still select this tab, e.g. a tab merged into this one */
+  aliases?: string[];
 }
 
 /**

@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
@@ -6,6 +6,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { Badge } from '@/components/Elements/Badge';
+import { SelectMenu } from '@/components/Forms/SelectMenu';
 import type {
   DimClientRelease,
   FctEngineGetBlobsByElClientDaily,
@@ -73,6 +74,9 @@ function lineSeries(
   };
 }
 
+/** Builds the opcode cost by build card lists */
+const MAX_OPCODE_BUILDS = 4;
+
 /** Release a build line reports, if one is published */
 function releaseOf(line: string, releases: DimClientRelease[]): DimClientRelease | undefined {
   return releases.find(release => !release.prerelease && buildMatchesRelease(line, release));
@@ -80,7 +84,8 @@ function releaseOf(line: string, releases: DimClientRelease[]): DimClientRelease
 
 /**
  * How the client's builds perform on the EIP-7870 reference nodes, which share standardised hardware, so builds
- * compare fairly: engine_newPayload latency and throughput, engine_getBlobs, newPayload wins and opcode costs.
+ * compare fairly: engine_newPayload latency and throughput against the build before, engine_getBlobs, newPayload
+ * wins, and opcode costs between the two newest builds and per opcode across recent builds.
  */
 export function ReferenceEngine({
   client,
@@ -155,7 +160,8 @@ export function ReferenceEngine({
     };
   }, [winrate, client]);
 
-  const opcodeChanges = useMemo(() => {
+  // Opcode costs per build line, newer build first
+  const opcodeLines = useMemo(() => {
     const ordered = focus
       ? focus.map(item => item.line)
       : [...lines].sort((a, b) => b.lastDay.localeCompare(a.lastDay)).map(line => line.line);
@@ -164,16 +170,32 @@ export function ReferenceEngine({
       const line = buildLine(row.meta_execution_version ?? '');
       byLine.set(line, [...(byLine.get(line) ?? []), row]);
     }
-    // Newer build first, so the change reads as what the newer build did
-    const withCosts = ordered.filter(line => byLine.has(line)).sort((a, b) => compareVersions(b, a));
-    if (withCosts.length < 2) return null;
-    const [current, previous] = withCosts;
-    return {
-      current,
-      previous,
-      changes: compareOpcodeCosts(opcodeCosts(byLine.get(current)!), opcodeCosts(byLine.get(previous)!)),
-    };
+    return ordered
+      .filter(line => byLine.has(line))
+      .sort((a, b) => compareVersions(b, a))
+      .map(line => ({ line, costs: opcodeCosts(byLine.get(line)!) }));
   }, [opcodes, lines, focus]);
+  // Newer build first, so the change reads as what the newer build did
+  const opcodeChanges =
+    opcodeLines.length < 2
+      ? null
+      : {
+          current: opcodeLines[0].line,
+          previous: opcodeLines[1].line,
+          changes: compareOpcodeCosts(opcodeLines[0].costs, opcodeLines[1].costs),
+        };
+  const opcodeGroups = useMemo(
+    () => [...new Set(opcodeLines.flatMap(({ costs }) => [...costs.keys()]))].sort(),
+    [opcodeLines]
+  );
+  const [pickedGroup, setOpcodeGroup] = useState('SLOAD');
+  const opcodeGroup = opcodeGroups.includes(pickedGroup) ? pickedGroup : opcodeGroups[0];
+  const groupCosts = opcodeLines.slice(0, MAX_OPCODE_BUILDS).flatMap(({ line, costs }) => {
+    const cost = costs.get(opcodeGroup);
+    return cost ? [{ line, ...cost }] : [];
+  });
+  // Throughput change of each build line against the older line after it
+  const previousMgas = new Map(lines.map((line, i) => [line.line, lines[i + 1]?.mgasPerSecond]));
 
   const visibleLines = focus
     ? focus.flatMap(item => {
@@ -223,10 +245,26 @@ export function ReferenceEngine({
       headerClassName: 'text-right',
     },
     {
+      header: 'vs previous build',
+      accessor: row => {
+        const previous = previousMgas.get(row.line);
+        if (!previous) return '-';
+        const change = (row.mgasPerSecond / previous - 1) * 100;
+        return `${change > 0 ? '+' : ''}${change.toFixed(1)}%`;
+      },
+      cellClassName: 'text-right tabular-nums text-muted',
+      headerClassName: 'text-right',
+    },
+    {
       header: 'Calls',
       accessor: row => row.observations.toLocaleString(),
       cellClassName: 'text-right tabular-nums text-muted',
       headerClassName: 'text-right',
+    },
+    {
+      header: 'First day',
+      accessor: row => row.firstDay,
+      cellClassName: 'tabular-nums text-muted',
     },
     {
       header: 'Last day',
@@ -340,53 +378,96 @@ export function ReferenceEngine({
       )}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {opcodeChanges ? (
-          <Card
-            rounded
-            title="Opcode cost changes"
-            subtitle={`${opcodeChanges.current} against ${opcodeChanges.previous}; grey changes are within the fit's interval`}
-          >
-            <Table
-              variant="nested"
-              data={opcodeChanges.changes.slice(0, 12)}
-              getRowKey={row => row.group}
-              columns={[
-                { header: 'Opcode', accessor: row => <span className="font-mono text-xs/6">{row.group}</span> },
-                {
-                  header: opcodeChanges.previous,
-                  accessor: row => `${row.previous.toFixed(1)} ns`,
-                  cellClassName: 'text-right tabular-nums text-muted',
-                  headerClassName: 'text-right',
-                },
-                {
-                  header: opcodeChanges.current,
-                  accessor: row => `${row.current.toFixed(1)} ns`,
-                  cellClassName: 'text-right tabular-nums text-foreground',
-                  headerClassName: 'text-right',
-                },
-                {
-                  header: 'Change',
-                  accessor: row => (
-                    <Badge
-                      color={!row.significant ? 'gray' : row.change < 0 ? 'green' : 'red'}
-                      size="small"
-                      variant="flat"
-                    >
-                      {row.change > 0 ? '+' : ''}
-                      {(row.change * 100).toFixed(1)}%
-                    </Badge>
-                  ),
-                  cellClassName: 'text-right',
-                  headerClassName: 'text-right',
-                },
-              ]}
-            />
-          </Card>
-        ) : (
-          <Card rounded title="Opcode cost changes">
-            <p className="text-sm/6 text-muted">Opcode costs need a day of blocks on two builds to compare.</p>
-          </Card>
-        )}
+        <div className="flex flex-col gap-4">
+          {opcodeChanges ? (
+            <Card
+              rounded
+              title="Opcode cost changes"
+              subtitle={`${opcodeChanges.current} against ${opcodeChanges.previous}; grey changes are within the fit's interval`}
+            >
+              <Table
+                variant="nested"
+                data={opcodeChanges.changes.slice(0, 12)}
+                getRowKey={row => row.group}
+                columns={[
+                  { header: 'Opcode', accessor: row => <span className="font-mono text-xs/6">{row.group}</span> },
+                  {
+                    header: opcodeChanges.previous,
+                    accessor: row => `${row.previous.toFixed(1)} ns`,
+                    cellClassName: 'text-right tabular-nums text-muted',
+                    headerClassName: 'text-right',
+                  },
+                  {
+                    header: opcodeChanges.current,
+                    accessor: row => `${row.current.toFixed(1)} ns`,
+                    cellClassName: 'text-right tabular-nums text-foreground',
+                    headerClassName: 'text-right',
+                  },
+                  {
+                    header: 'Change',
+                    accessor: row => (
+                      <Badge
+                        color={!row.significant ? 'gray' : row.change < 0 ? 'green' : 'red'}
+                        size="small"
+                        variant="flat"
+                      >
+                        {row.change > 0 ? '+' : ''}
+                        {(row.change * 100).toFixed(1)}%
+                      </Badge>
+                    ),
+                    cellClassName: 'text-right',
+                    headerClassName: 'text-right',
+                  },
+                ]}
+              />
+            </Card>
+          ) : (
+            <Card rounded title="Opcode cost changes">
+              <p className="text-sm/6 text-muted">Opcode costs need a day of blocks on two builds to compare.</p>
+            </Card>
+          )}
+          {groupCosts.length > 0 && (
+            <Card
+              rounded
+              title="Opcode cost by build"
+              actions={
+                <SelectMenu
+                  value={opcodeGroup}
+                  onChange={setOpcodeGroup}
+                  options={opcodeGroups.map(group => ({ value: group, label: group }))}
+                  expandToFit
+                />
+              }
+            >
+              <Table
+                variant="nested"
+                data={groupCosts}
+                getRowKey={row => row.line}
+                columns={[
+                  { header: 'Build', accessor: row => <span className="font-mono text-xs/6">{row.line}</span> },
+                  {
+                    header: 'ns / op',
+                    accessor: row => `${row.nsPerOp.toFixed(1)} ns`,
+                    cellClassName: 'text-right tabular-nums font-medium text-foreground',
+                    headerClassName: 'text-right',
+                  },
+                  {
+                    header: 'Lower',
+                    accessor: row => `${row.lower.toFixed(1)} ns`,
+                    cellClassName: 'text-right tabular-nums text-muted',
+                    headerClassName: 'text-right',
+                  },
+                  {
+                    header: 'Upper',
+                    accessor: row => `${row.upper.toFixed(1)} ns`,
+                    cellClassName: 'text-right tabular-nums text-muted',
+                    headerClassName: 'text-right',
+                  },
+                ]}
+              />
+            </Card>
+          )}
+        </div>
 
         <div className="flex flex-col gap-4">
           {winShare.share !== null && (

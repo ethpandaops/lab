@@ -213,8 +213,6 @@ function niceMax(value: number): number {
   return step * 4;
 }
 
-const MAX_RELEASES_PER_CLIENT = 4;
-
 const fmtDate = (t: number): string =>
   new Date(t * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
@@ -253,7 +251,7 @@ function dailyTooltip(
 
 /**
  * One opcode's cost over time: all clients on one chart, or a chart per client scaled to that
- * client's own range with deploys marked. Below, an estimate with interval for recent releases.
+ * client's own range with deploys marked.
  */
 export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): JSX.Element {
   const themeColors = useThemeColors();
@@ -276,22 +274,6 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
     interval: Math.max(1, Math.ceil((dayMax - dayMin + 2 * pad) / 86_400 / 8)) * 86_400_000,
     formatter: (v: number | string) => fmtDate(Number(v) / 1000),
   };
-
-  const releaseGroups = model.clients
-    .map((c, ci) => {
-      const color = getExecutionClientColor(c.client, ci);
-      // The most recent releases per client; long ranges otherwise list dozens of dev builds
-      const rows = c.versions.slice(-MAX_RELEASES_PER_CLIENT).map(v => ({
-        version: v,
-        ns: v.ratios[opIndex].nsPerOp,
-        lo: v.ratios[opIndex].nsLo,
-        hi: v.ratios[opIndex].nsHi,
-      }));
-      // Each client on its own scale: what matters is how its releases compare with each other
-      const max = Math.max(...rows.map(r => r.hi), 1e-9) * 1.05;
-      return { client: c.client, color, rows, max };
-    })
-    .filter(g => g.rows.length > 0);
 
   return (
     <PopoutCard
@@ -389,66 +371,6 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
               <p className="text-xs text-muted md:col-span-2 xl:col-span-3">
                 Each chart has its own scale. Dashed lines mark deploys.
               </p>
-            </div>
-          )}
-
-          {releaseGroups.length > 0 && (
-            <div className="border-t border-border pb-2">
-              <div className="px-4 pt-3 text-xs font-semibold text-foreground sm:px-5">Recent releases</div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  {releaseGroups.map(g => (
-                    <tbody key={g.client}>
-                      <tr>
-                        <td colSpan={4} className="px-4 pt-3 pb-1 sm:px-5">
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                            <ClientLogo client={g.client} size={14} />
-                            {g.client}
-                          </span>
-                        </td>
-                      </tr>
-                      {g.rows.map(r => (
-                        <tr key={r.version.version}>
-                          <td className="py-1 pr-3 pl-4 sm:pl-5">
-                            {/* Wraps rather than truncates on phones: the build hash at the end tells releases apart */}
-                            <div className="w-40 font-mono text-xs wrap-break-word text-foreground sm:w-auto sm:whitespace-nowrap">
-                              {r.version.version}
-                            </div>
-                            <div className="text-xs whitespace-nowrap text-muted sm:hidden">
-                              {fmtDate(r.version.firstSeen)} – {fmtDate(r.version.lastSeen)}
-                            </div>
-                          </td>
-                          <td className="hidden px-3 py-1 whitespace-nowrap text-muted sm:table-cell">
-                            {fmtDate(r.version.firstSeen)} – {fmtDate(r.version.lastSeen)}
-                          </td>
-                          <td className="w-[40%] min-w-12 px-3 py-1 sm:min-w-40">
-                            <div className="relative h-5">
-                              <div
-                                className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full opacity-40"
-                                style={{
-                                  left: `${(r.lo / g.max) * 100}%`,
-                                  width: `${Math.max(0.5, ((r.hi - r.lo) / g.max) * 100)}%`,
-                                  backgroundColor: g.color,
-                                }}
-                              />
-                              <div
-                                className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
-                                style={{ left: `${(r.ns / g.max) * 100}%`, backgroundColor: g.color }}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-4 py-1 text-right whitespace-nowrap tabular-nums sm:px-5">
-                            <div className="font-medium">{fmtNs(r.ns)}</div>
-                            <div className="text-xs text-muted">
-                              {fmtNs(r.lo)}–{fmtNs(r.hi)}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  ))}
-                </table>
-              </div>
             </div>
           )}
         </>

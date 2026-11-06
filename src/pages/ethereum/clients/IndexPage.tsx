@@ -8,7 +8,14 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getClientColor } from '@/utils/ethereum';
 import { buildTooltipHtml, fillTimeKeys, formatTooltipDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { ClientFilter, ClientPairs, ClientsSkeleton, EntityFilter, LayerClients } from './components';
+import {
+  AttestationPerformance,
+  ClientPairs,
+  ClientsSkeleton,
+  EntityFilter,
+  LayerClients,
+  ProposerBehaviour,
+} from './components';
 import { useCensus, useClientCounts, useEntityOptions, useLatestAdoption, useLatestReleases } from './hooks';
 import { CENSUS_TABLES } from './api/client-models';
 import { windowStart } from './utils/client-versions';
@@ -26,13 +33,11 @@ import {
   buildShareChartConfig,
   computeCoverage,
   entityLabel,
-  filterRecords,
   formatClientName,
   summariseClients,
   summarisePairs,
   toDailyRecords,
   unfilteredNote,
-  type ClientFilters,
   type ClientLayer,
 } from './utils/client-share';
 
@@ -49,24 +54,21 @@ const WINDOW_TEXT: Record<TimePeriod, string> = {
 /** Days of P2P census the charts load at least, since short windows hold one or two daily points */
 const MIN_PEER_DAYS = 7;
 
-/** Describes a layer's blocks, e.g. "from coinbase with Geth execution in the last 7 days" */
-function describeBlocks(
-  entity: string | undefined,
-  filters: ClientFilters,
-  layer: ClientLayer,
-  timePeriod: TimePeriod
-): string {
-  const other = layer === 'consensus' ? filters.executionClient : filters.consensusClient;
-  const parts: string[] = [];
-  if (entity) parts.push(`from ${entityLabel(entity)}`);
-  if (other) parts.push(`with ${formatClientName(other)} ${layer === 'consensus' ? 'execution' : 'consensus'}`);
-  parts.push(WINDOW_TEXT[timePeriod]);
-  return parts.join(' ');
+/** Layers the performance comparison switches between */
+const LAYER_OPTIONS: ReadonlyArray<{ value: ClientLayer; label: string }> = [
+  { value: 'consensus', label: 'Consensus' },
+  { value: 'execution', label: 'Execution' },
+];
+
+/** Describes the blocks counted, e.g. "from coinbase in the last 7 days" */
+function describeBlocks(entity: string | undefined, timePeriod: TimePeriod): string {
+  return entity ? `from ${entityLabel(entity)} ${WINDOW_TEXT[timePeriod]}` : WINDOW_TEXT[timePeriod];
 }
 
 /**
  * Clients overview: per layer, every client by share of proposed blocks and of P2P peers, Xatu nodes and adoption of
- * its latest release, with both shares over time and the most common pairs.
+ * its latest release, with both shares over time, the most common pairs, and each layer's clients compared on
+ * proposal and attestation performance.
  */
 export function IndexPage(): JSX.Element {
   const navigate = useNavigate({ from: '/ethereum/clients/' });
@@ -77,21 +79,19 @@ export function IndexPage(): JSX.Element {
   const hasData = !!tableBounds;
 
   const entity = search.entity;
-  const filters: ClientFilters = useMemo(
-    () => ({ consensusClient: search.cl, executionClient: search.el }),
-    [search.cl, search.el]
-  );
-  const hasFilters = !!entity || !!filters.consensusClient || !!filters.executionClient;
+  const performanceLayer: ClientLayer = search.layer ?? 'consensus';
 
   const { records, keys, isDaily, isLoading, error } = useClientCounts(timePeriod, entity);
   const entityOptions = useEntityOptions();
   const { latest: latestReleases } = useLatestReleases();
   const { adoption } = useLatestAdoption(latestReleases, entity);
-  const peerFrom = useMemo(() => {
-    const days = TIME_RANGE_CONFIG[timePeriod].days;
+  const days = TIME_RANGE_CONFIG[timePeriod].days;
+  const peerFrom = useMemo(
     // 0 loads the census from its first day; undefined would load only the latest days
-    return days === null ? 0 : windowStart(Math.max(days, MIN_PEER_DAYS));
-  }, [timePeriod]);
+    () => (days === null ? 0 : windowStart(Math.max(days, MIN_PEER_DAYS))),
+    [days]
+  );
+  const performanceFrom = useMemo(() => (days === null ? undefined : windowStart(days)), [days]);
   const clPeers = useCensus<{ day_start_date?: string; client?: string; peer_count?: number }>(
     CENSUS_TABLES.clPeers,
     {},
@@ -112,48 +112,33 @@ export function IndexPage(): JSX.Element {
     return counts;
   }, [nodes]);
 
-  // Each layer's own filter is skipped for its rows and chart, so the selected client shows among the others.
-  const filtered = useMemo(() => filterRecords(records, filters), [records, filters]);
-  const consensusRecords = useMemo(() => filterRecords(records, filters, 'consensus'), [records, filters]);
-  const executionRecords = useMemo(() => filterRecords(records, filters, 'execution'), [records, filters]);
-
-  const coverage = useMemo(() => computeCoverage(filtered), [filtered]);
-  const consensusSummary = useMemo(() => summariseClients(consensusRecords, 'consensus'), [consensusRecords]);
-  const executionSummary = useMemo(() => summariseClients(executionRecords, 'execution'), [executionRecords]);
-  const consensusClients = useMemo(() => summariseClients(records, 'consensus').map(s => s.client), [records]);
-  const executionClients = useMemo(() => summariseClients(records, 'execution').map(s => s.client), [records]);
-  const pairs = useMemo(() => summarisePairs(filtered), [filtered]);
+  const coverage = useMemo(() => computeCoverage(records), [records]);
+  const consensusSummary = useMemo(() => summariseClients(records, 'consensus'), [records]);
+  const executionSummary = useMemo(() => summariseClients(records, 'execution'), [records]);
+  const pairs = useMemo(() => summarisePairs(records), [records]);
   // One entity proposes too rarely for hourly buckets, so its charts count blocks per day over the same window
   const rebucket = !isDaily && !!entity;
   const chartDaily = isDaily || rebucket;
-  const consensusChartRecords = useMemo(
-    () => (rebucket ? toDailyRecords(consensusRecords) : consensusRecords),
-    [consensusRecords, rebucket]
-  );
-  const executionChartRecords = useMemo(
-    () => (rebucket ? toDailyRecords(executionRecords) : executionRecords),
-    [executionRecords, rebucket]
-  );
+  const chartRecords = useMemo(() => (rebucket ? toDailyRecords(records) : records), [records, rebucket]);
   const chartKeys = useMemo(
-    () =>
-      rebucket ? fillTimeKeys([...new Set(toDailyRecords(records).map(record => record.key))].sort(), true) : keys,
-    [records, keys, rebucket]
+    () => (rebucket ? fillTimeKeys([...new Set(chartRecords.map(record => record.key))].sort(), true) : keys),
+    [chartRecords, keys, rebucket]
   );
   const consensusChart = useMemo(
-    () => buildShareChartConfig(consensusChartRecords, chartKeys, 'consensus', chartDaily, true),
-    [consensusChartRecords, chartKeys, chartDaily]
+    () => buildShareChartConfig(chartRecords, chartKeys, 'consensus', chartDaily, true),
+    [chartRecords, chartKeys, chartDaily]
   );
   const executionChart = useMemo(
-    () => buildShareChartConfig(executionChartRecords, chartKeys, 'execution', chartDaily, true),
-    [executionChartRecords, chartKeys, chartDaily]
+    () => buildShareChartConfig(chartRecords, chartKeys, 'execution', chartDaily, true),
+    [chartRecords, chartKeys, chartDaily]
   );
 
   const setSearch = useCallback(
-    (update: { t?: TimePeriod; cl?: string; el?: string; entity?: string }) =>
+    (update: { t?: TimePeriod; entity?: string; layer?: ClientLayer }) =>
       navigate({ search: prev => ({ ...prev, ...update }), replace: true, resetScroll: false }),
     [navigate]
   );
-  const clearFilters = useCallback(() => setSearch({ cl: undefined, el: undefined, entity: undefined }), [setSearch]);
+  const clearEntity = useCallback(() => setSearch({ entity: undefined }), [setSearch]);
 
   const makeTooltip = useCallback(
     (layer: ClientLayer) =>
@@ -162,8 +147,7 @@ export function IndexPage(): JSX.Element {
         const index = points[0]?.dataIndex;
         const key = index === undefined ? undefined : chartKeys[index];
         if (!key) return '';
-        const layerRecords = layer === 'consensus' ? consensusChartRecords : executionChartRecords;
-        const { total, items } = bucketShares(layerRecords, key, layer, true);
+        const { total, items } = bucketShares(chartRecords, key, layer, true);
         return buildTooltipHtml(formatTooltipDate(chartDaily ? key : Number(key), chartDaily), [
           {
             title: `${layer === 'consensus' ? 'CONSENSUS' : 'EXECUTION'} CLIENTS (${total} blocks)`,
@@ -176,7 +160,7 @@ export function IndexPage(): JSX.Element {
           },
         ]);
       },
-    [chartKeys, consensusChartRecords, executionChartRecords, chartDaily]
+    [chartKeys, chartRecords, chartDaily]
   );
 
   const isEmpty = !isLoading && !boundsLoading && !error && coverage.total === 0;
@@ -209,23 +193,6 @@ export function IndexPage(): JSX.Element {
                   options={entityOptions.options}
                 />
               )}
-              <ClientFilter
-                layer="consensus"
-                value={filters.consensusClient}
-                onChange={client => setSearch({ cl: client })}
-                clients={consensusClients}
-              />
-              <ClientFilter
-                layer="execution"
-                value={filters.executionClient}
-                onChange={client => setSearch({ el: client })}
-                clients={executionClients}
-              />
-              {hasFilters && (
-                <Button variant="blank" size="sm" rounded="sm" onClick={clearFilters}>
-                  Clear filters
-                </Button>
-              )}
             </div>
           </div>
 
@@ -243,13 +210,11 @@ export function IndexPage(): JSX.Element {
                 <div className="flex flex-col gap-1">
                   <h3 className="text-base/7 font-semibold text-foreground">No blocks match these filters</h3>
                   <p className="text-sm/6 text-muted">
-                    {hasFilters
-                      ? 'Try a longer window or fewer filters.'
-                      : 'Nothing has been proposed in this window yet.'}
+                    {entity ? 'Try a longer window or fewer filters.' : 'Nothing has been proposed in this window yet.'}
                   </p>
                 </div>
-                {hasFilters && (
-                  <Button variant="secondary" size="sm" rounded="sm" onClick={clearFilters}>
+                {entity && (
+                  <Button variant="secondary" size="sm" rounded="sm" onClick={clearEntity}>
                     Clear filters
                   </Button>
                 )}
@@ -261,7 +226,7 @@ export function IndexPage(): JSX.Element {
                 layer="consensus"
                 blockSummaries={consensusSummary}
                 blockTotal={coverage.total}
-                blockScope={describeBlocks(entity, filters, 'consensus', timePeriod)}
+                blockScope={describeBlocks(entity, timePeriod)}
                 blockChart={consensusChart}
                 blockChartDaily={chartDaily}
                 blockTooltip={makeTooltip('consensus')}
@@ -271,15 +236,14 @@ export function IndexPage(): JSX.Element {
                 xatuNodes={nodeCounts}
                 latestReleases={latestReleases}
                 latestAdoption={adoption}
-                unfilteredNote={unfilteredNote('consensus', entity, filters)}
-                hideLatestAdoption={!!filters.executionClient}
+                unfilteredNote={unfilteredNote('consensus', entity)}
                 adoptionScope={entity ? `from ${entityLabel(entity)}` : undefined}
               />
               <LayerClients
                 layer="execution"
                 blockSummaries={executionSummary}
                 blockTotal={coverage.total}
-                blockScope={describeBlocks(entity, filters, 'execution', timePeriod)}
+                blockScope={describeBlocks(entity, timePeriod)}
                 blockChart={executionChart}
                 blockChartDaily={chartDaily}
                 blockTooltip={makeTooltip('execution')}
@@ -288,17 +252,36 @@ export function IndexPage(): JSX.Element {
                 peersLoading={elPeers.isLoading}
                 latestReleases={latestReleases}
                 latestAdoption={adoption}
-                unfilteredNote={unfilteredNote('execution', entity, filters)}
-                hideLatestAdoption={!!filters.consensusClient}
+                unfilteredNote={unfilteredNote('execution', entity)}
                 adoptionScope={entity ? `from ${entityLabel(entity)}` : undefined}
               />
-              <ClientPairs
-                pairs={pairs}
-                scope={describeBlocks(entity, {}, 'consensus', timePeriod)}
-                onSelect={pair => setSearch({ cl: pair.consensusClient, el: pair.executionClient })}
-              />
+              <ClientPairs pairs={pairs} scope={describeBlocks(entity, timePeriod)} />
             </>
           )}
+
+          <section id="performance" className="flex scroll-mt-24 flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-base/7 font-semibold text-foreground">Performance</h2>
+              {!entity && (
+                <SegmentedControl
+                  options={LAYER_OPTIONS}
+                  value={performanceLayer}
+                  onChange={value => setSearch({ layer: value })}
+                  ariaLabel="Layer"
+                />
+              )}
+            </div>
+            {entity ? (
+              <p className="text-xs/5 text-muted">
+                Client performance can&apos;t be attributed to an entity; clear the entity filter to compare.
+              </p>
+            ) : (
+              <>
+                <ProposerBehaviour layer={performanceLayer} from={performanceFrom} />
+                <AttestationPerformance layer={performanceLayer} from={performanceFrom} />
+              </>
+            )}
+          </section>
         </div>
       )}
     </Container>

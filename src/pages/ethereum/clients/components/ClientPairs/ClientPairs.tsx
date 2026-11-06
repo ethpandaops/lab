@@ -1,8 +1,10 @@
 import type { JSX } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
+import { isKnownClient } from '@/utils/ethereum';
 import type { ClientPairSummary } from '../../utils/client-share';
 
 export interface ClientPairsProps {
@@ -12,8 +14,6 @@ export interface ClientPairsProps {
   scope: string;
   /** How many pairs to show */
   limit?: number;
-  /** Called with a pair to filter the page by */
-  onSelect: (pair: ClientPairSummary) => void;
 }
 
 const columns: Column<ClientPairSummary>[] = [
@@ -34,9 +34,11 @@ const columns: Column<ClientPairSummary>[] = [
 ];
 
 /**
- * Most common consensus and execution client pairs over the selected window.
+ * Most common consensus and execution client pairs over the selected window. A row opens the consensus client's
+ * pairings.
  */
-export function ClientPairs({ pairs, scope, limit = 10, onSelect }: ClientPairsProps): JSX.Element {
+export function ClientPairs({ pairs, scope, limit = 10 }: ClientPairsProps): JSX.Element {
+  const navigate = useNavigate();
   return (
     <Card
       rounded
@@ -48,8 +50,15 @@ export function ClientPairs({ pairs, scope, limit = 10, onSelect }: ClientPairsP
         data={pairs.slice(0, limit)}
         columns={columns}
         getRowKey={row => `${row.consensusClient}|${row.executionClient}`}
-        onRowClick={row => onSelect(row)}
-        getRowClassName={() => 'cursor-pointer'}
+        onRowClick={row =>
+          isKnownClient(row.consensusClient) &&
+          navigate({
+            to: '/ethereum/clients/$client',
+            params: { client: row.consensusClient },
+            search: { tab: 'pairings' },
+          })
+        }
+        getRowClassName={row => (isKnownClient(row.consensusClient) ? 'cursor-pointer' : '')}
       />
     </Card>
   );

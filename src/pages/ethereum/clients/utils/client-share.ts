@@ -246,30 +246,6 @@ export function bucketShares(
   };
 }
 
-/** Active client filters for the page */
-export interface ClientFilters {
-  consensusClient?: string;
-  executionClient?: string;
-}
-
-/**
- * Records matching the client filters. `exceptLayer` skips that layer's own filter, so a breakdown or share
- * chart can show the selected client among the others instead of collapsing to 100%.
- */
-export function filterRecords(
-  records: ClientCountRecord[],
-  filters: ClientFilters,
-  exceptLayer?: ClientLayer
-): ClientCountRecord[] {
-  const consensus = exceptLayer === 'consensus' ? undefined : filters.consensusClient;
-  const execution = exceptLayer === 'execution' ? undefined : filters.executionClient;
-  if (!consensus && !execution) return records;
-  return records.filter(
-    record =>
-      (!consensus || record.consensusClient === consensus) && (!execution || record.executionClient === execution)
-  );
-}
-
 /** Entity name the validator counts give validators without a mapping */
 const UNKNOWN_ENTITY = 'unknown';
 
@@ -410,26 +386,11 @@ export function partnerRows(
 }
 
 /**
- * Why a layer's P2P peers, Xatu nodes and On latest columns are left out under the page's filters, or undefined when
- * they all follow them. P2P peers and Xatu nodes carry their own client but no entity and no client of the other
- * layer, and the version counts behind On latest carry no client of the other layer.
+ * Why a layer's P2P peers and Xatu nodes columns are left out under an entity filter, or undefined without one:
+ * P2P peers and Xatu nodes carry their own client but no entity.
  */
-export function unfilteredNote(
-  layer: ClientLayer,
-  entity: string | undefined,
-  filters: ClientFilters
-): string | undefined {
-  const other = layer === 'consensus' ? filters.executionClient : filters.consensusClient;
-  const otherLabel = layer === 'consensus' ? 'execution client' : 'consensus client';
-  const angles = layer === 'consensus' ? ['P2P peers', 'Xatu nodes'] : ['P2P peers'];
-  const list = (items: string[]): string =>
-    items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0];
-  if (entity && other) {
-    return `${list(angles)} can't be attributed to an entity, and On latest can't be split by ${otherLabel}; clear those filters to compare.`;
-  }
-  if (entity) return `${list(angles)} can't be attributed to an entity; clear the entity filter to compare.`;
-  if (other) {
-    return `${list([...angles, 'On latest'])} can't be split by ${otherLabel}; clear the ${otherLabel} filter to compare.`;
-  }
-  return undefined;
+export function unfilteredNote(layer: ClientLayer, entity: string | undefined): string | undefined {
+  if (!entity) return undefined;
+  const angles = layer === 'consensus' ? 'P2P peers and Xatu nodes' : 'P2P peers';
+  return `${angles} can't be attributed to an entity; clear the entity filter to compare.`;
 }

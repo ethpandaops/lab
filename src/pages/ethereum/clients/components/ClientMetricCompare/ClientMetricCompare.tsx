@@ -15,7 +15,7 @@ export type { ClientMetric };
 
 export interface ClientMetricCompareProps<T extends { day_start_date?: string; client?: string }> {
   /** Client the page is about, drawn on top and highlighted in the table */
-  client: string;
+  client?: string;
   title: string;
   subtitle?: string;
   rows: T[];

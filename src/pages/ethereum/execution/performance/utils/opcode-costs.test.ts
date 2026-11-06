@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type {
-  FctOpcodeCostByElClientDaily,
-  FctOpcodeCostByElClientVersion,
-  FctOpcodeCostByElClientWeekly,
-} from '@/api/types.gen';
+import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientWeekly } from '@/api/types.gen';
 import {
   OPCODE_GROUPS,
   buildOpcodeCostModel,
@@ -76,7 +72,7 @@ describe('buildOpcodeCostModel', () => {
       // Partial day, too few blocks
       ...day('2026-10-23', 'go-ethereum', { STACK: 100 }, 500),
     ];
-    const model = buildOpcodeCostModel(rows, [])!;
+    const model = buildOpcodeCostModel(rows)!;
     expect(model.clients.map(c => c.client)).toEqual(['geth']);
     const geth = model.clients[0];
     expect(geth.daily.map(d => d.day)).toEqual([
@@ -98,7 +94,7 @@ describe('buildOpcodeCostModel', () => {
         ...row,
         week_start_date: date,
       }));
-    const model = buildOpcodeCostModel([...week('2026-10-19', 2), ...week('2026-10-26', 3)], [])!;
+    const model = buildOpcodeCostModel([...week('2026-10-19', 2), ...week('2026-10-26', 3)])!;
     expect(model.grain).toBe('week');
     expect(model.clients[0].daily.map(d => d.day)).toEqual([
       Date.parse('2026-10-19T00:00:00Z') / 1000,
@@ -106,34 +102,6 @@ describe('buildOpcodeCostModel', () => {
     ]);
     expect(model.windowEnd).toBe(Date.parse('2026-11-02T00:00:00Z') / 1000);
     expect(model.days).toBe(14);
-  });
-
-  it('attaches release fits to their client', () => {
-    const versions: FctOpcodeCostByElClientVersion[] = OPCODE_GROUPS.map(g => ({
-      meta_execution_implementation: 'Reth',
-      meta_execution_version: '2.9.0',
-      opcode_group: g,
-      first_seen_date_time: 100,
-      last_seen_date_time: 200,
-      block_count: 9000,
-      hour_count: 30,
-      price_ratio: 1.2,
-      price_ratio_lower: 1.1,
-      price_ratio_upper: 1.3,
-      ns_per_op: 12,
-      ns_per_op_lower: 11,
-      ns_per_op_upper: 13,
-    }));
-    const model = buildOpcodeCostModel(day('2026-10-20', 'Reth', {}), versions)!;
-    expect(model.clients[0].versions).toHaveLength(1);
-    expect(model.clients[0].versions[0].ratios[0]).toEqual({
-      ratio: 1.2,
-      lo: 1.1,
-      hi: 1.3,
-      nsPerOp: 12,
-      nsLo: 11,
-      nsHi: 13,
-    });
   });
 });
 
@@ -148,7 +116,7 @@ describe('repricingCandidates', () => {
       '2026-10-25',
       '2026-10-26',
     ].flatMap((d, i) => day(d, 'Besu', { STACK: 3 + i * 0.01, SLOAD: 1.6 + i * 0.01, SSTORE: 5, MUL: 0.5 }));
-    const model = buildOpcodeCostModel(rows, [])!;
+    const model = buildOpcodeCostModel(rows)!;
     expect(repricingCandidates(model, 4).map(c => c.opcode.key)).toEqual(['STACK', 'SLOAD']);
   });
 });

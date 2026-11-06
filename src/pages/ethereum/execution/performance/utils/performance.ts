@@ -114,19 +114,6 @@ export interface SlowBlock {
   topResource?: { label: string; share: number };
 }
 
-export interface VersionRow {
-  client: string;
-  version: string;
-  firstSeen: number;
-  lastSeen: number;
-  throughput: number;
-  observations: number;
-  /** Hourly Mgas/s over the hours this version ran */
-  sparkline: (number | null)[];
-  /** % change vs the client's previous version (by first seen), when there is one */
-  delta?: number;
-}
-
 /** Lowercase client names and fold go-ethereum into geth */
 export function normalizeClient(name: string | undefined): string {
   const lower = (name ?? 'unknown').toLowerCase();
@@ -422,55 +409,4 @@ export function bucketedThroughputSeries(
     client,
     points: [...m.entries()].sort((a, b) => a[0] - b[0]).map(([t, v]) => [t, mgasPerSecond(v.gas, v.ms)]),
   }));
-}
-
-/** Throughput per client version, with the change against the client's previous version */
-export function versionRows(hourly: FctEngineNewPayloadByElClientHourly[]): VersionRow[] {
-  const agg = new Map<
-    string,
-    { client: string; version: string; gas: number; ms: number; obs: number; hours: Map<number, number> }
-  >();
-  for (const row of hourly) {
-    const client = normalizeClient(row.meta_execution_implementation);
-    const version = row.meta_execution_version ?? 'unknown';
-    const t = row.hour_start_date_time ?? 0;
-    const obs = row.observation_count ?? 0;
-    const ms = row.avg_duration_ms ?? 0;
-    if (!obs || !ms) continue;
-    const key = `${client}|${version}`;
-    const cur = agg.get(key) ?? { client, version, gas: 0, ms: 0, obs: 0, hours: new Map() };
-    cur.gas += (row.avg_gas_used ?? 0) * obs;
-    cur.ms += ms * obs;
-    cur.obs += obs;
-    cur.hours.set(t, mgasPerSecond(row.avg_gas_used ?? 0, ms));
-    agg.set(key, cur);
-  }
-
-  const rows: VersionRow[] = [...agg.values()]
-    .filter(v => v.obs >= 50)
-    .map(v => {
-      const seen = [...v.hours.keys()];
-      return {
-        client: v.client,
-        version: v.version,
-        firstSeen: Math.min(...seen),
-        lastSeen: Math.max(...seen),
-        throughput: mgasPerSecond(v.gas, v.ms),
-        observations: v.obs,
-        sparkline: [...v.hours.entries()].sort((a, b) => a[0] - b[0]).map(([, tput]) => tput),
-      };
-    });
-
-  const byClient = new Map<string, VersionRow[]>();
-  for (const r of rows) {
-    if (!byClient.has(r.client)) byClient.set(r.client, []);
-    byClient.get(r.client)!.push(r);
-  }
-  for (const list of byClient.values()) {
-    list.sort((a, b) => a.firstSeen - b.firstSeen);
-    for (let i = 1; i < list.length; i++) {
-      list[i].delta = (list[i].throughput / list[i - 1].throughput - 1) * 100;
-    }
-  }
-  return [...byClient.values()].flat();
 }

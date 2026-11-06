@@ -1,16 +1,16 @@
-import { type JSX, useCallback, useMemo } from 'react';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { type JSX, useMemo } from 'react';
+import { Link } from '@tanstack/react-router';
+import { ChevronRightIcon } from '@heroicons/react/16/solid';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { completeBucketEnd } from '@/utils/time';
+import { formatClientName } from '@/utils/graffiti';
 import { CLIENT_WINDOW_OPTIONS } from '../../constants';
 import { useVersionCounts } from '../../hooks';
-import { BLOCK_FILTER_KEYS, type BlockSearch } from '../../utils/block-filters';
 import { onLatestByEntity } from '../../utils/client-versions';
 import { EntityVersionBars } from '../EntityVersionBars';
-import { GraffitiBlocksTable } from '../GraffitiBlocksTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 const DAY = 86400;
@@ -21,7 +21,8 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Who proposes blocks with the client: how concentrated it is, each top entity's version mix, and the latest blocks.
+ * Who proposes blocks with the client: how concentrated it is and each top entity's version mix, with a link to its
+ * blocks on Slots.
  */
 export function ProposersTab({ client, layer, latest, since, window, onWindowChange }: ClientTabProps): JSX.Element {
   const { rows: blocks, isLoading: blocksLoading } = useVersionCounts({
@@ -56,15 +57,6 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
           },
     [dayEnd, dayBlocks]
   );
-  const search = useSearch({ from: '/ethereum/clients/$client/' });
-  const navigate = useNavigate({ from: '/ethereum/clients/$client/' });
-  const onBlockSearchChange = useCallback(
-    (update: Partial<BlockSearch>) => navigate({ search: prev => ({ ...prev, ...update }), resetScroll: false }),
-    [navigate]
-  );
-  // The page's own client is fixed; its layer's filter is not offered
-  const ownKey = layer === 'consensus' ? 'cl' : 'el';
-  const blockFields = BLOCK_FILTER_KEYS.filter(key => key !== ownKey);
 
   const concentration = useMemo(() => {
     const byEntity = new Map<string, number>();
@@ -84,9 +76,17 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Every section below covers this window */}
-      <div className="self-start">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Every section below covers this window */}
         <SegmentedControl options={CLIENT_WINDOW_OPTIONS} value={window} onChange={onWindowChange} ariaLabel="Window" />
+        <Link
+          to="/ethereum/slots"
+          search={layer === 'consensus' ? { cl: client } : { el: client }}
+          className="inline-flex items-center gap-0.5 text-sm/6 text-primary hover:underline"
+        >
+          Blocks proposed with {formatClientName(client)}
+          <ChevronRightIcon className="size-4" />
+        </Link>
       </div>
       {blocksLoading || dayLoading ? (
         <LoadingContainer className="h-96 rounded-sm" />
@@ -124,12 +124,6 @@ export function ProposersTab({ client, layer, latest, since, window, onWindowCha
           />
         </>
       )}
-      <GraffitiBlocksTable
-        search={{ ...search, [ownKey]: client }}
-        fields={blockFields}
-        onSearchChange={onBlockSearchChange}
-        since={since}
-      />
     </div>
   );
 }
