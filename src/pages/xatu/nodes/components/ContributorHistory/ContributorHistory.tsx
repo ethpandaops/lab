@@ -6,13 +6,13 @@ import { behindStarts } from '../../utils/history';
 import { PerNodeHistoryChart } from '../PerNodeHistoryChart';
 
 const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: string; anchorId: string }> = [
-  { metric: 'block', title: 'Block arrival', subtitle: 'Median per Xatu node', anchorId: 'block-latency' },
-  { metric: 'head', title: 'Head events', subtitle: 'Median per Xatu node', anchorId: 'head-latency' },
-  { metric: 'attestation', title: 'Attestations', subtitle: 'Median per Xatu node', anchorId: 'attestation-latency' },
+  { metric: 'block', title: 'Block arrival', subtitle: 'Median per node ID', anchorId: 'block-latency' },
+  { metric: 'head', title: 'Head events', subtitle: 'Median per node ID', anchorId: 'head-latency' },
+  { metric: 'attestation', title: 'Attestations', subtitle: 'Median per node ID', anchorId: 'attestation-latency' },
   {
     metric: 'dataColumn',
     title: 'Data columns',
-    subtitle: 'Median per Xatu node of when the last custody column arrived',
+    subtitle: 'Median per node ID of when the last custody column arrived',
     anchorId: 'data-column-latency',
   },
 ];
@@ -26,7 +26,7 @@ export interface ContributorHistoryProps {
 }
 
 /**
- * Block, head, attestation and data column arrival over the range, one line per Xatu node of one contributor.
+ * Block, head, attestation and data column arrival over the range, one line per node ID of one contributor.
  */
 export function ContributorHistory({
   username,
