@@ -5,6 +5,7 @@ import { summarizeByNode } from '../utils/history';
 import { isNodeOnline } from '../utils/node-stats';
 import { useLastSeenNodes } from './useLastSeenNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
+import { useStableNodes } from './useStableNodes';
 
 /** One node's typical timings over the selected range */
 export interface NodeObservation {
@@ -17,6 +18,8 @@ export interface NodeObservation {
 /** One node that reported in the range, joined with its timings over the range */
 export interface NodeRow {
   nodeId: string;
+  /** The Xatu node this ID belongs to: hashed IDs that rotate on restart share one */
+  xatuNode: string;
   /**
    * The node's fct_node_last_seen row, or for a node missing from it the contributor and client its latest rollup
    * row carries, without location or last seen
@@ -76,6 +79,7 @@ export function buildNodeRows(
       const attestationSummary = attestationSummaries.get(nodeId);
       return {
         nodeId,
+        xatuNode: nodeId,
         node,
         online: node.last_seen_date_time !== undefined && isNodeOnline(node.last_seen_date_time, nowSeconds),
         observation:
@@ -102,17 +106,21 @@ export function useNodeRows(range: NodeRange): UseNodeRowsResult {
   const lastSeen = useLastSeenNodes(range);
   const block = useNodeHistory('block', range, {});
   const attestation = useNodeHistory('attestation', range, {});
+  const { stable, isLoading: stableLoading } = useStableNodes();
 
   const rows = useMemo(
-    () => buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000),
-    [lastSeen.nodes, block.data, attestation.data]
+    () =>
+      buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000).map(
+        row => ({ ...row, xatuNode: stable.get(row.nodeId) ?? row.nodeId })
+      ),
+    [lastSeen.nodes, block.data, attestation.data, stable]
   );
 
   return {
     rows,
     block: block.data,
     // The node list depends on the range's rollups, so wait for them before listing nodes
-    isLoading: lastSeen.isLoading || block.isLoading || attestation.isLoading,
+    isLoading: lastSeen.isLoading || block.isLoading || attestation.isLoading || stableLoading,
     error: lastSeen.error,
   };
 }
