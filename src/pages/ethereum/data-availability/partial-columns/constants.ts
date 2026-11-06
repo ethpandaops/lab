@@ -31,8 +31,11 @@ export const PAGE_SIZE = 10_000;
 /** Retries before a failed query shows its error, instead of the app default of retrying forever */
 export const QUERY_RETRIES = 3;
 
-/** Page size for the blocks table */
-export const BLOCKS_PAGE_SIZE = 25;
+/** Blocks the slowest-blocks list shows */
+export const SLOWEST_BLOCKS = 10;
+
+/** Most days the slowest-blocks ranking reads; longer windows rank only their last days */
+export const SLOWEST_BLOCKS_MAX_DAYS = 7;
 
 /** Table whose bounds decide whether the network has partial message data */
 export const COMPLETION_HOURLY_TABLE = 'fct_data_column_completion_by_path_hourly';
