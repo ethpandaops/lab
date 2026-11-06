@@ -101,7 +101,10 @@ export function IndexPage(): JSX.Element {
   // Orphaned blocks and entities are only known from tables that start after genesis; say so where the list ends
   const { data: bounds } = useBounds();
   const genesisTime = currentNetwork?.genesis_time;
-  const listFrom = genesisTime !== undefined ? slotBounds(filters, genesisTime).min : undefined;
+  const listRange = genesisTime !== undefined ? slotBounds(filters, genesisTime) : undefined;
+  const listFrom = listRange?.min;
+  // Value sorts without a slot or time range cover the last week (see `fetchSlotsPage`)
+  const recentOnly = sort !== 'slot' && listRange?.min === undefined && listRange?.max === undefined;
   const endsAt = (start: number | undefined): start is number =>
     start !== undefined &&
     genesisTime !== undefined &&
@@ -418,6 +421,7 @@ export function IndexPage(): JSX.Element {
           data={rows}
           columns={columns}
           isLoading={isLoading}
+          title={recentOnly ? 'Last 7 days' : undefined}
           pageIndex={pageIndex}
           pageSize={pageSize}
           onPaginationChange={handlePagination}

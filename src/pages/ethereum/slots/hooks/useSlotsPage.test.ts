@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { SlotFilters, SlotSort } from '../IndexPage.types';
-import { GAS_PER_BLOB } from '../utils/slot-query';
+import { GAS_PER_BLOB, VALUE_SORT_SECONDS } from '../utils/slot-query';
 import { fetchSlotsPage, type SlotsPageArgs } from './useSlotsPage';
 
 type Row = Record<string, unknown> & { slot: number; slot_start_date_time: number };
@@ -51,12 +51,16 @@ function buildTables(): void {
   tables.fct_block_payload_ptc_vote_head = [];
 }
 
+/** Every request made, by table */
+const calls: { table: string; query: Record<string, string | number> }[] = [];
+
 /** Applies the subset of the API's filter grammar the page uses */
 function list(table: string) {
   return async ({ query }: { query: Record<string, string | number> }) => {
+    calls.push({ table, query });
     let rows = [...tables[table]];
     for (const [key, raw] of Object.entries(query)) {
-      const match = /^(.*)_(eq|gte|lte|in_values|has|ends_with|contains)$/.exec(key);
+      const match = /^(.*)_(eq|gte|lte|lt|in_values|has|ends_with|contains)$/.exec(key);
       if (!match) continue;
       const [, field, op] = match;
       const set = op === 'in_values' ? new Set(String(raw).split(',').map(Number)) : undefined;
@@ -65,6 +69,7 @@ function list(table: string) {
         if (op === 'eq') return value === raw;
         if (op === 'gte') return (value as number) >= Number(raw);
         if (op === 'lte') return (value as number) <= Number(raw);
+        if (op === 'lt') return (value as number) < Number(raw);
         if (set) return set.has(value as number);
         if (op === 'has') return (value as string[]).includes(String(raw));
         if (op === 'contains') return String(value).includes(String(raw));
@@ -123,10 +128,52 @@ const args = (filters: SlotFilters, sort: SlotSort = 'slot', pageSize = 25): Omi
   pageSize,
 });
 
+/** Now, just after the last slot starts */
+const NOW = (LAST + 1) * 12;
+
 describe('fetchSlotsPage', () => {
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(NOW * 1000);
     mevUntil = LAST;
+    calls.length = 0;
     buildTables();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('reads the newest page from the last hour, not the whole table', async () => {
+    const first = await fetchSlotsPage({ ...args({}), cursor: undefined }, 0, false);
+    expect(first.rows).toHaveLength(25);
+    // Every read that lists slots in order; joins read the page's slots by number
+    const reads = calls.filter(call => call.query.order_by);
+    expect(reads.length).toBeGreaterThan(0);
+    for (const { query } of reads) {
+      expect(query.slot_start_date_time_lt).toBeDefined();
+      expect(Number(query.slot_start_date_time_gte)).toBeGreaterThanOrEqual(NOW + 1 - 3600);
+    }
+  });
+
+  it('widens past an empty hour, one window at a time', async () => {
+    // Nothing in the last day: the head page widens to 7 days
+    vi.setSystemTime((NOW + 86400) * 1000);
+    const first = await fetchSlotsPage({ ...args({}), cursor: undefined }, 0, false);
+    expect(first.rows.map(r => r.slot)).toEqual(slotsWhere(() => true).slice(0, 25));
+    const widths = calls
+      .filter(call => call.table === 'fct_block_proposer_head')
+      .map(call => Number(call.query.slot_start_date_time_lt) - Number(call.query.slot_start_date_time_gte));
+    expect(widths).toEqual([3600, 6 * 3600, 86400, 7 * 86400]);
+  });
+
+  it('bounds value sorts without a range to the last week', async () => {
+    vi.setSystemTime((NOW + VALUE_SORT_SECONDS - 120) * 1000);
+    const page = await fetchSlotsPage({ ...args({}, 'gas'), cursor: undefined }, 0, false);
+    // Only the slots of the last two minutes before the table ends are in range
+    expect(page.rows.every(row => row.slot * 12 >= NOW - 121)).toBe(true);
+    const reads = calls.filter(call => call.table === 'fct_block_head' && call.query.order_by);
+    expect(reads.every(call => Number(call.query.slot_start_date_time_gte) >= NOW - 121)).toBe(true);
   });
 
   it('pages through every slot newest first, and Previous returns the page before', async () => {

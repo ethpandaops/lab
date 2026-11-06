@@ -1,4 +1,4 @@
-import { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -6,6 +6,7 @@ import { Alert } from '@/components/Feedback/Alert';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useTableBounds } from '@/hooks/useBounds';
 import {
   BlocksFilterPanel,
   ClientPairingMatrix,
@@ -28,6 +29,9 @@ import { preparedBlockFilters } from './utils/block-query';
 
 const BLOCKS_PAGE_SIZE = 25;
 
+/** Reach of all history when the table's start is unknown */
+const FALLBACK_HISTORY_SECONDS = 365 * 24 * 3600;
+
 const WINDOW_OPTIONS = TIME_WINDOWS.map(value => ({ value, label: value === 'all' ? 'All' : value }));
 
 /** The block filters out of a search, every key present so a navigation also clears removed filters */
@@ -43,31 +47,59 @@ export function IndexPage(): JSX.Element {
   const genesisTime = currentNetwork?.genesis_time ?? 0;
 
   const timeWindow: TimeWindow = search.window ?? DEFAULT_TIME_WINDOW;
-  const windowStart = useMemo(
-    () =>
-      timeWindow === 'all' ? genesisTime : Math.floor(Date.now() / 1000 / 60) * 60 - TIME_WINDOW_SECONDS[timeWindow],
-    [timeWindow, genesisTime]
-  );
+  // All history starts at the table's start, never genesis
+  const { data: tableBounds, isLoading: boundsLoading } = useTableBounds('fct_prepared_block');
+  const windowStart = useMemo(() => {
+    const minute = Math.floor(Date.now() / 1000 / 60) * 60;
+    if (timeWindow !== 'all') return minute - TIME_WINDOW_SECONDS[timeWindow];
+    if (boundsLoading) return undefined;
+    return tableBounds?.min ?? minute - FALLBACK_HISTORY_SECONDS;
+  }, [timeWindow, boundsLoading, tableBounds?.min]);
   const filters = pickBlockFilters(search);
   const isFiltered = Object.values(filters).some(value => value !== undefined);
   const hasSlotRange = filters.slotFrom !== undefined || filters.slotTo !== undefined;
   const query = preparedBlockFilters(filters, windowStart, genesisTime);
 
-  const sort: BlockSortKey = search.sort ?? 'slot';
-  const order = search.order ?? 'desc';
+  // Only newest first reads all history in widening windows; other sorts need a window or slot range
+  const sortable = timeWindow !== 'all' || hasSlotRange;
+  const sort: BlockSortKey = sortable ? (search.sort ?? 'slot') : 'slot';
+  const order = sortable ? (search.order ?? 'desc') : 'desc';
   const page = search.page ?? 0;
   const pageSize = search.pageSize ?? BLOCKS_PAGE_SIZE;
 
-  const roster = useNodeRoster(query.slot_start_date_time_gte ?? windowStart, query.slot_start_date_time_lte);
+  const roster = useNodeRoster(
+    query.slot_start_date_time_gte ?? windowStart ?? genesisTime,
+    query.slot_start_date_time_lte
+  );
   const timeline = useSlotBlocks(query, filters.slotTo === undefined);
   // All history is too slow to reread every slot; the timeline keeps following the newest slots
-  const table = usePreparedBlocks(query, sort, order, page, pageSize, timeWindow !== 'all');
+  const table = usePreparedBlocks(query, sort, order, page, pageSize, search.cursor, timeWindow !== 'all');
+
+  // Cursors of the newest-first pages already visited, so Previous can return to them
+  const visited = useRef(new Map<string, string | undefined>());
+  const viewKey = JSON.stringify([filters, timeWindow, sort, order, pageSize]);
 
   const setSearch = useCallback(
     (update: Partial<LocallyBuiltBlocksSearch>) =>
       navigate({ search: prev => ({ ...prev, ...update }), replace: true, resetScroll: false }),
     [navigate]
   );
+
+  const changePage = (nextPage: number, nextPageSize: number): void => {
+    const size = nextPageSize === BLOCKS_PAGE_SIZE ? undefined : nextPageSize;
+    if (nextPageSize !== pageSize || nextPage <= 0) {
+      setSearch({ page: undefined, cursor: undefined, pageSize: size });
+      return;
+    }
+    if (sort !== 'slot' || order !== 'desc') {
+      setSearch({ page: nextPage });
+      return;
+    }
+    // Newest first pages by cursor: forwards from this page, backwards to a page already visited, else the first
+    visited.current.set(`${viewKey}|${page}`, search.cursor);
+    const cursor = nextPage === page + 1 ? table.nextCursor : visited.current.get(`${viewKey}|${nextPage}`);
+    setSearch(cursor ? { page: nextPage, cursor } : { page: undefined, cursor: undefined });
+  };
 
   return (
     <Container>
@@ -93,6 +125,7 @@ export function IndexPage(): JSX.Element {
               slotFrom: undefined,
               slotTo: undefined,
               page: undefined,
+              cursor: undefined,
             })
           }
           ariaLabel="Time window"
@@ -100,7 +133,7 @@ export function IndexPage(): JSX.Element {
         <BlocksFilterPanel
           filters={filters}
           roster={roster}
-          onChange={next => setSearch({ ...pickBlockFilters(next), page: undefined })}
+          onChange={next => setSearch({ ...pickBlockFilters(next), page: undefined, cursor: undefined })}
         />
       </div>
 
@@ -134,6 +167,7 @@ export function IndexPage(): JSX.Element {
           error={table.error}
           hasNextPage={table.hasNextPage}
           isFiltered={isFiltered}
+          sortable={sortable}
           sort={sort}
           order={order}
           onSortChange={(nextSort, nextOrder) => {
@@ -142,16 +176,12 @@ export function IndexPage(): JSX.Element {
               sort: isDefault ? undefined : nextSort,
               order: isDefault ? undefined : nextOrder,
               page: undefined,
+              cursor: undefined,
             });
           }}
           page={page}
           pageSize={pageSize}
-          onPageChange={(nextPage, nextPageSize) =>
-            setSearch({
-              page: nextPageSize === pageSize && nextPage > 0 ? nextPage : undefined,
-              pageSize: nextPageSize === BLOCKS_PAGE_SIZE ? undefined : nextPageSize,
-            })
-          }
+          onPageChange={changePage}
         />
       </div>
     </Container>

@@ -15,6 +15,7 @@ import {
   DEFAULT_BLOCK_PAGE_SIZE,
   GRAFFITI_FILTER_KEYS,
   clearFilters,
+  hasRangeStart,
   paginationUpdate,
   parseSort,
   sortUpdate,
@@ -63,6 +64,8 @@ const statusColumns = [
   }),
 ] as DataTableColumn<StatusBlock>[];
 
+const unsortedStatusColumns = statusColumns.map(column => ({ ...column, enableSorting: false }));
+
 /** The entity's missed or orphaned slots, with the time, slot and proposer filters that apply to them */
 function StatusBlocksTable({
   entity,
@@ -79,8 +82,14 @@ function StatusBlocksTable({
   onSearchChange: (update: Partial<BlockSearch>) => void;
   toolbar: ReactNode;
 }): JSX.Element {
-  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useEntityBlocksByStatus(entity, status, search);
-  const { field, desc } = parseSort(search.sort, STATUS_SORT_FIELDS);
+  // Without a range start only newest first, which reads all history in widening windows, can be shown
+  const sortable = hasRangeStart(search);
+  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useEntityBlocksByStatus(
+    entity,
+    status,
+    sortable ? search : { ...search, sort: undefined }
+  );
+  const { field, desc } = parseSort(sortable ? search.sort : undefined, STATUS_SORT_FIELDS);
   const hasFilters = fields.some(key => search[key] !== undefined);
 
   return (
@@ -106,7 +115,7 @@ function StatusBlocksTable({
         {error && <Alert variant="error" title="Failed to load blocks" description={error.message} />}
         <DataTable
           data={blocks}
-          columns={statusColumns}
+          columns={sortable ? statusColumns : unsortedStatusColumns}
           isLoading={isLoading}
           getRowId={row => String(row.slot)}
           pageIndex={(search.page ?? 1) - 1}

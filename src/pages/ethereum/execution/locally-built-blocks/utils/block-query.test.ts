@@ -1,5 +1,10 @@
-import { describe, expect, it } from 'vitest';
-import { nodeIdOf, preparedBlockFilters, preparedBlockOrder } from './block-query';
+import { describe, expect, it, vi } from 'vitest';
+import { fctPreparedBlockServiceList } from '@/api/sdk.gen';
+import { fetchNewestPreparedBlocks, nodeIdOf, preparedBlockFilters, preparedBlockOrder } from './block-query';
+
+vi.mock('@/api/sdk.gen', () => ({
+  fctPreparedBlockServiceList: vi.fn(async () => ({ data: { fct_prepared_block: [] } })),
+}));
 
 const GENESIS = 1_606_824_023;
 
@@ -42,5 +47,35 @@ describe('nodeIdOf', () => {
   it('takes the last segment of the node name', () => {
     expect(nodeIdOf('ethpandaops/mainnet/utility-mainnet-teku-erigon-003')).toBe('utility-mainnet-teku-erigon-003');
     expect(nodeIdOf(undefined)).toBeUndefined();
+  });
+});
+
+describe('fetchNewestPreparedBlocks', () => {
+  it('reads widening windows inside the slot range, never the open range', async () => {
+    const list = vi.mocked(fctPreparedBlockServiceList);
+    list.mockClear();
+    const end = GENESIS + 110 * 12;
+    await fetchNewestPreparedBlocks(
+      {
+        slot_start_date_time_gte: end - 2 * 3600,
+        slot_start_date_time_lte: end,
+        meta_consensus_implementation_eq: 'teku',
+      },
+      25,
+      undefined
+    );
+    const queries = list.mock.calls.map(([options]) => options?.query);
+    expect(queries).toEqual([
+      expect.objectContaining({ slot_start_date_time_gte: end + 1 - 3600, slot_start_date_time_lt: end + 1 }),
+      expect.objectContaining({ slot_start_date_time_gte: end - 2 * 3600, slot_start_date_time_lt: end + 1 }),
+    ]);
+    for (const query of queries) {
+      expect(query).not.toHaveProperty('slot_start_date_time_lte');
+      expect(query).toMatchObject({
+        meta_consensus_implementation_eq: 'teku',
+        order_by: 'slot_start_date_time desc, meta_client_name asc',
+        page_size: 26,
+      });
+    }
   });
 });

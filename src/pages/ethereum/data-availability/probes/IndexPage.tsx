@@ -2,6 +2,9 @@ import { type JSX, useMemo, useCallback, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useTableBounds } from '@/hooks/useBounds';
+import { intCustodyProbeServiceList } from '@/api/sdk.gen';
+import { encodeTimeCursor, fetchNewestFirst, parseTimeCursor } from '@/utils/widening-window';
 import {
   intCustodyProbeServiceListOptions,
   intCustodyProbeOrderBySlotServiceListOptions,
@@ -14,6 +17,12 @@ import type { FilterValues } from './components/FilterPanel';
 import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { useLiveProbeStream } from './hooks';
+
+/** Newest first with tie-breaks, so probes of one second keep their order across pages */
+const NEWEST_FIRST_ORDER = 'probe_date_time desc, peer_id_unique_key asc, slot desc';
+
+/** Reach of the other sorts, which read every probe in their range: the last week */
+const SORTED_WINDOW_SECONDS = 7 * 24 * 3600;
 
 /**
  * Custody Probes page showing individual probe results
@@ -34,12 +43,6 @@ export function IndexPage(): JSX.Element {
   // Bounded by now so ClickHouse can cut off early with ORDER BY; fixed on mount so opening a probe keeps the page
   const [now] = useState(() => Math.floor(Date.now() / 1000));
 
-  const windowLabel = hasSlotWindow
-    ? `Slots ${formatTimeRange(search.timeStart!, search.timeEnd!)}`
-    : fuluActivation
-      ? `Since ${formatTimestamp(fuluActivation.dateTime, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}`
-      : undefined;
-
   // Check if live mode is enabled from URL (needed before query)
   const isLive = search.isLive ?? false;
 
@@ -50,14 +53,20 @@ export function IndexPage(): JSX.Element {
     const order = search.sortOrder ?? 'desc';
     return `${field} ${order}`;
   }, [search.sortBy, search.sortOrder]);
+  const isNewestFirst = orderBy === 'probe_date_time desc';
+
+  const windowLabel = hasSlotWindow
+    ? `Slots ${formatTimeRange(search.timeStart!, search.timeEnd!)}`
+    : !bySlot && !isNewestFirst
+      ? 'Last 7 days'
+      : fuluActivation
+        ? `Since ${formatTimestamp(fuluActivation.dateTime, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}`
+        : undefined;
 
   // Fetch data from the API with server-side filtering and sorting
   // Disabled in live mode - live mode uses its own polling
-  const listQuery = {
-    page_size: search.pageSize ?? 25,
-    page_token: search.pageToken,
-    order_by: orderBy,
-    // Server-side filters
+  const pageSize = search.pageSize ?? 25;
+  const listFilters = {
     ...(search.result && { result_eq: search.result }),
     ...(search.prober && { meta_client_implementation_eq: search.prober }),
     ...(search.peer && { meta_peer_implementation_eq: search.peer }),
@@ -75,20 +84,80 @@ export function IndexPage(): JSX.Element {
     ...(search.column !== undefined && { column_indices_has: search.column }),
     ...(search.blobPosters?.length && { blob_submitters_has_any_values: search.blobPosters }),
   };
+  const listQuery = { page_size: pageSize, page_token: search.pageToken, order_by: orderBy, ...listFilters };
+
+  // Probes by time start at Fulu, or the table's start if later. Newest first reads widening windows back from now
+  // or the page cursor (`pageToken` holds a time cursor in this sort); other sorts cover the last week.
+  const { data: probeBounds, isLoading: boundsLoading } = useTableBounds('int_custody_probe');
+  const probeFloor = fuluActivation ? Math.max(fuluActivation.dateTime, probeBounds?.min ?? 0) : undefined;
+  const cursor = parseTimeCursor(search.pageToken);
+  const newestQuery = useQuery({
+    queryKey: [
+      'probes',
+      'newest',
+      currentNetwork?.name,
+      listFilters,
+      fuluActivation?.slot,
+      probeFloor,
+      now,
+      cursor,
+      pageSize,
+    ],
+    queryFn: ({ signal }) =>
+      fetchNewestFirst<IntCustodyProbe>({
+        pageSize,
+        end: cursor?.end ?? now + 1,
+        skip: cursor?.skip,
+        floor: probeFloor,
+        timeOf: probe => probe.probe_date_time,
+        fetchWindow: async (window, limit) => {
+          const { data } = await intCustodyProbeServiceList({
+            query: {
+              probe_date_time_gte: window.gte,
+              probe_date_time_lt: window.lt,
+              // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
+              slot_gte: fuluActivation!.slot,
+              ...listFilters,
+              order_by: NEWEST_FIRST_ORDER,
+              page_size: limit,
+            },
+            signal,
+            throwOnError: true,
+          });
+          return data.int_custody_probe ?? [];
+        },
+      }),
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && !bySlot && isNewestFirst && !boundsLoading,
+    placeholderData: keepPreviousData,
+  });
   const probeTimeQuery = useQuery({
     ...intCustodyProbeServiceListOptions({
       query: {
-        probe_date_time_gte: fuluActivation?.dateTime,
+        probe_date_time_gte: Math.max(now - SORTED_WINDOW_SECONDS, probeFloor ?? 0),
         probe_date_time_lte: now,
         // Filter out pre-Fulu slots server-side (PeerDAS only exists after Fulu)
         ...(fuluActivation && { slot_gte: fuluActivation.slot }),
         ...listQuery,
       },
     }),
-    enabled: !!currentNetwork && !!fuluActivation && !isLive && !bySlot,
+    enabled: !!currentNetwork && !!fuluActivation && !isLive && !bySlot && !isNewestFirst,
     // Keep the table while a filter or page loads, so the page keeps its height and scroll position
     placeholderData: keepPreviousData,
   });
+  // The probe-time list, whichever sort reads it
+  const probeTimeList = isNewestFirst
+    ? {
+        isLoading: boundsLoading || newestQuery.isLoading,
+        error: newestQuery.error,
+        rows: newestQuery.data?.rows,
+        next: newestQuery.data?.next && encodeTimeCursor(newestQuery.data.next),
+      }
+    : {
+        isLoading: probeTimeQuery.isLoading,
+        error: probeTimeQuery.error,
+        rows: probeTimeQuery.data?.int_custody_probe,
+        next: probeTimeQuery.data?.next_page_token,
+      };
   const slotWindowQuery = useQuery({
     ...intCustodyProbeOrderBySlotServiceListOptions({
       query: {
@@ -105,8 +174,8 @@ export function IndexPage(): JSX.Element {
     enabled: !!currentNetwork && !!fuluActivation && !isLive && bySlot,
     placeholderData: keepPreviousData,
   });
-  const { isLoading, error } = bySlot ? slotWindowQuery : probeTimeQuery;
-  const nextPageToken = bySlot ? slotWindowQuery.data?.next_page_token : probeTimeQuery.data?.next_page_token;
+  const { isLoading, error } = bySlot ? slotWindowQuery : probeTimeList;
+  const nextPageToken = bySlot ? slotWindowQuery.data?.next_page_token : probeTimeList.next;
 
   // Build current filter values from URL for live mode hook
   const currentFilterValues: FilterValues = useMemo(
@@ -146,8 +215,8 @@ export function IndexPage(): JSX.Element {
   // Use API data directly (for non-live mode)
   const paginatedData = useMemo(
     (): IntCustodyProbe[] =>
-      (bySlot ? slotWindowQuery.data?.int_custody_probe_order_by_slot : probeTimeQuery.data?.int_custody_probe) ?? [],
-    [bySlot, slotWindowQuery.data, probeTimeQuery.data]
+      (bySlot ? slotWindowQuery.data?.int_custody_probe_order_by_slot : probeTimeList.rows) ?? [],
+    [bySlot, slotWindowQuery.data, probeTimeList.rows]
   );
 
   // Choose which data to display based on mode

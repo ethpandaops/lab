@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Time windows for the page when no slot range is set; `all` starts at genesis */
+/** Time windows for the page when no slot range is set; `all` starts at the table's start */
 export const TIME_WINDOWS = ['1h', '6h', '24h', '7d', 'all'] as const;
 export type TimeWindow = (typeof TIME_WINDOWS)[number];
 
@@ -52,6 +52,8 @@ export const locallyBuiltBlocksSearchSchema = blockFiltersSchema.extend({
   window: z.enum(TIME_WINDOWS).optional(),
   /** Blocks table page, from 0 */
   page: z.coerce.number().int().nonnegative().optional(),
+  /** Where a newest-first page starts, see `widening-window.ts` */
+  cursor: z.string().optional(),
   pageSize: z.coerce.number().int().min(1).max(100).optional(),
   sort: z.enum(BLOCK_SORT_KEYS).optional(),
   order: z.enum(['asc', 'desc']).optional(),

@@ -18,6 +18,9 @@ export const SORT_COLUMNS: Record<Exclude<SlotSort, 'slot'>, string> = {
   blobs: 'execution_payload_blob_gas_used',
 };
 
+/** Reach of a value sort without a slot or time range, the last week: it reads every row in its range */
+export const VALUE_SORT_SECONDS = 7 * 24 * 3600;
+
 /** Everything known about one slot, from whichever tables were read. A missing field means no row. */
 export interface SlotFacts {
   slot: number;

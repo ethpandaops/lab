@@ -4,12 +4,16 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { formatTimeRange } from '@/utils/time';
 import { intEngineNewPayloadServiceListOptions } from '@/api/@tanstack/react-query.gen';
+import { intEngineNewPayloadServiceList } from '@/api/sdk.gen';
+import { useTableBounds } from '@/hooks/useBounds';
+import { encodeTimeCursor, fetchNewestFirst, nowEnd, parseTimeCursor } from '@/utils/widening-window';
 import type { PayloadsSearch, FilterValues } from './IndexPage.types';
 import { DEFAULT_DURATION_MIN, DEFAULT_PAGE_SIZE, LIVE_MODE_ENABLED } from './IndexPage.types';
 import { PayloadsView } from './components/PayloadsView';
 import type { IntEngineNewPayload } from '@/api/types.gen';
 import type { SortingState } from '@tanstack/react-table';
 import { useLivePayloadsStream } from './hooks';
+import { NEWEST_FIRST_ORDER, payloadFilters, payloadTimeBounds, payloadWindowQuery } from './utils/payload-query';
 
 /**
  * Payloads page showing individual engine_newPayload observations
@@ -49,39 +53,56 @@ export function IndexPage(): JSX.Element {
     return `${field} ${order}`;
   }, [search.orderBy]);
 
+  const filterQuery = payloadFilters(search, durationMin, referenceNodes);
+  const pageSize = search.pageSize ?? DEFAULT_PAGE_SIZE;
+
+  // Newest first, the default, reads widening windows back from now or the page cursor (`pageToken` holds a time
+  // cursor in this sort), never the whole table at once
+  const isNewestFirst = orderBy === 'slot desc';
+  const { data: tableBounds, isLoading: boundsLoading } = useTableBounds('int_engine_new_payload');
+  const timeBounds = payloadTimeBounds(search, currentNetwork?.genesis_time ?? 0, tableBounds?.min);
+  const cursor = parseTimeCursor(search.pageToken);
+  const newestQuery = useQuery({
+    queryKey: ['payloads', 'newest', currentNetwork?.name, filterQuery, timeBounds, cursor, pageSize],
+    queryFn: ({ signal }) =>
+      fetchNewestFirst<IntEngineNewPayload>({
+        pageSize,
+        end: cursor?.end ?? timeBounds.end ?? nowEnd(),
+        skip: cursor?.skip,
+        floor: timeBounds.floor,
+        timeOf: row => row.slot_start_date_time,
+        fetchWindow: async (window, limit) => {
+          const { data } = await intEngineNewPayloadServiceList({
+            query: payloadWindowQuery(filterQuery, window, NEWEST_FIRST_ORDER, limit),
+            signal,
+            throwOnError: true,
+          });
+          return data.int_engine_new_payload ?? [];
+        },
+      }),
+    enabled: !!currentNetwork && !isLive && isNewestFirst && !boundsLoading,
+    placeholderData: keepPreviousData,
+  });
+
   // Fetch data from the API with server-side filtering and sorting
   // Disabled in live mode - live mode uses its own polling
-  const {
-    data: apiData,
-    isLoading,
-    error,
-  } = useQuery({
+  const sortedQuery = useQuery({
     ...intEngineNewPayloadServiceListOptions({
       query: {
         slot_start_date_time_gte: timeRange.start,
         ...(timeRange.end !== undefined && { slot_start_date_time_lte: timeRange.end }),
-        duration_ms_gte: durationMin,
-        page_size: search.pageSize ?? DEFAULT_PAGE_SIZE,
+        ...filterQuery,
+        page_size: pageSize,
         page_token: search.pageToken,
         order_by: orderBy,
-        // Server-side filters
-        ...(search.status &&
-          (search.status.includes(',') ? { status_in_values: search.status } : { status_eq: search.status })),
-        ...(search.elClient &&
-          (search.elClient.includes(',')
-            ? { meta_execution_implementation_in_values: search.elClient }
-            : { meta_execution_implementation_eq: search.elClient })),
-        ...(search.slot && { slot_eq: search.slot }),
-        ...(search.blockNumber && { block_number_eq: search.blockNumber }),
-        ...(search.gasUsedMin && { gas_used_gte: search.gasUsedMin }),
-        ...(search.txCountMin && { tx_count_gte: search.txCountMin }),
-        ...(referenceNodes && { node_class_eq: 'eip7870-block-builder' }),
       },
     }),
-    enabled: !!currentNetwork && !isLive,
+    enabled: !!currentNetwork && !isLive && !isNewestFirst,
     // Keep the table in place while a filter change loads, so the page keeps its scroll position
     placeholderData: keepPreviousData,
   });
+  const isLoading = isNewestFirst ? boundsLoading || newestQuery.isLoading : sortedQuery.isLoading;
+  const error = isNewestFirst ? newestQuery.error : sortedQuery.error;
 
   // Build current filter values from URL for live mode hook
   const currentFilterValues: FilterValues = useMemo(
@@ -113,15 +134,18 @@ export function IndexPage(): JSX.Element {
   });
 
   // Use API data directly (for non-live mode)
-  const paginatedData = useMemo(() => {
-    return apiData?.int_engine_new_payload ?? [];
-  }, [apiData]);
+  const paginatedData = useMemo(
+    () => (isNewestFirst ? newestQuery.data?.rows : sortedQuery.data?.int_engine_new_payload) ?? [],
+    [isNewestFirst, newestQuery.data, sortedQuery.data]
+  );
 
   // Choose which data to display based on mode
   const data = isLive ? liveItems : paginatedData;
 
   // Store the next page token for pagination
-  const nextPageToken = apiData?.next_page_token;
+  const nextPageToken = isNewestFirst
+    ? newestQuery.data?.next && encodeTimeCursor(newestQuery.data.next)
+    : sortedQuery.data?.next_page_token;
 
   // Current page from URL (0-indexed)
   const currentPage = search.page ?? 0;
@@ -350,7 +374,7 @@ export function IndexPage(): JSX.Element {
       sorting={currentSorting}
       onSortingChange={handleSortingChange}
       onFilterClick={handleFilterClick}
-      hasNextPage={!!apiData?.next_page_token}
+      hasNextPage={!!nextPageToken}
       filters={currentFilterValues}
       onFiltersChange={handleFiltersChange}
       onClearFilters={handleClearFilters}

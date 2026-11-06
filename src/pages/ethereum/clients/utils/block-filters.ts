@@ -132,13 +132,24 @@ export function parseSort(
   return { field: 'slot_start_date_time', desc: true };
 }
 
+/** Whether a `sort` param orders newest first, the one order read in widening windows over all history */
+export function isNewestFirst(sort: string | undefined, fields: readonly string[] = GRAFFITI_SORT_FIELDS): boolean {
+  const { field, desc } = parseSort(sort, fields);
+  return desc && (field === 'slot_start_date_time' || field === 'slot');
+}
+
+/** Whether the search bounds the blocks' range from below, so any column can be sorted without reading all history */
+export function hasRangeStart(search: BlockSearch): boolean {
+  return search.since !== undefined || search.slotMin !== undefined;
+}
+
 type GraffitiQuery = NonNullable<FctBlockGraffitiServiceListData['query']>;
 
 /**
- * fct_block_graffiti query for one page of blocks. `genesisTime` bounds the time range when no start is set, since
+ * fct_block_graffiti query for one page of blocks. `tableStart` bounds the time range when no start is set, since
  * the API needs a slot_start_date_time filter.
  */
-export function graffitiBlocksQuery(search: BlockSearch, genesisTime: number): GraffitiQuery {
+export function graffitiBlocksQuery(search: BlockSearch, tableStart: number): GraffitiQuery {
   const proposers = parseProposers(search.proposer);
   const size = search.size ?? DEFAULT_BLOCK_PAGE_SIZE;
   const { field, desc } = parseSort(search.sort);
@@ -147,7 +158,7 @@ export function graffitiBlocksQuery(search: BlockSearch, genesisTime: number): G
   const order = `${field} ${desc ? 'desc' : 'asc'}${tieBreak}`;
 
   return {
-    slot_start_date_time_gte: search.since ?? genesisTime,
+    slot_start_date_time_gte: search.since ?? tableStart,
     ...(search.until !== undefined && { slot_start_date_time_lte: search.until }),
     ...(search.slotMin !== undefined && { slot_gte: search.slotMin }),
     ...(search.slotMax !== undefined && { slot_lte: search.slotMax }),
