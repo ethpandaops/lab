@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   fctAttestationVoteCorrectnessByValidatorDailyServiceList,
-  fctAttestationVoteCorrectnessByValidatorServiceList,
   fctAttestationVoteCorrectnessByValidatorWeeklyServiceList,
   fctBlockProposerByValidatorServiceList,
   fctSyncCommitteeParticipationByValidatorDailyServiceList,
@@ -13,9 +12,8 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import { weekStartOf } from '../utils/week';
-import { currentUtcDate, currentUtcWeek } from '@/utils/time';
+import { rollupPeriods } from '../utils/range';
 import type {
-  FctAttestationVoteCorrectnessByValidator,
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
   FctSyncCommitteeParticipationByValidatorDaily,
@@ -71,57 +69,82 @@ function dateStringToTimestamp(dateStr: string): number {
   return Math.floor(new Date(dateStr + 'T00:00:00Z').getTime() / 1000);
 }
 
-/**
- * Generate all YYYY-MM-DD date strings in a range, joined by commas
- */
-function generateDateRange(startTs: number, endTs: number): string {
-  const dates: string[] = [];
-  const startDate = new Date(startTs * 1000);
-  startDate.setUTCHours(0, 0, 0, 0);
-  const endDate = new Date(endTs * 1000);
-  endDate.setUTCHours(23, 59, 59, 999);
+/** Sum of a count column over rows */
+function total<T>(rows: T[], key: keyof T): number {
+  return rows.reduce((sum, row) => sum + Number(row[key] ?? 0), 0);
+}
 
-  const current = new Date(startDate);
-  while (current <= endDate) {
-    dates.push(current.toISOString().slice(0, 10));
-    current.setUTCDate(current.getUTCDate() + 1);
+/**
+ * Daily rows of the days around a range's whole weeks, added up into one row per validator per partial week and keyed
+ * by the week's Monday like a weekly row. `merge` combines one validator's days, oldest first.
+ */
+function intoWeeks<T extends { validator_index?: number; day_start_date?: string }>(
+  days: T[],
+  merge: (days: T[]) => Partial<T>
+): T[] {
+  const groups = new Map<string, T[]>();
+  for (const row of [...days].sort((a, b) => (a.day_start_date ?? '').localeCompare(b.day_start_date ?? ''))) {
+    const key = `${row.validator_index}:${weekStartOf(row.day_start_date ?? '')}`;
+    groups.set(key, [...(groups.get(key) ?? []), row]);
   }
-  return dates.join(',');
+  return [...groups.values()].map(group => ({
+    ...group[group.length - 1],
+    ...merge(group),
+    day_start_date: weekStartOf(group[0].day_start_date ?? ''),
+  }));
 }
 
-/**
- * Wrong source votes per validator and per validator and day (or week), keyed `validator` and `validator:day`.
- * The rollups count only correct source votes; a source vote is unknown when the attestation was never seen on
- * gossip, so the source rate divides by correct plus wrong votes rather than by attestations.
- */
-type SourceMisses = Map<string, number>;
-
-/** Key of a validator's wrong source votes on one day (or week), or over the range */
-function sourceMissKey(validatorIndex: number, day?: string): string {
-  return day === undefined ? String(validatorIndex) : `${validatorIndex}:${day}`;
-}
-
-/** Count wrong source votes per validator, and per validator and day or week */
-function countSourceMisses(rows: FctAttestationVoteCorrectnessByValidator[], weekly: boolean): SourceMisses {
-  const misses: SourceMisses = new Map();
-  const add = (key: string): void => {
-    misses.set(key, (misses.get(key) ?? 0) + 1);
+function mergeAttestationDays(
+  days: FctAttestationVoteCorrectnessByValidatorDaily[]
+): Partial<FctAttestationVoteCorrectnessByValidatorDaily> {
+  const attested = total(days, 'attested_count');
+  const distance = days.reduce((sum, d) => sum + (d.avg_inclusion_distance ?? 0) * (d.attested_count ?? 0), 0);
+  return {
+    total_duties: total(days, 'total_duties'),
+    attested_count: attested,
+    missed_count: total(days, 'missed_count'),
+    head_correct_count: total(days, 'head_correct_count'),
+    target_correct_count: total(days, 'target_correct_count'),
+    source_correct_count: total(days, 'source_correct_count'),
+    source_incorrect_count: total(days, 'source_incorrect_count'),
+    avg_inclusion_distance: attested > 0 ? distance / attested : null,
   };
-  for (const row of rows) {
-    const validatorIndex = row.validator_index ?? 0;
-    const day = new Date((row.slot_start_date_time ?? 0) * 1000).toISOString().slice(0, 10);
-    add(sourceMissKey(validatorIndex));
-    add(sourceMissKey(validatorIndex, weekly ? weekStartOf(day) : day));
-  }
-  return misses;
 }
 
+function mergeSyncDays(
+  days: FctSyncCommitteeParticipationByValidatorDaily[]
+): Partial<FctSyncCommitteeParticipationByValidatorDaily> {
+  return {
+    total_slots: total(days, 'total_slots'),
+    participated_count: total(days, 'participated_count'),
+    missed_count: total(days, 'missed_count'),
+  };
+}
+
+/** The first day opens the period; everything else (end balance, status) is the last day's */
+function mergeBalanceDays(days: FctValidatorBalanceDaily[]): Partial<FctValidatorBalanceDaily> {
+  const mins = days.flatMap(d => (d.min_balance == null ? [] : [d.min_balance]));
+  const maxes = days.flatMap(d => (d.max_balance == null ? [] : [d.max_balance]));
+  return {
+    start_balance: days[0].start_balance,
+    start_epoch: days[0].start_epoch,
+    min_balance: mins.length > 0 ? Math.min(...mins) : undefined,
+    max_balance: maxes.length > 0 ? Math.max(...maxes) : undefined,
+  };
+}
+
+/** Mondays per weekly request, about six years; with 250 validators the URL stays near 6 KB */
+const WEEKS_PER_REQUEST = 320;
+
 /**
- * Aggregate attestation data by validator
+ * Aggregate attestation data by validator.
+ *
+ * Source votes are known only for attestations seen on gossip, so the source rate divides correct by correct plus
+ * incorrect votes rather than by attestations. Before gossip data starts (2025-02-01 on mainnet) both counts are 0,
+ * which leaves the rate unknown rather than 100%.
  */
 function aggregateAttestationByValidator(
-  data: FctAttestationVoteCorrectnessByValidatorDaily[],
-  sourceMisses: SourceMisses
+  data: FctAttestationVoteCorrectnessByValidatorDaily[]
 ): Map<number, ValidatorAttestationMetrics> {
   const byValidator = new Map<number, ValidatorAttestationMetrics>();
   // Σ(avg inclusion distance × attested) per validator, so the average weighs each attestation once
@@ -153,6 +176,7 @@ function aggregateAttestationByValidator(
     metrics.headCorrectCount += record.head_correct_count ?? 0;
     metrics.targetCorrectCount += record.target_correct_count ?? 0;
     metrics.sourceCorrectCount += record.source_correct_count ?? 0;
+    metrics.sourceIncorrectCount += record.source_incorrect_count ?? 0;
     const attested = record.attested_count ?? 0;
     if (record.avg_inclusion_distance != null && attested > 0) {
       distanceSums.set(
@@ -170,7 +194,6 @@ function aggregateAttestationByValidator(
     metrics.inclusionRate = safePercentage(metrics.attestedCount, metrics.totalDuties);
     metrics.headCorrectRate = safePercentage(metrics.headCorrectCount, metrics.attestedCount);
     metrics.targetCorrectRate = safePercentage(metrics.targetCorrectCount, metrics.attestedCount);
-    metrics.sourceIncorrectCount = sourceMisses.get(sourceMissKey(metrics.validatorIndex)) ?? 0;
     metrics.sourceCorrectRate = safePercentage(
       metrics.sourceCorrectCount,
       metrics.sourceCorrectCount + metrics.sourceIncorrectCount
@@ -432,14 +455,11 @@ function calculateAggregateSummary(
 /**
  * Transform attestation data to daily data points
  */
-function transformAttestationDaily(
-  data: FctAttestationVoteCorrectnessByValidatorDaily[],
-  sourceMisses: SourceMisses
-): AttestationDailyDataPoint[] {
+function transformAttestationDaily(data: FctAttestationVoteCorrectnessByValidatorDaily[]): AttestationDailyDataPoint[] {
   return data.map(record => {
     const validatorIndex = record.validator_index ?? 0;
     const sourceCorrect = record.source_correct_count ?? 0;
-    const sourceIncorrect = sourceMisses.get(sourceMissKey(validatorIndex, record.day_start_date ?? '')) ?? 0;
+    const sourceIncorrect = record.source_incorrect_count ?? 0;
     return {
       timestamp: dateStringToTimestamp(record.day_start_date ?? ''),
       validatorIndex,
@@ -482,8 +502,8 @@ function transformBalanceDaily(data: FctValidatorBalanceDaily[]): BalanceDailyDa
  * Hook to fetch and aggregate validator performance data
  *
  * @param validatorIndices - Array of validator indices to fetch data for
- * @param startTime - Start timestamp (Unix seconds)
- * @param endTime - End timestamp (Unix seconds)
+ * @param startTime - First day of the range (Unix seconds, start of day UTC)
+ * @param endTime - Last day of the range (Unix seconds, start of day UTC); the day is included
  */
 export function useValidatorsData(
   validatorIndices: number[],
@@ -491,15 +511,18 @@ export function useValidatorsData(
   endTime: number,
   {
     resolution = 'day',
-    allHistory = false,
-    slotsTo = endTime,
+    slotsFrom = startTime,
+    slotsEnd = endTime + 86400,
   }: {
-    /** Row granularity: one row per validator per day, or per week (Monday UTC) */
+    /**
+     * Row granularity: one row per validator per day, or per week (Monday UTC). Weekly rows cover the whole weeks in
+     * the range; the days before and after them are added up into partial weeks from the daily rows.
+     */
     resolution?: 'day' | 'week';
-    /** The range starts at the earliest data, so days need no explicit list */
-    allHistory?: boolean;
-    /** Last day of the per-slot proposal read (start of day UTC), which can run past the last complete week */
-    slotsTo?: number;
+    /** Start (Unix seconds) of the per-slot proposal read, no earlier than the proposer table's data */
+    slotsFrom?: number;
+    /** Exclusive end (Unix seconds) of the per-slot proposal read, which can run past the range's last day */
+    slotsEnd?: number;
   } = {}
 ): UseValidatorsDataReturn {
   const { currentNetwork } = useNetwork();
@@ -508,26 +531,8 @@ export function useValidatorsData(
   const enabled = validatorIndices.length > 0 && startTime > 0 && endTime > 0 && !!currentNetwork;
 
   const weekly = resolution === 'week';
-  const dateRangeString = useMemo(() => {
-    if (!enabled || allHistory) return '';
-    const days = generateDateRange(startTime, endTime);
-    return weekly ? [...new Set(days.split(',').map(weekStartOf))].join(',') : days;
-  }, [enabled, allHistory, weekly, startTime, endTime]);
-  // Listing every day of a multi-year range would not fit in a URL
-  const dayFilter = allHistory
-    ? { day_start_date_ne: currentUtcDate() }
-    : { day_start_date_in_values: dateRangeString };
-  const weekFilter = allHistory
-    ? { week_start_date_ne: currentUtcWeek() }
-    : { week_start_date_in_values: dateRangeString };
-  const periodFilter = weekly ? weekFilter : dayFilter;
-  const periodColumn = weekly ? 'week_start_date' : 'day_start_date';
-
-  // Wrong source votes over the same days or weeks as the rollups, from the per-slot table
-  const firstDay = new Date(startTime * 1000).toISOString().slice(0, 10);
-  const lastDay = new Date(endTime * 1000).toISOString().slice(0, 10);
-  const missesFrom = allHistory ? 0 : dateStringToTimestamp(weekly ? weekStartOf(firstDay) : firstDay);
-  const missesTo = dateStringToTimestamp(weekly ? weekStartOf(lastDay) : lastDay) + (weekly ? 7 : 1) * 86400;
+  // End of the range's last day, where the rollups stop
+  const rangeEnd = endTime + 86400;
 
   const { data, isLoading, isPlaceholderData, error } = useQuery({
     queryKey: [
@@ -536,15 +541,15 @@ export function useValidatorsData(
       currentNetwork?.name,
       indicesString,
       resolution,
-      periodFilter,
       startTime,
       endTime,
-      slotsTo,
-      missesFrom,
-      missesTo,
+      slotsFrom,
+      slotsEnd,
     ],
     queryFn: async ({ signal }) => {
       const chunks = chunkArray(validatorIndices, VALIDATORS_PER_REQUEST).map(c => c.join(','));
+      // Every request lists its days or weeks, so each one has a start and an end
+      const periods = rollupPeriods(startTime, endTime, weekly);
       /** Every row for every chunk of validators */
       const rows = async <T>(fn: unknown, table: string, query: Record<string, unknown>): Promise<T[]> =>
         (
@@ -560,50 +565,64 @@ export function useValidatorsData(
           )
         ).flat();
       // Weekly rows keep the daily shape, keyed by their week's Monday, so every consumer reads both
-      const rollup = async <T>(daily: unknown, weeklyFn: unknown, table: string): Promise<T[]> =>
-        (
-          await rows<T & { week_start_date?: string }>(
-            weekly ? weeklyFn : daily,
-            `${table}_${weekly ? 'weekly' : 'daily'}`,
-            { ...periodFilter, order_by: `${periodColumn}, validator_index` }
-          )
-        ).map(({ week_start_date, ...rest }) =>
-          week_start_date === undefined ? (rest as T) : ({ ...rest, day_start_date: week_start_date } as T)
-        );
+      const rollup = async <T extends { validator_index?: number; day_start_date?: string }>(
+        daily: unknown,
+        weeklyFn: unknown,
+        table: string,
+        merge: (days: T[]) => Partial<T>
+      ): Promise<T[]> => {
+        const [weekRows, dayRows] = await Promise.all([
+          Promise.all(
+            chunkArray(periods.weeks, WEEKS_PER_REQUEST).map(weeks =>
+              rows<T & { week_start_date?: string }>(weeklyFn, `${table}_weekly`, {
+                week_start_date_in_values: weeks.join(','),
+                order_by: 'week_start_date, validator_index',
+              })
+            )
+          ).then(pages => pages.flat()),
+          periods.days.length > 0
+            ? rows<T>(daily, `${table}_daily`, {
+                day_start_date_in_values: periods.days.join(','),
+                order_by: 'day_start_date, validator_index',
+              })
+            : [],
+        ]);
+        return [
+          ...weekRows.map(({ week_start_date, ...rest }) => ({ ...rest, day_start_date: week_start_date }) as T),
+          ...(weekly ? intoWeeks(dayRows, merge) : dayRows),
+        ];
+      };
 
-      const [attestation, syncCommittee, balance, blockProposal, sourceMissRows] = await Promise.all([
+      const [attestation, syncCommittee, balance, blockProposal] = await Promise.all([
         rollup<FctAttestationVoteCorrectnessByValidatorDaily>(
           fctAttestationVoteCorrectnessByValidatorDailyServiceList,
           fctAttestationVoteCorrectnessByValidatorWeeklyServiceList,
-          'fct_attestation_vote_correctness_by_validator'
+          'fct_attestation_vote_correctness_by_validator',
+          mergeAttestationDays
         ),
         rollup<FctSyncCommitteeParticipationByValidatorDaily>(
           fctSyncCommitteeParticipationByValidatorDailyServiceList,
           fctSyncCommitteeParticipationByValidatorWeeklyServiceList,
-          'fct_sync_committee_participation_by_validator'
+          'fct_sync_committee_participation_by_validator',
+          mergeSyncDays
         ),
         rollup<FctValidatorBalanceDaily>(
           fctValidatorBalanceDailyServiceList,
           fctValidatorBalanceWeeklyServiceList,
-          'fct_validator_balance'
+          'fct_validator_balance',
+          mergeBalanceDays
         ),
         rows<FctBlockProposerByValidator>(fctBlockProposerByValidatorServiceList, 'fct_block_proposer_by_validator', {
-          slot_start_date_time_gte: startTime,
-          slot_start_date_time_lt: slotsTo + 86400,
+          slot_start_date_time_gte: slotsFrom,
+          slot_start_date_time_lt: slotsEnd,
           order_by: 'slot_start_date_time',
         }),
-        rows<FctAttestationVoteCorrectnessByValidator>(
-          fctAttestationVoteCorrectnessByValidatorServiceList,
-          'fct_attestation_vote_correctness_by_validator',
-          { slot_start_date_time_gte: missesFrom, slot_start_date_time_lt: missesTo, source_correct_eq: false }
-        ),
       ]);
       return {
         attestation,
         syncCommittee,
         balance,
         blockProposal,
-        sourceMisses: countSourceMisses(sourceMissRows, weekly),
       };
     },
     enabled,
@@ -622,11 +641,11 @@ export function useValidatorsData(
         blockProposals: [],
       };
     }
-    const { attestation: attestationData, syncCommittee: syncCommitteeData, balance: balanceData, sourceMisses } = data;
+    const { attestation: attestationData, syncCommittee: syncCommitteeData, balance: balanceData } = data;
     // Summaries and the heatmap count proposals over the rollups' days, which can end before the per-slot read
-    const blockProposalData = data.blockProposal.filter(p => (p.slot_start_date_time ?? 0) < endTime + 86400);
+    const blockProposalData = data.blockProposal.filter(p => (p.slot_start_date_time ?? 0) < rangeEnd);
 
-    const attestationByValidator = aggregateAttestationByValidator(attestationData, sourceMisses);
+    const attestationByValidator = aggregateAttestationByValidator(attestationData);
     const syncCommitteeByValidator = aggregateSyncCommitteeByValidator(syncCommitteeData);
     const blockProposalByValidator = aggregateBlockProposalByValidator(blockProposalData);
     const balanceByValidator = aggregateBalanceByValidator(balanceData);
@@ -691,12 +710,12 @@ export function useValidatorsData(
     return {
       validators,
       summary,
-      attestationDaily: transformAttestationDaily(attestationData, sourceMisses),
+      attestationDaily: transformAttestationDaily(attestationData),
       syncCommitteeDaily: transformSyncCommitteeDaily(syncCommitteeData),
       balanceDaily: transformBalanceDaily(balanceData),
       blockProposals: transformBlockProposals(blockProposalData),
     };
-  }, [data, endTime]);
+  }, [data, rangeEnd]);
 
   const raw = {
     attestation: data?.attestation ?? [],

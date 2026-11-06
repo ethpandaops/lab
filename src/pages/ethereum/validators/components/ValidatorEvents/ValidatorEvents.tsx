@@ -36,9 +36,10 @@ const formatEth = (gwei: number): string =>
 
 interface ValidatorEventsProps {
   indices: number[];
-  /** Range start and end day (unix seconds, start of day UTC); the end day is included */
+  /** Range start (unix seconds) */
   from: number;
-  to: number;
+  /** Exclusive end (unix seconds) */
+  end: number;
   validator: number | null;
   onValidatorChange: (validator: number | null) => void;
 }
@@ -50,7 +51,7 @@ interface ValidatorEventsProps {
 export function ValidatorEvents({
   indices,
   from,
-  to,
+  end,
   validator,
   onValidatorChange,
 }: ValidatorEventsProps): JSX.Element {
@@ -58,13 +59,16 @@ export function ValidatorEvents({
   const [slotQuery, setSlotQuery] = useState('');
   const slot = /^\d+$/.test(slotQuery.trim()) ? Number(slotQuery.trim()) : null;
 
-  const page = useCursorPagination(JSON.stringify([indices, from, to, validator, kind, slot]));
+  const page = useCursorPagination(JSON.stringify([indices, from, end, validator, kind, slot]));
+  // The event table is still filling backwards; the read starts no earlier than its first day, and an empty result
+  // before its start means no data, not no events
+  const bounds = useTableBounds('fct_validator_event');
   const { data, isLoading, isPlaceholderData, error } = useQuery({
     ...fctValidatorEventServiceListOptions({
       query: {
         validator_index_in_values: (validator === null ? indices : [validator]).join(','),
-        slot_start_date_time_gte: from,
-        slot_start_date_time_lt: to + 86_400,
+        slot_start_date_time_gte: Math.max(from, Math.floor((bounds.data?.min ?? from) / 86_400) * 86_400),
+        slot_start_date_time_lt: end,
         order_by: 'slot DESC, event_position ASC',
         page_size: page.pageSize,
         page_token: page.pageToken,
@@ -72,12 +76,10 @@ export function ValidatorEvents({
         ...(slot !== null && { slot_eq: slot }),
       },
     }),
-    enabled: indices.length > 0,
+    enabled: indices.length > 0 && bounds.data !== undefined,
     placeholderData: keepPreviousData,
   });
   const rows = data?.fct_validator_event ?? [];
-  // The event table is still filling backwards; an empty result before its start means no data, not no events
-  const bounds = useTableBounds('fct_validator_event');
   const coverageStart =
     bounds.data && bounds.data.min > from
       ? new Date(bounds.data.min * 1000).toLocaleDateString('en-US', {

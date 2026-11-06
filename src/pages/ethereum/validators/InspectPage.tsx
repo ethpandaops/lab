@@ -12,6 +12,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { useTableBounds } from '@/hooks/useBounds';
 import { completeBucketEnd } from '@/utils/time';
 import { useValidatorsData, useValidatorResolver, useValidatorStatus, useValidatorIdentity } from './hooks';
+import { activityEnd, weekSpan } from './utils/range';
 import {
   ValidatorInput,
   parseValidatorIndices,
@@ -42,8 +43,6 @@ const DAY = 86_400;
 const MAX_DAILY_RANGE_DAYS = 120;
 
 const startOfDay = (ts: number): number => Math.floor(ts / DAY) * DAY;
-/** Monday (UTC) of the week containing the day */
-const mondayOf = (ts: number): number => ts - ((new Date(ts * 1000).getUTCDay() + 6) % 7) * DAY;
 // Links can carry the list JSON-quoted (indices="1,2"), so quotes are dropped
 const tagsFromUrl = (indices?: string | number): string[] =>
   String(indices ?? '')
@@ -64,6 +63,8 @@ export function InspectPage(): JSX.Element {
   const attestationBounds = useTableBounds('fct_attestation_vote_correctness_by_validator_daily');
   const proposalBounds = useTableBounds('fct_block_proposer_by_validator');
   const earliest = balanceBounds.data ? startOfDay(balanceBounds.data.min) : undefined;
+  // Whole days, so the proposal read keeps its key while the bounds move within a day
+  const proposalsFrom = proposalBounds.data ? startOfDay(proposalBounds.data.min) : undefined;
   const performanceFloor =
     attestationBounds.data && proposalBounds.data
       ? startOfDay(Math.max(attestationBounds.data.min, proposalBounds.data.min))
@@ -73,25 +74,31 @@ export function InspectPage(): JSX.Element {
   const [range, setRange] = useState<{ from?: number; to?: number }>({ from: search.from, to: search.to });
   const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('inclusion');
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  // When Activity was last asked to run to now; reset with each range, so its requests stay the same in between
+  const [activityNow, setActivityNow] = useState(() => Date.now());
   const [selection, setSelection] = useState<ValidatorSelection>({
     validatorIndex: null,
     dayTimestamp: null,
     hourTimestamp: null,
   });
 
-  // Start of the last complete UTC day, and the Sunday ending the last complete week
+  // Start of the last complete UTC day
   const lastDay = completeBucketEnd('day') - DAY;
-  const lastWeekDay = completeBucketEnd('week') - DAY;
   const to = range.to ?? lastDay;
   // Until the earliest day is known, an open start has no date; nothing loads before then
   const rangeFrom = range.from ?? earliest;
   const from = rangeFrom ?? to;
-  // Only a range that also ends on the last complete day can skip listing its periods; an earlier end must cut rows off
-  const allHistory = earliest !== undefined && from <= earliest && to >= lastDay;
   const resolution = (to - from) / DAY > MAX_DAILY_RANGE_DAYS ? 'week' : 'day';
-  // Weekly rows cover Monday to Sunday, so the data spans every complete week the range touches
-  const dataFrom = resolution === 'week' ? mondayOf(from) : from;
-  const dataTo = resolution === 'week' ? Math.min(lastWeekDay, mondayOf(to) + 6 * DAY) : to;
+  // Rollups cover the range's days and never the day in progress; at weekly grain the days around the whole weeks
+  // are added up into partial weeks
+  const dataTo = Math.min(to, lastDay);
+  // Per-slot Activity runs to now when the range ends on the last complete day
+  const slotsEnd = activityEnd(to, activityNow);
+  /** The days of a heatmap or breakdown week inside the range */
+  const weekRange = (weekStart: number): { from: number; to: number } => {
+    const [first, last] = weekSpan(weekStart, from, dataTo);
+    return { from: first, to: last };
+  };
 
   const { valid: parsedIndices, pubkeys: parsedPubkeys } = useMemo(() => parseValidatorIndices(tags), [tags]);
   const {
@@ -102,7 +109,7 @@ export function InspectPage(): JSX.Element {
     unresolvedPubkeys,
   } = useValidatorResolver(parsedIndices, parsedPubkeys, hasAnalyzed);
 
-  const ready = hasAnalyzed && isResolved && rangeFrom !== undefined;
+  const ready = hasAnalyzed && isResolved && rangeFrom !== undefined && proposalsFrom !== undefined;
   const {
     validators,
     summary,
@@ -115,10 +122,10 @@ export function InspectPage(): JSX.Element {
     error,
     hasData,
     raw,
-  } = useValidatorsData(ready ? resolvedIndices : [], ready ? dataFrom : 0, ready ? dataTo : 0, {
+  } = useValidatorsData(ready ? resolvedIndices : [], ready ? from : 0, ready ? dataTo : 0, {
     resolution,
-    allHistory,
-    slotsTo: to,
+    slotsFrom: Math.max(from, proposalsFrom ?? from),
+    slotsEnd,
   });
 
   const { getStatusAtTimestamp, unknownValidators, latestStatus } = useValidatorStatus(ready ? resolvedIndices : []);
@@ -175,6 +182,7 @@ export function InspectPage(): JSX.Element {
   const handleAnalyze = useCallback(() => {
     if (!hasValidInput) return;
     setHasAnalyzed(true);
+    setActivityNow(Date.now());
     updateUrl(tags, range);
   }, [hasValidInput, tags, range, updateUrl]);
 
@@ -193,6 +201,7 @@ export function InspectPage(): JSX.Element {
       const isAll = earliest !== undefined && picked.from <= earliest && picked.to === completeBucketEnd('day') - DAY;
       const next = isAll ? {} : picked;
       setRange(next);
+      setActivityNow(Date.now());
       setSelection({ validatorIndex: null, dayTimestamp: null, hourTimestamp: null });
       if (hasAnalyzed) updateUrl(tags, next);
     },
@@ -217,15 +226,15 @@ export function InspectPage(): JSX.Element {
   const loading = isResolving || isLoading || rangeFrom === undefined;
   const busy = loading || isPlaceholderData;
   // Attestation and proposal tables start later than balances; the heatmap and table begin where they do
-  const performanceFrom = performanceFloor !== undefined ? Math.max(dataFrom, performanceFloor) : dataFrom;
+  const performanceFrom = performanceFloor !== undefined ? Math.max(from, performanceFloor) : from;
   const rangeMeta = (
     <span className="flex items-center gap-2">
-      {formatDate(dataFrom)} – {formatDate(dataTo)}
+      {formatDate(from)} – {formatDate(dataTo)}
       {resolution === 'week' && <Badge color="gray">Weekly</Badge>}
     </span>
   );
   const performanceNote =
-    performanceFloor !== undefined && dataFrom < performanceFloor
+    performanceFloor !== undefined && from < performanceFloor
       ? `Attestation and proposal data start ${formatDate(performanceFloor)}.`
       : undefined;
 
@@ -296,9 +305,8 @@ export function InspectPage(): JSX.Element {
                 <ValidatorBalance
                   balances={raw.balance}
                   validatorIndices={knownIndices}
-                  from={dataFrom}
+                  from={from}
                   to={dataTo}
-                  allHistory={allHistory}
                   daysPerRow={resolution === 'week' ? 7 : 1}
                 />
               )}
@@ -314,7 +322,7 @@ export function InspectPage(): JSX.Element {
                 from={performanceFrom}
                 to={dataTo}
                 stepDays={resolution === 'week' ? 7 : 1}
-                onWeekSelect={weekStart => applyRange({ from: weekStart, to: weekStart + 6 * DAY })}
+                onWeekSelect={weekStart => applyRange(weekRange(weekStart))}
                 isLoading={loading}
                 validatorIndices={knownIndices}
                 selection={selection}
@@ -336,7 +344,7 @@ export function InspectPage(): JSX.Element {
                     to={dataTo}
                     stepDays={resolution === 'week' ? 7 : 1}
                     onWeekSelect={weekStart => {
-                      applyRange({ from: weekStart, to: weekStart + 6 * DAY });
+                      applyRange(weekRange(weekStart));
                       setSelection({ validatorIndex: knownIndices[0], dayTimestamp: null, hourTimestamp: null });
                     }}
                     getStatusAtTimestamp={getStatusAtTimestamp}
@@ -366,7 +374,7 @@ export function InspectPage(): JSX.Element {
                   to={dataTo}
                   stepDays={resolution === 'week' ? 7 : 1}
                   onWeekSelect={(validatorIndex, weekStart) => {
-                    applyRange({ from: weekStart, to: weekStart + 6 * DAY });
+                    applyRange(weekRange(weekStart));
                     setSelection({ validatorIndex, dayTimestamp: null, hourTimestamp: null });
                   }}
                   getStatusAtTimestamp={getStatusAtTimestamp}
@@ -381,8 +389,7 @@ export function InspectPage(): JSX.Element {
             </InspectSection>
 
             {hasData && (
-              // Per-slot activity runs to the range's last day, past the last complete week
-              <ValidatorDuties indices={knownIndices} from={dataFrom} to={to} proposals={raw.blockProposal} />
+              <ValidatorDuties indices={knownIndices} from={from} end={slotsEnd} proposals={raw.blockProposal} />
             )}
           </div>
         )}

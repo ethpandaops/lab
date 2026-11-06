@@ -11,16 +11,17 @@ type ActivityTab = 'attestations' | 'proposals' | 'sync' | 'events';
 
 interface ValidatorDutiesProps {
   indices: number[];
-  /** Range start and end day (unix seconds, start of day UTC) */
+  /** Range start (unix seconds, start of day UTC) */
   from: number;
-  to: number;
+  /** Exclusive end of the per-slot reads (unix seconds) */
+  end: number;
   proposals: FctBlockProposerByValidator[];
 }
 
 /**
  * Individual duties (attestations, proposals, sync committee) and lifecycle events for the inspected validators.
  */
-export function ValidatorDuties({ indices, from, to, proposals }: ValidatorDutiesProps): JSX.Element {
+export function ValidatorDuties({ indices, from, end, proposals }: ValidatorDutiesProps): JSX.Element {
   const [tab, setTab] = useState<ActivityTab>('attestations');
   const [validator, setValidator] = useState<number | null>(null);
   const tabs = (
@@ -41,13 +42,13 @@ export function ValidatorDuties({ indices, from, to, proposals }: ValidatorDutie
   return (
     <InspectSection title="Activity" actions={tabs}>
       {tab === 'events' ? (
-        <ValidatorEvents {...shared} from={from} to={to} />
+        <ValidatorEvents {...shared} from={from} end={end} />
       ) : tab === 'proposals' ? (
         <ProposalDuties {...shared} proposals={proposals} from={from} />
       ) : tab === 'sync' ? (
-        <SyncDuties {...shared} from={from} to={to} />
+        <SyncDuties {...shared} from={from} end={end} />
       ) : (
-        <AttestationDuties {...shared} from={from} to={to} />
+        <AttestationDuties {...shared} from={from} end={end} />
       )}
     </InspectSection>
   );

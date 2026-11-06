@@ -11,6 +11,7 @@ import type {
 import { useHourlyData, useSlotData } from '../../hooks';
 import { getStatusIconConfig } from '../../hooks/useValidatorStatus';
 import { weekStartOf } from '../../utils/week';
+import { weekSpan } from '../../utils/range';
 
 interface DailyBreakdownTableProps {
   /** Daily attestation data for the validator */
@@ -717,6 +718,14 @@ export function DailyBreakdownTable({
     return <div className="py-4 text-center text-xs text-muted">No daily data available</div>;
   }
 
+  /** A row's date: its day, its week's Monday, or the days of a week the range cuts short */
+  const rowLabel = (row: DailyRow): string => {
+    if (!weekly || from == null || to == null) return row.date;
+    const [first, last] = weekSpan(row.timestamp, from, to);
+    if (last - first === 6 * 86400) return row.date;
+    return first === last ? formatDate(first) : `${formatDate(first)} – ${formatDate(last)}`;
+  };
+
   return (
     <table className="w-full text-xs">
       <thead>
@@ -739,6 +748,7 @@ export function DailyBreakdownTable({
             <DailyDateRow
               key={row.date}
               row={row}
+              label={rowLabel(row)}
               isExpanded={isExpanded}
               validatorIndex={validatorIndex}
               blockProposals={blockProposals}
@@ -768,6 +778,7 @@ export function DailyBreakdownTable({
  */
 function DailyDateRow({
   row,
+  label,
   isExpanded,
   validatorIndex,
   blockProposals = [],
@@ -778,6 +789,7 @@ function DailyDateRow({
   onToggle,
 }: {
   row: DailyRow;
+  label: string;
   isExpanded: boolean;
   validatorIndex: number;
   blockProposals?: BlockProposalDataPoint[];
@@ -803,7 +815,7 @@ function DailyDateRow({
             ) : (
               <ChevronRightIcon className="size-3 text-muted" />
             )}
-            {row.date}
+            {label}
             {getStatusAtTimestamp &&
               (() => {
                 const config = getStatusIconConfig(

@@ -34,8 +34,10 @@ interface AttestationDutiesProps {
   indices: number[];
   validator: number | null;
   onValidatorChange: (validator: number | null) => void;
+  /** Range start (unix seconds) */
   from: number;
-  to: number;
+  /** Exclusive end (unix seconds) */
+  end: number;
 }
 
 /**
@@ -46,17 +48,17 @@ export function AttestationDuties({
   validator,
   onValidatorChange,
   from,
-  to,
+  end,
 }: AttestationDutiesProps): JSX.Element {
   const [outcome, setOutcome] = useState<AttestationOutcome>('all');
   const [slotQuery, setSlotQuery] = useState('');
   const slot = /^\d+$/.test(slotQuery.trim()) ? Number(slotQuery.trim()) : null;
 
-  const page = useCursorPagination(JSON.stringify([indices, from, to, validator, outcome, slot]));
+  const page = useCursorPagination(JSON.stringify([indices, from, end, validator, outcome, slot]));
   const { duties, nextPageToken, isLoading, isPlaceholderData, error } = useAttestationDuties({
     indices: validator === null ? indices : [validator],
     from,
-    to,
+    end,
     outcome,
     slot,
     pageSize: page.pageSize,

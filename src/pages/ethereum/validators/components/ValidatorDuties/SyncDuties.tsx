@@ -11,6 +11,7 @@ import {
   fctSyncCommitteeRewardByValidatorServiceListOptions,
 } from '@/api/@tanstack/react-query.gen';
 import type { FctSyncCommitteeParticipationByValidator } from '@/api/types.gen';
+import { useTableBounds } from '@/hooks/useBounds';
 import { useCursorPagination } from '../../hooks/useCursorPagination';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
 import { formatGwei } from './format';
@@ -21,26 +22,30 @@ interface SyncDutiesProps {
   indices: number[];
   validator: number | null;
   onValidatorChange: (validator: number | null) => void;
+  /** Range start (unix seconds) */
   from: number;
-  to: number;
+  /** Exclusive end (unix seconds) */
+  end: number;
 }
 
 /**
  * Sync committee duties, one row per validator per slot, newest first.
  */
-export function SyncDuties({ indices, validator, onValidatorChange, from, to }: SyncDutiesProps): JSX.Element {
+export function SyncDuties({ indices, validator, onValidatorChange, from, end }: SyncDutiesProps): JSX.Element {
   const [result, setResult] = useState<SyncResult>('all');
   const [slotQuery, setSlotQuery] = useState('');
   const slot = /^\d+$/.test(slotQuery.trim()) ? Number(slotQuery.trim()) : null;
   const filtered = validator !== null || result !== 'all' || slot !== null;
 
-  const page = useCursorPagination(JSON.stringify([indices, from, to, validator, result, slot]));
+  const page = useCursorPagination(JSON.stringify([indices, from, end, validator, result, slot]));
+  // Start no earlier than the table's first day, so the read never reaches back past its data
+  const bounds = useTableBounds('fct_sync_committee_participation_by_validator').data;
   const { data, isLoading, isPlaceholderData, error } = useQuery({
     ...fctSyncCommitteeParticipationByValidatorServiceListOptions({
       query: {
         validator_index_in_values: (validator === null ? indices : [validator]).join(','),
-        slot_start_date_time_gte: from,
-        slot_start_date_time_lt: to + 86_400,
+        slot_start_date_time_gte: Math.max(from, Math.floor((bounds?.min ?? from) / 86_400) * 86_400),
+        slot_start_date_time_lt: end,
         order_by: 'slot DESC, validator_index ASC',
         page_size: page.pageSize,
         page_token: page.pageToken,
@@ -48,7 +53,7 @@ export function SyncDuties({ indices, validator, onValidatorChange, from, to }: 
         ...(result === 'missed' && { participated_eq: false }),
       },
     }),
-    enabled: indices.length > 0,
+    enabled: indices.length > 0 && bounds !== undefined,
     placeholderData: keepPreviousData,
   });
   const rows = data?.fct_sync_committee_participation_by_validator ?? [];

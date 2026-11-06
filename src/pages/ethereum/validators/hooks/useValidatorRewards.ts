@@ -16,14 +16,22 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { currentUtcDate, currentUtcWeek } from '@/utils/time';
+import { rollupPeriods } from '../utils/range';
+import { weekStartOf } from '../utils/week';
 
 const GWEI = 1e9;
 const PAGE = 10_000;
 /** Validators per request, so the index list keeps the URL short; page tokens fetch the rows beyond one page */
 const VALIDATORS_PER_REQUEST = 250;
 
+/** Mondays per weekly request, about six years; with 250 validators the URL stays near 6 KB */
+const WEEKS_PER_REQUEST = 320;
+
 type ListFn = Parameters<typeof fetchAllPages>[0];
+
+function chunkList<T>(list: T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
+}
 
 export interface RewardPeriod {
   /** First day of the period: the day, or the week's Monday */
@@ -44,17 +52,14 @@ export function useValidatorRewards({
   from,
   to,
   resolution,
-  periodKeys,
-  allHistory,
   enabled: wanted,
 }: {
   indices: number[];
+  /** Range start and end day (unix seconds, start of day UTC); the end day is included */
   from: number;
   to: number;
+  /** Per day, or per week: whole weeks from the weekly rollups, the days around them added up into partial weeks */
   resolution: 'day' | 'week';
-  /** Days (or Mondays) in the range; ignored when allHistory */
-  periodKeys: string[];
-  allHistory: boolean;
   /** Load only while the rewards are shown */
   enabled: boolean;
 }): {
@@ -67,41 +72,51 @@ export function useValidatorRewards({
   const { currentNetwork } = useNetwork();
   const enabled = wanted && indices.length > 0 && from > 0;
   const weekly = resolution === 'week';
-  const column = weekly ? 'week_start_date' : 'day_start_date';
-  const periodFilter = allHistory
-    ? { [`${column}_ne`]: weekly ? currentUtcWeek() : currentUtcDate() }
-    : { [`${column}_in_values`]: periodKeys.join(',') };
   const chunks: string[] = [];
   for (let i = 0; i < indices.length; i += VALIDATORS_PER_REQUEST) {
     chunks.push(indices.slice(i, i + VALIDATORS_PER_REQUEST).join(','));
   }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['validator-rewards', currentNetwork?.name, resolution, chunks, periodFilter, from, to],
+    queryKey: ['validator-rewards', currentNetwork?.name, resolution, chunks, from, to],
     queryFn: async ({ signal }) => {
-      /** Every row for every chunk, with weekly rows keyed by their Monday like daily rows */
+      // Every request lists its days or weeks, so each one has a start and an end
+      const { weeks, days } = rollupPeriods(from, to, weekly);
+      const lists = [
+        ...chunkList(weeks, WEEKS_PER_REQUEST).map(list => ({ weekly: true, list })),
+        ...(days.length > 0 ? [{ weekly: false, list: days }] : []),
+      ];
+      /** Every row for every chunk, keyed by its day, or at weekly grain by its week's Monday */
       const rows = async <T>(
         daily: ListFn,
         weeklyFn: ListFn,
         table: string,
         query: (ids: string) => Record<string, unknown>
       ): Promise<T[]> => {
-        const name = `${table}_${resolution === 'week' ? 'weekly' : 'daily'}`;
         const pages = await Promise.all(
-          chunks.map(ids =>
-            fetchAllPages<T & { week_start_date?: string }>(
-              weekly ? weeklyFn : daily,
-              { query: { ...query(ids), ...periodFilter, page_size: PAGE, order_by: column } },
-              name,
-              signal
-            )
+          lists.flatMap(period =>
+            chunks.map(ids => {
+              const column = period.weekly ? 'week_start_date' : 'day_start_date';
+              return fetchAllPages<T & { day_start_date?: string; week_start_date?: string }>(
+                period.weekly ? weeklyFn : daily,
+                {
+                  query: {
+                    ...query(ids),
+                    [`${column}_in_values`]: period.list.join(','),
+                    page_size: PAGE,
+                    order_by: column,
+                  },
+                },
+                `${table}_${period.weekly ? 'weekly' : 'daily'}`,
+                signal
+              );
+            })
           )
         );
-        return pages
-          .flat()
-          .map(({ week_start_date, ...rest }) =>
-            week_start_date === undefined ? (rest as T) : ({ ...rest, day_start_date: week_start_date } as T)
-          );
+        return pages.flat().map(({ week_start_date, ...rest }) => {
+          const day = week_start_date ?? rest.day_start_date ?? '';
+          return { ...rest, day_start_date: weekly ? weekStartOf(day) : day } as T;
+        });
       };
       const [attestation, sync, blocks, withdrawals] = await Promise.all([
         rows<FctAttestationRewardByValidatorDaily>(
