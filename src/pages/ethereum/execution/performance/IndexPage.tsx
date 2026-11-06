@@ -19,7 +19,7 @@ import { completeBucketEnd } from '@/utils/time';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
 import { useTableBounds } from '@/hooks/useBounds';
-import { usePerformanceData } from './hooks/usePerformanceData';
+import { SLOWEST_MAX_DAYS, usePerformanceData } from './hooks/usePerformanceData';
 import { useOpcodeCostData } from './hooks/useOpcodeCostData';
 import { DEFAULT_TIME_RANGE, PER_SLOT_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from './IndexPage.types';
 import {
@@ -349,10 +349,14 @@ function PerformanceSections({
           }
         </PopoutCard>
 
-        {/* Slowest blocks: read from the whole range, never from the sampled slices */}
+        {/* Slowest blocks: ranked over the range's last SLOWEST_MAX_DAYS days, never from the sampled slices */}
         <PopoutCard
           title="Slowest Blocks"
-          subtitle="Blocks that took the slowest client longest to execute"
+          subtitle={
+            end - start > SLOWEST_MAX_DAYS * 86_400
+              ? `Blocks that took the slowest client longest to execute, last ${SLOWEST_MAX_DAYS} days`
+              : 'Blocks that took the slowest client longest to execute'
+          }
           anchorId="slowest-blocks"
           modalSize="full"
           noPadding

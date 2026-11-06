@@ -40,9 +40,6 @@ export const payloadsSearchSchema = z.object({
   // Block detail dialog (unique identifier)
   detailSlot: z.coerce.number().optional(),
   detailNodeName: z.string().optional(),
-
-  // Live mode - streams new observations in real-time
-  isLive: z.coerce.boolean().optional(),
 });
 
 /**
@@ -80,7 +77,8 @@ export type EngineStatus = (typeof ENGINE_STATUS_VALUES)[number];
 export const DEFAULT_DURATION_MIN = 0; // No duration filter by default
 export const DEFAULT_PAGE_SIZE = 25;
 
-/**
- * Feature flags
- */
-export const LIVE_MODE_ENABLED = false; // Disabled for now - can re-enable later
+/** Order when the URL gives none: slowest observation first */
+export const DEFAULT_ORDER = 'duration_ms desc';
+
+/** Most days a ranking other than newest first reads, ending at the URL's range end or now */
+export const RANKED_MAX_DAYS = 7;

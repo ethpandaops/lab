@@ -1,4 +1,4 @@
-import { type JSX, useMemo, useState, useCallback, type RefObject } from 'react';
+import { type JSX, useMemo, useState, useCallback } from 'react';
 import { createColumnHelper, type SortingState } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
@@ -21,7 +21,6 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   QuestionMarkCircleIcon,
-  SignalIcon,
   InformationCircleIcon,
   ServerIcon,
 } from '@heroicons/react/24/outline';
@@ -164,11 +163,6 @@ export type PayloadsViewProps = {
   windowLabel?: string;
   // External links
   tracoorUrl?: string;
-  // Live mode props
-  isLive?: boolean;
-  onLiveModeToggle?: () => void;
-  newItemIdsRef?: RefObject<Set<string>>;
-  liveHitPageLimitRef?: RefObject<boolean>;
 };
 
 export function PayloadsView({
@@ -186,9 +180,6 @@ export function PayloadsView({
   durationThreshold,
   windowLabel,
   tracoorUrl,
-  isLive = false,
-  onLiveModeToggle,
-  newItemIdsRef,
 }: PayloadsViewProps): JSX.Element {
   // Learn more dialog state
   const [learnMoreOpen, setLearnMoreOpen] = useState(false);
@@ -357,17 +348,6 @@ export function PayloadsView({
     [onFilterClick, tracoorUrl, handleClusterClick]
   );
 
-  // Get row ID for live mode highlighting
-  const getRowId = (row: Payload): string => {
-    return `${row.slot_start_date_time}:${row.slot}:${row.meta_client_name}`;
-  };
-
-  // Check if row is newly added (for live mode animation)
-  const isRowNew = (row: Payload): boolean => {
-    if (!newItemIdsRef?.current) return false;
-    return newItemIdsRef.current.has(getRowId(row));
-  };
-
   // Handle apply preset from QuickFilters
   const handleApplyPreset = (presetFilters: Partial<FilterValues>): void => {
     onFiltersChange({
@@ -394,26 +374,10 @@ export function PayloadsView({
       {/* Hardware specs banner */}
       <EIP7870SpecsBanner className="mb-4" />
 
-      {/* Unified toolbar: Live toggle + Quick filters + Reference */}
+      {/* Unified toolbar: Quick filters + Reference */}
       <div className="mb-4">
-        <QuickFilters
-          currentFilters={filters}
-          onApplyPreset={handleApplyPreset}
-          onClearFilters={onClearFilters}
-          isLive={isLive}
-          onLiveModeToggle={onLiveModeToggle}
-        />
+        <QuickFilters currentFilters={filters} onApplyPreset={handleApplyPreset} onClearFilters={onClearFilters} />
       </div>
-
-      {/* Live mode indicator bar */}
-      {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-success/30 bg-success/10 px-4 py-2">
-          <div className="flex items-center gap-3">
-            <SignalIcon className="size-5 text-success" />
-            <span className="text-sm font-medium text-success">Live Mode Active</span>
-          </div>
-        </div>
-      )}
 
       {/* Filter panel */}
       <div className="mb-4">
@@ -428,7 +392,7 @@ export function PayloadsView({
         data={data}
         columns={columns}
         isLoading={isLoading}
-        title={isLive ? undefined : windowLabel}
+        title={windowLabel}
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         onPaginationChange={pagination.onPaginationChange}
@@ -447,19 +411,13 @@ export function PayloadsView({
           const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
           return clsx(
             'cursor-pointer transition-colors hover:bg-surface/50',
-            isRowNew(row) && 'animate-pulse bg-success/10',
             showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
           );
         }}
         hideGlobalFilter
         hideColumnVisibility
-        paginationPosition={isLive ? undefined : 'bottom'}
+        paginationPosition="bottom"
       />
-
-      {/* Live mode info */}
-      {isLive && data.length > 0 && (
-        <div className="mt-2 text-center text-xs text-muted">Showing latest {data.length} observations (max 50)</div>
-      )}
 
       {/* Reference Nodes Info Dialog */}
       <ReferenceNodesInfoDialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} />
