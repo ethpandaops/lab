@@ -1,9 +1,12 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useTableBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 import { offsetPageToken } from '@/utils/page-token';
+import { fetchNewestFirst, nowEnd } from '@/utils/widening-window';
 import { entityQuery } from '@/pages/ethereum/clients/utils/client-share';
 import {
   DEFAULT_BLOCK_PAGE_SIZE,
+  isNewestFirst,
   parseProposers,
   parseSort,
   type BlockSearch,
@@ -32,13 +35,20 @@ export interface UseEntityBlocksByStatusResult {
   hasNextPage: boolean;
 }
 
-/** One page of an entity's missed or orphaned slots, filtered, sorted and paged server-side by the search params */
+/**
+ * One page of an entity's missed or orphaned slots, filtered, sorted and paged server-side by the search params.
+ * Newest first reads widening windows back from the range's end, skipping the earlier pages' rows; the range starts
+ * no earlier than the table.
+ */
 export function useEntityBlocksByStatus(
   entity: string,
   status: ProposalStatus,
   search: BlockSearch
 ): UseEntityBlocksByStatusResult {
   const { currentNetwork } = useNetwork();
+  const { data: tableBounds, isLoading: boundsLoading } = useTableBounds(ENTITY_TABLES.proposers);
+  const tableStart = Math.max(currentNetwork?.genesis_time ?? 0, tableBounds?.min ?? 0);
+  const newest = isNewestFirst(search.sort, STATUS_SORT_FIELDS);
   const proposers = parseProposers(search.proposer);
   const size = search.size ?? DEFAULT_BLOCK_PAGE_SIZE;
   const { field, desc } = parseSort(search.sort, STATUS_SORT_FIELDS);
@@ -46,7 +56,7 @@ export function useEntityBlocksByStatus(
   const query = {
     ...entityQuery(entity),
     status_eq: status,
-    slot_start_date_time_gte: search.since ?? currentNetwork?.genesis_time ?? 0,
+    slot_start_date_time_gte: search.since ?? tableStart,
     ...(search.until !== undefined && { slot_start_date_time_lte: search.until }),
     ...(search.slotMin !== undefined && { slot_gte: search.slotMin }),
     ...(search.slotMax !== undefined && { slot_lte: search.slotMax }),
@@ -57,12 +67,38 @@ export function useEntityBlocksByStatus(
   };
 
   const result = useQuery({
-    queryKey: ['entity-blocks-by-status', currentNetwork?.name, query],
+    queryKey: ['entity-blocks-by-status', currentNetwork?.name, query, newest],
     queryFn: async ({ signal }) => {
-      const response = await fctBlockProposerByEntityList({ query, signal, throwOnError: true });
-      return response.data as { [ENTITY_TABLES.proposers]?: FctBlockProposerByEntity[]; next_page_token?: string };
+      type Page = { [ENTITY_TABLES.proposers]?: FctBlockProposerByEntity[]; next_page_token?: string };
+      if (!newest) {
+        const response = await fctBlockProposerByEntityList({ query, signal, throwOnError: true });
+        return response.data as Page;
+      }
+      const { page_token: _token, order_by: _order, slot_start_date_time_lte: last, ...filters } = query;
+      const { rows, next } = await fetchNewestFirst<FctBlockProposerByEntity>({
+        pageSize: size,
+        skip: ((search.page ?? 1) - 1) * size,
+        end: last !== undefined ? last + 1 : nowEnd(),
+        floor: filters.slot_start_date_time_gte,
+        timeOf: row => row.slot_start_date_time,
+        fetchWindow: async (window, limit) => {
+          const response = await fctBlockProposerByEntityList({
+            query: {
+              ...filters,
+              slot_start_date_time_gte: window.gte,
+              slot_start_date_time_lt: window.lt,
+              order_by: 'slot_start_date_time desc',
+              page_size: limit,
+            },
+            signal,
+            throwOnError: true,
+          });
+          return (response.data as Page)[ENTITY_TABLES.proposers] ?? [];
+        },
+      });
+      return { [ENTITY_TABLES.proposers]: rows, next_page_token: next ? 'more' : undefined } as Page;
     },
-    enabled: !!currentNetwork && !!entity,
+    enabled: !!currentNetwork && !!entity && !boundsLoading,
     placeholderData: keepPreviousData,
   });
 
@@ -73,7 +109,7 @@ export function useEntityBlocksByStatus(
   }));
   return {
     blocks,
-    isLoading: result.isLoading,
+    isLoading: result.isLoading || boundsLoading,
     isPlaceholderData: result.isPlaceholderData,
     error: result.error as Error | null,
     hasNextPage: !!result.data?.next_page_token && blocks.length === size,

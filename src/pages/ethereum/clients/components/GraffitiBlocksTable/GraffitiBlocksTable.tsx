@@ -15,6 +15,7 @@ import { GRAFFITI_FORMAT_LABELS } from '../../constants';
 import { useGraffitiBlocks } from '../../hooks/useGraffitiBlocks';
 import {
   DEFAULT_BLOCK_PAGE_SIZE,
+  hasRangeStart,
   paginationUpdate,
   parseSort,
   sortUpdate,
@@ -69,8 +70,12 @@ export function GraffitiBlocksTable({
   hideEntity = false,
   toolbar,
 }: GraffitiBlocksTableProps): JSX.Element {
-  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useGraffitiBlocks(search);
-  const { field, desc } = parseSort(search.sort);
+  // Without a range start only newest first, which reads all history in widening windows, can be shown
+  const sortable = hasRangeStart(search);
+  const { blocks, isLoading, isPlaceholderData, error, hasNextPage } = useGraffitiBlocks(
+    sortable ? search : { ...search, sort: undefined }
+  );
+  const { field, desc } = parseSort(sortable ? search.sort : undefined);
   const hasFilters = fields.some(key => search[key] !== undefined);
   const canFilterFormat = fields.includes('format');
 
@@ -174,7 +179,7 @@ export function GraffitiBlocksTable({
         {error && <Alert variant="error" title="Failed to load blocks" description={error.message} />}
         <DataTable
           data={blocks}
-          columns={columns}
+          columns={sortable ? columns : columns.map(column => ({ ...column, enableSorting: false }))}
           isLoading={isLoading}
           getRowId={row => `${row.slot}-${row.block_root}`}
           pageIndex={(search.page ?? 1) - 1}
