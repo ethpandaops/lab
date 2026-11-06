@@ -40,12 +40,10 @@ export interface LayerClientsProps {
   /** Each client's blocks in the last 24 hours against its latest release */
   latestAdoption: Map<string, LatestAdoption>;
   /**
-   * Why the P2P peers and Xatu nodes columns, their chart and, with `hideLatestAdoption`, the release columns are
-   * left out: the page's filters narrow the blocks in ways those numbers cannot follow. Shown in their place.
+   * Why the P2P peers and Xatu nodes columns and their chart are left out: the entity filter narrows the blocks in a
+   * way those numbers cannot follow. Shown in their place.
    */
   unfilteredNote?: string;
-  /** Leave out Known release and On latest, which cannot follow the other layer's client filter */
-  hideLatestAdoption?: boolean;
   /** Which blocks Known release and On latest cover when the page is filtered, e.g. "from coinbase" */
   adoptionScope?: string;
 }
@@ -112,7 +110,6 @@ export function LayerClients({
   latestReleases,
   latestAdoption,
   unfilteredNote,
-  hideLatestAdoption = false,
   adoptionScope,
 }: LayerClientsProps): JSX.Element {
   // Every number shown follows the page's filters; those that cannot are left out rather than shown network-wide
@@ -159,26 +156,20 @@ export function LayerClients({
       {showXatu && (
         <div>
           <dt className="inline font-medium text-foreground">Xatu nodes: </dt>
-          <dd className="inline">
-            beacon nodes running Xatu or contributoor that report to ethPandaOps, active in the last 24 hours.
-          </dd>
+          <dd className="inline">beacon nodes running Xatu or contributoor that report to ethPandaOps.</dd>
         </div>
       )}
-      {!hideLatestAdoption && (
-        <>
-          <div>
-            <dt className="inline font-medium text-foreground">Known release: </dt>
-            <dd className="inline">
-              share of the client&apos;s blocks {adoptionScope ? `${adoptionScope} ` : ''}in the last 24 hours whose
-              graffiti resolves to one of its releases.
-            </dd>
-          </div>
-          <div>
-            <dt className="inline font-medium text-foreground">On latest: </dt>
-            <dd className="inline">share of those blocks with a known release on its latest release or newer.</dd>
-          </div>
-        </>
-      )}
+      <div>
+        <dt className="inline font-medium text-foreground">Known release: </dt>
+        <dd className="inline">
+          share of the client&apos;s blocks {adoptionScope ? `${adoptionScope} ` : ''}whose graffiti resolves to one of
+          its releases.
+        </dd>
+      </div>
+      <div>
+        <dt className="inline font-medium text-foreground">On latest: </dt>
+        <dd className="inline">share of those blocks with a known release on its latest release or newer.</dd>
+      </div>
     </dl>
   );
 
@@ -202,22 +193,27 @@ export function LayerClients({
                   className="w-[26%]"
                 />
                 {showPeers && (
-                  <HeaderCell title="P2P peers" note="Peer-weighted" color={ANGLE_COLORS.peers} className="w-[26%]" />
+                  <HeaderCell
+                    title="P2P peers (latest day)"
+                    note="Peer-weighted"
+                    color={ANGLE_COLORS.peers}
+                    className="w-[26%]"
+                  />
                 )}
                 {showXatu && (
-                  <HeaderCell title="Xatu nodes" color={ANGLE_COLORS.xatu} className={clsx('text-right', WIDE_ONLY)} />
+                  <HeaderCell
+                    title="Xatu nodes (24h)"
+                    color={ANGLE_COLORS.xatu}
+                    className={clsx('text-right', WIDE_ONLY)}
+                  />
                 )}
                 <HeaderCell title="Latest" className={WIDE_ONLY} />
-                {!hideLatestAdoption && (
-                  <>
-                    <HeaderCell title="Known release" className={clsx('text-right', WIDE_ONLY)} />
-                    <HeaderCell
-                      title="On latest"
-                      note="Of known-release blocks"
-                      className={clsx('text-right', WIDE_ONLY)}
-                    />
-                  </>
-                )}
+                <HeaderCell title="Known release (24h)" className={clsx('text-right', WIDE_ONLY)} />
+                <HeaderCell
+                  title="On latest (24h)"
+                  note="Of known-release blocks"
+                  className={clsx('text-right', WIDE_ONLY)}
+                />
                 <th aria-hidden className={clsx('w-5', WIDE_ONLY)} />
               </tr>
             </thead>
@@ -258,22 +254,16 @@ export function LayerClients({
                       <td className={clsx('px-3 py-2 font-mono text-xs/6 whitespace-nowrap text-muted', WIDE_ONLY)}>
                         {latest ?? '-'}
                       </td>
-                      {!hideLatestAdoption && (
-                        <>
-                          <td className={clsx('px-3 py-2 text-right text-sm/6 text-muted tabular-nums', WIDE_ONLY)}>
-                            {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
-                          </td>
-                          <td
-                            className={clsx('px-3 py-2 text-right text-sm/6 text-foreground tabular-nums', WIDE_ONLY)}
-                          >
-                            {adoption === undefined ? (
-                              <span className="text-muted">-</span>
-                            ) : (
-                              `${adoption.share.toFixed(0)}%`
-                            )}
-                          </td>
-                        </>
-                      )}
+                      <td className={clsx('px-3 py-2 text-right text-sm/6 text-muted tabular-nums', WIDE_ONLY)}>
+                        {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
+                      </td>
+                      <td className={clsx('px-3 py-2 text-right text-sm/6 text-foreground tabular-nums', WIDE_ONLY)}>
+                        {adoption === undefined ? (
+                          <span className="text-muted">-</span>
+                        ) : (
+                          `${adoption.share.toFixed(0)}%`
+                        )}
+                      </td>
                       <td className={clsx('py-2 pl-1 text-right', WIDE_ONLY)}>
                         <ChevronRightIcon className="inline size-4 text-muted group-hover:text-primary" />
                       </td>
@@ -284,7 +274,7 @@ export function LayerClients({
                         <dl className="grid grid-cols-[auto_auto_auto_auto] justify-start gap-x-3 pb-2 pl-7 text-xs/5 whitespace-nowrap text-muted">
                           {showXatu && xatuNodes && (
                             <>
-                              <dt>Xatu nodes</dt>
+                              <dt>Xatu nodes (24h)</dt>
                               <dd className="text-foreground tabular-nums">
                                 {(xatuNodes.get(row.client) ?? 0).toLocaleString()}
                               </dd>
@@ -292,18 +282,14 @@ export function LayerClients({
                           )}
                           <dt>Latest</dt>
                           <dd className="font-mono">{latest ?? '-'}</dd>
-                          {!hideLatestAdoption && (
-                            <>
-                              <dt>Known release</dt>
-                              <dd className="text-foreground tabular-nums">
-                                {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
-                              </dd>
-                              <dt>On latest</dt>
-                              <dd className="text-foreground tabular-nums">
-                                {adoption === undefined ? '-' : `${adoption.share.toFixed(0)}%`}
-                              </dd>
-                            </>
-                          )}
+                          <dt>Known release (24h)</dt>
+                          <dd className="text-foreground tabular-nums">
+                            {adoption === undefined ? '-' : `${adoption.known.toFixed(0)}%`}
+                          </dd>
+                          <dt>On latest (24h)</dt>
+                          <dd className="text-foreground tabular-nums">
+                            {adoption === undefined ? '-' : `${adoption.share.toFixed(0)}%`}
+                          </dd>
                         </dl>
                       </td>
                     </tr>
@@ -323,12 +309,8 @@ export function LayerClients({
                   </td>
                   {showXatu && <td className={WIDE_ONLY} />}
                   <td className={WIDE_ONLY} />
-                  {!hideLatestAdoption && (
-                    <>
-                      <td className={WIDE_ONLY} />
-                      <td className={WIDE_ONLY} />
-                    </>
-                  )}
+                  <td className={WIDE_ONLY} />
+                  <td className={WIDE_ONLY} />
                   <td className={WIDE_ONLY} />
                 </tr>
               )}

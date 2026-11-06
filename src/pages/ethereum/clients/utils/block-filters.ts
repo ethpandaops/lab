@@ -29,8 +29,8 @@ const optionalNumber = z.coerce.number().int().nonnegative().optional().catch(un
 const optionalString = z.coerce.string().trim().min(1).optional().catch(undefined);
 
 /**
- * Search params for a filterable blocks table. Spread into a route's schema; `cl`, `el` and `entity` share names
- * with the clients page filter bar so both read the same filter.
+ * Search params for a filterable blocks table. Spread into a route's schema; `entity` shares its name with the
+ * clients page entity filter.
  */
 export const blockSearchShape = {
   /** Earliest slot start, unix seconds */

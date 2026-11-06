@@ -18,3 +18,5 @@ export type { UseCensusResult } from './useCensus';
 export { useLatestAdoption } from './useLatestAdoption';
 export { useNodeVersions } from './useNodeVersions';
 export type { UseNodeVersionsResult } from './useNodeVersions';
+export { useNodesByVersion } from './useNodesByVersion';
+export type { UseNodesByVersionResult } from './useNodesByVersion';

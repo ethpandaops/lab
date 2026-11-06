@@ -12,7 +12,6 @@ import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { ScatterAndLineChart } from '@/components/Charts/ScatterAndLine';
 import { BoxPlot } from '@/components/Charts/BoxPlot';
 import { clientLogoHtml } from '@/components/Charts/chartChrome';
-import { Sparkline } from '@/components/Charts/Sparkline';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getExecutionClientColor } from '@/utils';
@@ -36,10 +35,8 @@ import {
   gasCeiling,
   hourlyThroughputSeries,
   rangeBounds,
-  versionRows,
   type ClientPerformance,
   type SlowBlock,
-  type VersionRow,
 } from './utils/performance';
 import { OpcodePricingCard, OpcodeVersionsCard } from './components/OpcodeCosts';
 import { MethodologyButton, MethodologyDialog, type MethodologySection } from './components/MethodologyDialog';
@@ -236,7 +233,6 @@ function PerformanceSections({
   }, [usePerSlotTrend, blocks, hourly, timeRange, percentile]);
 
   const rangeClients = useMemo(() => (hourly ? clientThroughput(hourly.perClientHourly) : []), [hourly]);
-  const versions = useMemo(() => (hourly ? versionRows(hourly.perClientHourly) : []), [hourly]);
 
   if (!hourly) {
     return (
@@ -366,17 +362,6 @@ function PerformanceSections({
           ) : (
             <div className="m-4 h-64 animate-pulse rounded-xs bg-background" />
           )}
-        </PopoutCard>
-
-        {/* Versions */}
-        <PopoutCard
-          title="Version Tracker"
-          subtitle="Throughput per release, compared with the release it replaced"
-          anchorId="versions"
-          modalSize="full"
-          noPadding
-        >
-          <VersionTracker rows={versions} />
         </PopoutCard>
       </InspectSection>
 
@@ -893,62 +878,6 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
               </tr>
             );
           })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/** Per-release throughput with change vs the previous release of the same client */
-function VersionTracker({ rows }: { rows: VersionRow[] }): JSX.Element {
-  const sorted = [...rows]
-    .sort((a, b) => a.client.localeCompare(b.client) || b.firstSeen - a.firstSeen)
-    .filter((r, i, all) => all.slice(0, i).filter(x => x.client === r.client).length < 3);
-  const fmtDate = (t: number): string => new Date(t * 1000).toLocaleDateString([], { month: 'short', day: 'numeric' });
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-border text-sm">
-        <thead>
-          <tr className="text-left text-xs text-muted">
-            <th className="px-4 py-2.5 font-medium sm:px-5">Client</th>
-            <th className="hidden px-3 py-2.5 font-medium xl:table-cell">Version</th>
-            <th className="hidden px-3 py-2.5 font-medium xl:table-cell">Seen</th>
-            <th className="hidden px-3 py-2.5 font-medium sm:table-cell">Hourly Mgas/s</th>
-            <th className="px-3 py-2.5 text-right font-medium whitespace-nowrap">Mgas/s</th>
-            <th className="px-4 py-2.5 text-right font-medium whitespace-nowrap sm:px-5">vs previous</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {sorted.map(r => (
-            <tr key={`${r.client}|${r.version}`}>
-              <td className="px-4 py-2 sm:px-5">
-                <ClientInline client={r.client} />
-                {/* Narrower screens stack version and dates under the client so the numbers stay in view */}
-                <div className="mt-0.5 font-mono text-xs wrap-break-word text-foreground xl:hidden">{r.version}</div>
-                <div className="text-xs whitespace-nowrap text-muted xl:hidden">
-                  {fmtDate(r.firstSeen)} – {fmtDate(r.lastSeen)}
-                </div>
-              </td>
-              <td className="hidden max-w-56 truncate px-3 py-2 font-mono text-xs text-foreground xl:table-cell">
-                {r.version}
-              </td>
-              <td className="hidden px-3 py-2 whitespace-nowrap text-muted xl:table-cell">
-                {fmtDate(r.firstSeen)} – {fmtDate(r.lastSeen)}
-              </td>
-              <td className="hidden px-3 py-2 sm:table-cell">
-                <Sparkline data={r.sparkline} width={180} height={24} color={getExecutionClientColor(r.client)} />
-              </td>
-              <td className="px-3 py-2 text-right font-medium tabular-nums">{fmtMgas(r.throughput)}</td>
-              <td
-                className={clsx(
-                  'px-4 py-2 text-right font-medium tabular-nums sm:px-5',
-                  r.delta !== undefined && r.delta <= -5 ? 'text-danger' : 'text-foreground'
-                )}
-              >
-                {r.delta === undefined ? <span className="text-muted">–</span> : fmtPct(r.delta)}
-              </td>
-            </tr>
-          ))}
         </tbody>
       </table>
     </div>

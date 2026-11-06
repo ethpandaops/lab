@@ -12,7 +12,14 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTabState } from '@/hooks/useTabState';
 import { normalizeClientName } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { CLIENT_TABS, VERSION_WINDOW_DAYS, type ShareWindow, type VersionWindow } from './constants';
+import {
+  CLIENT_TAB_ALIASES,
+  CLIENT_TABS,
+  VERSION_WINDOW_DAYS,
+  type ClientTab,
+  type ShareWindow,
+  type VersionWindow,
+} from './constants';
 import { ClientHeader, ForkReadinessCard } from './components';
 import {
   NetworkTab,
@@ -21,7 +28,6 @@ import {
   PairingsTab,
   PerformanceTab,
   ProposersTab,
-  ReleasesTab,
   VersionsTab,
   type ClientTabProps,
 } from './components/ClientTabs';
@@ -29,7 +35,7 @@ import { useClientNodes, useClientReleases, useVersionCounts } from './hooks';
 import { clientLayerOf, last24hStart, windowStart } from './utils/client-versions';
 import { forkRequirements } from './utils/fork-requirements';
 
-const TAB_LABELS: Record<(typeof CLIENT_TABS)[number], string> = {
+const TAB_LABELS: Record<ClientTab, string> = {
   overview: 'Overview',
   versions: 'Versions',
   proposers: 'Proposers',
@@ -37,12 +43,11 @@ const TAB_LABELS: Record<(typeof CLIENT_TABS)[number], string> = {
   network: 'Network',
   nodes: 'Xatu nodes',
   performance: 'Performance',
-  releases: 'Releases',
 };
 
 /**
- * Deep dive into one consensus or execution client: share, versions, proposers, pairings, network, Xatu nodes,
- * performance and releases.
+ * Deep dive into one consensus or execution client: share, versions and releases, proposers, pairings, network,
+ * Xatu nodes and performance.
  */
 export function ClientPage(): JSX.Element {
   const params = useParams({ from: '/ethereum/clients/$client/' });
@@ -54,7 +59,9 @@ export function ClientPage(): JSX.Element {
   const window: VersionWindow = search.w ?? 'all';
   const shareWindow: ShareWindow = search.t ?? 'all';
 
-  const { selectedIndex, onChange } = useTabState(CLIENT_TABS.map(id => ({ id })));
+  // Xatu nodes report only their consensus client, so execution clients have no Xatu nodes tab
+  const tabs = CLIENT_TABS.filter(tab => tab !== 'nodes' || layer === 'consensus');
+  const { selectedIndex, onChange } = useTabState(tabs.map(id => ({ id, aliases: CLIENT_TAB_ALIASES[id] })));
   const { releases, latest, isLoading: releasesLoading } = useClientReleases(layer ? client : undefined);
   const windowDays = VERSION_WINDOW_DAYS[window];
   const since = windowDays === null ? undefined : windowStart(windowDays);
@@ -176,7 +183,7 @@ export function ClientPage(): JSX.Element {
 
         <TabGroup selectedIndex={selectedIndex} onChange={onChange}>
           <ScrollableTabs>
-            {CLIENT_TABS.map(tab => (
+            {tabs.map(tab => (
               <Tab key={tab}>{TAB_LABELS[tab]}</Tab>
             ))}
           </ScrollableTabs>
@@ -197,14 +204,13 @@ export function ClientPage(): JSX.Element {
             <TabPanel>
               <NetworkTab {...tabProps} />
             </TabPanel>
-            <TabPanel>
-              <NodesTab {...tabProps} />
-            </TabPanel>
+            {layer === 'consensus' && (
+              <TabPanel>
+                <NodesTab {...tabProps} />
+              </TabPanel>
+            )}
             <TabPanel>
               <PerformanceTab {...tabProps} />
-            </TabPanel>
-            <TabPanel>
-              <ReleasesTab {...tabProps} />
             </TabPanel>
           </TabPanels>
         </TabGroup>

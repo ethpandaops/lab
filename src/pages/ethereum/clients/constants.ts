@@ -7,12 +7,12 @@ export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '1y' | 'all';
 
 /** Zod schema for the proposer clients page search params */
 export const clientsSearchSchema = z.object({
-  /** Filters for the whole page; same params as the block tables */
-  cl: blockSearchShape.cl,
-  el: blockSearchShape.el,
+  /** Entity filter for the whole page; same param as the block tables */
   entity: blockSearchShape.entity,
   /** Time period */
   t: z.enum(['24h', '7d', '30d', '90d', '1y', 'all']).optional(),
+  /** Layer the performance comparison shows */
+  layer: z.enum(['consensus', 'execution']).optional().catch(undefined),
 });
 export type ClientsSearch = z.infer<typeof clientsSearchSchema>;
 
@@ -98,7 +98,7 @@ export const SHARE_WINDOW_OPTIONS: ReadonlyArray<{ value: ShareWindow; label: st
   { value: 'all', label: 'All' },
 ];
 
-/** Tabs of the client page */
+/** Tabs of the client page; execution clients have no Xatu nodes tab */
 export const CLIENT_TABS = [
   'overview',
   'versions',
@@ -107,21 +107,24 @@ export const CLIENT_TABS = [
   'network',
   'nodes',
   'performance',
-  'releases',
 ] as const;
 export type ClientTab = (typeof CLIENT_TABS)[number];
 
+/** Old tab ids that land on the tab that replaced them */
+export const CLIENT_TAB_ALIASES: Partial<Record<ClientTab, string[]>> = { versions: ['releases'] };
+
 /** Zod schema for the client page search params */
 export const clientSearchSchema = z.object({
-  tab: z.enum(CLIENT_TABS).optional(),
-  /** Window of blocks the version, proposer and pairing views use */
+  tab: z
+    .enum([...CLIENT_TABS, 'releases'])
+    .optional()
+    .catch(undefined),
+  /** Window of blocks the proposer views use */
   w: z.enum(['7d', '14d', '30d', '90d', 'all']).optional().catch(undefined),
   /** Window of the share charts, which come from daily counts and reach back to genesis */
   t: z.enum(['30d', '90d', '1y', 'all']).optional().catch(undefined),
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
-  /** Proposers tab blocks table filters, sort and page */
-  ...blockSearchShape,
 });
 export type ClientSearch = z.infer<typeof clientSearchSchema>;
 

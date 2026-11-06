@@ -1,8 +1,4 @@
-import type {
-  FctOpcodeCostByElClientDaily,
-  FctOpcodeCostByElClientVersion,
-  FctOpcodeCostByElClientWeekly,
-} from '@/api/types.gen';
+import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientWeekly } from '@/api/types.gen';
 import { normalizeClient, quantile } from './performance';
 
 /** Opcode groups in the order the backend fits them */
@@ -82,17 +78,6 @@ export interface OpcodeCost {
   nsHi: number;
 }
 
-/** A release fitted over every hour it ran */
-export interface OpcodeCostVersion {
-  version: string;
-  firstSeen: number;
-  lastSeen: number;
-  blocks: number;
-  hours: number;
-  /** Aligned with OpcodeCostModel.opcodes */
-  ratios: OpcodeCost[];
-}
-
 /** One UTC day's or week's fit */
 export interface OpcodeCostDay {
   /** Unix seconds at 00:00 UTC on the day, or the Monday starting the week */
@@ -110,7 +95,6 @@ export interface OpcodeCostClient {
   /** Median of the daily fits, with a day-resampled 5–95% interval */
   ratios: OpcodeCost[];
   daily: OpcodeCostDay[];
-  versions: OpcodeCostVersion[];
 }
 
 export interface OpcodeCostModel {
@@ -131,9 +115,6 @@ const MIN_EFFECT = 0.1;
 
 /** Day resamples for the client interval */
 const BOOTSTRAP_SAMPLES = 400;
-
-/** Releases need this many hours before their fit is worth showing */
-export const MIN_VERSION_HOURS = 24;
 
 /** True when the interval excludes 1× and the estimate is at least 10% off it */
 export function isMispriced(cost: OpcodeCost): boolean {
@@ -184,12 +165,11 @@ function fitStart(row: FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWee
 }
 
 /**
- * Builds the per-client opcode cost model from the backend's daily or weekly fits and per-release fits.
+ * Builds the per-client opcode cost model from the backend's daily or weekly fits.
  * Days or weeks with fewer than `minDayBlocks` observations (such as a partial current day) are dropped.
  */
 export function buildOpcodeCostModel(
   dailyRows: Array<FctOpcodeCostByElClientDaily | FctOpcodeCostByElClientWeekly>,
-  versionRows: FctOpcodeCostByElClientVersion[],
   minDayBlocks = 3000
 ): OpcodeCostModel | null {
   const index = new Map<string, number>(OPCODE_GROUPS.map((g, i) => [g, i]));
@@ -229,37 +209,6 @@ export function buildOpcodeCostModel(
     pricedFor: STATE_PRICED.has(key) ? 'state' : 'execution',
   }));
 
-  const versionsByClient = new Map<string, OpcodeCostVersion[]>();
-  const versionMap = new Map<string, OpcodeCostVersion>();
-  for (const row of versionRows) {
-    const i = index.get(row.opcode_group ?? '');
-    if (i === undefined) continue;
-    const client = normalizeClient(row.meta_execution_implementation);
-    const key = `${client}|${row.meta_execution_version}`;
-    let v = versionMap.get(key);
-    if (!v) {
-      v = {
-        version: row.meta_execution_version ?? 'unknown',
-        firstSeen: row.first_seen_date_time ?? 0,
-        lastSeen: row.last_seen_date_time ?? 0,
-        blocks: row.block_count ?? 0,
-        hours: row.hour_count ?? 0,
-        ratios: new Array(n),
-      };
-      versionMap.set(key, v);
-      if (!versionsByClient.has(client)) versionsByClient.set(client, []);
-      versionsByClient.get(client)!.push(v);
-    }
-    v.ratios[i] = {
-      ratio: row.price_ratio ?? 0,
-      lo: row.price_ratio_lower ?? 0,
-      hi: row.price_ratio_upper ?? 0,
-      nsPerOp: row.ns_per_op ?? 0,
-      nsLo: row.ns_per_op_lower ?? 0,
-      nsHi: row.ns_per_op_upper ?? 0,
-    };
-  }
-
   let windowStart = Infinity;
   let windowEnd = -Infinity;
   const clients: OpcodeCostClient[] = [...byClientDay.entries()]
@@ -289,10 +238,7 @@ export function buildOpcodeCostModel(
         );
         return { ratio: r.value, lo: r.lo, hi: r.hi, nsPerOp: ns.value, nsLo: ns.lo, nsHi: ns.hi };
       });
-      const versions = (versionsByClient.get(client) ?? [])
-        .filter(v => v.ratios.every(Boolean))
-        .sort((a, b) => a.firstSeen - b.firstSeen);
-      return { client, ratios, daily, versions };
+      return { client, ratios, daily };
     })
     .filter(c => c.daily.length > 0)
     .sort((a, b) => a.client.localeCompare(b.client));

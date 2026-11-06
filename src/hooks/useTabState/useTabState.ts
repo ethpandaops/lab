@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import type { TabConfig, UseTabStateReturn } from './useTabState.types';
 
+/** Whether a tab id from the URL names this tab, by its id or an old alias */
+function matchesTab(tab: TabConfig, id: string): boolean {
+  return tab.id === id || !!tab.aliases?.includes(id);
+}
+
 /**
  * Hook for URL-based tab state management with automatic anchor scrolling
  *
@@ -58,8 +63,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
    */
   const getInitialTab = (): number => {
     // First, check search params (new format)
-    if (searchParams.tab) {
-      const index = tabs.findIndex(tab => tab.id === searchParams.tab);
+    const tabId = searchParams.tab;
+    if (tabId) {
+      const index = tabs.findIndex(tab => matchesTab(tab, tabId));
       if (index >= 0) return index;
     }
 
@@ -143,8 +149,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
    * Sync with URL changes (browser back/forward)
    */
   useEffect(() => {
-    if (searchParams.tab) {
-      const index = tabs.findIndex(tab => tab.id === searchParams.tab);
+    const tabId = searchParams.tab;
+    if (tabId) {
+      const index = tabs.findIndex(tab => matchesTab(tab, tabId));
       if (index >= 0 && index !== selectedIndex) {
         setSelectedIndex(index);
 

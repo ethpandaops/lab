@@ -17,11 +17,10 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Xatu nodes running the client: how many, where, on which versions, linked to each node.
+ * Xatu nodes running the consensus client: how many, where, on which versions, linked to each node.
  */
-export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest }: ClientTabProps): JSX.Element {
+export function NodesTab({ client, nodes, nodesLoading, releases, latest }: ClientTabProps): JSX.Element {
   const versions = useMemo(() => {
-    if (layer !== 'consensus') return [];
     const counts = new Map<string, number>();
     for (const node of nodes) {
       const version = displayVersion(node.meta_consensus_version, releases) || 'Unknown';
@@ -30,7 +29,7 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
     return [...counts.entries()]
       .map(([version, count]) => ({ version, count }))
       .sort((a, b) => compareVersions(b.version, a.version));
-  }, [nodes, layer, releases]);
+  }, [nodes, releases]);
 
   if (nodesLoading) return <LoadingContainer className="h-96 rounded-sm" />;
 
@@ -57,17 +56,13 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
           {
             id: 'latest',
             name: 'On latest or newer',
-            value: layer === 'consensus' ? percent(onLatest, nodes.length) : '-',
+            value: percent(onLatest, nodes.length),
           },
         ]}
       />
       {nodes.length === 0 ? (
         <Card rounded>
-          <p className="text-sm/6 text-muted">
-            {layer === 'consensus'
-              ? 'No Xatu node ran this client in the last 24 hours.'
-              : 'Xatu nodes report their consensus client only, and no ethPandaOps node name lists this client.'}
-          </p>
+          <p className="text-sm/6 text-muted">No Xatu node ran this client in the last 24 hours.</p>
         </Card>
       ) : (
         <>
@@ -105,7 +100,7 @@ export function NodesTab({ client, layer, nodes, nodesLoading, releases, latest 
               </Link>
             }
           >
-            <NodeTable client={client} layer={layer} nodes={nodes} releases={releases} />
+            <NodeTable client={client} nodes={nodes} releases={releases} />
           </Card>
         </>
       )}
