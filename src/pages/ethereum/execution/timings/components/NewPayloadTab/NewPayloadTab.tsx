@@ -48,6 +48,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
   const themeColors = useThemeColors();
   const {
     newPayloadDurationHistogram,
+    newPayloadPercentiles,
     newPayloadByElClient,
     newPayloadByElClientHourly,
     newPayloadByElClientDaily,
@@ -469,7 +470,15 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
         anchorId="client-duration"
         modalSize="full"
       >
-        {() => <ClientVersionBreakdown data={validPayloadByElClient} hourlyData={summaryRows} hideRange noCard />}
+        {() => (
+          <ClientVersionBreakdown
+            data={validPayloadByElClient}
+            hourlyData={summaryRows}
+            percentiles={newPayloadPercentiles}
+            hideRange
+            noCard
+          />
+        )}
       </PopoutCard>
 
       {/* Per-slot charts — short time ranges only */}

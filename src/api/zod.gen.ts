@@ -11745,9 +11745,10 @@ export const zFctEngineNewPayloadDurationHistogramHourly = z.object({
 });
 
 /**
- * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class (or all Xatu nodes), execution client, build line and version (empty for all), and status, recomputed hourly
  */
 export const zFctEngineNewPayloadDurationPercentileWindow = z.object({
+  meta_execution_build_line: z.optional(z.string()),
   meta_execution_implementation: z.optional(z.string()),
   meta_execution_version: z.optional(z.string()),
   node_class: z.optional(z.string()),
@@ -124197,6 +124198,15 @@ export const zFctEngineNewPayloadDurationPercentileWindowServiceListData = z.obj
       meta_execution_implementation_not_like: z.optional(z.string()),
       meta_execution_implementation_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       meta_execution_implementation_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_execution_build_line_eq: z.optional(z.string()),
+      meta_execution_build_line_ne: z.optional(z.string()),
+      meta_execution_build_line_contains: z.optional(z.string()),
+      meta_execution_build_line_starts_with: z.optional(z.string()),
+      meta_execution_build_line_ends_with: z.optional(z.string()),
+      meta_execution_build_line_like: z.optional(z.string()),
+      meta_execution_build_line_not_like: z.optional(z.string()),
+      meta_execution_build_line_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
+      meta_execution_build_line_not_in_values: z.optional(z.string().check(z.regex(/^[^,]+(,[^,]+)*$/))),
       meta_execution_version_eq: z.optional(z.string()),
       meta_execution_version_ne: z.optional(z.string()),
       meta_execution_version_contains: z.optional(z.string()),

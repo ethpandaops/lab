@@ -51,11 +51,23 @@ interface HourlyClientVersionData {
   day_start_date?: string;
 }
 
+interface PercentileRow {
+  meta_execution_implementation?: string;
+  /** Empty for all versions of the client together */
+  meta_execution_build_line?: string;
+  /** Empty for all builds of the build line together */
+  meta_execution_version?: string;
+  p50_duration_ms?: number;
+  p95_duration_ms?: number;
+}
+
 export interface ClientVersionBreakdownProps {
   /** Raw per-slot data with client/version info */
   data: ClientVersionData[];
   /** Optional hourly or daily aggregated data with true percentiles (used for P50/P95 columns) */
   hourlyData?: HourlyClientVersionData[];
+  /** P50/P95 over the whole range per client and version; replaces the P50/P95 averaged from hourlyData */
+  percentiles?: PercentileRow[];
   /** Title for the card */
   title?: string;
   /** Description for the card */
@@ -324,6 +336,7 @@ function ExpandedRowContent({
 export function ClientVersionBreakdown({
   data,
   hourlyData,
+  percentiles,
   title = 'Client Version Breakdown',
   description = 'Duration statistics by execution client and version',
   showBlobCount = false,
@@ -358,7 +371,23 @@ export function ClientVersionBreakdown({
   // Whether we have hourly data with true percentiles
   const hasHourlyData = hourlyData && hourlyData.length > 0;
 
-  // Aggregate hourly data by client + version (for true percentiles)
+  // Range percentiles keyed by client|version, with an empty version for all versions together
+  const rangePercentiles = useMemo(() => {
+    if (!percentiles) return null;
+    const map = new Map<string, { p50: number; p95: number }>();
+    percentiles.forEach(row => {
+      // Build-line rows: the table shows each version and the client
+      if (!row.meta_execution_version && row.meta_execution_build_line) return;
+      const client = normalizeClientName(row.meta_execution_implementation ?? 'unknown');
+      map.set(`${client}|${row.meta_execution_version ?? ''}`, {
+        p50: row.p50_duration_ms ?? 0,
+        p95: row.p95_duration_ms ?? 0,
+      });
+    });
+    return map;
+  }, [percentiles]);
+
+  // Aggregate hourly data by client + version
   const hourlyAggregatedData = useMemo(() => {
     if (!hourlyData || hourlyData.length === 0) return new Map<string, AggregatedRow>();
 
@@ -429,12 +458,13 @@ export function ClientVersionBreakdown({
     const result = new Map<string, AggregatedRow>();
     map.forEach((entry, key) => {
       if (entry.totalObservations > 0) {
+        const range = rangePercentiles?.get(key);
         result.set(key, {
           client: entry.client,
           version: entry.version,
           avgDuration: entry.totalWeightedAvg / entry.totalObservations,
-          p50Duration: entry.totalWeightedP50 / entry.totalObservations,
-          p95Duration: entry.totalWeightedP95 / entry.totalObservations,
+          p50Duration: rangePercentiles ? (range?.p50 ?? 0) : entry.totalWeightedP50 / entry.totalObservations,
+          p95Duration: rangePercentiles ? (range?.p95 ?? 0) : entry.totalWeightedP95 / entry.totalObservations,
           minDuration: entry.minDuration,
           maxDuration: entry.maxDuration,
           observations: entry.totalObservations,
@@ -446,7 +476,7 @@ export function ClientVersionBreakdown({
     });
 
     return result;
-  }, [hourlyData]);
+  }, [hourlyData, rangePercentiles]);
 
   // Aggregate per-slot data by client + version (fallback when no hourly data)
   const aggregatedData = useMemo(() => {
@@ -607,12 +637,21 @@ export function ClientVersionBreakdown({
         }
       );
 
+      const allVersions = rangePercentiles?.get(`${sorted[0].client}|`);
       result.push({
         client: sorted[0].client,
         version: sorted[0].version,
         avgDuration: summary.durationObs > 0 ? summary.totalWeightedAvg / summary.durationObs : 0,
-        p50Duration: summary.durationObs > 0 ? summary.totalWeightedP50 / summary.durationObs : 0,
-        p95Duration: summary.durationObs > 0 ? summary.totalWeightedP95 / summary.durationObs : 0,
+        p50Duration: rangePercentiles
+          ? (allVersions?.p50 ?? 0)
+          : summary.durationObs > 0
+            ? summary.totalWeightedP50 / summary.durationObs
+            : 0,
+        p95Duration: rangePercentiles
+          ? (allVersions?.p95 ?? 0)
+          : summary.durationObs > 0
+            ? summary.totalWeightedP95 / summary.durationObs
+            : 0,
         minDuration: summary.minDuration,
         maxDuration: summary.maxDuration,
         observations: summary.observations,
@@ -625,7 +664,7 @@ export function ClientVersionBreakdown({
     });
 
     return result;
-  }, [aggregatedData]);
+  }, [aggregatedData, rangePercentiles]);
 
   // Calculate max avg duration for color scaling
   const maxAvgDuration = useMemo(() => {
