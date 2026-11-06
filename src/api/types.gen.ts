@@ -8456,19 +8456,23 @@ export type FctEngineNewPayloadDurationHistogramHourly = {
 };
 
 /**
- * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class (or all Xatu nodes), execution client, build line and version (empty for all), and status, recomputed hourly
  */
 export type FctEngineNewPayloadDurationPercentileWindow = {
+  /**
+   * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together
+   */
+  meta_execution_build_line?: string;
   /**
    * Execution client implementation name (e.g., Geth, Nethermind, Besu, Reth)
    */
   meta_execution_implementation?: string;
   /**
-   * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together
+   * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together
    */
   meta_execution_version?: string;
   /**
-   * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes)
+   * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together
    */
   node_class?: string;
   /**
@@ -104315,39 +104319,39 @@ export type FctEngineNewPayloadDurationPercentileWindowServiceListData = {
      */
     window_length_not_in_values?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: eq)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: eq)
      */
     node_class_eq?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ne)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: ne)
      */
     node_class_ne?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: contains)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: contains)
      */
     node_class_contains?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: starts_with)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: starts_with)
      */
     node_class_starts_with?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: ends_with)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: ends_with)
      */
     node_class_ends_with?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: like)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: like)
      */
     node_class_like?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_like)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: not_like)
      */
     node_class_not_like?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: in_values) (comma-separated list)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: in_values) (comma-separated list)
      */
     node_class_in_values?: string;
     /**
-     * Node classification (eip7870-block-builder for reference nodes, empty for other Xatu nodes) (filter: not_in_values) (comma-separated list)
+     * Node classification: eip7870-block-builder for reference nodes, empty for other Xatu nodes, all for every Xatu node together (filter: not_in_values) (comma-separated list)
      */
     node_class_not_in_values?: string;
     /**
@@ -104387,39 +104391,75 @@ export type FctEngineNewPayloadDurationPercentileWindowServiceListData = {
      */
     meta_execution_implementation_not_in_values?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: eq)
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: eq)
+     */
+    meta_execution_build_line_eq?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: ne)
+     */
+    meta_execution_build_line_ne?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: contains)
+     */
+    meta_execution_build_line_contains?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: starts_with)
+     */
+    meta_execution_build_line_starts_with?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: ends_with)
+     */
+    meta_execution_build_line_ends_with?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: like)
+     */
+    meta_execution_build_line_like?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: not_like)
+     */
+    meta_execution_build_line_not_like?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: in_values) (comma-separated list)
+     */
+    meta_execution_build_line_in_values?: string;
+    /**
+     * Build line: the version without its trailing commit hash (e.g., 1.17.11-unstable), empty for all versions of the client together (filter: not_in_values) (comma-separated list)
+     */
+    meta_execution_build_line_not_in_values?: string;
+    /**
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: eq)
      */
     meta_execution_version_eq?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: ne)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: ne)
      */
     meta_execution_version_ne?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: contains)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: contains)
      */
     meta_execution_version_contains?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: starts_with)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: starts_with)
      */
     meta_execution_version_starts_with?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: ends_with)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: ends_with)
      */
     meta_execution_version_ends_with?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: like)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: like)
      */
     meta_execution_version_like?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: not_like)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: not_like)
      */
     meta_execution_version_not_like?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: in_values) (comma-separated list)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: in_values) (comma-separated list)
      */
     meta_execution_version_in_values?: string;
     /**
-     * Full execution client version string from web3_clientVersion RPC, empty for all versions of the client together (filter: not_in_values) (comma-separated list)
+     * Full execution client version string from web3_clientVersion RPC, empty for all builds of the build line together (filter: not_in_values) (comma-separated list)
      */
     meta_execution_version_not_in_values?: string;
     /**

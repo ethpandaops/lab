@@ -16,6 +16,7 @@ import {
   fctEngineNewPayloadWinrateHourlyServiceList,
   fctEngineNewPayloadWinrateDailyServiceList,
   intEngineNewPayloadFastestExecutionByNodeClassServiceList,
+  fctEngineNewPayloadDurationPercentileWindowServiceList,
 } from '@/api/sdk.gen';
 import type {
   FctEngineNewPayloadByElClient,
@@ -29,11 +30,18 @@ import type {
   FctEngineNewPayloadWinrateHourly,
   FctEngineNewPayloadWinrateDaily,
   IntEngineNewPayloadFastestExecutionByNodeClass,
+  FctEngineNewPayloadDurationPercentileWindow,
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd, currentUtcDate } from '@/utils/time';
-import { TIME_RANGE_CONFIG, PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, type TimeRange } from '../IndexPage.types';
+import {
+  TIME_RANGE_CONFIG,
+  PER_SLOT_CHART_RANGES,
+  HOURLY_CHART_RANGES,
+  PERCENTILE_WINDOW,
+  type TimeRange,
+} from '../IndexPage.types';
 
 export interface EngineTimingsData {
   // newPayload per-EL-client aggregations (includes per-slot granularity)
@@ -44,6 +52,9 @@ export interface EngineTimingsData {
 
   // newPayload daily aggregations with true percentiles (for long time ranges)
   newPayloadByElClientDaily: FctEngineNewPayloadByElClientDaily[];
+
+  // newPayload P50/P95 (VALID) over the range per client and version, empty version for all versions together
+  newPayloadPercentiles: FctEngineNewPayloadDurationPercentileWindow[];
 
   // newPayload duration histogram over the range, from the per-slot, hourly or daily chunk table
   newPayloadDurationHistogram: Pick<FctEngineNewPayloadDurationChunked50Ms, 'chunk_duration_ms' | 'valid_count'>[];
@@ -206,6 +217,7 @@ export function useEngineTimingsData({
   const fetchHourlyData = HOURLY_CHART_RANGES.includes(timeRange);
 
   const histogram = histogramGrain(timeRange);
+  const percentileWindow = PERCENTILE_WINDOW[timeRange];
 
   const queries = useQueries({
     queries: [
@@ -459,6 +471,34 @@ export function useEngineTimingsData({
         enabled: !!currentNetwork && fetchBlobs && !fetchHourlyData,
         placeholderData: keepPreviousData,
       },
+      // newPayload P50/P95 over the range's window, per client and version
+      {
+        queryKey: [
+          'engine-timings',
+          'newPayload-percentiles',
+          percentileWindow.grain,
+          percentileWindow.length,
+          referenceNodesOnly,
+        ],
+        queryFn: ({ signal }) =>
+          fetchAllPages<FctEngineNewPayloadDurationPercentileWindow>(
+            fctEngineNewPayloadDurationPercentileWindowServiceList,
+            {
+              query: {
+                window_grain_eq: percentileWindow.grain,
+                window_length_in_values: String(percentileWindow.length),
+                // 'all' rows are percentiles over every Xatu node together
+                node_class_eq: referenceNodesOnly ? 'eip7870-block-builder' : 'all',
+                status_eq: 'VALID',
+                page_size: 10000,
+              },
+            },
+            'fct_engine_new_payload_duration_percentile_window',
+            signal
+          ),
+        enabled: !!currentNetwork,
+        placeholderData: keepPreviousData,
+      },
     ],
   });
 
@@ -475,6 +515,7 @@ export function useEngineTimingsData({
     winratePerSlotQuery,
     newPayloadByElClientDailyQuery,
     getBlobsByElClientDailyQuery,
+    newPayloadPercentilesQuery,
   ] = queries;
 
   // Primary queries drive the page's loading/empty state: the newPayload queries
@@ -499,6 +540,7 @@ export function useEngineTimingsData({
           newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
           newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
           newPayloadByElClientDaily: newPayloadByElClientDailyQuery.data ?? [],
+          newPayloadPercentiles: (newPayloadPercentilesQuery.data ?? []).filter(r => (r.observation_count ?? 0) > 0),
           newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
           getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
           getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],

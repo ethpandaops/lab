@@ -21,6 +21,22 @@ export const TIME_RANGE_CONFIG: Record<TimeRange, { label: string; seconds: numb
 };
 
 /**
+ * The precomputed window matching each range in fct_engine_new_payload_duration_percentile_window:
+ * hour windows end at the last complete hour, day windows are complete UTC days ending yesterday (0 = all history)
+ */
+export const PERCENTILE_WINDOW: Record<TimeRange, { grain: 'hour' | 'day'; length: number }> = {
+  '1hour': { grain: 'hour', length: 1 },
+  '6hours': { grain: 'hour', length: 6 },
+  '24hours': { grain: 'hour', length: 24 },
+  '7days': { grain: 'hour', length: 168 },
+  '31days': { grain: 'hour', length: 744 },
+  '90days': { grain: 'day', length: 90 },
+  '180days': { grain: 'day', length: 180 },
+  '365days': { grain: 'day', length: 365 },
+  all: { grain: 'day', length: 0 },
+};
+
+/**
  * Time ranges that should use per-slot data for charts (short ranges)
  * Longer ranges will use hourly aggregated data or hide per-slot charts
  */

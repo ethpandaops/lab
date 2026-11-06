@@ -9074,7 +9074,7 @@ export const fctEngineNewPayloadDurationHistogramHourlyServiceGet = <ThrowOnErro
 /**
  * List records
  *
- * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class, execution client, version (empty for all versions) and status, recomputed hourly
+ * engine_newPayload duration P50 and P95 per window (1 hour to all history, aligned like Lab ranges), node class (or all Xatu nodes), execution client, build line and version (empty for all), and status, recomputed hourly
  */
 export const fctEngineNewPayloadDurationPercentileWindowServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctEngineNewPayloadDurationPercentileWindowServiceListData, ThrowOnError>

@@ -596,9 +596,9 @@ export function buildMatchesRelease(line: string, release: DimClientRelease | un
 export interface BuildLineStats {
   line: string;
   observations: number;
-  /** Observation-weighted mean of daily medians (ms) */
+  /** Median over the rows' days (ms): from `percentiles` when given, else the observation-weighted mean of daily medians */
   p50: number;
-  /** Observation-weighted mean of daily p95s (ms) */
+  /** 95th percentile over the rows' days (ms), from `percentiles` like p50 */
   p95: number;
   /** Mean gas per block divided by mean duration, in MGas/s */
   mgasPerSecond: number;
@@ -609,9 +609,13 @@ export interface BuildLineStats {
 }
 
 /**
- * newPayload per build line from daily rows, newest version first.
+ * newPayload per build line from daily rows, newest version first. `percentiles` holds each line's P50/P95 over the
+ * same days, which daily percentiles can't be combined into; a line missing from it gets 0.
  */
-export function summariseBuildLines(rows: FctEngineNewPayloadByElClientDaily[]): BuildLineStats[] {
+export function summariseBuildLines(
+  rows: FctEngineNewPayloadByElClientDaily[],
+  percentiles?: Map<string, { p50: number; p95: number }>
+): BuildLineStats[] {
   const lines = new Map<
     string,
     {
@@ -656,8 +660,8 @@ export function summariseBuildLines(rows: FctEngineNewPayloadByElClientDaily[]):
       return {
         line,
         observations: entry.observations,
-        p50: entry.p50 / entry.observations,
-        p95: entry.p95 / entry.observations,
+        p50: percentiles ? (percentiles.get(line)?.p50 ?? 0) : entry.p50 / entry.observations,
+        p95: percentiles ? (percentiles.get(line)?.p95 ?? 0) : entry.p95 / entry.observations,
         mgasPerSecond: entry.duration > 0 ? entry.gas / entry.duration / 1000 : 0,
         invalid: entry.invalid,
         firstDay: days[0] ?? '',

@@ -3,6 +3,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   fctEngineGetBlobsByElClientDailyServiceList,
   fctEngineNewPayloadByElClientDailyServiceList,
+  fctEngineNewPayloadDurationPercentileWindowServiceList,
   fctEngineNewPayloadWinrateDailyServiceList,
   fctOpcodeCostByElClientDailyServiceList,
   fctOpcodeCostByElClientVersionServiceList,
@@ -10,6 +11,7 @@ import {
 import type {
   FctEngineGetBlobsByElClientDaily,
   FctEngineNewPayloadByElClientDaily,
+  FctEngineNewPayloadDurationPercentileWindow,
   FctEngineNewPayloadWinrateDaily,
   FctOpcodeCostByElClientDaily,
   FctOpcodeCostByElClientVersion,
@@ -24,6 +26,8 @@ import { opcodeRowsFromDaily } from '../utils/client-versions';
 export interface UseReferenceEngineResult {
   /** Daily engine_newPayload per version of the client on the reference nodes, oldest first */
   newPayload: FctEngineNewPayloadByElClientDaily[];
+  /** engine_newPayload P50/P95 over the window per build line of the client on the reference nodes */
+  linePercentiles: Map<string, { p50: number; p95: number }>;
   /** Daily engine_getBlobs per version of the client on the reference nodes */
   getBlobs: FctEngineGetBlobsByElClientDaily[];
   /** Daily newPayload wins of every client on the reference nodes */
@@ -85,6 +89,30 @@ export function useReferenceEngine(
     staleTime: 30 * 60 * 1000,
     placeholderData: keepPreviousData,
   });
+  const percentiles = useQuery({
+    queryKey: ['client-pages', 'reference', 'percentiles', network, days ?? 0],
+    queryFn: ({ signal }) =>
+      fetchAllPages<FctEngineNewPayloadDurationPercentileWindow>(
+        fctEngineNewPayloadDurationPercentileWindowServiceList,
+        {
+          query: {
+            // Day windows end yesterday like the daily tables; 0 is all history
+            window_grain_eq: 'day',
+            window_length_in_values: String(days ?? 0),
+            node_class_eq: REFERENCE_NODE_CLASS,
+            status_eq: 'VALID',
+            // Build-line and client rows only
+            meta_execution_version_eq: '',
+            page_size: PAGE_SIZE,
+          },
+        },
+        'fct_engine_new_payload_duration_percentile_window',
+        signal
+      ),
+    enabled: on,
+    staleTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
+  });
   const winrate = useQuery({
     queryKey: ['client-pages', 'reference', 'winrate', network, dates ?? today],
     queryFn: ({ signal }) =>
@@ -132,12 +160,22 @@ export function useReferenceEngine(
             .filter(isClient(client))
             .sort((a, b) => (a.day_start_date ?? '').localeCompare(b.day_start_date ?? ''))
         : [],
+      linePercentiles: new Map(
+        client
+          ? (percentiles.data ?? [])
+              .filter(row => isClient(client)(row) && row.meta_execution_build_line && (row.observation_count ?? 0) > 0)
+              .map(row => [
+                row.meta_execution_build_line ?? '',
+                { p50: row.p50_duration_ms ?? 0, p95: row.p95_duration_ms ?? 0 },
+              ])
+          : []
+      ),
       getBlobs: client ? (getBlobs.data ?? []).filter(isClient(client)) : [],
       winrate: winrate.data ?? [],
       opcodes: client ? (opcodes.data ?? []).filter(isClient(client)) : [],
-      isLoading: newPayload.isLoading || opcodes.isLoading,
-      error: newPayload.error ?? opcodes.error ?? null,
+      isLoading: newPayload.isLoading || percentiles.isLoading || opcodes.isLoading,
+      error: newPayload.error ?? percentiles.error ?? opcodes.error ?? null,
     }),
-    [client, newPayload, getBlobs.data, winrate.data, opcodes]
+    [client, newPayload, percentiles, getBlobs.data, winrate.data, opcodes]
   );
 }

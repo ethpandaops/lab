@@ -32,6 +32,8 @@ export interface ReferenceEngineProps {
   client: string;
   releases: DimClientRelease[];
   newPayload: FctEngineNewPayloadByElClientDaily[];
+  /** newPayload P50/P95 per build line over the window */
+  linePercentiles: Map<string, { p50: number; p95: number }>;
   getBlobs: FctEngineGetBlobsByElClientDaily[];
   winrate: FctEngineNewPayloadWinrateDaily[];
   opcodes: FctOpcodeCostByElClientVersion[];
@@ -91,13 +93,14 @@ export function ReferenceEngine({
   client,
   releases,
   newPayload,
+  linePercentiles,
   getBlobs,
   winrate,
   opcodes,
   isLoading,
   focus,
 }: ReferenceEngineProps): JSX.Element {
-  const lines = useMemo(() => summariseBuildLines(newPayload), [newPayload]);
+  const lines = useMemo(() => summariseBuildLines(newPayload, linePercentiles), [newPayload, linePercentiles]);
   const blobLines = useMemo(
     () => summariseBuildLines(getBlobs.map(row => ({ ...row, avg_gas_used: 0 }) as FctEngineNewPayloadByElClientDaily)),
     [getBlobs]

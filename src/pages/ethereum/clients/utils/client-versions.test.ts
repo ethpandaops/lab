@@ -228,6 +228,30 @@ describe('build lines', () => {
     expect(line.mgasPerSecond).toBeCloseTo(460);
     expect(line.builds).toEqual(['2.9.0-aaaaaaaa', '2.9.0-bbbbbbbb']);
   });
+
+  it('should take each line percentile from the window, not from the daily rows', () => {
+    const lines = summariseBuildLines(
+      [
+        {
+          meta_execution_version: '2.9.0-aaaaaaaa',
+          day_start_date: '2026-10-01',
+          observation_count: 100,
+          p50_duration_ms: 50,
+        },
+        {
+          meta_execution_version: '2.8.1-cccccccc',
+          day_start_date: '2026-10-01',
+          observation_count: 100,
+          p50_duration_ms: 40,
+        },
+      ],
+      new Map([['2.9.0', { p50: 72, p95: 150 }]])
+    );
+    expect(lines.map(({ line, p50, p95 }) => ({ line, p50, p95 }))).toEqual([
+      { line: '2.9.0', p50: 72, p95: 150 },
+      { line: '2.8.1', p50: 0, p95: 0 },
+    ]);
+  });
 });
 
 describe('compareOpcodeCosts', () => {
