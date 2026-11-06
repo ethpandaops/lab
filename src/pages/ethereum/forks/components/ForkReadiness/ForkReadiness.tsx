@@ -1,4 +1,4 @@
-import { type JSX, useMemo } from 'react';
+import { type JSX, type ReactNode, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { dimClientReleaseServiceList } from '@/api/sdk.gen';
@@ -14,6 +14,13 @@ import { meetsMinVersion } from '@/utils/version';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
 import { displayVersion, last24hStart, type VersionCount } from '@/pages/ethereum/clients/utils/client-versions';
 import { useVersionCounts } from '@/pages/ethereum/clients/hooks/useVersionCounts';
+import { useCensus } from '@/pages/ethereum/clients/hooks/useCensus';
+import {
+  CENSUS_TABLES,
+  RESOLVED_STATUSES,
+  type FctPeerCountByClClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
+import { ANGLE_COLORS, type Angle } from '@/pages/ethereum/clients/utils/angle-colors';
 import type { ConsensusFork } from '@/hooks/useConfig/useConfig.types';
 
 export interface ForkReadinessProps {
@@ -29,8 +36,29 @@ interface ReadinessRow {
   blocksCounted: number;
   /** All of the client's blocks, with a version or not */
   blocksTotal: number;
+  peersReady: number;
+  /** P2P peers whose build resolved to a release */
+  peersCounted: number;
   nodesReady: number;
   nodesCounted: number;
+}
+
+/** A Xatu node still below the fork's minimum version */
+interface StragglerNode {
+  client: string;
+  name: string;
+  nodeId?: string;
+  version: string;
+}
+
+/** A column header after a swatch of its angle's colour */
+function angleHeader(angle: Angle, label: string): ReactNode {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: ANGLE_COLORS[angle] }} />
+      {label}
+    </span>
+  );
 }
 
 /** Formats a share, or a dash when nothing was counted */
@@ -39,8 +67,9 @@ function percent(part: number, total: number): string {
 }
 
 /**
- * Per client: the fork's minimum version, and how many of the last 24 hours of blocks and of Xatu nodes already
- * run it or newer. Renders nothing for forks without minimum versions.
+ * Per client: the fork's minimum version, and how many of the last 24 hours of blocks, of the P2P peers on the latest
+ * census day and of Xatu nodes already run it or newer, then the Xatu nodes still to upgrade. Renders nothing for
+ * forks without minimum versions.
  */
 export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null {
   const { currentNetwork } = useNetwork();
@@ -69,44 +98,54 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
     from: last24hStart(),
     enabled: clients.length > 0,
   });
+  const peers = useCensus<FctPeerCountByClClientDaily>(CENSUS_TABLES.clPeers, clients.length > 0 ? {} : null);
   const { nodes, isLoading: nodesLoading } = useActiveNodes();
 
-  const rows = useMemo((): ReadinessRow[] => {
+  const { rows, stragglers } = useMemo((): { rows: ReadinessRow[]; stragglers: StragglerNode[] } => {
     const allReleases = releases.data ?? [];
-    return requirements.map(({ client, minVersion }) => {
+    const stragglers: StragglerNode[] = [];
+    const rows = requirements.map(({ client, minVersion }) => {
       const clientReleases = allReleases.filter(release => release.client === client);
       const allClientBlocks = blocks.rows.filter(row => row.client === client);
       const clientBlocks = allClientBlocks.filter(row => row.version);
       const sum = (rows: VersionCount[]): number => rows.reduce((total, row) => total + row.count, 0);
-      const nodeVersions = nodes
+      const clientNodes = nodes
         .filter(node => normalizeClientName(node.meta_consensus_implementation ?? '') === client)
-        .map(node => displayVersion(node.meta_consensus_version, clientReleases))
-        .filter(Boolean);
+        .map(node => ({ node, version: displayVersion(node.meta_consensus_version, clientReleases) }))
+        .filter(entry => entry.version);
+      const nodeVersions = clientNodes.map(entry => entry.version);
+      for (const { node, version } of clientNodes) {
+        if (meetsMinVersion(version, minVersion)) continue;
+        stragglers.push({ client, name: node.meta_client_name ?? 'unknown', nodeId: node.node_id, version });
+      }
+      const clientPeers = peers.latest.filter(
+        row =>
+          normalizeClientName(row.client ?? '') === client &&
+          row.version &&
+          RESOLVED_STATUSES.has(row.release_status ?? '')
+      );
+      const peerSum = (list: FctPeerCountByClClientDaily[]): number =>
+        list.reduce((total, row) => total + (row.peer_count ?? 0), 0);
       return {
         client,
         minVersion,
         blocksReady: sum(clientBlocks.filter(block => meetsMinVersion(block.version!, minVersion))),
         blocksCounted: sum(clientBlocks),
         blocksTotal: sum(allClientBlocks),
+        peersReady: peerSum(clientPeers.filter(row => meetsMinVersion(row.version!, minVersion))),
+        peersCounted: peerSum(clientPeers),
         nodesReady: nodeVersions.filter(version => meetsMinVersion(version, minVersion)).length,
         nodesCounted: nodeVersions.length,
       };
     });
-  }, [requirements, releases.data, blocks.rows, nodes]);
+    stragglers.sort((a, b) => a.client.localeCompare(b.client) || a.name.localeCompare(b.name));
+    return { rows, stragglers };
+  }, [requirements, releases.data, blocks.rows, peers.latest, nodes]);
 
   if (requirements.length === 0) return null;
 
   return (
-    <Card
-      rounded
-      title="Client readiness"
-      subtitle="Blocks over the last 24 hours and Xatu nodes on the minimum version or newer"
-      actions={
-        <Link to="/xatu/fork-readiness" className="text-sm text-primary hover:underline">
-          Xatu node readiness
-        </Link>
-      }
-    >
+    <Card rounded title="Client readiness" subtitle="Share on the minimum version or newer">
       {releases.isLoading || blocks.isLoading || nodesLoading ? (
         <LoadingContainer className="h-48 rounded-sm" />
       ) : (
@@ -133,6 +172,24 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
               accessor: row => <span className="font-mono text-xs/6">{row.minVersion}</span>,
             },
             {
+              header: angleHeader('blocks', 'Blocks, last 24h'),
+              accessor: row => percent(row.blocksReady, row.blocksCounted),
+              cellClassName: 'text-right tabular-nums font-medium text-foreground',
+              headerClassName: 'text-right',
+            },
+            {
+              header: angleHeader('peers', peers.day ? `P2P peers, ${peers.day}` : 'P2P peers'),
+              accessor: row => (peers.isLoading ? '…' : percent(row.peersReady, row.peersCounted)),
+              cellClassName: 'text-right tabular-nums text-foreground',
+              headerClassName: 'text-right',
+            },
+            {
+              header: angleHeader('xatu', 'Xatu nodes, last 24h'),
+              accessor: row => percent(row.nodesReady, row.nodesCounted),
+              cellClassName: 'text-right tabular-nums text-foreground',
+              headerClassName: 'text-right',
+            },
+            {
               header: 'Blocks with a version',
               accessor: row =>
                 row.blocksTotal > 0
@@ -141,20 +198,40 @@ export function ForkReadiness({ fork }: ForkReadinessProps): JSX.Element | null 
               cellClassName: 'text-right tabular-nums text-muted',
               headerClassName: 'text-right',
             },
-            {
-              header: 'Blocks ready',
-              accessor: row => percent(row.blocksReady, row.blocksCounted),
-              cellClassName: 'text-right tabular-nums font-medium text-foreground',
-              headerClassName: 'text-right',
-            },
-            {
-              header: 'Xatu nodes ready',
-              accessor: row => percent(row.nodesReady, row.nodesCounted),
-              cellClassName: 'text-right tabular-nums text-foreground',
-              headerClassName: 'text-right',
-            },
           ]}
         />
+      )}
+      {stragglers.length > 0 && (
+        <div className="mt-6 border-t border-border pt-4">
+          <h4 className="text-sm/6 font-medium text-foreground">Xatu nodes to upgrade</h4>
+          <Table
+            variant="nested"
+            data={stragglers}
+            getRowKey={node => `${node.client}-${node.nodeId ?? node.name}`}
+            columns={[
+              {
+                header: 'Xatu node',
+                accessor: node =>
+                  node.nodeId ? (
+                    <Link
+                      to="/xatu/nodes/$nodeId"
+                      params={{ nodeId: node.nodeId }}
+                      className="text-primary hover:underline"
+                    >
+                      {node.name}
+                    </Link>
+                  ) : (
+                    node.name
+                  ),
+              },
+              { header: 'Client', accessor: node => <ClientLabel client={node.client} /> },
+              {
+                header: 'Version',
+                accessor: node => <span className="font-mono text-xs/6">{node.version}</span>,
+              },
+            ]}
+          />
+        </div>
       )}
     </Card>
   );

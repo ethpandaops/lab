@@ -97,7 +97,7 @@ export function ForkReadinessCard({
       rounded
       title={<span className="flex items-center gap-1">{forkLink} readiness</span>}
       actions={
-        <Link to="/xatu/fork-readiness" className="text-sm text-primary hover:underline">
+        <Link to="/ethereum/forks/$fork" params={{ fork }} className="text-sm text-primary hover:underline">
           All clients
         </Link>
       }
