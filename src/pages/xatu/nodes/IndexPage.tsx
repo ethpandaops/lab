@@ -25,9 +25,9 @@ import {
 } from './components';
 import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
-import { useLatestDayNodes } from './hooks/useLatestDayNodes';
 import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
+import { useStableNodes } from './hooks/useStableNodes';
 import { formatMs, median } from './utils/node-stats';
 
 /** Count rows by key */
@@ -55,7 +55,7 @@ export function IndexPage(): JSX.Element {
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const contributor = search.contributor;
   const { rows: allRows, block, isLoading, error } = useNodeRows(range);
-  const latestDay = useLatestDayNodes(contributor);
+  const stableNodes = useStableNodes();
   const networkHistory = useNetworkHistory(range);
 
   if (isLoading) {
@@ -81,7 +81,10 @@ export function IndexPage(): JSX.Element {
     .filter((username): username is string => !!username)
     .sort((a, b) => a.localeCompare(b));
 
-  const online = rows.filter(row => row.online).length;
+  // Node IDs that rotate on restart are one Xatu node
+  const countNodes = (nodeRows: NodeRow[]): number | string =>
+    stableNodes ? new Set(nodeRows.map(row => stableNodes.get(row.nodeId) ?? row.nodeId)).size : '–';
+  const online = countNodes(rows.filter(row => row.online));
   const contributors = new Set(rows.map(row => row.node.username).filter(Boolean)).size;
   const countries = new Set(rows.map(row => row.node.meta_client_geo_country_code).filter(Boolean)).size;
   const asns = new Set(rows.map(row => row.node.meta_client_geo_autonomous_system_number).filter(Boolean)).size;
@@ -150,12 +153,7 @@ export function IndexPage(): JSX.Element {
         <Stats
           gridClassName="grid grid-cols-2 md:grid-cols-4"
           stats={[
-            {
-              id: 'nodes',
-              name: 'Xatu nodes',
-              value: latestDay.count ?? '–',
-              subtitle: `Reporting on ${latestDay.day}`,
-            },
+            { id: 'nodes', name: 'Xatu nodes', value: countNodes(rows), subtitle: rangeLabel },
             { id: 'node-ids', name: 'Node IDs', value: rows.length, subtitle: rangeLabel },
             { id: 'online', name: 'Online now', value: online, subtitle: 'Xatu nodes' },
             ...(contributor
