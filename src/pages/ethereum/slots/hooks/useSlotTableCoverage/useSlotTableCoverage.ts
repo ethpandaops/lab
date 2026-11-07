@@ -5,12 +5,12 @@ import { useNetwork } from '@/hooks/useNetwork';
 /** Settled attestation tables the slot page reads, each with a head counterpart for slots they don't cover yet */
 export type SettledAttestationTable =
   | 'fct_attestation_correctness'
-  | 'int_attestation_attested'
+  | 'fct_attestation_vote_by_block_root'
   | 'fct_attestation_liveness_by_entity';
 
 const SETTLED_TABLES: SettledAttestationTable[] = [
   'fct_attestation_correctness',
-  'int_attestation_attested',
+  'fct_attestation_vote_by_block_root',
   'fct_attestation_liveness_by_entity',
 ];
 

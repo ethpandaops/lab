@@ -8,7 +8,7 @@ export type TimePeriod = '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
 
 /** Zod schema for execution overview search params */
 export const executionOverviewSearchSchema = z.object({
-  t: z.enum(['7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
+  t: z.enum(['7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional().catch(undefined),
 });
 export type ExecutionOverviewSearch = z.infer<typeof executionOverviewSearchSchema>;
 

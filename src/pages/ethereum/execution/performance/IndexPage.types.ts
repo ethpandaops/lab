@@ -36,8 +36,8 @@ export const DEFAULT_TIME_RANGE: TimeRange = 'all';
 
 /** Search params for the performance page */
 export const performanceSearchSchema = z.object({
-  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', 'all']).optional(),
-  refNodes: z.boolean().optional(),
+  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', 'all']).optional().catch(undefined),
+  refNodes: z.boolean().optional().catch(undefined),
 });
 
 export type PerformanceSearch = z.infer<typeof performanceSearchSchema>;

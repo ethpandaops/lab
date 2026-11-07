@@ -19,7 +19,7 @@ const network: Network = {
 const bounds: Bounds = {
   fct_attestation_correctness: { min: 1000, max: 5000 },
   fct_attestation_correctness_head: { min: 1000, max: 6000 },
-  int_attestation_attested: { min: 800, max: 4000 },
+  fct_attestation_vote_by_block_root: { min: 800, max: 4000 },
   fct_attestation_liveness_by_entity: { min: 1000, max: 5000 },
   fct_block_mev: { min: 2000, max: 6000 },
 };
@@ -55,7 +55,7 @@ describe('useSlotTableCoverage', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.settled).toEqual({
       fct_attestation_correctness: true,
-      int_attestation_attested: false,
+      fct_attestation_vote_by_block_root: false,
       fct_attestation_liveness_by_entity: true,
     });
   });

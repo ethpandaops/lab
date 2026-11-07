@@ -6,40 +6,40 @@ import { z } from 'zod';
  */
 export const payloadsSearchSchema = z.object({
   // Pagination
-  page: z.coerce.number().min(0).optional(),
-  pageSize: z.coerce.number().min(1).max(100).optional(),
-  pageToken: z.string().optional(),
+  page: z.coerce.number().min(0).optional().catch(undefined),
+  pageSize: z.coerce.number().min(1).max(100).optional().catch(undefined),
+  pageToken: z.string().optional().catch(undefined),
 
   // Sorting
-  orderBy: z.string().optional(),
+  orderBy: z.string().optional().catch(undefined),
 
   // Time range filters (Unix timestamps)
-  timeStart: z.coerce.number().optional(),
-  timeEnd: z.coerce.number().optional(),
+  timeStart: z.coerce.number().optional().catch(undefined),
+  timeEnd: z.coerce.number().optional().catch(undefined),
 
   // Duration filter (milliseconds)
-  durationMin: z.coerce.number().optional(),
+  durationMin: z.coerce.number().optional().catch(undefined),
 
   // Block metrics filters
-  gasUsedMin: z.coerce.number().optional(),
-  txCountMin: z.coerce.number().optional(),
+  gasUsedMin: z.coerce.number().optional().catch(undefined),
+  txCountMin: z.coerce.number().optional().catch(undefined),
 
   // Status filter (VALID, INVALID, SYNCING, ACCEPTED, INVALID_BLOCK_HASH, ERROR)
-  status: z.string().optional(),
+  status: z.string().optional().catch(undefined),
 
   // Client filter
-  elClient: z.string().optional(),
+  elClient: z.string().optional().catch(undefined),
 
   // Block filters
-  slot: z.coerce.number().optional(),
-  blockNumber: z.coerce.number().optional(),
+  slot: z.coerce.number().optional().catch(undefined),
+  blockNumber: z.coerce.number().optional().catch(undefined),
 
   // Node class filter (reference nodes = eip7870-block-builder)
-  referenceNodes: z.coerce.boolean().optional(),
+  referenceNodes: z.coerce.boolean().optional().catch(undefined),
 
   // Block detail dialog (unique identifier)
-  detailSlot: z.coerce.number().optional(),
-  detailNodeName: z.string().optional(),
+  detailSlot: z.coerce.number().optional().catch(undefined),
+  detailNodeName: z.string().optional().catch(undefined),
 });
 
 /**

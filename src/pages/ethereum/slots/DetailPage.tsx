@@ -29,7 +29,7 @@ import {
 } from '@/api/@tanstack/react-query.gen';
 import { useSlotDetailData } from './hooks/useSlotDetailData';
 import { useSlotPayloadData } from './hooks/useSlotPayloadData';
-import { useAllAttestationVotes } from './hooks/useAllAttestationVotes';
+import { useAttestationVotesByBlockRoot } from './hooks/useAttestationVotesByBlockRoot';
 import { useSlotTableCoverage, noDataBefore } from './hooks/useSlotTableCoverage';
 import { SlotBasicInfoCard } from './components/SlotBasicInfoCard';
 import { SlotPayloadCard } from './components/SlotPayloadCard';
@@ -191,10 +191,10 @@ export function DetailPage(): JSX.Element {
     referenceNodesOnly: true,
   });
 
-  // Fetch ALL attestation votes (with pagination)
-  const { data: allAttestationVotes, isLoading: attestationVotesLoading } = useAllAttestationVotes(
+  // Head vote counts per voted block root
+  const { data: attestationVotes, isLoading: attestationVotesLoading } = useAttestationVotesByBlockRoot(
     slotTimestamp,
-    coverage.settled.int_attestation_attested,
+    coverage.settled.fct_attestation_vote_by_block_root,
     !!currentNetwork && slotTimestamp > 0 && !coverage.isLoading
   );
 
@@ -364,7 +364,7 @@ export function DetailPage(): JSX.Element {
       ? `${data.totalMissedAttestations.toLocaleString()} missed attestations in total`
       : undefined;
   const livenessStart = coverage.dataStart('fct_attestation_liveness_by_entity');
-  const attestedStart = coverage.dataStart('int_attestation_attested');
+  const attestedStart = coverage.dataStart('fct_attestation_vote_by_block_root');
   const arrivalsStart = coverage.dataStart('fct_attestation_first_seen_chunked_50ms');
   const mevStart = coverage.dataStart('fct_block_mev');
 
@@ -831,7 +831,7 @@ export function DetailPage(): JSX.Element {
             <TabPanel>
               <div className="space-y-6">
                 <AttestationVotesBreakdownTable
-                  attestationData={allAttestationVotes}
+                  votes={attestationVotes}
                   currentSlot={slot}
                   votedForBlocks={data.votedForBlocks}
                   expectedValidatorCount={totalExpectedValidators}

@@ -1,10 +1,10 @@
-import type { IntAttestationAttested, FctBlockHead } from '@/api/types.gen';
+import type { FctAttestationVoteByBlockRoot, FctBlockHead } from '@/api/types.gen';
 
 export interface AttestationVotesBreakdownTableProps {
   /**
-   * Raw attestation data showing which block each validator voted for
+   * Head vote count per block root voted for in this slot
    */
-  attestationData: IntAttestationAttested[];
+  votes: FctAttestationVoteByBlockRoot[];
 
   /**
    * Current slot number (to identify if vote is for current slot or other)
