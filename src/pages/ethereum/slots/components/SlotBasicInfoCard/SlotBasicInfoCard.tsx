@@ -131,10 +131,16 @@ export function SlotBasicInfoCard({
 
   // Determine slot status from proposer data (which has canonical/orphaned/missed status)
   // or from the isOrphaned/isMissedSlot flags
+  // Orphaned blocks are only known from the head table's first slot; before it, a slot without a block may have been
+  // orphaned
+  const missed = {
+    label: dataStart('fct_block_proposer_head') ? 'Missed or orphaned' : 'Missed',
+    color: 'red',
+  } as const;
   const getSlotStatus = (): { label: string; color: 'green' | 'red' | 'orange' } => {
     // Check isMissedSlot prop first (no block data at all)
     if (isMissedSlot) {
-      return { label: 'Missed', color: 'red' };
+      return missed;
     }
 
     // Check isOrphaned flag (set when we have block data but no canonical blockHead)
@@ -151,7 +157,7 @@ export function SlotBasicInfoCard({
       return { label: 'Orphaned', color: 'orange' };
     }
     if (statusValue === 'missed' || !blockHead) {
-      return { label: 'Missed', color: 'red' };
+      return missed;
     }
     // Default to canonical if we have block data but no status
     return { label: 'Canonical', color: 'green' };
