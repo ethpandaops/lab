@@ -1,3 +1,4 @@
+import type { ProposalStatus } from '../utils/proposal-status';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
@@ -63,6 +64,8 @@ export interface ValidatorBlockProposalMetrics {
   canonicalCount: number;
   missedCount: number;
   orphanedCount: number;
+  /** Before orphaned blocks were observed: missed or orphaned, unknown which */
+  missedOrOrphanedCount: number;
   proposalRate: number | null;
 }
 
@@ -73,7 +76,7 @@ export interface BlockProposalDataPoint {
   slot: number;
   slotTimestamp: number;
   validatorIndex: number;
-  status: 'canonical' | 'orphaned' | 'missed';
+  status: ProposalStatus;
 }
 
 /**
@@ -152,6 +155,7 @@ export interface AggregateSummary {
     canonicalCount: number;
     missedCount: number;
     orphanedCount: number;
+    missedOrOrphanedCount: number;
     proposalRate: number | null;
     validatorsWithDuties: number;
   };

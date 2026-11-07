@@ -238,14 +238,19 @@ describe('fetchSlotsPage', () => {
     const headStart = 2000;
     // The canonical table only holds finalized slots
     tables.int_block_proposer_canonical = tables.fct_block_proposer_head.filter(row => row.slot < 3900);
-    for (const table of ['fct_block_proposer_head', 'fct_block_proposer', 'fct_block_proposer_entity']) {
+    // The status table reaches genesis, but only knows orphaned blocks from the head table's first slot
+    for (const table of ['fct_block_proposer_head', 'fct_block_proposer_entity']) {
       tables[table] = tables[table].filter(row => row.slot >= headStart);
     }
 
     expect((await allPages(args({}), headStart)).flat()).toEqual(slotsWhere(() => true));
     expect((await allPages(args({ status: 'missed' }, 'slot', 7), headStart)).flat()).toEqual(slotsWhere(isMissed));
-    // Orphaned blocks are only known from the status table
+    // Orphaned blocks are only known from the head table's first slot, so the search stops there
+    calls.length = 0;
     expect((await allPages(args({ status: 'orphaned' }), headStart)).flat()).toEqual([]);
+    const statusReads = calls.filter(call => call.table === 'fct_block_proposer');
+    expect(statusReads.length).toBeGreaterThan(0);
+    expect(statusReads.every(call => Number(call.query.slot_start_date_time_gte) >= headStart * 12)).toBe(true);
 
     const old = await fetchSlotsPage({ ...args({}), cursor: 'lt:2010' }, 0, false, headStart);
     expect(old.rows.map(row => row.slot)).toEqual(slotsWhere(s => s < 2010).slice(0, 25));

@@ -13,6 +13,7 @@ import { useHourlyData, useSlotData } from '../../hooks';
 import type { AttestationSlotDataPoint } from '../../hooks';
 import { formatStatusLabel } from '../../hooks/useValidatorStatus';
 import { weekSpan } from '../../utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
 
 const DAY = 86_400;
 
@@ -145,13 +146,25 @@ const METRIC_CONFIGS: Record<HeatmapMetric, MetricConfig> = {
   proposals: {
     label: 'Proposals',
     getValue: () => 0,
-    formatValue: (v: number) => (v >= 100 ? 'Canonical' : v >= 50 ? 'Orphaned' : v >= 0 ? 'Missed' : 'No duty'),
+    formatValue: formatProposalValue,
     colorGradient: [colors.red[600], colors.amber[500], colors.green[500]],
     min: 0,
     max: 100,
     visualMapText: ['Canonical', 'Missed'],
   },
 };
+
+/** Proposal cells by status; the worst status in a cell (the lowest value) wins */
+const PROPOSAL_VALUES: Record<ProposalStatus, number> = {
+  missed: 0,
+  [MISSED_OR_ORPHANED]: 25,
+  orphaned: 50,
+  canonical: 100,
+};
+
+function formatProposalValue(v: number): string {
+  return v >= 100 ? 'Canonical' : v >= 50 ? 'Orphaned' : v >= 25 ? 'Missed or orphaned' : v >= 0 ? 'Missed' : 'No duty';
+}
 
 /** Slot-level metric config — maps boolean slot data to 0/100 heatmap values */
 const SLOT_METRIC_GETTERS: Record<
@@ -184,7 +197,7 @@ const SLOT_METRIC_GETTERS: Record<
   },
   proposals: {
     getValue: () => 0,
-    formatValue: (v: number) => (v >= 100 ? 'Canonical' : v >= 50 ? 'Orphaned' : v >= 0 ? 'Missed' : 'No duty'),
+    formatValue: formatProposalValue,
   },
 };
 
@@ -480,7 +493,7 @@ export function ValidatorHeatmap({
       if (dayIdx === undefined || valIdx === undefined) continue;
 
       const key = `${dayIdx},${valIdx}`;
-      const statusValue = p.status === 'missed' ? 0 : p.status === 'orphaned' ? 50 : 100;
+      const statusValue = PROPOSAL_VALUES[p.status];
       const existing = cellMap.get(key);
       // Worst status wins: lower value = worse
       if (existing === undefined || statusValue < existing) {
@@ -531,7 +544,7 @@ export function ValidatorHeatmap({
       if (valIdx === undefined) continue;
 
       const key = `${hour},${valIdx}`;
-      const statusValue = p.status === 'missed' ? 0 : p.status === 'orphaned' ? 50 : 100;
+      const statusValue = PROPOSAL_VALUES[p.status];
       const existing = cellMap.get(key);
       if (existing === undefined || statusValue < existing) {
         cellMap.set(key, statusValue);
@@ -603,7 +616,7 @@ export function ValidatorHeatmap({
       .map(p => {
         const slotIdx = slotToIndex.get(p.slot)!;
         const valIdx = validatorToIndex.get(p.validatorIndex)!;
-        const statusValue = p.status === 'missed' ? 0 : p.status === 'orphaned' ? 50 : 100;
+        const statusValue = PROPOSAL_VALUES[p.status];
         return [slotIdx, valIdx, statusValue];
       });
 

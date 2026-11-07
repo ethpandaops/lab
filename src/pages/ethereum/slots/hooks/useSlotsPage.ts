@@ -180,6 +180,8 @@ export async function fetchSlotsPage(
 
   const recentOnly = sort !== 'slot' && bounds.min === undefined && bounds.max === undefined;
   let lo = bounds.min ?? (recentOnly ? Math.max(0, timestampToSlot(nowEnd() - VALUE_SORT_SECONDS, genesisTime)) : 0);
+  // Orphaned blocks are only known from the head table's first slot on
+  if (filters.status === 'orphaned' && headStart !== undefined) lo = Math.max(lo, headStart);
   let hi = bounds.max ?? Number.POSITIVE_INFINITY;
 
   /**

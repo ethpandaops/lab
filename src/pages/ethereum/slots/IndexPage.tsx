@@ -110,7 +110,7 @@ export function IndexPage(): JSX.Element {
     genesisTime !== undefined &&
     (listFrom === undefined || slotToTimestamp(listFrom, genesisTime) < start);
   const entityDataStart = bounds?.fct_block_proposer_entity?.min;
-  const orphanedStart = filters.status === 'orphaned' ? bounds?.fct_block_proposer?.min : undefined;
+  const orphanedStart = filters.status === 'orphaned' ? bounds?.fct_block_proposer_head?.min : undefined;
   const entityStart = filters.entity ? entityDataStart : undefined;
   const listEnd =
     !data || data.nextCursor
