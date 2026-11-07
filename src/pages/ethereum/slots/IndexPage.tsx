@@ -110,6 +110,8 @@ export function IndexPage(): JSX.Element {
     genesisTime !== undefined &&
     (listFrom === undefined || slotToTimestamp(listFrom, genesisTime) < start);
   const entityDataStart = bounds?.fct_block_proposer_entity?.min;
+  // Orphaned blocks are only known from the head table's first slot; a missed slot before it may have been orphaned
+  const orphansKnownFrom = bounds?.fct_block_proposer_head?.min;
   const orphanedStart = filters.status === 'orphaned' ? bounds?.fct_block_proposer_head?.min : undefined;
   const entityStart = filters.entity ? entityDataStart : undefined;
   const listEnd =
@@ -243,13 +245,15 @@ export function IndexPage(): JSX.Element {
           const status = info.getValue();
           if (!status) return <Muted />;
           const style = STATUS_STYLES[status];
+          const orphanUnknown =
+            status === 'missed' && (orphansKnownFrom === undefined || info.row.original.timestamp < orphansKnownFrom);
           return (
             <FilterButton
               title={`Only ${style.label.toLowerCase()} slots`}
               onClick={() => addFilter({ status })}
               className={clsx('font-medium', style.className)}
             >
-              {style.label}
+              {orphanUnknown ? 'Missed or orphaned' : style.label}
             </FilterButton>
           );
         },
@@ -391,7 +395,7 @@ export function IndexPage(): JSX.Element {
           ]
         : []),
     ],
-    [addFilter, hasGloas, entityDataStart]
+    [addFilter, hasGloas, entityDataStart, orphansKnownFrom]
   );
 
   const emptyMessage =
