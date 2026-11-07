@@ -10,7 +10,7 @@ import type { AttestationVotesBreakdownTableProps, VoteGroup } from './Attestati
  * Shows which blocks validators were voting for in this slot.
  */
 export function AttestationVotesBreakdownTable({
-  attestationData,
+  votes,
   currentSlot,
   votedForBlocks,
   expectedValidatorCount,
@@ -28,32 +28,25 @@ export function AttestationVotesBreakdownTable({
     return map;
   }, [votedForBlocks]);
 
-  // Group attestations by block_root and count votes
-  const voteGroups = useMemo((): VoteGroup[] => {
-    const groupMap = new Map<string, VoteGroup>();
-
-    attestationData.forEach(attestation => {
-      const blockRoot = attestation.block_root;
-      if (!blockRoot) return;
-
-      const existing = groupMap.get(blockRoot);
-      if (existing) {
-        existing.voteCount++;
-      } else {
-        const blockData = blockDataMap.get(blockRoot);
-        groupMap.set(blockRoot, {
-          blockRoot,
-          voteCount: 1,
-          slot: attestation.slot,
-          isCurrentSlot: attestation.slot === currentSlot,
-          blockData,
-        });
-      }
-    });
-
-    // Convert to array and sort by vote count (descending)
-    return Array.from(groupMap.values()).sort((a, b) => b.voteCount - a.voteCount);
-  }, [attestationData, currentSlot, blockDataMap]);
+  const voteGroups = useMemo(
+    (): VoteGroup[] =>
+      votes
+        .flatMap(({ block_root: blockRoot, vote_count: voteCount, slot }) =>
+          blockRoot && voteCount
+            ? [
+                {
+                  blockRoot,
+                  voteCount,
+                  slot,
+                  isCurrentSlot: slot === currentSlot,
+                  blockData: blockDataMap.get(blockRoot),
+                },
+              ]
+            : []
+        )
+        .sort((a, b) => b.voteCount - a.voteCount),
+    [votes, currentSlot, blockDataMap]
+  );
 
   const totalVotes = voteGroups.reduce((sum, group) => sum + group.voteCount, 0);
   const offlineCount = expectedValidatorCount - totalVotes;
@@ -83,7 +76,7 @@ export function AttestationVotesBreakdownTable({
       modalSize="full"
     >
       {isLoading ? (
-        <div className="px-6 py-8 text-center text-sm text-muted">Loading all attestation votes...</div>
+        <div className="px-6 py-8 text-center text-sm text-muted">Loading attestation votes...</div>
       ) : voteGroups.length === 0 ? (
         <div className="px-6 py-8 text-center text-sm text-muted">{emptyMessage}</div>
       ) : (
@@ -160,14 +153,21 @@ export function AttestationVotesBreakdownTable({
               cellClassName: 'w-24 text-right',
               headerClassName: 'text-right',
             },
-            {
-              header: '% of Total',
-              accessor: group => (
-                <span className="text-muted">{((group.voteCount / expectedValidatorCount) * 100).toFixed(1)}%</span>
-              ),
-              cellClassName: 'w-24 text-right',
-              headerClassName: 'text-right',
-            },
+            // The expected count comes from a table that starts later than the votes
+            ...(expectedValidatorCount > 0
+              ? [
+                  {
+                    header: '% of Total',
+                    accessor: (group: VoteGroup) => (
+                      <span className="text-muted">
+                        {((group.voteCount / expectedValidatorCount) * 100).toFixed(1)}%
+                      </span>
+                    ),
+                    cellClassName: 'w-24 text-right',
+                    headerClassName: 'text-right',
+                  },
+                ]
+              : []),
           ]}
           getRowKey={group => group.blockRoot}
         />

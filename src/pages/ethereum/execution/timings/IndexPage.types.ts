@@ -55,13 +55,16 @@ export const HOURLY_CHART_RANGES: TimeRange[] = ['1hour', '6hours', '24hours', '
 export const timingsSearchSchema = z.object({
   // Active tab selection
   // 'performance' is a legacy tab, redirected to /ethereum/execution/performance
-  tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients', 'performance']).optional(),
+  tab: z.enum(['overview', 'newPayload', 'getBlobs', 'clients', 'performance']).optional().catch(undefined),
 
   // Time range for data queries
-  range: z.enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days', 'all']).optional(),
+  range: z
+    .enum(['1hour', '6hours', '24hours', '7days', '31days', '90days', '180days', '365days', 'all'])
+    .optional()
+    .catch(undefined),
 
   // Filter to reference nodes only (ethPandaOps controlled fleet)
-  refNodes: z.boolean().optional(),
+  refNodes: z.boolean().optional().catch(undefined),
 });
 
 /**

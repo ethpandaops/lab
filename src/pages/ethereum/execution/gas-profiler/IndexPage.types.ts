@@ -6,11 +6,11 @@ import { BLOCK_TX_SORT_FIELDS } from './utils/blockTransactionFilters';
  */
 export const gasProfilerHomeSearchSchema = z.object({
   // Quick search by TX hash
-  tx: z.string().optional(),
+  tx: z.string().optional().catch(undefined),
   // Jump to specific block
-  block: z.coerce.number().optional(),
+  block: z.coerce.number().optional().catch(undefined),
   // Time period for network analytics charts
-  t: z.enum(['24h', '72h', '7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
+  t: z.enum(['24h', '72h', '7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional().catch(undefined),
 });
 
 const optionalCount = z.coerce.number().min(0).optional().catch(undefined);
@@ -21,9 +21,9 @@ const optionalCount = z.coerce.number().min(0).optional().catch(undefined);
  */
 export const gasProfilerBlockSearchSchema = z.object({
   // Search by tx hash, target or called contract
-  q: z.coerce.string().optional(),
+  q: z.coerce.string().optional().catch(undefined),
   // `Transfer` or root call type
-  type: z.coerce.string().optional(),
+  type: z.coerce.string().optional().catch(undefined),
   status: z.enum(['succeeded', 'failed']).optional().catch(undefined),
   gasMin: optionalCount,
   gasMax: optionalCount,
@@ -32,9 +32,9 @@ export const gasProfilerBlockSearchSchema = z.object({
   depthMin: optionalCount,
   depthMax: optionalCount,
   // Comma-separated opcodes the tx must execute
-  opcodes: z.coerce.string().optional(),
+  opcodes: z.coerce.string().optional().catch(undefined),
   // Opcode category with the most gas
-  category: z.coerce.string().optional(),
+  category: z.coerce.string().optional().catch(undefined),
   // Sort transactions (defaults to gas, descending)
   sort: z.enum(BLOCK_TX_SORT_FIELDS).optional().catch(undefined),
   sortDir: z.enum(['asc', 'desc']).optional().catch(undefined),
@@ -42,7 +42,7 @@ export const gasProfilerBlockSearchSchema = z.object({
   page: z.coerce.number().int().min(0).optional().catch(undefined),
   pageSize: z.coerce.number().int().min(1).max(100).optional().catch(undefined),
   // Highlight specific TX
-  highlight: z.string().optional(),
+  highlight: z.string().optional().catch(undefined),
 });
 
 /**
@@ -50,13 +50,13 @@ export const gasProfilerBlockSearchSchema = z.object({
  */
 export const gasProfilerTxSearchSchema = z.object({
   // Optional: block number for efficient API queries (can be resolved from tx hash)
-  block: z.coerce.number().optional(),
+  block: z.coerce.number().optional().catch(undefined),
   // Selected frame ID (if drilling into specific frame)
-  frame: z.coerce.number().optional(),
+  frame: z.coerce.number().optional().catch(undefined),
   // View mode for opcode panel
-  opcodeView: z.enum(['chart', 'table']).default('chart'),
+  opcodeView: z.enum(['chart', 'table']).default('chart').catch('chart'),
   // Opcode sort
-  opcodeSort: z.enum(['gas', 'count']).default('gas'),
+  opcodeSort: z.enum(['gas', 'count']).default('gas').catch('gas'),
 });
 
 /**
