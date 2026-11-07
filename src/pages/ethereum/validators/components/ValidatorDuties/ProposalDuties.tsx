@@ -10,8 +10,13 @@ import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { useTableBounds } from '@/hooks/useBounds';
 import type { FctBlockProposerByValidator } from '@/api/types.gen';
 import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
+import { MISSED_OR_ORPHANED } from '../../utils/proposal-status';
 
-const STATUS_COLORS: Record<string, 'green' | 'red' | 'orange'> = { canonical: 'green', missed: 'red' };
+const STATUS_COLORS: Record<string, 'green' | 'red' | 'orange'> = {
+  canonical: 'green',
+  missed: 'red',
+  [MISSED_OR_ORPHANED]: 'red',
+};
 
 interface ProposalDutiesProps {
   indices: number[];

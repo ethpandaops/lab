@@ -12,6 +12,7 @@ import { useHourlyData, useSlotData } from '../../hooks';
 import { getStatusIconConfig } from '../../hooks/useValidatorStatus';
 import { weekStartOf } from '../../utils/week';
 import { weekSpan } from '../../utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
 
 interface DailyBreakdownTableProps {
   /** Daily attestation data for the validator */
@@ -77,7 +78,7 @@ interface SlotRow {
   sourceCorrect: boolean | null;
   inclusionDistance: number | null;
   participated: boolean | null;
-  proposalStatus: 'canonical' | 'orphaned' | 'missed' | null;
+  proposalStatus: ProposalStatus | null;
 }
 
 /**
@@ -112,7 +113,7 @@ function formatBoolean(value: boolean | null): ReactNode {
 /**
  * Format a block proposal status as an icon
  */
-function formatProposalStatus(status: 'canonical' | 'orphaned' | 'missed' | null): ReactNode {
+function formatProposalStatus(status: ProposalStatus | null): ReactNode {
   if (status === null) return <span className="text-muted">-</span>;
   if (status === 'canonical')
     return (
@@ -120,9 +121,13 @@ function formatProposalStatus(status: 'canonical' | 'orphaned' | 'missed' | null
         ✓
       </span>
     );
-  if (status === 'missed')
+  if (status === 'missed' || status === MISSED_OR_ORPHANED)
     return (
-      <span className="text-danger" title="Fail" aria-label="Fail">
+      <span
+        className="text-danger"
+        title={status === 'missed' ? 'Fail' : 'Missed or orphaned'}
+        aria-label={status === 'missed' ? 'Fail' : 'Missed or orphaned'}
+      >
         ✗
       </span>
     );
@@ -163,7 +168,7 @@ function SlotBreakdownRows({
   // Build proposal lookup for this hour's slots
   const proposalBySlot = useMemo(() => {
     const hourEnd = hourTimestamp + 3600;
-    const map = new Map<number, 'canonical' | 'orphaned' | 'missed'>();
+    const map = new Map<number, ProposalStatus>();
     for (const p of blockProposals) {
       if (p.slotTimestamp >= hourTimestamp && p.slotTimestamp < hourEnd) {
         map.set(p.slot, p.status);

@@ -98,6 +98,7 @@ export function PerformanceSummary({ summary, isLoading = false, className }: Pe
         ? [
             blockProposal!.missedCount > 0 && `${blockProposal!.missedCount} missed`,
             blockProposal!.orphanedCount > 0 && `${blockProposal!.orphanedCount} orphaned`,
+            blockProposal!.missedOrOrphanedCount > 0 && `${blockProposal!.missedOrOrphanedCount} missed or orphaned`,
           ]
             .filter(Boolean)
             .join(', ') || 'All canonical'

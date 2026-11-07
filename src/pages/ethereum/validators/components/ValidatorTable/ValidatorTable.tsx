@@ -500,7 +500,7 @@ function ValidatorRow({
             <span
               className={clsx(
                 'tabular-nums',
-                row.blockProposal.missedCount > 0
+                row.blockProposal.missedCount > 0 || row.blockProposal.missedOrOrphanedCount > 0
                   ? 'text-danger'
                   : row.blockProposal.orphanedCount > 0
                     ? 'text-warning'

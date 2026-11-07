@@ -11,8 +11,10 @@ import {
 } from '@/api/sdk.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useTableBounds } from '@/hooks/useBounds';
 import { weekStartOf } from '../utils/week';
 import { rollupPeriods } from '../utils/range';
+import { MISSED_OR_ORPHANED, proposalStatus, type ProposalStatus } from '../utils/proposal-status';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
@@ -311,6 +313,7 @@ function aggregateBlockProposalByValidator(
       if (status === 'canonical') existing.canonicalCount += 1;
       else if (status === 'missed') existing.missedCount += 1;
       else if (status === 'orphaned') existing.orphanedCount += 1;
+      else if (status === MISSED_OR_ORPHANED) existing.missedOrOrphanedCount += 1;
     } else {
       byValidator.set(validatorIndex, {
         validatorIndex,
@@ -318,6 +321,7 @@ function aggregateBlockProposalByValidator(
         canonicalCount: status === 'canonical' ? 1 : 0,
         missedCount: status === 'missed' ? 1 : 0,
         orphanedCount: status === 'orphaned' ? 1 : 0,
+        missedOrOrphanedCount: status === MISSED_OR_ORPHANED ? 1 : 0,
         proposalRate: null,
       });
     }
@@ -338,7 +342,7 @@ function transformBlockProposals(data: FctBlockProposerByValidator[]): BlockProp
     slot: record.slot ?? 0,
     slotTimestamp: record.slot_start_date_time ?? 0,
     validatorIndex: record.validator_index ?? 0,
-    status: (record.status as 'canonical' | 'orphaned' | 'missed') ?? 'missed',
+    status: record.status as ProposalStatus,
   }));
 }
 
@@ -418,8 +422,9 @@ function calculateAggregateSummary(
       canonicalCount: acc.canonicalCount + m.canonicalCount,
       missedCount: acc.missedCount + m.missedCount,
       orphanedCount: acc.orphanedCount + m.orphanedCount,
+      missedOrOrphanedCount: acc.missedOrOrphanedCount + m.missedOrOrphanedCount,
     }),
-    { totalProposals: 0, canonicalCount: 0, missedCount: 0, orphanedCount: 0 }
+    { totalProposals: 0, canonicalCount: 0, missedCount: 0, orphanedCount: 0, missedOrOrphanedCount: 0 }
   );
 
   return {
@@ -513,6 +518,7 @@ export function useValidatorsData(
     resolution = 'day',
     slotsFrom = startTime,
     slotsEnd = endTime + 86400,
+    performanceFrom = startTime,
   }: {
     /**
      * Row granularity: one row per validator per day, or per week (Monday UTC). Weekly rows cover the whole weeks in
@@ -523,6 +529,8 @@ export function useValidatorsData(
     slotsFrom?: number;
     /** Exclusive end (Unix seconds) of the per-slot proposal read, which can run past the range's last day */
     slotsEnd?: number;
+    /** Start (Unix seconds) of the proposals counted in the summary and per-day views, where attestation data starts */
+    performanceFrom?: number;
   } = {}
 ): UseValidatorsDataReturn {
   const { currentNetwork } = useNetwork();
@@ -630,6 +638,17 @@ export function useValidatorsData(
     placeholderData: (previous, previousQuery) => (previousQuery?.queryKey[3] === indicesString ? previous : undefined),
   });
 
+  // Statuses as far as they are known: before the head table starts, orphaned blocks were never seen
+  const orphansKnownFrom = useTableBounds('fct_block_proposer_head').data?.min;
+  const blockProposalRows = useMemo(
+    () =>
+      (data?.blockProposal ?? []).map(p => ({
+        ...p,
+        status: proposalStatus(p.status, p.slot_start_date_time ?? 0, orphansKnownFrom),
+      })),
+    [data, orphansKnownFrom]
+  );
+
   const processedData = useMemo(() => {
     if (!data) {
       return {
@@ -643,7 +662,9 @@ export function useValidatorsData(
     }
     const { attestation: attestationData, syncCommittee: syncCommitteeData, balance: balanceData } = data;
     // Summaries and the heatmap count proposals over the rollups' days, which can end before the per-slot read
-    const blockProposalData = data.blockProposal.filter(p => (p.slot_start_date_time ?? 0) < rangeEnd);
+    const blockProposalData = blockProposalRows.filter(
+      p => (p.slot_start_date_time ?? 0) >= performanceFrom && (p.slot_start_date_time ?? 0) < rangeEnd
+    );
 
     const attestationByValidator = aggregateAttestationByValidator(attestationData);
     const syncCommitteeByValidator = aggregateSyncCommitteeByValidator(syncCommitteeData);
@@ -715,13 +736,13 @@ export function useValidatorsData(
       balanceDaily: transformBalanceDaily(balanceData),
       blockProposals: transformBlockProposals(blockProposalData),
     };
-  }, [data, rangeEnd]);
+  }, [data, blockProposalRows, performanceFrom, rangeEnd]);
 
   const raw = {
     attestation: data?.attestation ?? [],
     syncCommittee: data?.syncCommittee ?? [],
     balance: data?.balance ?? [],
-    blockProposal: data?.blockProposal ?? [],
+    blockProposal: blockProposalRows,
   };
   return {
     ...processedData,

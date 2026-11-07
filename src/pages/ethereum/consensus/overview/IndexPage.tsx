@@ -68,11 +68,12 @@ import {
   buildHeadVoteCorrectnessChartConfig,
   buildReorgChartConfig,
   isBucketCovered,
-  buildMissedSlotRateChartConfig,
   buildBlockProposalStatusChartConfig,
+  buildProposalStatusChartConfig,
+  proposalStatusCounts,
+  orphansKnown,
   buildAttestationInclusionDelayChartConfig,
   DEPTH_COLORS,
-  STATUS_COLORS,
   type TooltipSection,
 } from './overview.utils';
 
@@ -192,7 +193,18 @@ export function IndexPage(): JSX.Element {
       ),
     enabled: isDaily,
   });
-  const reorgBounds = useTableBounds(isDaily ? 'fct_reorg_daily' : 'fct_reorg_hourly');
+  const reorgTableBounds = useTableBounds(isDaily ? 'fct_reorg_daily' : 'fct_reorg_hourly');
+  // Orphaned blocks, and so reorgs, are only known from the proposer head table's first slot
+  const headBounds = useTableBounds('fct_block_proposer_head');
+  const orphansKnownFrom = headBounds.data?.min;
+  const reorgCoverage = useMemo(
+    () =>
+      reorgTableBounds.data && orphansKnownFrom !== undefined
+        ? { min: Math.max(reorgTableBounds.data.min, orphansKnownFrom), max: reorgTableBounds.data.max }
+        : undefined,
+    [reorgTableBounds.data, orphansKnownFrom]
+  );
+  const reorgBounds = { isLoading: reorgTableBounds.isLoading || headBounds.isLoading, data: reorgCoverage };
 
   const missedSlotHourlyQuery = useQuery({
     ...fctMissedSlotRateHourlyServiceListOptions({
@@ -486,15 +498,17 @@ export function IndexPage(): JSX.Element {
     return buildReorgChartConfig(reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data);
   }, [reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data]);
 
-  const missedSlotChartConfig = useMemo(() => {
-    if (!missedSlotRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildMissedSlotRateChartConfig(missedSlotRecords, unifiedTimeKeys, isDaily);
-  }, [missedSlotRecords, unifiedTimeKeys, isDaily]);
-
   const proposalStatusChartConfig = useMemo(() => {
     if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return null;
-    return buildBlockProposalStatusChartConfig(proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors);
-  }, [proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors]);
+    return buildProposalStatusChartConfig(
+      proposalStatusRecords,
+      missedSlotRecords ?? [],
+      unifiedTimeKeys,
+      isDaily,
+      orphansKnownFrom,
+      themeColors
+    );
+  }, [proposalStatusRecords, missedSlotRecords, unifiedTimeKeys, isDaily, orphansKnownFrom, themeColors]);
 
   const payloadStatusChartConfig = useMemo(() => {
     // Same record shape as proposal status: (time key, status, slot_count).
@@ -533,9 +547,9 @@ export function IndexPage(): JSX.Element {
       attnChartConfig?.labels ??
       hvChartConfig?.labels ??
       reorgChartConfig?.labels ??
-      missedSlotChartConfig?.labels ??
+      proposalStatusChartConfig?.labels ??
       [],
-    [blobChartConfig, attnChartConfig, hvChartConfig, reorgChartConfig, missedSlotChartConfig]
+    [blobChartConfig, attnChartConfig, hvChartConfig, reorgChartConfig, proposalStatusChartConfig]
   );
 
   const consensusForkMarkLines = useMemo(() => {
@@ -751,56 +765,6 @@ export function IndexPage(): JSX.Element {
     [reorgRecords, unifiedTimeKeys, isDaily, reorgBounds.data]
   );
 
-  const missedSlotTooltipFormatter = useCallback(
-    (params: unknown): string => {
-      if (!missedSlotRecords?.length || !unifiedTimeKeys.length) return '';
-
-      const recordsByKey = new Map<string, FctMissedSlotRateHourly | FctMissedSlotRateDaily>();
-      for (const r of missedSlotRecords) {
-        const key = isDaily
-          ? ((r as FctMissedSlotRateDaily).day_start_date ?? '')
-          : String((r as FctMissedSlotRateHourly).hour_start_date_time ?? '');
-        recordsByKey.set(key, r);
-      }
-
-      const dataPoints = Array.isArray(params) ? params : [params];
-      if (!dataPoints.length) return '';
-      const firstPoint = dataPoints[0] as { dataIndex?: number };
-      if (firstPoint.dataIndex === undefined) return '';
-      const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
-      if (!timeKey) return '';
-      const record = recordsByKey.get(timeKey);
-      if (!record) return '';
-
-      const dateValue = isDaily ? timeKey : Number(timeKey);
-      const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const sections: TooltipSection[] = [
-        {
-          title: 'SLOTS WITHOUT A CANONICAL BLOCK',
-          items: [
-            { color: DATA_COLORS.rose, label: 'Rate', value: `${(record.missed_rate ?? 0).toFixed(2)}%` },
-            {
-              color: DATA_COLORS.cyan,
-              label: 'Moving Avg',
-              value: `${(record.moving_avg_missed_rate ?? 0).toFixed(2)}%`,
-            },
-          ],
-        },
-        {
-          title: 'SLOTS',
-          items: [
-            { color: DATA_COLORS.rose, label: 'Without a block', value: String(record.missed_count ?? 0) },
-            { color: DATA_COLORS.slate, label: 'Total', value: String(record.slot_count ?? 0) },
-          ],
-        },
-      ];
-
-      return buildTooltipHtml(dateStr, sections);
-    },
-    [missedSlotRecords, unifiedTimeKeys, isDaily]
-  );
-
   const proposalStatusTooltipFormatter = useCallback(
     (params: unknown): string => {
       if (!proposalStatusRecords?.length || !unifiedTimeKeys.length) return '';
@@ -811,40 +775,54 @@ export function IndexPage(): JSX.Element {
       if (firstPoint.dataIndex === undefined) return '';
       const timeKey = unifiedTimeKeys[firstPoint.dataIndex];
       if (!timeKey) return '';
+      const counts = proposalStatusCounts(proposalStatusRecords, isDaily).get(timeKey);
+      if (!counts || counts.total === 0) return '';
 
       const dateValue = isDaily ? timeKey : Number(timeKey);
       const dateStr = formatTooltipDate(dateValue, isDaily);
-
-      const statusCounts = new Map<string, number>();
-      for (const r of proposalStatusRecords) {
-        const rKey = isDaily
-          ? ((r as FctBlockProposalStatusDaily).day_start_date ?? '')
-          : String((r as FctBlockProposalStatusHourly).hour_start_date_time ?? '');
-        if (rKey === timeKey) {
-          statusCounts.set(r.status ?? 'unknown', r.slot_count ?? 0);
-        }
-      }
-
-      const total = [...statusCounts.values()].reduce((s, c) => s + c, 0);
-      const sortedStatuses = [...statusCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+      const item = (label: string, color: string, count: number): TooltipSection['items'][number] => ({
+        color,
+        label,
+        value: `${((count / counts.total) * 100).toFixed(2)}% (${count})`,
+      });
+      const missedRate = missedSlotRecords?.find(r =>
+        isDaily
+          ? (r as FctMissedSlotRateDaily).day_start_date === timeKey
+          : String((r as FctMissedSlotRateHourly).hour_start_date_time) === timeKey
+      );
 
       const sections: TooltipSection[] = [
         {
-          title: `PROPOSAL STATUS (${total} slots)`,
-          items: sortedStatuses.map(([status, count]) => {
-            const rate = total > 0 ? ((count / total) * 100).toFixed(2) : '0.00';
-            return {
-              color: STATUS_COLORS[status] ? themeColors[STATUS_COLORS[status]] : themeColors.muted,
-              label: status.charAt(0).toUpperCase() + status.slice(1),
-              value: `${rate}% (${count})`,
-            };
-          }),
+          title: `PROPOSAL STATUS (${counts.total} slots)`,
+          items: [
+            item('Canonical', themeColors.success, counts.canonical),
+            ...(orphansKnown(timeKey, isDaily, orphansKnownFrom)
+              ? [
+                  item('Missed', themeColors.danger, counts.missed),
+                  item('Orphaned', themeColors.warning, counts.orphaned),
+                ]
+              : [item('Missed or orphaned', themeColors.muted, counts.missed + counts.orphaned)]),
+          ],
         },
+        ...(missedRate?.moving_avg_missed_rate != null
+          ? [
+              {
+                title: 'WITHOUT A CANONICAL BLOCK',
+                items: [
+                  {
+                    color: DATA_COLORS.cyan,
+                    label: 'Moving Avg',
+                    value: `${Math.max(0, missedRate.moving_avg_missed_rate).toFixed(2)}%`,
+                  },
+                ],
+              },
+            ]
+          : []),
       ];
 
       return buildTooltipHtml(dateStr, sections);
     },
-    [proposalStatusRecords, unifiedTimeKeys, isDaily, themeColors]
+    [proposalStatusRecords, missedSlotRecords, unifiedTimeKeys, isDaily, orphansKnownFrom, themeColors]
   );
 
   const inclusionDelayTooltipFormatter = useMemo(
@@ -926,25 +904,25 @@ export function IndexPage(): JSX.Element {
             </PopoutCard>
           )}
 
-          {/* Slots without a canonical block: missed and orphaned slots alike */}
-          {missedSlotChartConfig && (
+          {/* Block Proposal Status */}
+          {proposalStatusChartConfig && (
             <PopoutCard
-              title="Slots Without a Canonical Block"
-              subtitle={`Share of slots, missed or orphaned, ${bucket}, ${movingAvg}`}
-              anchorId="missed-slot-rate-chart"
+              title="Block Proposal Status"
+              subtitle={`Share of slots without a canonical block, ${bucket}, ${movingAvg}`}
+              anchorId="block-proposal-status-chart"
               modalSize="full"
             >
               {({ inModal }) => (
                 <MultiLineChart
-                  series={missedSlotChartConfig.series}
-                  xAxis={{ type: 'category', labels: missedSlotChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Slots (%)', min: 'dataMin' }}
+                  series={proposalStatusChartConfig.series}
+                  xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
+                  yAxis={{ name: 'Slots (%)', min: 0 }}
                   height={inModal ? 600 : 200}
                   showLegend
                   legendPosition="top"
                   enableDataZoom
                   showDataZoomSlider={inModal}
-                  tooltipFormatter={missedSlotTooltipFormatter}
+                  tooltipFormatter={proposalStatusTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />
@@ -997,32 +975,6 @@ export function IndexPage(): JSX.Element {
                   enableDataZoom
                   showDataZoomSlider={inModal}
                   tooltipFormatter={reorgTooltipFormatter}
-                  markLines={showAnnotations ? forkMarkLines : []}
-                  syncGroup={inModal ? undefined : 'consensus-overview'}
-                />
-              )}
-            </PopoutCard>
-          )}
-
-          {/* Block Proposal Status */}
-          {proposalStatusChartConfig && (
-            <PopoutCard
-              title="Block Proposal Status"
-              subtitle={`Share of slots, ${bucket}`}
-              anchorId="block-proposal-status-chart"
-              modalSize="full"
-            >
-              {({ inModal }) => (
-                <MultiLineChart
-                  series={proposalStatusChartConfig.series}
-                  xAxis={{ type: 'category', labels: proposalStatusChartConfig.labels, name: 'Date' }}
-                  yAxis={{ name: 'Rate (%)', min: 'dataMin' }}
-                  height={inModal ? 600 : 200}
-                  showLegend
-                  legendPosition="top"
-                  enableDataZoom
-                  showDataZoomSlider={inModal}
-                  tooltipFormatter={proposalStatusTooltipFormatter}
                   markLines={showAnnotations ? forkMarkLines : []}
                   syncGroup={inModal ? undefined : 'consensus-overview'}
                 />

@@ -109,6 +109,9 @@ export function InspectPage(): JSX.Element {
     unresolvedPubkeys,
   } = useValidatorResolver(parsedIndices, parsedPubkeys, hasAnalyzed);
 
+  // Attestation and proposal tables start later than balances; the heatmap and table begin where they do
+  const performanceFrom = performanceFloor !== undefined ? Math.max(from, performanceFloor) : from;
+
   const ready = hasAnalyzed && isResolved && rangeFrom !== undefined && proposalsFrom !== undefined;
   const {
     validators,
@@ -126,6 +129,7 @@ export function InspectPage(): JSX.Element {
     resolution,
     slotsFrom: Math.max(from, proposalsFrom ?? from),
     slotsEnd,
+    performanceFrom,
   });
 
   const { getStatusAtTimestamp, unknownValidators, latestStatus } = useValidatorStatus(ready ? resolvedIndices : []);
@@ -225,8 +229,6 @@ export function InspectPage(): JSX.Element {
 
   const loading = isResolving || isLoading || rangeFrom === undefined;
   const busy = loading || isPlaceholderData;
-  // Attestation and proposal tables start later than balances; the heatmap and table begin where they do
-  const performanceFrom = performanceFloor !== undefined ? Math.max(from, performanceFloor) : from;
   const rangeMeta = (
     <span className="flex items-center gap-2">
       {formatDate(from)} – {formatDate(dataTo)}

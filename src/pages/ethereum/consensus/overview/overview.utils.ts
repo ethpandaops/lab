@@ -393,46 +393,110 @@ export function buildReorgChartConfig(
   return { labels, series };
 }
 
-/** Builds chart config for the share of slots without a canonical block (missed or orphaned): rate + moving avg */
-export function buildMissedSlotRateChartConfig(
-  records: (FctMissedSlotRateHourly | FctMissedSlotRateDaily)[],
-  unifiedKeys: string[],
+/** Whether orphaned blocks are known for a whole bucket: it starts at or after the head table's first slot */
+export function orphansKnown(key: string, isDaily: boolean, orphansKnownFrom: number | undefined): boolean {
+  if (orphansKnownFrom === undefined) return false;
+  const start = isDaily ? Date.parse(`${key}T00:00:00Z`) / 1000 : Number(key);
+  return start >= orphansKnownFrom;
+}
+
+/** Slot counts by proposal status, for one hour or day */
+export interface ProposalStatusCounts {
+  canonical: number;
+  missed: number;
+  orphaned: number;
+  total: number;
+}
+
+/** Proposal status counts by time key */
+export function proposalStatusCounts(
+  records: (FctBlockProposalStatusHourly | FctBlockProposalStatusDaily)[],
   isDaily: boolean
-): ChartConfig {
-  const byKey = new Map<string, FctMissedSlotRateHourly | FctMissedSlotRateDaily>();
+): Map<string, ProposalStatusCounts> {
+  const byKey = new Map<string, ProposalStatusCounts>();
   for (const r of records) {
+    const key = isDaily
+      ? ((r as FctBlockProposalStatusDaily).day_start_date ?? '')
+      : String((r as FctBlockProposalStatusHourly).hour_start_date_time ?? '');
+    const counts = byKey.get(key) ?? { canonical: 0, missed: 0, orphaned: 0, total: 0 };
+    const status = r.status;
+    const count = r.slot_count ?? 0;
+    if (status === 'canonical' || status === 'missed' || status === 'orphaned') counts[status] += count;
+    counts.total += count;
+    byKey.set(key, counts);
+  }
+  return byKey;
+}
+
+/**
+ * Builds the proposal status chart: the share of slots without a canonical block, stacked by why, and its moving
+ * average. Orphaned blocks are only known from `orphansKnownFrom` (the head table's first slot); buckets before it
+ * show one "missed or orphaned" share instead of a split.
+ */
+export function buildProposalStatusChartConfig(
+  records: (FctBlockProposalStatusHourly | FctBlockProposalStatusDaily)[],
+  missedRateRecords: (FctMissedSlotRateHourly | FctMissedSlotRateDaily)[],
+  unifiedKeys: string[],
+  isDaily: boolean,
+  orphansKnownFrom: number | undefined,
+  themeColors: ThemeColors
+): ChartConfig {
+  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
+  const counts = proposalStatusCounts(records, isDaily);
+  const movingAvg = new Map<string, number | undefined>();
+  for (const r of missedRateRecords) {
     const key = isDaily
       ? ((r as FctMissedSlotRateDaily).day_start_date ?? '')
       : String((r as FctMissedSlotRateHourly).hour_start_date_time ?? '');
-    byKey.set(key, r);
+    movingAvg.set(key, r.moving_avg_missed_rate);
   }
 
-  const labels = unifiedKeys.map(k => (isDaily ? formatDailyDate(k) : formatHourlyDate(Number(k))));
-
-  const rateValues = unifiedKeys.map(k => {
-    const r = byKey.get(k);
-    return r?.missed_rate != null ? Math.max(0, r.missed_rate) : null;
-  });
-  const movingAvgValues = unifiedKeys.map(k => {
-    const r = byKey.get(k);
-    return r?.moving_avg_missed_rate != null ? Math.max(0, r.moving_avg_missed_rate) : null;
-  });
-
-  return {
-    labels,
-    series: [
-      createStatisticSeries('Rate', rateValues, {
-        color: DATA_COLORS.rose,
-        lineWidth: 2.5,
-        group: 'Statistics',
-      }),
-      createStatisticSeries('Moving Avg', movingAvgValues, {
-        color: DATA_COLORS.cyan,
-        lineWidth: 2,
-        group: 'Statistics',
-      }),
-    ],
+  const share = (k: string, known: boolean, pick: (c: ProposalStatusCounts) => number): number | null => {
+    const c = counts.get(k);
+    if (!c || c.total === 0 || orphansKnown(k, isDaily, orphansKnownFrom) !== known) return null;
+    return Number(((pick(c) / c.total) * 100).toFixed(4));
   };
+  const stacked = (name: string, color: string, data: (number | null)[], stack: string): SeriesData => ({
+    name,
+    data,
+    color,
+    showArea: true,
+    stack,
+    group: 'Status',
+  });
+
+  const series: SeriesData[] = [
+    stacked(
+      'Missed',
+      themeColors.danger,
+      unifiedKeys.map(k => share(k, true, c => c.missed)),
+      'known'
+    ),
+    stacked(
+      'Orphaned',
+      themeColors.warning,
+      unifiedKeys.map(k => share(k, true, c => c.orphaned)),
+      'known'
+    ),
+    stacked(
+      'Missed or orphaned',
+      themeColors.muted,
+      unifiedKeys.map(k => share(k, false, c => c.missed + c.orphaned)),
+      'unknown'
+    ),
+  ].filter(s => s.data.some(v => v !== null));
+
+  const avgValues = unifiedKeys.map(k => {
+    const v = movingAvg.get(k);
+    return v != null ? Math.max(0, v) : null;
+  });
+  if (avgValues.some(v => v !== null)) {
+    series.push(
+      createStatisticSeries('Moving Avg', avgValues, { color: DATA_COLORS.cyan, lineWidth: 2, group: 'Statistics' })
+    );
+  }
+
+  return { labels, series };
 }
 
 /** Theme color per block proposal / payload status */

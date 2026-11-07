@@ -150,6 +150,7 @@ describe('useValidatorsData', () => {
   });
 
   it('reads proposals to the range end and counts only those inside the weekly rollups', async () => {
+    // Proposals are read from before the range's attestation data, for Activity, but counted from where it starts
     const monday = 1788134400; // 2026-08-31
     const sunday = monday + 6 * 86400;
     const rangeEnd = sunday + 3 * 86400;
@@ -161,23 +162,72 @@ describe('useValidatorsData', () => {
         const url = new URL(request.url);
         urls.push(url);
         const body = url.pathname.endsWith('fct_block_proposer_by_validator')
-          ? { fct_block_proposer_by_validator: [proposal(monday + 12), proposal(rangeEnd + 12)] }
+          ? {
+              fct_block_proposer_by_validator: [proposal(monday - 12), proposal(monday + 12), proposal(rangeEnd + 12)],
+            }
           : {};
         return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
       })
     );
 
     const { result } = renderHook(
-      () => useValidatorsData([1], monday, sunday, { resolution: 'week', slotsEnd: rangeEnd + 86400 }),
+      () =>
+        useValidatorsData([1], monday - 7 * 86400, sunday, {
+          resolution: 'week',
+          slotsEnd: rangeEnd + 86400,
+          performanceFrom: monday,
+        }),
       { wrapper }
     );
 
     await waitFor(() => expect(result.current.summary).not.toBeNull());
     const read = urls.find(u => u.pathname.endsWith('fct_block_proposer_by_validator'));
     expect(read?.searchParams.get('slot_start_date_time_lt')).toBe(String(rangeEnd + 86400));
-    expect(result.current.raw.blockProposal).toHaveLength(2);
+    expect(result.current.raw.blockProposal).toHaveLength(3);
     expect(result.current.summary?.blockProposal.totalProposals).toBe(1);
     expect(result.current.blockProposals).toHaveLength(1);
+  });
+
+  it('counts a slot without a canonical block before the head table starts as missed or orphaned', async () => {
+    const day = 1788134400; // 2026-08-31
+    const headStart = day + 3600;
+    const proposal = (ts: number, status: string): object => ({ validator_index: 1, slot_start_date_time: ts, status });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (request: Request | string) => {
+        const url = new URL(typeof request === 'string' ? `http://localhost${request}` : request.url);
+        const body = url.pathname.endsWith('/bounds')
+          ? { fct_block_proposer_head: { min: headStart, max: day + 86400 } }
+          : url.pathname.endsWith('fct_block_proposer_by_validator')
+            ? {
+                fct_block_proposer_by_validator: [
+                  proposal(day + 12, 'missed'),
+                  proposal(headStart, 'missed'),
+                  proposal(headStart + 12, 'orphaned'),
+                  proposal(headStart + 24, 'canonical'),
+                ],
+              }
+            : {};
+        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      })
+    );
+
+    const { result } = renderHook(() => useValidatorsData([1], day, day), { wrapper });
+
+    await waitFor(() => expect(result.current.summary?.blockProposal.missedCount).toBe(1));
+    expect(result.current.summary?.blockProposal).toMatchObject({
+      totalProposals: 4,
+      canonicalCount: 1,
+      missedCount: 1,
+      orphanedCount: 1,
+      missedOrOrphanedCount: 1,
+    });
+    expect(result.current.raw.blockProposal.map(p => p.status)).toEqual([
+      'missed or orphaned',
+      'missed',
+      'orphaned',
+      'canonical',
+    ]);
   });
 
   it('reads whole weeks weekly and adds up the days around them into partial weeks', async () => {
