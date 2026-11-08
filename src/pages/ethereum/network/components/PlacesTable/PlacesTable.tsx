@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { networkTypeLabel } from '@/pages/ethereum/clients/utils/census';
 import type {
   FctPeerCountByClientAsnDaily,
@@ -71,7 +71,7 @@ export function CountriesTable({ end, start, limit }: CountriesTableProps): JSX.
               params={{ country: row.key.toLowerCase() }}
               className="inline-flex max-w-48 items-center gap-2 text-foreground hover:text-primary sm:max-w-none"
             >
-              <span aria-hidden>{getCountryFlag(row.key, '')}</span>
+              <CountryFlag code={row.key} />
               <span className="truncate">{names.get(row.key) || row.key}</span>
             </Link>
           ),

@@ -5,7 +5,8 @@ import { DataTable } from '@/components/DataTable';
 import { Input } from '@/components/Forms/Input';
 import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
-import { getCountryFlag, getRelativeTime } from '@/utils';
+import { getRelativeTime } from '@/utils';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import type { NodeRow } from '../../hooks/useNodeRows';
 import { formatNodeLocation } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
@@ -68,7 +69,7 @@ const columns: DataTableColumn<NodeRow>[] = [
     accessorFn: row => formatNodeLocation(row.node),
     cell: ({ row, getValue }) => (
       <span className="flex items-center gap-1.5">
-        <span>{getCountryFlag(row.original.node.meta_client_geo_country_code, '')}</span>
+        <CountryFlag code={row.original.node.meta_client_geo_country_code} />
         <span className="max-w-40 truncate">{getValue() as string}</span>
       </span>
     ),

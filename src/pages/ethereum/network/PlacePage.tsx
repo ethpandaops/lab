@@ -4,7 +4,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import {
   CENSUS_TABLES,
   type FctPeerCountByClientAsnDaily,
@@ -36,7 +36,14 @@ export function CountryPage(): JSX.Element {
 
   return (
     <Container>
-      <Header title={`${getCountryFlag(code, '')} ${countryName(code)}`.trim()} />
+      <Header
+        title={
+          <span className="inline-flex items-center gap-3">
+            <CountryFlag code={code} className="h-5 w-[30px] rounded-xs" />
+            {countryName(code)}
+          </span>
+        }
+      />
       <div className="flex flex-col gap-6">
         <RangeBar range={range} onChange={setRange} endDay={census.all.endDay} startDay={census.all.startDay} />
         {census.isLoading ? (

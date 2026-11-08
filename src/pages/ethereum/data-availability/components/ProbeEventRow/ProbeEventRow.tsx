@@ -4,7 +4,7 @@ import { CheckCircleIcon, XCircleIcon, QuestionMarkCircleIcon, EyeIcon } from '@
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { formatSlot } from '@/utils';
 import type { ProbeEventRowProps } from './ProbeEventRow.types';
 
@@ -60,8 +60,8 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
       <div className="relative shrink-0">
         <ClientLogo client={peerClient} size={28} noLink />
         {peerCountryCode && (
-          <div className="absolute -right-1.5 -bottom-1 flex size-4 items-center justify-center rounded-full border border-background bg-surface text-2xs">
-            {getCountryFlag(peerCountryCode)}
+          <div className="absolute -right-1.5 -bottom-1 flex size-4 overflow-hidden rounded-full border border-background bg-surface">
+            <CountryFlag code={peerCountryCode} showUnknown className="size-full" />
           </div>
         )}
       </div>

@@ -5,7 +5,8 @@ import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Card } from '@/components/Layout/Card';
-import { getClassificationBadgeClasses, getClassificationLabel, getCountryFlag } from '@/utils';
+import { getClassificationBadgeClasses, getClassificationLabel } from '@/utils';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import type { NodeRow } from '../../hooks/useNodeRows';
 import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '../../utils/node-stats';
 import { NodeStatus } from '../NodeStatus';
@@ -108,8 +109,9 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
           </span>
         </Detail>
         <Detail label="Location">
-          <span>{getCountryFlag(node.meta_client_geo_country_code, '')}</span>
-          <span>{formatNodeLocation(node)}</span>
+          <span>
+            <CountryFlag code={node.meta_client_geo_country_code} /> {formatNodeLocation(node)}
+          </span>
         </Detail>
         <Detail label="Network">
           <span>{node.meta_client_geo_autonomous_system_organization || '–'}</span>
