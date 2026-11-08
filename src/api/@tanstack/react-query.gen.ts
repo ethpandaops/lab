@@ -428,6 +428,8 @@ import {
   fctPeerCountByElClientCountryDailyServiceList,
   fctPeerCountByElClientDailyServiceGet,
   fctPeerCountByElClientDailyServiceList,
+  fctPeerCountBySourceDailyServiceGet,
+  fctPeerCountBySourceDailyServiceList,
   fctPeerForkReadinessByClClientDailyServiceGet,
   fctPeerForkReadinessByClClientDailyServiceList,
   fctPeerForkReadinessByElClientDailyServiceGet,
@@ -438,6 +440,10 @@ import {
   fctPeerPartialMessageSupportByClientHourlyServiceList,
   fctPeerProtocolByClClientDailyServiceGet,
   fctPeerProtocolByClClientDailyServiceList,
+  fctPeerReachabilityByClClientDailyServiceGet,
+  fctPeerReachabilityByClClientDailyServiceList,
+  fctPeerSyncStatusByClClientDailyServiceGet,
+  fctPeerSyncStatusByClClientDailyServiceList,
   fctPreparedBlockByNodeDailyServiceGet,
   fctPreparedBlockByNodeDailyServiceList,
   fctPreparedBlockServiceGet,
@@ -624,6 +630,10 @@ import {
   intExecutionBlockByDateServiceList,
   intExecutionStateSizeByBlockServiceGet,
   intExecutionStateSizeByBlockServiceList,
+  intPeerDailyOrderByPeerIdServiceGet,
+  intPeerDailyOrderByPeerIdServiceList,
+  intPeerDailyServiceGet,
+  intPeerDailyServiceList,
   intRocketpoolMegapoolServiceGet,
   intRocketpoolMegapoolServiceList,
   intRocketpoolMinipoolServiceGet,
@@ -1967,6 +1977,12 @@ import type {
   FctPeerCountByElClientDailyServiceListData,
   FctPeerCountByElClientDailyServiceListError,
   FctPeerCountByElClientDailyServiceListResponse,
+  FctPeerCountBySourceDailyServiceGetData,
+  FctPeerCountBySourceDailyServiceGetError,
+  FctPeerCountBySourceDailyServiceGetResponse,
+  FctPeerCountBySourceDailyServiceListData,
+  FctPeerCountBySourceDailyServiceListError,
+  FctPeerCountBySourceDailyServiceListResponse,
   FctPeerForkReadinessByClClientDailyServiceGetData,
   FctPeerForkReadinessByClClientDailyServiceGetError,
   FctPeerForkReadinessByClClientDailyServiceGetResponse,
@@ -1997,6 +2013,18 @@ import type {
   FctPeerProtocolByClClientDailyServiceListData,
   FctPeerProtocolByClClientDailyServiceListError,
   FctPeerProtocolByClClientDailyServiceListResponse,
+  FctPeerReachabilityByClClientDailyServiceGetData,
+  FctPeerReachabilityByClClientDailyServiceGetError,
+  FctPeerReachabilityByClClientDailyServiceGetResponse,
+  FctPeerReachabilityByClClientDailyServiceListData,
+  FctPeerReachabilityByClClientDailyServiceListError,
+  FctPeerReachabilityByClClientDailyServiceListResponse,
+  FctPeerSyncStatusByClClientDailyServiceGetData,
+  FctPeerSyncStatusByClClientDailyServiceGetError,
+  FctPeerSyncStatusByClClientDailyServiceGetResponse,
+  FctPeerSyncStatusByClClientDailyServiceListData,
+  FctPeerSyncStatusByClClientDailyServiceListError,
+  FctPeerSyncStatusByClClientDailyServiceListResponse,
   FctPreparedBlockByNodeDailyServiceGetData,
   FctPreparedBlockByNodeDailyServiceGetError,
   FctPreparedBlockByNodeDailyServiceGetResponse,
@@ -2555,6 +2583,18 @@ import type {
   IntExecutionStateSizeByBlockServiceListData,
   IntExecutionStateSizeByBlockServiceListError,
   IntExecutionStateSizeByBlockServiceListResponse,
+  IntPeerDailyOrderByPeerIdServiceGetData,
+  IntPeerDailyOrderByPeerIdServiceGetError,
+  IntPeerDailyOrderByPeerIdServiceGetResponse,
+  IntPeerDailyOrderByPeerIdServiceListData,
+  IntPeerDailyOrderByPeerIdServiceListError,
+  IntPeerDailyOrderByPeerIdServiceListResponse,
+  IntPeerDailyServiceGetData,
+  IntPeerDailyServiceGetError,
+  IntPeerDailyServiceGetResponse,
+  IntPeerDailyServiceListData,
+  IntPeerDailyServiceListError,
+  IntPeerDailyServiceListResponse,
   IntRocketpoolMegapoolServiceGetData,
   IntRocketpoolMegapoolServiceGetError,
   IntRocketpoolMegapoolServiceGetResponse,
@@ -14996,7 +15036,7 @@ export const fctPeerCountByClientPairDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery on the network genesis and its current fork. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
  */
 export const fctPeerCountByClientPairDailyServiceListOptions = (
   options?: Options<FctPeerCountByClientPairDailyServiceListData>
@@ -15056,7 +15096,7 @@ export const fctPeerCountByElClientAsnDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Autonomous systems under 3 nodes roll into an other bucket per network type.
  */
 export const fctPeerCountByElClientAsnDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientAsnDailyServiceListData>
@@ -15116,7 +15156,7 @@ export const fctPeerCountByElClientCountryDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByElClientCountryDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientCountryDailyServiceListData>
@@ -15176,7 +15216,7 @@ export const fctPeerCountByElClientDailyServiceListQueryKey = (
 /**
  * List records
  *
- * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByElClientDailyServiceListOptions = (
   options?: Options<FctPeerCountByElClientDailyServiceListData>
@@ -15227,6 +15267,64 @@ export const fctPeerCountByElClientDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctPeerCountByElClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCountBySourceDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountBySourceDailyServiceListData>
+) => createQueryKey('fctPeerCountBySourceDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peer totals by source: peers our libp2p sentries and our discovery crawler saw, and how many both saw, with reachability, hosting and custody counts. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountBySourceDailyServiceListOptions = (
+  options?: Options<FctPeerCountBySourceDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountBySourceDailyServiceListResponse,
+    FctPeerCountBySourceDailyServiceListError,
+    FctPeerCountBySourceDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountBySourceDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountBySourceDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountBySourceDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountBySourceDailyServiceGetQueryKey = (
+  options: Options<FctPeerCountBySourceDailyServiceGetData>
+) => createQueryKey('fctPeerCountBySourceDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountBySourceDailyServiceGetOptions = (options: Options<FctPeerCountBySourceDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerCountBySourceDailyServiceGetResponse,
+    FctPeerCountBySourceDailyServiceGetError,
+    FctPeerCountBySourceDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountBySourceDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountBySourceDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountBySourceDailyServiceGetQueryKey(options),
   });
 
 export const fctPeerForkReadinessByClClientDailyServiceListQueryKey = (
@@ -15527,6 +15625,126 @@ export const fctPeerProtocolByClClientDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctPeerProtocolByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerReachabilityByClClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerReachabilityByClClientDailyServiceListData>
+) => createQueryKey('fctPeerReachabilityByClClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peer reachability by client: peers our libp2p sentries dialled or that only connected in, QUIC, and ENR address mismatches.
+ */
+export const fctPeerReachabilityByClClientDailyServiceListOptions = (
+  options?: Options<FctPeerReachabilityByClClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerReachabilityByClClientDailyServiceListResponse,
+    FctPeerReachabilityByClClientDailyServiceListError,
+    FctPeerReachabilityByClClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerReachabilityByClClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerReachabilityByClClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerReachabilityByClClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerReachabilityByClClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerReachabilityByClClientDailyServiceGetData>
+) => createQueryKey('fctPeerReachabilityByClClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerReachabilityByClClientDailyServiceGetOptions = (
+  options: Options<FctPeerReachabilityByClClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerReachabilityByClClientDailyServiceGetResponse,
+    FctPeerReachabilityByClClientDailyServiceGetError,
+    FctPeerReachabilityByClClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerReachabilityByClClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerReachabilityByClClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerReachabilityByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerSyncStatusByClClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerSyncStatusByClClientDailyServiceListData>
+) => createQueryKey('fctPeerSyncStatusByClClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peer sync status by client, from status exchanges with our libp2p sentries: head and finalized lag against the sentry, fork digest, and block history served (earliest available slot).
+ */
+export const fctPeerSyncStatusByClClientDailyServiceListOptions = (
+  options?: Options<FctPeerSyncStatusByClClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerSyncStatusByClClientDailyServiceListResponse,
+    FctPeerSyncStatusByClClientDailyServiceListError,
+    FctPeerSyncStatusByClClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerSyncStatusByClClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSyncStatusByClClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSyncStatusByClClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerSyncStatusByClClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerSyncStatusByClClientDailyServiceGetData>
+) => createQueryKey('fctPeerSyncStatusByClClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerSyncStatusByClClientDailyServiceGetOptions = (
+  options: Options<FctPeerSyncStatusByClClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerSyncStatusByClClientDailyServiceGetResponse,
+    FctPeerSyncStatusByClClientDailyServiceGetError,
+    FctPeerSyncStatusByClClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerSyncStatusByClClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSyncStatusByClClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSyncStatusByClClientDailyServiceGetQueryKey(options),
   });
 
 export const fctPreparedBlockServiceListQueryKey = (options?: Options<FctPreparedBlockServiceListData>) =>
@@ -20914,6 +21132,118 @@ export const intExecutionStateSizeByBlockServiceGetOptions = (
       return data;
     },
     queryKey: intExecutionStateSizeByBlockServiceGetQueryKey(options),
+  });
+
+export const intPeerDailyServiceListQueryKey = (options?: Options<IntPeerDailyServiceListData>) =>
+  createQueryKey('intPeerDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Sentry values win over ENR values. Crawlers, probes, light clients and our own sentries are excluded. Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export const intPeerDailyServiceListOptions = (options?: Options<IntPeerDailyServiceListData>) =>
+  queryOptions<
+    IntPeerDailyServiceListResponse,
+    IntPeerDailyServiceListError,
+    IntPeerDailyServiceListResponse,
+    ReturnType<typeof intPeerDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerDailyServiceListQueryKey(options),
+  });
+
+export const intPeerDailyServiceGetQueryKey = (options: Options<IntPeerDailyServiceGetData>) =>
+  createQueryKey('intPeerDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const intPeerDailyServiceGetOptions = (options: Options<IntPeerDailyServiceGetData>) =>
+  queryOptions<
+    IntPeerDailyServiceGetResponse,
+    IntPeerDailyServiceGetError,
+    IntPeerDailyServiceGetResponse,
+    ReturnType<typeof intPeerDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerDailyServiceGetQueryKey(options),
+  });
+
+export const intPeerDailyOrderByPeerIdServiceListQueryKey = (
+  options?: Options<IntPeerDailyOrderByPeerIdServiceListData>
+) => createQueryKey('intPeerDailyOrderByPeerIdServiceList', options);
+
+/**
+ * List records
+ *
+ * int_peer_daily ordered by peer ID, for reading one peer across days. One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export const intPeerDailyOrderByPeerIdServiceListOptions = (
+  options?: Options<IntPeerDailyOrderByPeerIdServiceListData>
+) =>
+  queryOptions<
+    IntPeerDailyOrderByPeerIdServiceListResponse,
+    IntPeerDailyOrderByPeerIdServiceListError,
+    IntPeerDailyOrderByPeerIdServiceListResponse,
+    ReturnType<typeof intPeerDailyOrderByPeerIdServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerDailyOrderByPeerIdServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerDailyOrderByPeerIdServiceListQueryKey(options),
+  });
+
+export const intPeerDailyOrderByPeerIdServiceGetQueryKey = (
+  options: Options<IntPeerDailyOrderByPeerIdServiceGetData>
+) => createQueryKey('intPeerDailyOrderByPeerIdServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by peer_id
+ */
+export const intPeerDailyOrderByPeerIdServiceGetOptions = (options: Options<IntPeerDailyOrderByPeerIdServiceGetData>) =>
+  queryOptions<
+    IntPeerDailyOrderByPeerIdServiceGetResponse,
+    IntPeerDailyOrderByPeerIdServiceGetError,
+    IntPeerDailyOrderByPeerIdServiceGetResponse,
+    ReturnType<typeof intPeerDailyOrderByPeerIdServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerDailyOrderByPeerIdServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerDailyOrderByPeerIdServiceGetQueryKey(options),
   });
 
 export const intRocketpoolMegapoolServiceListQueryKey = (options?: Options<IntRocketpoolMegapoolServiceListData>) =>

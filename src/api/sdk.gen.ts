@@ -1275,6 +1275,12 @@ import type {
   FctPeerCountByElClientDailyServiceListData,
   FctPeerCountByElClientDailyServiceListErrors,
   FctPeerCountByElClientDailyServiceListResponses,
+  FctPeerCountBySourceDailyServiceGetData,
+  FctPeerCountBySourceDailyServiceGetErrors,
+  FctPeerCountBySourceDailyServiceGetResponses,
+  FctPeerCountBySourceDailyServiceListData,
+  FctPeerCountBySourceDailyServiceListErrors,
+  FctPeerCountBySourceDailyServiceListResponses,
   FctPeerForkReadinessByClClientDailyServiceGetData,
   FctPeerForkReadinessByClClientDailyServiceGetErrors,
   FctPeerForkReadinessByClClientDailyServiceGetResponses,
@@ -1305,6 +1311,18 @@ import type {
   FctPeerProtocolByClClientDailyServiceListData,
   FctPeerProtocolByClClientDailyServiceListErrors,
   FctPeerProtocolByClClientDailyServiceListResponses,
+  FctPeerReachabilityByClClientDailyServiceGetData,
+  FctPeerReachabilityByClClientDailyServiceGetErrors,
+  FctPeerReachabilityByClClientDailyServiceGetResponses,
+  FctPeerReachabilityByClClientDailyServiceListData,
+  FctPeerReachabilityByClClientDailyServiceListErrors,
+  FctPeerReachabilityByClClientDailyServiceListResponses,
+  FctPeerSyncStatusByClClientDailyServiceGetData,
+  FctPeerSyncStatusByClClientDailyServiceGetErrors,
+  FctPeerSyncStatusByClClientDailyServiceGetResponses,
+  FctPeerSyncStatusByClClientDailyServiceListData,
+  FctPeerSyncStatusByClClientDailyServiceListErrors,
+  FctPeerSyncStatusByClClientDailyServiceListResponses,
   FctPreparedBlockByNodeDailyServiceGetData,
   FctPreparedBlockByNodeDailyServiceGetErrors,
   FctPreparedBlockByNodeDailyServiceGetResponses,
@@ -1863,6 +1881,18 @@ import type {
   IntExecutionStateSizeByBlockServiceListData,
   IntExecutionStateSizeByBlockServiceListErrors,
   IntExecutionStateSizeByBlockServiceListResponses,
+  IntPeerDailyOrderByPeerIdServiceGetData,
+  IntPeerDailyOrderByPeerIdServiceGetErrors,
+  IntPeerDailyOrderByPeerIdServiceGetResponses,
+  IntPeerDailyOrderByPeerIdServiceListData,
+  IntPeerDailyOrderByPeerIdServiceListErrors,
+  IntPeerDailyOrderByPeerIdServiceListResponses,
+  IntPeerDailyServiceGetData,
+  IntPeerDailyServiceGetErrors,
+  IntPeerDailyServiceGetResponses,
+  IntPeerDailyServiceListData,
+  IntPeerDailyServiceListErrors,
+  IntPeerDailyServiceListResponses,
   IntRocketpoolMegapoolServiceGetData,
   IntRocketpoolMegapoolServiceGetErrors,
   IntRocketpoolMegapoolServiceGetResponses,
@@ -2917,6 +2947,10 @@ import {
   zFctPeerCountByElClientDailyServiceGetResponse,
   zFctPeerCountByElClientDailyServiceListData,
   zFctPeerCountByElClientDailyServiceListResponse,
+  zFctPeerCountBySourceDailyServiceGetData,
+  zFctPeerCountBySourceDailyServiceGetResponse,
+  zFctPeerCountBySourceDailyServiceListData,
+  zFctPeerCountBySourceDailyServiceListResponse,
   zFctPeerForkReadinessByClClientDailyServiceGetData,
   zFctPeerForkReadinessByClClientDailyServiceGetResponse,
   zFctPeerForkReadinessByClClientDailyServiceListData,
@@ -2937,6 +2971,14 @@ import {
   zFctPeerProtocolByClClientDailyServiceGetResponse,
   zFctPeerProtocolByClClientDailyServiceListData,
   zFctPeerProtocolByClClientDailyServiceListResponse,
+  zFctPeerReachabilityByClClientDailyServiceGetData,
+  zFctPeerReachabilityByClClientDailyServiceGetResponse,
+  zFctPeerReachabilityByClClientDailyServiceListData,
+  zFctPeerReachabilityByClClientDailyServiceListResponse,
+  zFctPeerSyncStatusByClClientDailyServiceGetData,
+  zFctPeerSyncStatusByClClientDailyServiceGetResponse,
+  zFctPeerSyncStatusByClClientDailyServiceListData,
+  zFctPeerSyncStatusByClClientDailyServiceListResponse,
   zFctPreparedBlockByNodeDailyServiceGetData,
   zFctPreparedBlockByNodeDailyServiceGetResponse,
   zFctPreparedBlockByNodeDailyServiceListData,
@@ -3309,6 +3351,14 @@ import {
   zIntExecutionStateSizeByBlockServiceGetResponse,
   zIntExecutionStateSizeByBlockServiceListData,
   zIntExecutionStateSizeByBlockServiceListResponse,
+  zIntPeerDailyOrderByPeerIdServiceGetData,
+  zIntPeerDailyOrderByPeerIdServiceGetResponse,
+  zIntPeerDailyOrderByPeerIdServiceListData,
+  zIntPeerDailyOrderByPeerIdServiceListResponse,
+  zIntPeerDailyServiceGetData,
+  zIntPeerDailyServiceGetResponse,
+  zIntPeerDailyServiceListData,
+  zIntPeerDailyServiceListResponse,
   zIntRocketpoolMegapoolServiceGetData,
   zIntRocketpoolMegapoolServiceGetResponse,
   zIntRocketpoolMegapoolServiceListData,
@@ -11359,7 +11409,7 @@ export const fctPeerCountByClClientDailyServiceGet = <ThrowOnError extends boole
 /**
  * List records
  *
- * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery on the network genesis and its current fork. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
  */
 export const fctPeerCountByClientPairDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByClientPairDailyServiceListData, ThrowOnError>
@@ -11397,7 +11447,7 @@ export const fctPeerCountByClientPairDailyServiceGet = <ThrowOnError extends boo
 /**
  * List records
  *
- * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Autonomous systems under 3 nodes roll into an other bucket per network type.
  */
 export const fctPeerCountByElClientAsnDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientAsnDailyServiceListData, ThrowOnError>
@@ -11435,7 +11485,7 @@ export const fctPeerCountByElClientAsnDailyServiceGet = <ThrowOnError extends bo
 /**
  * List records
  *
- * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export const fctPeerCountByElClientCountryDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientCountryDailyServiceListData, ThrowOnError>
@@ -11473,7 +11523,7 @@ export const fctPeerCountByElClientCountryDailyServiceGet = <ThrowOnError extend
 /**
  * List records
  *
- * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export const fctPeerCountByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
   options?: Options<FctPeerCountByElClientDailyServiceListData, ThrowOnError>
@@ -11505,6 +11555,44 @@ export const fctPeerCountByElClientDailyServiceGet = <ThrowOnError extends boole
     requestValidator: async data => await zFctPeerCountByElClientDailyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctPeerCountByElClientDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_peer_count_by_el_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily consensus peer totals by source: peers our libp2p sentries and our discovery crawler saw, and how many both saw, with reachability, hosting and custody counts. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountBySourceDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerCountBySourceDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerCountBySourceDailyServiceListResponses,
+    FctPeerCountBySourceDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountBySourceDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountBySourceDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_source_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountBySourceDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerCountBySourceDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerCountBySourceDailyServiceGetResponses,
+    FctPeerCountBySourceDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerCountBySourceDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerCountBySourceDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_count_by_source_daily/{day_start_date}',
     ...options,
   });
 
@@ -11699,6 +11787,82 @@ export const fctPeerProtocolByClClientDailyServiceGet = <ThrowOnError extends bo
     requestValidator: async data => await zFctPeerProtocolByClClientDailyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctPeerProtocolByClClientDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_peer_protocol_by_cl_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily consensus peer reachability by client: peers our libp2p sentries dialled or that only connected in, QUIC, and ENR address mismatches.
+ */
+export const fctPeerReachabilityByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerReachabilityByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerReachabilityByClClientDailyServiceListResponses,
+    FctPeerReachabilityByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerReachabilityByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerReachabilityByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_reachability_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerReachabilityByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerReachabilityByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerReachabilityByClClientDailyServiceGetResponses,
+    FctPeerReachabilityByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerReachabilityByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerReachabilityByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_reachability_by_cl_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily consensus peer sync status by client, from status exchanges with our libp2p sentries: head and finalized lag against the sentry, fork digest, and block history served (earliest available slot).
+ */
+export const fctPeerSyncStatusByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerSyncStatusByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerSyncStatusByClClientDailyServiceListResponses,
+    FctPeerSyncStatusByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerSyncStatusByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerSyncStatusByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_sync_status_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerSyncStatusByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerSyncStatusByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerSyncStatusByClClientDailyServiceGetResponses,
+    FctPeerSyncStatusByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerSyncStatusByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerSyncStatusByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_sync_status_by_cl_client_daily/{day_start_date}',
     ...options,
   });
 
@@ -15221,6 +15385,74 @@ export const intExecutionStateSizeByBlockServiceGet = <ThrowOnError extends bool
     requestValidator: async data => await zIntExecutionStateSizeByBlockServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntExecutionStateSizeByBlockServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_execution_state_size_by_block/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Sentry values win over ENR values. Crawlers, probes, light clients and our own sentries are excluded. Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export const intPeerDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntPeerDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<IntPeerDailyServiceListResponses, IntPeerDailyServiceListErrors, ThrowOnError>({
+    requestValidator: async data => await zIntPeerDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntPeerDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_peer_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const intPeerDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntPeerDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<IntPeerDailyServiceGetResponses, IntPeerDailyServiceGetErrors, ThrowOnError>({
+    requestValidator: async data => await zIntPeerDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntPeerDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_peer_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * int_peer_daily ordered by peer ID, for reading one peer across days. One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export const intPeerDailyOrderByPeerIdServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntPeerDailyOrderByPeerIdServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntPeerDailyOrderByPeerIdServiceListResponses,
+    IntPeerDailyOrderByPeerIdServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntPeerDailyOrderByPeerIdServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntPeerDailyOrderByPeerIdServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_peer_daily_order_by_peer_id',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by peer_id
+ */
+export const intPeerDailyOrderByPeerIdServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntPeerDailyOrderByPeerIdServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntPeerDailyOrderByPeerIdServiceGetResponses,
+    IntPeerDailyOrderByPeerIdServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntPeerDailyOrderByPeerIdServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntPeerDailyOrderByPeerIdServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_peer_daily_order_by_peer_id/{peer_id}',
     ...options,
   });
 
