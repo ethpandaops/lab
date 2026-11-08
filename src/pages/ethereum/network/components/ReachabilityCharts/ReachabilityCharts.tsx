@@ -14,11 +14,11 @@ export interface ReachabilityChartsProps {
 const MIN_CLIENT_PEERS = 10;
 
 /** Colours of the ways a peer connects; none is a client or an angle */
-const REACH_COLORS = { dialled: '#0ea5e9', quic: '#f59e0b', ipv6: '#8b5cf6' };
+const REACH_COLORS = { dialled: '#0ea5e9', quic: '#f59e0b' };
 
 /**
- * How consensus peers connect each day: whether a sentry dialled them, and whether they use QUIC and IPv6, across
- * the network and per client.
+ * How consensus peers connect each day: whether a sentry dialled them, and whether they use QUIC, across the network
+ * and per client.
  */
 export function ReachabilityCharts({ network, clients }: ReachabilityChartsProps): JSX.Element {
   const peers = (row: { peer_count?: number }): number | undefined => row.peer_count;
@@ -46,11 +46,6 @@ export function ReachabilityCharts({ network, clients }: ReachabilityChartsProps
               'QUIC',
               share(row => row.quic_peer_count),
               REACH_COLORS.quic
-            ),
-            line(
-              'IPv6',
-              share(row => row.ipv6_peer_count),
-              REACH_COLORS.ipv6
             ),
           ]}
         />
