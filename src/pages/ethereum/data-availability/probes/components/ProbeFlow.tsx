@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/solid';
 import { type IntCustodyProbe } from '@/api/types.gen';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 
 type ProbeFlowProps = {
   probe: IntCustodyProbe;
@@ -46,8 +46,8 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         <div className="relative">
           <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {clientCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs sm:size-6 sm:text-sm">
-              {getCountryFlag(clientCountryCode)}
+            <div className="absolute -right-2 -bottom-1 flex size-5 overflow-hidden rounded-full border border-background bg-surface sm:size-6">
+              <CountryFlag code={clientCountryCode} showUnknown className="size-full" />
             </div>
           )}
         </div>
@@ -112,8 +112,8 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
         <div className="relative">
           <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
           {peerCountryCode && (
-            <div className="absolute -right-2 -bottom-1 flex size-5 items-center justify-center rounded-full border border-background bg-surface text-xs sm:size-6 sm:text-sm">
-              {getCountryFlag(peerCountryCode)}
+            <div className="absolute -right-2 -bottom-1 flex size-5 overflow-hidden rounded-full border border-background bg-surface sm:size-6">
+              <CountryFlag code={peerCountryCode} showUnknown className="size-full" />
             </div>
           )}
         </div>

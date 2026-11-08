@@ -2,9 +2,9 @@ export type HeaderSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface HeaderProps {
   /**
-   * Main heading text
+   * Main heading
    */
-  title: string;
+  title: React.ReactNode;
   /**
    * Optional description text or content below the title
    */

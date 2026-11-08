@@ -14,7 +14,7 @@ import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Button } from '@/components/Elements/Button';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import type { IntCustodyProbe } from '@/api/types.gen';
 import { FilterPanel, type FilterValues } from './FilterPanel';
 import { QuickFilters } from './QuickFilters';
@@ -339,7 +339,7 @@ export function ProbesView({
           return (
             <FilterableCell field="meta_client_geo_country" value={country} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1">
-                <span>{getCountryFlag(code)}</span>
+                <CountryFlag code={code} showUnknown />
                 <span className="text-xs">{country || '-'}</span>
               </div>
             </FilterableCell>
@@ -377,7 +377,7 @@ export function ProbesView({
           return (
             <FilterableCell field="meta_peer_geo_country" value={country} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1">
-                <span>{getCountryFlag(code)}</span>
+                <CountryFlag code={code} showUnknown />
                 <span className="text-xs">{country || '-'}</span>
               </div>
             </FilterableCell>

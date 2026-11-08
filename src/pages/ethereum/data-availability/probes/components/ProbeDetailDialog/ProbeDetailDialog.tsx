@@ -17,7 +17,7 @@ import { Dialog } from '@/components/Overlays/Dialog';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { slotToTimestamp } from '@/utils/beacon';
 import { formatSlot } from '@/utils';
 import { ProbeFlow } from '../ProbeFlow';
@@ -341,8 +341,7 @@ export function ProbeDetailDialog({
                     {peerCountry && (
                       <>
                         {' '}
-                        in {probe.meta_peer_geo_country_code && getCountryFlag(probe.meta_peer_geo_country_code)}{' '}
-                        {peerCountry}
+                        in <CountryFlag code={probe.meta_peer_geo_country_code} /> {peerCountry}
                       </>
                     )}
                     . The slot was {ageString} old at the time.
@@ -430,7 +429,7 @@ export function ProbeDetailDialog({
                   <td className="px-2 py-1 font-medium text-muted">Country</td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
-                      <span>{getCountryFlag(probe.meta_client_geo_country_code)}</span>
+                      <CountryFlag code={probe.meta_client_geo_country_code} showUnknown />
                       <FilterableValue
                         value={probe.meta_client_geo_country}
                         field="meta_client_geo_country"
@@ -440,7 +439,7 @@ export function ProbeDetailDialog({
                   </td>
                   <td className="px-2 py-1">
                     <div className="flex items-center gap-1.5">
-                      <span>{getCountryFlag(probe.meta_peer_geo_country_code)}</span>
+                      <CountryFlag code={probe.meta_peer_geo_country_code} showUnknown />
                       <FilterableValue
                         value={probe.meta_peer_geo_country}
                         field="meta_peer_geo_country"

@@ -7,7 +7,7 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
@@ -378,12 +378,12 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
                   params={{ country: row.country_code.toLowerCase() }}
                   className="inline-flex items-center gap-1.5 text-sm/6 text-foreground hover:text-primary"
                 >
-                  <span>{getCountryFlag(row.country_code, '')}</span>
+                  <CountryFlag code={row.country_code} />
                   <span className="truncate">{row.country}</span>
                 </Link>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-sm/6">
-                  <span>{getCountryFlag(row.country_code, '')}</span>
+                  <CountryFlag code={row.country_code} />
                   <span className="truncate">{row.country || 'Other'}</span>
                 </span>
               ),

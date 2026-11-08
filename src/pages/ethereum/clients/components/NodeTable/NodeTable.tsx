@@ -4,7 +4,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
-import { getCountryFlag } from '@/utils/country';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { matchReleaseVersion, shortVersion } from '../../utils/client-versions';
 
 export interface NodeTableProps {
@@ -73,7 +73,7 @@ export function NodeTable({ client, nodes, releases }: NodeTableProps): JSX.Elem
       header: 'Location',
       accessor: row => (
         <span className="inline-flex items-center gap-1.5 text-sm/6">
-          <span>{getCountryFlag(row.meta_client_geo_country_code)}</span>
+          <CountryFlag code={row.meta_client_geo_country_code} showUnknown />
           <span className="truncate">{row.meta_client_geo_city || row.meta_client_geo_country || 'Unknown'}</span>
         </span>
       ),

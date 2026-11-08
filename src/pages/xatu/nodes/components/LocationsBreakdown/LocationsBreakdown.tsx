@@ -1,7 +1,7 @@
 import type { JSX, ReactNode } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { getCountryFlag } from '@/utils';
+import { CountryFlag } from '@/components/Elements/CountryFlag';
 import type { NodeRow } from '../../hooks/useNodeRows';
 
 export interface LocationsBreakdownProps {
@@ -56,7 +56,7 @@ const LEVELS: Array<(row: NodeRow) => { key: string; label: ReactNode }> = [
     key: node.meta_client_geo_country_code || 'unknown',
     label: (
       <span className="flex items-center gap-1.5">
-        <span>{getCountryFlag(node.meta_client_geo_country_code, '')}</span>
+        <CountryFlag code={node.meta_client_geo_country_code} />
         <span className="truncate">{node.meta_client_geo_country || 'Unknown'}</span>
       </span>
     ),
