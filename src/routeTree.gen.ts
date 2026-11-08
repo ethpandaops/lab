@@ -27,6 +27,7 @@ import { Route as ExperimentsLiveSlotsRouteImport } from './routes/experiments/l
 import { Route as ExperimentsBlockProductionFlowRouteImport } from './routes/experiments/block-production-flow'
 import { Route as EthereumValidatorsRouteImport } from './routes/ethereum/validators'
 import { Route as EthereumSlotsRouteImport } from './routes/ethereum/slots'
+import { Route as EthereumNetworkRouteImport } from './routes/ethereum/network'
 import { Route as EthereumLiveRouteImport } from './routes/ethereum/live'
 import { Route as EthereumForksRouteImport } from './routes/ethereum/forks'
 import { Route as EthereumExecutionRouteImport } from './routes/ethereum/execution'
@@ -41,6 +42,7 @@ import { Route as XatuNodesIndexRouteImport } from './routes/xatu/nodes/index'
 import { Route as XatuContributorsIndexRouteImport } from './routes/xatu/contributors/index'
 import { Route as EthereumValidatorsIndexRouteImport } from './routes/ethereum/validators/index'
 import { Route as EthereumSlotsIndexRouteImport } from './routes/ethereum/slots/index'
+import { Route as EthereumNetworkIndexRouteImport } from './routes/ethereum/network/index'
 import { Route as EthereumForksIndexRouteImport } from './routes/ethereum/forks/index'
 import { Route as EthereumExecutionIndexRouteImport } from './routes/ethereum/execution/index'
 import { Route as EthereumEpochsIndexRouteImport } from './routes/ethereum/epochs/index'
@@ -54,6 +56,8 @@ import { Route as XatuNodesNodeIdRouteImport } from './routes/xatu/nodes/$nodeId
 import { Route as XatuContributorsIdRouteImport } from './routes/xatu/contributors/$id'
 import { Route as EthereumValidatorsInspectRouteImport } from './routes/ethereum/validators/inspect'
 import { Route as EthereumSlotsSlotRouteImport } from './routes/ethereum/slots/$slot'
+import { Route as EthereumNetworkCountriesRouteImport } from './routes/ethereum/network/countries'
+import { Route as EthereumNetworkAsnRouteImport } from './routes/ethereum/network/asn'
 import { Route as EthereumForksForkRouteImport } from './routes/ethereum/forks/$fork'
 import { Route as EthereumExecutionTimingsRouteImport } from './routes/ethereum/execution/timings'
 import { Route as EthereumExecutionStateGrowthRouteImport } from './routes/ethereum/execution/state-growth'
@@ -73,12 +77,16 @@ import { Route as EthereumConsensusOverviewRouteImport } from './routes/ethereum
 import { Route as EthereumClientsClientRouteImport } from './routes/ethereum/clients/$client'
 import { Route as BeaconSlotLiveRouteImport } from './routes/beacon/slot/live'
 import { Route as BeaconBlockProductionLiveRouteImport } from './routes/beacon/block-production/live'
+import { Route as EthereumNetworkCountriesIndexRouteImport } from './routes/ethereum/network/countries/index'
+import { Route as EthereumNetworkAsnIndexRouteImport } from './routes/ethereum/network/asn/index'
 import { Route as EthereumExecutionTimingsIndexRouteImport } from './routes/ethereum/execution/timings/index'
 import { Route as EthereumExecutionPayloadsIndexRouteImport } from './routes/ethereum/execution/payloads/index'
 import { Route as EthereumExecutionGasProfilerIndexRouteImport } from './routes/ethereum/execution/gas-profiler/index'
 import { Route as EthereumDataAvailabilityProbesIndexRouteImport } from './routes/ethereum/data-availability/probes/index'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
 import { Route as EthereumClientsClientIndexRouteImport } from './routes/ethereum/clients/$client/index'
+import { Route as EthereumNetworkCountriesCountryRouteImport } from './routes/ethereum/network/countries/$country'
+import { Route as EthereumNetworkAsnAsnRouteImport } from './routes/ethereum/network/asn/$asn'
 import { Route as EthereumExecutionGasProfilerSimulateRouteImport } from './routes/ethereum/execution/gas-profiler/simulate'
 import { Route as EthereumClientsClientVersionRouteImport } from './routes/ethereum/clients/$client/$version'
 import { Route as EthereumExecutionGasProfilerTxTxHashRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash'
@@ -178,6 +186,11 @@ const EthereumSlotsRoute = EthereumSlotsRouteImport.update({
   path: '/slots',
   getParentRoute: () => EthereumRoute,
 } as any)
+const EthereumNetworkRoute = EthereumNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => EthereumRoute,
+} as any)
 const EthereumLiveRoute = EthereumLiveRouteImport.update({
   id: '/live',
   path: '/live',
@@ -250,6 +263,11 @@ const EthereumSlotsIndexRoute = EthereumSlotsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EthereumSlotsRoute,
 } as any)
+const EthereumNetworkIndexRoute = EthereumNetworkIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumNetworkRoute,
+} as any)
 const EthereumForksIndexRoute = EthereumForksIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -316,6 +334,17 @@ const EthereumSlotsSlotRoute = EthereumSlotsSlotRouteImport.update({
   id: '/$slot',
   path: '/$slot',
   getParentRoute: () => EthereumSlotsRoute,
+} as any)
+const EthereumNetworkCountriesRoute =
+  EthereumNetworkCountriesRouteImport.update({
+    id: '/countries',
+    path: '/countries',
+    getParentRoute: () => EthereumNetworkRoute,
+  } as any)
+const EthereumNetworkAsnRoute = EthereumNetworkAsnRouteImport.update({
+  id: '/asn',
+  path: '/asn',
+  getParentRoute: () => EthereumNetworkRoute,
 } as any)
 const EthereumForksForkRoute = EthereumForksForkRouteImport.update({
   id: '/$fork',
@@ -426,6 +455,17 @@ const BeaconBlockProductionLiveRoute =
     path: '/beacon/block-production/live',
     getParentRoute: () => rootRouteImport,
   } as any)
+const EthereumNetworkCountriesIndexRoute =
+  EthereumNetworkCountriesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EthereumNetworkCountriesRoute,
+  } as any)
+const EthereumNetworkAsnIndexRoute = EthereumNetworkAsnIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EthereumNetworkAsnRoute,
+} as any)
 const EthereumExecutionTimingsIndexRoute =
   EthereumExecutionTimingsIndexRouteImport.update({
     id: '/',
@@ -462,6 +502,17 @@ const EthereumClientsClientIndexRoute =
     path: '/',
     getParentRoute: () => EthereumClientsClientRoute,
   } as any)
+const EthereumNetworkCountriesCountryRoute =
+  EthereumNetworkCountriesCountryRouteImport.update({
+    id: '/$country',
+    path: '/$country',
+    getParentRoute: () => EthereumNetworkCountriesRoute,
+  } as any)
+const EthereumNetworkAsnAsnRoute = EthereumNetworkAsnAsnRouteImport.update({
+  id: '/$asn',
+  path: '/$asn',
+  getParentRoute: () => EthereumNetworkAsnRoute,
+} as any)
 const EthereumExecutionGasProfilerSimulateRoute =
   EthereumExecutionGasProfilerSimulateRouteImport.update({
     id: '/simulate',
@@ -508,6 +559,7 @@ export interface FileRoutesByFullPath {
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
   '/ethereum/forks': typeof EthereumForksRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
+  '/ethereum/network': typeof EthereumNetworkRouteWithChildren
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/ethereum/validators': typeof EthereumValidatorsRouteWithChildren
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
@@ -541,6 +593,8 @@ export interface FileRoutesByFullPath {
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
+  '/ethereum/network/asn': typeof EthereumNetworkAsnRouteWithChildren
+  '/ethereum/network/countries': typeof EthereumNetworkCountriesRouteWithChildren
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
@@ -554,18 +608,23 @@ export interface FileRoutesByFullPath {
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/execution/': typeof EthereumExecutionIndexRoute
   '/ethereum/forks/': typeof EthereumForksIndexRoute
+  '/ethereum/network/': typeof EthereumNetworkIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/ethereum/validators/': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/xatu/nodes/': typeof XatuNodesIndexRoute
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
   '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
   '/ethereum/execution/payloads/': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings/': typeof EthereumExecutionTimingsIndexRoute
+  '/ethereum/network/asn/': typeof EthereumNetworkAsnIndexRoute
+  '/ethereum/network/countries/': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
   '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
@@ -611,18 +670,23 @@ export interface FileRoutesByTo {
   '/ethereum/epochs': typeof EthereumEpochsIndexRoute
   '/ethereum/execution': typeof EthereumExecutionIndexRoute
   '/ethereum/forks': typeof EthereumForksIndexRoute
+  '/ethereum/network': typeof EthereumNetworkIndexRoute
   '/ethereum/slots': typeof EthereumSlotsIndexRoute
   '/ethereum/validators': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors': typeof XatuContributorsIndexRoute
   '/xatu/nodes': typeof XatuNodesIndexRoute
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
   '/ethereum/clients/$client': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler': typeof EthereumExecutionGasProfilerIndexRoute
   '/ethereum/execution/payloads': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsIndexRoute
+  '/ethereum/network/asn': typeof EthereumNetworkAsnIndexRoute
+  '/ethereum/network/countries': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
   '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
@@ -643,6 +707,7 @@ export interface FileRoutesById {
   '/ethereum/execution': typeof EthereumExecutionRouteWithChildren
   '/ethereum/forks': typeof EthereumForksRouteWithChildren
   '/ethereum/live': typeof EthereumLiveRoute
+  '/ethereum/network': typeof EthereumNetworkRouteWithChildren
   '/ethereum/slots': typeof EthereumSlotsRouteWithChildren
   '/ethereum/validators': typeof EthereumValidatorsRouteWithChildren
   '/experiments/block-production-flow': typeof ExperimentsBlockProductionFlowRoute
@@ -676,6 +741,8 @@ export interface FileRoutesById {
   '/ethereum/execution/state-growth': typeof EthereumExecutionStateGrowthRoute
   '/ethereum/execution/timings': typeof EthereumExecutionTimingsRouteWithChildren
   '/ethereum/forks/$fork': typeof EthereumForksForkRoute
+  '/ethereum/network/asn': typeof EthereumNetworkAsnRouteWithChildren
+  '/ethereum/network/countries': typeof EthereumNetworkCountriesRouteWithChildren
   '/ethereum/slots/$slot': typeof EthereumSlotsSlotRoute
   '/ethereum/validators/inspect': typeof EthereumValidatorsInspectRoute
   '/xatu/contributors/$id': typeof XatuContributorsIdRoute
@@ -689,18 +756,23 @@ export interface FileRoutesById {
   '/ethereum/epochs/': typeof EthereumEpochsIndexRoute
   '/ethereum/execution/': typeof EthereumExecutionIndexRoute
   '/ethereum/forks/': typeof EthereumForksIndexRoute
+  '/ethereum/network/': typeof EthereumNetworkIndexRoute
   '/ethereum/slots/': typeof EthereumSlotsIndexRoute
   '/ethereum/validators/': typeof EthereumValidatorsIndexRoute
   '/xatu/contributors/': typeof XatuContributorsIndexRoute
   '/xatu/nodes/': typeof XatuNodesIndexRoute
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
+  '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
   '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
   '/ethereum/execution/gas-profiler/': typeof EthereumExecutionGasProfilerIndexRoute
   '/ethereum/execution/payloads/': typeof EthereumExecutionPayloadsIndexRoute
   '/ethereum/execution/timings/': typeof EthereumExecutionTimingsIndexRoute
+  '/ethereum/network/asn/': typeof EthereumNetworkAsnIndexRoute
+  '/ethereum/network/countries/': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
   '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
@@ -722,6 +794,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution'
     | '/ethereum/forks'
     | '/ethereum/live'
+    | '/ethereum/network'
     | '/ethereum/slots'
     | '/ethereum/validators'
     | '/experiments/block-production-flow'
@@ -755,6 +828,8 @@ export interface FileRouteTypes {
     | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
+    | '/ethereum/network/asn'
+    | '/ethereum/network/countries'
     | '/ethereum/slots/$slot'
     | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
@@ -768,18 +843,23 @@ export interface FileRouteTypes {
     | '/ethereum/epochs/'
     | '/ethereum/execution/'
     | '/ethereum/forks/'
+    | '/ethereum/network/'
     | '/ethereum/slots/'
     | '/ethereum/validators/'
     | '/xatu/contributors/'
     | '/xatu/nodes/'
     | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/network/asn/$asn'
+    | '/ethereum/network/countries/$country'
     | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
     | '/ethereum/execution/payloads/'
     | '/ethereum/execution/timings/'
+    | '/ethereum/network/asn/'
+    | '/ethereum/network/countries/'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
     | '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId'
@@ -825,18 +905,23 @@ export interface FileRouteTypes {
     | '/ethereum/epochs'
     | '/ethereum/execution'
     | '/ethereum/forks'
+    | '/ethereum/network'
     | '/ethereum/slots'
     | '/ethereum/validators'
     | '/xatu/contributors'
     | '/xatu/nodes'
     | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/network/asn/$asn'
+    | '/ethereum/network/countries/$country'
     | '/ethereum/clients/$client'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
     | '/ethereum/execution/gas-profiler'
     | '/ethereum/execution/payloads'
     | '/ethereum/execution/timings'
+    | '/ethereum/network/asn'
+    | '/ethereum/network/countries'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
     | '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId'
@@ -856,6 +941,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution'
     | '/ethereum/forks'
     | '/ethereum/live'
+    | '/ethereum/network'
     | '/ethereum/slots'
     | '/ethereum/validators'
     | '/experiments/block-production-flow'
@@ -889,6 +975,8 @@ export interface FileRouteTypes {
     | '/ethereum/execution/state-growth'
     | '/ethereum/execution/timings'
     | '/ethereum/forks/$fork'
+    | '/ethereum/network/asn'
+    | '/ethereum/network/countries'
     | '/ethereum/slots/$slot'
     | '/ethereum/validators/inspect'
     | '/xatu/contributors/$id'
@@ -902,18 +990,23 @@ export interface FileRouteTypes {
     | '/ethereum/epochs/'
     | '/ethereum/execution/'
     | '/ethereum/forks/'
+    | '/ethereum/network/'
     | '/ethereum/slots/'
     | '/ethereum/validators/'
     | '/xatu/contributors/'
     | '/xatu/nodes/'
     | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
+    | '/ethereum/network/asn/$asn'
+    | '/ethereum/network/countries/$country'
     | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
     | '/ethereum/execution/gas-profiler/'
     | '/ethereum/execution/payloads/'
     | '/ethereum/execution/timings/'
+    | '/ethereum/network/asn/'
+    | '/ethereum/network/countries/'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
     | '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId'
@@ -1060,6 +1153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumSlotsRouteImport
       parentRoute: typeof EthereumRoute
     }
+    '/ethereum/network': {
+      id: '/ethereum/network'
+      path: '/network'
+      fullPath: '/ethereum/network'
+      preLoaderRoute: typeof EthereumNetworkRouteImport
+      parentRoute: typeof EthereumRoute
+    }
     '/ethereum/live': {
       id: '/ethereum/live'
       path: '/live'
@@ -1158,6 +1258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumSlotsIndexRouteImport
       parentRoute: typeof EthereumSlotsRoute
     }
+    '/ethereum/network/': {
+      id: '/ethereum/network/'
+      path: '/'
+      fullPath: '/ethereum/network/'
+      preLoaderRoute: typeof EthereumNetworkIndexRouteImport
+      parentRoute: typeof EthereumNetworkRoute
+    }
     '/ethereum/forks/': {
       id: '/ethereum/forks/'
       path: '/'
@@ -1248,6 +1355,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/slots/$slot'
       preLoaderRoute: typeof EthereumSlotsSlotRouteImport
       parentRoute: typeof EthereumSlotsRoute
+    }
+    '/ethereum/network/countries': {
+      id: '/ethereum/network/countries'
+      path: '/countries'
+      fullPath: '/ethereum/network/countries'
+      preLoaderRoute: typeof EthereumNetworkCountriesRouteImport
+      parentRoute: typeof EthereumNetworkRoute
+    }
+    '/ethereum/network/asn': {
+      id: '/ethereum/network/asn'
+      path: '/asn'
+      fullPath: '/ethereum/network/asn'
+      preLoaderRoute: typeof EthereumNetworkAsnRouteImport
+      parentRoute: typeof EthereumNetworkRoute
     }
     '/ethereum/forks/$fork': {
       id: '/ethereum/forks/$fork'
@@ -1382,6 +1503,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BeaconBlockProductionLiveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ethereum/network/countries/': {
+      id: '/ethereum/network/countries/'
+      path: '/'
+      fullPath: '/ethereum/network/countries/'
+      preLoaderRoute: typeof EthereumNetworkCountriesIndexRouteImport
+      parentRoute: typeof EthereumNetworkCountriesRoute
+    }
+    '/ethereum/network/asn/': {
+      id: '/ethereum/network/asn/'
+      path: '/'
+      fullPath: '/ethereum/network/asn/'
+      preLoaderRoute: typeof EthereumNetworkAsnIndexRouteImport
+      parentRoute: typeof EthereumNetworkAsnRoute
+    }
     '/ethereum/execution/timings/': {
       id: '/ethereum/execution/timings/'
       path: '/'
@@ -1423,6 +1558,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/clients/$client/'
       preLoaderRoute: typeof EthereumClientsClientIndexRouteImport
       parentRoute: typeof EthereumClientsClientRoute
+    }
+    '/ethereum/network/countries/$country': {
+      id: '/ethereum/network/countries/$country'
+      path: '/$country'
+      fullPath: '/ethereum/network/countries/$country'
+      preLoaderRoute: typeof EthereumNetworkCountriesCountryRouteImport
+      parentRoute: typeof EthereumNetworkCountriesRoute
+    }
+    '/ethereum/network/asn/$asn': {
+      id: '/ethereum/network/asn/$asn'
+      path: '/$asn'
+      fullPath: '/ethereum/network/asn/$asn'
+      preLoaderRoute: typeof EthereumNetworkAsnAsnRouteImport
+      parentRoute: typeof EthereumNetworkAsnRoute
     }
     '/ethereum/execution/gas-profiler/simulate': {
       id: '/ethereum/execution/gas-profiler/simulate'
@@ -1695,6 +1844,51 @@ const EthereumForksRouteWithChildren = EthereumForksRoute._addFileChildren(
   EthereumForksRouteChildren,
 )
 
+interface EthereumNetworkAsnRouteChildren {
+  EthereumNetworkAsnAsnRoute: typeof EthereumNetworkAsnAsnRoute
+  EthereumNetworkAsnIndexRoute: typeof EthereumNetworkAsnIndexRoute
+}
+
+const EthereumNetworkAsnRouteChildren: EthereumNetworkAsnRouteChildren = {
+  EthereumNetworkAsnAsnRoute: EthereumNetworkAsnAsnRoute,
+  EthereumNetworkAsnIndexRoute: EthereumNetworkAsnIndexRoute,
+}
+
+const EthereumNetworkAsnRouteWithChildren =
+  EthereumNetworkAsnRoute._addFileChildren(EthereumNetworkAsnRouteChildren)
+
+interface EthereumNetworkCountriesRouteChildren {
+  EthereumNetworkCountriesCountryRoute: typeof EthereumNetworkCountriesCountryRoute
+  EthereumNetworkCountriesIndexRoute: typeof EthereumNetworkCountriesIndexRoute
+}
+
+const EthereumNetworkCountriesRouteChildren: EthereumNetworkCountriesRouteChildren =
+  {
+    EthereumNetworkCountriesCountryRoute: EthereumNetworkCountriesCountryRoute,
+    EthereumNetworkCountriesIndexRoute: EthereumNetworkCountriesIndexRoute,
+  }
+
+const EthereumNetworkCountriesRouteWithChildren =
+  EthereumNetworkCountriesRoute._addFileChildren(
+    EthereumNetworkCountriesRouteChildren,
+  )
+
+interface EthereumNetworkRouteChildren {
+  EthereumNetworkAsnRoute: typeof EthereumNetworkAsnRouteWithChildren
+  EthereumNetworkCountriesRoute: typeof EthereumNetworkCountriesRouteWithChildren
+  EthereumNetworkIndexRoute: typeof EthereumNetworkIndexRoute
+}
+
+const EthereumNetworkRouteChildren: EthereumNetworkRouteChildren = {
+  EthereumNetworkAsnRoute: EthereumNetworkAsnRouteWithChildren,
+  EthereumNetworkCountriesRoute: EthereumNetworkCountriesRouteWithChildren,
+  EthereumNetworkIndexRoute: EthereumNetworkIndexRoute,
+}
+
+const EthereumNetworkRouteWithChildren = EthereumNetworkRoute._addFileChildren(
+  EthereumNetworkRouteChildren,
+)
+
 interface EthereumSlotsRouteChildren {
   EthereumSlotsSlotRoute: typeof EthereumSlotsSlotRoute
   EthereumSlotsIndexRoute: typeof EthereumSlotsIndexRoute
@@ -1732,6 +1926,7 @@ interface EthereumRouteChildren {
   EthereumExecutionRoute: typeof EthereumExecutionRouteWithChildren
   EthereumForksRoute: typeof EthereumForksRouteWithChildren
   EthereumLiveRoute: typeof EthereumLiveRoute
+  EthereumNetworkRoute: typeof EthereumNetworkRouteWithChildren
   EthereumSlotsRoute: typeof EthereumSlotsRouteWithChildren
   EthereumValidatorsRoute: typeof EthereumValidatorsRouteWithChildren
   EthereumIndexRoute: typeof EthereumIndexRoute
@@ -1747,6 +1942,7 @@ const EthereumRouteChildren: EthereumRouteChildren = {
   EthereumExecutionRoute: EthereumExecutionRouteWithChildren,
   EthereumForksRoute: EthereumForksRouteWithChildren,
   EthereumLiveRoute: EthereumLiveRoute,
+  EthereumNetworkRoute: EthereumNetworkRouteWithChildren,
   EthereumSlotsRoute: EthereumSlotsRouteWithChildren,
   EthereumValidatorsRoute: EthereumValidatorsRouteWithChildren,
   EthereumIndexRoute: EthereumIndexRoute,
