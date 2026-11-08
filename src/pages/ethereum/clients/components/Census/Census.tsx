@@ -371,12 +371,22 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
           countHeader="P2P peers"
           rows={topCountries.map(row => ({
             key: row.country_code || row.country || 'other',
-            label: (
-              <span className="inline-flex items-center gap-1.5 text-sm/6">
-                <span>{getCountryFlag(row.country_code, '')}</span>
-                <span className="truncate">{row.country || 'Other'}</span>
-              </span>
-            ),
+            label:
+              layer === 'consensus' && row.country_code && row.country_code !== 'other' ? (
+                <Link
+                  to="/ethereum/network/countries/$country"
+                  params={{ country: row.country_code.toLowerCase() }}
+                  className="inline-flex items-center gap-1.5 text-sm/6 text-foreground hover:text-primary"
+                >
+                  <span>{getCountryFlag(row.country_code, '')}</span>
+                  <span className="truncate">{row.country}</span>
+                </Link>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-sm/6">
+                  <span>{getCountryFlag(row.country_code, '')}</span>
+                  <span className="truncate">{row.country || 'Other'}</span>
+                </span>
+              ),
             share: countryTotal > 0 ? ((row.peer_count ?? 0) / countryTotal) * 100 : 0,
             count: row.peer_count ?? 0,
             color,
@@ -400,13 +410,23 @@ function PeerGeography({ client, layer }: { client: string; layer: ClientLayer }
           columns={[
             {
               header: 'Network',
-              accessor: row => (
-                <span className="block max-w-56 truncate" title={row.autonomous_system_organization}>
-                  {!row.autonomous_system_organization || row.autonomous_system_organization === 'other'
-                    ? 'Smaller networks'
-                    : row.autonomous_system_organization}
-                </span>
-              ),
+              accessor: row =>
+                !row.autonomous_system_number || row.autonomous_system_organization === 'other' ? (
+                  <span className="block max-w-56 truncate">Smaller networks</span>
+                ) : layer === 'consensus' ? (
+                  <Link
+                    to="/ethereum/network/asn/$asn"
+                    params={{ asn: String(row.autonomous_system_number) }}
+                    className="block max-w-56 truncate text-foreground hover:text-primary"
+                    title={row.autonomous_system_organization}
+                  >
+                    {row.autonomous_system_organization || `AS${row.autonomous_system_number}`}
+                  </Link>
+                ) : (
+                  <span className="block max-w-56 truncate" title={row.autonomous_system_organization}>
+                    {row.autonomous_system_organization || `AS${row.autonomous_system_number}`}
+                  </span>
+                ),
             },
             {
               header: 'ASN',

@@ -195,8 +195,9 @@ function clientGroup(label: string, clients: readonly string[]): NavGroup {
   };
 }
 
-/** Who runs Ethereum: the entities staking, the clients they run and the forks those clients ship */
+/** Who runs Ethereum: its nodes, the entities staking, the clients they run and the forks those clients ship */
 const ethereumNetworkPages: NavItem[] = [
+  { name: 'Overview', to: '/ethereum/network', icon: PresentationChartLineIcon },
   { name: 'Entities', to: '/ethereum/entities', icon: UserGroupIcon },
   {
     name: 'Clients',
