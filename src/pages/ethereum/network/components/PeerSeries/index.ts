@@ -1,1 +1,1 @@
-export { CustodyChart, HostingChart, NodesChart } from './PeerSeries';
+export { CustodyChart, ExecutionNodesChart, NodesChart } from './PeerSeries';

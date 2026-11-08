@@ -29,5 +29,16 @@ export const networkSearchSchema = z.object({
 });
 export type NetworkSearch = z.infer<typeof networkSearchSchema>;
 
-/** Rows the overview's country and network tables show */
+/** Countries the overview charts */
 export const TOP_PLACES = 10;
+
+/**
+ * First full day of the execution discovery crawl that counts nodes at today's scale. Before it the census held a few
+ * hundred nodes a day, so execution series start here.
+ */
+export const EL_CRAWL_START = '2026-07-15';
+
+/** Zod schema for the overview's search params: the range, and which layer "where nodes run" shows */
+export const overviewSearchSchema = networkSearchSchema.extend({
+  layer: z.enum(['consensus', 'execution']).optional().catch(undefined),
+});

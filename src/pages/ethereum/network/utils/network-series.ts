@@ -1,4 +1,5 @@
 import type { SeriesData } from '@/components/Charts/MultiLine';
+import type { FctPeerConcentrationElDaily, FctPeerCountByCountryDaily } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 
@@ -83,4 +84,57 @@ export function clientShareLines<T extends DayRow & { client?: string }>(
         getClientColor(client)
       )
     );
+}
+
+/** Where a layer's nodes run on a day; the consensus and execution concentration tables share a shape */
+export type ConcentrationRow = FctPeerConcentrationElDaily;
+
+/** A country's nodes on a day */
+export type CountryDayRow = Pick<FctPeerCountByCountryDaily, 'day_start_date' | 'country_code' | 'peer_count'>;
+
+/** Continents in the order their bands stack, with the concentration column that counts each */
+export const CONTINENTS = [
+  { key: 'europe_peer_count', label: 'Europe' },
+  { key: 'north_america_peer_count', label: 'North America' },
+  { key: 'asia_peer_count', label: 'Asia' },
+  { key: 'oceania_peer_count', label: 'Oceania' },
+  { key: 'south_america_peer_count', label: 'South America' },
+  { key: 'africa_peer_count', label: 'Africa' },
+  { key: 'antarctica_peer_count', label: 'Antarctica' },
+] as const;
+
+/** Nodes geolocated to a continent on a day, the whole that continent and country shares are of */
+export function geolocated(row: ConcentrationRow): number {
+  return CONTINENTS.reduce((sum, { key }) => sum + (row[key] ?? 0), 0);
+}
+
+/** Codes of the `limit` countries with the most nodes in the rows, largest first; unlocated nodes are no country */
+export function topCountries(rows: CountryDayRow[], limit: number): string[] {
+  const totals = new Map<string, number>();
+  for (const { country_code: code, peer_count: count } of rows) {
+    if (code && /^[A-Z]{2}$/.test(code)) totals.set(code, (totals.get(code) ?? 0) + (count ?? 0));
+  }
+  return [...totals]
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([code]) => code);
+}
+
+/** Each country's nodes as a percentage of each day's geolocated nodes, null on days without a whole */
+export function countryShares(
+  rows: CountryDayRow[],
+  wholes: ConcentrationRow[],
+  days: string[],
+  code: string
+): Array<number | null> {
+  const parts = daySums(
+    rows.filter(row => row.country_code === code),
+    row => row.peer_count
+  );
+  const whole = daySums(wholes, geolocated);
+  return days.map(day => {
+    const of = whole.get(day) ?? 0;
+    return of > 0 ? ((parts.get(day) ?? 0) / of) * 100 : null;
+  });
 }

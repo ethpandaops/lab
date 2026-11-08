@@ -1,37 +1,44 @@
 import type { JSX } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { SegmentedControl } from '@/components/Forms/SegmentedControl';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Card } from '@/components/Layout/Card';
 import {
-  CountriesTable,
   CountsNote,
   CustodyChart,
+  ExecutionNodesChart,
   ForkReadiness,
-  HostingChart,
   NetworkSkeleton,
-  NetworksTable,
   NodesChart,
   RangeBar,
   ReachabilityCharts,
   Section,
   SyncCharts,
+  WhereNodesRun,
 } from './components';
-import { RANGE_DAYS, TOP_PLACES } from './constants';
+import { RANGE_DAYS } from './constants';
 import { useRangeSearch } from './hooks/useRangeSearch';
 import { useOverviewCensus } from './hooks/useOverviewCensus';
-import { dayStart } from './utils/network-census';
-import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
+
+/** Layers the "where nodes run" section switches between */
+const LAYER_OPTIONS: ReadonlyArray<{ value: ClientLayer; label: string }> = [
+  { value: 'consensus', label: 'Consensus' },
+  { value: 'execution', label: 'Execution' },
+];
 
 /**
- * Network overview: the consensus peers our sentries and ENR crawler reached each day of the range, how far behind
- * they run and how much history they serve, where they run, what they custody and how they connect, with fork
- * readiness on the latest day.
+ * Network overview: the consensus peers our sentries and ENR crawler reached and the execution nodes our crawler
+ * found, each day of the range: how far behind they run and how much history they serve, where they run, what they
+ * custody and how they connect, with fork readiness on the latest day.
  */
 export function IndexPage(): JSX.Element {
   const { range, t, setRange } = useRangeSearch();
-  const census = useOverviewCensus(RANGE_DAYS[range]);
-  const { peers, countries, networks } = census;
+  const navigate = useNavigate({ from: '/ethereum/network/' });
+  const layer: ClientLayer = useSearch({ from: '/ethereum/network/' }).layer ?? 'consensus';
+  const census = useOverviewCensus(RANGE_DAYS[range], layer);
+  const { peers, concentration } = census;
 
   return (
     <Container>
@@ -47,45 +54,47 @@ export function IndexPage(): JSX.Element {
         ) : (
           <>
             <Section title="Nodes">
-              <NodesChart rows={peers.rows} />
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <NodesChart rows={peers.rows} />
+                <ExecutionNodesChart rows={concentration.execution.rows} />
+              </div>
             </Section>
 
             <Section title="Sync and history">
               <SyncCharts rows={census.sync.rows} />
             </Section>
 
-            <Section title="Where nodes run">
-              <HostingChart rows={peers.rows} />
-              <div className="grid grid-cols-1 gap-4 2xl:grid-cols-2">
-                <Card
-                  rounded
-                  title="Countries"
-                  subtitle={placesSubtitle(countries.endDay, countries.startDay)}
-                  actions={
-                    <Link
-                      to="/ethereum/network/countries"
-                      search={{ t }}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      All countries
-                    </Link>
-                  }
-                >
-                  <CountriesTable end={countries.end} start={countries.start} limit={TOP_PLACES} />
-                </Card>
-                <Card
-                  rounded
-                  title="Networks"
-                  subtitle={placesSubtitle(networks.endDay, networks.startDay)}
-                  actions={
-                    <Link to="/ethereum/network/asn" search={{ t }} className="text-sm text-primary hover:underline">
-                      All networks
-                    </Link>
-                  }
-                >
-                  <NetworksTable end={networks.end} start={networks.start} limit={TOP_PLACES} />
-                </Card>
-              </div>
+            <Section
+              title="Where nodes run"
+              actions={
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <Link
+                    to="/ethereum/network/countries"
+                    search={{ t }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    All countries
+                  </Link>
+                  <Link to="/ethereum/network/asn" search={{ t }} className="text-sm text-primary hover:underline">
+                    All networks
+                  </Link>
+                  <SegmentedControl
+                    options={LAYER_OPTIONS}
+                    value={layer}
+                    onChange={value =>
+                      navigate({ search: prev => ({ ...prev, layer: value }), replace: true, resetScroll: false })
+                    }
+                    ariaLabel="Layer"
+                  />
+                </div>
+              }
+            >
+              <WhereNodesRun
+                rows={concentration[layer].rows}
+                countryCodes={census.countryCodes}
+                countries={census.countries.rows}
+                noun={layer === 'consensus' ? 'consensus peers' : 'execution nodes'}
+              />
             </Section>
 
             <Section title="PeerDAS custody">
@@ -105,12 +114,4 @@ export function IndexPage(): JSX.Element {
       </div>
     </Container>
   );
-}
-
-/** Days a place table's counts and changes come from */
-function placesSubtitle(endDay: string | null, startDay: string | null): string | undefined {
-  if (!endDay) return undefined;
-  return startDay
-    ? `Consensus peers on ${formatDataDate(dayStart(endDay))}, change since ${formatDataDate(dayStart(startDay))}`
-    : `Consensus peers on ${formatDataDate(dayStart(endDay))}`;
 }

@@ -3,7 +3,7 @@ import type { FctPeerCountBySourceDaily } from '@/api/types.gen';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { CUSTODY_BUCKETS } from '@/pages/ethereum/clients/utils/census';
 import { SeriesCard } from '../SeriesCard';
-import { dayShares, line, seriesDays, stackLayer } from '../../utils/network-series';
+import { dayShares, seriesDays, stackLayer, type ConcentrationRow } from '../../utils/network-series';
 
 type Row = FctPeerCountBySourceDaily;
 
@@ -83,24 +83,29 @@ export function CustodyChart({ rows }: PeerSeriesProps): JSX.Element {
 }
 
 /**
- * Share of located consensus peers on hosting providers' networks each day.
+ * Execution nodes on this chain each day, as the discovery crawler found them.
  */
-export function HostingChart({ rows }: PeerSeriesProps): JSX.Element {
-  const located = (row: Row): number | undefined => row.located_peer_count;
-  const days = seriesDays(rows, located);
+export function ExecutionNodesChart({
+  rows,
+}: {
+  /** Execution concentration rows, one a day */ rows: ConcentrationRow[];
+}): JSX.Element {
+  const nodes = (row: ConcentrationRow): number | undefined => row.peer_count;
+  const days = seriesDays(rows, nodes);
+  const byDay = new Map(rows.map(row => [row.day_start_date, row.peer_count ?? 0]));
 
   return (
     <SeriesCard
-      title="On hosting providers"
+      title="Execution nodes"
       days={days}
-      yName="Share of peers"
-      percent="line"
-      empty="No consensus peer was located in this range."
+      yName="Nodes"
+      empty="No execution node was counted in this range."
       series={[
-        line(
-          'Hosting',
-          dayShares(rows, days, row => row.hosting_peer_count, located),
-          ANGLE_COLORS.peers
+        stackLayer(
+          'Nodes',
+          days.map(day => byDay.get(day) ?? 0),
+          ANGLE_COLORS.peers,
+          'nodes'
         ),
       ]}
     />

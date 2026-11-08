@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { IndexPage } from '@/pages/ethereum/network';
-import { networkSearchSchema } from '@/pages/ethereum/network/constants';
+import { overviewSearchSchema } from '@/pages/ethereum/network/constants';
 
 export const Route = createFileRoute('/ethereum/network/')({
   component: IndexPage,
-  validateSearch: networkSearchSchema,
+  validateSearch: overviewSearchSchema,
   beforeLoad: () => ({
     getBreadcrumb: () => ({ show: false }),
   }),
