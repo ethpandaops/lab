@@ -68,11 +68,15 @@ const columns: DataTableColumn<NodeRow>[] = [
     header: 'Location',
     accessorFn: row => formatNodeLocation(row.node),
     cell: ({ row, getValue }) => (
-      <span className="flex items-center gap-1.5">
+      <span className="flex min-w-0 items-center gap-1.5">
         <CountryFlag code={row.original.node.meta_client_geo_country_code} />
-        <span className="max-w-40 truncate">{getValue() as string}</span>
+        <span className="max-w-40 min-w-0 truncate sm:max-w-none" title={getValue() as string}>
+          {getValue() as string}
+        </span>
       </span>
     ),
+    // From sm up the column takes the table's spare width without widening the table; narrower, the text keeps its cap
+    meta: { cellClassName: 'text-muted sm:w-full sm:max-w-0 sm:min-w-52' },
   },
   {
     id: 'lastSeen',
