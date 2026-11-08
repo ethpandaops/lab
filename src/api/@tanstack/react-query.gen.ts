@@ -6,6 +6,8 @@ import { client } from '../client.gen';
 import {
   adminCbtIncrementalServiceGet,
   adminCbtIncrementalServiceList,
+  dimAsnServiceGet,
+  dimAsnServiceList,
   dimBlockBlobSubmitterServiceGet,
   dimBlockBlobSubmitterServiceList,
   dimClientCommitServiceGet,
@@ -232,8 +234,12 @@ import {
   fctContractStorageStateWithExpiryByBlockDailyServiceList,
   fctContractStorageStateWithExpiryByBlockHourlyServiceGet,
   fctContractStorageStateWithExpiryByBlockHourlyServiceList,
+  fctCustodyProbeByAsnDailyServiceGet,
+  fctCustodyProbeByAsnDailyServiceList,
   fctCustodyProbeByClientDailyServiceGet,
   fctCustodyProbeByClientDailyServiceList,
+  fctCustodyProbeByCountryDailyServiceGet,
+  fctCustodyProbeByCountryDailyServiceList,
   fctCustodyProbeBySlotAgeDailyServiceGet,
   fctCustodyProbeBySlotAgeDailyServiceList,
   fctCustodyProbeBySlotAgeHourlyServiceGet,
@@ -414,26 +420,44 @@ import {
   fctPayloadBidHighestValueByBuilderChunked50MsServiceList,
   fctPayloadBidHighestValueChunked50MsServiceGet,
   fctPayloadBidHighestValueChunked50MsServiceList,
+  fctPeerConcentrationClDailyServiceGet,
+  fctPeerConcentrationClDailyServiceList,
+  fctPeerConcentrationElDailyServiceGet,
+  fctPeerConcentrationElDailyServiceList,
+  fctPeerCountByAsnCountryDailyServiceGet,
+  fctPeerCountByAsnCountryDailyServiceList,
+  fctPeerCountByAsnDailyServiceGet,
+  fctPeerCountByAsnDailyServiceList,
   fctPeerCountByClClientAsnDailyServiceGet,
   fctPeerCountByClClientAsnDailyServiceList,
+  fctPeerCountByClClientCityDailyServiceGet,
+  fctPeerCountByClClientCityDailyServiceList,
   fctPeerCountByClClientCountryDailyServiceGet,
   fctPeerCountByClClientCountryDailyServiceList,
   fctPeerCountByClClientDailyServiceGet,
   fctPeerCountByClClientDailyServiceList,
   fctPeerCountByClientPairDailyServiceGet,
   fctPeerCountByClientPairDailyServiceList,
+  fctPeerCountByCountryDailyServiceGet,
+  fctPeerCountByCountryDailyServiceList,
+  fctPeerCountByElAsnDailyServiceGet,
+  fctPeerCountByElAsnDailyServiceList,
   fctPeerCountByElClientAsnDailyServiceGet,
   fctPeerCountByElClientAsnDailyServiceList,
   fctPeerCountByElClientCountryDailyServiceGet,
   fctPeerCountByElClientCountryDailyServiceList,
   fctPeerCountByElClientDailyServiceGet,
   fctPeerCountByElClientDailyServiceList,
+  fctPeerCountByElCountryDailyServiceGet,
+  fctPeerCountByElCountryDailyServiceList,
   fctPeerCountBySourceDailyServiceGet,
   fctPeerCountBySourceDailyServiceList,
   fctPeerForkReadinessByClClientDailyServiceGet,
   fctPeerForkReadinessByClClientDailyServiceList,
   fctPeerForkReadinessByElClientDailyServiceGet,
   fctPeerForkReadinessByElClientDailyServiceList,
+  fctPeerHostingByElClientDailyServiceGet,
+  fctPeerHostingByElClientDailyServiceList,
   fctPeerPartialMessageSupportByClientDailyServiceGet,
   fctPeerPartialMessageSupportByClientDailyServiceList,
   fctPeerPartialMessageSupportByClientHourlyServiceGet,
@@ -711,6 +735,12 @@ import type {
   AdminCbtIncrementalServiceListData,
   AdminCbtIncrementalServiceListError,
   AdminCbtIncrementalServiceListResponse,
+  DimAsnServiceGetData,
+  DimAsnServiceGetError,
+  DimAsnServiceGetResponse,
+  DimAsnServiceListData,
+  DimAsnServiceListError,
+  DimAsnServiceListResponse,
   DimBlockBlobSubmitterServiceGetData,
   DimBlockBlobSubmitterServiceGetError,
   DimBlockBlobSubmitterServiceGetResponse,
@@ -1389,12 +1419,24 @@ import type {
   FctContractStorageStateWithExpiryByBlockHourlyServiceListData,
   FctContractStorageStateWithExpiryByBlockHourlyServiceListError,
   FctContractStorageStateWithExpiryByBlockHourlyServiceListResponse,
+  FctCustodyProbeByAsnDailyServiceGetData,
+  FctCustodyProbeByAsnDailyServiceGetError,
+  FctCustodyProbeByAsnDailyServiceGetResponse,
+  FctCustodyProbeByAsnDailyServiceListData,
+  FctCustodyProbeByAsnDailyServiceListError,
+  FctCustodyProbeByAsnDailyServiceListResponse,
   FctCustodyProbeByClientDailyServiceGetData,
   FctCustodyProbeByClientDailyServiceGetError,
   FctCustodyProbeByClientDailyServiceGetResponse,
   FctCustodyProbeByClientDailyServiceListData,
   FctCustodyProbeByClientDailyServiceListError,
   FctCustodyProbeByClientDailyServiceListResponse,
+  FctCustodyProbeByCountryDailyServiceGetData,
+  FctCustodyProbeByCountryDailyServiceGetError,
+  FctCustodyProbeByCountryDailyServiceGetResponse,
+  FctCustodyProbeByCountryDailyServiceListData,
+  FctCustodyProbeByCountryDailyServiceListError,
+  FctCustodyProbeByCountryDailyServiceListResponse,
   FctCustodyProbeBySlotAgeDailyServiceGetData,
   FctCustodyProbeBySlotAgeDailyServiceGetError,
   FctCustodyProbeBySlotAgeDailyServiceGetResponse,
@@ -1935,12 +1977,42 @@ import type {
   FctPayloadBidHighestValueChunked50MsServiceListData,
   FctPayloadBidHighestValueChunked50MsServiceListError,
   FctPayloadBidHighestValueChunked50MsServiceListResponse,
+  FctPeerConcentrationClDailyServiceGetData,
+  FctPeerConcentrationClDailyServiceGetError,
+  FctPeerConcentrationClDailyServiceGetResponse,
+  FctPeerConcentrationClDailyServiceListData,
+  FctPeerConcentrationClDailyServiceListError,
+  FctPeerConcentrationClDailyServiceListResponse,
+  FctPeerConcentrationElDailyServiceGetData,
+  FctPeerConcentrationElDailyServiceGetError,
+  FctPeerConcentrationElDailyServiceGetResponse,
+  FctPeerConcentrationElDailyServiceListData,
+  FctPeerConcentrationElDailyServiceListError,
+  FctPeerConcentrationElDailyServiceListResponse,
+  FctPeerCountByAsnCountryDailyServiceGetData,
+  FctPeerCountByAsnCountryDailyServiceGetError,
+  FctPeerCountByAsnCountryDailyServiceGetResponse,
+  FctPeerCountByAsnCountryDailyServiceListData,
+  FctPeerCountByAsnCountryDailyServiceListError,
+  FctPeerCountByAsnCountryDailyServiceListResponse,
+  FctPeerCountByAsnDailyServiceGetData,
+  FctPeerCountByAsnDailyServiceGetError,
+  FctPeerCountByAsnDailyServiceGetResponse,
+  FctPeerCountByAsnDailyServiceListData,
+  FctPeerCountByAsnDailyServiceListError,
+  FctPeerCountByAsnDailyServiceListResponse,
   FctPeerCountByClClientAsnDailyServiceGetData,
   FctPeerCountByClClientAsnDailyServiceGetError,
   FctPeerCountByClClientAsnDailyServiceGetResponse,
   FctPeerCountByClClientAsnDailyServiceListData,
   FctPeerCountByClClientAsnDailyServiceListError,
   FctPeerCountByClClientAsnDailyServiceListResponse,
+  FctPeerCountByClClientCityDailyServiceGetData,
+  FctPeerCountByClClientCityDailyServiceGetError,
+  FctPeerCountByClClientCityDailyServiceGetResponse,
+  FctPeerCountByClClientCityDailyServiceListData,
+  FctPeerCountByClClientCityDailyServiceListError,
+  FctPeerCountByClClientCityDailyServiceListResponse,
   FctPeerCountByClClientCountryDailyServiceGetData,
   FctPeerCountByClClientCountryDailyServiceGetError,
   FctPeerCountByClClientCountryDailyServiceGetResponse,
@@ -1959,6 +2031,18 @@ import type {
   FctPeerCountByClientPairDailyServiceListData,
   FctPeerCountByClientPairDailyServiceListError,
   FctPeerCountByClientPairDailyServiceListResponse,
+  FctPeerCountByCountryDailyServiceGetData,
+  FctPeerCountByCountryDailyServiceGetError,
+  FctPeerCountByCountryDailyServiceGetResponse,
+  FctPeerCountByCountryDailyServiceListData,
+  FctPeerCountByCountryDailyServiceListError,
+  FctPeerCountByCountryDailyServiceListResponse,
+  FctPeerCountByElAsnDailyServiceGetData,
+  FctPeerCountByElAsnDailyServiceGetError,
+  FctPeerCountByElAsnDailyServiceGetResponse,
+  FctPeerCountByElAsnDailyServiceListData,
+  FctPeerCountByElAsnDailyServiceListError,
+  FctPeerCountByElAsnDailyServiceListResponse,
   FctPeerCountByElClientAsnDailyServiceGetData,
   FctPeerCountByElClientAsnDailyServiceGetError,
   FctPeerCountByElClientAsnDailyServiceGetResponse,
@@ -1977,6 +2061,12 @@ import type {
   FctPeerCountByElClientDailyServiceListData,
   FctPeerCountByElClientDailyServiceListError,
   FctPeerCountByElClientDailyServiceListResponse,
+  FctPeerCountByElCountryDailyServiceGetData,
+  FctPeerCountByElCountryDailyServiceGetError,
+  FctPeerCountByElCountryDailyServiceGetResponse,
+  FctPeerCountByElCountryDailyServiceListData,
+  FctPeerCountByElCountryDailyServiceListError,
+  FctPeerCountByElCountryDailyServiceListResponse,
   FctPeerCountBySourceDailyServiceGetData,
   FctPeerCountBySourceDailyServiceGetError,
   FctPeerCountBySourceDailyServiceGetResponse,
@@ -1995,6 +2085,12 @@ import type {
   FctPeerForkReadinessByElClientDailyServiceListData,
   FctPeerForkReadinessByElClientDailyServiceListError,
   FctPeerForkReadinessByElClientDailyServiceListResponse,
+  FctPeerHostingByElClientDailyServiceGetData,
+  FctPeerHostingByElClientDailyServiceGetError,
+  FctPeerHostingByElClientDailyServiceGetResponse,
+  FctPeerHostingByElClientDailyServiceListData,
+  FctPeerHostingByElClientDailyServiceListError,
+  FctPeerHostingByElClientDailyServiceListResponse,
   FctPeerPartialMessageSupportByClientDailyServiceGetData,
   FctPeerPartialMessageSupportByClientDailyServiceGetError,
   FctPeerPartialMessageSupportByClientDailyServiceGetResponse,
@@ -2892,6 +2988,60 @@ export const adminCbtIncrementalServiceGetOptions = (options: Options<AdminCbtIn
       return data;
     },
     queryKey: adminCbtIncrementalServiceGetQueryKey(options),
+  });
+
+export const dimAsnServiceListQueryKey = (options?: Options<DimAsnServiceListData>) =>
+  createQueryKey('dimAsnServiceList', options);
+
+/**
+ * List records
+ *
+ * Autonomous systems our consensus peers were on, residential and hosting, with organisation, provider and network type as of the last day they had peers.
+ */
+export const dimAsnServiceListOptions = (options?: Options<DimAsnServiceListData>) =>
+  queryOptions<
+    DimAsnServiceListResponse,
+    DimAsnServiceListError,
+    DimAsnServiceListResponse,
+    ReturnType<typeof dimAsnServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimAsnServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimAsnServiceListQueryKey(options),
+  });
+
+export const dimAsnServiceGetQueryKey = (options: Options<DimAsnServiceGetData>) =>
+  createQueryKey('dimAsnServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by autonomous_system_number
+ */
+export const dimAsnServiceGetOptions = (options: Options<DimAsnServiceGetData>) =>
+  queryOptions<
+    DimAsnServiceGetResponse,
+    DimAsnServiceGetError,
+    DimAsnServiceGetResponse,
+    ReturnType<typeof dimAsnServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimAsnServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimAsnServiceGetQueryKey(options),
   });
 
 export const dimBlockBlobSubmitterServiceListQueryKey = (options?: Options<DimBlockBlobSubmitterServiceListData>) =>
@@ -9483,6 +9633,64 @@ export const fctContractStorageStateWithExpiryByBlockHourlyServiceGetOptions = (
     queryKey: fctContractStorageStateWithExpiryByBlockHourlyServiceGetQueryKey(options),
   });
 
+export const fctCustodyProbeByAsnDailyServiceListQueryKey = (
+  options?: Options<FctCustodyProbeByAsnDailyServiceListData>
+) => createQueryKey('fctCustodyProbeByAsnDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily data column custody probes by the probed peer autonomous system (its latest location in the day), residential and hosting. Residential autonomous systems with under 3 probed peers in the day roll into autonomous system 0 (other). Crawlers and probes are excluded.
+ */
+export const fctCustodyProbeByAsnDailyServiceListOptions = (
+  options?: Options<FctCustodyProbeByAsnDailyServiceListData>
+) =>
+  queryOptions<
+    FctCustodyProbeByAsnDailyServiceListResponse,
+    FctCustodyProbeByAsnDailyServiceListError,
+    FctCustodyProbeByAsnDailyServiceListResponse,
+    ReturnType<typeof fctCustodyProbeByAsnDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeByAsnDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeByAsnDailyServiceListQueryKey(options),
+  });
+
+export const fctCustodyProbeByAsnDailyServiceGetQueryKey = (
+  options: Options<FctCustodyProbeByAsnDailyServiceGetData>
+) => createQueryKey('fctCustodyProbeByAsnDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctCustodyProbeByAsnDailyServiceGetOptions = (options: Options<FctCustodyProbeByAsnDailyServiceGetData>) =>
+  queryOptions<
+    FctCustodyProbeByAsnDailyServiceGetResponse,
+    FctCustodyProbeByAsnDailyServiceGetError,
+    FctCustodyProbeByAsnDailyServiceGetResponse,
+    ReturnType<typeof fctCustodyProbeByAsnDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeByAsnDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeByAsnDailyServiceGetQueryKey(options),
+  });
+
 export const fctCustodyProbeByClientDailyServiceListQueryKey = (
   options?: Options<FctCustodyProbeByClientDailyServiceListData>
 ) => createQueryKey('fctCustodyProbeByClientDailyServiceList', options);
@@ -9541,6 +9749,66 @@ export const fctCustodyProbeByClientDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctCustodyProbeByClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctCustodyProbeByCountryDailyServiceListQueryKey = (
+  options?: Options<FctCustodyProbeByCountryDailyServiceListData>
+) => createQueryKey('fctCustodyProbeByCountryDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily data column custody probes by the probed peer country (its latest location in the day). Crawlers and probes are excluded.
+ */
+export const fctCustodyProbeByCountryDailyServiceListOptions = (
+  options?: Options<FctCustodyProbeByCountryDailyServiceListData>
+) =>
+  queryOptions<
+    FctCustodyProbeByCountryDailyServiceListResponse,
+    FctCustodyProbeByCountryDailyServiceListError,
+    FctCustodyProbeByCountryDailyServiceListResponse,
+    ReturnType<typeof fctCustodyProbeByCountryDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeByCountryDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeByCountryDailyServiceListQueryKey(options),
+  });
+
+export const fctCustodyProbeByCountryDailyServiceGetQueryKey = (
+  options: Options<FctCustodyProbeByCountryDailyServiceGetData>
+) => createQueryKey('fctCustodyProbeByCountryDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctCustodyProbeByCountryDailyServiceGetOptions = (
+  options: Options<FctCustodyProbeByCountryDailyServiceGetData>
+) =>
+  queryOptions<
+    FctCustodyProbeByCountryDailyServiceGetResponse,
+    FctCustodyProbeByCountryDailyServiceGetError,
+    FctCustodyProbeByCountryDailyServiceGetResponse,
+    ReturnType<typeof fctCustodyProbeByCountryDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctCustodyProbeByCountryDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctCustodyProbeByCountryDailyServiceGetQueryKey(options),
   });
 
 export const fctCustodyProbeBySlotAgeDailyServiceListQueryKey = (
@@ -14849,6 +15117,240 @@ export const fctPayloadBidHighestValueChunked50MsServiceGetOptions = (
     queryKey: fctPayloadBidHighestValueChunked50MsServiceGetQueryKey(options),
   });
 
+export const fctPeerConcentrationClDailyServiceListQueryKey = (
+  options?: Options<FctPeerConcentrationClDailyServiceListData>
+) => createQueryKey('fctPeerConcentrationClDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily concentration of consensus peers our libp2p sentries or our discovery crawler saw: countries and autonomous systems, the largest systems, the fewest countries and systems holding a third and half of the peers, and peers per continent. Shares are of peers with a known country or system. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerConcentrationClDailyServiceListOptions = (
+  options?: Options<FctPeerConcentrationClDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerConcentrationClDailyServiceListResponse,
+    FctPeerConcentrationClDailyServiceListError,
+    FctPeerConcentrationClDailyServiceListResponse,
+    ReturnType<typeof fctPeerConcentrationClDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerConcentrationClDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerConcentrationClDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerConcentrationClDailyServiceGetQueryKey = (
+  options: Options<FctPeerConcentrationClDailyServiceGetData>
+) => createQueryKey('fctPeerConcentrationClDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerConcentrationClDailyServiceGetOptions = (
+  options: Options<FctPeerConcentrationClDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerConcentrationClDailyServiceGetResponse,
+    FctPeerConcentrationClDailyServiceGetError,
+    FctPeerConcentrationClDailyServiceGetResponse,
+    ReturnType<typeof fctPeerConcentrationClDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerConcentrationClDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerConcentrationClDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerConcentrationElDailyServiceListQueryKey = (
+  options?: Options<FctPeerConcentrationElDailyServiceListData>
+) => createQueryKey('fctPeerConcentrationElDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily concentration of execution nodes: countries and autonomous systems, the largest systems, the fewest countries and systems holding a third and half of the nodes, and nodes per continent. Shares are of nodes with a known country or system. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export const fctPeerConcentrationElDailyServiceListOptions = (
+  options?: Options<FctPeerConcentrationElDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerConcentrationElDailyServiceListResponse,
+    FctPeerConcentrationElDailyServiceListError,
+    FctPeerConcentrationElDailyServiceListResponse,
+    ReturnType<typeof fctPeerConcentrationElDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerConcentrationElDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerConcentrationElDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerConcentrationElDailyServiceGetQueryKey = (
+  options: Options<FctPeerConcentrationElDailyServiceGetData>
+) => createQueryKey('fctPeerConcentrationElDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerConcentrationElDailyServiceGetOptions = (
+  options: Options<FctPeerConcentrationElDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerConcentrationElDailyServiceGetResponse,
+    FctPeerConcentrationElDailyServiceGetError,
+    FctPeerConcentrationElDailyServiceGetResponse,
+    ReturnType<typeof fctPeerConcentrationElDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerConcentrationElDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerConcentrationElDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCountByAsnCountryDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountByAsnCountryDailyServiceListData>
+) => createQueryKey('fctPeerCountByAsnCountryDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by autonomous system and country, residential and hosting, from our libp2p sentries and our discovery crawler, with reachability and custody counts. Not crossed with city or client. Residential (network type other or unknown) autonomous system and country cells under 3 peers roll into autonomous system 0 (other) within the country. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountByAsnCountryDailyServiceListOptions = (
+  options?: Options<FctPeerCountByAsnCountryDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountByAsnCountryDailyServiceListResponse,
+    FctPeerCountByAsnCountryDailyServiceListError,
+    FctPeerCountByAsnCountryDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByAsnCountryDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByAsnCountryDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByAsnCountryDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByAsnCountryDailyServiceGetQueryKey = (
+  options: Options<FctPeerCountByAsnCountryDailyServiceGetData>
+) => createQueryKey('fctPeerCountByAsnCountryDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByAsnCountryDailyServiceGetOptions = (
+  options: Options<FctPeerCountByAsnCountryDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCountByAsnCountryDailyServiceGetResponse,
+    FctPeerCountByAsnCountryDailyServiceGetError,
+    FctPeerCountByAsnCountryDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByAsnCountryDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByAsnCountryDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByAsnCountryDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCountByAsnDailyServiceListQueryKey = (options?: Options<FctPeerCountByAsnDailyServiceListData>) =>
+  createQueryKey('fctPeerCountByAsnDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by autonomous system, residential and hosting, from our libp2p sentries and our discovery crawler, with reachability and custody counts. Residential autonomous systems under 3 peers in the day roll into autonomous system 0 (other), which keeps how many systems it holds. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountByAsnDailyServiceListOptions = (options?: Options<FctPeerCountByAsnDailyServiceListData>) =>
+  queryOptions<
+    FctPeerCountByAsnDailyServiceListResponse,
+    FctPeerCountByAsnDailyServiceListError,
+    FctPeerCountByAsnDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByAsnDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByAsnDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByAsnDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByAsnDailyServiceGetQueryKey = (options: Options<FctPeerCountByAsnDailyServiceGetData>) =>
+  createQueryKey('fctPeerCountByAsnDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByAsnDailyServiceGetOptions = (options: Options<FctPeerCountByAsnDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerCountByAsnDailyServiceGetResponse,
+    FctPeerCountByAsnDailyServiceGetError,
+    FctPeerCountByAsnDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByAsnDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByAsnDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByAsnDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerCountByClClientAsnDailyServiceListQueryKey = (
   options?: Options<FctPeerCountByClClientAsnDailyServiceListData>
 ) => createQueryKey('fctPeerCountByClClientAsnDailyServiceList', options);
@@ -14907,6 +15409,66 @@ export const fctPeerCountByClClientAsnDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctPeerCountByClClientAsnDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCountByClClientCityDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountByClClientCityDailyServiceListData>
+) => createQueryKey('fctPeerCountByClClientCityDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by country, city, network type and client, residential and hosting, from our libp2p sentries and our discovery crawler. Not crossed with autonomous system or version. Residential (network type other or unknown) city and client cells under 3 peers roll into city other within the country. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountByClClientCityDailyServiceListOptions = (
+  options?: Options<FctPeerCountByClClientCityDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountByClClientCityDailyServiceListResponse,
+    FctPeerCountByClClientCityDailyServiceListError,
+    FctPeerCountByClClientCityDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByClClientCityDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByClClientCityDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByClClientCityDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByClClientCityDailyServiceGetQueryKey = (
+  options: Options<FctPeerCountByClClientCityDailyServiceGetData>
+) => createQueryKey('fctPeerCountByClClientCityDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByClClientCityDailyServiceGetOptions = (
+  options: Options<FctPeerCountByClClientCityDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCountByClClientCityDailyServiceGetResponse,
+    FctPeerCountByClClientCityDailyServiceGetError,
+    FctPeerCountByClClientCityDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByClClientCityDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByClClientCityDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByClClientCityDailyServiceGetQueryKey(options),
   });
 
 export const fctPeerCountByClClientCountryDailyServiceListQueryKey = (
@@ -15089,6 +15651,123 @@ export const fctPeerCountByClientPairDailyServiceGetOptions = (
     queryKey: fctPeerCountByClientPairDailyServiceGetQueryKey(options),
   });
 
+export const fctPeerCountByCountryDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountByCountryDailyServiceListData>
+) => createQueryKey('fctPeerCountByCountryDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by country, from our libp2p sentries and our discovery crawler, with reachability, hosting and custody counts. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCountByCountryDailyServiceListOptions = (
+  options?: Options<FctPeerCountByCountryDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountByCountryDailyServiceListResponse,
+    FctPeerCountByCountryDailyServiceListError,
+    FctPeerCountByCountryDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByCountryDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByCountryDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByCountryDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByCountryDailyServiceGetQueryKey = (
+  options: Options<FctPeerCountByCountryDailyServiceGetData>
+) => createQueryKey('fctPeerCountByCountryDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByCountryDailyServiceGetOptions = (
+  options: Options<FctPeerCountByCountryDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCountByCountryDailyServiceGetResponse,
+    FctPeerCountByCountryDailyServiceGetError,
+    FctPeerCountByCountryDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByCountryDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByCountryDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByCountryDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCountByElAsnDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountByElAsnDailyServiceListData>
+) => createQueryKey('fctPeerCountByElAsnDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily execution nodes by autonomous system, all clients together. Residential autonomous systems under 3 nodes roll into autonomous system 0 (other), which keeps how many systems it holds. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export const fctPeerCountByElAsnDailyServiceListOptions = (
+  options?: Options<FctPeerCountByElAsnDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountByElAsnDailyServiceListResponse,
+    FctPeerCountByElAsnDailyServiceListError,
+    FctPeerCountByElAsnDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByElAsnDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByElAsnDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByElAsnDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByElAsnDailyServiceGetQueryKey = (options: Options<FctPeerCountByElAsnDailyServiceGetData>) =>
+  createQueryKey('fctPeerCountByElAsnDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByElAsnDailyServiceGetOptions = (options: Options<FctPeerCountByElAsnDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerCountByElAsnDailyServiceGetResponse,
+    FctPeerCountByElAsnDailyServiceGetError,
+    FctPeerCountByElAsnDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByElAsnDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByElAsnDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByElAsnDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerCountByElClientAsnDailyServiceListQueryKey = (
   options?: Options<FctPeerCountByElClientAsnDailyServiceListData>
 ) => createQueryKey('fctPeerCountByElClientAsnDailyServiceList', options);
@@ -15269,6 +15948,66 @@ export const fctPeerCountByElClientDailyServiceGetOptions = (
     queryKey: fctPeerCountByElClientDailyServiceGetQueryKey(options),
   });
 
+export const fctPeerCountByElCountryDailyServiceListQueryKey = (
+  options?: Options<FctPeerCountByElCountryDailyServiceListData>
+) => createQueryKey('fctPeerCountByElCountryDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily execution nodes by country, all clients together. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export const fctPeerCountByElCountryDailyServiceListOptions = (
+  options?: Options<FctPeerCountByElCountryDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCountByElCountryDailyServiceListResponse,
+    FctPeerCountByElCountryDailyServiceListError,
+    FctPeerCountByElCountryDailyServiceListResponse,
+    ReturnType<typeof fctPeerCountByElCountryDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByElCountryDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByElCountryDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCountByElCountryDailyServiceGetQueryKey = (
+  options: Options<FctPeerCountByElCountryDailyServiceGetData>
+) => createQueryKey('fctPeerCountByElCountryDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCountByElCountryDailyServiceGetOptions = (
+  options: Options<FctPeerCountByElCountryDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCountByElCountryDailyServiceGetResponse,
+    FctPeerCountByElCountryDailyServiceGetError,
+    FctPeerCountByElCountryDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCountByElCountryDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCountByElCountryDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCountByElCountryDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerCountBySourceDailyServiceListQueryKey = (
   options?: Options<FctPeerCountBySourceDailyServiceListData>
 ) => createQueryKey('fctPeerCountBySourceDailyServiceList', options);
@@ -15445,6 +16184,66 @@ export const fctPeerForkReadinessByElClientDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctPeerForkReadinessByElClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerHostingByElClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerHostingByElClientDailyServiceListData>
+) => createQueryKey('fctPeerHostingByElClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily execution nodes by client, without versions, with hosting and IPv6 counts. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export const fctPeerHostingByElClientDailyServiceListOptions = (
+  options?: Options<FctPeerHostingByElClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerHostingByElClientDailyServiceListResponse,
+    FctPeerHostingByElClientDailyServiceListError,
+    FctPeerHostingByElClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerHostingByElClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerHostingByElClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerHostingByElClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerHostingByElClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerHostingByElClientDailyServiceGetData>
+) => createQueryKey('fctPeerHostingByElClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerHostingByElClientDailyServiceGetOptions = (
+  options: Options<FctPeerHostingByElClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerHostingByElClientDailyServiceGetResponse,
+    FctPeerHostingByElClientDailyServiceGetError,
+    FctPeerHostingByElClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerHostingByElClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerHostingByElClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerHostingByElClientDailyServiceGetQueryKey(options),
   });
 
 export const fctPeerPartialMessageSupportByClientDailyServiceListQueryKey = (
