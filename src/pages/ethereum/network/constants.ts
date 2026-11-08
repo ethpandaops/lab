@@ -29,11 +29,5 @@ export const networkSearchSchema = z.object({
 });
 export type NetworkSearch = z.infer<typeof networkSearchSchema>;
 
-/**
- * First full day of the execution discovery crawl that counts nodes at today's scale. Before it the census held a few
- * hundred nodes a day, so execution changes start here.
- */
-export const EL_CRAWL_START = '2026-07-15';
-
 /** Rows the overview's country and network tables show */
 export const TOP_PLACES = 10;

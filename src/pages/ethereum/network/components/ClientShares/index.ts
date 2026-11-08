@@ -1,1 +1,0 @@
-export { ClientShares } from './ClientShares';
