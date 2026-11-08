@@ -28,6 +28,36 @@ export type AdminCbtIncremental = {
 };
 
 /**
+ * Autonomous systems our consensus peers were on, residential and hosting, with organisation, provider and network type as of the last day they had peers.
+ */
+export type DimAsn = {
+  /**
+   * Autonomous system number of the address, 0 when unknown
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation on the last day it had peers
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Last day our consensus peers were on the autonomous system
+   */
+  last_seen_date?: string;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs)
+   */
+  network_type?: string;
+  /**
+   * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown
+   */
+  provider?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Blob transaction to submitter name mapping.
  */
 export type DimBlockBlobSubmitter = {
@@ -5896,6 +5926,64 @@ export type FctContractStorageStateWithExpiryByBlockHourly = {
 };
 
 /**
+ * Daily data column custody probes by the probed peer autonomous system (its latest location in the day), residential and hosting. Residential autonomous systems with under 3 probed peers in the day roll into autonomous system 0 (other). Crawlers and probes are excluded.
+ */
+export type FctCustodyProbeByAsnDaily = {
+  /**
+   * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other)
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Probes that errored or timed out
+   */
+  failure_count?: number;
+  /**
+   * Probes the peer answered without the column
+   */
+  missing_count?: number;
+  /**
+   * Peers with at least one missing probe
+   */
+  missing_peer_count?: number;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Peers probed in the day
+   */
+  peer_count?: number;
+  /**
+   * Custody probes
+   */
+  probe_count?: number;
+  /**
+   * Median response time of successful probes in ms, NULL without any
+   */
+  response_time_p50_ms?: number | null;
+  /**
+   * 90th percentile response time of successful probes in ms, NULL without any
+   */
+  response_time_p90_ms?: number | null;
+  /**
+   * Probes the peer answered with the column
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily data column custody probe outcomes by the probed peer client and release (its latest agent in the day), from int_custody_probe. How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export type FctCustodyProbeByClientDaily = {
@@ -5951,6 +6039,64 @@ export type FctCustodyProbeByClientDaily = {
    * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
    */
   version?: string;
+};
+
+/**
+ * Daily data column custody probes by the probed peer country (its latest location in the day). Crawlers and probes are excluded.
+ */
+export type FctCustodyProbeByCountryDaily = {
+  /**
+   * Continent code of the address, unknown when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name, Unknown when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Probes that errored or timed out
+   */
+  failure_count?: number;
+  /**
+   * Probes the peer answered without the column
+   */
+  missing_count?: number;
+  /**
+   * Peers with at least one missing probe
+   */
+  missing_peer_count?: number;
+  /**
+   * Peers probed in the day
+   */
+  peer_count?: number;
+  /**
+   * Custody probes
+   */
+  probe_count?: number;
+  /**
+   * Median response time of successful probes in ms, NULL without any
+   */
+  response_time_p50_ms?: number | null;
+  /**
+   * 90th percentile response time of successful probes in ms, NULL without any
+   */
+  response_time_p90_ms?: number | null;
+  /**
+   * Probes the peer answered with the column
+   */
+  success_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 /**
@@ -11680,6 +11826,358 @@ export type FctPayloadBidHighestValueChunked50Ms = {
 };
 
 /**
+ * Daily concentration of consensus peers our libp2p sentries or our discovery crawler saw: countries and autonomous systems, the largest systems, the fewest countries and systems holding a third and half of the peers, and peers per continent. Shares are of peers with a known country or system. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerConcentrationClDaily = {
+  /**
+   * Peers in Africa (AF)
+   */
+  africa_peer_count?: number;
+  /**
+   * Peers in Antarctica (AN)
+   */
+  antarctica_peer_count?: number;
+  /**
+   * Peers in Asia (AS)
+   */
+  asia_peer_count?: number;
+  /**
+   * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own
+   */
+  autonomous_system_count?: number;
+  /**
+   * Countries with peers
+   */
+  country_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers in Europe (EU)
+   */
+  europe_peer_count?: number;
+  /**
+   * Fewest autonomous systems that hold half of the peers with a known autonomous system
+   */
+  half_asn_count?: number;
+  /**
+   * Fewest countries that hold half of the peers with a known country
+   */
+  half_country_count?: number;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record
+   */
+  ipv6_peer_count?: number;
+  /**
+   * Peers with a known autonomous system, the population of hosting_peer_count
+   */
+  located_peer_count?: number;
+  /**
+   * Peers in North America (NA)
+   */
+  north_america_peer_count?: number;
+  /**
+   * Peers in Oceania (OC)
+   */
+  oceania_peer_count?: number;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers in South America (SA)
+   */
+  south_america_peer_count?: number;
+  /**
+   * Fewest autonomous systems that hold a third of the peers with a known autonomous system
+   */
+  third_asn_count?: number;
+  /**
+   * Fewest countries that hold a third of the peers with a known country
+   */
+  third_country_count?: number;
+  /**
+   * Peers in the largest autonomous system
+   */
+  top_1_asn_peer_count?: number;
+  /**
+   * Peers in the 5 largest autonomous systems
+   */
+  top_5_asn_peer_count?: number;
+  /**
+   * Peers in the 10 largest autonomous systems
+   */
+  top_10_asn_peer_count?: number;
+  /**
+   * Peers not geolocated to a continent
+   */
+  unknown_continent_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily concentration of execution nodes: countries and autonomous systems, the largest systems, the fewest countries and systems holding a third and half of the nodes, and nodes per continent. Shares are of nodes with a known country or system. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export type FctPeerConcentrationElDaily = {
+  /**
+   * Peers in Africa (AF)
+   */
+  africa_peer_count?: number;
+  /**
+   * Peers in Antarctica (AN)
+   */
+  antarctica_peer_count?: number;
+  /**
+   * Peers in Asia (AS)
+   */
+  asia_peer_count?: number;
+  /**
+   * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own
+   */
+  autonomous_system_count?: number;
+  /**
+   * Countries with peers
+   */
+  country_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers in Europe (EU)
+   */
+  europe_peer_count?: number;
+  /**
+   * Fewest autonomous systems that hold half of the peers with a known autonomous system
+   */
+  half_asn_count?: number;
+  /**
+   * Fewest countries that hold half of the peers with a known country
+   */
+  half_country_count?: number;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Nodes whose record advertises an IPv6 address
+   */
+  ipv6_peer_count?: number;
+  /**
+   * Peers with a known autonomous system, the population of hosting_peer_count
+   */
+  located_peer_count?: number;
+  /**
+   * Peers in North America (NA)
+   */
+  north_america_peer_count?: number;
+  /**
+   * Peers in Oceania (OC)
+   */
+  oceania_peer_count?: number;
+  /**
+   * Execution nodes
+   */
+  peer_count?: number;
+  /**
+   * Peers in South America (SA)
+   */
+  south_america_peer_count?: number;
+  /**
+   * Fewest autonomous systems that hold a third of the peers with a known autonomous system
+   */
+  third_asn_count?: number;
+  /**
+   * Fewest countries that hold a third of the peers with a known country
+   */
+  third_country_count?: number;
+  /**
+   * Peers in the largest autonomous system
+   */
+  top_1_asn_peer_count?: number;
+  /**
+   * Peers in the 5 largest autonomous systems
+   */
+  top_5_asn_peer_count?: number;
+  /**
+   * Peers in the 10 largest autonomous systems
+   */
+  top_10_asn_peer_count?: number;
+  /**
+   * Peers not geolocated to a continent
+   */
+  unknown_continent_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peers by autonomous system and country, residential and hosting, from our libp2p sentries and our discovery crawler, with reachability and custody counts. Not crossed with city or client. Residential (network type other or unknown) autonomous system and country cells under 3 peers roll into autonomous system 0 (other) within the country. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerCountByAsnCountryDaily = {
+  /**
+   * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Continent code of the address, unknown when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name, Unknown when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Peers custodying 4 or fewer groups (the minimum)
+   */
+  custody_4_peer_count?: number;
+  /**
+   * Peers custodying 5 to 8 groups
+   */
+  custody_5_8_peer_count?: number;
+  /**
+   * Peers custodying 9 to 127 groups
+   */
+  custody_9_127_peer_count?: number;
+  /**
+   * Peers custodying all 128 groups (supernodes)
+   */
+  custody_128_peer_count?: number;
+  /**
+   * Peers whose custody group count is known from a metadata response or their ENR
+   */
+  custody_known_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Peers our discovery crawler dialled from their ENR
+   */
+  enr_peer_count?: number;
+  /**
+   * Peers that only connected to our sentries and were never dialled
+   */
+  inbound_only_peer_count?: number;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC or advertising a QUIC listen address
+   */
+  quic_peer_count?: number;
+  /**
+   * Peers our libp2p sentries were connected to
+   */
+  sentry_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peers by autonomous system, residential and hosting, from our libp2p sentries and our discovery crawler, with reachability and custody counts. Residential autonomous systems under 3 peers in the day roll into autonomous system 0 (other), which keeps how many systems it holds. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerCountByAsnDaily = {
+  /**
+   * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown
+   */
+  autonomous_system_count?: number;
+  /**
+   * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Peers custodying 4 or fewer groups (the minimum)
+   */
+  custody_4_peer_count?: number;
+  /**
+   * Peers custodying 5 to 8 groups
+   */
+  custody_5_8_peer_count?: number;
+  /**
+   * Peers custodying 9 to 127 groups
+   */
+  custody_9_127_peer_count?: number;
+  /**
+   * Peers custodying all 128 groups (supernodes)
+   */
+  custody_128_peer_count?: number;
+  /**
+   * Peers whose custody group count is known from a metadata response or their ENR
+   */
+  custody_known_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Peers our discovery crawler dialled from their ENR
+   */
+  enr_peer_count?: number;
+  /**
+   * Peers that only connected to our sentries and were never dialled
+   */
+  inbound_only_peer_count?: number;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC or advertising a QUIC listen address
+   */
+  quic_peer_count?: number;
+  /**
+   * Peers our libp2p sentries were connected to
+   */
+  sentry_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily consensus peer census by client and autonomous system. Consensus peers our libp2p sentries saw in the day (heartbeats and identify exchanges), one count per peer with its latest agent and address. Crawlers, probes, light clients and our own sentries are excluded. Autonomous systems under 3 peers roll into an other bucket per network type.
  */
 export type FctPeerCountByClClientAsnDaily = {
@@ -11705,6 +12203,40 @@ export type FctPeerCountByClClientAsnDaily = {
   network_type?: string;
   /**
    * Peers
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peers by country, city, network type and client, residential and hosting, from our libp2p sentries and our discovery crawler. Not crossed with autonomous system or version. Residential (network type other or unknown) city and client cells under 3 peers roll into city other within the country. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerCountByClClientCityDaily = {
+  /**
+   * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers
+   */
+  city?: string;
+  /**
+   * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent
+   */
+  client?: string;
+  /**
+   * Country code of the address, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
    */
   peer_count?: number;
   /**
@@ -11822,7 +12354,7 @@ export type FctPeerCountByClClientDaily = {
 };
 
 /**
- * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
+ * Daily consensus and execution client pairs from nodes sharing an IPv4 address: consensus peers from libp2p and ENRs, execution nodes from discovery on the network genesis and its current fork. Only addresses with exactly one consensus and one execution client form a pair. No address is stored.
  */
 export type FctPeerCountByClientPairDaily = {
   /**
@@ -11864,7 +12396,115 @@ export type FctPeerCountByClientPairDaily = {
 };
 
 /**
- * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Autonomous systems under 3 nodes roll into an other bucket per network type.
+ * Daily consensus peers by country, from our libp2p sentries and our discovery crawler, with reachability, hosting and custody counts. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerCountByCountryDaily = {
+  /**
+   * Continent code of the address, unknown when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name, Unknown when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Peers custodying 4 or fewer groups (the minimum)
+   */
+  custody_4_peer_count?: number;
+  /**
+   * Peers custodying 5 to 8 groups
+   */
+  custody_5_8_peer_count?: number;
+  /**
+   * Peers custodying 9 to 127 groups
+   */
+  custody_9_127_peer_count?: number;
+  /**
+   * Peers custodying all 128 groups (supernodes)
+   */
+  custody_128_peer_count?: number;
+  /**
+   * Peers whose custody group count is known from a metadata response or their ENR
+   */
+  custody_known_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Peers our discovery crawler dialled from their ENR
+   */
+  enr_peer_count?: number;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Peers that only connected to our sentries and were never dialled
+   */
+  inbound_only_peer_count?: number;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC or advertising a QUIC listen address
+   */
+  quic_peer_count?: number;
+  /**
+   * Peers our libp2p sentries were connected to
+   */
+  sentry_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily execution nodes by autonomous system, all clients together. Residential autonomous systems under 3 nodes roll into autonomous system 0 (other), which keeps how many systems it holds. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export type FctPeerCountByElAsnDaily = {
+  /**
+   * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown
+   */
+  autonomous_system_count?: number;
+  /**
+   * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other)
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers
+   */
+  autonomous_system_organization?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * Execution nodes
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily execution node census by client and autonomous system. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Autonomous systems under 3 nodes roll into an other bucket per network type.
  */
 export type FctPeerCountByElClientAsnDaily = {
   /**
@@ -11898,7 +12538,7 @@ export type FctPeerCountByElClientAsnDaily = {
 };
 
 /**
- * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
+ * Daily execution node census by client and country. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). Countries under 3 nodes roll into their continent other bucket, and continents still under 3 into a global other bucket.
  */
 export type FctPeerCountByElClientCountryDaily = {
   /**
@@ -11932,7 +12572,7 @@ export type FctPeerCountByElClientCountryDaily = {
 };
 
 /**
- * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis (the most common one that day, which excludes other chains). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
+ * Daily execution node census by client and release. Execution nodes our discovery crawler found in the day, one count per node with its latest record, on the network genesis and its current fork (a fork ID hash at least 10% of the nodes of the day share whose next fork has not passed, which excludes other chains and stale forks). How the version was resolved: commit_match (a release tag commit agreeing with any stated version), commit_untagged (a default or release branch commit, version is the release it builds on, else the stated version), commit_mismatch (the commit resolves to another release than the stated version, version is the commit release), commit_ambiguous, commit_unmatched (a custom or fork build, the stated version is kept), commit_zero, version_match, version_unmatched or none. Rows whose commit does not resolve keep the version the agent states
  */
 export type FctPeerCountByElClientDaily = {
   /**
@@ -11959,6 +12599,114 @@ export type FctPeerCountByElClientDaily = {
    * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
    */
   version?: string;
+};
+
+/**
+ * Daily execution nodes by country, all clients together. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export type FctPeerCountByElCountryDaily = {
+  /**
+   * Continent code of the address, unknown when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name, Unknown when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, unknown when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Execution nodes
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peer totals by source: peers our libp2p sentries and our discovery crawler saw, and how many both saw, with reachability, hosting and custody counts. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export type FctPeerCountBySourceDaily = {
+  /**
+   * Peers custodying 4 or fewer groups (the minimum)
+   */
+  custody_4_peer_count?: number;
+  /**
+   * Peers custodying 5 to 8 groups
+   */
+  custody_5_8_peer_count?: number;
+  /**
+   * Peers custodying 9 to 127 groups
+   */
+  custody_9_127_peer_count?: number;
+  /**
+   * Peers custodying all 128 groups (supernodes)
+   */
+  custody_128_peer_count?: number;
+  /**
+   * Peers whose custody group count is known from a metadata response or their ENR
+   */
+  custody_known_peer_count?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Peers our discovery crawler dialled from their ENR
+   */
+  enr_peer_count?: number;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Peers that only connected to our sentries and were never dialled
+   */
+  inbound_only_peer_count?: number;
+  /**
+   * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record
+   */
+  ipv6_peer_count?: number;
+  /**
+   * Peers with a known autonomous system, the population of hosting_peer_count
+   */
+  located_peer_count?: number;
+  /**
+   * Consensus peers our libp2p sentries or our discovery crawler saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC or advertising a QUIC listen address
+   */
+  quic_peer_count?: number;
+  /**
+   * Peers both sources saw
+   */
+  sentry_and_enr_peer_count?: number;
+  /**
+   * Peers our libp2p sentries were connected to
+   */
+  sentry_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 /**
@@ -12035,6 +12783,40 @@ export type FctPeerForkReadinessByElClientDaily = {
    * Release version from dim_client_release when the commit or version resolved (for commit_untagged the release the commit builds on), else the version the agent reports, empty when it reports none
    */
   version?: string;
+};
+
+/**
+ * Daily execution nodes by client, without versions, with hosting and IPv6 counts. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
+ */
+export type FctPeerHostingByElClientDaily = {
+  /**
+   * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers on a cloud or hosting provider network
+   */
+  hosting_peer_count?: number;
+  /**
+   * Nodes whose record advertises an IPv6 address
+   */
+  ipv6_peer_count?: number;
+  /**
+   * Peers with a known autonomous system, the population of hosting_peer_count
+   */
+  located_peer_count?: number;
+  /**
+   * Execution nodes
+   */
+  peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
 };
 
 /**
@@ -12149,6 +12931,118 @@ export type FctPeerProtocolByClClientDaily = {
    * libp2p protocol ID, e.g. /meshsub/1.3.0 or /eth2/beacon_chain/req/status/2/ssz_snappy
    */
   protocol?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peer reachability by client: peers our libp2p sentries dialled or that only connected in, QUIC, and ENR address mismatches.
+ */
+export type FctPeerReachabilityByClClientDaily = {
+  /**
+   * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers our sentries dialled (outbound connections), so publicly reachable
+   */
+  dialled_peer_count?: number;
+  /**
+   * Of those, peers whose ENR advertises another address than the one our sentries connected to
+   */
+  enr_ip_mismatch_peer_count?: number;
+  /**
+   * Peers our discovery crawler also dialled from their ENR
+   */
+  enr_peer_count?: number;
+  /**
+   * Peers that only connected to our sentries and were never dialled
+   */
+  inbound_only_peer_count?: number;
+  /**
+   * Peers our sentries saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers connected to over QUIC
+   */
+  quic_connected_peer_count?: number;
+  /**
+   * Peers advertising a QUIC listen address in identify
+   */
+  quic_listen_peer_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily consensus peer sync status by client, from status exchanges with our libp2p sentries: head and finalized lag against the sentry, fork digest, and block history served (earliest available slot).
+ */
+export type FctPeerSyncStatusByClClientDaily = {
+  /**
+   * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent
+   */
+  client?: string;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day)
+   */
+  finalized_lag_over_1_peer_count?: number;
+  /**
+   * Peers whose head trailed our sentries by at most 1 slot (median over the day)
+   */
+  head_lag_0_1_peer_count?: number;
+  /**
+   * Peers whose head trailed our sentries by 2 to 32 slots
+   */
+  head_lag_2_32_peer_count?: number;
+  /**
+   * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck)
+   */
+  head_lag_over_32_peer_count?: number;
+  /**
+   * Peers serving blocks from genesis (earliest available slot 0)
+   */
+  history_full_peer_count?: number;
+  /**
+   * Peers that sent an earliest available slot (status v2), the population of the history buckets
+   */
+  history_known_peer_count?: number;
+  /**
+   * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day
+   */
+  history_min_peer_count?: number;
+  /**
+   * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis
+   */
+  history_over_min_peer_count?: number;
+  /**
+   * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks
+   */
+  history_under_min_peer_count?: number;
+  /**
+   * Peers whose latest status carried another fork digest than the most common one among all peers that day
+   */
+  other_fork_digest_peer_count?: number;
+  /**
+   * Peers our sentries saw in the day
+   */
+  peer_count?: number;
+  /**
+   * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets
+   */
+  status_peer_count?: number;
   /**
    * Timestamp when the record was last updated
    */
@@ -14039,6 +14933,13 @@ export type GetAdminCbtIncrementalResponse = {
 };
 
 /**
+ * Response for getting a single dim_asn record
+ */
+export type GetDimAsnResponse = {
+  item?: DimAsn;
+};
+
+/**
  * Response for getting a single dim_block_blob_submitter record
  */
 export type GetDimBlockBlobSubmitterResponse = {
@@ -14830,10 +15731,24 @@ export type GetFctContractStorageStateWithExpiryByBlockHourlyResponse = {
 };
 
 /**
+ * Response for getting a single fct_custody_probe_by_asn_daily record
+ */
+export type GetFctCustodyProbeByAsnDailyResponse = {
+  item?: FctCustodyProbeByAsnDaily;
+};
+
+/**
  * Response for getting a single fct_custody_probe_by_client_daily record
  */
 export type GetFctCustodyProbeByClientDailyResponse = {
   item?: FctCustodyProbeByClientDaily;
+};
+
+/**
+ * Response for getting a single fct_custody_probe_by_country_daily record
+ */
+export type GetFctCustodyProbeByCountryDailyResponse = {
+  item?: FctCustodyProbeByCountryDaily;
 };
 
 /**
@@ -15467,10 +16382,45 @@ export type GetFctPayloadBidHighestValueChunked50MsResponse = {
 };
 
 /**
+ * Response for getting a single fct_peer_concentration_cl_daily record
+ */
+export type GetFctPeerConcentrationClDailyResponse = {
+  item?: FctPeerConcentrationClDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_concentration_el_daily record
+ */
+export type GetFctPeerConcentrationElDailyResponse = {
+  item?: FctPeerConcentrationElDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_asn_country_daily record
+ */
+export type GetFctPeerCountByAsnCountryDailyResponse = {
+  item?: FctPeerCountByAsnCountryDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_asn_daily record
+ */
+export type GetFctPeerCountByAsnDailyResponse = {
+  item?: FctPeerCountByAsnDaily;
+};
+
+/**
  * Response for getting a single fct_peer_count_by_cl_client_asn_daily record
  */
 export type GetFctPeerCountByClClientAsnDailyResponse = {
   item?: FctPeerCountByClClientAsnDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_cl_client_city_daily record
+ */
+export type GetFctPeerCountByClClientCityDailyResponse = {
+  item?: FctPeerCountByClClientCityDaily;
 };
 
 /**
@@ -15495,6 +16445,20 @@ export type GetFctPeerCountByClientPairDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_peer_count_by_country_daily record
+ */
+export type GetFctPeerCountByCountryDailyResponse = {
+  item?: FctPeerCountByCountryDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_el_asn_daily record
+ */
+export type GetFctPeerCountByElAsnDailyResponse = {
+  item?: FctPeerCountByElAsnDaily;
+};
+
+/**
  * Response for getting a single fct_peer_count_by_el_client_asn_daily record
  */
 export type GetFctPeerCountByElClientAsnDailyResponse = {
@@ -15516,6 +16480,20 @@ export type GetFctPeerCountByElClientDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_peer_count_by_el_country_daily record
+ */
+export type GetFctPeerCountByElCountryDailyResponse = {
+  item?: FctPeerCountByElCountryDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_count_by_source_daily record
+ */
+export type GetFctPeerCountBySourceDailyResponse = {
+  item?: FctPeerCountBySourceDaily;
+};
+
+/**
  * Response for getting a single fct_peer_fork_readiness_by_cl_client_daily record
  */
 export type GetFctPeerForkReadinessByClClientDailyResponse = {
@@ -15527,6 +16505,13 @@ export type GetFctPeerForkReadinessByClClientDailyResponse = {
  */
 export type GetFctPeerForkReadinessByElClientDailyResponse = {
   item?: FctPeerForkReadinessByElClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_hosting_by_el_client_daily record
+ */
+export type GetFctPeerHostingByElClientDailyResponse = {
+  item?: FctPeerHostingByElClientDaily;
 };
 
 /**
@@ -15548,6 +16533,20 @@ export type GetFctPeerPartialMessageSupportByClientHourlyResponse = {
  */
 export type GetFctPeerProtocolByClClientDailyResponse = {
   item?: FctPeerProtocolByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_reachability_by_cl_client_daily record
+ */
+export type GetFctPeerReachabilityByClClientDailyResponse = {
+  item?: FctPeerReachabilityByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_sync_status_by_cl_client_daily record
+ */
+export type GetFctPeerSyncStatusByClClientDailyResponse = {
+  item?: FctPeerSyncStatusByClClientDaily;
 };
 
 /**
@@ -16199,6 +17198,20 @@ export type GetIntExecutionBlockByDateResponse = {
  */
 export type GetIntExecutionStateSizeByBlockResponse = {
   item?: IntExecutionStateSizeByBlock;
+};
+
+/**
+ * Response for getting a single int_peer_daily_order_by_peer_id record
+ */
+export type GetIntPeerDailyOrderByPeerIdResponse = {
+  item?: IntPeerDailyOrderByPeerId;
+};
+
+/**
+ * Response for getting a single int_peer_daily record
+ */
+export type GetIntPeerDailyResponse = {
+  item?: IntPeerDaily;
 };
 
 /**
@@ -19097,6 +20110,266 @@ export type IntExecutionStateSizeByBlock = {
 };
 
 /**
+ * One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Sentry values win over ENR values. Crawlers, probes, light clients and our own sentries are excluded. Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export type IntPeerDaily = {
+  /**
+   * Version field of the agent as reported, for Caplin its platform field
+   */
+  agent_version?: string;
+  /**
+   * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown
+   */
+  autonomous_system_organization?: string;
+  /**
+   * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city
+   */
+  city?: string;
+  /**
+   * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Continent code of the address, empty when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name of the address, empty when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, empty when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown
+   */
+  custody_group_count?: number | null;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Our sentries dialled the peer (an outbound connection), so it is publicly reachable
+   */
+  dialled?: boolean;
+  /**
+   * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1)
+   */
+  earliest_available_slot?: number | null;
+  /**
+   * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known
+   */
+  enr_ip_mismatch?: boolean | null;
+  /**
+   * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges
+   */
+  finalized_lag_epochs?: number | null;
+  /**
+   * Fork digest of the peer latest status, else of its ENR, empty when neither is known
+   */
+  fork_digest?: string;
+  /**
+   * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges
+   */
+  head_lag_slots?: number | null;
+  /**
+   * The peer connected to our sentries (an inbound connection)
+   */
+  inbound?: boolean;
+  /**
+   * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6
+   */
+  ipv6?: boolean;
+  /**
+   * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies
+   */
+  latency_ms?: number | null;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026)
+   */
+  peer_id?: string;
+  /**
+   * Hash of the peer ID and network, the key shared by the libp2p tables
+   */
+  peer_id_unique_key?: number;
+  /**
+   * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown
+   */
+  provider?: string;
+  /**
+   * Connected to over QUIC
+   */
+  quic_connected?: boolean;
+  /**
+   * Advertises a QUIC listen address in identify
+   */
+  quic_listen?: boolean;
+  /**
+   * Our discovery crawler dialled the peer from its ENR in the day
+   */
+  seen_by_enr?: boolean;
+  /**
+   * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount
+   */
+  seen_by_sentry?: boolean;
+  /**
+   * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs)
+   */
+  served_history_slots?: number | null;
+  /**
+   * Status exchanges with our sentries in the day
+   */
+  status_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Version the agent states (semver with any pre-release suffix), empty when it states none
+   */
+  version?: string;
+};
+
+/**
+ * int_peer_daily ordered by peer ID, for reading one peer across days. One row per consensus peer per day, from our libp2p sentries (heartbeats, identify, metadata and status exchanges) and the discovery crawler (ENRs). Holds no addresses. Residential peers are country-only: city and autonomous system are kept for hosting peers only.
+ */
+export type IntPeerDailyOrderByPeerId = {
+  /**
+   * Version field of the agent as reported, for Caplin its platform field
+   */
+  agent_version?: string;
+  /**
+   * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown
+   */
+  autonomous_system_number?: number;
+  /**
+   * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown
+   */
+  autonomous_system_organization?: string;
+  /**
+   * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city
+   */
+  city?: string;
+  /**
+   * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names
+   */
+  client?: string;
+  /**
+   * Continent code of the address, empty when not geolocated
+   */
+  continent_code?: string;
+  /**
+   * Country name of the address, empty when not geolocated
+   */
+  country?: string;
+  /**
+   * Country code of the address, empty when not geolocated
+   */
+  country_code?: string;
+  /**
+   * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown
+   */
+  custody_group_count?: number | null;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Our sentries dialled the peer (an outbound connection), so it is publicly reachable
+   */
+  dialled?: boolean;
+  /**
+   * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1)
+   */
+  earliest_available_slot?: number | null;
+  /**
+   * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known
+   */
+  enr_ip_mismatch?: boolean | null;
+  /**
+   * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges
+   */
+  finalized_lag_epochs?: number | null;
+  /**
+   * Fork digest of the peer latest status, else of its ENR, empty when neither is known
+   */
+  fork_digest?: string;
+  /**
+   * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges
+   */
+  head_lag_slots?: number | null;
+  /**
+   * The peer connected to our sentries (an inbound connection)
+   */
+  inbound?: boolean;
+  /**
+   * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6
+   */
+  ipv6?: boolean;
+  /**
+   * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies
+   */
+  latency_ms?: number | null;
+  /**
+   * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated
+   */
+  network_type?: string;
+  /**
+   * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026)
+   */
+  peer_id?: string;
+  /**
+   * Hash of the peer ID and network, the key shared by the libp2p tables
+   */
+  peer_id_unique_key?: number;
+  /**
+   * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown
+   */
+  provider?: string;
+  /**
+   * Connected to over QUIC
+   */
+  quic_connected?: boolean;
+  /**
+   * Advertises a QUIC listen address in identify
+   */
+  quic_listen?: boolean;
+  /**
+   * Our discovery crawler dialled the peer from its ENR in the day
+   */
+  seen_by_enr?: boolean;
+  /**
+   * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount
+   */
+  seen_by_sentry?: boolean;
+  /**
+   * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs)
+   */
+  served_history_slots?: number | null;
+  /**
+   * Status exchanges with our sentries in the day
+   */
+  status_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Version the agent states (semver with any pre-release suffix), empty when it states none
+   */
+  version?: string;
+};
+
+/**
  * Rocket Pool Saturn megapool contracts mapped to their node operator
  */
 export type IntRocketpoolMegapool = {
@@ -20416,6 +21689,20 @@ export type ListAdminCbtIncrementalResponse = {
    * The list of admin_cbt_incremental.
    */
   admin_cbt_incremental?: Array<AdminCbtIncremental>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing dim_asn records
+ */
+export type ListDimAsnResponse = {
+  /**
+   * The list of dim_asn.
+   */
+  dim_asn?: Array<DimAsn>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -22005,6 +23292,20 @@ export type ListFctContractStorageStateWithExpiryByBlockHourlyResponse = {
 };
 
 /**
+ * Response for listing fct_custody_probe_by_asn_daily records
+ */
+export type ListFctCustodyProbeByAsnDailyResponse = {
+  /**
+   * The list of fct_custody_probe_by_asn_daily.
+   */
+  fct_custody_probe_by_asn_daily?: Array<FctCustodyProbeByAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_custody_probe_by_client_daily records
  */
 export type ListFctCustodyProbeByClientDailyResponse = {
@@ -22012,6 +23313,20 @@ export type ListFctCustodyProbeByClientDailyResponse = {
    * The list of fct_custody_probe_by_client_daily.
    */
   fct_custody_probe_by_client_daily?: Array<FctCustodyProbeByClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_custody_probe_by_country_daily records
+ */
+export type ListFctCustodyProbeByCountryDailyResponse = {
+  /**
+   * The list of fct_custody_probe_by_country_daily.
+   */
+  fct_custody_probe_by_country_daily?: Array<FctCustodyProbeByCountryDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -23279,6 +24594,62 @@ export type ListFctPayloadBidHighestValueChunked50MsResponse = {
 };
 
 /**
+ * Response for listing fct_peer_concentration_cl_daily records
+ */
+export type ListFctPeerConcentrationClDailyResponse = {
+  /**
+   * The list of fct_peer_concentration_cl_daily.
+   */
+  fct_peer_concentration_cl_daily?: Array<FctPeerConcentrationClDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_concentration_el_daily records
+ */
+export type ListFctPeerConcentrationElDailyResponse = {
+  /**
+   * The list of fct_peer_concentration_el_daily.
+   */
+  fct_peer_concentration_el_daily?: Array<FctPeerConcentrationElDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_asn_country_daily records
+ */
+export type ListFctPeerCountByAsnCountryDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_asn_country_daily.
+   */
+  fct_peer_count_by_asn_country_daily?: Array<FctPeerCountByAsnCountryDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_asn_daily records
+ */
+export type ListFctPeerCountByAsnDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_asn_daily.
+   */
+  fct_peer_count_by_asn_daily?: Array<FctPeerCountByAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_peer_count_by_cl_client_asn_daily records
  */
 export type ListFctPeerCountByClClientAsnDailyResponse = {
@@ -23286,6 +24657,20 @@ export type ListFctPeerCountByClClientAsnDailyResponse = {
    * The list of fct_peer_count_by_cl_client_asn_daily.
    */
   fct_peer_count_by_cl_client_asn_daily?: Array<FctPeerCountByClClientAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_cl_client_city_daily records
+ */
+export type ListFctPeerCountByClClientCityDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_cl_client_city_daily.
+   */
+  fct_peer_count_by_cl_client_city_daily?: Array<FctPeerCountByClClientCityDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -23335,6 +24720,34 @@ export type ListFctPeerCountByClientPairDailyResponse = {
 };
 
 /**
+ * Response for listing fct_peer_count_by_country_daily records
+ */
+export type ListFctPeerCountByCountryDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_country_daily.
+   */
+  fct_peer_count_by_country_daily?: Array<FctPeerCountByCountryDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_el_asn_daily records
+ */
+export type ListFctPeerCountByElAsnDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_el_asn_daily.
+   */
+  fct_peer_count_by_el_asn_daily?: Array<FctPeerCountByElAsnDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_peer_count_by_el_client_asn_daily records
  */
 export type ListFctPeerCountByElClientAsnDailyResponse = {
@@ -23377,6 +24790,34 @@ export type ListFctPeerCountByElClientDailyResponse = {
 };
 
 /**
+ * Response for listing fct_peer_count_by_el_country_daily records
+ */
+export type ListFctPeerCountByElCountryDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_el_country_daily.
+   */
+  fct_peer_count_by_el_country_daily?: Array<FctPeerCountByElCountryDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_count_by_source_daily records
+ */
+export type ListFctPeerCountBySourceDailyResponse = {
+  /**
+   * The list of fct_peer_count_by_source_daily.
+   */
+  fct_peer_count_by_source_daily?: Array<FctPeerCountBySourceDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_peer_fork_readiness_by_cl_client_daily records
  */
 export type ListFctPeerForkReadinessByClClientDailyResponse = {
@@ -23398,6 +24839,20 @@ export type ListFctPeerForkReadinessByElClientDailyResponse = {
    * The list of fct_peer_fork_readiness_by_el_client_daily.
    */
   fct_peer_fork_readiness_by_el_client_daily?: Array<FctPeerForkReadinessByElClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_hosting_by_el_client_daily records
+ */
+export type ListFctPeerHostingByElClientDailyResponse = {
+  /**
+   * The list of fct_peer_hosting_by_el_client_daily.
+   */
+  fct_peer_hosting_by_el_client_daily?: Array<FctPeerHostingByElClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -23440,6 +24895,34 @@ export type ListFctPeerProtocolByClClientDailyResponse = {
    * The list of fct_peer_protocol_by_cl_client_daily.
    */
   fct_peer_protocol_by_cl_client_daily?: Array<FctPeerProtocolByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_reachability_by_cl_client_daily records
+ */
+export type ListFctPeerReachabilityByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_reachability_by_cl_client_daily.
+   */
+  fct_peer_reachability_by_cl_client_daily?: Array<FctPeerReachabilityByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_sync_status_by_cl_client_daily records
+ */
+export type ListFctPeerSyncStatusByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_sync_status_by_cl_client_daily.
+   */
+  fct_peer_sync_status_by_cl_client_daily?: Array<FctPeerSyncStatusByClClientDaily>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -24749,6 +26232,34 @@ export type ListIntExecutionStateSizeByBlockResponse = {
 };
 
 /**
+ * Response for listing int_peer_daily_order_by_peer_id records
+ */
+export type ListIntPeerDailyOrderByPeerIdResponse = {
+  /**
+   * The list of int_peer_daily_order_by_peer_id.
+   */
+  int_peer_daily_order_by_peer_id?: Array<IntPeerDailyOrderByPeerId>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_peer_daily records
+ */
+export type ListIntPeerDailyResponse = {
+  /**
+   * The list of int_peer_daily.
+   */
+  int_peer_daily?: Array<IntPeerDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing int_rocketpool_megapool records
  */
 export type ListIntRocketpoolMegapoolResponse = {
@@ -25505,6 +27016,298 @@ export type AdminCbtIncrementalServiceGetResponses = {
 
 export type AdminCbtIncrementalServiceGetResponse =
   AdminCbtIncrementalServiceGetResponses[keyof AdminCbtIncrementalServiceGetResponses];
+
+export type DimAsnServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 when unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation on the last day it had peers (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: eq)
+     */
+    provider_eq?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: ne)
+     */
+    provider_ne?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: contains)
+     */
+    provider_contains?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: starts_with)
+     */
+    provider_starts_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: ends_with)
+     */
+    provider_ends_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: like)
+     */
+    provider_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: not_like)
+     */
+    provider_not_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: in_values) (comma-separated list)
+     */
+    provider_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix, empty when unknown (filter: not_in_values) (comma-separated list)
+     */
+    provider_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs) (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: eq)
+     */
+    last_seen_date_eq?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: ne)
+     */
+    last_seen_date_ne?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: contains)
+     */
+    last_seen_date_contains?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: starts_with)
+     */
+    last_seen_date_starts_with?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: ends_with)
+     */
+    last_seen_date_ends_with?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: like)
+     */
+    last_seen_date_like?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: not_like)
+     */
+    last_seen_date_not_like?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_in_values?: string;
+    /**
+     * Last day our consensus peers were on the autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_not_in_values?: string;
+    /**
+     * The maximum number of dim_asn to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListDimAsn` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/dim_asn';
+};
+
+export type DimAsnServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimAsnServiceListError = DimAsnServiceListErrors[keyof DimAsnServiceListErrors];
+
+export type DimAsnServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListDimAsnResponse;
+};
+
+export type DimAsnServiceListResponse = DimAsnServiceListResponses[keyof DimAsnServiceListResponses];
+
+export type DimAsnServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Autonomous system number of the address, 0 when unknown
+     */
+    autonomous_system_number: number;
+  };
+  query?: never;
+  url: '/api/v1/dim_asn/{autonomous_system_number}';
+};
+
+export type DimAsnServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type DimAsnServiceGetError = DimAsnServiceGetErrors[keyof DimAsnServiceGetErrors];
+
+export type DimAsnServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetDimAsnResponse;
+};
+
+export type DimAsnServiceGetResponse = DimAsnServiceGetResponses[keyof DimAsnServiceGetResponses];
 
 export type DimBlockBlobSubmitterServiceListData = {
   body?: never;
@@ -79594,6 +81397,514 @@ export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses = 
 export type FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponse =
   FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses[keyof FctContractStorageStateWithExpiryByBlockHourlyServiceGetResponses];
 
+export type FctCustodyProbeByAsnDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 when unknown and for residential autonomous systems with under 3 probed peers in the day (other) (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 probed peers in the day (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers probed in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers probed in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers probed in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers probed in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers probed in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers probed in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers probed in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers probed in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers probed in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers probed in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Custody probes (filter: eq)
+     */
+    probe_count_eq?: number;
+    /**
+     * Custody probes (filter: ne)
+     */
+    probe_count_ne?: number;
+    /**
+     * Custody probes (filter: lt)
+     */
+    probe_count_lt?: number;
+    /**
+     * Custody probes (filter: lte)
+     */
+    probe_count_lte?: number;
+    /**
+     * Custody probes (filter: gt)
+     */
+    probe_count_gt?: number;
+    /**
+     * Custody probes (filter: gte)
+     */
+    probe_count_gte?: number;
+    /**
+     * Custody probes (filter: between_min)
+     */
+    probe_count_between_min?: number;
+    /**
+     * Custody probes (filter: between_max_value)
+     */
+    probe_count_between_max_value?: number;
+    /**
+     * Custody probes (filter: in_values) (comma-separated list)
+     */
+    probe_count_in_values?: string;
+    /**
+     * Custody probes (filter: not_in_values) (comma-separated list)
+     */
+    probe_count_not_in_values?: string;
+    /**
+     * Probes the peer answered with the column (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Probes the peer answered with the column (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Probes the peer answered with the column (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Probes the peer answered with the column (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Probes the peer answered with the column (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Probes the peer answered with the column (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Probes the peer answered with the column (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Probes the peer answered with the column (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Probes the peer answered with the column (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Probes the peer answered with the column (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Probes the peer answered without the column (filter: eq)
+     */
+    missing_count_eq?: number;
+    /**
+     * Probes the peer answered without the column (filter: ne)
+     */
+    missing_count_ne?: number;
+    /**
+     * Probes the peer answered without the column (filter: lt)
+     */
+    missing_count_lt?: number;
+    /**
+     * Probes the peer answered without the column (filter: lte)
+     */
+    missing_count_lte?: number;
+    /**
+     * Probes the peer answered without the column (filter: gt)
+     */
+    missing_count_gt?: number;
+    /**
+     * Probes the peer answered without the column (filter: gte)
+     */
+    missing_count_gte?: number;
+    /**
+     * Probes the peer answered without the column (filter: between_min)
+     */
+    missing_count_between_min?: number;
+    /**
+     * Probes the peer answered without the column (filter: between_max_value)
+     */
+    missing_count_between_max_value?: number;
+    /**
+     * Probes the peer answered without the column (filter: in_values) (comma-separated list)
+     */
+    missing_count_in_values?: string;
+    /**
+     * Probes the peer answered without the column (filter: not_in_values) (comma-separated list)
+     */
+    missing_count_not_in_values?: string;
+    /**
+     * Probes that errored or timed out (filter: eq)
+     */
+    failure_count_eq?: number;
+    /**
+     * Probes that errored or timed out (filter: ne)
+     */
+    failure_count_ne?: number;
+    /**
+     * Probes that errored or timed out (filter: lt)
+     */
+    failure_count_lt?: number;
+    /**
+     * Probes that errored or timed out (filter: lte)
+     */
+    failure_count_lte?: number;
+    /**
+     * Probes that errored or timed out (filter: gt)
+     */
+    failure_count_gt?: number;
+    /**
+     * Probes that errored or timed out (filter: gte)
+     */
+    failure_count_gte?: number;
+    /**
+     * Probes that errored or timed out (filter: between_min)
+     */
+    failure_count_between_min?: number;
+    /**
+     * Probes that errored or timed out (filter: between_max_value)
+     */
+    failure_count_between_max_value?: number;
+    /**
+     * Probes that errored or timed out (filter: in_values) (comma-separated list)
+     */
+    failure_count_in_values?: string;
+    /**
+     * Probes that errored or timed out (filter: not_in_values) (comma-separated list)
+     */
+    failure_count_not_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: eq)
+     */
+    missing_peer_count_eq?: number;
+    /**
+     * Peers with at least one missing probe (filter: ne)
+     */
+    missing_peer_count_ne?: number;
+    /**
+     * Peers with at least one missing probe (filter: lt)
+     */
+    missing_peer_count_lt?: number;
+    /**
+     * Peers with at least one missing probe (filter: lte)
+     */
+    missing_peer_count_lte?: number;
+    /**
+     * Peers with at least one missing probe (filter: gt)
+     */
+    missing_peer_count_gt?: number;
+    /**
+     * Peers with at least one missing probe (filter: gte)
+     */
+    missing_peer_count_gte?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_min)
+     */
+    missing_peer_count_between_min?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_max_value)
+     */
+    missing_peer_count_between_max_value?: number;
+    /**
+     * Peers with at least one missing probe (filter: in_values) (comma-separated list)
+     */
+    missing_peer_count_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: not_in_values) (comma-separated list)
+     */
+    missing_peer_count_not_in_values?: string;
+    /**
+     * Filter response_time_p50_ms using value
+     */
+    response_time_p50_ms_value?: number;
+    /**
+     * Filter response_time_p90_ms using value
+     */
+    response_time_p90_ms_value?: number;
+    /**
+     * The maximum number of fct_custody_probe_by_asn_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctCustodyProbeByAsnDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_custody_probe_by_asn_daily';
+};
+
+export type FctCustodyProbeByAsnDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByAsnDailyServiceListError =
+  FctCustodyProbeByAsnDailyServiceListErrors[keyof FctCustodyProbeByAsnDailyServiceListErrors];
+
+export type FctCustodyProbeByAsnDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctCustodyProbeByAsnDailyResponse;
+};
+
+export type FctCustodyProbeByAsnDailyServiceListResponse =
+  FctCustodyProbeByAsnDailyServiceListResponses[keyof FctCustodyProbeByAsnDailyServiceListResponses];
+
+export type FctCustodyProbeByAsnDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_custody_probe_by_asn_daily/{day_start_date}';
+};
+
+export type FctCustodyProbeByAsnDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByAsnDailyServiceGetError =
+  FctCustodyProbeByAsnDailyServiceGetErrors[keyof FctCustodyProbeByAsnDailyServiceGetErrors];
+
+export type FctCustodyProbeByAsnDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctCustodyProbeByAsnDailyResponse;
+};
+
+export type FctCustodyProbeByAsnDailyServiceGetResponse =
+  FctCustodyProbeByAsnDailyServiceGetResponses[keyof FctCustodyProbeByAsnDailyServiceGetResponses];
+
 export type FctCustodyProbeByClientDailyServiceListData = {
   body?: never;
   path?: never;
@@ -80097,6 +82408,510 @@ export type FctCustodyProbeByClientDailyServiceGetResponses = {
 
 export type FctCustodyProbeByClientDailyServiceGetResponse =
   FctCustodyProbeByClientDailyServiceGetResponses[keyof FctCustodyProbeByClientDailyServiceGetResponses];
+
+export type FctCustodyProbeByCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers probed in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers probed in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers probed in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers probed in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers probed in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers probed in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers probed in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers probed in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers probed in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers probed in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Custody probes (filter: eq)
+     */
+    probe_count_eq?: number;
+    /**
+     * Custody probes (filter: ne)
+     */
+    probe_count_ne?: number;
+    /**
+     * Custody probes (filter: lt)
+     */
+    probe_count_lt?: number;
+    /**
+     * Custody probes (filter: lte)
+     */
+    probe_count_lte?: number;
+    /**
+     * Custody probes (filter: gt)
+     */
+    probe_count_gt?: number;
+    /**
+     * Custody probes (filter: gte)
+     */
+    probe_count_gte?: number;
+    /**
+     * Custody probes (filter: between_min)
+     */
+    probe_count_between_min?: number;
+    /**
+     * Custody probes (filter: between_max_value)
+     */
+    probe_count_between_max_value?: number;
+    /**
+     * Custody probes (filter: in_values) (comma-separated list)
+     */
+    probe_count_in_values?: string;
+    /**
+     * Custody probes (filter: not_in_values) (comma-separated list)
+     */
+    probe_count_not_in_values?: string;
+    /**
+     * Probes the peer answered with the column (filter: eq)
+     */
+    success_count_eq?: number;
+    /**
+     * Probes the peer answered with the column (filter: ne)
+     */
+    success_count_ne?: number;
+    /**
+     * Probes the peer answered with the column (filter: lt)
+     */
+    success_count_lt?: number;
+    /**
+     * Probes the peer answered with the column (filter: lte)
+     */
+    success_count_lte?: number;
+    /**
+     * Probes the peer answered with the column (filter: gt)
+     */
+    success_count_gt?: number;
+    /**
+     * Probes the peer answered with the column (filter: gte)
+     */
+    success_count_gte?: number;
+    /**
+     * Probes the peer answered with the column (filter: between_min)
+     */
+    success_count_between_min?: number;
+    /**
+     * Probes the peer answered with the column (filter: between_max_value)
+     */
+    success_count_between_max_value?: number;
+    /**
+     * Probes the peer answered with the column (filter: in_values) (comma-separated list)
+     */
+    success_count_in_values?: string;
+    /**
+     * Probes the peer answered with the column (filter: not_in_values) (comma-separated list)
+     */
+    success_count_not_in_values?: string;
+    /**
+     * Probes the peer answered without the column (filter: eq)
+     */
+    missing_count_eq?: number;
+    /**
+     * Probes the peer answered without the column (filter: ne)
+     */
+    missing_count_ne?: number;
+    /**
+     * Probes the peer answered without the column (filter: lt)
+     */
+    missing_count_lt?: number;
+    /**
+     * Probes the peer answered without the column (filter: lte)
+     */
+    missing_count_lte?: number;
+    /**
+     * Probes the peer answered without the column (filter: gt)
+     */
+    missing_count_gt?: number;
+    /**
+     * Probes the peer answered without the column (filter: gte)
+     */
+    missing_count_gte?: number;
+    /**
+     * Probes the peer answered without the column (filter: between_min)
+     */
+    missing_count_between_min?: number;
+    /**
+     * Probes the peer answered without the column (filter: between_max_value)
+     */
+    missing_count_between_max_value?: number;
+    /**
+     * Probes the peer answered without the column (filter: in_values) (comma-separated list)
+     */
+    missing_count_in_values?: string;
+    /**
+     * Probes the peer answered without the column (filter: not_in_values) (comma-separated list)
+     */
+    missing_count_not_in_values?: string;
+    /**
+     * Probes that errored or timed out (filter: eq)
+     */
+    failure_count_eq?: number;
+    /**
+     * Probes that errored or timed out (filter: ne)
+     */
+    failure_count_ne?: number;
+    /**
+     * Probes that errored or timed out (filter: lt)
+     */
+    failure_count_lt?: number;
+    /**
+     * Probes that errored or timed out (filter: lte)
+     */
+    failure_count_lte?: number;
+    /**
+     * Probes that errored or timed out (filter: gt)
+     */
+    failure_count_gt?: number;
+    /**
+     * Probes that errored or timed out (filter: gte)
+     */
+    failure_count_gte?: number;
+    /**
+     * Probes that errored or timed out (filter: between_min)
+     */
+    failure_count_between_min?: number;
+    /**
+     * Probes that errored or timed out (filter: between_max_value)
+     */
+    failure_count_between_max_value?: number;
+    /**
+     * Probes that errored or timed out (filter: in_values) (comma-separated list)
+     */
+    failure_count_in_values?: string;
+    /**
+     * Probes that errored or timed out (filter: not_in_values) (comma-separated list)
+     */
+    failure_count_not_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: eq)
+     */
+    missing_peer_count_eq?: number;
+    /**
+     * Peers with at least one missing probe (filter: ne)
+     */
+    missing_peer_count_ne?: number;
+    /**
+     * Peers with at least one missing probe (filter: lt)
+     */
+    missing_peer_count_lt?: number;
+    /**
+     * Peers with at least one missing probe (filter: lte)
+     */
+    missing_peer_count_lte?: number;
+    /**
+     * Peers with at least one missing probe (filter: gt)
+     */
+    missing_peer_count_gt?: number;
+    /**
+     * Peers with at least one missing probe (filter: gte)
+     */
+    missing_peer_count_gte?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_min)
+     */
+    missing_peer_count_between_min?: number;
+    /**
+     * Peers with at least one missing probe (filter: between_max_value)
+     */
+    missing_peer_count_between_max_value?: number;
+    /**
+     * Peers with at least one missing probe (filter: in_values) (comma-separated list)
+     */
+    missing_peer_count_in_values?: string;
+    /**
+     * Peers with at least one missing probe (filter: not_in_values) (comma-separated list)
+     */
+    missing_peer_count_not_in_values?: string;
+    /**
+     * Filter response_time_p50_ms using value
+     */
+    response_time_p50_ms_value?: number;
+    /**
+     * Filter response_time_p90_ms using value
+     */
+    response_time_p90_ms_value?: number;
+    /**
+     * The maximum number of fct_custody_probe_by_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctCustodyProbeByCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_custody_probe_by_country_daily';
+};
+
+export type FctCustodyProbeByCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByCountryDailyServiceListError =
+  FctCustodyProbeByCountryDailyServiceListErrors[keyof FctCustodyProbeByCountryDailyServiceListErrors];
+
+export type FctCustodyProbeByCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctCustodyProbeByCountryDailyResponse;
+};
+
+export type FctCustodyProbeByCountryDailyServiceListResponse =
+  FctCustodyProbeByCountryDailyServiceListResponses[keyof FctCustodyProbeByCountryDailyServiceListResponses];
+
+export type FctCustodyProbeByCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_custody_probe_by_country_daily/{day_start_date}';
+};
+
+export type FctCustodyProbeByCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctCustodyProbeByCountryDailyServiceGetError =
+  FctCustodyProbeByCountryDailyServiceGetErrors[keyof FctCustodyProbeByCountryDailyServiceGetErrors];
+
+export type FctCustodyProbeByCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctCustodyProbeByCountryDailyResponse;
+};
+
+export type FctCustodyProbeByCountryDailyServiceGetResponse =
+  FctCustodyProbeByCountryDailyServiceGetResponses[keyof FctCustodyProbeByCountryDailyServiceGetResponses];
 
 export type FctCustodyProbeBySlotAgeDailyServiceListData = {
   body?: never;
@@ -129822,6 +132637,3530 @@ export type FctPayloadBidHighestValueChunked50MsServiceGetResponses = {
 export type FctPayloadBidHighestValueChunked50MsServiceGetResponse =
   FctPayloadBidHighestValueChunked50MsServiceGetResponses[keyof FctPayloadBidHighestValueChunked50MsServiceGetResponses];
 
+export type FctPeerConcentrationClDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: eq)
+     */
+    located_peer_count_eq?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: ne)
+     */
+    located_peer_count_ne?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lt)
+     */
+    located_peer_count_lt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lte)
+     */
+    located_peer_count_lte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gt)
+     */
+    located_peer_count_gt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gte)
+     */
+    located_peer_count_gte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_min)
+     */
+    located_peer_count_between_min?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_max_value)
+     */
+    located_peer_count_between_max_value?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: in_values) (comma-separated list)
+     */
+    located_peer_count_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: not_in_values) (comma-separated list)
+     */
+    located_peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: eq)
+     */
+    ipv6_peer_count_eq?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: ne)
+     */
+    ipv6_peer_count_ne?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: lt)
+     */
+    ipv6_peer_count_lt?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: lte)
+     */
+    ipv6_peer_count_lte?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: gt)
+     */
+    ipv6_peer_count_gt?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: gte)
+     */
+    ipv6_peer_count_gte?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: between_min)
+     */
+    ipv6_peer_count_between_min?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: between_max_value)
+     */
+    ipv6_peer_count_between_max_value?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: in_values) (comma-separated list)
+     */
+    ipv6_peer_count_in_values?: string;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: not_in_values) (comma-separated list)
+     */
+    ipv6_peer_count_not_in_values?: string;
+    /**
+     * Countries with peers (filter: eq)
+     */
+    country_count_eq?: number;
+    /**
+     * Countries with peers (filter: ne)
+     */
+    country_count_ne?: number;
+    /**
+     * Countries with peers (filter: lt)
+     */
+    country_count_lt?: number;
+    /**
+     * Countries with peers (filter: lte)
+     */
+    country_count_lte?: number;
+    /**
+     * Countries with peers (filter: gt)
+     */
+    country_count_gt?: number;
+    /**
+     * Countries with peers (filter: gte)
+     */
+    country_count_gte?: number;
+    /**
+     * Countries with peers (filter: between_min)
+     */
+    country_count_between_min?: number;
+    /**
+     * Countries with peers (filter: between_max_value)
+     */
+    country_count_between_max_value?: number;
+    /**
+     * Countries with peers (filter: in_values) (comma-separated list)
+     */
+    country_count_in_values?: string;
+    /**
+     * Countries with peers (filter: not_in_values) (comma-separated list)
+     */
+    country_count_not_in_values?: string;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: eq)
+     */
+    third_country_count_eq?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: ne)
+     */
+    third_country_count_ne?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: lt)
+     */
+    third_country_count_lt?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: lte)
+     */
+    third_country_count_lte?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: gt)
+     */
+    third_country_count_gt?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: gte)
+     */
+    third_country_count_gte?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: between_min)
+     */
+    third_country_count_between_min?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: between_max_value)
+     */
+    third_country_count_between_max_value?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: in_values) (comma-separated list)
+     */
+    third_country_count_in_values?: string;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: not_in_values) (comma-separated list)
+     */
+    third_country_count_not_in_values?: string;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: eq)
+     */
+    half_country_count_eq?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: ne)
+     */
+    half_country_count_ne?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: lt)
+     */
+    half_country_count_lt?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: lte)
+     */
+    half_country_count_lte?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: gt)
+     */
+    half_country_count_gt?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: gte)
+     */
+    half_country_count_gte?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: between_min)
+     */
+    half_country_count_between_min?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: between_max_value)
+     */
+    half_country_count_between_max_value?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: in_values) (comma-separated list)
+     */
+    half_country_count_in_values?: string;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: not_in_values) (comma-separated list)
+     */
+    half_country_count_not_in_values?: string;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: eq)
+     */
+    autonomous_system_count_eq?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: ne)
+     */
+    autonomous_system_count_ne?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: lt)
+     */
+    autonomous_system_count_lt?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: lte)
+     */
+    autonomous_system_count_lte?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: gt)
+     */
+    autonomous_system_count_gt?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: gte)
+     */
+    autonomous_system_count_gte?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: between_min)
+     */
+    autonomous_system_count_between_min?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: between_max_value)
+     */
+    autonomous_system_count_between_max_value?: number;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_count_in_values?: string;
+    /**
+     * Autonomous systems with peers, counting each residential system folded into autonomous system 0 (other) on its own (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_count_not_in_values?: string;
+    /**
+     * Peers in the largest autonomous system (filter: eq)
+     */
+    top_1_asn_peer_count_eq?: number;
+    /**
+     * Peers in the largest autonomous system (filter: ne)
+     */
+    top_1_asn_peer_count_ne?: number;
+    /**
+     * Peers in the largest autonomous system (filter: lt)
+     */
+    top_1_asn_peer_count_lt?: number;
+    /**
+     * Peers in the largest autonomous system (filter: lte)
+     */
+    top_1_asn_peer_count_lte?: number;
+    /**
+     * Peers in the largest autonomous system (filter: gt)
+     */
+    top_1_asn_peer_count_gt?: number;
+    /**
+     * Peers in the largest autonomous system (filter: gte)
+     */
+    top_1_asn_peer_count_gte?: number;
+    /**
+     * Peers in the largest autonomous system (filter: between_min)
+     */
+    top_1_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the largest autonomous system (filter: between_max_value)
+     */
+    top_1_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the largest autonomous system (filter: in_values) (comma-separated list)
+     */
+    top_1_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the largest autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    top_1_asn_peer_count_not_in_values?: string;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: eq)
+     */
+    top_5_asn_peer_count_eq?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: ne)
+     */
+    top_5_asn_peer_count_ne?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: lt)
+     */
+    top_5_asn_peer_count_lt?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: lte)
+     */
+    top_5_asn_peer_count_lte?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: gt)
+     */
+    top_5_asn_peer_count_gt?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: gte)
+     */
+    top_5_asn_peer_count_gte?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: between_min)
+     */
+    top_5_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: between_max_value)
+     */
+    top_5_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: in_values) (comma-separated list)
+     */
+    top_5_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: not_in_values) (comma-separated list)
+     */
+    top_5_asn_peer_count_not_in_values?: string;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: eq)
+     */
+    top_10_asn_peer_count_eq?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: ne)
+     */
+    top_10_asn_peer_count_ne?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: lt)
+     */
+    top_10_asn_peer_count_lt?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: lte)
+     */
+    top_10_asn_peer_count_lte?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: gt)
+     */
+    top_10_asn_peer_count_gt?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: gte)
+     */
+    top_10_asn_peer_count_gte?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: between_min)
+     */
+    top_10_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: between_max_value)
+     */
+    top_10_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: in_values) (comma-separated list)
+     */
+    top_10_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: not_in_values) (comma-separated list)
+     */
+    top_10_asn_peer_count_not_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: eq)
+     */
+    third_asn_count_eq?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: ne)
+     */
+    third_asn_count_ne?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: lt)
+     */
+    third_asn_count_lt?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: lte)
+     */
+    third_asn_count_lte?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: gt)
+     */
+    third_asn_count_gt?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: gte)
+     */
+    third_asn_count_gte?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: between_min)
+     */
+    third_asn_count_between_min?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: between_max_value)
+     */
+    third_asn_count_between_max_value?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: in_values) (comma-separated list)
+     */
+    third_asn_count_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    third_asn_count_not_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: eq)
+     */
+    half_asn_count_eq?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: ne)
+     */
+    half_asn_count_ne?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: lt)
+     */
+    half_asn_count_lt?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: lte)
+     */
+    half_asn_count_lte?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: gt)
+     */
+    half_asn_count_gt?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: gte)
+     */
+    half_asn_count_gte?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: between_min)
+     */
+    half_asn_count_between_min?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: between_max_value)
+     */
+    half_asn_count_between_max_value?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: in_values) (comma-separated list)
+     */
+    half_asn_count_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    half_asn_count_not_in_values?: string;
+    /**
+     * Peers in Africa (AF) (filter: eq)
+     */
+    africa_peer_count_eq?: number;
+    /**
+     * Peers in Africa (AF) (filter: ne)
+     */
+    africa_peer_count_ne?: number;
+    /**
+     * Peers in Africa (AF) (filter: lt)
+     */
+    africa_peer_count_lt?: number;
+    /**
+     * Peers in Africa (AF) (filter: lte)
+     */
+    africa_peer_count_lte?: number;
+    /**
+     * Peers in Africa (AF) (filter: gt)
+     */
+    africa_peer_count_gt?: number;
+    /**
+     * Peers in Africa (AF) (filter: gte)
+     */
+    africa_peer_count_gte?: number;
+    /**
+     * Peers in Africa (AF) (filter: between_min)
+     */
+    africa_peer_count_between_min?: number;
+    /**
+     * Peers in Africa (AF) (filter: between_max_value)
+     */
+    africa_peer_count_between_max_value?: number;
+    /**
+     * Peers in Africa (AF) (filter: in_values) (comma-separated list)
+     */
+    africa_peer_count_in_values?: string;
+    /**
+     * Peers in Africa (AF) (filter: not_in_values) (comma-separated list)
+     */
+    africa_peer_count_not_in_values?: string;
+    /**
+     * Peers in Antarctica (AN) (filter: eq)
+     */
+    antarctica_peer_count_eq?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: ne)
+     */
+    antarctica_peer_count_ne?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: lt)
+     */
+    antarctica_peer_count_lt?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: lte)
+     */
+    antarctica_peer_count_lte?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: gt)
+     */
+    antarctica_peer_count_gt?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: gte)
+     */
+    antarctica_peer_count_gte?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: between_min)
+     */
+    antarctica_peer_count_between_min?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: between_max_value)
+     */
+    antarctica_peer_count_between_max_value?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: in_values) (comma-separated list)
+     */
+    antarctica_peer_count_in_values?: string;
+    /**
+     * Peers in Antarctica (AN) (filter: not_in_values) (comma-separated list)
+     */
+    antarctica_peer_count_not_in_values?: string;
+    /**
+     * Peers in Asia (AS) (filter: eq)
+     */
+    asia_peer_count_eq?: number;
+    /**
+     * Peers in Asia (AS) (filter: ne)
+     */
+    asia_peer_count_ne?: number;
+    /**
+     * Peers in Asia (AS) (filter: lt)
+     */
+    asia_peer_count_lt?: number;
+    /**
+     * Peers in Asia (AS) (filter: lte)
+     */
+    asia_peer_count_lte?: number;
+    /**
+     * Peers in Asia (AS) (filter: gt)
+     */
+    asia_peer_count_gt?: number;
+    /**
+     * Peers in Asia (AS) (filter: gte)
+     */
+    asia_peer_count_gte?: number;
+    /**
+     * Peers in Asia (AS) (filter: between_min)
+     */
+    asia_peer_count_between_min?: number;
+    /**
+     * Peers in Asia (AS) (filter: between_max_value)
+     */
+    asia_peer_count_between_max_value?: number;
+    /**
+     * Peers in Asia (AS) (filter: in_values) (comma-separated list)
+     */
+    asia_peer_count_in_values?: string;
+    /**
+     * Peers in Asia (AS) (filter: not_in_values) (comma-separated list)
+     */
+    asia_peer_count_not_in_values?: string;
+    /**
+     * Peers in Europe (EU) (filter: eq)
+     */
+    europe_peer_count_eq?: number;
+    /**
+     * Peers in Europe (EU) (filter: ne)
+     */
+    europe_peer_count_ne?: number;
+    /**
+     * Peers in Europe (EU) (filter: lt)
+     */
+    europe_peer_count_lt?: number;
+    /**
+     * Peers in Europe (EU) (filter: lte)
+     */
+    europe_peer_count_lte?: number;
+    /**
+     * Peers in Europe (EU) (filter: gt)
+     */
+    europe_peer_count_gt?: number;
+    /**
+     * Peers in Europe (EU) (filter: gte)
+     */
+    europe_peer_count_gte?: number;
+    /**
+     * Peers in Europe (EU) (filter: between_min)
+     */
+    europe_peer_count_between_min?: number;
+    /**
+     * Peers in Europe (EU) (filter: between_max_value)
+     */
+    europe_peer_count_between_max_value?: number;
+    /**
+     * Peers in Europe (EU) (filter: in_values) (comma-separated list)
+     */
+    europe_peer_count_in_values?: string;
+    /**
+     * Peers in Europe (EU) (filter: not_in_values) (comma-separated list)
+     */
+    europe_peer_count_not_in_values?: string;
+    /**
+     * Peers in North America (NA) (filter: eq)
+     */
+    north_america_peer_count_eq?: number;
+    /**
+     * Peers in North America (NA) (filter: ne)
+     */
+    north_america_peer_count_ne?: number;
+    /**
+     * Peers in North America (NA) (filter: lt)
+     */
+    north_america_peer_count_lt?: number;
+    /**
+     * Peers in North America (NA) (filter: lte)
+     */
+    north_america_peer_count_lte?: number;
+    /**
+     * Peers in North America (NA) (filter: gt)
+     */
+    north_america_peer_count_gt?: number;
+    /**
+     * Peers in North America (NA) (filter: gte)
+     */
+    north_america_peer_count_gte?: number;
+    /**
+     * Peers in North America (NA) (filter: between_min)
+     */
+    north_america_peer_count_between_min?: number;
+    /**
+     * Peers in North America (NA) (filter: between_max_value)
+     */
+    north_america_peer_count_between_max_value?: number;
+    /**
+     * Peers in North America (NA) (filter: in_values) (comma-separated list)
+     */
+    north_america_peer_count_in_values?: string;
+    /**
+     * Peers in North America (NA) (filter: not_in_values) (comma-separated list)
+     */
+    north_america_peer_count_not_in_values?: string;
+    /**
+     * Peers in Oceania (OC) (filter: eq)
+     */
+    oceania_peer_count_eq?: number;
+    /**
+     * Peers in Oceania (OC) (filter: ne)
+     */
+    oceania_peer_count_ne?: number;
+    /**
+     * Peers in Oceania (OC) (filter: lt)
+     */
+    oceania_peer_count_lt?: number;
+    /**
+     * Peers in Oceania (OC) (filter: lte)
+     */
+    oceania_peer_count_lte?: number;
+    /**
+     * Peers in Oceania (OC) (filter: gt)
+     */
+    oceania_peer_count_gt?: number;
+    /**
+     * Peers in Oceania (OC) (filter: gte)
+     */
+    oceania_peer_count_gte?: number;
+    /**
+     * Peers in Oceania (OC) (filter: between_min)
+     */
+    oceania_peer_count_between_min?: number;
+    /**
+     * Peers in Oceania (OC) (filter: between_max_value)
+     */
+    oceania_peer_count_between_max_value?: number;
+    /**
+     * Peers in Oceania (OC) (filter: in_values) (comma-separated list)
+     */
+    oceania_peer_count_in_values?: string;
+    /**
+     * Peers in Oceania (OC) (filter: not_in_values) (comma-separated list)
+     */
+    oceania_peer_count_not_in_values?: string;
+    /**
+     * Peers in South America (SA) (filter: eq)
+     */
+    south_america_peer_count_eq?: number;
+    /**
+     * Peers in South America (SA) (filter: ne)
+     */
+    south_america_peer_count_ne?: number;
+    /**
+     * Peers in South America (SA) (filter: lt)
+     */
+    south_america_peer_count_lt?: number;
+    /**
+     * Peers in South America (SA) (filter: lte)
+     */
+    south_america_peer_count_lte?: number;
+    /**
+     * Peers in South America (SA) (filter: gt)
+     */
+    south_america_peer_count_gt?: number;
+    /**
+     * Peers in South America (SA) (filter: gte)
+     */
+    south_america_peer_count_gte?: number;
+    /**
+     * Peers in South America (SA) (filter: between_min)
+     */
+    south_america_peer_count_between_min?: number;
+    /**
+     * Peers in South America (SA) (filter: between_max_value)
+     */
+    south_america_peer_count_between_max_value?: number;
+    /**
+     * Peers in South America (SA) (filter: in_values) (comma-separated list)
+     */
+    south_america_peer_count_in_values?: string;
+    /**
+     * Peers in South America (SA) (filter: not_in_values) (comma-separated list)
+     */
+    south_america_peer_count_not_in_values?: string;
+    /**
+     * Peers not geolocated to a continent (filter: eq)
+     */
+    unknown_continent_peer_count_eq?: number;
+    /**
+     * Peers not geolocated to a continent (filter: ne)
+     */
+    unknown_continent_peer_count_ne?: number;
+    /**
+     * Peers not geolocated to a continent (filter: lt)
+     */
+    unknown_continent_peer_count_lt?: number;
+    /**
+     * Peers not geolocated to a continent (filter: lte)
+     */
+    unknown_continent_peer_count_lte?: number;
+    /**
+     * Peers not geolocated to a continent (filter: gt)
+     */
+    unknown_continent_peer_count_gt?: number;
+    /**
+     * Peers not geolocated to a continent (filter: gte)
+     */
+    unknown_continent_peer_count_gte?: number;
+    /**
+     * Peers not geolocated to a continent (filter: between_min)
+     */
+    unknown_continent_peer_count_between_min?: number;
+    /**
+     * Peers not geolocated to a continent (filter: between_max_value)
+     */
+    unknown_continent_peer_count_between_max_value?: number;
+    /**
+     * Peers not geolocated to a continent (filter: in_values) (comma-separated list)
+     */
+    unknown_continent_peer_count_in_values?: string;
+    /**
+     * Peers not geolocated to a continent (filter: not_in_values) (comma-separated list)
+     */
+    unknown_continent_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_concentration_cl_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerConcentrationClDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_concentration_cl_daily';
+};
+
+export type FctPeerConcentrationClDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerConcentrationClDailyServiceListError =
+  FctPeerConcentrationClDailyServiceListErrors[keyof FctPeerConcentrationClDailyServiceListErrors];
+
+export type FctPeerConcentrationClDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerConcentrationClDailyResponse;
+};
+
+export type FctPeerConcentrationClDailyServiceListResponse =
+  FctPeerConcentrationClDailyServiceListResponses[keyof FctPeerConcentrationClDailyServiceListResponses];
+
+export type FctPeerConcentrationClDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_concentration_cl_daily/{day_start_date}';
+};
+
+export type FctPeerConcentrationClDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerConcentrationClDailyServiceGetError =
+  FctPeerConcentrationClDailyServiceGetErrors[keyof FctPeerConcentrationClDailyServiceGetErrors];
+
+export type FctPeerConcentrationClDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerConcentrationClDailyResponse;
+};
+
+export type FctPeerConcentrationClDailyServiceGetResponse =
+  FctPeerConcentrationClDailyServiceGetResponses[keyof FctPeerConcentrationClDailyServiceGetResponses];
+
+export type FctPeerConcentrationElDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Execution nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Execution nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Execution nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Execution nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Execution nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Execution nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Execution nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Execution nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Execution nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Execution nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: eq)
+     */
+    located_peer_count_eq?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: ne)
+     */
+    located_peer_count_ne?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lt)
+     */
+    located_peer_count_lt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lte)
+     */
+    located_peer_count_lte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gt)
+     */
+    located_peer_count_gt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gte)
+     */
+    located_peer_count_gte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_min)
+     */
+    located_peer_count_between_min?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_max_value)
+     */
+    located_peer_count_between_max_value?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: in_values) (comma-separated list)
+     */
+    located_peer_count_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: not_in_values) (comma-separated list)
+     */
+    located_peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: eq)
+     */
+    ipv6_peer_count_eq?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: ne)
+     */
+    ipv6_peer_count_ne?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: lt)
+     */
+    ipv6_peer_count_lt?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: lte)
+     */
+    ipv6_peer_count_lte?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: gt)
+     */
+    ipv6_peer_count_gt?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: gte)
+     */
+    ipv6_peer_count_gte?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: between_min)
+     */
+    ipv6_peer_count_between_min?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: between_max_value)
+     */
+    ipv6_peer_count_between_max_value?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: in_values) (comma-separated list)
+     */
+    ipv6_peer_count_in_values?: string;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: not_in_values) (comma-separated list)
+     */
+    ipv6_peer_count_not_in_values?: string;
+    /**
+     * Countries with peers (filter: eq)
+     */
+    country_count_eq?: number;
+    /**
+     * Countries with peers (filter: ne)
+     */
+    country_count_ne?: number;
+    /**
+     * Countries with peers (filter: lt)
+     */
+    country_count_lt?: number;
+    /**
+     * Countries with peers (filter: lte)
+     */
+    country_count_lte?: number;
+    /**
+     * Countries with peers (filter: gt)
+     */
+    country_count_gt?: number;
+    /**
+     * Countries with peers (filter: gte)
+     */
+    country_count_gte?: number;
+    /**
+     * Countries with peers (filter: between_min)
+     */
+    country_count_between_min?: number;
+    /**
+     * Countries with peers (filter: between_max_value)
+     */
+    country_count_between_max_value?: number;
+    /**
+     * Countries with peers (filter: in_values) (comma-separated list)
+     */
+    country_count_in_values?: string;
+    /**
+     * Countries with peers (filter: not_in_values) (comma-separated list)
+     */
+    country_count_not_in_values?: string;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: eq)
+     */
+    third_country_count_eq?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: ne)
+     */
+    third_country_count_ne?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: lt)
+     */
+    third_country_count_lt?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: lte)
+     */
+    third_country_count_lte?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: gt)
+     */
+    third_country_count_gt?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: gte)
+     */
+    third_country_count_gte?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: between_min)
+     */
+    third_country_count_between_min?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: between_max_value)
+     */
+    third_country_count_between_max_value?: number;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: in_values) (comma-separated list)
+     */
+    third_country_count_in_values?: string;
+    /**
+     * Fewest countries that hold a third of the peers with a known country (filter: not_in_values) (comma-separated list)
+     */
+    third_country_count_not_in_values?: string;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: eq)
+     */
+    half_country_count_eq?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: ne)
+     */
+    half_country_count_ne?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: lt)
+     */
+    half_country_count_lt?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: lte)
+     */
+    half_country_count_lte?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: gt)
+     */
+    half_country_count_gt?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: gte)
+     */
+    half_country_count_gte?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: between_min)
+     */
+    half_country_count_between_min?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: between_max_value)
+     */
+    half_country_count_between_max_value?: number;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: in_values) (comma-separated list)
+     */
+    half_country_count_in_values?: string;
+    /**
+     * Fewest countries that hold half of the peers with a known country (filter: not_in_values) (comma-separated list)
+     */
+    half_country_count_not_in_values?: string;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: eq)
+     */
+    autonomous_system_count_eq?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: ne)
+     */
+    autonomous_system_count_ne?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: lt)
+     */
+    autonomous_system_count_lt?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: lte)
+     */
+    autonomous_system_count_lte?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: gt)
+     */
+    autonomous_system_count_gt?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: gte)
+     */
+    autonomous_system_count_gte?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: between_min)
+     */
+    autonomous_system_count_between_min?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: between_max_value)
+     */
+    autonomous_system_count_between_max_value?: number;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_count_in_values?: string;
+    /**
+     * Autonomous systems with nodes, counting each residential system folded into autonomous system 0 (other) on its own (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_count_not_in_values?: string;
+    /**
+     * Peers in the largest autonomous system (filter: eq)
+     */
+    top_1_asn_peer_count_eq?: number;
+    /**
+     * Peers in the largest autonomous system (filter: ne)
+     */
+    top_1_asn_peer_count_ne?: number;
+    /**
+     * Peers in the largest autonomous system (filter: lt)
+     */
+    top_1_asn_peer_count_lt?: number;
+    /**
+     * Peers in the largest autonomous system (filter: lte)
+     */
+    top_1_asn_peer_count_lte?: number;
+    /**
+     * Peers in the largest autonomous system (filter: gt)
+     */
+    top_1_asn_peer_count_gt?: number;
+    /**
+     * Peers in the largest autonomous system (filter: gte)
+     */
+    top_1_asn_peer_count_gte?: number;
+    /**
+     * Peers in the largest autonomous system (filter: between_min)
+     */
+    top_1_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the largest autonomous system (filter: between_max_value)
+     */
+    top_1_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the largest autonomous system (filter: in_values) (comma-separated list)
+     */
+    top_1_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the largest autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    top_1_asn_peer_count_not_in_values?: string;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: eq)
+     */
+    top_5_asn_peer_count_eq?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: ne)
+     */
+    top_5_asn_peer_count_ne?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: lt)
+     */
+    top_5_asn_peer_count_lt?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: lte)
+     */
+    top_5_asn_peer_count_lte?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: gt)
+     */
+    top_5_asn_peer_count_gt?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: gte)
+     */
+    top_5_asn_peer_count_gte?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: between_min)
+     */
+    top_5_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: between_max_value)
+     */
+    top_5_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: in_values) (comma-separated list)
+     */
+    top_5_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the 5 largest autonomous systems (filter: not_in_values) (comma-separated list)
+     */
+    top_5_asn_peer_count_not_in_values?: string;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: eq)
+     */
+    top_10_asn_peer_count_eq?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: ne)
+     */
+    top_10_asn_peer_count_ne?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: lt)
+     */
+    top_10_asn_peer_count_lt?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: lte)
+     */
+    top_10_asn_peer_count_lte?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: gt)
+     */
+    top_10_asn_peer_count_gt?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: gte)
+     */
+    top_10_asn_peer_count_gte?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: between_min)
+     */
+    top_10_asn_peer_count_between_min?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: between_max_value)
+     */
+    top_10_asn_peer_count_between_max_value?: number;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: in_values) (comma-separated list)
+     */
+    top_10_asn_peer_count_in_values?: string;
+    /**
+     * Peers in the 10 largest autonomous systems (filter: not_in_values) (comma-separated list)
+     */
+    top_10_asn_peer_count_not_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: eq)
+     */
+    third_asn_count_eq?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: ne)
+     */
+    third_asn_count_ne?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: lt)
+     */
+    third_asn_count_lt?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: lte)
+     */
+    third_asn_count_lte?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: gt)
+     */
+    third_asn_count_gt?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: gte)
+     */
+    third_asn_count_gte?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: between_min)
+     */
+    third_asn_count_between_min?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: between_max_value)
+     */
+    third_asn_count_between_max_value?: number;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: in_values) (comma-separated list)
+     */
+    third_asn_count_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold a third of the peers with a known autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    third_asn_count_not_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: eq)
+     */
+    half_asn_count_eq?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: ne)
+     */
+    half_asn_count_ne?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: lt)
+     */
+    half_asn_count_lt?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: lte)
+     */
+    half_asn_count_lte?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: gt)
+     */
+    half_asn_count_gt?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: gte)
+     */
+    half_asn_count_gte?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: between_min)
+     */
+    half_asn_count_between_min?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: between_max_value)
+     */
+    half_asn_count_between_max_value?: number;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: in_values) (comma-separated list)
+     */
+    half_asn_count_in_values?: string;
+    /**
+     * Fewest autonomous systems that hold half of the peers with a known autonomous system (filter: not_in_values) (comma-separated list)
+     */
+    half_asn_count_not_in_values?: string;
+    /**
+     * Peers in Africa (AF) (filter: eq)
+     */
+    africa_peer_count_eq?: number;
+    /**
+     * Peers in Africa (AF) (filter: ne)
+     */
+    africa_peer_count_ne?: number;
+    /**
+     * Peers in Africa (AF) (filter: lt)
+     */
+    africa_peer_count_lt?: number;
+    /**
+     * Peers in Africa (AF) (filter: lte)
+     */
+    africa_peer_count_lte?: number;
+    /**
+     * Peers in Africa (AF) (filter: gt)
+     */
+    africa_peer_count_gt?: number;
+    /**
+     * Peers in Africa (AF) (filter: gte)
+     */
+    africa_peer_count_gte?: number;
+    /**
+     * Peers in Africa (AF) (filter: between_min)
+     */
+    africa_peer_count_between_min?: number;
+    /**
+     * Peers in Africa (AF) (filter: between_max_value)
+     */
+    africa_peer_count_between_max_value?: number;
+    /**
+     * Peers in Africa (AF) (filter: in_values) (comma-separated list)
+     */
+    africa_peer_count_in_values?: string;
+    /**
+     * Peers in Africa (AF) (filter: not_in_values) (comma-separated list)
+     */
+    africa_peer_count_not_in_values?: string;
+    /**
+     * Peers in Antarctica (AN) (filter: eq)
+     */
+    antarctica_peer_count_eq?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: ne)
+     */
+    antarctica_peer_count_ne?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: lt)
+     */
+    antarctica_peer_count_lt?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: lte)
+     */
+    antarctica_peer_count_lte?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: gt)
+     */
+    antarctica_peer_count_gt?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: gte)
+     */
+    antarctica_peer_count_gte?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: between_min)
+     */
+    antarctica_peer_count_between_min?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: between_max_value)
+     */
+    antarctica_peer_count_between_max_value?: number;
+    /**
+     * Peers in Antarctica (AN) (filter: in_values) (comma-separated list)
+     */
+    antarctica_peer_count_in_values?: string;
+    /**
+     * Peers in Antarctica (AN) (filter: not_in_values) (comma-separated list)
+     */
+    antarctica_peer_count_not_in_values?: string;
+    /**
+     * Peers in Asia (AS) (filter: eq)
+     */
+    asia_peer_count_eq?: number;
+    /**
+     * Peers in Asia (AS) (filter: ne)
+     */
+    asia_peer_count_ne?: number;
+    /**
+     * Peers in Asia (AS) (filter: lt)
+     */
+    asia_peer_count_lt?: number;
+    /**
+     * Peers in Asia (AS) (filter: lte)
+     */
+    asia_peer_count_lte?: number;
+    /**
+     * Peers in Asia (AS) (filter: gt)
+     */
+    asia_peer_count_gt?: number;
+    /**
+     * Peers in Asia (AS) (filter: gte)
+     */
+    asia_peer_count_gte?: number;
+    /**
+     * Peers in Asia (AS) (filter: between_min)
+     */
+    asia_peer_count_between_min?: number;
+    /**
+     * Peers in Asia (AS) (filter: between_max_value)
+     */
+    asia_peer_count_between_max_value?: number;
+    /**
+     * Peers in Asia (AS) (filter: in_values) (comma-separated list)
+     */
+    asia_peer_count_in_values?: string;
+    /**
+     * Peers in Asia (AS) (filter: not_in_values) (comma-separated list)
+     */
+    asia_peer_count_not_in_values?: string;
+    /**
+     * Peers in Europe (EU) (filter: eq)
+     */
+    europe_peer_count_eq?: number;
+    /**
+     * Peers in Europe (EU) (filter: ne)
+     */
+    europe_peer_count_ne?: number;
+    /**
+     * Peers in Europe (EU) (filter: lt)
+     */
+    europe_peer_count_lt?: number;
+    /**
+     * Peers in Europe (EU) (filter: lte)
+     */
+    europe_peer_count_lte?: number;
+    /**
+     * Peers in Europe (EU) (filter: gt)
+     */
+    europe_peer_count_gt?: number;
+    /**
+     * Peers in Europe (EU) (filter: gte)
+     */
+    europe_peer_count_gte?: number;
+    /**
+     * Peers in Europe (EU) (filter: between_min)
+     */
+    europe_peer_count_between_min?: number;
+    /**
+     * Peers in Europe (EU) (filter: between_max_value)
+     */
+    europe_peer_count_between_max_value?: number;
+    /**
+     * Peers in Europe (EU) (filter: in_values) (comma-separated list)
+     */
+    europe_peer_count_in_values?: string;
+    /**
+     * Peers in Europe (EU) (filter: not_in_values) (comma-separated list)
+     */
+    europe_peer_count_not_in_values?: string;
+    /**
+     * Peers in North America (NA) (filter: eq)
+     */
+    north_america_peer_count_eq?: number;
+    /**
+     * Peers in North America (NA) (filter: ne)
+     */
+    north_america_peer_count_ne?: number;
+    /**
+     * Peers in North America (NA) (filter: lt)
+     */
+    north_america_peer_count_lt?: number;
+    /**
+     * Peers in North America (NA) (filter: lte)
+     */
+    north_america_peer_count_lte?: number;
+    /**
+     * Peers in North America (NA) (filter: gt)
+     */
+    north_america_peer_count_gt?: number;
+    /**
+     * Peers in North America (NA) (filter: gte)
+     */
+    north_america_peer_count_gte?: number;
+    /**
+     * Peers in North America (NA) (filter: between_min)
+     */
+    north_america_peer_count_between_min?: number;
+    /**
+     * Peers in North America (NA) (filter: between_max_value)
+     */
+    north_america_peer_count_between_max_value?: number;
+    /**
+     * Peers in North America (NA) (filter: in_values) (comma-separated list)
+     */
+    north_america_peer_count_in_values?: string;
+    /**
+     * Peers in North America (NA) (filter: not_in_values) (comma-separated list)
+     */
+    north_america_peer_count_not_in_values?: string;
+    /**
+     * Peers in Oceania (OC) (filter: eq)
+     */
+    oceania_peer_count_eq?: number;
+    /**
+     * Peers in Oceania (OC) (filter: ne)
+     */
+    oceania_peer_count_ne?: number;
+    /**
+     * Peers in Oceania (OC) (filter: lt)
+     */
+    oceania_peer_count_lt?: number;
+    /**
+     * Peers in Oceania (OC) (filter: lte)
+     */
+    oceania_peer_count_lte?: number;
+    /**
+     * Peers in Oceania (OC) (filter: gt)
+     */
+    oceania_peer_count_gt?: number;
+    /**
+     * Peers in Oceania (OC) (filter: gte)
+     */
+    oceania_peer_count_gte?: number;
+    /**
+     * Peers in Oceania (OC) (filter: between_min)
+     */
+    oceania_peer_count_between_min?: number;
+    /**
+     * Peers in Oceania (OC) (filter: between_max_value)
+     */
+    oceania_peer_count_between_max_value?: number;
+    /**
+     * Peers in Oceania (OC) (filter: in_values) (comma-separated list)
+     */
+    oceania_peer_count_in_values?: string;
+    /**
+     * Peers in Oceania (OC) (filter: not_in_values) (comma-separated list)
+     */
+    oceania_peer_count_not_in_values?: string;
+    /**
+     * Peers in South America (SA) (filter: eq)
+     */
+    south_america_peer_count_eq?: number;
+    /**
+     * Peers in South America (SA) (filter: ne)
+     */
+    south_america_peer_count_ne?: number;
+    /**
+     * Peers in South America (SA) (filter: lt)
+     */
+    south_america_peer_count_lt?: number;
+    /**
+     * Peers in South America (SA) (filter: lte)
+     */
+    south_america_peer_count_lte?: number;
+    /**
+     * Peers in South America (SA) (filter: gt)
+     */
+    south_america_peer_count_gt?: number;
+    /**
+     * Peers in South America (SA) (filter: gte)
+     */
+    south_america_peer_count_gte?: number;
+    /**
+     * Peers in South America (SA) (filter: between_min)
+     */
+    south_america_peer_count_between_min?: number;
+    /**
+     * Peers in South America (SA) (filter: between_max_value)
+     */
+    south_america_peer_count_between_max_value?: number;
+    /**
+     * Peers in South America (SA) (filter: in_values) (comma-separated list)
+     */
+    south_america_peer_count_in_values?: string;
+    /**
+     * Peers in South America (SA) (filter: not_in_values) (comma-separated list)
+     */
+    south_america_peer_count_not_in_values?: string;
+    /**
+     * Peers not geolocated to a continent (filter: eq)
+     */
+    unknown_continent_peer_count_eq?: number;
+    /**
+     * Peers not geolocated to a continent (filter: ne)
+     */
+    unknown_continent_peer_count_ne?: number;
+    /**
+     * Peers not geolocated to a continent (filter: lt)
+     */
+    unknown_continent_peer_count_lt?: number;
+    /**
+     * Peers not geolocated to a continent (filter: lte)
+     */
+    unknown_continent_peer_count_lte?: number;
+    /**
+     * Peers not geolocated to a continent (filter: gt)
+     */
+    unknown_continent_peer_count_gt?: number;
+    /**
+     * Peers not geolocated to a continent (filter: gte)
+     */
+    unknown_continent_peer_count_gte?: number;
+    /**
+     * Peers not geolocated to a continent (filter: between_min)
+     */
+    unknown_continent_peer_count_between_min?: number;
+    /**
+     * Peers not geolocated to a continent (filter: between_max_value)
+     */
+    unknown_continent_peer_count_between_max_value?: number;
+    /**
+     * Peers not geolocated to a continent (filter: in_values) (comma-separated list)
+     */
+    unknown_continent_peer_count_in_values?: string;
+    /**
+     * Peers not geolocated to a continent (filter: not_in_values) (comma-separated list)
+     */
+    unknown_continent_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_concentration_el_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerConcentrationElDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_concentration_el_daily';
+};
+
+export type FctPeerConcentrationElDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerConcentrationElDailyServiceListError =
+  FctPeerConcentrationElDailyServiceListErrors[keyof FctPeerConcentrationElDailyServiceListErrors];
+
+export type FctPeerConcentrationElDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerConcentrationElDailyResponse;
+};
+
+export type FctPeerConcentrationElDailyServiceListResponse =
+  FctPeerConcentrationElDailyServiceListResponses[keyof FctPeerConcentrationElDailyServiceListResponses];
+
+export type FctPeerConcentrationElDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_concentration_el_daily/{day_start_date}';
+};
+
+export type FctPeerConcentrationElDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerConcentrationElDailyServiceGetError =
+  FctPeerConcentrationElDailyServiceGetErrors[keyof FctPeerConcentrationElDailyServiceGetErrors];
+
+export type FctPeerConcentrationElDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerConcentrationElDailyResponse;
+};
+
+export type FctPeerConcentrationElDailyServiceGetResponse =
+  FctPeerConcentrationElDailyServiceGetResponses[keyof FctPeerConcentrationElDailyServiceGetResponses];
+
+export type FctPeerCountByAsnCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the country (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the country (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: eq)
+     */
+    sentry_peer_count_eq?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: ne)
+     */
+    sentry_peer_count_ne?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lt)
+     */
+    sentry_peer_count_lt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lte)
+     */
+    sentry_peer_count_lte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gt)
+     */
+    sentry_peer_count_gt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gte)
+     */
+    sentry_peer_count_gte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_min)
+     */
+    sentry_peer_count_between_min?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_max_value)
+     */
+    sentry_peer_count_between_max_value?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: in_values) (comma-separated list)
+     */
+    sentry_peer_count_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: not_in_values) (comma-separated list)
+     */
+    sentry_peer_count_not_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: eq)
+     */
+    enr_peer_count_eq?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: ne)
+     */
+    enr_peer_count_ne?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lt)
+     */
+    enr_peer_count_lt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lte)
+     */
+    enr_peer_count_lte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gt)
+     */
+    enr_peer_count_gt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gte)
+     */
+    enr_peer_count_gte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_min)
+     */
+    enr_peer_count_between_min?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_max_value)
+     */
+    enr_peer_count_between_max_value?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: in_values) (comma-separated list)
+     */
+    enr_peer_count_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: not_in_values) (comma-separated list)
+     */
+    enr_peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: eq)
+     */
+    inbound_only_peer_count_eq?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: ne)
+     */
+    inbound_only_peer_count_ne?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lt)
+     */
+    inbound_only_peer_count_lt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lte)
+     */
+    inbound_only_peer_count_lte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gt)
+     */
+    inbound_only_peer_count_gt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gte)
+     */
+    inbound_only_peer_count_gte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_min)
+     */
+    inbound_only_peer_count_between_min?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_max_value)
+     */
+    inbound_only_peer_count_between_max_value?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: not_in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: eq)
+     */
+    quic_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: ne)
+     */
+    quic_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lt)
+     */
+    quic_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lte)
+     */
+    quic_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gt)
+     */
+    quic_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gte)
+     */
+    quic_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_min)
+     */
+    quic_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_max_value)
+     */
+    quic_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: in_values) (comma-separated list)
+     */
+    quic_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: not_in_values) (comma-separated list)
+     */
+    quic_peer_count_not_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: eq)
+     */
+    custody_known_peer_count_eq?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: ne)
+     */
+    custody_known_peer_count_ne?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lt)
+     */
+    custody_known_peer_count_lt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lte)
+     */
+    custody_known_peer_count_lte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gt)
+     */
+    custody_known_peer_count_gt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gte)
+     */
+    custody_known_peer_count_gte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_min)
+     */
+    custody_known_peer_count_between_min?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_max_value)
+     */
+    custody_known_peer_count_between_max_value?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: in_values) (comma-separated list)
+     */
+    custody_known_peer_count_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: not_in_values) (comma-separated list)
+     */
+    custody_known_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: eq)
+     */
+    custody_4_peer_count_eq?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: ne)
+     */
+    custody_4_peer_count_ne?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lt)
+     */
+    custody_4_peer_count_lt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lte)
+     */
+    custody_4_peer_count_lte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gt)
+     */
+    custody_4_peer_count_gt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gte)
+     */
+    custody_4_peer_count_gte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_min)
+     */
+    custody_4_peer_count_between_min?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_max_value)
+     */
+    custody_4_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: in_values) (comma-separated list)
+     */
+    custody_4_peer_count_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: not_in_values) (comma-separated list)
+     */
+    custody_4_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: eq)
+     */
+    custody_5_8_peer_count_eq?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: ne)
+     */
+    custody_5_8_peer_count_ne?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lt)
+     */
+    custody_5_8_peer_count_lt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lte)
+     */
+    custody_5_8_peer_count_lte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gt)
+     */
+    custody_5_8_peer_count_gt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gte)
+     */
+    custody_5_8_peer_count_gte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_min)
+     */
+    custody_5_8_peer_count_between_min?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_max_value)
+     */
+    custody_5_8_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: eq)
+     */
+    custody_9_127_peer_count_eq?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: ne)
+     */
+    custody_9_127_peer_count_ne?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lt)
+     */
+    custody_9_127_peer_count_lt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lte)
+     */
+    custody_9_127_peer_count_lte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gt)
+     */
+    custody_9_127_peer_count_gt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gte)
+     */
+    custody_9_127_peer_count_gte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_min)
+     */
+    custody_9_127_peer_count_between_min?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_max_value)
+     */
+    custody_9_127_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: eq)
+     */
+    custody_128_peer_count_eq?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: ne)
+     */
+    custody_128_peer_count_ne?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lt)
+     */
+    custody_128_peer_count_lt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lte)
+     */
+    custody_128_peer_count_lte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gt)
+     */
+    custody_128_peer_count_gt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gte)
+     */
+    custody_128_peer_count_gte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_min)
+     */
+    custody_128_peer_count_between_min?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_max_value)
+     */
+    custody_128_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: in_values) (comma-separated list)
+     */
+    custody_128_peer_count_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: not_in_values) (comma-separated list)
+     */
+    custody_128_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_asn_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByAsnCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_asn_country_daily';
+};
+
+export type FctPeerCountByAsnCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByAsnCountryDailyServiceListError =
+  FctPeerCountByAsnCountryDailyServiceListErrors[keyof FctPeerCountByAsnCountryDailyServiceListErrors];
+
+export type FctPeerCountByAsnCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByAsnCountryDailyResponse;
+};
+
+export type FctPeerCountByAsnCountryDailyServiceListResponse =
+  FctPeerCountByAsnCountryDailyServiceListResponses[keyof FctPeerCountByAsnCountryDailyServiceListResponses];
+
+export type FctPeerCountByAsnCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_asn_country_daily/{day_start_date}';
+};
+
+export type FctPeerCountByAsnCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByAsnCountryDailyServiceGetError =
+  FctPeerCountByAsnCountryDailyServiceGetErrors[keyof FctPeerCountByAsnCountryDailyServiceGetErrors];
+
+export type FctPeerCountByAsnCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByAsnCountryDailyResponse;
+};
+
+export type FctPeerCountByAsnCountryDailyServiceGetResponse =
+  FctPeerCountByAsnCountryDailyServiceGetResponses[keyof FctPeerCountByAsnCountryDailyServiceGetResponses];
+
+export type FctPeerCountByAsnDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems with under 3 peers in the day (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems with under 3 peers in the day (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: eq)
+     */
+    sentry_peer_count_eq?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: ne)
+     */
+    sentry_peer_count_ne?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lt)
+     */
+    sentry_peer_count_lt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lte)
+     */
+    sentry_peer_count_lte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gt)
+     */
+    sentry_peer_count_gt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gte)
+     */
+    sentry_peer_count_gte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_min)
+     */
+    sentry_peer_count_between_min?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_max_value)
+     */
+    sentry_peer_count_between_max_value?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: in_values) (comma-separated list)
+     */
+    sentry_peer_count_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: not_in_values) (comma-separated list)
+     */
+    sentry_peer_count_not_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: eq)
+     */
+    enr_peer_count_eq?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: ne)
+     */
+    enr_peer_count_ne?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lt)
+     */
+    enr_peer_count_lt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lte)
+     */
+    enr_peer_count_lte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gt)
+     */
+    enr_peer_count_gt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gte)
+     */
+    enr_peer_count_gte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_min)
+     */
+    enr_peer_count_between_min?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_max_value)
+     */
+    enr_peer_count_between_max_value?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: in_values) (comma-separated list)
+     */
+    enr_peer_count_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: not_in_values) (comma-separated list)
+     */
+    enr_peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: eq)
+     */
+    inbound_only_peer_count_eq?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: ne)
+     */
+    inbound_only_peer_count_ne?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lt)
+     */
+    inbound_only_peer_count_lt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lte)
+     */
+    inbound_only_peer_count_lte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gt)
+     */
+    inbound_only_peer_count_gt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gte)
+     */
+    inbound_only_peer_count_gte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_min)
+     */
+    inbound_only_peer_count_between_min?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_max_value)
+     */
+    inbound_only_peer_count_between_max_value?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: not_in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: eq)
+     */
+    quic_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: ne)
+     */
+    quic_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lt)
+     */
+    quic_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lte)
+     */
+    quic_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gt)
+     */
+    quic_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gte)
+     */
+    quic_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_min)
+     */
+    quic_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_max_value)
+     */
+    quic_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: in_values) (comma-separated list)
+     */
+    quic_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: not_in_values) (comma-separated list)
+     */
+    quic_peer_count_not_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: eq)
+     */
+    custody_known_peer_count_eq?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: ne)
+     */
+    custody_known_peer_count_ne?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lt)
+     */
+    custody_known_peer_count_lt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lte)
+     */
+    custody_known_peer_count_lte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gt)
+     */
+    custody_known_peer_count_gt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gte)
+     */
+    custody_known_peer_count_gte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_min)
+     */
+    custody_known_peer_count_between_min?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_max_value)
+     */
+    custody_known_peer_count_between_max_value?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: in_values) (comma-separated list)
+     */
+    custody_known_peer_count_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: not_in_values) (comma-separated list)
+     */
+    custody_known_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: eq)
+     */
+    custody_4_peer_count_eq?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: ne)
+     */
+    custody_4_peer_count_ne?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lt)
+     */
+    custody_4_peer_count_lt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lte)
+     */
+    custody_4_peer_count_lte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gt)
+     */
+    custody_4_peer_count_gt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gte)
+     */
+    custody_4_peer_count_gte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_min)
+     */
+    custody_4_peer_count_between_min?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_max_value)
+     */
+    custody_4_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: in_values) (comma-separated list)
+     */
+    custody_4_peer_count_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: not_in_values) (comma-separated list)
+     */
+    custody_4_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: eq)
+     */
+    custody_5_8_peer_count_eq?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: ne)
+     */
+    custody_5_8_peer_count_ne?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lt)
+     */
+    custody_5_8_peer_count_lt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lte)
+     */
+    custody_5_8_peer_count_lte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gt)
+     */
+    custody_5_8_peer_count_gt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gte)
+     */
+    custody_5_8_peer_count_gte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_min)
+     */
+    custody_5_8_peer_count_between_min?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_max_value)
+     */
+    custody_5_8_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: eq)
+     */
+    custody_9_127_peer_count_eq?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: ne)
+     */
+    custody_9_127_peer_count_ne?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lt)
+     */
+    custody_9_127_peer_count_lt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lte)
+     */
+    custody_9_127_peer_count_lte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gt)
+     */
+    custody_9_127_peer_count_gt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gte)
+     */
+    custody_9_127_peer_count_gte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_min)
+     */
+    custody_9_127_peer_count_between_min?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_max_value)
+     */
+    custody_9_127_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: eq)
+     */
+    custody_128_peer_count_eq?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: ne)
+     */
+    custody_128_peer_count_ne?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lt)
+     */
+    custody_128_peer_count_lt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lte)
+     */
+    custody_128_peer_count_lte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gt)
+     */
+    custody_128_peer_count_gt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gte)
+     */
+    custody_128_peer_count_gte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_min)
+     */
+    custody_128_peer_count_between_min?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_max_value)
+     */
+    custody_128_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: in_values) (comma-separated list)
+     */
+    custody_128_peer_count_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: not_in_values) (comma-separated list)
+     */
+    custody_128_peer_count_not_in_values?: string;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: eq)
+     */
+    autonomous_system_count_eq?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: ne)
+     */
+    autonomous_system_count_ne?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: lt)
+     */
+    autonomous_system_count_lt?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: lte)
+     */
+    autonomous_system_count_lte?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: gt)
+     */
+    autonomous_system_count_gt?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: gte)
+     */
+    autonomous_system_count_gte?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: between_min)
+     */
+    autonomous_system_count_between_min?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: between_max_value)
+     */
+    autonomous_system_count_between_max_value?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_count_in_values?: string;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_asn_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByAsnDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_asn_daily';
+};
+
+export type FctPeerCountByAsnDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByAsnDailyServiceListError =
+  FctPeerCountByAsnDailyServiceListErrors[keyof FctPeerCountByAsnDailyServiceListErrors];
+
+export type FctPeerCountByAsnDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByAsnDailyResponse;
+};
+
+export type FctPeerCountByAsnDailyServiceListResponse =
+  FctPeerCountByAsnDailyServiceListResponses[keyof FctPeerCountByAsnDailyServiceListResponses];
+
+export type FctPeerCountByAsnDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_asn_daily/{day_start_date}';
+};
+
+export type FctPeerCountByAsnDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByAsnDailyServiceGetError =
+  FctPeerCountByAsnDailyServiceGetErrors[keyof FctPeerCountByAsnDailyServiceGetErrors];
+
+export type FctPeerCountByAsnDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByAsnDailyResponse;
+};
+
+export type FctPeerCountByAsnDailyServiceGetResponse =
+  FctPeerCountByAsnDailyServiceGetResponses[keyof FctPeerCountByAsnDailyServiceGetResponses];
+
 export type FctPeerCountByClClientAsnDailyServiceListData = {
   body?: never;
   path?: never;
@@ -130157,6 +136496,338 @@ export type FctPeerCountByClClientAsnDailyServiceGetResponses = {
 
 export type FctPeerCountByClClientAsnDailyServiceGetResponse =
   FctPeerCountByClClientAsnDailyServiceGetResponses[keyof FctPeerCountByClClientAsnDailyServiceGetResponses];
+
+export type FctPeerCountByClClientCityDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: eq)
+     */
+    city_eq?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: ne)
+     */
+    city_ne?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: contains)
+     */
+    city_contains?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: starts_with)
+     */
+    city_starts_with?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: ends_with)
+     */
+    city_ends_with?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: like)
+     */
+    city_like?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: not_like)
+     */
+    city_not_like?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: in_values) (comma-separated list)
+     */
+    city_in_values?: string;
+    /**
+     * City of the address, unknown when not geolocated to a city, other for residential city and client cells with under 3 peers (filter: not_in_values) (comma-separated list)
+     */
+    city_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_cl_client_city_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByClClientCityDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_cl_client_city_daily';
+};
+
+export type FctPeerCountByClClientCityDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientCityDailyServiceListError =
+  FctPeerCountByClClientCityDailyServiceListErrors[keyof FctPeerCountByClClientCityDailyServiceListErrors];
+
+export type FctPeerCountByClClientCityDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByClClientCityDailyResponse;
+};
+
+export type FctPeerCountByClClientCityDailyServiceListResponse =
+  FctPeerCountByClClientCityDailyServiceListResponses[keyof FctPeerCountByClClientCityDailyServiceListResponses];
+
+export type FctPeerCountByClClientCityDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_cl_client_city_daily/{day_start_date}';
+};
+
+export type FctPeerCountByClClientCityDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByClClientCityDailyServiceGetError =
+  FctPeerCountByClClientCityDailyServiceGetErrors[keyof FctPeerCountByClClientCityDailyServiceGetErrors];
+
+export type FctPeerCountByClClientCityDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByClClientCityDailyResponse;
+};
+
+export type FctPeerCountByClClientCityDailyServiceGetResponse =
+  FctPeerCountByClClientCityDailyServiceGetResponses[keyof FctPeerCountByClClientCityDailyServiceGetResponses];
 
 export type FctPeerCountByClClientCountryDailyServiceListData = {
   body?: never;
@@ -131538,6 +138209,1082 @@ export type FctPeerCountByClientPairDailyServiceGetResponses = {
 export type FctPeerCountByClientPairDailyServiceGetResponse =
   FctPeerCountByClientPairDailyServiceGetResponses[keyof FctPeerCountByClientPairDailyServiceGetResponses];
 
+export type FctPeerCountByCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: eq)
+     */
+    sentry_peer_count_eq?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: ne)
+     */
+    sentry_peer_count_ne?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lt)
+     */
+    sentry_peer_count_lt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lte)
+     */
+    sentry_peer_count_lte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gt)
+     */
+    sentry_peer_count_gt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gte)
+     */
+    sentry_peer_count_gte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_min)
+     */
+    sentry_peer_count_between_min?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_max_value)
+     */
+    sentry_peer_count_between_max_value?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: in_values) (comma-separated list)
+     */
+    sentry_peer_count_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: not_in_values) (comma-separated list)
+     */
+    sentry_peer_count_not_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: eq)
+     */
+    enr_peer_count_eq?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: ne)
+     */
+    enr_peer_count_ne?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lt)
+     */
+    enr_peer_count_lt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lte)
+     */
+    enr_peer_count_lte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gt)
+     */
+    enr_peer_count_gt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gte)
+     */
+    enr_peer_count_gte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_min)
+     */
+    enr_peer_count_between_min?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_max_value)
+     */
+    enr_peer_count_between_max_value?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: in_values) (comma-separated list)
+     */
+    enr_peer_count_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: not_in_values) (comma-separated list)
+     */
+    enr_peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: eq)
+     */
+    inbound_only_peer_count_eq?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: ne)
+     */
+    inbound_only_peer_count_ne?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lt)
+     */
+    inbound_only_peer_count_lt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lte)
+     */
+    inbound_only_peer_count_lte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gt)
+     */
+    inbound_only_peer_count_gt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gte)
+     */
+    inbound_only_peer_count_gte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_min)
+     */
+    inbound_only_peer_count_between_min?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_max_value)
+     */
+    inbound_only_peer_count_between_max_value?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: not_in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: eq)
+     */
+    quic_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: ne)
+     */
+    quic_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lt)
+     */
+    quic_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lte)
+     */
+    quic_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gt)
+     */
+    quic_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gte)
+     */
+    quic_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_min)
+     */
+    quic_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_max_value)
+     */
+    quic_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: in_values) (comma-separated list)
+     */
+    quic_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: not_in_values) (comma-separated list)
+     */
+    quic_peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: eq)
+     */
+    custody_known_peer_count_eq?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: ne)
+     */
+    custody_known_peer_count_ne?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lt)
+     */
+    custody_known_peer_count_lt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lte)
+     */
+    custody_known_peer_count_lte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gt)
+     */
+    custody_known_peer_count_gt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gte)
+     */
+    custody_known_peer_count_gte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_min)
+     */
+    custody_known_peer_count_between_min?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_max_value)
+     */
+    custody_known_peer_count_between_max_value?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: in_values) (comma-separated list)
+     */
+    custody_known_peer_count_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: not_in_values) (comma-separated list)
+     */
+    custody_known_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: eq)
+     */
+    custody_4_peer_count_eq?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: ne)
+     */
+    custody_4_peer_count_ne?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lt)
+     */
+    custody_4_peer_count_lt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lte)
+     */
+    custody_4_peer_count_lte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gt)
+     */
+    custody_4_peer_count_gt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gte)
+     */
+    custody_4_peer_count_gte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_min)
+     */
+    custody_4_peer_count_between_min?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_max_value)
+     */
+    custody_4_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: in_values) (comma-separated list)
+     */
+    custody_4_peer_count_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: not_in_values) (comma-separated list)
+     */
+    custody_4_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: eq)
+     */
+    custody_5_8_peer_count_eq?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: ne)
+     */
+    custody_5_8_peer_count_ne?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lt)
+     */
+    custody_5_8_peer_count_lt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lte)
+     */
+    custody_5_8_peer_count_lte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gt)
+     */
+    custody_5_8_peer_count_gt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gte)
+     */
+    custody_5_8_peer_count_gte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_min)
+     */
+    custody_5_8_peer_count_between_min?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_max_value)
+     */
+    custody_5_8_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: eq)
+     */
+    custody_9_127_peer_count_eq?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: ne)
+     */
+    custody_9_127_peer_count_ne?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lt)
+     */
+    custody_9_127_peer_count_lt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lte)
+     */
+    custody_9_127_peer_count_lte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gt)
+     */
+    custody_9_127_peer_count_gt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gte)
+     */
+    custody_9_127_peer_count_gte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_min)
+     */
+    custody_9_127_peer_count_between_min?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_max_value)
+     */
+    custody_9_127_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: eq)
+     */
+    custody_128_peer_count_eq?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: ne)
+     */
+    custody_128_peer_count_ne?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lt)
+     */
+    custody_128_peer_count_lt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lte)
+     */
+    custody_128_peer_count_lte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gt)
+     */
+    custody_128_peer_count_gt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gte)
+     */
+    custody_128_peer_count_gte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_min)
+     */
+    custody_128_peer_count_between_min?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_max_value)
+     */
+    custody_128_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: in_values) (comma-separated list)
+     */
+    custody_128_peer_count_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: not_in_values) (comma-separated list)
+     */
+    custody_128_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_country_daily';
+};
+
+export type FctPeerCountByCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByCountryDailyServiceListError =
+  FctPeerCountByCountryDailyServiceListErrors[keyof FctPeerCountByCountryDailyServiceListErrors];
+
+export type FctPeerCountByCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByCountryDailyResponse;
+};
+
+export type FctPeerCountByCountryDailyServiceListResponse =
+  FctPeerCountByCountryDailyServiceListResponses[keyof FctPeerCountByCountryDailyServiceListResponses];
+
+export type FctPeerCountByCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_country_daily/{day_start_date}';
+};
+
+export type FctPeerCountByCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByCountryDailyServiceGetError =
+  FctPeerCountByCountryDailyServiceGetErrors[keyof FctPeerCountByCountryDailyServiceGetErrors];
+
+export type FctPeerCountByCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByCountryDailyResponse;
+};
+
+export type FctPeerCountByCountryDailyServiceGetResponse =
+  FctPeerCountByCountryDailyServiceGetResponses[keyof FctPeerCountByCountryDailyServiceGetResponses];
+
+export type FctPeerCountByElAsnDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address, 0 for unknown and for residential autonomous systems under 3 peers (other) (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation, unknown when not geolocated, other for residential autonomous systems under 3 peers (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Execution nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Execution nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Execution nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Execution nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Execution nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Execution nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Execution nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Execution nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Execution nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Execution nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: eq)
+     */
+    autonomous_system_count_eq?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: ne)
+     */
+    autonomous_system_count_ne?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: lt)
+     */
+    autonomous_system_count_lt?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: lte)
+     */
+    autonomous_system_count_lte?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: gt)
+     */
+    autonomous_system_count_gt?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: gte)
+     */
+    autonomous_system_count_gte?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: between_min)
+     */
+    autonomous_system_count_between_min?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: between_max_value)
+     */
+    autonomous_system_count_between_max_value?: number;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_count_in_values?: string;
+    /**
+     * Autonomous systems in the row: 1, the number of residential systems folded into autonomous system 0 (other), each with 1 or 2 peers, or 0 for unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_el_asn_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByElAsnDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_el_asn_daily';
+};
+
+export type FctPeerCountByElAsnDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElAsnDailyServiceListError =
+  FctPeerCountByElAsnDailyServiceListErrors[keyof FctPeerCountByElAsnDailyServiceListErrors];
+
+export type FctPeerCountByElAsnDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByElAsnDailyResponse;
+};
+
+export type FctPeerCountByElAsnDailyServiceListResponse =
+  FctPeerCountByElAsnDailyServiceListResponses[keyof FctPeerCountByElAsnDailyServiceListResponses];
+
+export type FctPeerCountByElAsnDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_el_asn_daily/{day_start_date}';
+};
+
+export type FctPeerCountByElAsnDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElAsnDailyServiceGetError =
+  FctPeerCountByElAsnDailyServiceGetErrors[keyof FctPeerCountByElAsnDailyServiceGetErrors];
+
+export type FctPeerCountByElAsnDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByElAsnDailyResponse;
+};
+
+export type FctPeerCountByElAsnDailyServiceGetResponse =
+  FctPeerCountByElAsnDailyServiceGetResponses[keyof FctPeerCountByElAsnDailyServiceGetResponses];
+
 export type FctPeerCountByElClientAsnDailyServiceListData = {
   body?: never;
   path?: never;
@@ -132502,6 +140249,1090 @@ export type FctPeerCountByElClientDailyServiceGetResponses = {
 export type FctPeerCountByElClientDailyServiceGetResponse =
   FctPeerCountByElClientDailyServiceGetResponses[keyof FctPeerCountByElClientDailyServiceGetResponses];
 
+export type FctPeerCountByElCountryDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name, Unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Execution nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Execution nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Execution nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Execution nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Execution nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Execution nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Execution nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Execution nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Execution nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Execution nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_el_country_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountByElCountryDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_el_country_daily';
+};
+
+export type FctPeerCountByElCountryDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElCountryDailyServiceListError =
+  FctPeerCountByElCountryDailyServiceListErrors[keyof FctPeerCountByElCountryDailyServiceListErrors];
+
+export type FctPeerCountByElCountryDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountByElCountryDailyResponse;
+};
+
+export type FctPeerCountByElCountryDailyServiceListResponse =
+  FctPeerCountByElCountryDailyServiceListResponses[keyof FctPeerCountByElCountryDailyServiceListResponses];
+
+export type FctPeerCountByElCountryDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_el_country_daily/{day_start_date}';
+};
+
+export type FctPeerCountByElCountryDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountByElCountryDailyServiceGetError =
+  FctPeerCountByElCountryDailyServiceGetErrors[keyof FctPeerCountByElCountryDailyServiceGetErrors];
+
+export type FctPeerCountByElCountryDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountByElCountryDailyResponse;
+};
+
+export type FctPeerCountByElCountryDailyServiceGetResponse =
+  FctPeerCountByElCountryDailyServiceGetResponses[keyof FctPeerCountByElCountryDailyServiceGetResponses];
+
+export type FctPeerCountBySourceDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Consensus peers our libp2p sentries or our discovery crawler saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: eq)
+     */
+    sentry_peer_count_eq?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: ne)
+     */
+    sentry_peer_count_ne?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lt)
+     */
+    sentry_peer_count_lt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: lte)
+     */
+    sentry_peer_count_lte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gt)
+     */
+    sentry_peer_count_gt?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: gte)
+     */
+    sentry_peer_count_gte?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_min)
+     */
+    sentry_peer_count_between_min?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: between_max_value)
+     */
+    sentry_peer_count_between_max_value?: number;
+    /**
+     * Peers our libp2p sentries were connected to (filter: in_values) (comma-separated list)
+     */
+    sentry_peer_count_in_values?: string;
+    /**
+     * Peers our libp2p sentries were connected to (filter: not_in_values) (comma-separated list)
+     */
+    sentry_peer_count_not_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: eq)
+     */
+    enr_peer_count_eq?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: ne)
+     */
+    enr_peer_count_ne?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lt)
+     */
+    enr_peer_count_lt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: lte)
+     */
+    enr_peer_count_lte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gt)
+     */
+    enr_peer_count_gt?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: gte)
+     */
+    enr_peer_count_gte?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_min)
+     */
+    enr_peer_count_between_min?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: between_max_value)
+     */
+    enr_peer_count_between_max_value?: number;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: in_values) (comma-separated list)
+     */
+    enr_peer_count_in_values?: string;
+    /**
+     * Peers our discovery crawler dialled from their ENR (filter: not_in_values) (comma-separated list)
+     */
+    enr_peer_count_not_in_values?: string;
+    /**
+     * Peers both sources saw (filter: eq)
+     */
+    sentry_and_enr_peer_count_eq?: number;
+    /**
+     * Peers both sources saw (filter: ne)
+     */
+    sentry_and_enr_peer_count_ne?: number;
+    /**
+     * Peers both sources saw (filter: lt)
+     */
+    sentry_and_enr_peer_count_lt?: number;
+    /**
+     * Peers both sources saw (filter: lte)
+     */
+    sentry_and_enr_peer_count_lte?: number;
+    /**
+     * Peers both sources saw (filter: gt)
+     */
+    sentry_and_enr_peer_count_gt?: number;
+    /**
+     * Peers both sources saw (filter: gte)
+     */
+    sentry_and_enr_peer_count_gte?: number;
+    /**
+     * Peers both sources saw (filter: between_min)
+     */
+    sentry_and_enr_peer_count_between_min?: number;
+    /**
+     * Peers both sources saw (filter: between_max_value)
+     */
+    sentry_and_enr_peer_count_between_max_value?: number;
+    /**
+     * Peers both sources saw (filter: in_values) (comma-separated list)
+     */
+    sentry_and_enr_peer_count_in_values?: string;
+    /**
+     * Peers both sources saw (filter: not_in_values) (comma-separated list)
+     */
+    sentry_and_enr_peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: eq)
+     */
+    inbound_only_peer_count_eq?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: ne)
+     */
+    inbound_only_peer_count_ne?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lt)
+     */
+    inbound_only_peer_count_lt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lte)
+     */
+    inbound_only_peer_count_lte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gt)
+     */
+    inbound_only_peer_count_gt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gte)
+     */
+    inbound_only_peer_count_gte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_min)
+     */
+    inbound_only_peer_count_between_min?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_max_value)
+     */
+    inbound_only_peer_count_between_max_value?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: not_in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: eq)
+     */
+    quic_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: ne)
+     */
+    quic_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lt)
+     */
+    quic_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: lte)
+     */
+    quic_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gt)
+     */
+    quic_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: gte)
+     */
+    quic_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_min)
+     */
+    quic_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: between_max_value)
+     */
+    quic_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: in_values) (comma-separated list)
+     */
+    quic_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC or advertising a QUIC listen address (filter: not_in_values) (comma-separated list)
+     */
+    quic_peer_count_not_in_values?: string;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: eq)
+     */
+    ipv6_peer_count_eq?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: ne)
+     */
+    ipv6_peer_count_ne?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: lt)
+     */
+    ipv6_peer_count_lt?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: lte)
+     */
+    ipv6_peer_count_lte?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: gt)
+     */
+    ipv6_peer_count_gt?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: gte)
+     */
+    ipv6_peer_count_gte?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: between_min)
+     */
+    ipv6_peer_count_between_min?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: between_max_value)
+     */
+    ipv6_peer_count_between_max_value?: number;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: in_values) (comma-separated list)
+     */
+    ipv6_peer_count_in_values?: string;
+    /**
+     * Peers that advertise a global IPv6 address, in an identify listen address or their ENR record (filter: not_in_values) (comma-separated list)
+     */
+    ipv6_peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: eq)
+     */
+    located_peer_count_eq?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: ne)
+     */
+    located_peer_count_ne?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lt)
+     */
+    located_peer_count_lt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lte)
+     */
+    located_peer_count_lte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gt)
+     */
+    located_peer_count_gt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gte)
+     */
+    located_peer_count_gte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_min)
+     */
+    located_peer_count_between_min?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_max_value)
+     */
+    located_peer_count_between_max_value?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: in_values) (comma-separated list)
+     */
+    located_peer_count_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: not_in_values) (comma-separated list)
+     */
+    located_peer_count_not_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: eq)
+     */
+    custody_known_peer_count_eq?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: ne)
+     */
+    custody_known_peer_count_ne?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lt)
+     */
+    custody_known_peer_count_lt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: lte)
+     */
+    custody_known_peer_count_lte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gt)
+     */
+    custody_known_peer_count_gt?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: gte)
+     */
+    custody_known_peer_count_gte?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_min)
+     */
+    custody_known_peer_count_between_min?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: between_max_value)
+     */
+    custody_known_peer_count_between_max_value?: number;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: in_values) (comma-separated list)
+     */
+    custody_known_peer_count_in_values?: string;
+    /**
+     * Peers whose custody group count is known from a metadata response or their ENR (filter: not_in_values) (comma-separated list)
+     */
+    custody_known_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: eq)
+     */
+    custody_4_peer_count_eq?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: ne)
+     */
+    custody_4_peer_count_ne?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lt)
+     */
+    custody_4_peer_count_lt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: lte)
+     */
+    custody_4_peer_count_lte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gt)
+     */
+    custody_4_peer_count_gt?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: gte)
+     */
+    custody_4_peer_count_gte?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_min)
+     */
+    custody_4_peer_count_between_min?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: between_max_value)
+     */
+    custody_4_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: in_values) (comma-separated list)
+     */
+    custody_4_peer_count_in_values?: string;
+    /**
+     * Peers custodying 4 or fewer groups (the minimum) (filter: not_in_values) (comma-separated list)
+     */
+    custody_4_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: eq)
+     */
+    custody_5_8_peer_count_eq?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: ne)
+     */
+    custody_5_8_peer_count_ne?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lt)
+     */
+    custody_5_8_peer_count_lt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: lte)
+     */
+    custody_5_8_peer_count_lte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gt)
+     */
+    custody_5_8_peer_count_gt?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: gte)
+     */
+    custody_5_8_peer_count_gte?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_min)
+     */
+    custody_5_8_peer_count_between_min?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: between_max_value)
+     */
+    custody_5_8_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 5 to 8 groups (filter: in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_in_values?: string;
+    /**
+     * Peers custodying 5 to 8 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_5_8_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: eq)
+     */
+    custody_9_127_peer_count_eq?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: ne)
+     */
+    custody_9_127_peer_count_ne?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lt)
+     */
+    custody_9_127_peer_count_lt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: lte)
+     */
+    custody_9_127_peer_count_lte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gt)
+     */
+    custody_9_127_peer_count_gt?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: gte)
+     */
+    custody_9_127_peer_count_gte?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_min)
+     */
+    custody_9_127_peer_count_between_min?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: between_max_value)
+     */
+    custody_9_127_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying 9 to 127 groups (filter: in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_in_values?: string;
+    /**
+     * Peers custodying 9 to 127 groups (filter: not_in_values) (comma-separated list)
+     */
+    custody_9_127_peer_count_not_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: eq)
+     */
+    custody_128_peer_count_eq?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: ne)
+     */
+    custody_128_peer_count_ne?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lt)
+     */
+    custody_128_peer_count_lt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: lte)
+     */
+    custody_128_peer_count_lte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gt)
+     */
+    custody_128_peer_count_gt?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: gte)
+     */
+    custody_128_peer_count_gte?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_min)
+     */
+    custody_128_peer_count_between_min?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: between_max_value)
+     */
+    custody_128_peer_count_between_max_value?: number;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: in_values) (comma-separated list)
+     */
+    custody_128_peer_count_in_values?: string;
+    /**
+     * Peers custodying all 128 groups (supernodes) (filter: not_in_values) (comma-separated list)
+     */
+    custody_128_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_count_by_source_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerCountBySourceDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_count_by_source_daily';
+};
+
+export type FctPeerCountBySourceDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountBySourceDailyServiceListError =
+  FctPeerCountBySourceDailyServiceListErrors[keyof FctPeerCountBySourceDailyServiceListErrors];
+
+export type FctPeerCountBySourceDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerCountBySourceDailyResponse;
+};
+
+export type FctPeerCountBySourceDailyServiceListResponse =
+  FctPeerCountBySourceDailyServiceListResponses[keyof FctPeerCountBySourceDailyServiceListResponses];
+
+export type FctPeerCountBySourceDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_count_by_source_daily/{day_start_date}';
+};
+
+export type FctPeerCountBySourceDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerCountBySourceDailyServiceGetError =
+  FctPeerCountBySourceDailyServiceGetErrors[keyof FctPeerCountBySourceDailyServiceGetErrors];
+
+export type FctPeerCountBySourceDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerCountBySourceDailyResponse;
+};
+
+export type FctPeerCountBySourceDailyServiceGetResponse =
+  FctPeerCountBySourceDailyServiceGetResponses[keyof FctPeerCountBySourceDailyServiceGetResponses];
+
 export type FctPeerForkReadinessByClClientDailyServiceListData = {
   body?: never;
   path?: never;
@@ -133237,6 +142068,350 @@ export type FctPeerForkReadinessByElClientDailyServiceGetResponses = {
 
 export type FctPeerForkReadinessByElClientDailyServiceGetResponse =
   FctPeerForkReadinessByElClientDailyServiceGetResponses[keyof FctPeerForkReadinessByElClientDailyServiceGetResponses];
+
+export type FctPeerHostingByElClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Execution client from the node devp2p name: geth, nethermind, besu, erigon, reth, ethrex, nimbusel, ethereumjs or trin-execution, other for every other name (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Execution nodes (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Execution nodes (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Execution nodes (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Execution nodes (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Execution nodes (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Execution nodes (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Execution nodes (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Execution nodes (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Execution nodes (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Execution nodes (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: eq)
+     */
+    hosting_peer_count_eq?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: ne)
+     */
+    hosting_peer_count_ne?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lt)
+     */
+    hosting_peer_count_lt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: lte)
+     */
+    hosting_peer_count_lte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gt)
+     */
+    hosting_peer_count_gt?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: gte)
+     */
+    hosting_peer_count_gte?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_min)
+     */
+    hosting_peer_count_between_min?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: between_max_value)
+     */
+    hosting_peer_count_between_max_value?: number;
+    /**
+     * Peers on a cloud or hosting provider network (filter: in_values) (comma-separated list)
+     */
+    hosting_peer_count_in_values?: string;
+    /**
+     * Peers on a cloud or hosting provider network (filter: not_in_values) (comma-separated list)
+     */
+    hosting_peer_count_not_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: eq)
+     */
+    located_peer_count_eq?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: ne)
+     */
+    located_peer_count_ne?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lt)
+     */
+    located_peer_count_lt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: lte)
+     */
+    located_peer_count_lte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gt)
+     */
+    located_peer_count_gt?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: gte)
+     */
+    located_peer_count_gte?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_min)
+     */
+    located_peer_count_between_min?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: between_max_value)
+     */
+    located_peer_count_between_max_value?: number;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: in_values) (comma-separated list)
+     */
+    located_peer_count_in_values?: string;
+    /**
+     * Peers with a known autonomous system, the population of hosting_peer_count (filter: not_in_values) (comma-separated list)
+     */
+    located_peer_count_not_in_values?: string;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: eq)
+     */
+    ipv6_peer_count_eq?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: ne)
+     */
+    ipv6_peer_count_ne?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: lt)
+     */
+    ipv6_peer_count_lt?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: lte)
+     */
+    ipv6_peer_count_lte?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: gt)
+     */
+    ipv6_peer_count_gt?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: gte)
+     */
+    ipv6_peer_count_gte?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: between_min)
+     */
+    ipv6_peer_count_between_min?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: between_max_value)
+     */
+    ipv6_peer_count_between_max_value?: number;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: in_values) (comma-separated list)
+     */
+    ipv6_peer_count_in_values?: string;
+    /**
+     * Nodes whose record advertises an IPv6 address (filter: not_in_values) (comma-separated list)
+     */
+    ipv6_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_hosting_by_el_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerHostingByElClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_hosting_by_el_client_daily';
+};
+
+export type FctPeerHostingByElClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerHostingByElClientDailyServiceListError =
+  FctPeerHostingByElClientDailyServiceListErrors[keyof FctPeerHostingByElClientDailyServiceListErrors];
+
+export type FctPeerHostingByElClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerHostingByElClientDailyResponse;
+};
+
+export type FctPeerHostingByElClientDailyServiceListResponse =
+  FctPeerHostingByElClientDailyServiceListResponses[keyof FctPeerHostingByElClientDailyServiceListResponses];
+
+export type FctPeerHostingByElClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_hosting_by_el_client_daily/{day_start_date}';
+};
+
+export type FctPeerHostingByElClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerHostingByElClientDailyServiceGetError =
+  FctPeerHostingByElClientDailyServiceGetErrors[keyof FctPeerHostingByElClientDailyServiceGetErrors];
+
+export type FctPeerHostingByElClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerHostingByElClientDailyResponse;
+};
+
+export type FctPeerHostingByElClientDailyServiceGetResponse =
+  FctPeerHostingByElClientDailyServiceGetResponses[keyof FctPeerHostingByElClientDailyServiceGetResponses];
 
 export type FctPeerPartialMessageSupportByClientDailyServiceListData = {
   body?: never;
@@ -134241,6 +143416,1134 @@ export type FctPeerProtocolByClClientDailyServiceGetResponses = {
 
 export type FctPeerProtocolByClClientDailyServiceGetResponse =
   FctPeerProtocolByClClientDailyServiceGetResponses[keyof FctPeerProtocolByClClientDailyServiceGetResponses];
+
+export type FctPeerReachabilityByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers our sentries saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers our sentries saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers our sentries saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers our sentries saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers our sentries saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers our sentries saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers our sentries saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers our sentries saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers our sentries saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: eq)
+     */
+    dialled_peer_count_eq?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: ne)
+     */
+    dialled_peer_count_ne?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lt)
+     */
+    dialled_peer_count_lt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: lte)
+     */
+    dialled_peer_count_lte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gt)
+     */
+    dialled_peer_count_gt?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: gte)
+     */
+    dialled_peer_count_gte?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_min)
+     */
+    dialled_peer_count_between_min?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: between_max_value)
+     */
+    dialled_peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: in_values) (comma-separated list)
+     */
+    dialled_peer_count_in_values?: string;
+    /**
+     * Peers our sentries dialled (outbound connections), so publicly reachable (filter: not_in_values) (comma-separated list)
+     */
+    dialled_peer_count_not_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: eq)
+     */
+    inbound_only_peer_count_eq?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: ne)
+     */
+    inbound_only_peer_count_ne?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lt)
+     */
+    inbound_only_peer_count_lt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: lte)
+     */
+    inbound_only_peer_count_lte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gt)
+     */
+    inbound_only_peer_count_gt?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: gte)
+     */
+    inbound_only_peer_count_gte?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_min)
+     */
+    inbound_only_peer_count_between_min?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: between_max_value)
+     */
+    inbound_only_peer_count_between_max_value?: number;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_in_values?: string;
+    /**
+     * Peers that only connected to our sentries and were never dialled (filter: not_in_values) (comma-separated list)
+     */
+    inbound_only_peer_count_not_in_values?: string;
+    /**
+     * Peers connected to over QUIC (filter: eq)
+     */
+    quic_connected_peer_count_eq?: number;
+    /**
+     * Peers connected to over QUIC (filter: ne)
+     */
+    quic_connected_peer_count_ne?: number;
+    /**
+     * Peers connected to over QUIC (filter: lt)
+     */
+    quic_connected_peer_count_lt?: number;
+    /**
+     * Peers connected to over QUIC (filter: lte)
+     */
+    quic_connected_peer_count_lte?: number;
+    /**
+     * Peers connected to over QUIC (filter: gt)
+     */
+    quic_connected_peer_count_gt?: number;
+    /**
+     * Peers connected to over QUIC (filter: gte)
+     */
+    quic_connected_peer_count_gte?: number;
+    /**
+     * Peers connected to over QUIC (filter: between_min)
+     */
+    quic_connected_peer_count_between_min?: number;
+    /**
+     * Peers connected to over QUIC (filter: between_max_value)
+     */
+    quic_connected_peer_count_between_max_value?: number;
+    /**
+     * Peers connected to over QUIC (filter: in_values) (comma-separated list)
+     */
+    quic_connected_peer_count_in_values?: string;
+    /**
+     * Peers connected to over QUIC (filter: not_in_values) (comma-separated list)
+     */
+    quic_connected_peer_count_not_in_values?: string;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: eq)
+     */
+    quic_listen_peer_count_eq?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: ne)
+     */
+    quic_listen_peer_count_ne?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: lt)
+     */
+    quic_listen_peer_count_lt?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: lte)
+     */
+    quic_listen_peer_count_lte?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: gt)
+     */
+    quic_listen_peer_count_gt?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: gte)
+     */
+    quic_listen_peer_count_gte?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: between_min)
+     */
+    quic_listen_peer_count_between_min?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: between_max_value)
+     */
+    quic_listen_peer_count_between_max_value?: number;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: in_values) (comma-separated list)
+     */
+    quic_listen_peer_count_in_values?: string;
+    /**
+     * Peers advertising a QUIC listen address in identify (filter: not_in_values) (comma-separated list)
+     */
+    quic_listen_peer_count_not_in_values?: string;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: eq)
+     */
+    enr_peer_count_eq?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: ne)
+     */
+    enr_peer_count_ne?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: lt)
+     */
+    enr_peer_count_lt?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: lte)
+     */
+    enr_peer_count_lte?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: gt)
+     */
+    enr_peer_count_gt?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: gte)
+     */
+    enr_peer_count_gte?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: between_min)
+     */
+    enr_peer_count_between_min?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: between_max_value)
+     */
+    enr_peer_count_between_max_value?: number;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: in_values) (comma-separated list)
+     */
+    enr_peer_count_in_values?: string;
+    /**
+     * Peers our discovery crawler also dialled from their ENR (filter: not_in_values) (comma-separated list)
+     */
+    enr_peer_count_not_in_values?: string;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: eq)
+     */
+    enr_ip_mismatch_peer_count_eq?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: ne)
+     */
+    enr_ip_mismatch_peer_count_ne?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: lt)
+     */
+    enr_ip_mismatch_peer_count_lt?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: lte)
+     */
+    enr_ip_mismatch_peer_count_lte?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: gt)
+     */
+    enr_ip_mismatch_peer_count_gt?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: gte)
+     */
+    enr_ip_mismatch_peer_count_gte?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: between_min)
+     */
+    enr_ip_mismatch_peer_count_between_min?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: between_max_value)
+     */
+    enr_ip_mismatch_peer_count_between_max_value?: number;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: in_values) (comma-separated list)
+     */
+    enr_ip_mismatch_peer_count_in_values?: string;
+    /**
+     * Of those, peers whose ENR advertises another address than the one our sentries connected to (filter: not_in_values) (comma-separated list)
+     */
+    enr_ip_mismatch_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_reachability_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerReachabilityByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_reachability_by_cl_client_daily';
+};
+
+export type FctPeerReachabilityByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerReachabilityByClClientDailyServiceListError =
+  FctPeerReachabilityByClClientDailyServiceListErrors[keyof FctPeerReachabilityByClClientDailyServiceListErrors];
+
+export type FctPeerReachabilityByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerReachabilityByClClientDailyResponse;
+};
+
+export type FctPeerReachabilityByClClientDailyServiceListResponse =
+  FctPeerReachabilityByClClientDailyServiceListResponses[keyof FctPeerReachabilityByClClientDailyServiceListResponses];
+
+export type FctPeerReachabilityByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_reachability_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerReachabilityByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerReachabilityByClClientDailyServiceGetError =
+  FctPeerReachabilityByClClientDailyServiceGetErrors[keyof FctPeerReachabilityByClClientDailyServiceGetErrors];
+
+export type FctPeerReachabilityByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerReachabilityByClClientDailyResponse;
+};
+
+export type FctPeerReachabilityByClClientDailyServiceGetResponse =
+  FctPeerReachabilityByClClientDailyServiceGetResponses[keyof FctPeerReachabilityByClClientDailyServiceGetResponses];
+
+export type FctPeerSyncStatusByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was never seen, other for every other agent (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Peers our sentries saw in the day (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Peers our sentries saw in the day (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Peers our sentries saw in the day (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Peers our sentries saw in the day (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Peers our sentries saw in the day (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Peers our sentries saw in the day (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Peers our sentries saw in the day (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Peers our sentries saw in the day (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Peers our sentries saw in the day (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Peers our sentries saw in the day (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: eq)
+     */
+    status_peer_count_eq?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: ne)
+     */
+    status_peer_count_ne?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: lt)
+     */
+    status_peer_count_lt?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: lte)
+     */
+    status_peer_count_lte?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: gt)
+     */
+    status_peer_count_gt?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: gte)
+     */
+    status_peer_count_gte?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: between_min)
+     */
+    status_peer_count_between_min?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: between_max_value)
+     */
+    status_peer_count_between_max_value?: number;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: in_values) (comma-separated list)
+     */
+    status_peer_count_in_values?: string;
+    /**
+     * Peers that exchanged status with our sentries, the population of the head, finalized and fork digest buckets (filter: not_in_values) (comma-separated list)
+     */
+    status_peer_count_not_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: eq)
+     */
+    head_lag_0_1_peer_count_eq?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: ne)
+     */
+    head_lag_0_1_peer_count_ne?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: lt)
+     */
+    head_lag_0_1_peer_count_lt?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: lte)
+     */
+    head_lag_0_1_peer_count_lte?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: gt)
+     */
+    head_lag_0_1_peer_count_gt?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: gte)
+     */
+    head_lag_0_1_peer_count_gte?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: between_min)
+     */
+    head_lag_0_1_peer_count_between_min?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: between_max_value)
+     */
+    head_lag_0_1_peer_count_between_max_value?: number;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: in_values) (comma-separated list)
+     */
+    head_lag_0_1_peer_count_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by at most 1 slot (median over the day) (filter: not_in_values) (comma-separated list)
+     */
+    head_lag_0_1_peer_count_not_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: eq)
+     */
+    head_lag_2_32_peer_count_eq?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: ne)
+     */
+    head_lag_2_32_peer_count_ne?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: lt)
+     */
+    head_lag_2_32_peer_count_lt?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: lte)
+     */
+    head_lag_2_32_peer_count_lte?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: gt)
+     */
+    head_lag_2_32_peer_count_gt?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: gte)
+     */
+    head_lag_2_32_peer_count_gte?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: between_min)
+     */
+    head_lag_2_32_peer_count_between_min?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: between_max_value)
+     */
+    head_lag_2_32_peer_count_between_max_value?: number;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: in_values) (comma-separated list)
+     */
+    head_lag_2_32_peer_count_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by 2 to 32 slots (filter: not_in_values) (comma-separated list)
+     */
+    head_lag_2_32_peer_count_not_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: eq)
+     */
+    head_lag_over_32_peer_count_eq?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: ne)
+     */
+    head_lag_over_32_peer_count_ne?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: lt)
+     */
+    head_lag_over_32_peer_count_lt?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: lte)
+     */
+    head_lag_over_32_peer_count_lte?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: gt)
+     */
+    head_lag_over_32_peer_count_gt?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: gte)
+     */
+    head_lag_over_32_peer_count_gte?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: between_min)
+     */
+    head_lag_over_32_peer_count_between_min?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: between_max_value)
+     */
+    head_lag_over_32_peer_count_between_max_value?: number;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: in_values) (comma-separated list)
+     */
+    head_lag_over_32_peer_count_in_values?: string;
+    /**
+     * Peers whose head trailed our sentries by more than 32 slots (syncing or stuck) (filter: not_in_values) (comma-separated list)
+     */
+    head_lag_over_32_peer_count_not_in_values?: string;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: eq)
+     */
+    finalized_lag_over_1_peer_count_eq?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: ne)
+     */
+    finalized_lag_over_1_peer_count_ne?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: lt)
+     */
+    finalized_lag_over_1_peer_count_lt?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: lte)
+     */
+    finalized_lag_over_1_peer_count_lte?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: gt)
+     */
+    finalized_lag_over_1_peer_count_gt?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: gte)
+     */
+    finalized_lag_over_1_peer_count_gte?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: between_min)
+     */
+    finalized_lag_over_1_peer_count_between_min?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: between_max_value)
+     */
+    finalized_lag_over_1_peer_count_between_max_value?: number;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: in_values) (comma-separated list)
+     */
+    finalized_lag_over_1_peer_count_in_values?: string;
+    /**
+     * Peers whose finalized checkpoint trailed our sentries by more than 1 epoch (median over the day) (filter: not_in_values) (comma-separated list)
+     */
+    finalized_lag_over_1_peer_count_not_in_values?: string;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: eq)
+     */
+    other_fork_digest_peer_count_eq?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: ne)
+     */
+    other_fork_digest_peer_count_ne?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: lt)
+     */
+    other_fork_digest_peer_count_lt?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: lte)
+     */
+    other_fork_digest_peer_count_lte?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: gt)
+     */
+    other_fork_digest_peer_count_gt?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: gte)
+     */
+    other_fork_digest_peer_count_gte?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: between_min)
+     */
+    other_fork_digest_peer_count_between_min?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: between_max_value)
+     */
+    other_fork_digest_peer_count_between_max_value?: number;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: in_values) (comma-separated list)
+     */
+    other_fork_digest_peer_count_in_values?: string;
+    /**
+     * Peers whose latest status carried another fork digest than the most common one among all peers that day (filter: not_in_values) (comma-separated list)
+     */
+    other_fork_digest_peer_count_not_in_values?: string;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: eq)
+     */
+    history_known_peer_count_eq?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: ne)
+     */
+    history_known_peer_count_ne?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: lt)
+     */
+    history_known_peer_count_lt?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: lte)
+     */
+    history_known_peer_count_lte?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: gt)
+     */
+    history_known_peer_count_gt?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: gte)
+     */
+    history_known_peer_count_gte?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: between_min)
+     */
+    history_known_peer_count_between_min?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: between_max_value)
+     */
+    history_known_peer_count_between_max_value?: number;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: in_values) (comma-separated list)
+     */
+    history_known_peer_count_in_values?: string;
+    /**
+     * Peers that sent an earliest available slot (status v2), the population of the history buckets (filter: not_in_values) (comma-separated list)
+     */
+    history_known_peer_count_not_in_values?: string;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: eq)
+     */
+    history_full_peer_count_eq?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: ne)
+     */
+    history_full_peer_count_ne?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: lt)
+     */
+    history_full_peer_count_lt?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: lte)
+     */
+    history_full_peer_count_lte?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: gt)
+     */
+    history_full_peer_count_gt?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: gte)
+     */
+    history_full_peer_count_gte?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: between_min)
+     */
+    history_full_peer_count_between_min?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: between_max_value)
+     */
+    history_full_peer_count_between_max_value?: number;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: in_values) (comma-separated list)
+     */
+    history_full_peer_count_in_values?: string;
+    /**
+     * Peers serving blocks from genesis (earliest available slot 0) (filter: not_in_values) (comma-separated list)
+     */
+    history_full_peer_count_not_in_values?: string;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: eq)
+     */
+    history_over_min_peer_count_eq?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: ne)
+     */
+    history_over_min_peer_count_ne?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: lt)
+     */
+    history_over_min_peer_count_lt?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: lte)
+     */
+    history_over_min_peer_count_lte?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: gt)
+     */
+    history_over_min_peer_count_gt?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: gte)
+     */
+    history_over_min_peer_count_gte?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: between_min)
+     */
+    history_over_min_peer_count_between_min?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: between_max_value)
+     */
+    history_over_min_peer_count_between_max_value?: number;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: in_values) (comma-separated list)
+     */
+    history_over_min_peer_count_in_values?: string;
+    /**
+     * Peers serving more than a day beyond the spec minimum of 33024 epochs of blocks, short of genesis (filter: not_in_values) (comma-separated list)
+     */
+    history_over_min_peer_count_not_in_values?: string;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: eq)
+     */
+    history_min_peer_count_eq?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: ne)
+     */
+    history_min_peer_count_ne?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: lt)
+     */
+    history_min_peer_count_lt?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: lte)
+     */
+    history_min_peer_count_lte?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: gt)
+     */
+    history_min_peer_count_gt?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: gte)
+     */
+    history_min_peer_count_gte?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: between_min)
+     */
+    history_min_peer_count_between_min?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: between_max_value)
+     */
+    history_min_peer_count_between_max_value?: number;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: in_values) (comma-separated list)
+     */
+    history_min_peer_count_in_values?: string;
+    /**
+     * Peers serving the spec minimum of 33024 epochs of blocks, give or take a day (filter: not_in_values) (comma-separated list)
+     */
+    history_min_peer_count_not_in_values?: string;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: eq)
+     */
+    history_under_min_peer_count_eq?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: ne)
+     */
+    history_under_min_peer_count_ne?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: lt)
+     */
+    history_under_min_peer_count_lt?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: lte)
+     */
+    history_under_min_peer_count_lte?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: gt)
+     */
+    history_under_min_peer_count_gt?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: gte)
+     */
+    history_under_min_peer_count_gte?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: between_min)
+     */
+    history_under_min_peer_count_between_min?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: between_max_value)
+     */
+    history_under_min_peer_count_between_max_value?: number;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: in_values) (comma-separated list)
+     */
+    history_under_min_peer_count_in_values?: string;
+    /**
+     * Peers serving more than a day less than the spec minimum of 33024 epochs of blocks (filter: not_in_values) (comma-separated list)
+     */
+    history_under_min_peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_sync_status_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerSyncStatusByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_sync_status_by_cl_client_daily';
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceListError =
+  FctPeerSyncStatusByClClientDailyServiceListErrors[keyof FctPeerSyncStatusByClClientDailyServiceListErrors];
+
+export type FctPeerSyncStatusByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerSyncStatusByClClientDailyResponse;
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceListResponse =
+  FctPeerSyncStatusByClClientDailyServiceListResponses[keyof FctPeerSyncStatusByClClientDailyServiceListResponses];
+
+export type FctPeerSyncStatusByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_sync_status_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceGetError =
+  FctPeerSyncStatusByClClientDailyServiceGetErrors[keyof FctPeerSyncStatusByClClientDailyServiceGetErrors];
+
+export type FctPeerSyncStatusByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerSyncStatusByClClientDailyResponse;
+};
+
+export type FctPeerSyncStatusByClClientDailyServiceGetResponse =
+  FctPeerSyncStatusByClClientDailyServiceGetResponses[keyof FctPeerSyncStatusByClClientDailyServiceGetResponses];
 
 export type FctPreparedBlockServiceListData = {
   body?: never;
@@ -177531,6 +187834,2010 @@ export type IntExecutionStateSizeByBlockServiceGetResponses = {
 
 export type IntExecutionStateSizeByBlockServiceGetResponse =
   IntExecutionStateSizeByBlockServiceGetResponses[keyof IntExecutionStateSizeByBlockServiceGetResponses];
+
+export type IntPeerDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: eq)
+     */
+    peer_id_unique_key_eq?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: ne)
+     */
+    peer_id_unique_key_ne?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: lt)
+     */
+    peer_id_unique_key_lt?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: lte)
+     */
+    peer_id_unique_key_lte?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: gt)
+     */
+    peer_id_unique_key_gt?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: gte)
+     */
+    peer_id_unique_key_gte?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: between_min)
+     */
+    peer_id_unique_key_between_min?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: between_max_value)
+     */
+    peer_id_unique_key_between_max_value?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: in_values) (comma-separated list)
+     */
+    peer_id_unique_key_in_values?: string;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: not_in_values) (comma-separated list)
+     */
+    peer_id_unique_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: eq)
+     */
+    peer_id_eq?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: ne)
+     */
+    peer_id_ne?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: contains)
+     */
+    peer_id_contains?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: starts_with)
+     */
+    peer_id_starts_with?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: ends_with)
+     */
+    peer_id_ends_with?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: like)
+     */
+    peer_id_like?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: not_like)
+     */
+    peer_id_not_like?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: in_values) (comma-separated list)
+     */
+    peer_id_in_values?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: not_in_values) (comma-separated list)
+     */
+    peer_id_not_in_values?: string;
+    /**
+     * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount (filter: eq)
+     */
+    seen_by_sentry_eq?: boolean;
+    /**
+     * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount (filter: ne)
+     */
+    seen_by_sentry_ne?: boolean;
+    /**
+     * Our discovery crawler dialled the peer from its ENR in the day (filter: eq)
+     */
+    seen_by_enr_eq?: boolean;
+    /**
+     * Our discovery crawler dialled the peer from its ENR in the day (filter: ne)
+     */
+    seen_by_enr_ne?: boolean;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: eq)
+     */
+    agent_version_eq?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: ne)
+     */
+    agent_version_ne?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: contains)
+     */
+    agent_version_contains?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: starts_with)
+     */
+    agent_version_starts_with?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: ends_with)
+     */
+    agent_version_ends_with?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: like)
+     */
+    agent_version_like?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: not_like)
+     */
+    agent_version_not_like?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: in_values) (comma-separated list)
+     */
+    agent_version_in_values?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: not_in_values) (comma-separated list)
+     */
+    agent_version_not_in_values?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: eq)
+     */
+    city_eq?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: ne)
+     */
+    city_ne?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: contains)
+     */
+    city_contains?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: starts_with)
+     */
+    city_starts_with?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: ends_with)
+     */
+    city_ends_with?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: like)
+     */
+    city_like?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: not_like)
+     */
+    city_not_like?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: in_values) (comma-separated list)
+     */
+    city_in_values?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: not_in_values) (comma-separated list)
+     */
+    city_not_in_values?: string;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: eq)
+     */
+    provider_eq?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: ne)
+     */
+    provider_ne?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: contains)
+     */
+    provider_contains?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: starts_with)
+     */
+    provider_starts_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: ends_with)
+     */
+    provider_ends_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: like)
+     */
+    provider_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: not_like)
+     */
+    provider_not_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    provider_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    provider_not_in_values?: string;
+    /**
+     * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6 (filter: eq)
+     */
+    ipv6_eq?: boolean;
+    /**
+     * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6 (filter: ne)
+     */
+    ipv6_ne?: boolean;
+    /**
+     * Our sentries dialled the peer (an outbound connection), so it is publicly reachable (filter: eq)
+     */
+    dialled_eq?: boolean;
+    /**
+     * Our sentries dialled the peer (an outbound connection), so it is publicly reachable (filter: ne)
+     */
+    dialled_ne?: boolean;
+    /**
+     * The peer connected to our sentries (an inbound connection) (filter: eq)
+     */
+    inbound_eq?: boolean;
+    /**
+     * The peer connected to our sentries (an inbound connection) (filter: ne)
+     */
+    inbound_ne?: boolean;
+    /**
+     * Connected to over QUIC (filter: eq)
+     */
+    quic_connected_eq?: boolean;
+    /**
+     * Connected to over QUIC (filter: ne)
+     */
+    quic_connected_ne?: boolean;
+    /**
+     * Advertises a QUIC listen address in identify (filter: eq)
+     */
+    quic_listen_eq?: boolean;
+    /**
+     * Advertises a QUIC listen address in identify (filter: ne)
+     */
+    quic_listen_ne?: boolean;
+    /**
+     * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known (filter: eq)
+     */
+    enr_ip_mismatch_eq?: boolean;
+    /**
+     * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known (filter: ne)
+     */
+    enr_ip_mismatch_ne?: boolean;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: eq)
+     */
+    custody_group_count_eq?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: ne)
+     */
+    custody_group_count_ne?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: lt)
+     */
+    custody_group_count_lt?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: lte)
+     */
+    custody_group_count_lte?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: gt)
+     */
+    custody_group_count_gt?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: gte)
+     */
+    custody_group_count_gte?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: between_min)
+     */
+    custody_group_count_between_min?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: between_max_value)
+     */
+    custody_group_count_between_max_value?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: in_values) (comma-separated list)
+     */
+    custody_group_count_in_values?: string;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: not_in_values) (comma-separated list)
+     */
+    custody_group_count_not_in_values?: string;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: eq)
+     */
+    latency_ms_eq?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: ne)
+     */
+    latency_ms_ne?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: lt)
+     */
+    latency_ms_lt?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: lte)
+     */
+    latency_ms_lte?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: gt)
+     */
+    latency_ms_gt?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: gte)
+     */
+    latency_ms_gte?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: between_min)
+     */
+    latency_ms_between_min?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: between_max_value)
+     */
+    latency_ms_between_max_value?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: in_values) (comma-separated list)
+     */
+    latency_ms_in_values?: string;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: not_in_values) (comma-separated list)
+     */
+    latency_ms_not_in_values?: string;
+    /**
+     * Status exchanges with our sentries in the day (filter: eq)
+     */
+    status_count_eq?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: ne)
+     */
+    status_count_ne?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: lt)
+     */
+    status_count_lt?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: lte)
+     */
+    status_count_lte?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: gt)
+     */
+    status_count_gt?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: gte)
+     */
+    status_count_gte?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: between_min)
+     */
+    status_count_between_min?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: between_max_value)
+     */
+    status_count_between_max_value?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: in_values) (comma-separated list)
+     */
+    status_count_in_values?: string;
+    /**
+     * Status exchanges with our sentries in the day (filter: not_in_values) (comma-separated list)
+     */
+    status_count_not_in_values?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: eq)
+     */
+    fork_digest_eq?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: ne)
+     */
+    fork_digest_ne?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: contains)
+     */
+    fork_digest_contains?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: starts_with)
+     */
+    fork_digest_starts_with?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: ends_with)
+     */
+    fork_digest_ends_with?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: like)
+     */
+    fork_digest_like?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: not_like)
+     */
+    fork_digest_not_like?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: in_values) (comma-separated list)
+     */
+    fork_digest_in_values?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: not_in_values) (comma-separated list)
+     */
+    fork_digest_not_in_values?: string;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: eq)
+     */
+    head_lag_slots_eq?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: ne)
+     */
+    head_lag_slots_ne?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: lt)
+     */
+    head_lag_slots_lt?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: lte)
+     */
+    head_lag_slots_lte?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: gt)
+     */
+    head_lag_slots_gt?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: gte)
+     */
+    head_lag_slots_gte?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: between_min)
+     */
+    head_lag_slots_between_min?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: between_max_value)
+     */
+    head_lag_slots_between_max_value?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: in_values) (comma-separated list)
+     */
+    head_lag_slots_in_values?: string;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: not_in_values) (comma-separated list)
+     */
+    head_lag_slots_not_in_values?: string;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: eq)
+     */
+    finalized_lag_epochs_eq?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: ne)
+     */
+    finalized_lag_epochs_ne?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: lt)
+     */
+    finalized_lag_epochs_lt?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: lte)
+     */
+    finalized_lag_epochs_lte?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: gt)
+     */
+    finalized_lag_epochs_gt?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: gte)
+     */
+    finalized_lag_epochs_gte?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: between_min)
+     */
+    finalized_lag_epochs_between_min?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: between_max_value)
+     */
+    finalized_lag_epochs_between_max_value?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: in_values) (comma-separated list)
+     */
+    finalized_lag_epochs_in_values?: string;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: not_in_values) (comma-separated list)
+     */
+    finalized_lag_epochs_not_in_values?: string;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: eq)
+     */
+    earliest_available_slot_eq?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: ne)
+     */
+    earliest_available_slot_ne?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: lt)
+     */
+    earliest_available_slot_lt?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: lte)
+     */
+    earliest_available_slot_lte?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: gt)
+     */
+    earliest_available_slot_gt?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: gte)
+     */
+    earliest_available_slot_gte?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: between_min)
+     */
+    earliest_available_slot_between_min?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: between_max_value)
+     */
+    earliest_available_slot_between_max_value?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: in_values) (comma-separated list)
+     */
+    earliest_available_slot_in_values?: string;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: not_in_values) (comma-separated list)
+     */
+    earliest_available_slot_not_in_values?: string;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: eq)
+     */
+    served_history_slots_eq?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: ne)
+     */
+    served_history_slots_ne?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: lt)
+     */
+    served_history_slots_lt?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: lte)
+     */
+    served_history_slots_lte?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: gt)
+     */
+    served_history_slots_gt?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: gte)
+     */
+    served_history_slots_gte?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: between_min)
+     */
+    served_history_slots_between_min?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: between_max_value)
+     */
+    served_history_slots_between_max_value?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: in_values) (comma-separated list)
+     */
+    served_history_slots_in_values?: string;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: not_in_values) (comma-separated list)
+     */
+    served_history_slots_not_in_values?: string;
+    /**
+     * The maximum number of int_peer_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntPeerDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_peer_daily';
+};
+
+export type IntPeerDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntPeerDailyServiceListError = IntPeerDailyServiceListErrors[keyof IntPeerDailyServiceListErrors];
+
+export type IntPeerDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntPeerDailyResponse;
+};
+
+export type IntPeerDailyServiceListResponse = IntPeerDailyServiceListResponses[keyof IntPeerDailyServiceListResponses];
+
+export type IntPeerDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/int_peer_daily/{day_start_date}';
+};
+
+export type IntPeerDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntPeerDailyServiceGetError = IntPeerDailyServiceGetErrors[keyof IntPeerDailyServiceGetErrors];
+
+export type IntPeerDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntPeerDailyResponse;
+};
+
+export type IntPeerDailyServiceGetResponse = IntPeerDailyServiceGetResponses[keyof IntPeerDailyServiceGetResponses];
+
+export type IntPeerDailyOrderByPeerIdServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: eq)
+     */
+    peer_id_eq?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: ne)
+     */
+    peer_id_ne?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: contains)
+     */
+    peer_id_contains?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: starts_with)
+     */
+    peer_id_starts_with?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: ends_with)
+     */
+    peer_id_ends_with?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: like)
+     */
+    peer_id_like?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: not_like)
+     */
+    peer_id_not_like?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: in_values) (comma-separated list)
+     */
+    peer_id_in_values?: string;
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026) (filter: not_in_values) (comma-separated list)
+     */
+    peer_id_not_in_values?: string;
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: eq)
+     */
+    peer_id_unique_key_eq?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: ne)
+     */
+    peer_id_unique_key_ne?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: lt)
+     */
+    peer_id_unique_key_lt?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: lte)
+     */
+    peer_id_unique_key_lte?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: gt)
+     */
+    peer_id_unique_key_gt?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: gte)
+     */
+    peer_id_unique_key_gte?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: between_min)
+     */
+    peer_id_unique_key_between_min?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: between_max_value)
+     */
+    peer_id_unique_key_between_max_value?: number;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: in_values) (comma-separated list)
+     */
+    peer_id_unique_key_in_values?: string;
+    /**
+     * Hash of the peer ID and network, the key shared by the libp2p tables (filter: not_in_values) (comma-separated list)
+     */
+    peer_id_unique_key_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount (filter: eq)
+     */
+    seen_by_sentry_eq?: boolean;
+    /**
+     * Our libp2p sentries were connected to the peer in the day. False on both sources means the peer was dropped from the day on a recount (filter: ne)
+     */
+    seen_by_sentry_ne?: boolean;
+    /**
+     * Our discovery crawler dialled the peer from its ENR in the day (filter: eq)
+     */
+    seen_by_enr_eq?: boolean;
+    /**
+     * Our discovery crawler dialled the peer from its ENR in the day (filter: ne)
+     */
+    seen_by_enr_ne?: boolean;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client from the peer agent, else its ENR name (erigon reported as caplin), unknown when neither names one, other for unparseable names (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: eq)
+     */
+    version_eq?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: ne)
+     */
+    version_ne?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: contains)
+     */
+    version_contains?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: starts_with)
+     */
+    version_starts_with?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: ends_with)
+     */
+    version_ends_with?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: like)
+     */
+    version_like?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: not_like)
+     */
+    version_not_like?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: in_values) (comma-separated list)
+     */
+    version_in_values?: string;
+    /**
+     * Version the agent states (semver with any pre-release suffix), empty when it states none (filter: not_in_values) (comma-separated list)
+     */
+    version_not_in_values?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: eq)
+     */
+    agent_version_eq?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: ne)
+     */
+    agent_version_ne?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: contains)
+     */
+    agent_version_contains?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: starts_with)
+     */
+    agent_version_starts_with?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: ends_with)
+     */
+    agent_version_ends_with?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: like)
+     */
+    agent_version_like?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: not_like)
+     */
+    agent_version_not_like?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: in_values) (comma-separated list)
+     */
+    agent_version_in_values?: string;
+    /**
+     * Version field of the agent as reported, for Caplin its platform field (filter: not_in_values) (comma-separated list)
+     */
+    agent_version_not_in_values?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: eq)
+     */
+    continent_code_eq?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: ne)
+     */
+    continent_code_ne?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: contains)
+     */
+    continent_code_contains?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: starts_with)
+     */
+    continent_code_starts_with?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: ends_with)
+     */
+    continent_code_ends_with?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: like)
+     */
+    continent_code_like?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: not_like)
+     */
+    continent_code_not_like?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    continent_code_in_values?: string;
+    /**
+     * Continent code of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    continent_code_not_in_values?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: eq)
+     */
+    country_code_eq?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: ne)
+     */
+    country_code_ne?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: contains)
+     */
+    country_code_contains?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: starts_with)
+     */
+    country_code_starts_with?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: ends_with)
+     */
+    country_code_ends_with?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: like)
+     */
+    country_code_like?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: not_like)
+     */
+    country_code_not_like?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_code_in_values?: string;
+    /**
+     * Country code of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_code_not_in_values?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: eq)
+     */
+    country_eq?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: ne)
+     */
+    country_ne?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: contains)
+     */
+    country_contains?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: starts_with)
+     */
+    country_starts_with?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: ends_with)
+     */
+    country_ends_with?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: like)
+     */
+    country_like?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: not_like)
+     */
+    country_not_like?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: in_values) (comma-separated list)
+     */
+    country_in_values?: string;
+    /**
+     * Country name of the address, empty when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    country_not_in_values?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: eq)
+     */
+    city_eq?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: ne)
+     */
+    city_ne?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: contains)
+     */
+    city_contains?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: starts_with)
+     */
+    city_starts_with?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: ends_with)
+     */
+    city_ends_with?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: like)
+     */
+    city_like?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: not_like)
+     */
+    city_not_like?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: in_values) (comma-separated list)
+     */
+    city_in_values?: string;
+    /**
+     * City of the address for hosting peers, empty for residential peers (network_type other or unknown) and when not geolocated to a city (filter: not_in_values) (comma-separated list)
+     */
+    city_not_in_values?: string;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: eq)
+     */
+    autonomous_system_number_eq?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: ne)
+     */
+    autonomous_system_number_ne?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: lt)
+     */
+    autonomous_system_number_lt?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: lte)
+     */
+    autonomous_system_number_lte?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: gt)
+     */
+    autonomous_system_number_gt?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: gte)
+     */
+    autonomous_system_number_gte?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: between_min)
+     */
+    autonomous_system_number_between_min?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: between_max_value)
+     */
+    autonomous_system_number_between_max_value?: number;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_number_in_values?: string;
+    /**
+     * Autonomous system number of the address for hosting peers, 0 for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_number_not_in_values?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: eq)
+     */
+    autonomous_system_organization_eq?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: ne)
+     */
+    autonomous_system_organization_ne?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: contains)
+     */
+    autonomous_system_organization_contains?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: starts_with)
+     */
+    autonomous_system_organization_starts_with?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: ends_with)
+     */
+    autonomous_system_organization_ends_with?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: like)
+     */
+    autonomous_system_organization_like?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: not_like)
+     */
+    autonomous_system_organization_not_like?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    autonomous_system_organization_in_values?: string;
+    /**
+     * Autonomous system organisation of the address for hosting peers, empty for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    autonomous_system_organization_not_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: eq)
+     */
+    network_type_eq?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ne)
+     */
+    network_type_ne?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: contains)
+     */
+    network_type_contains?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: starts_with)
+     */
+    network_type_starts_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: ends_with)
+     */
+    network_type_ends_with?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: like)
+     */
+    network_type_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_like)
+     */
+    network_type_not_like?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: in_values) (comma-separated list)
+     */
+    network_type_in_values?: string;
+    /**
+     * hosting for cloud and hosting providers (known ASNs and organisation names), other for the rest (mostly residential and business ISPs), unknown when not geolocated (filter: not_in_values) (comma-separated list)
+     */
+    network_type_not_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: eq)
+     */
+    provider_eq?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: ne)
+     */
+    provider_ne?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: contains)
+     */
+    provider_contains?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: starts_with)
+     */
+    provider_starts_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: ends_with)
+     */
+    provider_ends_with?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: like)
+     */
+    provider_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: not_like)
+     */
+    provider_not_like?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: in_values) (comma-separated list)
+     */
+    provider_in_values?: string;
+    /**
+     * Network operator: one name for providers that span several autonomous systems or organisation names (Amazon, Google, Microsoft, Alibaba, Oracle, OVHcloud, Hetzner, Contabo, Akamai, Tencent), else the organisation without its legal suffix. Empty for residential peers and when unknown (filter: not_in_values) (comma-separated list)
+     */
+    provider_not_in_values?: string;
+    /**
+     * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6 (filter: eq)
+     */
+    ipv6_eq?: boolean;
+    /**
+     * The peer advertises a global IPv6 address, in an identify listen address or its ENR record, or we connected to it over IPv6 (filter: ne)
+     */
+    ipv6_ne?: boolean;
+    /**
+     * Our sentries dialled the peer (an outbound connection), so it is publicly reachable (filter: eq)
+     */
+    dialled_eq?: boolean;
+    /**
+     * Our sentries dialled the peer (an outbound connection), so it is publicly reachable (filter: ne)
+     */
+    dialled_ne?: boolean;
+    /**
+     * The peer connected to our sentries (an inbound connection) (filter: eq)
+     */
+    inbound_eq?: boolean;
+    /**
+     * The peer connected to our sentries (an inbound connection) (filter: ne)
+     */
+    inbound_ne?: boolean;
+    /**
+     * Connected to over QUIC (filter: eq)
+     */
+    quic_connected_eq?: boolean;
+    /**
+     * Connected to over QUIC (filter: ne)
+     */
+    quic_connected_ne?: boolean;
+    /**
+     * Advertises a QUIC listen address in identify (filter: eq)
+     */
+    quic_listen_eq?: boolean;
+    /**
+     * Advertises a QUIC listen address in identify (filter: ne)
+     */
+    quic_listen_ne?: boolean;
+    /**
+     * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known (filter: eq)
+     */
+    enr_ip_mismatch_eq?: boolean;
+    /**
+     * The address in the peer ENR differs from the one our sentries connected to, NULL unless both are known (filter: ne)
+     */
+    enr_ip_mismatch_ne?: boolean;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: eq)
+     */
+    custody_group_count_eq?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: ne)
+     */
+    custody_group_count_ne?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: lt)
+     */
+    custody_group_count_lt?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: lte)
+     */
+    custody_group_count_lte?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: gt)
+     */
+    custody_group_count_gt?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: gte)
+     */
+    custody_group_count_gte?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: between_min)
+     */
+    custody_group_count_between_min?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: between_max_value)
+     */
+    custody_group_count_between_max_value?: number;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: in_values) (comma-separated list)
+     */
+    custody_group_count_in_values?: string;
+    /**
+     * Custody group count from the peer metadata responses, else from its ENR, NULL when unknown (filter: not_in_values) (comma-separated list)
+     */
+    custody_group_count_not_in_values?: string;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: eq)
+     */
+    latency_ms_eq?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: ne)
+     */
+    latency_ms_ne?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: lt)
+     */
+    latency_ms_lt?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: lte)
+     */
+    latency_ms_lte?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: gt)
+     */
+    latency_ms_gt?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: gte)
+     */
+    latency_ms_gte?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: between_min)
+     */
+    latency_ms_between_min?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: between_max_value)
+     */
+    latency_ms_between_max_value?: number;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: in_values) (comma-separated list)
+     */
+    latency_ms_in_values?: string;
+    /**
+     * Median heartbeat latency to our sentries in ms, NULL without heartbeat latencies (filter: not_in_values) (comma-separated list)
+     */
+    latency_ms_not_in_values?: string;
+    /**
+     * Status exchanges with our sentries in the day (filter: eq)
+     */
+    status_count_eq?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: ne)
+     */
+    status_count_ne?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: lt)
+     */
+    status_count_lt?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: lte)
+     */
+    status_count_lte?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: gt)
+     */
+    status_count_gt?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: gte)
+     */
+    status_count_gte?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: between_min)
+     */
+    status_count_between_min?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: between_max_value)
+     */
+    status_count_between_max_value?: number;
+    /**
+     * Status exchanges with our sentries in the day (filter: in_values) (comma-separated list)
+     */
+    status_count_in_values?: string;
+    /**
+     * Status exchanges with our sentries in the day (filter: not_in_values) (comma-separated list)
+     */
+    status_count_not_in_values?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: eq)
+     */
+    fork_digest_eq?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: ne)
+     */
+    fork_digest_ne?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: contains)
+     */
+    fork_digest_contains?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: starts_with)
+     */
+    fork_digest_starts_with?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: ends_with)
+     */
+    fork_digest_ends_with?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: like)
+     */
+    fork_digest_like?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: not_like)
+     */
+    fork_digest_not_like?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: in_values) (comma-separated list)
+     */
+    fork_digest_in_values?: string;
+    /**
+     * Fork digest of the peer latest status, else of its ENR, empty when neither is known (filter: not_in_values) (comma-separated list)
+     */
+    fork_digest_not_in_values?: string;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: eq)
+     */
+    head_lag_slots_eq?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: ne)
+     */
+    head_lag_slots_ne?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: lt)
+     */
+    head_lag_slots_lt?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: lte)
+     */
+    head_lag_slots_lte?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: gt)
+     */
+    head_lag_slots_gt?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: gte)
+     */
+    head_lag_slots_gte?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: between_min)
+     */
+    head_lag_slots_between_min?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: between_max_value)
+     */
+    head_lag_slots_between_max_value?: number;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: in_values) (comma-separated list)
+     */
+    head_lag_slots_in_values?: string;
+    /**
+     * Median of the slots the peer head trailed the head of the sentry it exchanged status with, NULL without status exchanges (filter: not_in_values) (comma-separated list)
+     */
+    head_lag_slots_not_in_values?: string;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: eq)
+     */
+    finalized_lag_epochs_eq?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: ne)
+     */
+    finalized_lag_epochs_ne?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: lt)
+     */
+    finalized_lag_epochs_lt?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: lte)
+     */
+    finalized_lag_epochs_lte?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: gt)
+     */
+    finalized_lag_epochs_gt?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: gte)
+     */
+    finalized_lag_epochs_gte?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: between_min)
+     */
+    finalized_lag_epochs_between_min?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: between_max_value)
+     */
+    finalized_lag_epochs_between_max_value?: number;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: in_values) (comma-separated list)
+     */
+    finalized_lag_epochs_in_values?: string;
+    /**
+     * Median of the epochs the peer finalized checkpoint trailed that of the sentry it exchanged status with, NULL without status exchanges (filter: not_in_values) (comma-separated list)
+     */
+    finalized_lag_epochs_not_in_values?: string;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: eq)
+     */
+    earliest_available_slot_eq?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: ne)
+     */
+    earliest_available_slot_ne?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: lt)
+     */
+    earliest_available_slot_lt?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: lte)
+     */
+    earliest_available_slot_lte?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: gt)
+     */
+    earliest_available_slot_gt?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: gte)
+     */
+    earliest_available_slot_gte?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: between_min)
+     */
+    earliest_available_slot_between_min?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: between_max_value)
+     */
+    earliest_available_slot_between_max_value?: number;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: in_values) (comma-separated list)
+     */
+    earliest_available_slot_in_values?: string;
+    /**
+     * Earliest slot the peer serves blocks from in its latest status (0 for full history), NULL when it sent none (status v1) (filter: not_in_values) (comma-separated list)
+     */
+    earliest_available_slot_not_in_values?: string;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: eq)
+     */
+    served_history_slots_eq?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: ne)
+     */
+    served_history_slots_ne?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: lt)
+     */
+    served_history_slots_lt?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: lte)
+     */
+    served_history_slots_lte?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: gt)
+     */
+    served_history_slots_gt?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: gte)
+     */
+    served_history_slots_gte?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: between_min)
+     */
+    served_history_slots_between_min?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: between_max_value)
+     */
+    served_history_slots_between_max_value?: number;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: in_values) (comma-separated list)
+     */
+    served_history_slots_in_values?: string;
+    /**
+     * Slots of block history the peer serves at its latest status: the head of the sentry it exchanged status with minus earliest_available_slot. The spec minimum is 1056768 slots (33024 epochs) (filter: not_in_values) (comma-separated list)
+     */
+    served_history_slots_not_in_values?: string;
+    /**
+     * The maximum number of int_peer_daily_order_by_peer_id to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntPeerDailyOrderByPeerId` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_peer_daily_order_by_peer_id';
+};
+
+export type IntPeerDailyOrderByPeerIdServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntPeerDailyOrderByPeerIdServiceListError =
+  IntPeerDailyOrderByPeerIdServiceListErrors[keyof IntPeerDailyOrderByPeerIdServiceListErrors];
+
+export type IntPeerDailyOrderByPeerIdServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntPeerDailyOrderByPeerIdResponse;
+};
+
+export type IntPeerDailyOrderByPeerIdServiceListResponse =
+  IntPeerDailyOrderByPeerIdServiceListResponses[keyof IntPeerDailyOrderByPeerIdServiceListResponses];
+
+export type IntPeerDailyOrderByPeerIdServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * libp2p peer ID, empty when the peer was only seen before peer IDs were recorded (April 2026)
+     */
+    peer_id: string;
+  };
+  query?: never;
+  url: '/api/v1/int_peer_daily_order_by_peer_id/{peer_id}';
+};
+
+export type IntPeerDailyOrderByPeerIdServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntPeerDailyOrderByPeerIdServiceGetError =
+  IntPeerDailyOrderByPeerIdServiceGetErrors[keyof IntPeerDailyOrderByPeerIdServiceGetErrors];
+
+export type IntPeerDailyOrderByPeerIdServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntPeerDailyOrderByPeerIdResponse;
+};
+
+export type IntPeerDailyOrderByPeerIdServiceGetResponse =
+  IntPeerDailyOrderByPeerIdServiceGetResponses[keyof IntPeerDailyOrderByPeerIdServiceGetResponses];
 
 export type IntRocketpoolMegapoolServiceListData = {
   body?: never;

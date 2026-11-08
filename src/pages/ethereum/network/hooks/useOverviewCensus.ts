@@ -1,94 +1,141 @@
 import { useMemo } from 'react';
 import {
+  fctPeerConcentrationClDailyServiceList,
+  fctPeerConcentrationElDailyServiceList,
+  fctPeerCountByCountryDailyServiceList,
+  fctPeerCountByElCountryDailyServiceList,
+  fctPeerCountBySourceDailyServiceList,
+  fctPeerReachabilityByClClientDailyServiceList,
+  fctPeerSyncStatusByClClientDailyServiceList,
+} from '@/api/sdk.gen';
+import type {
+  FctPeerConcentrationClDaily,
+  FctPeerCountByCountryDaily,
+  FctPeerCountBySourceDaily,
+  FctPeerReachabilityByClClientDaily,
+  FctPeerSyncStatusByClClientDaily,
+} from '@/api/types.gen';
+import {
   CENSUS_TABLES,
   censusList,
-  fctBlockProposalByClientDailyList,
-  type FctBlockProposalByClientDaily,
-  type FctPeerCountByClClientDaily,
-  type FctPeerCountByClientAsnDaily,
-  type FctPeerCountByClientCountryDaily,
   type FctPeerForkReadinessByClClientDaily,
   type FctPeerForkReadinessByElClientDaily,
 } from '@/pages/ethereum/clients/api/client-models';
-import { EL_CRAWL_START } from '../constants';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
+import type { fetchAllPages } from '@/utils/api-pagination';
+import { EL_CRAWL_START, TOP_PLACES } from '../constants';
 import { onChainRows } from '../utils/network-census';
+import { topCountries, type ConcentrationRow, type CountryDayRow } from '../utils/network-series';
+import { useRangeDays, type UseRangeDaysResult } from './useRangeDays';
 import { useRangeEnds, type UseRangeEndsResult } from './useRangeEnds';
 
+type ListFn = Parameters<typeof fetchAllPages>[0];
+
 export interface OverviewCensus {
-  /** Consensus peers per client and version */
-  cl: UseRangeEndsResult<FctPeerCountByClClientDaily>;
-  /** Execution nodes on this chain per client, version and fork ID */
-  el: UseRangeEndsResult<FctPeerForkReadinessByElClientDaily>;
-  /** Consensus peers per client and country */
-  countries: UseRangeEndsResult<FctPeerCountByClientCountryDaily>;
-  /** Consensus peers per client and network */
-  networks: UseRangeEndsResult<FctPeerCountByClientAsnDaily>;
+  /** Network-wide consensus peers by source, custody and connection, one row a day */
+  peers: UseRangeDaysResult<FctPeerCountBySourceDaily>;
+  /** Consensus peers' head and finality lag, fork and history per client, each day */
+  sync: UseRangeDaysResult<FctPeerSyncStatusByClClientDaily>;
+  /** How each consensus client's peers connect, each day */
+  reachability: UseRangeDaysResult<FctPeerReachabilityByClClientDaily>;
+  /** Where each layer's nodes run, one row a day; execution from the crawl's full-scale start */
+  concentration: Record<ClientLayer, UseRangeDaysResult<ConcentrationRow>>;
+  /** The selected layer's largest countries on the latest day, largest first */
+  countryCodes: string[];
+  /** Those countries' nodes each day of the range, for the selected layer */
+  countries: UseRangeDaysResult<CountryDayRow>;
   /** Consensus ENRs per client and next fork digest, latest day only */
   clReadiness: UseRangeEndsResult<FctPeerForkReadinessByClClientDaily>;
   /** Execution ENRs on this chain per client and next fork, latest day only */
   elReadiness: FctPeerForkReadinessByElClientDaily[];
-  /** Proposed blocks per client, latest day only */
-  blocks: UseRangeEndsResult<FctBlockProposalByClientDaily>;
   isLoading: boolean;
 }
 
 const ALL = {};
 
+const TABLES = {
+  peers: 'fct_peer_count_by_source_daily',
+  sync: 'fct_peer_sync_status_by_cl_client_daily',
+  reachability: 'fct_peer_reachability_by_cl_client_daily',
+  concentration: { consensus: 'fct_peer_concentration_cl_daily', execution: 'fct_peer_concentration_el_daily' },
+  countries: { consensus: 'fct_peer_count_by_country_daily', execution: 'fct_peer_count_by_el_country_daily' },
+} as const;
+
+const COUNTRY_LISTS: Record<ClientLayer, ListFn> = {
+  consensus: fctPeerCountByCountryDailyServiceList as ListFn,
+  execution: fctPeerCountByElCountryDailyServiceList as ListFn,
+};
+
+/** Execution history starts where the crawl counts nodes at today's scale */
+const FLOOR: Record<ClientLayer, string | undefined> = { consensus: undefined, execution: EL_CRAWL_START };
+
 /**
- * Everything the network overview shows, as rows of the range's first and last days. Execution nodes count only those
- * on this chain, from the execution ENR crawl's fork IDs.
+ * Everything the network overview shows: the daily series over the range, for `layer` where the nodes run, and fork
+ * readiness on the latest day. Each read is a few rows a day; the countries are the layer's ten largest.
  */
-export function useOverviewCensus(days: number | null): OverviewCensus {
-  const cl = useRangeEnds<FctPeerCountByClClientDaily>(
-    censusList(CENSUS_TABLES.clPeers),
-    CENSUS_TABLES.clPeers,
-    ALL,
+export function useOverviewCensus(days: number | null, layer: ClientLayer): OverviewCensus {
+  const peers = useRangeDays<FctPeerCountBySourceDaily>(
+    fctPeerCountBySourceDailyServiceList as ListFn,
+    TABLES.peers,
     days
   );
-  const elAll = useRangeEnds<FctPeerForkReadinessByElClientDaily>(
-    censusList(CENSUS_TABLES.elReadiness),
-    CENSUS_TABLES.elReadiness,
-    ALL,
+  const sync = useRangeDays<FctPeerSyncStatusByClClientDaily>(
+    fctPeerSyncStatusByClClientDailyServiceList as ListFn,
+    TABLES.sync,
+    days
+  );
+  const reachability = useRangeDays<FctPeerReachabilityByClClientDaily>(
+    fctPeerReachabilityByClClientDailyServiceList as ListFn,
+    TABLES.reachability,
+    days
+  );
+  const concentrationCl = useRangeDays<FctPeerConcentrationClDaily>(
+    fctPeerConcentrationClDailyServiceList as ListFn,
+    TABLES.concentration.consensus,
+    days
+  );
+  const concentrationEl = useRangeDays<ConcentrationRow>(
+    fctPeerConcentrationElDailyServiceList as ListFn,
+    TABLES.concentration.execution,
     days,
-    EL_CRAWL_START
+    { floor: EL_CRAWL_START }
   );
-  const countries = useRangeEnds<FctPeerCountByClientCountryDaily>(
-    censusList(CENSUS_TABLES.clCountry),
-    CENSUS_TABLES.clCountry,
+
+  const latestCountries = useRangeEnds<FctPeerCountByCountryDaily>(
+    COUNTRY_LISTS[layer],
+    TABLES.countries[layer],
     ALL,
-    days
+    1
   );
-  const networks = useRangeEnds<FctPeerCountByClientAsnDaily>(
-    censusList(CENSUS_TABLES.clAsn),
-    CENSUS_TABLES.clAsn,
-    ALL,
-    days
-  );
+  const countryCodes = useMemo(() => topCountries(latestCountries.end, TOP_PLACES), [latestCountries.end]);
+  const countries = useRangeDays<CountryDayRow>(COUNTRY_LISTS[layer], TABLES.countries[layer], days, {
+    filters: countryCodes.length > 0 ? { country_code_in_values: countryCodes.join(',') } : null,
+    floor: FLOOR[layer],
+  });
+
   const clReadiness = useRangeEnds<FctPeerForkReadinessByClClientDaily>(
     censusList(CENSUS_TABLES.clReadiness),
     CENSUS_TABLES.clReadiness,
     ALL,
     1
   );
-  const blocks = useRangeEnds<FctBlockProposalByClientDaily>(
-    fctBlockProposalByClientDailyList,
-    'fct_block_proposal_by_client_daily',
+  const elReadiness = useRangeEnds<FctPeerForkReadinessByElClientDaily>(
+    censusList(CENSUS_TABLES.elReadiness),
+    CENSUS_TABLES.elReadiness,
     ALL,
     1
   );
-
-  const elEnd = useMemo(() => onChainRows(elAll.end), [elAll.end]);
-  const elStart = useMemo(() => (elAll.start ? onChainRows(elAll.start) : null), [elAll.start]);
-  const el = useMemo(() => ({ ...elAll, end: elEnd, start: elStart }), [elAll, elEnd, elStart]);
+  const elOnChain = useMemo(() => onChainRows(elReadiness.end), [elReadiness.end]);
 
   return {
-    cl,
-    el,
-    countries,
-    networks,
+    peers,
+    sync,
+    reachability,
+    concentration: { consensus: concentrationCl, execution: concentrationEl },
+    countryCodes,
+    countries: { rows: countries.rows, isLoading: latestCountries.isLoading || countries.isLoading },
     clReadiness,
-    elReadiness: elEnd,
-    blocks,
-    isLoading: cl.isLoading || elAll.isLoading || countries.isLoading || networks.isLoading,
+    elReadiness: elOnChain,
+    isLoading: peers.isLoading || sync.isLoading || reachability.isLoading,
   };
 }

@@ -49,19 +49,17 @@ export function ChartCardSkeleton(): JSX.Element {
 }
 
 /**
- * Loading skeleton for the network overview: the stats strip, then the client and place tables.
+ * Loading skeleton for the network overview: the nodes chart, then the sync and history charts.
  */
 export function NetworkSkeleton(): JSX.Element {
   return (
     <div className="flex flex-col gap-6">
-      <StatsSkeleton />
+      <ChartCardSkeleton />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <TableCardSkeleton rows={7} />
-        <TableCardSkeleton rows={6} />
-      </div>
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <TableCardSkeleton rows={10} />
-        <TableCardSkeleton rows={10} />
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
       </div>
     </div>
   );
