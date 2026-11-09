@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import { currentUtcDate } from '@/utils/time';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { intExecutionBlockByDateServiceList } from '@/api/sdk.gen';
+import { useTableBounds } from '@/hooks/useBounds';
+import { useNetwork } from '@/hooks/useNetwork';
 import {
   fctContractStorageStateByAddressDailyServiceListOptions,
   fctContractStorageStateWithExpiryByAddressDailyServiceListOptions,
@@ -62,12 +65,70 @@ interface UseContractStorageDataResult {
   error: Error | null;
 }
 
-/** Query for the newest day in a whole table, so a series isn't carried past where its table stops */
-const TABLE_END_QUERY = {
-  address_like: '0x%',
-  order_by: 'day_start_date desc',
-  page_size: 1,
-};
+/** `block_date_time` is in microseconds */
+const MICROS = 1_000_000;
+
+/** Days searched back for the last day a table has */
+const MAX_TABLE_LAG_DAYS = 90;
+
+/** The UTC date `days` after `date` (YYYY-MM-DD) */
+function addDays(date: string, days: number): string {
+  const result = new Date(`${date}T00:00:00Z`);
+  result.setUTCDate(result.getUTCDate() + days);
+  return formatDateStr(result);
+}
+
+/** First execution block of a UTC day, or null while `int_execution_block_by_date` has no block from it */
+async function fetchFirstBlockOfDay(day: string): Promise<number | null> {
+  const start = Date.parse(`${day}T00:00:00Z`) / 1000;
+  const response = await intExecutionBlockByDateServiceList({
+    query: {
+      block_date_time_gte: start * MICROS,
+      block_date_time_lt: (start + 86400) * MICROS,
+      order_by: 'block_date_time asc',
+      page_size: 1,
+    },
+    throwOnError: true,
+  });
+  return response.data.int_execution_block_by_date?.[0]?.block_number ?? null;
+}
+
+/**
+ * Last day a daily table has, so a series isn't carried past where its table stops. The table's newest block comes
+ * from `/bounds` and is compared with the first block of each day back from today, each read once per day. A table
+ * into today ends yesterday, as today is left out. Undefined while loading; null when the table isn't found.
+ */
+function useTableEndDay(table: string, today: string): string | null | undefined {
+  const queryClient = useQueryClient();
+  const { currentNetwork } = useNetwork();
+  const network = currentNetwork?.name;
+  const { data: bounds, isPending: boundsPending } = useTableBounds(table);
+  const block = bounds?.max;
+
+  const { data, isError } = useQuery({
+    queryKey: ['contracts', 'table-end-day', network, today, block],
+    queryFn: async (): Promise<string | null> => {
+      for (let lag = 0; lag <= MAX_TABLE_LAG_DAYS; lag++) {
+        const day = addDays(today, -lag);
+        const firstBlock = await queryClient.fetchQuery({
+          queryKey: ['execution', 'first-block-of-day', network, day],
+          queryFn: () => fetchFirstBlockOfDay(day),
+          // A day not indexed yet is looked up again; a found block never changes
+          staleTime: query => (query.state.data == null ? 0 : Infinity),
+        });
+        if (firstBlock !== null && block! >= firstBlock) return lag === 0 ? addDays(today, -1) : day;
+      }
+      return null;
+    },
+    enabled: block !== undefined && !!network,
+    // Bounds move every minute; keep the last answer while the next is checked
+    placeholderData: keepPreviousData,
+  });
+
+  if (block === undefined) return boundsPending ? undefined : null;
+  if (isError) return null;
+  return data;
+}
 
 /**
  * Hook that fetches daily storage data for a specific contract address.
@@ -77,7 +138,6 @@ export function useContractStorageData(address: string): UseContractStorageDataR
   // Normalize address to lowercase for API requests
   const normalizedAddress = address.toLowerCase();
   const today = currentUtcDate();
-  const tableEndQuery = { ...TABLE_END_QUERY, day_start_date_ne: today };
 
   // Fetch current state for this address (no expiry)
   const currentStateQuery = useQuery({
@@ -153,24 +213,12 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     placeholderData: keepPreviousData,
   });
 
-  // Newest day in each table. Rows are only written on days a contract changes, so a contract's own
+  // Last day in each table. Rows are only written on days a contract changes, so a contract's own
   // rows can't tell a quiet contract from a table that stopped updating.
-  const contractCurrentEndQuery = useQuery({
-    ...fctContractStorageStateByAddressDailyServiceListOptions({ query: tableEndQuery }),
-    select: res => res.fct_contract_storage_state_by_address_daily?.[0]?.day_start_date ?? null,
-  });
-  const contractExpiryEndQuery = useQuery({
-    ...fctContractStorageStateWithExpiryByAddressDailyServiceListOptions({ query: tableEndQuery }),
-    select: res => res.fct_contract_storage_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
-  });
-  const slotCurrentEndQuery = useQuery({
-    ...fctStorageSlotStateByAddressDailyServiceListOptions({ query: tableEndQuery }),
-    select: res => res.fct_storage_slot_state_by_address_daily?.[0]?.day_start_date ?? null,
-  });
-  const slotExpiryEndQuery = useQuery({
-    ...fctStorageSlotStateWithExpiryByAddressDailyServiceListOptions({ query: tableEndQuery }),
-    select: res => res.fct_storage_slot_state_with_expiry_by_address_daily?.[0]?.day_start_date ?? null,
-  });
+  const contractCurrentTableEnd = useTableEndDay('fct_contract_storage_state_by_address_daily', today);
+  const contractExpiryTableEnd = useTableEndDay('fct_contract_storage_state_with_expiry_by_address_daily', today);
+  const slotCurrentTableEnd = useTableEndDay('fct_storage_slot_state_by_address_daily', today);
+  const slotExpiryTableEnd = useTableEndDay('fct_storage_slot_state_with_expiry_by_address_daily', today);
 
   // Combine and normalize the data
   const processedData = useMemo((): ContractStorageDataPoint[] | null => {
@@ -294,10 +342,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     // A series is carried forward to the chart's last date, but never past the last day its table has
     const fillEnd = (tableEnd: string | null | undefined): string =>
       tableEnd && tableEnd < globalMaxDateStr ? tableEnd : globalMaxDateStr;
-    const contractCurrentEnd = fillEnd(contractCurrentEndQuery.data);
-    const contractExpiryEnd = fillEnd(contractExpiryEndQuery.data);
-    const slotCurrentEnd = fillEnd(slotCurrentEndQuery.data);
-    const slotExpiryEnd = fillEnd(slotExpiryEndQuery.data);
+    const contractCurrentEnd = fillEnd(contractCurrentTableEnd);
+    const contractExpiryEnd = fillEnd(contractExpiryTableEnd);
+    const slotCurrentEnd = fillEnd(slotCurrentTableEnd);
+    const slotExpiryEnd = fillEnd(slotExpiryTableEnd);
 
     // === STEP 3: Helper to fill gaps in a dataset within its own min/max range ===
     const fillGaps = (
@@ -429,10 +477,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     slotCurrentStateQuery.data,
     slotExpiry12mQuery.data,
     slotExpiry24mQuery.data,
-    contractCurrentEndQuery.data,
-    contractExpiryEndQuery.data,
-    slotCurrentEndQuery.data,
-    slotExpiryEndQuery.data,
+    contractCurrentTableEnd,
+    contractExpiryTableEnd,
+    slotCurrentTableEnd,
+    slotExpiryTableEnd,
   ]);
 
   const latestData = useMemo(() => {
@@ -447,10 +495,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     slotCurrentStateQuery.isLoading ||
     slotExpiry12mQuery.isLoading ||
     slotExpiry24mQuery.isLoading ||
-    contractCurrentEndQuery.isLoading ||
-    contractExpiryEndQuery.isLoading ||
-    slotCurrentEndQuery.isLoading ||
-    slotExpiryEndQuery.isLoading;
+    contractCurrentTableEnd === undefined ||
+    contractExpiryTableEnd === undefined ||
+    slotCurrentTableEnd === undefined ||
+    slotExpiryTableEnd === undefined;
 
   const error = (currentStateQuery.error ||
     expiry12mQuery.error ||
