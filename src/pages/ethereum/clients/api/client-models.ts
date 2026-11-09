@@ -5,6 +5,7 @@ import {
   dimClientCommitServiceList,
   fctAttestationVoteCorrectnessByClientDailyServiceList,
   fctBlockGraffitiClientVersionByEntityDailyServiceList,
+  fctBlockGraffitiClientVersionByEntityGroupDailyServiceList,
   fctBlockGraffitiClientVersionByEntityHourlyServiceList,
   fctBlockGraffitiClientVersionByEntityWeeklyServiceList,
   fctBlockGraffitiClientVersionDailyServiceList,
@@ -93,6 +94,8 @@ type ListFn = Parameters<typeof fetchAllPages>[0];
 export const fctBlockGraffitiClientVersionDailyList = fctBlockGraffitiClientVersionDailyServiceList as ListFn;
 export const fctBlockGraffitiClientVersionByEntityDailyList =
   fctBlockGraffitiClientVersionByEntityDailyServiceList as ListFn;
+export const fctBlockGraffitiClientVersionByEntityGroupDailyList =
+  fctBlockGraffitiClientVersionByEntityGroupDailyServiceList as ListFn;
 export const fctBlockGraffitiClientVersionHourlyList = fctBlockGraffitiClientVersionHourlyServiceList as ListFn;
 export const fctBlockGraffitiClientVersionByEntityHourlyList =
   fctBlockGraffitiClientVersionByEntityHourlyServiceList as ListFn;

@@ -7,6 +7,7 @@ import { completeBucketEnd, wholeUtcWeeks } from '@/utils/time';
 import {
   UNRESOLVED_STATUSES,
   fctBlockGraffitiClientVersionByEntityDailyList,
+  fctBlockGraffitiClientVersionByEntityGroupDailyList,
   fctBlockGraffitiClientVersionByEntityHourlyList,
   fctBlockGraffitiClientVersionByEntityWeeklyList,
   fctBlockGraffitiClientVersionDailyList,
@@ -27,11 +28,11 @@ const ENTITY_WEEKLY_TABLE = 'fct_block_graffiti_client_version_by_entity_weekly'
 const FIRST_YEAR = 2020;
 
 export interface UseVersionCountsOptions {
-  /** Daily or hourly counts, overall or per entity */
-  grain: 'daily' | 'entity-daily' | 'hourly' | 'entity-hourly';
+  /** Daily or hourly counts, overall, per entity, or per entity group (daily, from the group table) */
+  grain: 'daily' | 'entity-daily' | 'group-daily' | 'hourly' | 'entity-hourly';
   client?: string;
   layer?: ClientLayer | null;
-  /** An entity, or an entity group; per-entity grains only */
+  /** An entity, or an entity group such as `*lido`; per-entity grains only, and the group grain takes a group */
   entity?: string;
   /** Only rows that resolve to no release */
   unresolvedOnly?: boolean;
@@ -157,6 +158,7 @@ export function useVersionCounts({
   const dataKey = {
     daily: 'fct_block_graffiti_client_version_daily',
     'entity-daily': 'fct_block_graffiti_client_version_by_entity_daily',
+    'group-daily': 'fct_block_graffiti_client_version_by_entity_group_daily',
     hourly: 'fct_block_graffiti_client_version_hourly',
     'entity-hourly': 'fct_block_graffiti_client_version_by_entity_hourly',
   }[grain];
@@ -182,13 +184,14 @@ export function useVersionCounts({
   const table = {
     daily: fctBlockGraffitiClientVersionDailyList,
     'entity-daily': fctBlockGraffitiClientVersionByEntityDailyList,
+    'group-daily': fctBlockGraffitiClientVersionByEntityGroupDailyList,
     hourly: fctBlockGraffitiClientVersionHourlyList,
     'entity-hourly': fctBlockGraffitiClientVersionByEntityHourlyList,
   }[grain];
   const filters = {
     ...(client && { client_eq: client }),
     ...(layer && { layer_eq: layer }),
-    ...(entity && entityQuery(entity)),
+    ...(entity && (grain === 'group-daily' ? { entity_group_eq: entity.slice(1) } : entityQuery(entity))),
     ...(unresolvedOnly && { release_status_in_values: UNRESOLVED_STATUSES.join(',') }),
   };
 
