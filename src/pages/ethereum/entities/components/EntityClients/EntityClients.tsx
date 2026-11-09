@@ -1,8 +1,11 @@
 import { type JSX, useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { fctBlockGraffitiClientByEntityDailyServiceList } from '@/api/sdk.gen';
-import type { FctBlockGraffitiClientByEntityDaily } from '@/api/types.gen';
+import {
+  fctBlockGraffitiClientByEntityDailyServiceList,
+  fctBlockGraffitiClientByEntityGroupDailyServiceList,
+} from '@/api/sdk.gen';
+import type { FctBlockGraffitiClientByEntityDaily, FctBlockGraffitiClientByEntityGroupDaily } from '@/api/types.gen';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
@@ -11,9 +14,11 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT } from '@/utils/graffiti';
+import { completeBucketEnd, completeUtcDays, toUtcDate } from '@/utils/time';
 import { ShareTable } from '@/pages/ethereum/clients/components/ShareTable';
 import {
   entityQuery,
+  isEntityGroup,
   summariseClients,
   toClientCountRecords,
   type ClientLayer,
@@ -109,38 +114,44 @@ function LayerCard({
 
 /**
  * Which clients and releases an entity proposes with over the window, from block graffiti, linked to the client and
- * version pages.
+ * version pages. An entity group such as `*lido` reads the per-group tables, which already sum its members.
  */
 export function EntityClients({ entity, days, window }: EntityClientsProps): JSX.Element {
   const { currentNetwork } = useNetwork();
+  const group = isEntityGroup(entity);
   // Whole UTC days ending yesterday, so today's partial count never sits beside complete days
-  const today = useMemo(() => Math.floor(Date.now() / 1000 / 86400) * 86400, []);
+  const today = useMemo(() => completeBucketEnd('day'), []);
   const since = days === null ? undefined : today - days * 86400;
-  const todayDay = new Date(today * 1000).toISOString().slice(0, 10);
-  const sinceDay = since === undefined ? '' : new Date(since * 1000).toISOString().slice(0, 10);
+  const todayDay = toUtcDate(today);
+  const sinceDay = since === undefined ? '' : toUtcDate(since);
 
-  // The window's days, so a short window does not read the entity's whole history
+  // The window's days, so a short window does not read the entity's whole history. The API takes one filter per date
+  // column, so all history matches every date by its leading "20".
   const dayFilter =
-    since === undefined
-      ? // The daily table only filters its date key by value; every date starts with 20
-        { day_start_date_like: '20%' }
-      : {
-          day_start_date_in_values: Array.from({ length: days ?? 0 }, (_, i) =>
-            new Date((since + i * 86400) * 1000).toISOString().slice(0, 10)
-          ).join(','),
-        };
+    days === null
+      ? { day_start_date_like: '20%' }
+      : { day_start_date_in_values: completeUtcDays(days, today * 1000).join(',') };
   const counts = useQuery({
-    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity, days],
-    queryFn: ({ signal }) =>
-      fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
-        fctBlockGraffitiClientByEntityDailyServiceList,
-        { query: { ...entityQuery(entity), ...dayFilter, page_size: 10000 } },
-        'fct_block_graffiti_client_by_entity_daily',
-        signal
-      ),
+    queryKey: ['entity-clients', 'counts', currentNetwork?.name, entity, days, todayDay],
+    queryFn: ({
+      signal,
+    }): Promise<Array<FctBlockGraffitiClientByEntityDaily | FctBlockGraffitiClientByEntityGroupDaily>> =>
+      group
+        ? fetchAllPages<FctBlockGraffitiClientByEntityGroupDaily>(
+            fctBlockGraffitiClientByEntityGroupDailyServiceList,
+            { query: { entity_group_eq: entity.slice(1), ...dayFilter, page_size: 10000 } },
+            'fct_block_graffiti_client_by_entity_group_daily',
+            signal
+          )
+        : fetchAllPages<FctBlockGraffitiClientByEntityDaily>(
+            fctBlockGraffitiClientByEntityDailyServiceList,
+            { query: { ...entityQuery(entity), ...dayFilter, page_size: 10000 } },
+            'fct_block_graffiti_client_by_entity_daily',
+            signal
+          ),
     enabled: !!currentNetwork,
   });
-  const blocks = useVersionCounts({ grain: 'entity-daily', entity, from: since, to: today });
+  const blocks = useVersionCounts({ grain: group ? 'group-daily' : 'entity-daily', entity, from: since, to: today });
 
   const shares = useMemo(() => {
     const inWindow = (counts.data ?? []).filter(row => {
