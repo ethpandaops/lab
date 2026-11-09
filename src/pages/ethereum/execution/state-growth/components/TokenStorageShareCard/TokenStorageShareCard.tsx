@@ -47,10 +47,7 @@ export function TokenStorageShareCard({ data }: TokenStorageShareCardProps): JSX
     return { day, total, erc20: token.erc20, erc721: token.erc721, others };
   }, [data, byDay]);
 
-  // Palette matching the gas-profiler "Gas Distribution" chart: brand primary for the headline
-  // category, a categorical blue (--color-chart-0) for ERC721, and the muted token for "Others"
-  // (same as that chart's "Other" tile). primary/muted come from useThemeColors so they track
-  // light/dark/star.
+  // Brand primary for the headline category, categorical blue for ERC721, and muted for Others.
   const segments: StackedBarSegment[] = useMemo(() => {
     if (!snapshot) return [];
     return [
