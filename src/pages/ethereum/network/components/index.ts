@@ -10,3 +10,5 @@ export * from './SyncCharts';
 export * from './RangeBar';
 export * from './PlaceOverview';
 export * from './WhereNodesRun';
+export * from './CityTable';
+export * from './PeerTable';

@@ -175,7 +175,7 @@ export function PlaceOverview<T extends PlaceCensusRow>({
 }
 
 /** A place's peers each day, stacked by client in client colours; other agents stack on top as Other */
-function clientSeries(rows: PlaceCensusRow[]): { days: string[]; series: SeriesData[] } {
+export function clientSeries(rows: PlaceCensusRow[]): { days: string[]; series: SeriesData[] } {
   const days = [...new Set(rows.map(row => row.day_start_date ?? '').filter(Boolean))].sort();
   const totals = layerCounts(rows, 'consensus', peers);
   const clients = new Set(totals.clients.map(row => row.client));
