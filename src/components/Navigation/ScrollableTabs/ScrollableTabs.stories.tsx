@@ -132,3 +132,33 @@ export const ConstrainedWidth: Story = {
     </div>
   ),
 };
+
+/**
+ * The last tab selected on load scrolls into view, clear of the arrows
+ */
+export const SelectedOnLoad: Story = {
+  render: () => (
+    <div style={{ width: 320 }}>
+      <TabGroup defaultIndex={11}>
+        <ScrollableTabs>
+          {[
+            'Overview',
+            'Block',
+            'Attestations',
+            'Propagation',
+            'Execution',
+            'MEV',
+            'Validators',
+            'Committees',
+            'Sync',
+            'Advanced',
+            'Metrics',
+            'Performance',
+          ].map(label => (
+            <Tab key={label}>{label}</Tab>
+          ))}
+        </ScrollableTabs>
+      </TabGroup>
+    </div>
+  ),
+};
