@@ -9,14 +9,13 @@ import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { fetchAllPages } from '@/utils/api-pagination';
-import { clientSeries } from './components/PlaceOverview/PlaceOverview';
+import { clientSeries, seriesDays, stackLayer } from './utils/network-series';
 import { CountsNote, PeerTable, PlaceSkeleton, RangeBar, SeriesCard } from './components';
 import { RANGE_DAYS } from './constants';
 import { usePeerList } from './hooks/usePeerList';
 import { useRangeDays } from './hooks/useRangeDays';
 import { useRangeSearch } from './hooks/useRangeSearch';
 import { countryName, dayBounds } from './utils/network-census';
-import { seriesDays, stackLayer } from './utils/network-series';
 import { isHosting, ROLLUP_CITIES } from './utils/network-peers';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];

@@ -17,8 +17,8 @@ export interface UsePeerListResult {
 }
 
 /**
- * One page of the peers counted on `day` that match `filters`, by peer ID. Rows a recount dropped are left out, so a
- * page can hold a few fewer than the page size. Pass a null day to skip loading.
+ * One page of the peers our sentries saw on `day` that match `filters`, by peer ID: the peers the country and network
+ * counts hold. Pass a null day to skip loading.
  */
 export function usePeerList(day: string | null, filters: Record<string, unknown>): UsePeerListResult {
   const { currentNetwork } = useNetwork();
@@ -30,6 +30,7 @@ export function usePeerList(day: string | null, filters: Record<string, unknown>
       const { data } = await intPeerDailyServiceList({
         query: {
           day_start_date_eq: day ?? '',
+          seen_by_sentry_eq: true,
           ...filters,
           order_by: 'peer_id',
           page_size: PEER_PAGE_SIZE,
@@ -51,7 +52,7 @@ export function usePeerList(day: string | null, filters: Record<string, unknown>
   }, [result.isPlaceholderData, result.isSuccess, next, recordNextToken]);
 
   return {
-    peers: (result.data?.rows ?? []).filter(row => row.seen_by_sentry || row.seen_by_enr),
+    peers: result.data?.rows ?? [],
     pageIndex: page.pageIndex,
     hasNextPage: !!next && (result.data?.rows.length ?? 0) === PEER_PAGE_SIZE,
     goTo: index => page.onPaginationChange(index, PEER_PAGE_SIZE),

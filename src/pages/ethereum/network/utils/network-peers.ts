@@ -14,9 +14,12 @@ export function isHosting(row: { network_type?: string }): boolean {
   return row.network_type === 'hosting';
 }
 
-/** A peer ID shortened for titles and breadcrumbs, e.g. "16Uiu2…xQs4" */
+/**
+ * A peer ID shortened the way libp2p logs it, e.g. "16*Bm3xQs": every secp256k1 peer ID starts "16Uiu2HA", so only
+ * the tail tells peers apart.
+ */
 export function shortPeerId(peerId: string): string {
-  return peerId.length > 14 ? `${peerId.slice(0, 6)}…${peerId.slice(-4)}` : peerId;
+  return peerId.length > 14 ? `${peerId.slice(0, 2)}*${peerId.slice(-6)}` : peerId;
 }
 
 /**

@@ -87,6 +87,14 @@ export function PeerPage(): JSX.Element {
       const row = byDay.get(day);
       return row ? (pick(row) ?? null) : null;
     });
+  /** The chart's days, or none so the card shows its empty state when the peer never reported the value */
+  const daysOf = (data: Array<number | null>): string[] => (data.some(point => point !== null) ? axis : []);
+  const headLag = value(row => row.head_lag_slots);
+  const latency = value(row => row.latency_ms);
+  const history = value(row =>
+    row.served_history_slots == null ? null : Math.floor(row.served_history_slots / SLOTS_PER_EPOCH)
+  );
+  const custody = value(row => row.custody_group_count);
   const { CHART_CATEGORICAL_COLORS: palette } = getDataVizColors();
   const spans = versionSpans(days);
   const hosting = latest ? isHosting(latest) : false;
@@ -189,60 +197,31 @@ export function PeerPage(): JSX.Element {
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               <SeriesCard
                 title="Head lag"
-                days={axis}
+                days={daysOf(headLag)}
                 yName="Slots"
                 empty="This peer never answered a status request."
-                series={[
-                  line(
-                    'Median head lag',
-                    value(row => row.head_lag_slots),
-                    palette[0]
-                  ),
-                ]}
+                series={[line('Median head lag', headLag, palette[0])]}
               />
               <SeriesCard
                 title="Latency"
-                days={axis}
+                days={daysOf(latency)}
                 yName="ms"
                 empty="No latency was measured for this peer."
-                series={[
-                  line(
-                    'Median latency',
-                    value(row => row.latency_ms),
-                    palette[1]
-                  ),
-                ]}
+                series={[line('Median latency', latency, palette[1])]}
               />
               <SeriesCard
                 title="History served"
-                days={axis}
+                days={daysOf(history)}
                 yName="Epochs"
                 empty="This peer never reported its earliest available slot."
-                series={[
-                  line(
-                    'History served',
-                    value(row =>
-                      row.served_history_slots == null ? null : Math.floor(row.served_history_slots / SLOTS_PER_EPOCH)
-                    ),
-                    palette[2]
-                  ),
-                ]}
+                series={[line('History served', history, palette[2])]}
               />
               <SeriesCard
                 title="Custody groups"
-                days={axis}
+                days={daysOf(custody)}
                 yName="Groups"
                 empty="This peer never reported its custody."
-                series={[
-                  {
-                    ...line(
-                      'Custody groups',
-                      value(row => row.custody_group_count),
-                      palette[3]
-                    ),
-                    step: 'end',
-                  },
-                ]}
+                series={[{ ...line('Custody groups', custody, palette[3]), step: 'end' }]}
               />
             </div>
 
@@ -272,13 +251,13 @@ export function PeerPage(): JSX.Element {
                   {
                     header: 'From',
                     accessor: span => formatDataDate(dayStart(span.first)),
-                    cellClassName: 'hidden sm:table-cell text-muted',
-                    headerClassName: 'hidden sm:table-cell',
+                    cellClassName: 'text-muted',
                   },
                   {
                     header: 'To',
                     accessor: span => formatDataDate(dayStart(span.last)),
-                    cellClassName: 'text-muted',
+                    cellClassName: 'hidden sm:table-cell text-muted',
+                    headerClassName: 'hidden sm:table-cell',
                   },
                   {
                     header: 'Days',
