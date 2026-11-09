@@ -4,11 +4,15 @@ import { TabList } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ScrollableTabsProps } from './ScrollableTabs.types';
 
+/** Room kept beside the selected tab for the arrow buttons that overlay the strip's edges */
+const ARROW_INSET = 40;
+
 /**
  * ScrollableTabs component - wraps TabList with horizontal scroll and navigation arrows
  *
  * Provides a scrollable container for tabs that may overflow horizontally.
- * Shows left/right navigation arrows when content is scrollable.
+ * Shows left/right navigation arrows when content is scrollable, and scrolls the selected tab clear of them
+ * whenever the selection changes, including a tab selected on load.
  *
  * @example
  * ```tsx
@@ -70,6 +74,26 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
 
     return () => window.removeEventListener('resize', handleResize);
   }, [children]);
+
+  // Scroll the selected tab into view, along the strip only so the page keeps its scroll position. Headless UI marks
+  // the selection after mounting, so watch for it rather than reading it once.
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const reveal = (): void => {
+      const tab = container.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+      if (!tab) return;
+      const start = tab.getBoundingClientRect().left - container.getBoundingClientRect().left + container.scrollLeft;
+      const end = start + tab.offsetWidth;
+      const { scrollLeft, clientWidth } = container;
+      if (start < scrollLeft + ARROW_INSET) container.scrollLeft = Math.max(0, start - ARROW_INSET);
+      else if (end > scrollLeft + clientWidth - ARROW_INSET) container.scrollLeft = end - clientWidth + ARROW_INSET;
+    };
+    reveal();
+    const observer = new MutationObserver(reveal);
+    observer.observe(container, { attributes: true, attributeFilter: ['aria-selected'], subtree: true });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className={clsx('relative', className)}>
