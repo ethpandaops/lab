@@ -2,6 +2,9 @@ import type { SeriesData } from '@/components/Charts/MultiLine';
 import type { FctPeerConcentrationElDaily, FctPeerCountByCountryDaily } from '@/api/types.gen';
 import { CONSENSUS_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
+import { OTHER_VERSION_COLOR } from '@/pages/ethereum/clients/utils/client-versions';
+import type { PlaceCensusRow } from '../hooks/usePlaceCensus';
+import { layerCounts, sumBy } from './network-census';
 
 type DayRow = { day_start_date?: string };
 
@@ -137,4 +140,29 @@ export function countryShares(
     const of = whole.get(day) ?? 0;
     return of > 0 ? ((parts.get(day) ?? 0) / of) * 100 : null;
   });
+}
+
+const peers = (row: PlaceCensusRow): number | undefined => row.peer_count;
+
+/** A place's peers each day, stacked by client in client colours; other agents stack on top as Other */
+export function clientSeries(rows: PlaceCensusRow[]): { days: string[]; series: SeriesData[] } {
+  const days = [...new Set(rows.map(row => row.day_start_date ?? '').filter(Boolean))].sort();
+  const totals = layerCounts(rows, 'consensus', peers);
+  const clients = new Set(totals.clients.map(row => row.client));
+  const key = (row: PlaceCensusRow): string =>
+    `${row.day_start_date}|${row.client && clients.has(row.client) ? row.client : row.client && row.client !== 'unknown' ? 'other' : 'unknown'}`;
+  const byDayClient = sumBy(rows, key, peers);
+  const series: SeriesData[] = [...totals.clients.map(row => row.client), ...(totals.other > 0 ? ['other'] : [])].map(
+    client => ({
+      name: client === 'other' ? 'Other' : formatClientName(client),
+      data: days.map(day => byDayClient.get(`${day}|${client}`) ?? 0),
+      color: client === 'other' ? OTHER_VERSION_COLOR : getClientColor(client),
+      stack: 'peers',
+      showArea: true,
+      areaOpacity: client === 'other' ? 0.3 : 0.85,
+      lineWidth: 0,
+      showSymbol: false,
+    })
+  );
+  return { days, series };
 }

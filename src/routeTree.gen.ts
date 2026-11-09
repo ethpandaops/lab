@@ -85,10 +85,13 @@ import { Route as EthereumExecutionGasProfilerIndexRouteImport } from './routes/
 import { Route as EthereumDataAvailabilityProbesIndexRouteImport } from './routes/ethereum/data-availability/probes/index'
 import { Route as EthereumDataAvailabilityCustodyIndexRouteImport } from './routes/ethereum/data-availability/custody/index'
 import { Route as EthereumClientsClientIndexRouteImport } from './routes/ethereum/clients/$client/index'
+import { Route as EthereumNetworkPeersPeerIdRouteImport } from './routes/ethereum/network/peers/$peerId'
 import { Route as EthereumNetworkCountriesCountryRouteImport } from './routes/ethereum/network/countries/$country'
 import { Route as EthereumNetworkAsnAsnRouteImport } from './routes/ethereum/network/asn/$asn'
 import { Route as EthereumExecutionGasProfilerSimulateRouteImport } from './routes/ethereum/execution/gas-profiler/simulate'
 import { Route as EthereumClientsClientVersionRouteImport } from './routes/ethereum/clients/$client/$version'
+import { Route as EthereumNetworkCountriesCountryIndexRouteImport } from './routes/ethereum/network/countries/$country/index'
+import { Route as EthereumNetworkCountriesCountryCityRouteImport } from './routes/ethereum/network/countries/$country/$city'
 import { Route as EthereumExecutionGasProfilerTxTxHashRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash'
 import { Route as EthereumExecutionGasProfilerBlockBlockNumberRouteImport } from './routes/ethereum/execution/gas-profiler/block.$blockNumber'
 import { Route as EthereumExecutionGasProfilerTxTxHashCallCallIdRouteImport } from './routes/ethereum/execution/gas-profiler/tx.$txHash_.call.$callId'
@@ -502,6 +505,12 @@ const EthereumClientsClientIndexRoute =
     path: '/',
     getParentRoute: () => EthereumClientsClientRoute,
   } as any)
+const EthereumNetworkPeersPeerIdRoute =
+  EthereumNetworkPeersPeerIdRouteImport.update({
+    id: '/peers/$peerId',
+    path: '/peers/$peerId',
+    getParentRoute: () => EthereumNetworkRoute,
+  } as any)
 const EthereumNetworkCountriesCountryRoute =
   EthereumNetworkCountriesCountryRouteImport.update({
     id: '/$country',
@@ -524,6 +533,18 @@ const EthereumClientsClientVersionRoute =
     id: '/$version',
     path: '/$version',
     getParentRoute: () => EthereumClientsClientRoute,
+  } as any)
+const EthereumNetworkCountriesCountryIndexRoute =
+  EthereumNetworkCountriesCountryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => EthereumNetworkCountriesCountryRoute,
+  } as any)
+const EthereumNetworkCountriesCountryCityRoute =
+  EthereumNetworkCountriesCountryCityRouteImport.update({
+    id: '/$city',
+    path: '/$city',
+    getParentRoute: () => EthereumNetworkCountriesCountryRoute,
   } as any)
 const EthereumExecutionGasProfilerTxTxHashRoute =
   EthereumExecutionGasProfilerTxTxHashRouteImport.update({
@@ -616,7 +637,8 @@ export interface FileRoutesByFullPath {
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
-  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRouteWithChildren
+  '/ethereum/network/peers/$peerId': typeof EthereumNetworkPeersPeerIdRoute
   '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
@@ -627,6 +649,8 @@ export interface FileRoutesByFullPath {
   '/ethereum/network/countries/': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
+  '/ethereum/network/countries/$country/$city': typeof EthereumNetworkCountriesCountryCityRoute
+  '/ethereum/network/countries/$country/': typeof EthereumNetworkCountriesCountryIndexRoute
   '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
 }
 export interface FileRoutesByTo {
@@ -678,7 +702,7 @@ export interface FileRoutesByTo {
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
-  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
+  '/ethereum/network/peers/$peerId': typeof EthereumNetworkPeersPeerIdRoute
   '/ethereum/clients/$client': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes': typeof EthereumDataAvailabilityProbesIndexRoute
@@ -689,6 +713,8 @@ export interface FileRoutesByTo {
   '/ethereum/network/countries': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
+  '/ethereum/network/countries/$country/$city': typeof EthereumNetworkCountriesCountryCityRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryIndexRoute
   '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
 }
 export interface FileRoutesById {
@@ -764,7 +790,8 @@ export interface FileRoutesById {
   '/ethereum/clients/$client/$version': typeof EthereumClientsClientVersionRoute
   '/ethereum/execution/gas-profiler/simulate': typeof EthereumExecutionGasProfilerSimulateRoute
   '/ethereum/network/asn/$asn': typeof EthereumNetworkAsnAsnRoute
-  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRoute
+  '/ethereum/network/countries/$country': typeof EthereumNetworkCountriesCountryRouteWithChildren
+  '/ethereum/network/peers/$peerId': typeof EthereumNetworkPeersPeerIdRoute
   '/ethereum/clients/$client/': typeof EthereumClientsClientIndexRoute
   '/ethereum/data-availability/custody/': typeof EthereumDataAvailabilityCustodyIndexRoute
   '/ethereum/data-availability/probes/': typeof EthereumDataAvailabilityProbesIndexRoute
@@ -775,6 +802,8 @@ export interface FileRoutesById {
   '/ethereum/network/countries/': typeof EthereumNetworkCountriesIndexRoute
   '/ethereum/execution/gas-profiler/block/$blockNumber': typeof EthereumExecutionGasProfilerBlockBlockNumberRoute
   '/ethereum/execution/gas-profiler/tx/$txHash': typeof EthereumExecutionGasProfilerTxTxHashRoute
+  '/ethereum/network/countries/$country/$city': typeof EthereumNetworkCountriesCountryCityRoute
+  '/ethereum/network/countries/$country/': typeof EthereumNetworkCountriesCountryIndexRoute
   '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId': typeof EthereumExecutionGasProfilerTxTxHashCallCallIdRoute
 }
 export interface FileRouteTypes {
@@ -852,6 +881,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/network/asn/$asn'
     | '/ethereum/network/countries/$country'
+    | '/ethereum/network/peers/$peerId'
     | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
@@ -862,6 +892,8 @@ export interface FileRouteTypes {
     | '/ethereum/network/countries/'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
+    | '/ethereum/network/countries/$country/$city'
+    | '/ethereum/network/countries/$country/'
     | '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -913,7 +945,7 @@ export interface FileRouteTypes {
     | '/ethereum/clients/$client/$version'
     | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/network/asn/$asn'
-    | '/ethereum/network/countries/$country'
+    | '/ethereum/network/peers/$peerId'
     | '/ethereum/clients/$client'
     | '/ethereum/data-availability/custody'
     | '/ethereum/data-availability/probes'
@@ -924,6 +956,8 @@ export interface FileRouteTypes {
     | '/ethereum/network/countries'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
+    | '/ethereum/network/countries/$country/$city'
+    | '/ethereum/network/countries/$country'
     | '/ethereum/execution/gas-profiler/tx/$txHash/call/$callId'
   id:
     | '__root__'
@@ -999,6 +1033,7 @@ export interface FileRouteTypes {
     | '/ethereum/execution/gas-profiler/simulate'
     | '/ethereum/network/asn/$asn'
     | '/ethereum/network/countries/$country'
+    | '/ethereum/network/peers/$peerId'
     | '/ethereum/clients/$client/'
     | '/ethereum/data-availability/custody/'
     | '/ethereum/data-availability/probes/'
@@ -1009,6 +1044,8 @@ export interface FileRouteTypes {
     | '/ethereum/network/countries/'
     | '/ethereum/execution/gas-profiler/block/$blockNumber'
     | '/ethereum/execution/gas-profiler/tx/$txHash'
+    | '/ethereum/network/countries/$country/$city'
+    | '/ethereum/network/countries/$country/'
     | '/ethereum/execution/gas-profiler/tx/$txHash_/call/$callId'
   fileRoutesById: FileRoutesById
 }
@@ -1559,6 +1596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EthereumClientsClientIndexRouteImport
       parentRoute: typeof EthereumClientsClientRoute
     }
+    '/ethereum/network/peers/$peerId': {
+      id: '/ethereum/network/peers/$peerId'
+      path: '/peers/$peerId'
+      fullPath: '/ethereum/network/peers/$peerId'
+      preLoaderRoute: typeof EthereumNetworkPeersPeerIdRouteImport
+      parentRoute: typeof EthereumNetworkRoute
+    }
     '/ethereum/network/countries/$country': {
       id: '/ethereum/network/countries/$country'
       path: '/$country'
@@ -1586,6 +1630,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/ethereum/clients/$client/$version'
       preLoaderRoute: typeof EthereumClientsClientVersionRouteImport
       parentRoute: typeof EthereumClientsClientRoute
+    }
+    '/ethereum/network/countries/$country/': {
+      id: '/ethereum/network/countries/$country/'
+      path: '/'
+      fullPath: '/ethereum/network/countries/$country/'
+      preLoaderRoute: typeof EthereumNetworkCountriesCountryIndexRouteImport
+      parentRoute: typeof EthereumNetworkCountriesCountryRoute
+    }
+    '/ethereum/network/countries/$country/$city': {
+      id: '/ethereum/network/countries/$country/$city'
+      path: '/$city'
+      fullPath: '/ethereum/network/countries/$country/$city'
+      preLoaderRoute: typeof EthereumNetworkCountriesCountryCityRouteImport
+      parentRoute: typeof EthereumNetworkCountriesCountryRoute
     }
     '/ethereum/execution/gas-profiler/tx/$txHash': {
       id: '/ethereum/execution/gas-profiler/tx/$txHash'
@@ -1857,14 +1915,33 @@ const EthereumNetworkAsnRouteChildren: EthereumNetworkAsnRouteChildren = {
 const EthereumNetworkAsnRouteWithChildren =
   EthereumNetworkAsnRoute._addFileChildren(EthereumNetworkAsnRouteChildren)
 
+interface EthereumNetworkCountriesCountryRouteChildren {
+  EthereumNetworkCountriesCountryCityRoute: typeof EthereumNetworkCountriesCountryCityRoute
+  EthereumNetworkCountriesCountryIndexRoute: typeof EthereumNetworkCountriesCountryIndexRoute
+}
+
+const EthereumNetworkCountriesCountryRouteChildren: EthereumNetworkCountriesCountryRouteChildren =
+  {
+    EthereumNetworkCountriesCountryCityRoute:
+      EthereumNetworkCountriesCountryCityRoute,
+    EthereumNetworkCountriesCountryIndexRoute:
+      EthereumNetworkCountriesCountryIndexRoute,
+  }
+
+const EthereumNetworkCountriesCountryRouteWithChildren =
+  EthereumNetworkCountriesCountryRoute._addFileChildren(
+    EthereumNetworkCountriesCountryRouteChildren,
+  )
+
 interface EthereumNetworkCountriesRouteChildren {
-  EthereumNetworkCountriesCountryRoute: typeof EthereumNetworkCountriesCountryRoute
+  EthereumNetworkCountriesCountryRoute: typeof EthereumNetworkCountriesCountryRouteWithChildren
   EthereumNetworkCountriesIndexRoute: typeof EthereumNetworkCountriesIndexRoute
 }
 
 const EthereumNetworkCountriesRouteChildren: EthereumNetworkCountriesRouteChildren =
   {
-    EthereumNetworkCountriesCountryRoute: EthereumNetworkCountriesCountryRoute,
+    EthereumNetworkCountriesCountryRoute:
+      EthereumNetworkCountriesCountryRouteWithChildren,
     EthereumNetworkCountriesIndexRoute: EthereumNetworkCountriesIndexRoute,
   }
 
@@ -1877,12 +1954,14 @@ interface EthereumNetworkRouteChildren {
   EthereumNetworkAsnRoute: typeof EthereumNetworkAsnRouteWithChildren
   EthereumNetworkCountriesRoute: typeof EthereumNetworkCountriesRouteWithChildren
   EthereumNetworkIndexRoute: typeof EthereumNetworkIndexRoute
+  EthereumNetworkPeersPeerIdRoute: typeof EthereumNetworkPeersPeerIdRoute
 }
 
 const EthereumNetworkRouteChildren: EthereumNetworkRouteChildren = {
   EthereumNetworkAsnRoute: EthereumNetworkAsnRouteWithChildren,
   EthereumNetworkCountriesRoute: EthereumNetworkCountriesRouteWithChildren,
   EthereumNetworkIndexRoute: EthereumNetworkIndexRoute,
+  EthereumNetworkPeersPeerIdRoute: EthereumNetworkPeersPeerIdRoute,
 }
 
 const EthereumNetworkRouteWithChildren = EthereumNetworkRoute._addFileChildren(

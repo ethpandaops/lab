@@ -10,14 +10,34 @@ import {
   type FctPeerCountByClientAsnDaily,
   type FctPeerCountByClientCountryDaily,
 } from '@/pages/ethereum/clients/api/client-models';
-import { CountsNote, OTHER_COUNTRY, OTHER_NETWORK, PlaceOverview, PlaceSkeleton, RangeBar } from './components';
+import { fctPeerCountByClClientCityDailyServiceList } from '@/api/sdk.gen';
+import type { FctPeerCountByClClientCityDaily } from '@/api/types.gen';
+import type { fetchAllPages } from '@/utils/api-pagination';
+import {
+  CityTable,
+  CountsNote,
+  OTHER_COUNTRY,
+  OTHER_NETWORK,
+  PeerTable,
+  PlaceOverview,
+  PlaceSkeleton,
+  RangeBar,
+} from './components';
+import { usePeerList } from './hooks/usePeerList';
+import { useRangeEnds } from './hooks/useRangeEnds';
 import { RANGE_DAYS } from './constants';
 import { useRangeSearch } from './hooks/useRangeSearch';
 import { usePlaceCensus, type PlaceKind } from './hooks/usePlaceCensus';
 import { countryName } from './utils/network-census';
 
+type ListFn = Parameters<typeof fetchAllPages>[0];
+
+const CITY_TABLE = 'fct_peer_count_by_cl_client_city_daily';
+const HOSTING = { network_type_eq: 'hosting' };
+
 /**
- * One country: its consensus peers over the range, their share of the network and rank, and its client mix.
+ * One country: its consensus peers over the range, their share of the network and rank, its client mix, its cities
+ * and its peers on the range's last day.
  */
 export function CountryPage(): JSX.Element {
   const { country } = useParams({ from: '/ethereum/network/countries/$country' });
@@ -33,6 +53,14 @@ export function CountryPage(): JSX.Element {
     [code]
   );
   const census = usePlaceCensus(kind, RANGE_DAYS[range]);
+  const cityFilter = useMemo(() => ({ country_code_eq: code }), [code]);
+  const cities = useRangeEnds<FctPeerCountByClClientCityDaily>(
+    fctPeerCountByClClientCityDailyServiceList as ListFn,
+    CITY_TABLE,
+    cityFilter,
+    1
+  );
+  const peers = usePeerList(census.all.endDay, cityFilter);
 
   return (
     <Container>
@@ -68,6 +96,12 @@ export function CountryPage(): JSX.Element {
             noun="countries"
           />
         )}
+        {!census.isLoading && census.place.end.length > 0 && (
+          <>
+            <CityTable country={country.toLowerCase()} rows={cities.end} day={cities.endDay} />
+            <PeerTable title="Peers" day={census.all.endDay} list={peers} city network />
+          </>
+        )}
         <CountsNote />
       </div>
     </Container>
@@ -76,7 +110,7 @@ export function CountryPage(): JSX.Element {
 
 /**
  * One network (autonomous system): its consensus peers over the range, their share of the network and rank, and
- * its client mix.
+ * its client mix. Hosting networks also list their peers on the range's last day.
  */
 export function AsnPage(): JSX.Element {
   const { asn } = useParams({ from: '/ethereum/network/asn/$asn' });
@@ -94,16 +128,15 @@ export function AsnPage(): JSX.Element {
   const census = usePlaceCensus(kind, RANGE_DAYS[range]);
   const latest = census.place.end[0];
   const name = latest?.autonomous_system_organization;
+  const hosting = latest?.network_type === 'hosting';
+  const asnFilter = useMemo(() => ({ ...HOSTING, autonomous_system_number_eq: number }), [number]);
+  const peers = usePeerList(hosting ? census.all.endDay : null, asnFilter);
 
   return (
     <Container>
       <Header
         title={name || `AS${number}`}
-        description={
-          latest?.network_type === 'hosting'
-            ? `Autonomous system ${number}, a hosting provider`
-            : `Autonomous system ${number}`
-        }
+        description={hosting ? `Autonomous system ${number}, a hosting provider` : `Autonomous system ${number}`}
       />
       <div className="flex flex-col gap-6">
         <RangeBar range={range} onChange={setRange} endDay={census.all.endDay} startDay={census.all.startDay} />
@@ -125,6 +158,7 @@ export function AsnPage(): JSX.Element {
             noun="networks"
           />
         )}
+        {hosting && <PeerTable title="Peers" day={census.all.endDay} list={peers} country city />}
         <CountsNote />
       </div>
     </Container>

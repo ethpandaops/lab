@@ -3,13 +3,12 @@ import { Link } from '@tanstack/react-router';
 import { Card } from '@/components/Layout/Card';
 import { Stats } from '@/components/DataDisplay/Stats';
 import { Table } from '@/components/Lists/Table';
-import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
+import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
-import { OTHER_VERSION_COLOR, formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
+import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
 import type { UseRangeEndsResult } from '../../hooks/useRangeEnds';
 import type { PlaceCensusRow } from '../../hooks/usePlaceCensus';
 import {
@@ -19,9 +18,9 @@ import {
   layerCounts,
   rankPlaces,
   shareDelta,
-  sumBy,
   total,
 } from '../../utils/network-census';
+import { clientSeries } from '../../utils/network-series';
 
 export interface PlaceOverviewProps<T extends PlaceCensusRow> {
   /** The place's rows on the range's first and last days */
@@ -172,27 +171,4 @@ export function PlaceOverview<T extends PlaceCensusRow>({
       </Card>
     </div>
   );
-}
-
-/** A place's peers each day, stacked by client in client colours; other agents stack on top as Other */
-function clientSeries(rows: PlaceCensusRow[]): { days: string[]; series: SeriesData[] } {
-  const days = [...new Set(rows.map(row => row.day_start_date ?? '').filter(Boolean))].sort();
-  const totals = layerCounts(rows, 'consensus', peers);
-  const clients = new Set(totals.clients.map(row => row.client));
-  const key = (row: PlaceCensusRow): string =>
-    `${row.day_start_date}|${row.client && clients.has(row.client) ? row.client : row.client && row.client !== 'unknown' ? 'other' : 'unknown'}`;
-  const byDayClient = sumBy(rows, key, peers);
-  const series: SeriesData[] = [...totals.clients.map(row => row.client), ...(totals.other > 0 ? ['other'] : [])].map(
-    client => ({
-      name: client === 'other' ? 'Other' : formatClientName(client),
-      data: days.map(day => byDayClient.get(`${day}|${client}`) ?? 0),
-      color: client === 'other' ? OTHER_VERSION_COLOR : getClientColor(client),
-      stack: 'peers',
-      showArea: true,
-      areaOpacity: client === 'other' ? 0.3 : 0.85,
-      lineWidth: 0,
-      showSymbol: false,
-    })
-  );
-  return { days, series };
 }
