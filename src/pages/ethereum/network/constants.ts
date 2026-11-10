@@ -38,6 +38,15 @@ export const TOP_PLACES = 10;
  */
 export const EL_CRAWL_START = '2026-07-15';
 
+/**
+ * First day custody by column counts every peer: before it about 14% of peers with a custody count had no peer ID to
+ * derive their columns from, so the column series start here.
+ */
+export const CUSTODY_COLUMNS_START = '2026-04-01';
+
+/** Days a churn row looks back over; rows with less history overstate new peers */
+export const CHURN_WINDOW_DAYS = 29;
+
 /** Zod schema for the overview's search params: the range, and which layer "where nodes run" shows */
 export const overviewSearchSchema = networkSearchSchema.extend({
   layer: z.enum(['consensus', 'execution']).optional().catch(undefined),

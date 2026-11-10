@@ -20,6 +20,8 @@ import {
   dimFunctionSignatureServiceList,
   dimNodeServiceGet,
   dimNodeServiceList,
+  dimPeerNodeServiceGet,
+  dimPeerNodeServiceList,
   dimRocketpoolNodeServiceGet,
   dimRocketpoolNodeServiceList,
   dimTokenContractServiceGet,
@@ -420,6 +422,12 @@ import {
   fctPayloadBidHighestValueByBuilderChunked50MsServiceList,
   fctPayloadBidHighestValueChunked50MsServiceGet,
   fctPayloadBidHighestValueChunked50MsServiceList,
+  fctPeerAttnetCountByClClientDailyServiceGet,
+  fctPeerAttnetCountByClClientDailyServiceList,
+  fctPeerChurnByClClientDailyServiceGet,
+  fctPeerChurnByClClientDailyServiceList,
+  fctPeerChurnDailyServiceGet,
+  fctPeerChurnDailyServiceList,
   fctPeerConcentrationClDailyServiceGet,
   fctPeerConcentrationClDailyServiceList,
   fctPeerConcentrationElDailyServiceGet,
@@ -452,6 +460,10 @@ import {
   fctPeerCountByElCountryDailyServiceList,
   fctPeerCountBySourceDailyServiceGet,
   fctPeerCountBySourceDailyServiceList,
+  fctPeerCustodyByColumnDailyServiceGet,
+  fctPeerCustodyByColumnDailyServiceList,
+  fctPeerCustodyCoverageDailyServiceGet,
+  fctPeerCustodyCoverageDailyServiceList,
   fctPeerForkReadinessByClClientDailyServiceGet,
   fctPeerForkReadinessByClClientDailyServiceList,
   fctPeerForkReadinessByElClientDailyServiceGet,
@@ -466,6 +478,10 @@ import {
   fctPeerProtocolByClClientDailyServiceList,
   fctPeerReachabilityByClClientDailyServiceGet,
   fctPeerReachabilityByClClientDailyServiceList,
+  fctPeerSubnetCoverageDailyServiceGet,
+  fctPeerSubnetCoverageDailyServiceList,
+  fctPeerSubnetDailyServiceGet,
+  fctPeerSubnetDailyServiceList,
   fctPeerSyncStatusByClClientDailyServiceGet,
   fctPeerSyncStatusByClClientDailyServiceList,
   fctPreparedBlockByNodeDailyServiceGet,
@@ -658,6 +674,8 @@ import {
   intPeerDailyOrderByPeerIdServiceList,
   intPeerDailyServiceGet,
   intPeerDailyServiceList,
+  intPeerSubnetDailyServiceGet,
+  intPeerSubnetDailyServiceList,
   intRocketpoolMegapoolServiceGet,
   intRocketpoolMegapoolServiceList,
   intRocketpoolMinipoolServiceGet,
@@ -777,6 +795,12 @@ import type {
   DimNodeServiceListData,
   DimNodeServiceListError,
   DimNodeServiceListResponse,
+  DimPeerNodeServiceGetData,
+  DimPeerNodeServiceGetError,
+  DimPeerNodeServiceGetResponse,
+  DimPeerNodeServiceListData,
+  DimPeerNodeServiceListError,
+  DimPeerNodeServiceListResponse,
   DimRocketpoolNodeServiceGetData,
   DimRocketpoolNodeServiceGetError,
   DimRocketpoolNodeServiceGetResponse,
@@ -1977,6 +2001,24 @@ import type {
   FctPayloadBidHighestValueChunked50MsServiceListData,
   FctPayloadBidHighestValueChunked50MsServiceListError,
   FctPayloadBidHighestValueChunked50MsServiceListResponse,
+  FctPeerAttnetCountByClClientDailyServiceGetData,
+  FctPeerAttnetCountByClClientDailyServiceGetError,
+  FctPeerAttnetCountByClClientDailyServiceGetResponse,
+  FctPeerAttnetCountByClClientDailyServiceListData,
+  FctPeerAttnetCountByClClientDailyServiceListError,
+  FctPeerAttnetCountByClClientDailyServiceListResponse,
+  FctPeerChurnByClClientDailyServiceGetData,
+  FctPeerChurnByClClientDailyServiceGetError,
+  FctPeerChurnByClClientDailyServiceGetResponse,
+  FctPeerChurnByClClientDailyServiceListData,
+  FctPeerChurnByClClientDailyServiceListError,
+  FctPeerChurnByClClientDailyServiceListResponse,
+  FctPeerChurnDailyServiceGetData,
+  FctPeerChurnDailyServiceGetError,
+  FctPeerChurnDailyServiceGetResponse,
+  FctPeerChurnDailyServiceListData,
+  FctPeerChurnDailyServiceListError,
+  FctPeerChurnDailyServiceListResponse,
   FctPeerConcentrationClDailyServiceGetData,
   FctPeerConcentrationClDailyServiceGetError,
   FctPeerConcentrationClDailyServiceGetResponse,
@@ -2073,6 +2115,18 @@ import type {
   FctPeerCountBySourceDailyServiceListData,
   FctPeerCountBySourceDailyServiceListError,
   FctPeerCountBySourceDailyServiceListResponse,
+  FctPeerCustodyByColumnDailyServiceGetData,
+  FctPeerCustodyByColumnDailyServiceGetError,
+  FctPeerCustodyByColumnDailyServiceGetResponse,
+  FctPeerCustodyByColumnDailyServiceListData,
+  FctPeerCustodyByColumnDailyServiceListError,
+  FctPeerCustodyByColumnDailyServiceListResponse,
+  FctPeerCustodyCoverageDailyServiceGetData,
+  FctPeerCustodyCoverageDailyServiceGetError,
+  FctPeerCustodyCoverageDailyServiceGetResponse,
+  FctPeerCustodyCoverageDailyServiceListData,
+  FctPeerCustodyCoverageDailyServiceListError,
+  FctPeerCustodyCoverageDailyServiceListResponse,
   FctPeerForkReadinessByClClientDailyServiceGetData,
   FctPeerForkReadinessByClClientDailyServiceGetError,
   FctPeerForkReadinessByClClientDailyServiceGetResponse,
@@ -2115,6 +2169,18 @@ import type {
   FctPeerReachabilityByClClientDailyServiceListData,
   FctPeerReachabilityByClClientDailyServiceListError,
   FctPeerReachabilityByClClientDailyServiceListResponse,
+  FctPeerSubnetCoverageDailyServiceGetData,
+  FctPeerSubnetCoverageDailyServiceGetError,
+  FctPeerSubnetCoverageDailyServiceGetResponse,
+  FctPeerSubnetCoverageDailyServiceListData,
+  FctPeerSubnetCoverageDailyServiceListError,
+  FctPeerSubnetCoverageDailyServiceListResponse,
+  FctPeerSubnetDailyServiceGetData,
+  FctPeerSubnetDailyServiceGetError,
+  FctPeerSubnetDailyServiceGetResponse,
+  FctPeerSubnetDailyServiceListData,
+  FctPeerSubnetDailyServiceListError,
+  FctPeerSubnetDailyServiceListResponse,
   FctPeerSyncStatusByClClientDailyServiceGetData,
   FctPeerSyncStatusByClClientDailyServiceGetError,
   FctPeerSyncStatusByClClientDailyServiceGetResponse,
@@ -2691,6 +2757,12 @@ import type {
   IntPeerDailyServiceListData,
   IntPeerDailyServiceListError,
   IntPeerDailyServiceListResponse,
+  IntPeerSubnetDailyServiceGetData,
+  IntPeerSubnetDailyServiceGetError,
+  IntPeerSubnetDailyServiceGetResponse,
+  IntPeerSubnetDailyServiceListData,
+  IntPeerSubnetDailyServiceListError,
+  IntPeerSubnetDailyServiceListResponse,
   IntRocketpoolMegapoolServiceGetData,
   IntRocketpoolMegapoolServiceGetError,
   IntRocketpoolMegapoolServiceGetResponse,
@@ -3366,6 +3438,60 @@ export const dimNodeServiceGetOptions = (options: Options<DimNodeServiceGetData>
       return data;
     },
     queryKey: dimNodeServiceGetQueryKey(options),
+  });
+
+export const dimPeerNodeServiceListQueryKey = (options?: Options<DimPeerNodeServiceListData>) =>
+  createQueryKey('dimPeerNodeServiceList', options);
+
+/**
+ * List records
+ *
+ * Consensus peers in int_peer_daily with a peer ID, with their discv5 node ID and the order their node ID assigns custody groups in.
+ */
+export const dimPeerNodeServiceListOptions = (options?: Options<DimPeerNodeServiceListData>) =>
+  queryOptions<
+    DimPeerNodeServiceListResponse,
+    DimPeerNodeServiceListError,
+    DimPeerNodeServiceListResponse,
+    ReturnType<typeof dimPeerNodeServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimPeerNodeServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimPeerNodeServiceListQueryKey(options),
+  });
+
+export const dimPeerNodeServiceGetQueryKey = (options: Options<DimPeerNodeServiceGetData>) =>
+  createQueryKey('dimPeerNodeServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by peer_id_unique_key
+ */
+export const dimPeerNodeServiceGetOptions = (options: Options<DimPeerNodeServiceGetData>) =>
+  queryOptions<
+    DimPeerNodeServiceGetResponse,
+    DimPeerNodeServiceGetError,
+    DimPeerNodeServiceGetResponse,
+    ReturnType<typeof dimPeerNodeServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await dimPeerNodeServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: dimPeerNodeServiceGetQueryKey(options),
   });
 
 export const dimRocketpoolNodeServiceListQueryKey = (options?: Options<DimRocketpoolNodeServiceListData>) =>
@@ -15117,6 +15243,180 @@ export const fctPayloadBidHighestValueChunked50MsServiceGetOptions = (
     queryKey: fctPayloadBidHighestValueChunked50MsServiceGetQueryKey(options),
   });
 
+export const fctPeerAttnetCountByClClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerAttnetCountByClClientDailyServiceListData>
+) => createQueryKey('fctPeerAttnetCountByClClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by client and by how many attestation and sync subnets they last advertised in a metadata response to our libp2p sentries. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerAttnetCountByClClientDailyServiceListOptions = (
+  options?: Options<FctPeerAttnetCountByClClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerAttnetCountByClClientDailyServiceListResponse,
+    FctPeerAttnetCountByClClientDailyServiceListError,
+    FctPeerAttnetCountByClClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerAttnetCountByClClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerAttnetCountByClClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerAttnetCountByClClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerAttnetCountByClClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerAttnetCountByClClientDailyServiceGetData>
+) => createQueryKey('fctPeerAttnetCountByClClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerAttnetCountByClClientDailyServiceGetOptions = (
+  options: Options<FctPeerAttnetCountByClClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerAttnetCountByClClientDailyServiceGetResponse,
+    FctPeerAttnetCountByClClientDailyServiceGetError,
+    FctPeerAttnetCountByClClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerAttnetCountByClClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerAttnetCountByClClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerAttnetCountByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerChurnByClClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerChurnByClClientDailyServiceListData>
+) => createQueryKey('fctPeerChurnByClClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peer churn by client, from the peers our libp2p sentries saw: peers kept from the previous day, new peers, returning peers and departed peers, and how many of the last 30 days each peer was seen on. A peer is its peer ID, so clients that rotate their ID on restart show as churn. Rows are written once the day is complete. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerChurnByClClientDailyServiceListOptions = (
+  options?: Options<FctPeerChurnByClClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerChurnByClClientDailyServiceListResponse,
+    FctPeerChurnByClClientDailyServiceListError,
+    FctPeerChurnByClClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerChurnByClClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerChurnByClClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerChurnByClClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerChurnByClClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerChurnByClClientDailyServiceGetData>
+) => createQueryKey('fctPeerChurnByClClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerChurnByClClientDailyServiceGetOptions = (
+  options: Options<FctPeerChurnByClClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerChurnByClClientDailyServiceGetResponse,
+    FctPeerChurnByClClientDailyServiceGetError,
+    FctPeerChurnByClClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerChurnByClClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerChurnByClClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerChurnByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerChurnDailyServiceListQueryKey = (options?: Options<FctPeerChurnDailyServiceListData>) =>
+  createQueryKey('fctPeerChurnDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peer churn by network type, from the peers our libp2p sentries saw: peers kept from the previous day, new peers, returning peers and departed peers, and how many of the last 30 days each peer was seen on. A peer is its peer ID, so clients that rotate their ID on restart show as churn. Rows are written once the day is complete. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerChurnDailyServiceListOptions = (options?: Options<FctPeerChurnDailyServiceListData>) =>
+  queryOptions<
+    FctPeerChurnDailyServiceListResponse,
+    FctPeerChurnDailyServiceListError,
+    FctPeerChurnDailyServiceListResponse,
+    ReturnType<typeof fctPeerChurnDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerChurnDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerChurnDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerChurnDailyServiceGetQueryKey = (options: Options<FctPeerChurnDailyServiceGetData>) =>
+  createQueryKey('fctPeerChurnDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerChurnDailyServiceGetOptions = (options: Options<FctPeerChurnDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerChurnDailyServiceGetResponse,
+    FctPeerChurnDailyServiceGetError,
+    FctPeerChurnDailyServiceGetResponse,
+    ReturnType<typeof fctPeerChurnDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerChurnDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerChurnDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerConcentrationClDailyServiceListQueryKey = (
   options?: Options<FctPeerConcentrationClDailyServiceListData>
 ) => createQueryKey('fctPeerConcentrationClDailyServiceList', options);
@@ -16066,6 +16366,126 @@ export const fctPeerCountBySourceDailyServiceGetOptions = (options: Options<FctP
     queryKey: fctPeerCountBySourceDailyServiceGetQueryKey(options),
   });
 
+export const fctPeerCustodyByColumnDailyServiceListQueryKey = (
+  options?: Options<FctPeerCustodyByColumnDailyServiceListData>
+) => createQueryKey('fctPeerCustodyByColumnDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by the data columns they custody, 128 rows a day: a peer with custody group count n custodies the first n groups its node ID assigns. Peers our libp2p sentries or discovery crawler saw with a known custody group count and peer ID (all peers from April 2026). Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerCustodyByColumnDailyServiceListOptions = (
+  options?: Options<FctPeerCustodyByColumnDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCustodyByColumnDailyServiceListResponse,
+    FctPeerCustodyByColumnDailyServiceListError,
+    FctPeerCustodyByColumnDailyServiceListResponse,
+    ReturnType<typeof fctPeerCustodyByColumnDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCustodyByColumnDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCustodyByColumnDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCustodyByColumnDailyServiceGetQueryKey = (
+  options: Options<FctPeerCustodyByColumnDailyServiceGetData>
+) => createQueryKey('fctPeerCustodyByColumnDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCustodyByColumnDailyServiceGetOptions = (
+  options: Options<FctPeerCustodyByColumnDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCustodyByColumnDailyServiceGetResponse,
+    FctPeerCustodyByColumnDailyServiceGetError,
+    FctPeerCustodyByColumnDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCustodyByColumnDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCustodyByColumnDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCustodyByColumnDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerCustodyCoverageDailyServiceListQueryKey = (
+  options?: Options<FctPeerCustodyCoverageDailyServiceListData>
+) => createQueryKey('fctPeerCustodyCoverageDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily spread of consensus peers over the 128 data columns they custody, one row a day: the thinnest, median and thickest column, and the thinnest once supernodes or its largest hosting autonomous system are taken away. Peers as in fct_peer_custody_by_column_daily.
+ */
+export const fctPeerCustodyCoverageDailyServiceListOptions = (
+  options?: Options<FctPeerCustodyCoverageDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerCustodyCoverageDailyServiceListResponse,
+    FctPeerCustodyCoverageDailyServiceListError,
+    FctPeerCustodyCoverageDailyServiceListResponse,
+    ReturnType<typeof fctPeerCustodyCoverageDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCustodyCoverageDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCustodyCoverageDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerCustodyCoverageDailyServiceGetQueryKey = (
+  options: Options<FctPeerCustodyCoverageDailyServiceGetData>
+) => createQueryKey('fctPeerCustodyCoverageDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerCustodyCoverageDailyServiceGetOptions = (
+  options: Options<FctPeerCustodyCoverageDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerCustodyCoverageDailyServiceGetResponse,
+    FctPeerCustodyCoverageDailyServiceGetError,
+    FctPeerCustodyCoverageDailyServiceGetResponse,
+    ReturnType<typeof fctPeerCustodyCoverageDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerCustodyCoverageDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerCustodyCoverageDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerForkReadinessByClClientDailyServiceListQueryKey = (
   options?: Options<FctPeerForkReadinessByClClientDailyServiceListData>
 ) => createQueryKey('fctPeerForkReadinessByClClientDailyServiceList', options);
@@ -16484,6 +16904,120 @@ export const fctPeerReachabilityByClClientDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctPeerReachabilityByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerSubnetCoverageDailyServiceListQueryKey = (
+  options?: Options<FctPeerSubnetCoverageDailyServiceListData>
+) => createQueryKey('fctPeerSubnetCoverageDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily spread of consensus peers over the 64 attestation and 4 sync subnets they advertise, one row a day: the thinnest, median and thickest attestation subnet, the thinnest without peers on all 64, and the thinnest and thickest sync subnet. Peers as in fct_peer_subnet_daily.
+ */
+export const fctPeerSubnetCoverageDailyServiceListOptions = (
+  options?: Options<FctPeerSubnetCoverageDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerSubnetCoverageDailyServiceListResponse,
+    FctPeerSubnetCoverageDailyServiceListError,
+    FctPeerSubnetCoverageDailyServiceListResponse,
+    ReturnType<typeof fctPeerSubnetCoverageDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSubnetCoverageDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSubnetCoverageDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerSubnetCoverageDailyServiceGetQueryKey = (
+  options: Options<FctPeerSubnetCoverageDailyServiceGetData>
+) => createQueryKey('fctPeerSubnetCoverageDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerSubnetCoverageDailyServiceGetOptions = (
+  options: Options<FctPeerSubnetCoverageDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerSubnetCoverageDailyServiceGetResponse,
+    FctPeerSubnetCoverageDailyServiceGetError,
+    FctPeerSubnetCoverageDailyServiceGetResponse,
+    ReturnType<typeof fctPeerSubnetCoverageDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSubnetCoverageDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSubnetCoverageDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerSubnetDailyServiceListQueryKey = (options?: Options<FctPeerSubnetDailyServiceListData>) =>
+  createQueryKey('fctPeerSubnetDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily consensus peers by the attestation and sync subnets they last advertised in a metadata response to our libp2p sentries, 68 rows a day. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const fctPeerSubnetDailyServiceListOptions = (options?: Options<FctPeerSubnetDailyServiceListData>) =>
+  queryOptions<
+    FctPeerSubnetDailyServiceListResponse,
+    FctPeerSubnetDailyServiceListError,
+    FctPeerSubnetDailyServiceListResponse,
+    ReturnType<typeof fctPeerSubnetDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSubnetDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSubnetDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerSubnetDailyServiceGetQueryKey = (options: Options<FctPeerSubnetDailyServiceGetData>) =>
+  createQueryKey('fctPeerSubnetDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerSubnetDailyServiceGetOptions = (options: Options<FctPeerSubnetDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerSubnetDailyServiceGetResponse,
+    FctPeerSubnetDailyServiceGetError,
+    FctPeerSubnetDailyServiceGetResponse,
+    ReturnType<typeof fctPeerSubnetDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerSubnetDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerSubnetDailyServiceGetQueryKey(options),
   });
 
 export const fctPeerSyncStatusByClClientDailyServiceListQueryKey = (
@@ -22043,6 +22577,60 @@ export const intPeerDailyOrderByPeerIdServiceGetOptions = (options: Options<IntP
       return data;
     },
     queryKey: intPeerDailyOrderByPeerIdServiceGetQueryKey(options),
+  });
+
+export const intPeerSubnetDailyServiceListQueryKey = (options?: Options<IntPeerSubnetDailyServiceListData>) =>
+  createQueryKey('intPeerSubnetDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per consensus peer per day with the attestation and sync subnets it last advertised in a metadata response to our libp2p sentries. Crawlers, probes, light clients and our own sentries are excluded.
+ */
+export const intPeerSubnetDailyServiceListOptions = (options?: Options<IntPeerSubnetDailyServiceListData>) =>
+  queryOptions<
+    IntPeerSubnetDailyServiceListResponse,
+    IntPeerSubnetDailyServiceListError,
+    IntPeerSubnetDailyServiceListResponse,
+    ReturnType<typeof intPeerSubnetDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerSubnetDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerSubnetDailyServiceListQueryKey(options),
+  });
+
+export const intPeerSubnetDailyServiceGetQueryKey = (options: Options<IntPeerSubnetDailyServiceGetData>) =>
+  createQueryKey('intPeerSubnetDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const intPeerSubnetDailyServiceGetOptions = (options: Options<IntPeerSubnetDailyServiceGetData>) =>
+  queryOptions<
+    IntPeerSubnetDailyServiceGetResponse,
+    IntPeerSubnetDailyServiceGetError,
+    IntPeerSubnetDailyServiceGetResponse,
+    ReturnType<typeof intPeerSubnetDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intPeerSubnetDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intPeerSubnetDailyServiceGetQueryKey(options),
   });
 
 export const intRocketpoolMegapoolServiceListQueryKey = (options?: Options<IntRocketpoolMegapoolServiceListData>) =>
