@@ -13,10 +13,11 @@ import { getDefaultSelectors } from 'eslint-plugin-better-tailwindcss/defaults';
 import customRules from './eslint-rules/index.cjs';
 
 const noColor = 'Colours come from tokens in src/styles/tokens.css, used as Tailwind classes.';
-// A colour literal: hex, rgb() or hsl(); in a colour property, a named colour too.
+const noFixedStyle = 'A fixed value is a Tailwind class; style only carries values computed at runtime.';
+// A colour literal: hex, rgb() or hsl().
 const colorLiteral = '^(?:#[0-9a-fA-F]{3,8}|(?:rgb|hsl)a?\\(.*\\))$';
-const colorProperty =
-  '^(?:color|background(?:Color)?|border(?:Top|Right|Bottom|Left)?Color|outlineColor|textDecorationColor|fill|stroke|caretColor|accentColor)$';
+const colorAttribute = '^(?:fill|stroke|color|stopColor|floodColor|lightingColor)$';
+const styleValue = "JSXAttribute[name.name='style'] > JSXExpressionContainer > ObjectExpression > Property";
 // An opacity modifier (`bg-primary/10`). `w-1/2` is a fraction, and `text-sm/6` gives a type
 // size a line height from the spacing step.
 const modifier = '(?:^|:)!?(?!text-(?:2xs|xs|sm|base|lg|\\d?xl)/)[a-z-]*[a-z]/\\d+!?$';
@@ -94,14 +95,23 @@ export default defineConfig(
       'no-restricted-imports': ['error', { patterns: [noParentImports] }],
       'no-restricted-syntax': [
         'error',
-        // Colour literals in inline styles and SVG colour attributes bypass the tokens.
-        { selector: `JSXAttribute[name.name='style'] Property > Literal[value=/${colorLiteral}/]`, message: noColor },
+        // A value written into an inline style is a class instead; style keeps what is computed at runtime.
         {
-          selector: `JSXAttribute[name.name='style'] Property[key.name=/${colorProperty}/] > Literal[value=/^(?!(?:currentColor|transparent|inherit|initial|unset|none)$)[a-zA-Z]+$/]`,
+          selector: `${styleValue} > :matches(Literal, TemplateLiteral[expressions.length=0], UnaryExpression[argument.type='Literal']).value`,
+          message: noFixedStyle,
+        },
+        {
+          selector: `${styleValue} > ConditionalExpression.value:matches([consequent.type='Literal'][alternate.type='Literal'], [consequent.type='Literal'][alternate.name='undefined'], [consequent.name='undefined'][alternate.type='Literal'])`,
+          message: noFixedStyle,
+        },
+        // An element's SVG colour attributes take currentColor, none or a url() paint. Components keep colour
+        // props (Badge's color="green" names a variant) but never a colour literal.
+        {
+          selector: `JSXOpeningElement[name.name=/^[a-z]/] > JSXAttribute[name.name=/${colorAttribute}/] > Literal[value!=/^(?:currentColor|none|url\\(.*\\))$/i]`,
           message: noColor,
         },
         {
-          selector: `JSXAttribute[name.name=/^(?:fill|stroke|color|stopColor|floodColor|lightingColor)$/] > Literal[value=/${colorLiteral}/]`,
+          selector: `JSXOpeningElement:not([name.name=/^[a-z]/]) > JSXAttribute[name.name=/${colorAttribute}/] > Literal[value=/${colorLiteral}/]`,
           message: noColor,
         },
       ],
