@@ -124,6 +124,10 @@ export interface SeriesData {
    */
   seriesType?: 'line' | 'bar';
   /**
+   * Widest a bar may draw in pixels, so a few categories don't stretch into slabs
+   */
+  barMaxWidth?: number;
+  /**
    * Legend group name - series with the same group will be grouped together in the legend
    * Groups are displayed in the order they first appear in the series array
    */

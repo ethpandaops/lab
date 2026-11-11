@@ -12,6 +12,7 @@ import {
   CustodyChart,
   ExecutionNodesChart,
   ForkReadiness,
+  GoodbyeCharts,
   NetworkSkeleton,
   NodesChart,
   RangeBar,
@@ -33,8 +34,9 @@ const LAYER_OPTIONS: ReadonlyArray<{ value: ClientLayer; label: string }> = [
 
 /**
  * Network overview: the consensus peers our sentries and ENR crawler reached and the execution nodes our crawler
- * found, each day of the range: how they come and go, how far behind they run and how much history they serve, where
- * they run, what they custody, which subnets they join and how they connect, with fork readiness on the latest day.
+ * found, each day of the range: how they come and go and why they drop our sentries, how far behind they run and how
+ * much history they serve, where they run, what they custody, which subnets they join and how they connect, with fork
+ * readiness on the latest day.
  */
 export function IndexPage(): JSX.Element {
   const { range, t, setRange } = useRangeSearch();
@@ -65,6 +67,10 @@ export function IndexPage(): JSX.Element {
 
             <Section title="Churn">
               <ChurnCharts networkTypes={census.churn.networkTypes.rows} clients={census.churn.clients.rows} />
+            </Section>
+
+            <Section title="Goodbyes">
+              <GoodbyeCharts reasons={census.goodbyes.reasons.rows} clients={census.goodbyes.clients.rows} />
             </Section>
 
             <Section title="Sync and history">

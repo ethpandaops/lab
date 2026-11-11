@@ -732,6 +732,7 @@ export function MultiLineChart({
         showSymbol: s.showSymbol ?? false,
         symbolSize: s.symbolSize ?? 4,
         stack: s.stack,
+        ...(s.barMaxWidth !== undefined ? { barMaxWidth: s.barMaxWidth } : {}),
         yAxisIndex: s.yAxisIndex ?? 0,
         triggerLineEvent: true, // Enable click events on lines
         // Dense lines (thousands of points across a few hundred pixels) alias into fuzz; LTTB keeps

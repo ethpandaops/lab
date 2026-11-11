@@ -14,7 +14,7 @@ export const Route = createFileRoute('/ethereum/network/')({
       {
         name: 'description',
         content:
-          'Ethereum consensus peers and execution nodes by client, country, network, churn, custody, subnets and reachability',
+          'Ethereum consensus peers and execution nodes by client, country, network, churn, goodbye reasons, custody, subnets and reachability',
       },
       { property: 'og:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/network` },
       { property: 'og:type', content: 'website' },
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/ethereum/network/')({
       {
         property: 'og:description',
         content:
-          'Ethereum consensus peers and execution nodes by client, country, network, churn, custody, subnets and reachability',
+          'Ethereum consensus peers and execution nodes by client, country, network, churn, goodbye reasons, custody, subnets and reachability',
       },
       { property: 'og:image', content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/network.png` },
       { name: 'twitter:url', content: `${import.meta.env.VITE_BASE_URL}/ethereum/network` },
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/ethereum/network/')({
       {
         name: 'twitter:description',
         content:
-          'Ethereum consensus peers and execution nodes by client, country, network, churn, custody, subnets and reachability',
+          'Ethereum consensus peers and execution nodes by client, country, network, churn, goodbye reasons, custody, subnets and reachability',
       },
       { name: 'twitter:image', content: `${import.meta.env.VITE_BASE_URL}/images/ethereum/network.png` },
     ],

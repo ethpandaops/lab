@@ -1395,6 +1395,18 @@ import type {
   FctPeerForkReadinessByElClientDailyServiceListData,
   FctPeerForkReadinessByElClientDailyServiceListErrors,
   FctPeerForkReadinessByElClientDailyServiceListResponses,
+  FctPeerGoodbyeByClClientDailyServiceGetData,
+  FctPeerGoodbyeByClClientDailyServiceGetErrors,
+  FctPeerGoodbyeByClClientDailyServiceGetResponses,
+  FctPeerGoodbyeByClClientDailyServiceListData,
+  FctPeerGoodbyeByClClientDailyServiceListErrors,
+  FctPeerGoodbyeByClClientDailyServiceListResponses,
+  FctPeerGoodbyeDailyServiceGetData,
+  FctPeerGoodbyeDailyServiceGetErrors,
+  FctPeerGoodbyeDailyServiceGetResponses,
+  FctPeerGoodbyeDailyServiceListData,
+  FctPeerGoodbyeDailyServiceListErrors,
+  FctPeerGoodbyeDailyServiceListResponses,
   FctPeerHostingByElClientDailyServiceGetData,
   FctPeerHostingByElClientDailyServiceGetErrors,
   FctPeerHostingByElClientDailyServiceGetResponses,
@@ -1599,6 +1611,48 @@ import type {
   FctTokenContractStorageStateByBlockDailyServiceListData,
   FctTokenContractStorageStateByBlockDailyServiceListErrors,
   FctTokenContractStorageStateByBlockDailyServiceListResponses,
+  FctTransactionInclusionDailyServiceGetData,
+  FctTransactionInclusionDailyServiceGetErrors,
+  FctTransactionInclusionDailyServiceGetResponses,
+  FctTransactionInclusionDailyServiceListData,
+  FctTransactionInclusionDailyServiceListErrors,
+  FctTransactionInclusionDailyServiceListResponses,
+  FctTransactionInclusionHourlyServiceGetData,
+  FctTransactionInclusionHourlyServiceGetErrors,
+  FctTransactionInclusionHourlyServiceGetResponses,
+  FctTransactionInclusionHourlyServiceListData,
+  FctTransactionInclusionHourlyServiceListErrors,
+  FctTransactionInclusionHourlyServiceListResponses,
+  FctTransactionInclusionServiceGetData,
+  FctTransactionInclusionServiceGetErrors,
+  FctTransactionInclusionServiceGetResponses,
+  FctTransactionInclusionServiceListData,
+  FctTransactionInclusionServiceListErrors,
+  FctTransactionInclusionServiceListResponses,
+  FctTransactionMempoolOutcome7dServiceGetData,
+  FctTransactionMempoolOutcome7dServiceGetErrors,
+  FctTransactionMempoolOutcome7dServiceGetResponses,
+  FctTransactionMempoolOutcome7dServiceListData,
+  FctTransactionMempoolOutcome7dServiceListErrors,
+  FctTransactionMempoolOutcome7dServiceListResponses,
+  FctTransactionMempoolOutcomeDailyServiceGetData,
+  FctTransactionMempoolOutcomeDailyServiceGetErrors,
+  FctTransactionMempoolOutcomeDailyServiceGetResponses,
+  FctTransactionMempoolOutcomeDailyServiceListData,
+  FctTransactionMempoolOutcomeDailyServiceListErrors,
+  FctTransactionMempoolOutcomeDailyServiceListResponses,
+  FctTransactionMempoolOutcomeHourlyServiceGetData,
+  FctTransactionMempoolOutcomeHourlyServiceGetErrors,
+  FctTransactionMempoolOutcomeHourlyServiceGetResponses,
+  FctTransactionMempoolOutcomeHourlyServiceListData,
+  FctTransactionMempoolOutcomeHourlyServiceListErrors,
+  FctTransactionMempoolOutcomeHourlyServiceListResponses,
+  FctTransactionReplacementServiceGetData,
+  FctTransactionReplacementServiceGetErrors,
+  FctTransactionReplacementServiceGetResponses,
+  FctTransactionReplacementServiceListData,
+  FctTransactionReplacementServiceListErrors,
+  FctTransactionReplacementServiceListResponses,
   FctValidatorBalanceDailyServiceGetData,
   FctValidatorBalanceDailyServiceGetErrors,
   FctValidatorBalanceDailyServiceGetResponses,
@@ -2205,6 +2259,12 @@ import type {
   IntTransactionCallFrameServiceListData,
   IntTransactionCallFrameServiceListErrors,
   IntTransactionCallFrameServiceListResponses,
+  IntTransactionMempoolObservationHourlyServiceGetData,
+  IntTransactionMempoolObservationHourlyServiceGetErrors,
+  IntTransactionMempoolObservationHourlyServiceGetResponses,
+  IntTransactionMempoolObservationHourlyServiceListData,
+  IntTransactionMempoolObservationHourlyServiceListErrors,
+  IntTransactionMempoolObservationHourlyServiceListResponses,
   IntTransactionOpcodeGasServiceGetData,
   IntTransactionOpcodeGasServiceGetErrors,
   IntTransactionOpcodeGasServiceGetResponses,
@@ -3153,6 +3213,14 @@ import {
   zFctPeerForkReadinessByElClientDailyServiceGetResponse,
   zFctPeerForkReadinessByElClientDailyServiceListData,
   zFctPeerForkReadinessByElClientDailyServiceListResponse,
+  zFctPeerGoodbyeByClClientDailyServiceGetData,
+  zFctPeerGoodbyeByClClientDailyServiceGetResponse,
+  zFctPeerGoodbyeByClClientDailyServiceListData,
+  zFctPeerGoodbyeByClClientDailyServiceListResponse,
+  zFctPeerGoodbyeDailyServiceGetData,
+  zFctPeerGoodbyeDailyServiceGetResponse,
+  zFctPeerGoodbyeDailyServiceListData,
+  zFctPeerGoodbyeDailyServiceListResponse,
   zFctPeerHostingByElClientDailyServiceGetData,
   zFctPeerHostingByElClientDailyServiceGetResponse,
   zFctPeerHostingByElClientDailyServiceListData,
@@ -3289,6 +3357,34 @@ import {
   zFctTokenContractStorageStateByBlockDailyServiceGetResponse,
   zFctTokenContractStorageStateByBlockDailyServiceListData,
   zFctTokenContractStorageStateByBlockDailyServiceListResponse,
+  zFctTransactionInclusionDailyServiceGetData,
+  zFctTransactionInclusionDailyServiceGetResponse,
+  zFctTransactionInclusionDailyServiceListData,
+  zFctTransactionInclusionDailyServiceListResponse,
+  zFctTransactionInclusionHourlyServiceGetData,
+  zFctTransactionInclusionHourlyServiceGetResponse,
+  zFctTransactionInclusionHourlyServiceListData,
+  zFctTransactionInclusionHourlyServiceListResponse,
+  zFctTransactionInclusionServiceGetData,
+  zFctTransactionInclusionServiceGetResponse,
+  zFctTransactionInclusionServiceListData,
+  zFctTransactionInclusionServiceListResponse,
+  zFctTransactionMempoolOutcome7dServiceGetData,
+  zFctTransactionMempoolOutcome7dServiceGetResponse,
+  zFctTransactionMempoolOutcome7dServiceListData,
+  zFctTransactionMempoolOutcome7dServiceListResponse,
+  zFctTransactionMempoolOutcomeDailyServiceGetData,
+  zFctTransactionMempoolOutcomeDailyServiceGetResponse,
+  zFctTransactionMempoolOutcomeDailyServiceListData,
+  zFctTransactionMempoolOutcomeDailyServiceListResponse,
+  zFctTransactionMempoolOutcomeHourlyServiceGetData,
+  zFctTransactionMempoolOutcomeHourlyServiceGetResponse,
+  zFctTransactionMempoolOutcomeHourlyServiceListData,
+  zFctTransactionMempoolOutcomeHourlyServiceListResponse,
+  zFctTransactionReplacementServiceGetData,
+  zFctTransactionReplacementServiceGetResponse,
+  zFctTransactionReplacementServiceListData,
+  zFctTransactionReplacementServiceListResponse,
   zFctValidatorBalanceDailyServiceGetData,
   zFctValidatorBalanceDailyServiceGetResponse,
   zFctValidatorBalanceDailyServiceListData,
@@ -3693,6 +3789,10 @@ import {
   zIntTransactionCallFrameServiceGetResponse,
   zIntTransactionCallFrameServiceListData,
   zIntTransactionCallFrameServiceListResponse,
+  zIntTransactionMempoolObservationHourlyServiceGetData,
+  zIntTransactionMempoolObservationHourlyServiceGetResponse,
+  zIntTransactionMempoolObservationHourlyServiceListData,
+  zIntTransactionMempoolObservationHourlyServiceListResponse,
   zIntTransactionOpcodeGasServiceGetData,
   zIntTransactionOpcodeGasServiceGetResponse,
   zIntTransactionOpcodeGasServiceListData,
@@ -12513,6 +12613,82 @@ export const fctPeerForkReadinessByElClientDailyServiceGet = <ThrowOnError exten
 /**
  * List records
  *
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the consensus client of the peer and the reason code it gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export const fctPeerGoodbyeByClClientDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerGoodbyeByClClientDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerGoodbyeByClClientDailyServiceListResponses,
+    FctPeerGoodbyeByClClientDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerGoodbyeByClClientDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerGoodbyeByClClientDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_goodbye_by_cl_client_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerGoodbyeByClClientDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerGoodbyeByClClientDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerGoodbyeByClClientDailyServiceGetResponses,
+    FctPeerGoodbyeByClClientDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerGoodbyeByClClientDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerGoodbyeByClClientDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_goodbye_by_cl_client_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the reason code the peer gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export const fctPeerGoodbyeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctPeerGoodbyeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctPeerGoodbyeDailyServiceListResponses,
+    FctPeerGoodbyeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerGoodbyeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctPeerGoodbyeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_goodbye_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerGoodbyeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctPeerGoodbyeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctPeerGoodbyeDailyServiceGetResponses,
+    FctPeerGoodbyeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctPeerGoodbyeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctPeerGoodbyeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_peer_goodbye_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
  * Daily execution nodes by client, without versions, with hosting and IPv6 counts. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
  */
 export const fctPeerHostingByElClientDailyServiceList = <ThrowOnError extends boolean = false>(
@@ -13796,6 +13972,272 @@ export const fctTokenContractStorageStateByBlockDailyServiceGet = <ThrowOnError 
     requestValidator: async data => await zFctTokenContractStorageStateByBlockDailyServiceGetData.parseAsync(data),
     responseValidator: async data => await zFctTokenContractStorageStateByBlockDailyServiceGetResponse.parseAsync(data),
     url: '/api/v1/fct_token_contract_storage_state_by_block_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per transaction included in a canonical beacon block execution payload. Carries no mempool or relay context so it can cover the full post-Merge history
+ */
+export const fctTransactionInclusionServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionInclusionServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionInclusionServiceListResponses,
+    FctTransactionInclusionServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctTransactionInclusionServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionInclusionServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionInclusionServiceGetResponses,
+    FctTransactionInclusionServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion/{slot_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export const fctTransactionInclusionDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionInclusionDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionInclusionDailyServiceListResponses,
+    FctTransactionInclusionDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctTransactionInclusionDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionInclusionDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionInclusionDailyServiceGetResponses,
+    FctTransactionInclusionDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export const fctTransactionInclusionHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionInclusionHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionInclusionHourlyServiceListResponses,
+    FctTransactionInclusionHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctTransactionInclusionHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionInclusionHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionInclusionHourlyServiceGetResponses,
+    FctTransactionInclusionHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionInclusionHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionInclusionHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_inclusion_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One immutable row per transaction hash observed in the public mempool, stating its fixed-horizon outcome within 7 days of first sighting. An observation episode starts when a hash is sighted with no sightings in the preceding 7 days. A hash re-sighted after more than 7 days of silence starts a new episode and a new row
+ */
+export const fctTransactionMempoolOutcome7dServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionMempoolOutcome7dServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionMempoolOutcome7dServiceListResponses,
+    FctTransactionMempoolOutcome7dServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcome7dServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcome7dServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_7d',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by first_seen_date_time
+ */
+export const fctTransactionMempoolOutcome7dServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionMempoolOutcome7dServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionMempoolOutcome7dServiceGetResponses,
+    FctTransactionMempoolOutcome7dServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcome7dServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcome7dServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_7d/{first_seen_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Daily cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export const fctTransactionMempoolOutcomeDailyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionMempoolOutcomeDailyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionMempoolOutcomeDailyServiceListResponses,
+    FctTransactionMempoolOutcomeDailyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcomeDailyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcomeDailyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_daily',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctTransactionMempoolOutcomeDailyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionMempoolOutcomeDailyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionMempoolOutcomeDailyServiceGetResponses,
+    FctTransactionMempoolOutcomeDailyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcomeDailyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcomeDailyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_daily/{day_start_date}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * Hourly cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export const fctTransactionMempoolOutcomeHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionMempoolOutcomeHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionMempoolOutcomeHourlyServiceListResponses,
+    FctTransactionMempoolOutcomeHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcomeHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcomeHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctTransactionMempoolOutcomeHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionMempoolOutcomeHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionMempoolOutcomeHourlyServiceGetResponses,
+    FctTransactionMempoolOutcomeHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionMempoolOutcomeHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionMempoolOutcomeHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_mempool_outcome_hourly/{hour_start_date_time}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per publicly observed attempt in nonce groups with at least two attempts, emitted when the group resolves. A nonce group is all transactions sharing a from address and nonce whose first sightings fall within 7 days of the group anchor
+ */
+export const fctTransactionReplacementServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<FctTransactionReplacementServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    FctTransactionReplacementServiceListResponses,
+    FctTransactionReplacementServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionReplacementServiceListData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionReplacementServiceListResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_replacement',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by group_first_seen_date_time
+ */
+export const fctTransactionReplacementServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<FctTransactionReplacementServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    FctTransactionReplacementServiceGetResponses,
+    FctTransactionReplacementServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zFctTransactionReplacementServiceGetData.parseAsync(data),
+    responseValidator: async data => await zFctTransactionReplacementServiceGetResponse.parseAsync(data),
+    url: '/api/v1/fct_transaction_replacement/{group_first_seen_date_time}',
     ...options,
   });
 
@@ -17622,6 +18064,44 @@ export const intTransactionCallFrameOpcodeResourceGasServiceGet = <ThrowOnError 
     requestValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetData.parseAsync(data),
     responseValidator: async data => await zIntTransactionCallFrameOpcodeResourceGasServiceGetResponse.parseAsync(data),
     url: '/api/v1/int_transaction_call_frame_opcode_resource_gas/{block_number}',
+    ...options,
+  });
+
+/**
+ * List records
+ *
+ * One row per transaction hash per hour in which it was sighted in the public mempool by at least one sentry. Rows summarise the sightings within that hour only. A transaction sighted across multiple hours has multiple rows
+ */
+export const intTransactionMempoolObservationHourlyServiceList = <ThrowOnError extends boolean = false>(
+  options?: Options<IntTransactionMempoolObservationHourlyServiceListData, ThrowOnError>
+) =>
+  (options?.client ?? client).get<
+    IntTransactionMempoolObservationHourlyServiceListResponses,
+    IntTransactionMempoolObservationHourlyServiceListErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionMempoolObservationHourlyServiceListData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionMempoolObservationHourlyServiceListResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_mempool_observation_hourly',
+    ...options,
+  });
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const intTransactionMempoolObservationHourlyServiceGet = <ThrowOnError extends boolean = false>(
+  options: Options<IntTransactionMempoolObservationHourlyServiceGetData, ThrowOnError>
+) =>
+  (options.client ?? client).get<
+    IntTransactionMempoolObservationHourlyServiceGetResponses,
+    IntTransactionMempoolObservationHourlyServiceGetErrors,
+    ThrowOnError
+  >({
+    requestValidator: async data => await zIntTransactionMempoolObservationHourlyServiceGetData.parseAsync(data),
+    responseValidator: async data => await zIntTransactionMempoolObservationHourlyServiceGetResponse.parseAsync(data),
+    url: '/api/v1/int_transaction_mempool_observation_hourly/{hour_start_date_time}',
     ...options,
   });
 
