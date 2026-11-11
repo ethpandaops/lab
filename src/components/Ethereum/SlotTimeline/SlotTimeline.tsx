@@ -203,8 +203,8 @@ function SlotTimelineComponent({
         {/* Current time label */}
         {showCurrentTime && (
           <div
-            className="pointer-events-none absolute -top-6 transition-all duration-300"
-            style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
+            className="pointer-events-none absolute -top-6 -translate-x-1/2 transition-all duration-300"
+            style={{ left: `${currentTimePercent}%` }}
           >
             <span className="text-xs/4 font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}s</span>
           </div>

@@ -152,7 +152,7 @@ export const ConstrainedWidth: Story = {
  */
 export const SelectedOnLoad: Story = {
   render: () => (
-    <div style={{ width: 320 }}>
+    <div className="w-80">
       <TabGroup defaultIndex={11}>
         <ScrollableTabs>
           {manyTabs.map(label => (

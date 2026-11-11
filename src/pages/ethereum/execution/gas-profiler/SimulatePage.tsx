@@ -806,7 +806,7 @@ export function SimulatePage(): JSX.Element {
             <div className="mt-3 overflow-hidden rounded-sm border border-warning-30" role="status" aria-live="polite">
               <div className="flex items-start gap-3 bg-warning-5 p-3.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning-15">
-                  <ArrowPathIcon className="size-4 animate-spin text-warning" style={{ animationDuration: '2s' }} />
+                  <ArrowPathIcon className="size-4 animate-spin text-warning animate-duration-2000" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm/5 font-medium text-foreground">Backend execution clients are syncing</p>
@@ -868,7 +868,7 @@ export function SimulatePage(): JSX.Element {
           <div className="flex items-center gap-4 p-4">
             {/* Spinner */}
             <div className="relative flex size-10 shrink-0 items-center justify-center">
-              <svg className="size-10 -rotate-90 animate-spin" viewBox="0 0 40 40" style={{ animationDuration: '3s' }}>
+              <svg className="size-10 -rotate-90 animate-spin animate-duration-3000" viewBox="0 0 40 40">
                 <circle cx="20" cy="20" r="16" fill="none" className="stroke-border" strokeWidth="3" />
                 <circle
                   cx="20"
@@ -936,7 +936,7 @@ export function SimulatePage(): JSX.Element {
             <Card className="overflow-hidden">
               <div className="flex items-start gap-4 p-5" role="status" aria-live="polite">
                 <div className="relative flex size-10 shrink-0 items-center justify-center">
-                  <ArrowPathIcon className="size-5 animate-spin text-warning" style={{ animationDuration: '2s' }} />
+                  <ArrowPathIcon className="size-5 animate-spin text-warning animate-duration-2000" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-semibold text-foreground">Backend Syncing</h3>
@@ -1035,7 +1035,8 @@ export function SimulatePage(): JSX.Element {
                 theme={ECHARTS_THEME}
                 echarts={echarts}
                 option={chartOptions}
-                style={{ height: 180 }}
+                // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                className="h-45!"
                 onEvents={{ click: handleChartClick }}
                 notMerge={true}
               />
@@ -1085,10 +1086,9 @@ export function SimulatePage(): JSX.Element {
                   type="button"
                   onClick={() => setSelectedBlockIndex(index)}
                   className={clsx(
-                    'group relative flex shrink-0 flex-col rounded-sm border transition-all',
+                    'group relative flex min-w-30 shrink-0 flex-col rounded-sm border transition-all',
                     isSelected ? 'border-primary bg-primary-10' : 'border-border bg-background hover:border-muted'
                   )}
-                  style={{ minWidth: '7.5rem' }}
                 >
                   {/* Connector arrow to detail panel */}
                   {isSelected && (
@@ -1143,10 +1143,9 @@ export function SimulatePage(): JSX.Element {
               <div
                 key={blockNumber}
                 className={clsx(
-                  'flex shrink-0 flex-col rounded-sm border border-dashed border-border-60',
+                  'flex min-w-30 shrink-0 flex-col rounded-sm border border-dashed border-border-60',
                   i === 0 && 'animate-pulse'
                 )}
-                style={{ minWidth: '7.5rem' }}
               >
                 <div className="px-3 pt-2 pb-1.5">
                   <div className="text-2xs font-semibold text-muted">Block</div>

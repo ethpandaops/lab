@@ -1121,7 +1121,8 @@ export function TransactionPage(): JSX.Element {
                       <ReactECharts
                         theme={ECHARTS_THEME}
                         option={contractTreemapOption}
-                        style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
+                        // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                        className={clsx(inModal ? 'h-125!' : 'h-70!', 'cursor-pointer')}
                         opts={{ renderer: 'canvas' }}
                         onEvents={{ click: handleTreemapClick }}
                       />

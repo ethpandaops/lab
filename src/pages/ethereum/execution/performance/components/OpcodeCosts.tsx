@@ -187,13 +187,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
       <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border px-4 py-3 text-xs text-muted sm:px-5">
         <span className="flex w-full items-center gap-2 whitespace-nowrap sm:w-auto">
           Faster than priced
-          <span
-            className="h-2 min-w-8 flex-1 rounded-full sm:w-32 sm:flex-none"
-            style={{
-              background:
-                'linear-gradient(to right, color-mix(in oklab, var(--color-chart-0) 70%, transparent), transparent, color-mix(in oklab, var(--color-chart-3) 70%, transparent))',
-            }}
-          />
+          <span className="h-2 min-w-8 flex-1 rounded-full bg-faster-to-slower sm:w-32 sm:flex-none" />
           Slower than priced
         </span>
       </div>

@@ -278,10 +278,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
                     />
 
                     {/* Opcode label (vertical using writing-mode) */}
-                    <div
-                      className="mt-1 font-mono text-2xs whitespace-nowrap text-muted"
-                      style={{ writingMode: 'vertical-rl' }}
-                    >
+                    <div className="mt-1 font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                       {opcode}
                     </div>
                   </div>

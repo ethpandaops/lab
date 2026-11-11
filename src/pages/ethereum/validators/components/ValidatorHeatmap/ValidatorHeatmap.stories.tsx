@@ -129,20 +129,20 @@ function SkeletonPreview({ rows, height, showChrome, loading }: SkeletonPreviewP
 
   const skeleton = (
     <div className="relative" style={{ height }}>
-      <div className="absolute flex flex-col justify-evenly" style={{ top: 16, bottom: 50, left: 8, width: 48 }}>
+      <div className="absolute top-4 bottom-12.5 left-2 flex w-12 flex-col justify-evenly">
         {Array.from({ length: rows }, (_, i) => (
           <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
         ))}
       </div>
-      <div className="absolute flex flex-col justify-evenly gap-1" style={{ top: 16, right: 90, bottom: 50, left: 60 }}>
+      <div className="absolute top-4 right-22.5 bottom-12.5 left-15 flex flex-col justify-evenly gap-1">
         {Array.from({ length: rows }, (_, i) => (
           <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
         ))}
       </div>
-      <div className="absolute" style={{ left: 60, right: 90, bottom: 24 }}>
+      <div className="absolute right-22.5 bottom-6 left-15">
         <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
       </div>
-      <div className="absolute" style={{ right: 24, top: '25%', bottom: '25%', width: 16 }}>
+      <div className="absolute inset-y-1/4 right-6 w-4">
         <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
       </div>
     </div>

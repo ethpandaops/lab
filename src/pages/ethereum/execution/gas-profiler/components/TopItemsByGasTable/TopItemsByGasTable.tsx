@@ -1,5 +1,6 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CALL_TYPE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -158,7 +159,7 @@ export function TopItemsByGasTable({
         const displayItems = items.slice(0, inModal ? modalCount : compactCount);
 
         return displayItems.length > 0 ? (
-          <div className="overflow-auto" style={{ height: inModal ? 400 : 280 }}>
+          <div className={clsx('overflow-auto', inModal ? 'h-100' : 'h-70')}>
             <table className="min-w-full">
               <thead className="sticky top-0 bg-surface">
                 <tr className="border-b border-border text-xs text-muted">
@@ -183,9 +184,7 @@ export function TopItemsByGasTable({
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center text-sm text-muted" style={{ height: 280 }}>
-            No data
-          </div>
+          <div className="flex h-70 items-center justify-center text-sm text-muted">No data</div>
         );
       }}
     </PopoutCard>

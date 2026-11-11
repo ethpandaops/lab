@@ -228,7 +228,8 @@ export function Donut({
         ref={ref}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={true}
         lazyUpdate={false}
       />

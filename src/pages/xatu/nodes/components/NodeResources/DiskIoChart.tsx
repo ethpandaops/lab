@@ -321,12 +321,11 @@ export function DiskIoChart({
                 }}
               >
                 <div
-                  className="absolute inset-y-0"
+                  className="absolute inset-y-0 opacity-12"
                   style={{
                     left: `${highlight.startFrac * 100}%`,
                     width: `${highlight.widthFrac * 100}%`,
                     backgroundColor: highlight.color,
-                    opacity: 0.12,
                   }}
                 />
               </div>

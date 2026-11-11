@@ -228,7 +228,8 @@ export function BarChart({
         ref={ref}
         echarts={echarts}
         option={option}
-        style={{ height: _height, width: '100%', minHeight: _height }}
+        className="w-full"
+        style={{ height: _height, minHeight: _height }}
         notMerge={false}
         lazyUpdate={true}
       />

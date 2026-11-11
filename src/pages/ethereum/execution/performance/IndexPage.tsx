@@ -806,13 +806,7 @@ function WorkloadSensitivity({ clients }: { clients: ClientPerformance[] }): JSX
       </table>
       <div className="mt-3 flex items-center justify-end gap-2 text-xs text-muted">
         <span>Slower</span>
-        <div
-          className="h-2 w-32 rounded-full"
-          style={{
-            background:
-              'linear-gradient(to right, color-mix(in oklab, var(--color-chart-3) 70%, transparent), transparent, color-mix(in oklab, var(--color-chart-0) 70%, transparent))',
-          }}
-        />
+        <div className="h-2 w-32 rounded-full bg-slower-to-faster" />
         <span>Faster</span>
       </div>
     </div>

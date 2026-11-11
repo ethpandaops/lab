@@ -233,7 +233,8 @@ export function RadarChart({
         theme={ECHARTS_THEME}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
       />

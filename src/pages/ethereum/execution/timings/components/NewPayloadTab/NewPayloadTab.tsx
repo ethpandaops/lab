@@ -1092,19 +1092,25 @@ function WinrateSection({
                   >
                     {/* Proportional fill bar */}
                     <div
-                      className={clsx('absolute inset-y-0 left-0', isLeader ? 'rounded-sm' : 'rounded-xs')}
+                      className={clsx(
+                        'absolute inset-y-0 left-0',
+                        isLeader
+                          ? 'rounded-sm opacity-12'
+                          : isTopThree
+                            ? 'rounded-xs opacity-10'
+                            : 'rounded-xs opacity-6'
+                      )}
                       style={{
                         width: `${barWidth}%`,
                         backgroundColor: standing.color,
-                        opacity: isLeader ? 0.12 : isTopThree ? 0.1 : 0.06,
                       }}
                     />
 
                     {/* Left accent bar for top 3 */}
                     {isTopThree && (
                       <div
-                        className={clsx('absolute inset-y-0 left-0', isLeader ? 'w-1' : 'w-0.5')}
-                        style={{ backgroundColor: standing.color, opacity: isLeader ? 0.8 : 0.5 }}
+                        className={clsx('absolute inset-y-0 left-0', isLeader ? 'w-1 opacity-80' : 'w-0.5 opacity-50')}
+                        style={{ backgroundColor: standing.color }}
                       />
                     )}
 

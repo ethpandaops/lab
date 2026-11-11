@@ -98,8 +98,8 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
 
         {/* Current value cell - spans all type rows */}
         <div
-          className="flex flex-col items-center justify-center border-r border-border-30 bg-muted-5 p-2 lg:p-4"
-          style={{ gridColumn: 2, gridRow: `2 / ${2 + types.length}` }}
+          className="col-2 flex flex-col items-center justify-center border-r border-border-30 bg-muted-5 p-2 lg:p-4"
+          style={{ gridRow: `2 / ${2 + types.length}` }}
         >
           {currentBytes !== null && currentSlots !== null ? (
             <>

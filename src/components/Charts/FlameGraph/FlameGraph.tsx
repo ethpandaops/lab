@@ -528,8 +528,8 @@ export function FlameGraph({
           {rows.map((row, rowIndex) => (
             <div
               key={row.depth}
-              className="relative flex w-full overflow-hidden"
-              style={{ height: rowHeight, marginTop: rowIndex > 0 ? 1 : 0 }}
+              className={clsx('relative flex w-full overflow-hidden', rowIndex > 0 ? 'mt-px' : 'mt-0')}
+              style={{ height: rowHeight }}
             >
               {row.nodes.map(flatNode => {
                 // Skip nodes that are too small

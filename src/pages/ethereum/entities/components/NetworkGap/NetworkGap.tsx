@@ -156,8 +156,12 @@ export function NetworkGap({ entities, counts, network, window }: NetworkGapProp
                     <span className="relative block h-2.5">
                       <span className="absolute -inset-y-0.75 left-1/2 w-px bg-border" />
                       <span
-                        className={clsx('absolute inset-y-0 rounded-xs', BAR_CLASS[row.verdict])}
-                        style={towardsBetter ? { left: '50%', width } : { right: '50%', width }}
+                        className={clsx(
+                          'absolute inset-y-0 rounded-xs',
+                          towardsBetter ? 'left-1/2' : 'right-1/2',
+                          BAR_CLASS[row.verdict]
+                        )}
+                        style={{ width }}
                       />
                     </span>
                   </td>

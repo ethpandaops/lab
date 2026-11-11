@@ -170,10 +170,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
                     />
 
                     {/* Opcode label (vertical using writing-mode) */}
-                    <div
-                      className="mt-1 font-mono text-2xs whitespace-nowrap text-muted"
-                      style={{ writingMode: 'vertical-rl' }}
-                    >
+                    <div className="mt-1 font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                       {opcode}
                     </div>
                   </div>
@@ -392,8 +389,7 @@ function TransactionsViewHeatmap({
                     to="/ethereum/execution/gas-profiler/tx/$txHash"
                     params={{ txHash }}
                     search={{ block: blockNumber }}
-                    className="truncate text-2xs text-muted hover:text-foreground"
-                    style={{ maxWidth: '80px' }}
+                    className="max-w-20 truncate text-2xs text-muted hover:text-foreground"
                     title={targetName || txHash}
                   >
                     {txIndex >= 0 ? `#${txIndex}` : txHash.slice(0, 8)}
@@ -415,10 +411,7 @@ function TransactionsViewHeatmap({
                 >
                   {opcodes.map(opcode => (
                     <div key={opcode} className="flex w-6 justify-center">
-                      <span
-                        className="font-mono text-2xs whitespace-nowrap text-muted"
-                        style={{ writingMode: 'vertical-rl' }}
-                      >
+                      <span className="font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                         {opcode}
                       </span>
                     </div>

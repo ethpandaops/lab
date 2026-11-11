@@ -1064,13 +1064,13 @@ export function BlockPage(): JSX.Element {
                   <ReactECharts
                     theme={ECHARTS_THEME}
                     option={gasDistributionOption}
-                    style={{ height: inModal ? 500 : 280 }}
+                    // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                    className={inModal ? 'h-125!' : 'h-70!'}
                     onEvents={{ click: handleTreemapClick }}
                   />
                 ) : (
                   <div
-                    className="flex items-center justify-center text-sm text-muted"
-                    style={{ height: inModal ? 500 : 280 }}
+                    className={clsx('flex items-center justify-center text-sm text-muted', inModal ? 'h-125' : 'h-70')}
                   >
                     No transaction data
                   </div>
@@ -1194,7 +1194,8 @@ export function BlockPage(): JSX.Element {
                     <ReactECharts
                       theme={ECHARTS_THEME}
                       option={contractTreemapOption}
-                      style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
+                      // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                      className={clsx(inModal ? 'h-125!' : 'h-70!', 'cursor-pointer')}
                       opts={{ renderer: 'canvas' }}
                       onEvents={{ click: handleContractTreemapClick }}
                     />
@@ -1243,7 +1244,8 @@ export function BlockPage(): JSX.Element {
                     <ReactECharts
                       theme={ECHARTS_THEME}
                       option={contractFlowSankeyOption}
-                      style={{ height: inModal ? 550 : 320, width: '100%', cursor: 'pointer' }}
+                      // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                      className={clsx(inModal ? 'h-137.5!' : 'h-80!', 'w-full cursor-pointer')}
                       opts={{ renderer: 'canvas' }}
                       onEvents={{ click: handleSankeyClick }}
                     />

@@ -200,10 +200,7 @@ export function GridHeatmap<T = unknown>({
           {/* Y-axis title - vertical text on the left */}
           {yAxisTitle && (
             <div className="flex shrink-0 items-center justify-center pr-1">
-              <span
-                className="text-2xs font-medium tracking-wider text-muted uppercase"
-                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-              >
+              <span className="rotate-180 text-2xs font-medium tracking-wider text-muted uppercase writing-vertical-rl">
                 {yAxisTitle}
               </span>
             </div>

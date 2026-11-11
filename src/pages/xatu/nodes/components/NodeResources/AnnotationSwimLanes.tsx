@@ -171,24 +171,20 @@ export function AnnotationSwimLanes({
   return (
     <div className="mt-2 flex flex-col gap-0.5" style={{ paddingRight: gridRight }}>
       {lanes.map(lane => (
-        <div key={lane.type} className="flex items-center" style={{ height: 14 }}>
-          <span
-            className="shrink-0 truncate text-muted"
-            style={{ width: gridLeft, fontSize: 9, lineHeight: '14px', textAlign: 'right', paddingRight: 6 }}
-          >
+        <div key={lane.type} className="flex h-3.5 items-center">
+          <span className="shrink-0 truncate pr-1.5 text-right text-swim-lane text-muted" style={{ width: gridLeft }}>
             {lane.label}
           </span>
-          <div className="relative grow bg-foreground-3" style={{ height: 10, borderRadius: 2 }}>
+          <div className="relative h-2.5 grow rounded-2xs bg-foreground-3">
             {lane.marks.map(mark => (
               <div
                 key={mark.id}
-                className="absolute top-0 h-full cursor-pointer"
+                className="absolute top-0 h-full cursor-pointer rounded-px"
                 style={{
                   left: `${mark.leftPct}%`,
                   width: `${mark.widthPct}%`,
                   backgroundColor: mark.color,
                   opacity: mark.opacity,
-                  borderRadius: 1,
                 }}
                 onMouseEnter={() =>
                   onHighlight?.({

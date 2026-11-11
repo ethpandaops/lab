@@ -266,11 +266,13 @@ export function EntityVersionBars({
                           // An inset divider takes no width, so slivers of rare versions can't crowd out the rest
                           <span
                             key={version}
-                            className="h-full shadow-edge last:shadow-none"
+                            className={clsx(
+                              'h-full shadow-edge last:shadow-none',
+                              dimmed ? 'opacity-25' : 'opacity-100'
+                            )}
                             style={{
                               width: `${(count / row.blocks) * 100}%`,
                               backgroundColor: colorOf(version),
-                              opacity: dimmed ? 0.25 : 1,
                             }}
                             title={`${version}: ${count.toLocaleString()} blocks, ${percent(count, row.blocks)} of ${row.entity}'s`}
                           />

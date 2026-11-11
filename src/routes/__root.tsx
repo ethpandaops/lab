@@ -166,12 +166,7 @@ function RootComponent(): JSX.Element {
     return (
       <ThemeProvider themeOverride={themeOverride}>
         <div className="flex min-h-dvh items-center justify-center bg-background p-4">
-          <span
-            className="text-center"
-            style={{ fontSize: '80vw', lineHeight: '1' }}
-            role="img"
-            aria-label="Clown face"
-          >
+          <span className="text-center text-vw-80" role="img" aria-label="Clown face">
             🤡
           </span>
         </div>

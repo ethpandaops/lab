@@ -308,7 +308,8 @@ export function StackedBar({
           ref={ref}
           echarts={echarts}
           option={option}
-          style={{ height: chartHeight, width: '100%' }}
+          className="w-full"
+          style={{ height: chartHeight }}
           notMerge={false}
           lazyUpdate={true}
           onEvents={handleChartEvents}

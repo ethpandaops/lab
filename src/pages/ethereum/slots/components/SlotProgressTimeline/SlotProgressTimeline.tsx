@@ -230,7 +230,7 @@ export function SlotProgressTimeline({
       <div ref={containerRef} className="relative">
         {/* Scrollable timeline container for mobile */}
         <div className="overflow-x-auto">
-          <div style={{ minWidth: 600 }}>
+          <div className="min-w-150">
             <TimelineHeader labelWidth={LABEL_WIDTH} />
 
             {/* Trace Rows */}
@@ -308,7 +308,7 @@ export function SlotProgressTimeline({
                     <div className="relative h-full flex-1">
                       <div
                         className={clsx(
-                          'absolute top-1 rounded-xs transition-all',
+                          'absolute top-1 min-w-1 rounded-xs transition-all',
                           colors.bg,
                           isHovered && 'ring-1 ring-on-fill-20 brightness-110',
                           span.collapsible && 'cursor-pointer'
@@ -317,7 +317,6 @@ export function SlotProgressTimeline({
                           left: `${startPercent}%`,
                           width: `${widthPercent}%`,
                           height: ROW_HEIGHT - 8,
-                          minWidth: 4,
                         }}
                         title={span.details}
                         onClick={span.collapsible ? () => toggleCollapse(span.id) : undefined}
@@ -325,10 +324,7 @@ export function SlotProgressTimeline({
                     </div>
 
                     {/* Duration column - show absolute time for point-in-time events */}
-                    <div
-                      className={clsx('shrink-0 px-2 text-right font-mono text-xs', colors.text)}
-                      style={{ width: 80 }}
-                    >
+                    <div className={clsx('w-20 shrink-0 px-2 text-right font-mono text-xs', colors.text)}>
                       {span.isPointInTime ? formatMs(span.startMs) : formatMs(duration)}
                     </div>
                   </div>

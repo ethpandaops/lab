@@ -47,7 +47,7 @@ export function NodeMap({ rows, rangeLabel }: NodeMapProps): JSX.Element {
   return (
     <PopoutCard title="Xatu node locations" subtitle={rangeLabel} anchorId="node-map" modalSize="full">
       {({ inModal }) => (
-        <div style={{ height: inModal ? 720 : 440 }}>
+        <div className={inModal ? 'h-180' : 'h-110'}>
           <Map2DChart
             points={points}
             height={inModal ? 720 : 440}

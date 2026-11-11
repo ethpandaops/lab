@@ -1,5 +1,6 @@
 import { type JSX, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
+import clsx from 'clsx';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
@@ -111,9 +112,14 @@ export function GasHistogram({
     <PopoutCard title={title} subtitle={subtitle}>
       {({ inModal }) =>
         histogramData.buckets.length > 0 ? (
-          <ReactECharts theme={ECHARTS_THEME} option={chartOption} style={{ height: inModal ? 400 : 280 }} />
+          <ReactECharts
+            theme={ECHARTS_THEME}
+            option={chartOption}
+            // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+            className={inModal ? 'h-100!' : 'h-70!'}
+          />
         ) : (
-          <div className="flex items-center justify-center text-sm text-muted" style={{ height: inModal ? 400 : 280 }}>
+          <div className={clsx('flex items-center justify-center text-sm text-muted', inModal ? 'h-100' : 'h-70')}>
             No data
           </div>
         )

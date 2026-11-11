@@ -123,6 +123,27 @@
   max-height: calc(--value(number) * 1vh);
 }
 
+@utility min-h-vh-* {
+  min-height: calc(--value(number) * 1vh);
+}
+
+/* Type sized to the viewport width, on a line of 1: text-vw-80 is 80vw. */
+@utility text-vw-* {
+  font-size: calc(--value(number) * 1vw);
+  line-height: 1;
+}
+
+/* Annotation swim-lane labels: 9px type on the lane's 14px line, a step under text-2xs. */
+@utility text-swim-lane {
+  font-size: 0.5625rem;
+  line-height: 0.875rem;
+}
+
+/* Text set top to bottom, as in column labels of tight headers. */
+@utility writing-vertical-rl {
+  writing-mode: vertical-rl;
+}
+
 /* Headless UI sets --button-width and --input-width on an anchored panel. */
 @utility w-button {
   width: var(--button-width);
@@ -148,15 +169,44 @@
   border-radius: inherit;
 }
 
+/* A 1px corner, for marks too thin for rounded-2xs. */
+@utility rounded-px {
+  border-radius: 1px;
+}
+
 @utility transition-width {
   transition-property: width;
   transition-timing-function: var(--default-transition-timing-function);
   transition-duration: var(--default-transition-duration);
 }
 
+/* An animation's length in milliseconds, as duration-* is a transition's: animate-duration-2000 is 2s. */
+@utility animate-duration-* {
+  animation-duration: calc(--value(integer) * 1ms);
+}
+
 /* The shimmer gradient is twice as wide as the bar it slides across. */
 @utility bg-size-shimmer {
   background-size: 200% 100%;
+}
+
+/* Legends for the performance cells' shading: chart-3 (slower) through clear to chart-0 (faster), each at its 70% peak. */
+@utility bg-slower-to-faster {
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--color-chart-3) 70%, transparent),
+    transparent,
+    color-mix(in oklab, var(--color-chart-0) 70%, transparent)
+  );
+}
+
+@utility bg-faster-to-slower {
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--color-chart-0) 70%, transparent),
+    transparent,
+    color-mix(in oklab, var(--color-chart-3) 70%, transparent)
+  );
 }
 
 /* Grid templates: fill is minmax(0, 1fr), a number is that many spacing steps. */

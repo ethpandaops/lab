@@ -482,7 +482,8 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
           )}
         </div>
       }
-      style={{ display: 'block' }}
+      // The ! outranks the tooltip's own inline-flex
+      className="block!"
     >
       <div className="group rounded-xs py-1.5 pl-2 transition-colors hover:bg-surface-40">
         {/* Main row — mirrors category header pattern */}

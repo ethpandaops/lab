@@ -189,7 +189,7 @@ export function SlotProgressTimeline({
 
       {/* Mobile: Vertical layout */}
       <div className="md:hidden">
-        <div className="flex flex-col gap-4" style={{ minHeight: '50vh' }}>
+        <div className="flex min-h-vh-50 flex-col gap-4">
           {enrichedPhases.map((phase, index) => {
             const status = phase.isActive ? 'active' : phase.isCompleted ? 'completed' : 'pending';
             const hasConnection = index < enrichedPhases.length - 1;

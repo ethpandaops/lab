@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useState, useEffect, useRef, useMemo, useCallback, use } from 'react';
+import clsx from 'clsx';
 import type { EChartsInstance } from 'echarts-for-react/lib';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import ReactEChartsComponent from 'echarts-for-react/lib/core';
@@ -62,16 +63,15 @@ function LegendSwatch({
   return block ? (
     <span
       aria-hidden
-      className="size-2.5 rounded-xs transition-opacity"
-      style={{ backgroundColor: color, opacity: active ? 0.9 : 0.25 }}
+      className={clsx('size-2.5 rounded-xs transition-opacity', active ? 'opacity-90' : 'opacity-25')}
+      style={{ backgroundColor: color }}
     />
   ) : (
     <span
       aria-hidden
-      className="w-3 transition-opacity"
+      className={clsx('w-3 transition-opacity', active ? 'opacity-100' : 'opacity-30')}
       style={{
         borderTop: `2px ${series.lineStyle === 'dotted' ? 'dotted' : series.lineStyle === 'dashed' ? 'dashed' : 'solid'} ${color}`,
-        opacity: active ? 1 : 0.3,
       }}
     />
   );
@@ -1404,12 +1404,7 @@ export function MultiLineChart({
       {!useNativeLegend && hasLegend && legendPosition === 'top' && <div className="mb-3">{legendControls}</div>}
 
       <div
-        style={{
-          height: _height === '100%' ? '100%' : 'auto',
-          flex: _height === '100%' ? '1 1 0%' : undefined,
-          minHeight: _height === '100%' ? 0 : undefined,
-          cursor: onSeriesClick ? 'pointer' : undefined,
-        }}
+        className={clsx(_height === '100%' ? 'h-full min-h-0 flex-1' : 'h-auto', onSeriesClick && 'cursor-pointer')}
         onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
         <ReactEChartsComponent
@@ -1417,9 +1412,9 @@ export function MultiLineChart({
           ref={chartRef}
           echarts={echarts}
           option={option}
+          className="w-full"
           style={{
             height: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
-            width: '100%',
             minHeight: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
           }}
           notMerge={notMerge}

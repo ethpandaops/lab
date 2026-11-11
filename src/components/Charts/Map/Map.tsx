@@ -276,7 +276,8 @@ export function MapChart({
       <ReactECharts
         theme={ECHARTS_THEME}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
         opts={{ renderer: 'canvas' }}
