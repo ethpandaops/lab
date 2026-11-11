@@ -5,7 +5,8 @@
 ```bash
 pnpm dev                    # Dev server proxying to local backend (localhost:8080)
 BACKEND=production pnpm dev # Dev server proxying to production (lab.ethpandaops.io)
-pnpm lint
+pnpm lint                   # ESLint; warnings fail too
+pnpm typecheck              # tsc -b over the app, the tests and stories, and the config files
 pnpm format:check           # Prettier over the whole repo; pnpm format rewrites
 pnpm knip                   # Unused files, exports and dependencies
 pnpm test                   # Unit tests (jsdom), then every story in Chromium under each theme
@@ -141,10 +142,10 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Use JSDoc style comments for functions, components, hooks, and complex types
 - Use Tailwind v4 classes with semantic color tokens from `src/styles/tokens.css`
 - Read API data through the generated query options (see [Data](#data))
-- Use path aliases (`@/`) over relative imports
+- Import through `@/`, never `../`; lint rejects parent-relative imports
 - Use `clsx` for conditional classes
-- Run `pnpm lint`, `pnpm format:check`, `pnpm knip` and `pnpm build` before committing
-- React `useMemo`/`memo` should only be used for genuinely expensive calculations
+- Run `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm knip` and `pnpm build` before committing
+- Test-only code (tests, stories, `src/test-utils`, `src/design-docs`, `src/styles/**/*.ts`) is excluded from `tsconfig.app.json` and type-checked by `tsconfig.test.json`; a new test-only path goes in both
 
 ### Naming Conventions
 
@@ -163,17 +164,8 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - **Vitest** for hooks and utilities, **Storybook interactions** for components
 - **Location**: Co-located with source files (`.test.ts(x)` for Vitest, `.stories.tsx` for Storybook)
 - `vitest.config.ts` holds both projects: `unit` (jsdom) and `storybook` (Chromium, once per theme: `storybook:light`, `storybook:dark`, `storybook:star`, each in UTC, `en-US` and reduced motion). Mocks and stubbed globals are restored before every test.
-- Unit tests render through `@/test-utils` (`render`, `renderHook`: a fresh query client and a router; pass `client`, `wrapper` or `initialProps` when a test needs them) and add MSW handlers with `server.use(...)`. A request no handler answers fails the test.
-- `src/test-utils/handlers/<domain>.ts` holds a fixture typed with the app's types and a `<domain>Handlers` object with one handler per state (`success`, `failure`, and `pending`, which never resolves), re-exported from `handlers/index.ts`. Unit tests and stories share them.
-- Fixtures, tests and stories take the current time from `@/test-utils/time` (`NOW_MS`), never `Date.now()` or `new Date()`. Stories of components that show times relative to now set `beforeEach: freezeNow`.
+- Unit tests render through `@/test-utils` and mock the API with MSW; fixtures and time come from `@/test-utils` too. See [Tests](.claude/rules/tests.md).
 - Vitest caps jsdom at four workers, then runs Storybook with two Chromium pages per theme. The test scripts raise `VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB` so Vitest's Linux workaround collects Chromium garbage after each file.
-
-### Loading States
-
-- Use `LoadingContainer` from `src/components/Layout/LoadingContainer/` as base
-- Create page-specific skeletons: `[PageName]Skeleton` or `[ComponentName]Skeleton`
-- Place in `pages/[section]/[page-name]/components/` alongside other page components
-- Show skeleton UI that matches actual content structure
 
 ## Data
 
@@ -208,13 +200,16 @@ import { formatSlot, formatEpoch } from '@/utils';
 
 ## Additional Rules
 
-Detailed standards for specific topics are in `.claude/rules/`:
+Detailed standards for specific topics are in `.claude/rules/`. Claude Code loads each for the paths in its front matter; other agents read the matching file before editing those files.
 
 - [Charts](.claude/rules/charts.md) — Visual standards, axis formatting, grid padding, component architecture
 - [Forms](.claude/rules/forms.md) — Zod search param validation, react-hook-form patterns
+- [Loading states](.claude/rules/loading-states.md) — Loading, error, empty and stale states for async data
+- [React](.claude/rules/react.md) — Components, hooks and the React Compiler rules lint enforces
 - [SEO](.claude/rules/seo.md) — Head meta hierarchy, feature images, route implementation
 - [Styling](.claude/rules/styling.md) — Tokens, themes, Tailwind classes, adding a token
 - [Storybook](.claude/rules/storybook.md) — Stories as tests, API mocks, decorator pattern, story title convention
+- [Tests](.claude/rules/tests.md) — `@/test-utils`, MSW handlers, fixtures and time in unit tests
 
 ## Layout
 
