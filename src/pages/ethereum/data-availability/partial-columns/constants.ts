@@ -37,6 +37,12 @@ export const SLOWEST_BLOCKS = 10;
 /** Most days the slowest-blocks ranking reads; longer windows rank only their last days */
 export const SLOWEST_BLOCKS_MAX_DAYS = 7;
 
+/**
+ * Completion times (ms from slot start) at or above this are not real: Xatu stores the diff unsigned, so a completion
+ * stamped before slot start wraps to just under 2^32 (e.g. -101ms becomes 4294967195).
+ */
+export const WRAPPED_COMPLETION_MS = 2 ** 31;
+
 /** Table whose bounds decide whether the network has partial message data */
 export const COMPLETION_HOURLY_TABLE = 'fct_data_column_completion_by_path_hourly';
 

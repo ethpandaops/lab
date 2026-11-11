@@ -19,6 +19,7 @@ import {
   PATH_COLORS,
   PATH_LABELS,
   VERDICT_COLORS,
+  WRAPPED_COMPLETION_MS,
 } from '../constants';
 import type { CompletionPath, PartialRecord, PathRecord, PeerRecord } from '../IndexPage.types';
 
@@ -164,9 +165,9 @@ export function formatShare(part: number, total: number): string {
   return share === null ? '-' : `${share.toFixed(1)}%`;
 }
 
-/** Milliseconds as seconds with two decimals, e.g. 1.64s */
+/** Milliseconds as seconds with two decimals, e.g. 1.64s, or a dash when missing or wrapped */
 export function formatSeconds(ms: number | undefined | null): string {
-  if (ms === undefined || ms === null || ms <= 0) return '-';
+  if (ms === undefined || ms === null || ms <= 0 || ms >= WRAPPED_COMPLETION_MS) return '-';
   return `${(ms / 1000).toFixed(2)}s`;
 }
 

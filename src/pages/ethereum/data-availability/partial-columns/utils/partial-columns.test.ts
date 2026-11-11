@@ -298,6 +298,8 @@ describe('formatting', () => {
     expect(formatSeconds(1640)).toBe('1.64s');
     expect(formatSeconds(0)).toBe('-');
     expect(formatSeconds(undefined)).toBe('-');
+    expect(formatSeconds(407217)).toBe('407.22s');
+    expect(formatSeconds(4294967195)).toBe('-');
   });
 
   it('should fill hourly bucket gaps', () => {
