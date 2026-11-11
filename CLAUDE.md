@@ -6,7 +6,10 @@
 pnpm dev                    # Dev server proxying to local backend (localhost:8080)
 BACKEND=production pnpm dev # Dev server proxying to production (lab.ethpandaops.io)
 pnpm lint
+pnpm format:check           # Prettier over the whole repo; pnpm format rewrites
+pnpm knip                   # Unused files, exports and dependencies
 pnpm test
+pnpm test:coverage          # Unit tests with a v8 coverage report in coverage/
 pnpm build
 pnpm storybook
 ```
@@ -134,7 +137,7 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Use `@/api/@tanstack/react-query.gen.ts` hooks for API calls
 - Use path aliases (`@/`) over relative imports
 - Use `clsx` for conditional classes
-- Run `pnpm lint` and `pnpm build` before committing
+- Run `pnpm lint`, `pnpm format:check`, `pnpm knip` and `pnpm build` before committing
 - React `useMemo`/`memo` should only be used for genuinely expensive calculations
 
 ### Naming Conventions
