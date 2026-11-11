@@ -65,8 +65,9 @@ src/
   providers/                          # React Context Providers
   contexts/                           # React Context definitions (with .types.ts)
   hooks/                              # Custom React hooks (with tests)
-  api/                                # Generated API client (do not edit)
-    @tanstack/react-query.gen.ts      # TanStack Query hooks - USE THIS for all API calls
+  api/                                # Generated CBT API client (do not edit)
+    @tanstack/react-query.gen.ts      # TanStack Query options - USE THIS for all API calls
+  lab-api/                            # Generated lab-backend client from openapi/lab-backend.yaml (do not edit)
   utils/                              # Utility functions and helpers
   index.css                           # Global styles and Tailwind theme config
 ```
@@ -134,7 +135,7 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Write Vitest tests for all components, hooks, and utilities
 - Use JSDoc style comments for functions, components, hooks, and complex types
 - Use Tailwind v4 classes with semantic color tokens from `src/index.css` theme
-- Use `@/api/@tanstack/react-query.gen.ts` hooks for API calls
+- Read API data through the generated query options (see [Data](#data))
 - Use path aliases (`@/`) over relative imports
 - Use `clsx` for conditional classes
 - Run `pnpm lint`, `pnpm format:check`, `pnpm knip` and `pnpm build` before committing
@@ -163,6 +164,15 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Create page-specific skeletons: `[PageName]Skeleton` or `[ComponentName]Skeleton`
 - Place in `pages/[section]/[page-name]/components/` alongside other page components
 - Show skeleton UI that matches actual content structure
+
+## Data
+
+- Read server data with `useQuery(<operation>Options(...))` from the generated clients: `@/api/@tanstack/react-query.gen` for the CBT tables, `@/lab-api/@tanstack/react-query.gen` for lab-backend's own routes (config, bounds, downloads, gas profiler). Types come from `@/api` and `@/lab-api`, schemas from their `zod.gen`. Never `fetch` in a component or an effect.
+- Actions, such as a download or a simulation, run the generated SDK function or `<operation>Mutation()` through `useMutation`.
+- A lab-backend route the UI needs goes into `openapi/lab-backend.yaml`, matching the backend's handler in `internal/api`; `pnpm generate:api` regenerates both clients. Responses are validated against the specs, so a spec that drifts from the backend fails loudly.
+- The generated clients throw the response body, not an `Error`. Read lab-backend's message with `apiErrorMessage` from `@/utils/api-error`.
+- `createQueryClient` (`@/utils/query-client`) makes the app's query client; tests and stories use it too, with `{ retry: false }`. Its `staleTime` is 30 s, so a query that follows the chain head sets its own `staleTime` or `refetchInterval`.
+- Read configuration with `useConfig()` and bounds with `useBounds()`, never `window.__CONFIG__` or `window.__BOUNDS__`. lab-backend injects both into the page, and `createQueryClient` seeds the cache with them before the first render.
 
 ## Slot & Epoch Display
 
