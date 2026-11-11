@@ -122,7 +122,7 @@ export function IndexPage(): JSX.Element {
           : undefined;
 
   // Cursors of pages already visited, so Previous works for value sorts where only Next can be derived
-  const visited = useRef(new Map<string, string | undefined>());
+  const visitedRef = useRef(new Map<string, string | undefined>());
   const viewKey = JSON.stringify([filters, sort, dir, pageSize]);
 
   const setFilters = useCallback(
@@ -142,7 +142,7 @@ export function IndexPage(): JSX.Element {
 
   const goToPage = useCallback(
     (page: number, cursor: string | undefined) => {
-      visited.current.set(`${viewKey}|${pageIndex}`, search.cursor);
+      visitedRef.current.set(`${viewKey}|${pageIndex}`, search.cursor);
       navigate({ search: prev => ({ ...prev, page: page || undefined, cursor: page ? cursor : undefined }) });
     },
     [navigate, viewKey, pageIndex, search.cursor]
@@ -168,7 +168,7 @@ export function IndexPage(): JSX.Element {
         const key = `${viewKey}|${target}`;
         if (sort === 'slot') goToPage(target, data?.prevCursor);
         // Value orders can only page forwards; without the earlier cursor (e.g. after a reload) start over
-        else if (visited.current.has(key)) goToPage(target, visited.current.get(key));
+        else if (visitedRef.current.has(key)) goToPage(target, visitedRef.current.get(key));
         else goToPage(0, undefined);
       }
     },

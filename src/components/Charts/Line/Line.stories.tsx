@@ -206,10 +206,10 @@ export const AnimatedProgressiveFill: Story = {
   render: () => {
     const totalPoints = 100;
     const labels = Array.from({ length: totalPoints }, (_, i) => `${i}`);
-    const [chartData, setChartData] = useState<{ filledCount: number; data: number[] }>({
+    const [chartData, setChartData] = useState<{ filledCount: number; data: number[] }>(() => ({
       filledCount: 0,
       data: Array(totalPoints).fill(0),
-    });
+    }));
 
     useEffect(() => {
       const interval = setInterval(() => {

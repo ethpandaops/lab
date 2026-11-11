@@ -45,9 +45,9 @@ export function SlotProgressTimeline({
   const canHover = useCanHover();
   const [hoveredSpan, setHoveredSpan] = useState<TraceSpan | null>(null);
   const [mousePos, setMousePos] = useState<{ x: number; y: number; containerWidth: number } | null>(null);
-  const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
+  const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(() => new Set());
   const [excludeOutliers, setExcludeOutliers] = useState(true);
-  const hasInitializedCollapsed = useRef(false);
+  const hasInitializedCollapsedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Use contributor from URL params
@@ -112,8 +112,8 @@ export function SlotProgressTimeline({
 
   // Initialize collapsed state from spans' defaultCollapsed property
   useEffect(() => {
-    if (!hasInitializedCollapsed.current && spans.length > 1) {
-      hasInitializedCollapsed.current = true;
+    if (!hasInitializedCollapsedRef.current && spans.length > 1) {
+      hasInitializedCollapsedRef.current = true;
       const initial = new Set<string>();
       for (const span of spans) {
         if (span.defaultCollapsed && span.collapsible) {
@@ -126,7 +126,7 @@ export function SlotProgressTimeline({
 
   // Reset collapsed state when filter changes
   useEffect(() => {
-    hasInitializedCollapsed.current = false;
+    hasInitializedCollapsedRef.current = false;
   }, [selectedUsername]);
 
   // Handle mouse events for tooltip (disabled on touch devices)

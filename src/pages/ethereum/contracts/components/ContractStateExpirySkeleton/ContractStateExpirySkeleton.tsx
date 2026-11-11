@@ -2,6 +2,29 @@ import type { JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
+/** Chart card placeholder matching the PopoutCard layout */
+function ChartCardSkeleton(): JSX.Element {
+  return (
+    <Card className="overflow-hidden">
+      {/* Header matching PopoutCard */}
+      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3">
+        <div>
+          <LoadingContainer className="h-5 w-28 rounded-xs" />
+          <LoadingContainer className="mt-1.5 h-3 w-36 rounded-xs" />
+        </div>
+        <div className="flex gap-2">
+          <LoadingContainer className="size-6 rounded-xs" />
+          <LoadingContainer className="size-6 rounded-xs" />
+        </div>
+      </div>
+      {/* Chart area */}
+      <div className="p-4">
+        <LoadingContainer className="h-70 w-full rounded-xs" />
+      </div>
+    </Card>
+  );
+}
+
 /**
  * Loading skeleton for the State Expiry section within the Contract page.
  * Displays shimmer placeholders for stats panels and charts.
@@ -38,25 +61,8 @@ export function ContractStateExpirySkeleton(): JSX.Element {
 
       {/* Charts - 2 side by side matching PopoutCard style */}
       <div className="grid gap-4 md:grid-cols-2">
-        {Array.from({ length: 2 }).map((_, i) => (
-          <Card key={i} className="overflow-hidden">
-            {/* Header matching PopoutCard */}
-            <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3">
-              <div>
-                <LoadingContainer className="h-5 w-28 rounded-xs" />
-                <LoadingContainer className="mt-1.5 h-3 w-36 rounded-xs" />
-              </div>
-              <div className="flex gap-2">
-                <LoadingContainer className="size-6 rounded-xs" />
-                <LoadingContainer className="size-6 rounded-xs" />
-              </div>
-            </div>
-            {/* Chart area */}
-            <div className="p-4">
-              <LoadingContainer className="h-70 w-full rounded-xs" />
-            </div>
-          </Card>
-        ))}
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
       </div>
     </div>
   );

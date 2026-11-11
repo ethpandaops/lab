@@ -43,12 +43,12 @@ export function ProgressBar({
             className={clsx('h-2 rounded-full', !disableTransition && 'transition-all duration-300', fillColor)}
           />
 
-          {processedSegments.map((segment, index) => {
+          {processedSegments.map(segment => {
             if (!segment.showMark) return null;
 
             return (
               <div
-                key={`${segment.label}-${index}`}
+                key={segment.label}
                 className={clsx('absolute top-0 h-2 w-0.5 -translate-x-1/2', segment.markColor ?? 'bg-foreground')}
                 style={{ left: `${segment.percentage ?? 0}%` }}
               />
@@ -63,7 +63,7 @@ export function ProgressBar({
           >
             {processedSegments.map((segment, index) => (
               <div
-                key={`${segment.label}-label-${index}`}
+                key={segment.label}
                 className={clsx(
                   index === 0 && 'text-left',
                   index === processedSegments.length - 1 && 'text-right',

@@ -24,6 +24,31 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const manyTabs = [
+  'Overview',
+  'Block',
+  'Attestations',
+  'Propagation',
+  'Execution',
+  'MEV',
+  'Validators',
+  'Committees',
+  'Sync',
+  'Advanced',
+  'Metrics',
+  'Performance',
+];
+
+const longLabelTabs = [
+  'Very Long Tab Label That Extends',
+  'Another Long Label Here',
+  'More Extended Content',
+  'Additional Information',
+  'Extra Details Section',
+];
+
+const constrainedTabs = ['Overview', 'Block', 'Attestations', 'Propagation', 'Execution', 'MEV'];
+
 /**
  * Basic scrollable tabs with a few items
  */
@@ -61,23 +86,14 @@ export const ManyTabs: Story = {
   render: () => (
     <TabGroup>
       <ScrollableTabs>
-        <Tab>Overview</Tab>
-        <Tab>Block</Tab>
-        <Tab>Attestations</Tab>
-        <Tab>Propagation</Tab>
-        <Tab>Execution</Tab>
-        <Tab>MEV</Tab>
-        <Tab>Validators</Tab>
-        <Tab>Committees</Tab>
-        <Tab>Sync</Tab>
-        <Tab>Advanced</Tab>
-        <Tab>Metrics</Tab>
-        <Tab>Performance</Tab>
+        {manyTabs.map(label => (
+          <Tab key={label}>{label}</Tab>
+        ))}
       </ScrollableTabs>
       <TabPanels className="mt-6">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <TabPanel key={i}>
-            <div className="rounded-sm bg-background p-4">Tab {i + 1} content goes here</div>
+        {manyTabs.map((label, index) => (
+          <TabPanel key={label}>
+            <div className="rounded-sm bg-background p-4">Tab {index + 1} content goes here</div>
           </TabPanel>
         ))}
       </TabPanels>
@@ -92,16 +108,14 @@ export const LongLabels: Story = {
   render: () => (
     <TabGroup>
       <ScrollableTabs>
-        <Tab>Very Long Tab Label That Extends</Tab>
-        <Tab>Another Long Label Here</Tab>
-        <Tab>More Extended Content</Tab>
-        <Tab>Additional Information</Tab>
-        <Tab>Extra Details Section</Tab>
+        {longLabelTabs.map(label => (
+          <Tab key={label}>{label}</Tab>
+        ))}
       </ScrollableTabs>
       <TabPanels className="mt-6">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <TabPanel key={i}>
-            <div className="rounded-sm bg-background p-4">Tab {i + 1} content goes here</div>
+        {longLabelTabs.map((label, index) => (
+          <TabPanel key={label}>
+            <div className="rounded-sm bg-background p-4">Tab {index + 1} content goes here</div>
           </TabPanel>
         ))}
       </TabPanels>
@@ -117,17 +131,14 @@ export const ConstrainedWidth: Story = {
     <div className="max-w-md">
       <TabGroup>
         <ScrollableTabs>
-          <Tab>Overview</Tab>
-          <Tab>Block</Tab>
-          <Tab>Attestations</Tab>
-          <Tab>Propagation</Tab>
-          <Tab>Execution</Tab>
-          <Tab>MEV</Tab>
+          {constrainedTabs.map(label => (
+            <Tab key={label}>{label}</Tab>
+          ))}
         </ScrollableTabs>
         <TabPanels className="mt-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <TabPanel key={i}>
-              <div className="rounded-sm bg-background p-4">Tab {i + 1} content goes here</div>
+          {constrainedTabs.map((label, index) => (
+            <TabPanel key={label}>
+              <div className="rounded-sm bg-background p-4">Tab {index + 1} content goes here</div>
             </TabPanel>
           ))}
         </TabPanels>
@@ -144,20 +155,7 @@ export const SelectedOnLoad: Story = {
     <div style={{ width: 320 }}>
       <TabGroup defaultIndex={11}>
         <ScrollableTabs>
-          {[
-            'Overview',
-            'Block',
-            'Attestations',
-            'Propagation',
-            'Execution',
-            'MEV',
-            'Validators',
-            'Committees',
-            'Sync',
-            'Advanced',
-            'Metrics',
-            'Performance',
-          ].map(label => (
+          {manyTabs.map(label => (
             <Tab key={label}>{label}</Tab>
           ))}
         </ScrollableTabs>

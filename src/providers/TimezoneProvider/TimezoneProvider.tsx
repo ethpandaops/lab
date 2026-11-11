@@ -13,7 +13,7 @@ interface TimezoneProviderProps {
  * Persists preference to localStorage
  */
 export function TimezoneProvider({ children }: TimezoneProviderProps): JSX.Element {
-  const [timezone, setTimezoneState] = useState<TimezoneMode>(() => {
+  const [timezone, setTimezone] = useState<TimezoneMode>(() => {
     // Load from localStorage on mount
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'UTC' || stored === 'local') {
@@ -28,11 +28,7 @@ export function TimezoneProvider({ children }: TimezoneProviderProps): JSX.Eleme
   }, [timezone]);
 
   const toggleTimezone = useCallback(() => {
-    setTimezoneState(prev => (prev === 'UTC' ? 'local' : 'UTC'));
-  }, []);
-
-  const setTimezone = useCallback((newTimezone: TimezoneMode) => {
-    setTimezoneState(newTimezone);
+    setTimezone(prev => (prev === 'UTC' ? 'local' : 'UTC'));
   }, []);
 
   const value = useMemo(() => ({ timezone, toggleTimezone, setTimezone }), [timezone, toggleTimezone, setTimezone]);

@@ -1,6 +1,19 @@
 import type { TableProps, Column } from './Table.types';
-import type { ReactNode } from 'react';
+import { isValidElement, type ReactNode } from 'react';
 import clsx from 'clsx';
+
+/** The text a header shows, e.g. the label inside a header element */
+function headerText(header: ReactNode): string {
+  if (typeof header === 'string' || typeof header === 'number') return String(header);
+  if (Array.isArray(header)) return header.map(headerText).join('');
+  if (isValidElement<{ children?: ReactNode }>(header)) return headerText(header.props.children);
+  return '';
+}
+
+/** A column's key: the header it shows, or the field it reads when the header has no text */
+function columnKey<T>(column: Column<T>): string {
+  return headerText(column.header) || (typeof column.accessor === 'string' ? column.accessor : '');
+}
 
 /**
  * Data table.
@@ -37,7 +50,7 @@ export function Table<T = unknown>({
         <tr>
           {columns.map((column, index) => (
             <th
-              key={index}
+              key={columnKey(column)}
               scope="col"
               className={clsx(
                 'py-2.5 text-left text-xs font-medium whitespace-nowrap text-muted',
@@ -70,7 +83,7 @@ export function Table<T = unknown>({
             >
               {columns.map((column, colIndex) => (
                 <td
-                  key={colIndex}
+                  key={columnKey(column)}
                   className={clsx(
                     'py-2.5 text-sm whitespace-nowrap tabular-nums',
                     edgePadding(colIndex),

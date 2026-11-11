@@ -77,9 +77,9 @@ export function SelectMenu<T>({
             expandToFit ? 'w-max' : 'w-button'
           )}
         >
-          {options.map((option, index) => (
+          {options.map(option => (
             <ListboxOption
-              key={index}
+              key={String(option.value)}
               value={option.value}
               className="relative cursor-pointer py-1.5 pr-9 pl-2.5 text-sm text-foreground transition-colors select-none data-focus:bg-primary-10 data-focus:text-primary data-selected:text-primary"
             >

@@ -161,12 +161,12 @@ function OpcodeByCountChart({
 function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.Element {
   const [hoveredOpcode, setHoveredOpcode] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Update tooltip position when hovered opcode changes
   useEffect(() => {
-    if (hoveredOpcode && cellRefs.current.has(hoveredOpcode)) {
-      const cell = cellRefs.current.get(hoveredOpcode)!;
+    if (hoveredOpcode && cellsRef.current.has(hoveredOpcode)) {
+      const cell = cellsRef.current.get(hoveredOpcode)!;
       const rect = cell.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top - 8,
@@ -177,9 +177,9 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
   const setCellRef = useCallback((opcode: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(opcode, el);
+      cellsRef.current.set(opcode, el);
     } else {
-      cellRefs.current.delete(opcode);
+      cellsRef.current.delete(opcode);
     }
   }, []);
 

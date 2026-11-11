@@ -101,14 +101,14 @@ export function ScrollingTimeline({
   formatTime = defaultFormatTime,
 }: ScrollingTimelineProps): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const itemElementsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // One stable ref callback for every item, so TimelineItemComponent doesn't re-render
   const handleItemRef = useCallback((id: string, el: HTMLDivElement | null) => {
     if (el) {
-      itemRefs.current.set(id, el);
+      itemElementsRef.current.set(id, el);
     } else {
-      itemRefs.current.delete(id);
+      itemElementsRef.current.delete(id);
     }
   }, []);
 
@@ -162,7 +162,7 @@ export function ScrollingTimeline({
       if (lastScrolledItemRef.current === activeItemId) return;
       lastScrolledItemRef.current = activeItemId;
 
-      const element = itemRefs.current.get(activeItemId);
+      const element = itemElementsRef.current.get(activeItemId);
       if (element && containerRef.current) {
         // Scroll the active item to the center of the container
         const container = containerRef.current;

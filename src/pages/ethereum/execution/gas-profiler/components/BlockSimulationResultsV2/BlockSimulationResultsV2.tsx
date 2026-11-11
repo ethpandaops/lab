@@ -186,6 +186,15 @@ function ErrorCard({
   const isSimulated = variant === 'simulated';
   const hasErrors = sorted.length > 0;
 
+  // Call errors carry no id, so each is keyed by what it shows, with repeats of the same error numbered
+  const repeats = new Map<string, number>();
+  const rows = sorted.map(err => {
+    const shown = `${err.depth}|${err.type}|${err.address}|${err.error}`;
+    const repeat = repeats.get(shown) ?? 0;
+    repeats.set(shown, repeat + 1);
+    return { err, key: `${shown}|${repeat}` };
+  });
+
   return (
     <div
       className={clsx(
@@ -213,9 +222,9 @@ function ErrorCard({
       <div className="px-3 py-2.5">
         {hasErrors ? (
           <div className="space-y-0.5 overflow-x-auto">
-            {sorted.map((err, idx) => (
+            {rows.map(({ err, key }) => (
               <div
-                key={idx}
+                key={key}
                 className="flex items-center gap-1.5 py-0.5 whitespace-nowrap"
                 style={{ paddingLeft: `${err.depth * 16}px` }}
               >
@@ -666,7 +675,7 @@ function TransactionImpactView({
   const { currentNetwork } = useNetwork();
   const search = useSearch({ from: SIMULATE_ROUTE }) as GasProfilerSimulateSearch;
   const navigate = useNavigate({ from: SIMULATE_ROUTE });
-  const [expandedTxs, setExpandedTxs] = useState<Set<string>>(new Set());
+  const [expandedTxs, setExpandedTxs] = useState<Set<string>>(() => new Set());
 
   const toggleExpand = useCallback((hash: string) => {
     setExpandedTxs(prev => {

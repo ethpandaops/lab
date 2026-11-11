@@ -37,7 +37,7 @@ export function SlotTimeline({
   const [now, setNow] = useState(() => Date.now() / 1000);
 
   // Track new slots for flash animation
-  const [newSlots, setNewSlots] = useState<Set<number>>(new Set());
+  const [newSlots, setNewSlots] = useState<Set<number>>(() => new Set());
   const prevSlotsRef = useRef<Set<number>>(new Set());
 
   // Modal state

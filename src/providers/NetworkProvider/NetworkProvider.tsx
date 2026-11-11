@@ -51,7 +51,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   const search = useSearch({ strict: false });
   const hasRouter = navigate !== undefined && search !== undefined;
 
-  const [currentNetwork, setCurrentNetworkState] = useState<Network | null>(null);
+  const [currentNetwork, setCurrentNetwork] = useState<Network | null>(null);
 
   // Use ref to avoid stale closures in the interceptor
   const currentNetworkRef = useRef<Network | null>(null);
@@ -106,7 +106,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     }
 
     if (initialNetwork) {
-      setCurrentNetworkState(initialNetwork);
+      setCurrentNetwork(initialNetwork);
     }
   }
 
@@ -158,9 +158,10 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     }
   }, [currentNetwork, queryClient]);
 
-  const setCurrentNetwork = useCallback(
+  // Switch network and record the choice in the URL
+  const selectNetwork = useCallback(
     (network: Network): void => {
-      setCurrentNetworkState(network);
+      setCurrentNetwork(network);
 
       // Only add network param for non-mainnet networks (if router is available)
       if (hasRouter) {
@@ -186,11 +187,11 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   const value: NetworkContextValue = useMemo(
     () => ({
       currentNetwork,
-      setCurrentNetwork,
+      setCurrentNetwork: selectNetwork,
       networks,
       isLoading,
     }),
-    [currentNetwork, setCurrentNetwork, networks, isLoading]
+    [currentNetwork, selectNetwork, networks, isLoading]
   );
 
   // Block rendering until network is initialized to prevent race condition

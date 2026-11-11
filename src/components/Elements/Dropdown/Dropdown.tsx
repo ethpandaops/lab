@@ -1,4 +1,4 @@
-import { type JSX, Fragment, cloneElement, isValidElement } from 'react';
+import { type JSX, Fragment, isValidElement } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import clsx from 'clsx';
 import type { DropdownProps, DropdownItemProps, DropdownHeaderProps, DropdownSectionProps } from './Dropdown.types';
@@ -74,18 +74,15 @@ export function DropdownItem({
     className
   );
 
+  // Styles the icon from a box-less wrapper, so the icon stays a flex item of the row
   const iconClasses = clsx(
-    'mr-3 size-5',
-    variant === 'default' && ['text-muted group-data-focus:text-foreground'],
-    variant === 'danger' && 'text-danger'
+    'contents *:mr-3 *:size-5',
+    variant === 'default' && ['*:text-muted *:group-data-focus:text-foreground'],
+    variant === 'danger' && '*:text-danger'
   );
 
   // Render icon with appropriate styles
-  const iconElement = icon
-    ? cloneElement(icon as React.ReactElement<{ className?: string }>, {
-        className: iconClasses,
-      })
-    : null;
+  const iconElement = icon ? <span className={iconClasses}>{icon}</span> : null;
 
   const content = (
     <>

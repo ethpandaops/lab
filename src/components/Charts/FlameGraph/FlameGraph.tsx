@@ -222,7 +222,7 @@ export function FlameGraph({
     categories,
   } = useMemo(() => {
     if (!zoomedNode) {
-      return { maxDepth: 0, rows: [] as FlattenedNode[][], categories: new Set<string>() };
+      return { maxDepth: 0, rows: [] as { depth: number; nodes: FlattenedNode[] }[], categories: new Set<string>() };
     }
 
     const nodes = flattenTree(zoomedNode, zoomedNode.value);
@@ -240,7 +240,7 @@ export function FlameGraph({
 
     const rowArray = Array.from(rowMap.entries())
       .sort(([a], [b]) => a - b)
-      .map(([, nodes]) => nodes);
+      .map(([rowDepth, nodes]) => ({ depth: rowDepth, nodes }));
 
     return {
       maxDepth: depth,
@@ -527,11 +527,11 @@ export function FlameGraph({
         >
           {rows.map((row, rowIndex) => (
             <div
-              key={rowIndex}
+              key={row.depth}
               className="relative flex w-full overflow-hidden"
               style={{ height: rowHeight, marginTop: rowIndex > 0 ? 1 : 0 }}
             >
-              {row.map(flatNode => {
+              {row.nodes.map(flatNode => {
                 // Skip nodes that are too small
                 if (flatNode.widthPercent < minWidthPercent) {
                   return null;

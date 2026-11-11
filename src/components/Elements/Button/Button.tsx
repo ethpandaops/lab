@@ -1,20 +1,21 @@
-import { type JSX, cloneElement, isValidElement } from 'react';
+import { type JSX, isValidElement } from 'react';
 import { Button as HeadlessButton } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ButtonProps } from './Button.types';
 import { buttonClassName } from './Button.styles';
 
+// Icons are sized and placed from a box-less wrapper, so each icon stays a flex item of the button
 const iconSizeStyles = {
-  xs: 'size-4', // 16px - proportional to xs
-  sm: 'size-4', // 16px - aligned with smaller button height
-  md: 'size-4', // 16px - aligned with smaller button height
-  lg: 'size-5', // 20px - proportional to lg
-  xl: 'size-5', // 20px - proportional to xl
+  xs: '*:size-4', // 16px - proportional to xs
+  sm: '*:size-4', // 16px - aligned with smaller button height
+  md: '*:size-4', // 16px - aligned with smaller button height
+  lg: '*:size-5', // 20px - proportional to lg
+  xl: '*:size-5', // 20px - proportional to xl
 };
 
 const iconMarginStyles = {
-  leading: '-ml-0.5',
-  trailing: '-mr-0.5',
+  leading: '*:-ml-0.5',
+  trailing: '*:-mr-0.5',
 };
 
 export function Button({
@@ -48,10 +49,14 @@ export function Button({
   const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
     if (!icon || !isValidElement(icon)) return null;
 
-    return cloneElement(icon, {
-      'aria-hidden': 'true',
-      className: clsx(iconSizeStyles[size], !iconOnly && iconMarginStyles[position]),
-    } as Record<string, unknown>);
+    return (
+      <span
+        aria-hidden="true"
+        className={clsx('contents', iconSizeStyles[size], !iconOnly && iconMarginStyles[position])}
+      >
+        {icon}
+      </span>
+    );
   };
 
   // For icon-only buttons

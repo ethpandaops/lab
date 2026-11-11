@@ -234,7 +234,7 @@ export function SimulatePage(): JSX.Element {
   const cancelledRef = useRef(false);
 
   // Block card refs for scroll-into-view
-  const blockCardRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const blockCardsRef = useRef<Map<number, HTMLButtonElement>>(new Map());
   const blockStripRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -266,7 +266,7 @@ export function SimulatePage(): JSX.Element {
   // Scroll selected block card into view when selection changes
   useEffect(() => {
     if (selectedBlockIndex === null) return;
-    const el = blockCardRefs.current.get(selectedBlockIndex);
+    const el = blockCardsRef.current.get(selectedBlockIndex);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
@@ -620,6 +620,12 @@ export function SimulatePage(): JSX.Element {
   const isRunning = simState.status === 'running';
   const hasResults = simState.results.length > 0;
 
+  // Block numbers of the running simulation, in order (the start block input is locked while it runs)
+  const runBlocks =
+    isRunning && startBlockNumber !== null
+      ? Array.from({ length: simState.totalBlocks }, (_, i) => startBlockNumber + i)
+      : [];
+
   // Block navigation
   const selectedResult = selectedBlockIndex !== null ? simState.results[selectedBlockIndex] : null;
 
@@ -906,9 +912,9 @@ export function SimulatePage(): JSX.Element {
 
           {/* Segmented progress */}
           <div className="flex h-1.5 gap-px bg-border-50">
-            {Array.from({ length: simState.totalBlocks }).map((_, i) => (
+            {runBlocks.map((blockNumber, i) => (
               <div
-                key={i}
+                key={blockNumber}
                 className={clsx(
                   'flex-1 transition-colors duration-500',
                   i < simState.completedBlocks
@@ -1073,8 +1079,8 @@ export function SimulatePage(): JSX.Element {
                 <button
                   key={result.blockNumber}
                   ref={el => {
-                    if (el) blockCardRefs.current.set(index, el);
-                    else blockCardRefs.current.delete(index);
+                    if (el) blockCardsRef.current.set(index, el);
+                    else blockCardsRef.current.delete(index);
                   }}
                   type="button"
                   onClick={() => setSelectedBlockIndex(index)}
@@ -1133,32 +1139,27 @@ export function SimulatePage(): JSX.Element {
             })}
 
             {/* Pending blocks */}
-            {isRunning &&
-              Array.from({
-                length: simState.totalBlocks - simState.completedBlocks,
-              }).map((_, i) => (
-                <div
-                  key={`pending-${i}`}
-                  className={clsx(
-                    'flex shrink-0 flex-col rounded-sm border border-dashed border-border-60',
-                    i === 0 && 'animate-pulse'
-                  )}
-                  style={{ minWidth: '7.5rem' }}
-                >
-                  <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-2xs font-semibold text-muted">Block</div>
-                    <div className="font-mono text-sm text-muted-30 tabular-nums">
-                      {startBlockNumber !== null ? formatGas(startBlockNumber + simState.completedBlocks + i) : '...'}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 border-t border-dashed border-border-40 px-3 pt-1.5 pb-2">
-                    <div>
-                      <div className="text-2xs text-muted-30">Delta</div>
-                      <div className="font-mono text-xs text-muted-20">—</div>
-                    </div>
+            {runBlocks.slice(simState.completedBlocks).map((blockNumber, i) => (
+              <div
+                key={blockNumber}
+                className={clsx(
+                  'flex shrink-0 flex-col rounded-sm border border-dashed border-border-60',
+                  i === 0 && 'animate-pulse'
+                )}
+                style={{ minWidth: '7.5rem' }}
+              >
+                <div className="px-3 pt-2 pb-1.5">
+                  <div className="text-2xs font-semibold text-muted">Block</div>
+                  <div className="font-mono text-sm text-muted-30 tabular-nums">{formatGas(blockNumber)}</div>
+                </div>
+                <div className="flex items-center gap-3 border-t border-dashed border-border-40 px-3 pt-1.5 pb-2">
+                  <div>
+                    <div className="text-2xs text-muted-30">Delta</div>
+                    <div className="font-mono text-xs text-muted-20">—</div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </div>
       )}

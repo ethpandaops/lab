@@ -148,7 +148,7 @@ function SlotTimelineComponent({
         >
           {phasePositions.map((phase, index) => (
             <div
-              key={`${phase.label}-${index}`}
+              key={phase.label}
               className={clsx(
                 phase.className,
                 'relative transition-colors duration-200',
@@ -192,8 +192,8 @@ function SlotTimelineComponent({
         {showTimeCutovers && (
           <div className="mt-1 flex w-full justify-between">
             <span className="text-xs text-muted">0s</span>
-            {phasePositions.map((phase, index) => (
-              <span key={`cutover-${phase.label}-${index}`} className="text-xs text-muted">
+            {phasePositions.map(phase => (
+              <span key={phase.label} className="text-xs text-muted">
                 {(phase.endTime / 1000).toFixed(0)}s
               </span>
             ))}
@@ -214,8 +214,8 @@ function SlotTimelineComponent({
       {/* Phase labels below timeline */}
       {showPhaseLabels && phases.length > 0 && (
         <div className="mt-8 flex gap-4">
-          {phasePositions.map((phase, index) => (
-            <div key={`${phase.label}-label-${index}`} className="flex items-center gap-2">
+          {phasePositions.map(phase => (
+            <div key={phase.label} className="flex items-center gap-2">
               {/* Color indicator */}
               <div className={clsx('size-3 rounded-xs border border-border', phase.className)} />
               {/* Phase label */}

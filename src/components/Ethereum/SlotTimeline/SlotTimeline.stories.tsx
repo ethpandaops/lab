@@ -281,8 +281,8 @@ export const MultipleSlots: Story = {
       </div>
       {/* Phase labels shown once at bottom */}
       <div className="flex gap-4 border-t border-border pt-4">
-        {DEFAULT_BEACON_SLOT_PHASES.map((phase, index) => (
-          <div key={`legend-${index}`} className="flex items-center gap-2">
+        {DEFAULT_BEACON_SLOT_PHASES.map(phase => (
+          <div key={phase.label} className="flex items-center gap-2">
             <div className={`size-3 rounded-xs border border-border ${phase.className}`} />
             <span className="text-xs/4 text-muted">{phase.label}</span>
           </div>

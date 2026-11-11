@@ -1,4 +1,4 @@
-import { type JSX, Children, isValidElement, cloneElement } from 'react';
+import { type JSX } from 'react';
 import { clsx } from 'clsx';
 import type { ButtonGroupProps } from './ButtonGroup.types';
 
@@ -9,38 +9,26 @@ export function ButtonGroup({
   ref,
   ...props
 }: ButtonGroupProps): JSX.Element {
-  const childArray = Children.toArray(children);
-  const count = childArray.length;
-
-  const childrenWithPosition = childArray.map((child, index) => {
-    if (!isValidElement(child)) return child;
-
-    const isFirst = index === 0;
-    const isLast = index === count - 1;
-
-    const positionClasses = clsx(
-      // Rounded corners (only when rounded prop is true)
-      rounded && isFirst && 'rounded-l-sm rounded-r-none!',
-      rounded && isLast && 'rounded-r-sm rounded-l-none!',
-      rounded && !isFirst && !isLast && 'rounded-none!',
-      // Square corners (when rounded prop is false)
-      !rounded && 'rounded-none!',
-      // Negative margin for overlapping borders
-      !isFirst && '-ml-px',
-      // Focus z-index
-      'focus:z-10'
-    );
-
-    // Type-safe way to add className to existing element
-    const childProps = child.props as { className?: string };
-    return cloneElement(child, {
-      className: clsx(childProps.className, positionClasses),
-    } as Partial<{ className: string }>);
-  });
-
   return (
-    <span ref={ref} className={clsx('isolate inline-flex', rounded && 'rounded-sm', className)} {...props}>
-      {childrenWithPosition}
+    <span
+      ref={ref}
+      className={clsx(
+        'isolate inline-flex',
+        rounded && 'rounded-sm',
+        // Rounded corners (only when rounded prop is true): only the group's outer corners
+        rounded && '*:first:rounded-l-sm *:first:rounded-r-none! *:last:rounded-l-none! *:last:rounded-r-sm',
+        rounded && '*:not-first:not-last:rounded-none!',
+        // Square corners (when rounded prop is false)
+        !rounded && '*:rounded-none!',
+        // Negative margin for overlapping borders
+        '*:not-first:-ml-px',
+        // Focus z-index
+        '*:focus:z-10',
+        className
+      )}
+      {...props}
+    >
+      {children}
     </span>
   );
 }

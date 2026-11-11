@@ -47,6 +47,8 @@ interface AnnotationSwimLanesProps {
 }
 
 interface LaneMark {
+  /** The event a mark shows: its node and timing, or the lane's spread when no node is selected */
+  id: string;
   leftPct: number;
   widthPct: number;
   color: string;
@@ -83,9 +85,11 @@ export function AnnotationSwimLanes({
 
           const startFrac = clampFraction(rawStartFrac);
           const endFrac = clampFraction(rawEndFrac);
+          const id = `${anno.nodeName}-${anno.timeMs}-${anno.endMs ?? ''}`;
 
           if (hasRange) {
             marks.push({
+              id,
               leftPct: startFrac * 100,
               widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
               color,
@@ -93,6 +97,7 @@ export function AnnotationSwimLanes({
             });
           } else {
             marks.push({
+              id,
               leftPct: Math.max(0, startFrac - MIN_MARK_FRAC / 2) * 100,
               widthPct: MIN_MARK_FRAC * 100,
               color,
@@ -117,6 +122,7 @@ export function AnnotationSwimLanes({
           const startFrac = clampFraction(rawStartFrac);
           const endFrac = clampFraction(rawEndFrac);
           marks.push({
+            id: 'spread',
             leftPct: startFrac * 100,
             widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
             color,
@@ -134,6 +140,7 @@ export function AnnotationSwimLanes({
           if (width < MIN_MARK_FRAC) {
             const medFrac = clampFraction(percentile(times, 0.5) / SLOT_DURATION_MS);
             marks.push({
+              id: 'spread',
               leftPct: Math.max(0, medFrac - MIN_MARK_FRAC / 2) * 100,
               widthPct: MIN_MARK_FRAC * 100,
               color,
@@ -141,6 +148,7 @@ export function AnnotationSwimLanes({
             });
           } else {
             marks.push({
+              id: 'spread',
               leftPct: minFrac * 100,
               widthPct: (p95Frac - minFrac) * 100,
               color,
@@ -171,9 +179,9 @@ export function AnnotationSwimLanes({
             {lane.label}
           </span>
           <div className="relative grow bg-foreground-3" style={{ height: 10, borderRadius: 2 }}>
-            {lane.marks.map((mark, i) => (
+            {lane.marks.map(mark => (
               <div
-                key={i}
+                key={mark.id}
                 className="absolute top-0 h-full cursor-pointer"
                 style={{
                   left: `${mark.leftPct}%`,

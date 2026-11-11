@@ -41,13 +41,19 @@ export const getStyleConfig = (): {
  * Renders select dropdown
  *
  * @param select - The select configuration
+ * @param slot - The side of the field the select sits on
  * @returns Rendered select dropdown or null
  */
-export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | null => {
+export const renderSelect = (select: SelectAddonProps | undefined, slot: 'leading' | 'trailing'): ReactNode | null => {
   if (!select) return null;
 
   return (
-    <div className="grid shrink-0 grid-cols-1 focus-within:relative">
+    <div
+      data-input-slot=""
+      data-input-leading={slot === 'leading' ? '' : undefined}
+      data-input-trailing={slot === 'trailing' ? '' : undefined}
+      className="grid shrink-0 grid-cols-1 focus-within:relative"
+    >
       <select
         id={select.id}
         name={select.name}

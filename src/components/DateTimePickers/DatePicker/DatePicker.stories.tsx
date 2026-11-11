@@ -29,7 +29,7 @@ type Story = StoryObj<typeof DatePicker>;
  */
 export const Default: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date(NOW_MS));
 
     return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
   },
@@ -51,7 +51,7 @@ export const NoInitialDate: Story = {
  */
 export const WithSpecificDate: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date('2025-12-25'));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date('2025-12-25'));
 
     return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
   },
@@ -62,7 +62,7 @@ export const WithSpecificDate: Story = {
  */
 export const WithDisabledDates: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date(NOW_MS));
 
     // Disable weekends
     const isWeekday = (date: Date): boolean => {
@@ -85,7 +85,7 @@ export const WithDisabledDates: Story = {
  */
 export const WithDateRange: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date(NOW_MS));
     const today = new Date(NOW_MS);
     const maxDate = new Date(NOW_MS);
     maxDate.setMonth(maxDate.getMonth() + 3);
@@ -140,7 +140,7 @@ export const RangeSelection: Story = {
  */
 export const WithPopover: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(() => new Date(NOW_MS));
 
     return (
       <div className="flex flex-col gap-4">

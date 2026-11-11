@@ -4,6 +4,19 @@ import { Badge } from '@/components/Elements/Badge';
 import type { TagInputProps } from './TagInput.types';
 
 /**
+ * Pairs each tag with its key: the tag's text, numbered from the second time the same text appears (tags passed in,
+ * e.g. from a URL, can repeat)
+ */
+function withKeys(tags: string[]): { tag: string; key: string }[] {
+  const seen = new Map<string, number>();
+  return tags.map(tag => {
+    const count = (seen.get(tag) ?? 0) + 1;
+    seen.set(tag, count);
+    return { tag, key: count === 1 ? tag : `${tag}#${count}` };
+  });
+}
+
+/**
  * A chip/tag input component that renders entered values as removable Badge chips.
  *
  * Supports tokenizing on Enter, comma, Tab, paste, and blur. Tags are displayed
@@ -137,11 +150,11 @@ export function TagInput({
           disabled && 'cursor-not-allowed opacity-50'
         )}
       >
-        {tags.map((tag, index) => {
+        {withKeys(tags).map(({ tag, key }, index) => {
           const validation = validate?.(tag);
           return (
             <Badge
-              key={`${tag}-${index}`}
+              key={key}
               size="small"
               pill
               color={validation ? (validation.color ?? (validation.valid ? 'green' : 'red')) : 'gray'}

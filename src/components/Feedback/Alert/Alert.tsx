@@ -103,8 +103,8 @@ export function Alert({
           {items && items.length > 0 && (
             <div className={`mt-2 text-sm/5 ${descriptionClasses}`}>
               <ul role="list" className="list-disc space-y-1 pl-5">
-                {items.map((item, index) => (
-                  <li key={index}>{item}</li>
+                {items.map(item => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
@@ -124,9 +124,9 @@ export function Alert({
           {actions && actions.length > 0 && (
             <div className="mt-4">
               <div className="-mx-2 -my-1.5 flex gap-3">
-                {actions.map((action, index) => (
+                {actions.map(action => (
                   <button
-                    key={index}
+                    key={action.label}
                     type="button"
                     onClick={action.onClick}
                     className={`rounded-sm px-2 py-1.5 text-sm/5 font-medium ${config.actionText} ${config.actionHover} ${FOCUS}`}

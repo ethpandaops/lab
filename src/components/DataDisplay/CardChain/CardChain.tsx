@@ -271,8 +271,10 @@ export function CardChain({
         {/* Cards */}
         <div className="flex flex-1 items-stretch justify-between gap-4">
           {isLoading
-            ? // Loading skeleton
-              Array.from({ length: skeletonCount }).map((_, index) => <CardSkeleton key={index} />)
+            ? // Loading skeleton: placeholders carry no data, only their place in the chain
+              Array.from({ length: skeletonCount }, (_, place) => `place-${place + 1}`).map(place => (
+                <CardSkeleton key={place} />
+              ))
             : // Actual items
               items.map((item, index) => {
                 const isLast = index === items.length - 1;

@@ -3,6 +3,23 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Card } from '@/components/Layout/Card';
 
 /**
+ * A metric card: text-xs label, text-2xl value, text-xs delta, text-sm info
+ */
+function MetricCardSkeleton(): JSX.Element {
+  return (
+    <Card rounded className="p-3">
+      <LoadingContainer className="h-3 w-24 rounded-xs" />
+      <LoadingContainer className="mt-1 h-8 w-28 rounded-xs" />
+      <div className="mt-1.5 flex items-center gap-2">
+        <LoadingContainer className="h-5 w-20 rounded-xs" />
+        <LoadingContainer className="h-4 w-16 rounded-xs" />
+      </div>
+      <LoadingContainer className="mt-1.5 h-5 w-full rounded-xs" />
+    </Card>
+  );
+}
+
+/**
  * Loading skeleton for the State Growth page.
  * Matches the layout: Stats row (Total + 3 cards) -> Main Chart
  */
@@ -21,19 +38,11 @@ export function StateSizeSkeleton(): JSX.Element {
           </div>
         </div>
 
-        {/* Metric Cards - text-xs label, text-2xl value, text-xs delta, text-sm info */}
+        {/* Metric Cards */}
         <div className="grid min-w-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} rounded className="p-3">
-              <LoadingContainer className="h-3 w-24 rounded-xs" />
-              <LoadingContainer className="mt-1 h-8 w-28 rounded-xs" />
-              <div className="mt-1.5 flex items-center gap-2">
-                <LoadingContainer className="h-5 w-20 rounded-xs" />
-                <LoadingContainer className="h-4 w-16 rounded-xs" />
-              </div>
-              <LoadingContainer className="mt-1.5 h-5 w-full rounded-xs" />
-            </Card>
-          ))}
+          <MetricCardSkeleton />
+          <MetricCardSkeleton />
+          <MetricCardSkeleton />
         </div>
       </div>
 

@@ -200,18 +200,6 @@ export default defineConfig(
     },
   },
   {
-    // Switched on, with their fixes, by the commits that follow.
-    files: ['**/*.{ts,tsx}'],
-    rules: {
-      '@eslint-react/no-array-index-key': 'off',
-      '@eslint-react/no-clone-element': 'off',
-      '@eslint-react/no-children-to-array': 'off',
-      '@eslint-react/naming-convention-ref-name': 'off',
-      '@eslint-react/use-state': 'off',
-      '@eslint-react/web-api-no-leaked-timeout': 'off',
-    },
-  },
-  {
     files: ['src/**/*.test.{ts,tsx}'],
     rules: {
       'vitest/no-disabled-tests': 'off',

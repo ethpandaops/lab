@@ -82,12 +82,12 @@ function Legend({ opcodeCount }: { opcodeCount: number }): JSX.Element {
 function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.Element {
   const [hoveredOpcode, setHoveredOpcode] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Update tooltip position when hovered opcode changes
   useEffect(() => {
-    if (hoveredOpcode && cellRefs.current.has(hoveredOpcode)) {
-      const cell = cellRefs.current.get(hoveredOpcode)!;
+    if (hoveredOpcode && cellsRef.current.has(hoveredOpcode)) {
+      const cell = cellsRef.current.get(hoveredOpcode)!;
       const rect = cell.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top - 8,
@@ -98,9 +98,9 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
   const setCellRef = useCallback((opcode: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(opcode, el);
+      cellsRef.current.set(opcode, el);
     } else {
-      cellRefs.current.delete(opcode);
+      cellsRef.current.delete(opcode);
     }
   }, []);
 
@@ -243,14 +243,14 @@ function TransactionsViewHeatmap({
   const [hoveredCell, setHoveredCell] = useState<{ txHash: string; opcode: string } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [headerHeight, setHeaderHeight] = useState<number>(0);
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const headerRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const headersRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const setHeaderRef = useCallback((category: string, el: HTMLDivElement | null) => {
     if (el) {
-      headerRefs.current.set(category, el);
+      headersRef.current.set(category, el);
     } else {
-      headerRefs.current.delete(category);
+      headersRef.current.delete(category);
     }
   }, []);
 
@@ -258,8 +258,8 @@ function TransactionsViewHeatmap({
   useEffect(() => {
     if (hoveredCell) {
       const key = `${hoveredCell.txHash}-${hoveredCell.opcode}`;
-      if (cellRefs.current.has(key)) {
-        const cell = cellRefs.current.get(key)!;
+      if (cellsRef.current.has(key)) {
+        const cell = cellsRef.current.get(key)!;
         const rect = cell.getBoundingClientRect();
         setTooltipPosition({
           top: rect.top - 8,
@@ -271,9 +271,9 @@ function TransactionsViewHeatmap({
 
   const setCellRef = useCallback((key: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(key, el);
+      cellsRef.current.set(key, el);
     } else {
-      cellRefs.current.delete(key);
+      cellsRef.current.delete(key);
     }
   }, []);
 
@@ -344,7 +344,7 @@ function TransactionsViewHeatmap({
 
   // Sync header height for y-axis spacer alignment - use max height across all categories
   useEffect(() => {
-    const elements = Array.from(headerRefs.current.values());
+    const elements = Array.from(headersRef.current.values());
     if (elements.length === 0) return;
 
     const updateMaxHeight = (): void => {

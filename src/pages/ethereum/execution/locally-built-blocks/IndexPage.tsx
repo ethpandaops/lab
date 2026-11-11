@@ -82,7 +82,7 @@ export function IndexPage(): JSX.Element {
   const table = usePreparedBlocks(query, sort, order, page, pageSize, search.cursor, timeWindow !== 'all');
 
   // Cursors of the newest-first pages already visited, so Previous can return to them
-  const visited = useRef(new Map<string, string | undefined>());
+  const visitedRef = useRef(new Map<string, string | undefined>());
   const viewKey = JSON.stringify([filters, timeWindow, sort, order, pageSize]);
 
   const setSearch = useCallback(
@@ -102,8 +102,8 @@ export function IndexPage(): JSX.Element {
       return;
     }
     // Newest first pages by cursor: forwards from this page, backwards to a page already visited, else the first
-    visited.current.set(`${viewKey}|${page}`, search.cursor);
-    const cursor = nextPage === page + 1 ? table.nextCursor : visited.current.get(`${viewKey}|${nextPage}`);
+    visitedRef.current.set(`${viewKey}|${page}`, search.cursor);
+    const cursor = nextPage === page + 1 ? table.nextCursor : visitedRef.current.get(`${viewKey}|${nextPage}`);
     setSearch(cursor ? { page: nextPage, cursor } : { page: undefined, cursor: undefined });
   };
 

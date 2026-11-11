@@ -22,10 +22,11 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): JSX.Element {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  // The stored preference, else the system's
+  const [preferredTheme, setPreferredTheme] = useState<Theme>(getInitialTheme);
 
   // Determine effective theme - URL override takes precedence
-  const effectiveTheme = themeOverride ?? theme;
+  const effectiveTheme = themeOverride ?? preferredTheme;
 
   // Apply theme to document and update theme-color meta tag
   useEffect(() => {
@@ -56,7 +57,7 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (): void => {
-      setThemeState(getSystemTheme());
+      setPreferredTheme(getSystemTheme());
     };
 
     mediaQuery.addEventListener('change', handleChange);
@@ -64,7 +65,7 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
   }, [themeOverride]);
 
   const setTheme = useCallback((newTheme: Theme): void => {
-    setThemeState(newTheme);
+    setPreferredTheme(newTheme);
     const systemTheme = getSystemTheme();
 
     // Only store if different from system preference
@@ -77,7 +78,7 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
 
   const clearTheme = useCallback((): void => {
     localStorage.removeItem('theme');
-    setThemeState(getSystemTheme());
+    setPreferredTheme(getSystemTheme());
   }, []);
 
   // Expose effective theme (with override applied) to consumers

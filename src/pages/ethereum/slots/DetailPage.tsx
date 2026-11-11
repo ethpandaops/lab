@@ -943,9 +943,9 @@ export function DetailPage(): JSX.Element {
                         } across ${blobSubmitters.length} transaction${blobSubmitters.length !== 1 ? 's' : ''}`}
                       >
                         <div className="grid gap-3">
-                          {blobSubmitters.map((submitter, index) => (
+                          {blobSubmitters.map(submitter => (
                             <div
-                              key={submitter.transaction_hash ?? index}
+                              key={submitter.transaction_hash ?? submitter.transaction_index}
                               className="flex items-center gap-4 rounded-sm border border-border bg-surface-50 p-4"
                             >
                               {/* Logo and Name */}

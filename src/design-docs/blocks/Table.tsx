@@ -31,9 +31,10 @@ export function Table({ caption, head, rows }: TableProps): JSX.Element {
               <th scope="row" className="py-2 pr-4 text-left font-mono">
                 {first}
               </th>
-              {rest.map((cell, index) => (
-                <td key={index} className="py-2 pr-4 wrap-break-word text-muted">
-                  {cell}
+              {/* One cell per remaining column, keyed by the column's heading */}
+              {head.slice(1).map((column, index) => (
+                <td key={column} className="py-2 pr-4 wrap-break-word text-muted">
+                  {rest[index]}
                 </td>
               ))}
             </tr>

@@ -28,6 +28,34 @@ export interface GetBlobsTabProps {
 }
 
 /**
+ * A stat card: label and value
+ */
+function StatCardSkeleton(): JSX.Element {
+  return (
+    <Card>
+      <div className="space-y-2 p-4">
+        <LoadingContainer className="h-3 w-20 rounded-xs" />
+        <LoadingContainer className="h-8 w-24 rounded-xs" />
+      </div>
+    </Card>
+  );
+}
+
+/**
+ * A chart card: title and plot
+ */
+function ChartCardSkeleton(): JSX.Element {
+  return (
+    <Card>
+      <div className="space-y-4 p-4">
+        <LoadingContainer className="h-5 w-32 rounded-xs" />
+        <LoadingContainer className="h-93.75 w-full rounded-xs" />
+      </div>
+    </Card>
+  );
+}
+
+/**
  * Loading skeleton for the getBlobs tab
  */
 function GetBlobsTabSkeleton(): JSX.Element {
@@ -35,14 +63,10 @@ function GetBlobsTabSkeleton(): JSX.Element {
     <div className="space-y-6">
       {/* Stats skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Card key={index}>
-            <div className="space-y-2 p-4">
-              <LoadingContainer className="h-3 w-20 rounded-xs" />
-              <LoadingContainer className="h-8 w-24 rounded-xs" />
-            </div>
-          </Card>
-        ))}
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
       </div>
 
       {/* Client breakdown skeleton */}
@@ -55,14 +79,8 @@ function GetBlobsTabSkeleton(): JSX.Element {
 
       {/* Charts skeleton */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {Array.from({ length: 2 }).map((_, index) => (
-          <Card key={index}>
-            <div className="space-y-4 p-4">
-              <LoadingContainer className="h-5 w-32 rounded-xs" />
-              <LoadingContainer className="h-93.75 w-full rounded-xs" />
-            </div>
-          </Card>
-        ))}
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
       </div>
     </div>
   );

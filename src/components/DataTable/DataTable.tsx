@@ -20,6 +20,9 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Input } from '@/components/Forms/Input';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 
+/** The loading state's placeholder rows, which carry no data, only their place in the table */
+const LOADING_ROWS = ['loading-1', 'loading-2', 'loading-3', 'loading-4', 'loading-5'];
+
 export function DataTable<TData>({
   data,
   columns,
@@ -314,8 +317,8 @@ export function DataTable<TData>({
                 <tr>
                   <td colSpan={columns.length} className="py-8">
                     <div className="flex flex-col gap-2">
-                      {[...Array(5)].map((_, i) => (
-                        <LoadingContainer key={i} className="h-12 w-full" />
+                      {LOADING_ROWS.map(row => (
+                        <LoadingContainer key={row} className="h-12 w-full" />
                       ))}
                     </div>
                   </td>

@@ -9,7 +9,7 @@ type GasFormulaColor = 'blue' | 'purple' | 'green' | 'amber' | 'cyan';
  * A segment in the gas formula (before the equals sign)
  */
 interface GasFormulaSegment {
-  /** Display label for this segment */
+  /** Display label for this segment, unique within the formula */
   label: string;
   /** Numeric value */
   value: number;
@@ -111,13 +111,13 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
     <>
       {/* Mobile: vertical stacked layout */}
       <div className="space-y-1.5 sm:hidden">
-        {segments.map((segment, index) => {
+        {segments.map(segment => {
           const colorClasses = getColorClasses(segment.color);
           const valueColor = getValueColor(segment.color);
 
           return (
             <div
-              key={`mobile-segment-${index}`}
+              key={segment.label}
               className={`flex items-center justify-between rounded-xs border-l-2 ${colorClasses.border} ${colorClasses.bg} px-3 py-2`}
             >
               <div className="flex items-center gap-2">
@@ -152,12 +152,12 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
 
       {/* Desktop: horizontal formula layout */}
       <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-2">
-        {segments.map((segment, index) => {
+        {segments.map(segment => {
           const colorClasses = getColorClasses(segment.color);
           const valueColor = getValueColor(segment.color);
 
           return (
-            <div key={`segment-${index}`} className="contents">
+            <div key={segment.label} className="contents">
               {/* Operator (if not first segment) */}
               {segment.operator && (
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-medium text-muted">

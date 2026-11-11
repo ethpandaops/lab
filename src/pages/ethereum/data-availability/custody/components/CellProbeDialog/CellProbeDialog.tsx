@@ -99,6 +99,27 @@ function buildContextDescription(cellContext: CellContext): string {
 }
 
 /**
+ * A probe row's key: int_custody_probe_order_by_slot's sort key, as one probe batch has a row for each slot it tested
+ * and each result it got
+ */
+function probeKey(probe: IntCustodyProbeOrderBySlot): string {
+  return `${probe.slot}-${probe.peer_id_unique_key}-${probe.result}-${probe.error}-${probe.probe_date_time}`;
+}
+
+/** Placeholder for a probe row while the probes load */
+function ProbeRowSkeleton(): JSX.Element {
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5">
+      <div className="size-7 animate-pulse rounded-full bg-muted-50" />
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted-50" />
+        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted-50" />
+      </div>
+    </div>
+  );
+}
+
+/**
  * Quick filter button component - styled as standard buttons with color variants
  */
 function FilterButton({
@@ -320,15 +341,11 @@ export function CellProbeDialog({
             <div className="pr-3">
               {isLoading ? (
                 <div className="space-y-2 p-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex items-center gap-2 px-2 py-1.5">
-                      <div className="size-7 animate-pulse rounded-full bg-muted-50" />
-                      <div className="flex flex-1 flex-col gap-1">
-                        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted-50" />
-                        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted-50" />
-                      </div>
-                    </div>
-                  ))}
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
                 </div>
               ) : probes.length === 0 ? (
                 <div className="py-8 text-center text-sm text-muted">
@@ -336,9 +353,9 @@ export function CellProbeDialog({
                 </div>
               ) : (
                 <div className="space-y-0.5">
-                  {probes.map((probe, index) => (
+                  {probes.map(probe => (
                     <ProbeEventRow
-                      key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
+                      key={probeKey(probe)}
                       probe={probe}
                       onClick={() => handleProbeClick(probe)}
                       showViewIcon

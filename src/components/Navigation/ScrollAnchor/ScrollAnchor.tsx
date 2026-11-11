@@ -78,10 +78,11 @@ export function ScrollAnchor({
    */
   useEffect(() => {
     const hash = window.location.hash.slice(1); // Remove '#' prefix
-    if (hash === id) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => scrollToAnchor(id, scrollOffset), 100);
-    }
+    if (hash !== id) return;
+
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => scrollToAnchor(id, scrollOffset), 100);
+    return () => clearTimeout(timeoutId);
   }, [id, scrollOffset]);
 
   return (

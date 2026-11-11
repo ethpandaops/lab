@@ -195,12 +195,7 @@ export function ContractTop100List(): JSX.Element {
           </thead>
           <tbody className="divide-y divide-border-50">
             {sortedData.map((item, idx) => (
-              <ContractRow
-                key={item.contract.contract_address ?? idx}
-                item={item}
-                index={idx + 1}
-                hideSavings={hideSavings}
-              />
+              <ContractRow key={item.contract.contract_address} item={item} index={idx + 1} hideSavings={hideSavings} />
             ))}
           </tbody>
         </table>
@@ -222,12 +217,7 @@ export function ContractTop100List(): JSX.Element {
       {!isLoading && !error && sortedData && sortedData.length > 0 && (
         <div>
           {sortedData.map((item, idx) => (
-            <ContractCard
-              key={item.contract.contract_address ?? idx}
-              item={item}
-              index={idx + 1}
-              hideSavings={hideSavings}
-            />
+            <ContractCard key={item.contract.contract_address} item={item} index={idx + 1} hideSavings={hideSavings} />
           ))}
         </div>
       )}

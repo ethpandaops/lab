@@ -354,8 +354,12 @@ function NavFlyout({
               </Link>
             )}
             <div className="flex flex-wrap gap-x-3 gap-y-2">
-              {page.children?.map((group, index) => (
-                <div key={group.label ?? index} className="flex min-w-40 flex-1 flex-col">
+              {page.children?.map(group => (
+                <div
+                  // An unlabelled group is known by the pages it lists
+                  key={group.label ?? group.items.map(item => item.to).join()}
+                  className="flex min-w-40 flex-1 flex-col"
+                >
                   {group.label && (
                     <div className="px-2 pt-0.5 pb-1 text-2xs font-semibold tracking-wider text-muted-60 uppercase">
                       {group.label}

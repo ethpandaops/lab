@@ -120,7 +120,7 @@ export function EntitiesTable({
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('stake');
-  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   const query = search.trim().toLowerCase();
   // Members a search matches, so searching for an operator finds its group
   const matching = (group: string): EntityStake[] =>

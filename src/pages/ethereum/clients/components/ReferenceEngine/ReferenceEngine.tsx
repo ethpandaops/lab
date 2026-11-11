@@ -192,7 +192,7 @@ export function ReferenceEngine({
     () => [...new Set(opcodeLines.flatMap(({ costs }) => [...costs.keys()]))].sort(),
     [opcodeLines]
   );
-  const [pickedGroup, setOpcodeGroup] = useState('SLOAD');
+  const [pickedGroup, setPickedGroup] = useState('SLOAD');
   const opcodeGroup = opcodeGroups.includes(pickedGroup) ? pickedGroup : (opcodeGroups[0] ?? '');
   const groupCosts = opcodeLines.slice(0, MAX_OPCODE_BUILDS).flatMap(({ line, costs }) => {
     const cost = costs.get(opcodeGroup);
@@ -437,7 +437,7 @@ export function ReferenceEngine({
               actions={
                 <SelectMenu
                   value={opcodeGroup}
-                  onChange={setOpcodeGroup}
+                  onChange={setPickedGroup}
                   options={opcodeGroups.map(group => ({ value: group, label: group }))}
                   expandToFit
                 />

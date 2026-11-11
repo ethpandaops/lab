@@ -301,12 +301,13 @@ function ExpandedRowContent({
               </tr>
             </thead>
             <tbody>
-              {observations.map((obs: IntEngineNewPayload, idx: number) => {
+              {observations.map((obs: IntEngineNewPayload) => {
                 const statusStyle = getStatusStyle(obs.status);
                 const clusterName = extractClusterFromNodeName(obs.meta_client_name ?? '');
                 const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
+                // An observation is one node's call for one block at one time
                 return (
-                  <tr key={`${obs.meta_client_name}-${idx}`} className="text-sm">
+                  <tr key={`${obs.block_hash}-${obs.meta_client_name}-${obs.event_date_time}`} className="text-sm">
                     <td className="px-2 py-1.5">
                       <span className="flex items-center gap-1.5 text-muted" title={obs.meta_client_name}>
                         {clusterColor && clusterName && (
@@ -374,10 +375,10 @@ export function ClientVersionBreakdown({
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Track which clients are expanded (for expandable mode)
-  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(() => new Set());
 
   // Track which client groups are expanded (for multi-version collapsing)
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => new Set());
 
   // Cluster specs modal state
   const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
@@ -813,7 +814,7 @@ export function ClientVersionBreakdown({
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface">
-            {sortedData.map((row, index) => {
+            {sortedData.map(row => {
               const isGroupExpanded = expandedGroups.has(row.client);
               const hasMultipleVersions = row.versionCount > 1;
               const rowKey = `${row.client}-${row.version}`;
@@ -942,7 +943,7 @@ export function ClientVersionBreakdown({
               );
 
               return (
-                <React.Fragment key={`${row.client}-${row.version}-${index}`}>
+                <React.Fragment key={row.client}>
                   {/* Primary row */}
                   <tr
                     className={clsx(
@@ -990,7 +991,7 @@ export function ClientVersionBreakdown({
                   {/* Group expansion: per-version sub-rows, newest first */}
                   {hasMultipleVersions &&
                     isGroupExpanded &&
-                    row.versions.map((subRow, subIndex) => {
+                    row.versions.map(subRow => {
                       const subRowKey = `${subRow.client}-${subRow.version}`;
                       const isSubNodeExpanded = expandedClients.has(subRowKey);
 
@@ -1008,7 +1009,7 @@ export function ClientVersionBreakdown({
                       };
 
                       return (
-                        <React.Fragment key={`sub-${subRow.client}-${subRow.version}-${subIndex}`}>
+                        <React.Fragment key={subRowKey}>
                           <tr
                             className={clsx(
                               'bg-background-50 transition-colors hover:bg-background',

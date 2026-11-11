@@ -1,4 +1,4 @@
-import React, { useId, createContext, use, type JSX } from 'react';
+import React, { useId, createContext, use, type JSX, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/Elements/Button';
 import type { InputProps, InputFieldProps, InputSlotProps, InputSize, SelectAddonProps } from './Input.types';
@@ -10,6 +10,9 @@ interface InputContextValue {
   inline: boolean;
   inputId: string;
   labelVariant: 'standard' | 'inset' | 'overlapping';
+  /** Ids of the helper or error text and the corner hint, for the field's aria-describedby */
+  describedBy?: string;
+  required?: boolean;
 }
 
 const InputContext = createContext<InputContextValue | null>(null);
@@ -20,6 +23,86 @@ const useInputContext = (): InputContextValue => {
     throw new Error('Input subcomponents must be used within an Input component');
   }
   return context;
+};
+
+/**
+ * What a slot holds: its explicit type, or one detected from its child
+ */
+function slotContent(children: ReactNode, type: InputSlotProps['type']): NonNullable<InputSlotProps['type']> {
+  if (type) return type;
+  if (!React.isValidElement(children)) return 'text'; // Default to text for string children
+  if (
+    children.type === 'select' ||
+    ('options' in (children.props as object) && Array.isArray((children.props as { options?: unknown }).options))
+  ) {
+    return 'select';
+  }
+  if (children.type === Button) return 'button';
+  if (
+    children.type === 'svg' ||
+    typeof children.type === 'function' ||
+    (typeof children.type === 'object' && children.type !== null)
+  ) {
+    // SVG, function component, or forwardRef component (likely an icon)
+    // Note: Heroicons v2 uses forwardRef which returns an object
+    return 'icon';
+  }
+  return 'text';
+}
+
+/*
+ * Input never inspects its children. Every slot marks its root with data-input-slot (plus data-input-leading or
+ * data-input-trailing, and data-input-icon for icons), and the box around the slots and the field lays itself out
+ * from what it holds:
+ * - icons overlay the field in one grid cell, with the field padded clear of the slots
+ * - other addons sit beside the field
+ * - inline addons share one bordered box with the field, which drops its own
+ */
+const containerStyles = {
+  external: clsx(
+    'has-data-input-icon:grid has-data-input-icon:grid-cols-1',
+    'not-has-data-input-icon:has-data-input-slot:flex'
+  ),
+  inline: clsx(
+    'has-data-input-slot:flex has-data-input-slot:items-center has-data-input-slot:bg-surface has-data-input-slot:px-3',
+    'has-data-input-slot:outline-1 has-data-input-slot:-outline-offset-1 has-data-input-slot:outline-border',
+    'has-data-input-slot:focus-within:outline-2 has-data-input-slot:focus-within:-outline-offset-2 has-data-input-slot:focus-within:outline-primary'
+  ),
+};
+
+// The field under icons: first to paint, in the grid cell the slots share, padded clear of them
+const overlayFieldStyles: Record<InputSize, string> = {
+  sm: clsx(
+    'group-has-data-input-icon/input:order-first group-has-data-input-icon/input:col-start-1 group-has-data-input-icon/input:row-start-1',
+    'group-has-data-input-icon/input:group-has-data-input-leading/input:pl-9',
+    'group-has-data-input-icon/input:group-has-data-input-trailing/input:pr-9'
+  ),
+  md: clsx(
+    'group-has-data-input-icon/input:order-first group-has-data-input-icon/input:col-start-1 group-has-data-input-icon/input:row-start-1',
+    'group-has-data-input-icon/input:group-has-data-input-leading/input:pl-10',
+    'group-has-data-input-icon/input:group-has-data-input-trailing/input:pr-10'
+  ),
+  lg: clsx(
+    'group-has-data-input-icon/input:order-first group-has-data-input-icon/input:col-start-1 group-has-data-input-icon/input:row-start-1',
+    'group-has-data-input-icon/input:group-has-data-input-leading/input:pl-11',
+    'group-has-data-input-icon/input:group-has-data-input-trailing/input:pr-11'
+  ),
+};
+
+// The field beside inline addons: borderless and transparent, padded only towards the addons
+const inlineFieldClasses = clsx(
+  'group-has-data-input-slot/input:min-w-0 group-has-data-input-slot/input:grow group-has-data-input-slot/input:bg-transparent!',
+  'group-has-data-input-slot/input:shadow-none group-has-data-input-slot/input:outline-hidden',
+  'group-has-data-input-slot/input:focus:outline-hidden group-has-data-input-slot/input:focus-visible:outline-hidden',
+  'group-has-data-input-slot/input:sm:text-sm/6 group-has-data-input-slot/input:px-0',
+  'group-has-data-input-slot/input:group-has-data-input-leading/input:pl-1',
+  'group-has-data-input-slot/input:group-has-data-input-trailing/input:pr-1'
+);
+
+const slotIconStyles: Record<InputSize, string> = {
+  sm: '*:size-4',
+  md: '*:size-5',
+  lg: '*:size-5',
 };
 
 /**
@@ -42,69 +125,46 @@ const useInputContext = (): InputContextValue => {
  *   <select>...</select>
  * </Input.Leading>
  * ```
- * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputLeading = ({ children, className, type }: InputSlotProps): React.ReactNode => {
-  const { size, inline } = useInputContext();
+  const { size, inline, labelVariant } = useInputContext();
 
-  // Determine content type (explicit type prop takes precedence)
-  let contentType = type;
+  // An inset label takes the slots' place
+  if (labelVariant === 'inset') return null;
 
-  // Auto-detect if no explicit type provided
-  if (!contentType && React.isValidElement(children)) {
-    if (
-      children.type === 'select' ||
-      ('options' in (children.props as object) && Array.isArray((children.props as { options?: unknown }).options))
-    ) {
-      contentType = 'select';
-    } else if (children.type === Button) {
-      contentType = 'button';
-    } else if (
-      children.type === 'svg' ||
-      typeof children.type === 'function' ||
-      (typeof children.type === 'object' && children.type !== null)
-    ) {
-      // SVG, function component, or forwardRef component (likely an icon)
-      // Note: Heroicons v2 uses forwardRef which returns an object
-      contentType = 'icon';
-    } else {
-      contentType = 'text';
-    }
-  } else if (!contentType) {
-    contentType = 'text'; // Default to text for string children
-  }
+  // Explicit type prop takes precedence over detection
+  const contentType = slotContent(children, type);
 
   // Render based on content type
   if (contentType === 'icon') {
-    const iconSizeStyles = {
-      sm: 'size-4',
-      md: 'size-5',
-      lg: 'size-5',
-    };
-
     return (
-      <div className="pointer-events-none col-start-1 row-start-1 flex items-center">
-        {React.isValidElement(children) &&
-          React.cloneElement(children, {
-            'aria-hidden': 'true',
-            className: clsx(
-              iconSizeStyles[size],
-              'ml-3',
-              'pointer-events-none self-center text-muted',
-              (children.props as { className?: string }).className
-            ),
-          } as Record<string, unknown>)}
+      <div
+        data-input-slot=""
+        data-input-leading=""
+        data-input-icon=""
+        className="pointer-events-none col-start-1 row-start-1 flex items-center"
+      >
+        {React.isValidElement(children) && (
+          <span
+            aria-hidden="true"
+            className={clsx('contents *:pointer-events-none *:ml-3 *:self-center *:text-muted', slotIconStyles[size])}
+          >
+            {children}
+          </span>
+        )}
       </div>
     );
   }
 
   if (contentType === 'select') {
-    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined);
+    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined, 'leading');
   }
 
   // Text addon (default)
   return (
     <div
+      data-input-slot=""
+      data-input-leading=""
       className={clsx(
         inline
           ? 'shrink-0 text-base text-muted select-none sm:text-sm/6'
@@ -140,77 +200,58 @@ InputLeading.displayName = 'Input.Leading';
  *   <Button>Sort</Button>
  * </Input.Trailing>
  * ```
- * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputTrailing = ({ children, className, type }: InputSlotProps): React.ReactNode => {
-  const { size, inline } = useInputContext();
+  const { size, inline, labelVariant } = useInputContext();
 
-  // Determine content type (explicit type prop takes precedence)
-  let contentType = type;
+  // An inset label takes the slots' place
+  if (labelVariant === 'inset') return null;
 
-  // Auto-detect if no explicit type provided
-  if (!contentType && React.isValidElement(children)) {
-    if (
-      children.type === 'select' ||
-      ('options' in (children.props as object) && Array.isArray((children.props as { options?: unknown }).options))
-    ) {
-      contentType = 'select';
-    } else if (children.type === Button) {
-      contentType = 'button';
-    } else if (
-      children.type === 'svg' ||
-      typeof children.type === 'function' ||
-      (typeof children.type === 'object' && children.type !== null)
-    ) {
-      // SVG, function component, or forwardRef component (likely an icon)
-      // Note: Heroicons v2 uses forwardRef which returns an object
-      contentType = 'icon';
-    } else {
-      contentType = 'text';
-    }
-  } else if (!contentType) {
-    contentType = 'text'; // Default to text for string children
-  }
+  // Explicit type prop takes precedence over detection
+  const contentType = slotContent(children, type);
 
   // Render based on content type
   if (contentType === 'icon') {
-    const iconSizeStyles = {
-      sm: 'size-4',
-      md: 'size-5',
-      lg: 'size-5',
-    };
-
     return (
-      <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
-        {React.isValidElement(children) &&
-          React.cloneElement(children, {
-            'aria-hidden': 'true',
-            className: clsx(
-              iconSizeStyles[size],
-              'mr-3',
-              'pointer-events-none self-center text-muted',
-              (children.props as { className?: string }).className
-            ),
-          } as Record<string, unknown>)}
+      <div
+        data-input-slot=""
+        data-input-trailing=""
+        data-input-icon=""
+        className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end"
+      >
+        {React.isValidElement(children) && (
+          <span
+            aria-hidden="true"
+            className={clsx('contents *:pointer-events-none *:mr-3 *:self-center *:text-muted', slotIconStyles[size])}
+          >
+            {children}
+          </span>
+        )}
       </div>
     );
   }
 
   if (contentType === 'button') {
     return (
-      <div className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end">
+      <div
+        data-input-slot=""
+        data-input-trailing=""
+        className="pointer-events-none col-start-1 row-start-1 flex items-center justify-end"
+      >
         <div className="pointer-events-auto shrink-0 self-center pr-0.5">{children}</div>
       </div>
     );
   }
 
   if (contentType === 'select') {
-    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined);
+    return renderSelect(React.isValidElement(children) ? (children.props as SelectAddonProps) : undefined, 'trailing');
   }
 
   // Text addon (default)
   return (
     <div
+      data-input-slot=""
+      data-input-trailing=""
       className={clsx(
         inline
           ? 'shrink-0 text-base text-muted select-none sm:text-sm/6'
@@ -240,14 +281,25 @@ InputTrailing.displayName = 'Input.Trailing';
  *   inputMode="email"
  * />
  * ```
- * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputField = ({ className, ref, inputMode, ...props }: InputFieldProps): JSX.Element => {
-  const { size, error, inputId, labelVariant } = useInputContext();
+  const { size, error, inline, inputId, labelVariant, describedBy, required } = useInputContext();
   const styles = getStyleConfig();
+
+  // The Input's helper text, corner hint and required flag take precedence over the field's own
+  const aria = {
+    ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+    ...(required ? { 'aria-required': 'true' as const } : {}),
+  };
 
   // For inset labels, skip base styles (container handles styling)
   if (labelVariant === 'inset') {
+    // Inset label - no outline on input (container handles it)
+    const textSize = {
+      sm: 'text-sm/6',
+      md: 'text-base/6',
+      lg: 'text-base/6',
+    };
     return (
       <input
         ref={ref}
@@ -255,7 +307,13 @@ export const InputField = ({ className, ref, inputMode, ...props }: InputFieldPr
         aria-invalid={error ? ('true' as const) : undefined}
         inputMode={inputMode}
         {...props}
-        className={className}
+        {...aria}
+        className={clsx(
+          'block w-full border-0 bg-transparent text-foreground shadow-none placeholder:text-muted',
+          textSize[size],
+          'ring-0 outline-0 focus:ring-0 focus:outline-0 focus-visible:outline-0',
+          className
+        )}
       />
     );
   }
@@ -270,11 +328,14 @@ export const InputField = ({ className, ref, inputMode, ...props }: InputFieldPr
       aria-invalid={error ? ('true' as const) : undefined}
       inputMode={inputMode}
       {...props}
+      {...aria}
       className={clsx(
         styles.base,
         error ? styles.outline.error : styles.outline.default,
         styles.size[size],
         paddingClasses,
+        // How the field sits among the slots, if there are any
+        inline ? inlineFieldClasses : overlayFieldStyles[size],
         className
       )}
     />
@@ -340,6 +401,11 @@ const InputBase = ({
     inline,
     inputId,
     labelVariant,
+    describedBy:
+      errorMessage || helperText || cornerHint
+        ? [errorMessage || helperText ? `${inputId}-error` : null, cornerHintId].filter(Boolean).join(' ')
+        : undefined,
+    required,
   };
 
   /**
@@ -413,115 +479,10 @@ const InputBase = ({
     );
   };
 
-  // Extract slots from children
-  const childArray = React.Children.toArray(children);
-  const leadingSlot = childArray.find(child => React.isValidElement(child) && child.type === InputLeading);
-  const trailingSlot = childArray.find(child => React.isValidElement(child) && child.type === InputTrailing);
-  const fieldSlotRaw = childArray.find(child => React.isValidElement(child) && child.type === InputField);
-
-  const hasLeading = !!leadingSlot;
-  const hasTrailing = !!trailingSlot;
-
-  // Check if slots contain icons or buttons (for grid layout) vs text (for flex layout)
-  const getSlotType = (slot: React.ReactNode): 'icon' | 'button' | 'text' | null => {
-    if (!slot || !React.isValidElement(slot)) return null;
-    const slotProps = slot.props as InputSlotProps;
-
-    // Use explicit type if provided
-    if (slotProps.type) {
-      return slotProps.type === 'select' ? 'text' : slotProps.type;
-    }
-
-    // Auto-detect based on children
-    if (!slotProps.children || !React.isValidElement(slotProps.children)) return 'text';
-
-    const child = slotProps.children;
-    if (child.type === Button) return 'button';
-    if (
-      child.type === 'svg' ||
-      typeof child.type === 'function' ||
-      (typeof child.type === 'object' && child.type !== null)
-    ) {
-      // SVG, function component, or forwardRef component (likely an icon)
-      // Note: Heroicons v2 uses forwardRef which returns an object
-      return 'icon';
-    }
-    return 'text';
-  };
-
-  const leadingType = getSlotType(leadingSlot);
-  const trailingType = getSlotType(trailingSlot);
-
-  const hasIcons = leadingType === 'icon' || trailingType === 'icon';
-  const hasInlineContent = inline && (hasLeading || hasTrailing);
-  const hasExternalAddons = !inline && (hasLeading || hasTrailing) && !hasIcons;
-
-  // Determine layout based on content
-  const needsGrid = hasIcons;
-  const needsFlex = hasInlineContent;
-  const needsExternalFlex = hasExternalAddons;
-
-  // Clone the field slot with proper classes based on layout
-  const getFieldClasses = (): string | undefined => {
-    if (labelVariant === 'inset') {
-      // Inset label - no outline on input (container handles it)
-      const textSize = {
-        sm: 'text-sm/6',
-        md: 'text-base/6',
-        lg: 'text-base/6',
-      };
-      return clsx(
-        'block w-full border-0 bg-transparent text-foreground placeholder:text-muted shadow-none',
-        textSize[size],
-        'outline-0 focus:outline-0 focus-visible:outline-0 ring-0 focus:ring-0'
-      );
-    }
-    if (needsFlex) {
-      // Inline addons - minimal padding, transparent bg
-      // Use !bg-transparent to override any bg-white from base styles
-      return clsx(
-        'block min-w-0 grow border-0 bg-transparent! text-base text-foreground shadow-none outline-hidden placeholder:text-muted sm:text-sm/6',
-        'focus:outline-hidden focus-visible:outline-hidden py-1.5',
-        hasLeading ? 'pl-1' : 'pl-0',
-        hasTrailing ? 'pr-1' : 'pr-0'
-      );
-    }
-    if (needsGrid) {
-      // Icons/buttons - needs grid positioning and padding for icons
-      const styles = getStyleConfig();
-      const iconPadding = {
-        sm: { leading: 'pl-9', trailing: 'pr-9' },
-        md: { leading: 'pl-10', trailing: 'pr-10' },
-        lg: { leading: 'pl-11', trailing: 'pr-11' },
-      };
-      return clsx(
-        styles.base,
-        error ? styles.outline.error : styles.outline.default,
-        styles.size[size],
-        'col-start-1 row-start-1',
-        hasLeading && iconPadding[size].leading,
-        hasTrailing && iconPadding[size].trailing,
-        !hasLeading && !hasTrailing && 'px-3'
-      );
-    }
-    // Default - will use InputField's own classes
-    return undefined;
-  };
-
-  const fieldSlot =
-    fieldSlotRaw && React.isValidElement(fieldSlotRaw)
-      ? React.cloneElement(fieldSlotRaw, {
-          ...(errorMessage || helperText || cornerHint
-            ? {
-                'aria-describedby': [errorMessage || helperText ? `${inputId}-error` : null, cornerHintId]
-                  .filter(Boolean)
-                  .join(' '),
-              }
-            : {}),
-          ...(required ? { 'aria-required': 'true' as const } : {}),
-          className: clsx(getFieldClasses(), (fieldSlotRaw.props as InputFieldProps).className),
-        } as Record<string, unknown>)
-      : null;
+  // The slots and the field, in a box that lays itself out from the slots it holds
+  const fields = (
+    <div className={clsx('group/input', inline ? containerStyles.inline : containerStyles.external)}>{children}</div>
+  );
 
   // Overlapping label layout
   if (labelVariant === 'overlapping') {
@@ -529,15 +490,7 @@ const InputBase = ({
       <InputContext value={contextValue}>
         <div className={clsx('relative', wrapperClassName)}>
           {renderLabel()}
-          {needsGrid ? (
-            <div className="grid grid-cols-1">
-              {fieldSlot}
-              {leadingSlot}
-              {trailingSlot}
-            </div>
-          ) : (
-            fieldSlot
-          )}
+          {fields}
           {renderHelperText()}
         </div>
       </InputContext>
@@ -563,7 +516,7 @@ const InputBase = ({
             )}
           >
             {renderLabel()}
-            {fieldSlot}
+            {children}
           </div>
           {renderHelperText()}
         </div>
@@ -571,68 +524,12 @@ const InputBase = ({
     );
   }
 
-  // Flex layout (for inline addons)
-  if (needsFlex) {
-    return (
-      <InputContext value={contextValue}>
-        <div className={clsx(wrapperClassName)}>
-          {renderLabel()}
-          <div
-            className={clsx(
-              'flex items-center bg-surface px-3 outline-1 -outline-offset-1 outline-border',
-              'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary'
-            )}
-          >
-            {leadingSlot}
-            {fieldSlot}
-            {trailingSlot}
-          </div>
-          {renderHelperText()}
-        </div>
-      </InputContext>
-    );
-  }
-
-  // Grid layout (for icons/buttons)
-  if (needsGrid) {
-    return (
-      <InputContext value={contextValue}>
-        <div className={clsx(wrapperClassName)}>
-          {renderLabel()}
-          <div className="grid grid-cols-1">
-            {fieldSlot}
-            {leadingSlot}
-            {trailingSlot}
-          </div>
-          {renderHelperText()}
-        </div>
-      </InputContext>
-    );
-  }
-
-  // External addons layout (text addons outside border)
-  if (needsExternalFlex) {
-    return (
-      <InputContext value={contextValue}>
-        <div className={clsx(wrapperClassName)}>
-          {renderLabel()}
-          <div className="flex">
-            {leadingSlot}
-            {fieldSlot}
-            {trailingSlot}
-          </div>
-          {renderHelperText()}
-        </div>
-      </InputContext>
-    );
-  }
-
-  // Standard layout (field only)
+  // Standard layout
   return (
     <InputContext value={contextValue}>
       <div className={clsx(wrapperClassName)}>
         {renderLabel()}
-        {fieldSlot}
+        {fields}
         {renderHelperText()}
       </div>
     </InputContext>

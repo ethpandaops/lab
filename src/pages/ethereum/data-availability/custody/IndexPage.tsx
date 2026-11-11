@@ -721,11 +721,13 @@ export function IndexPage(): JSX.Element {
    */
   const breadcrumbs = useMemo(() => {
     const crumbs: Array<{
+      level: DrillDownLevel['type'];
       label: string;
       onClick: () => void;
       icon: React.ComponentType<{ className?: string }>;
     }> = [
       {
+        level: 'window',
         label: `Window`,
         icon: Squares2X2Icon,
         onClick: () => {
@@ -749,6 +751,7 @@ export function IndexPage(): JSX.Element {
     ) {
       const breadcrumbLabelDate = new Date(currentLevel.date + 'T00:00:00Z');
       crumbs.push({
+        level: 'day',
         label: breadcrumbLabelDate.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -767,6 +770,7 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'hour',
         label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
@@ -786,6 +790,7 @@ export function IndexPage(): JSX.Element {
     // Add epoch breadcrumb if we're at epoch level or deeper
     if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'epoch',
         label: formatEpoch(currentLevel.epoch),
         icon: CubeIcon,
         onClick: () =>
@@ -804,6 +809,7 @@ export function IndexPage(): JSX.Element {
     // Add slot breadcrumb if we're at slot level
     if (currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'slot',
         label: formatSlot(currentLevel.slot),
         icon: Square2StackIcon,
         onClick: () =>
@@ -922,7 +928,7 @@ export function IndexPage(): JSX.Element {
                 {breadcrumbs.slice(0, -1).map((crumb, index) => {
                   const Icon = crumb.icon;
                   return (
-                    <div key={index} className="flex items-center">
+                    <div key={crumb.level} className="flex items-center">
                       {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
                       <button
                         type="button"

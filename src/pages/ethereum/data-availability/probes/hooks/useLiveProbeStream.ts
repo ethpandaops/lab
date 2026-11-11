@@ -73,10 +73,10 @@ export function useLiveProbeStream({
 
   // Use refs for frequently-updated values to avoid re-renders
   const newItemIdsRef = useRef<Set<string>>(new Set());
-  const queue = useRef<IntCustodyProbe[]>([]);
-  const seenIds = useRef<Set<string>>(new Set());
-  const dripTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lastBoundsMax = useRef<number | null>(null);
+  const queueRef = useRef<IntCustodyProbe[]>([]);
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const dripTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastBoundsMaxRef = useRef<number | null>(null);
   const hitPageLimitRef = useRef(false);
 
   // Latest filters for fetchForBounds; effects run in order, so the fetching effects below see them updated
@@ -89,7 +89,7 @@ export function useLiveProbeStream({
 
   // Drip one item from queue to display; the drip timer stops once the queue is empty
   const drip = useCallback(() => {
-    const item = queue.current.shift();
+    const item = queueRef.current.shift();
     if (item) {
       const id = getProbeId(item);
       newItemIdsRef.current.add(id);
@@ -99,9 +99,9 @@ export function useLiveProbeStream({
       setTimeout(() => newItemIdsRef.current.delete(id), 400);
     }
 
-    if (queue.current.length === 0 && dripTimer.current) {
-      clearInterval(dripTimer.current);
-      dripTimer.current = null;
+    if (queueRef.current.length === 0 && dripTimerRef.current) {
+      clearInterval(dripTimerRef.current);
+      dripTimerRef.current = null;
     }
   }, []);
 
@@ -158,24 +158,24 @@ export function useLiveProbeStream({
         const newProbes: IntCustodyProbe[] = [];
         for (const probe of probes) {
           const id = getProbeId(probe);
-          if (!seenIds.current.has(id)) {
-            seenIds.current.add(id);
+          if (!seenIdsRef.current.has(id)) {
+            seenIdsRef.current.add(id);
             newProbes.push(probe);
           }
         }
 
         if (newProbes.length > 0) {
           // Add new probes to queue (reverse so oldest drips first, newest ends at top)
-          queue.current.push(...newProbes.reverse());
+          queueRef.current.push(...newProbes.reverse());
 
           // Start dripping if not already running
-          if (!dripTimer.current) {
-            dripTimer.current = setInterval(drip, CONFIG.DRIP_INTERVAL);
+          if (!dripTimerRef.current) {
+            dripTimerRef.current = setInterval(drip, CONFIG.DRIP_INTERVAL);
           }
         }
 
         // Prune old entries from seenIds to prevent unbounded memory growth
-        pruneOldSeenIds(seenIds.current, windowStart);
+        pruneOldSeenIds(seenIdsRef.current, windowStart);
       } catch (e) {
         setError(e instanceof Error ? e : new Error('Failed to fetch'));
       }
@@ -188,8 +188,8 @@ export function useLiveProbeStream({
     if (!enabled || !bounds?.max) return;
 
     // Only fetch if bounds.max has actually changed
-    if (lastBoundsMax.current === bounds.max) return;
-    lastBoundsMax.current = bounds.max;
+    if (lastBoundsMaxRef.current === bounds.max) return;
+    lastBoundsMaxRef.current = bounds.max;
 
     fetchForBounds(bounds.max);
   }, [enabled, bounds?.max, fetchForBounds]);
@@ -199,39 +199,39 @@ export function useLiveProbeStream({
     if (enabled) return;
 
     // Stop drip timer
-    if (dripTimer.current) {
-      clearInterval(dripTimer.current);
-      dripTimer.current = null;
+    if (dripTimerRef.current) {
+      clearInterval(dripTimerRef.current);
+      dripTimerRef.current = null;
     }
 
     // Reset refs
-    queue.current = [];
-    seenIds.current.clear();
+    queueRef.current = [];
+    seenIdsRef.current.clear();
     newItemIdsRef.current.clear();
-    lastBoundsMax.current = null;
+    lastBoundsMaxRef.current = null;
     hitPageLimitRef.current = false;
   }, [enabled]);
 
   // Full reset on filter change
-  const prevFilters = useRef('');
+  const prevFiltersRef = useRef('');
   useEffect(() => {
     if (!enabled) return;
     const key = JSON.stringify(filters);
-    if (prevFilters.current === key) return;
+    if (prevFiltersRef.current === key) return;
 
     // Skip on initial mount
-    if (prevFilters.current !== '') {
+    if (prevFiltersRef.current !== '') {
       // Stop drip timer
-      if (dripTimer.current) {
-        clearInterval(dripTimer.current);
-        dripTimer.current = null;
+      if (dripTimerRef.current) {
+        clearInterval(dripTimerRef.current);
+        dripTimerRef.current = null;
       }
 
       // Clear all refs
-      seenIds.current.clear();
-      queue.current = [];
+      seenIdsRef.current.clear();
+      queueRef.current = [];
       newItemIdsRef.current.clear();
-      lastBoundsMax.current = null;
+      lastBoundsMaxRef.current = null;
       hitPageLimitRef.current = false;
 
       // Clear all state
@@ -240,12 +240,12 @@ export function useLiveProbeStream({
 
       // Fetch immediately with current bounds if available
       if (bounds?.max) {
-        lastBoundsMax.current = bounds.max;
+        lastBoundsMaxRef.current = bounds.max;
         fetchForBounds(bounds.max);
       }
     }
 
-    prevFilters.current = key;
+    prevFiltersRef.current = key;
   }, [enabled, filters, bounds?.max, fetchForBounds]);
 
   return { displayedItems, newItemIdsRef, hitPageLimitRef, error };
