@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map2D.types';
@@ -63,6 +63,14 @@ function Map2DChartComponent({
   // Memoize style and opts objects to prevent ReactECharts from seeing new props every render
   const chartStyle = useMemo(() => ({ height, width: '100%', minHeight: height }), [height]);
   const chartOpts = useMemo(() => ({ renderer: 'canvas' as const }), []);
+
+  // zrender paints thousands of points over several animation frames and keeps going after
+  // ReactECharts disposes the chart, so the next frame throws. Clearing the chart first ends
+  // that paint. A layout effect's cleanup runs before ReactECharts unmounts.
+  useLayoutEffect(() => {
+    const chart = chartRef.current;
+    return () => chart?.getEchartsInstance().clear();
+  }, []);
 
   // Load and register world map on mount - retry every 5s on failure
   useEffect(() => {
