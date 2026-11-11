@@ -71,6 +71,7 @@ src/
   utils/                              # Utility functions and helpers
   index.css                           # Entry stylesheet: fonts, tokens, utilities, base styles; Tailwind scans src
   styles/                             # tokens.css (every design token), base.css, utilities.css, token tests
+  design-docs/                        # Foundations MDX pages generated from the tokens
 ```
 
 ## Architecture

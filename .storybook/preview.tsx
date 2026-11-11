@@ -138,6 +138,7 @@ const preview: Preview = {
     options: {
       storySort: {
         method: 'alphabetical',
+        order: ['Foundations', ['Introduction', 'Colours', 'Typography', 'Layout'], '*'],
       },
     },
   },

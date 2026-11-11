@@ -36,5 +36,7 @@ paths:
    `--color-primary-15: color-mix(in oklab, var(--color-primary) 15%, transparent)`.
 2. Add a base colour to its group in `src/styles/tokens.ts`, and to a `CONTRAST_RULES` entry or to
    `CONTRAST_EXEMPT` with the reason. A derived colour goes in `DERIVED_COLORS`.
-3. `pnpm test:unit` checks the file, the colour names and tints, contrast in all three themes, and that `index.html`
-   and `ThemeProvider` give the browser each theme's background.
+3. The Foundations pages in `src/design-docs/` list every token in the namespaces they show. A new namespace needs a
+   story on the matching page.
+4. `pnpm test:unit` checks the file, the colour names and tints, contrast in all three themes, that every namespace
+   has a Foundations page, and that `index.html` and `ThemeProvider` give the browser each theme's background.

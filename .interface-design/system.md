@@ -21,7 +21,7 @@
 Every colour is a token in `src/styles/tokens.css` (rules: `.claude/rules/styling.md`); Tailwind's palette is
 removed. Each base colour is a `light-dark(light, dark)` pair, and star, a dark scheme with its own palette, sets its
 values in `html.star`. Tints (`bg-primary-10`) and derived colours (`panel`, `on-solid`, `primary-hover`) follow all
-three themes, so components never carry `dark:` variants.
+three themes, so components never carry `dark:` variants. Storybook's Foundations pages list every token.
 
 - `primary` / `secondary` / `accent` — brand
 - `background` / `surface` / `foreground` / `muted` / `border` — UI structure
