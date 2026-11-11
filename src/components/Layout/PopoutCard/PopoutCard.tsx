@@ -15,6 +15,7 @@ import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useChartDownload } from '@/hooks/useChartDownload';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getNetworkFullLabel } from '@/utils/networks';
+import { dataUrlToBlob } from '@/utils/data-url';
 import type { PopoutCardProps } from './PopoutCard.types';
 
 /**
@@ -231,10 +232,7 @@ export function PopoutCard({
       });
 
       // Step 3: Convert data URL to blob
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-
-      return blob;
+      return dataUrlToBlob(dataUrl);
     } finally {
       // Step 4: Restore icons and hide metadata
       setShowModalLogo(false);
