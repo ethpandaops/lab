@@ -4,3 +4,4 @@ src/routeTree.gen.ts
 public/mockServiceWorker.js
 public/data/
 .design-sync/
+src/lab-api/

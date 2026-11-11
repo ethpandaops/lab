@@ -9,9 +9,9 @@
 export default {
   entry: ['src/routes/**/*.tsx'],
   project: ['src/**/*.{ts,tsx,css,mdx}'],
-  // Generated from the API's OpenAPI spec; it exports every operation and type
-  // whether or not the app uses it.
-  ignore: ['src/api/**'],
+  // Generated from the CBT and lab-backend OpenAPI specs; they export every
+  // operation and type whether or not the app uses them.
+  ignore: ['src/api/**', 'src/lab-api/**'],
   ignoreDependencies: [
     // CountryFlag loads the flag SVGs with import.meta.glob on a node_modules
     // path, which knip does not resolve to the package.

@@ -20,6 +20,7 @@ export default tseslint.config(
       'coverage',
       'eslint_report.json',
       'src/api',
+      'src/lab-api',
       'storybook-static',
       'lab',
       'eslint-rules',
