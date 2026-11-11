@@ -95,7 +95,7 @@ export function ActivityStrip({ block, blockSlots }: ActivityStripProps): JSX.El
             <span
               className={clsx(
                 'flex w-full items-end overflow-hidden rounded-xs',
-                bar.before ? 'bg-border/40' : 'bg-border/60'
+                bar.before ? 'bg-border-40' : 'bg-border-60'
               )}
             >
               {!bar.before && (

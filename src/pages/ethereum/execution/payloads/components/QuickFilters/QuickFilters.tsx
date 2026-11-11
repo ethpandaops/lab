@@ -156,8 +156,8 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
               className={clsx(
                 'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
                 isActive
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-foreground hover:border-primary/40'
+                  ? 'border-primary bg-primary-10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary-40'
               )}
             >
               {preset.icon}
@@ -177,8 +177,8 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
               className={clsx(
                 'hidden items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors sm:inline-flex',
                 isActive
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-foreground hover:border-primary/40'
+                  ? 'border-primary bg-primary-10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary-40'
               )}
             >
               {preset.icon}
@@ -202,8 +202,8 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
               className={clsx(
                 'inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-xs font-medium transition-colors',
                 isActive
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-foreground hover:border-primary/40'
+                  ? 'border-primary bg-primary-10 text-primary'
+                  : 'border-border bg-surface text-foreground hover:border-primary-40'
               )}
             >
               <ClientLogo client={client.id} size={14} noLink />
@@ -223,8 +223,8 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
           className={clsx(
             'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
             isReferenceNodesActive
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-surface text-foreground hover:border-primary/40'
+              ? 'border-primary bg-primary-10 text-primary'
+              : 'border-border bg-surface text-foreground hover:border-primary-40'
           )}
         >
           <BeakerIcon className="size-4" />

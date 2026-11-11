@@ -36,8 +36,8 @@ export function EngineTimingsCard({
     return (
       <Card title="Engine API Timings">
         <div className="space-y-3">
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
         </div>
       </Card>
     );

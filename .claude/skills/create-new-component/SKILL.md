@@ -115,8 +115,8 @@ const baseClasses = 'inline-flex items-center font-semibold';
 
 // Variant classes when needed
 const variantClasses = {
-  primary: 'bg-primary text-white hover:bg-primary/90',
-  secondary: 'bg-white text-gray-900 hover:bg-gray-50',
+  primary: 'bg-primary text-on-fill hover:bg-primary-hover',
+  secondary: 'bg-surface text-foreground hover:bg-surface-hover',
 };
 
 export const ComponentName = forwardRef<HTMLElement, ComponentNameProps>(
@@ -312,12 +312,12 @@ const sizeClasses = {
 ### Interactive States
 
 ```tsx
+// primary-hover is a light-dark() token, so no dark: variant is needed
 const baseClasses = `
   inline-flex items-center
-  hover:bg-primary/90
+  hover:bg-primary-hover
   focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
   disabled:cursor-not-allowed disabled:opacity-50
-  dark:hover:bg-primary/80
 `;
 ```
 
@@ -327,16 +327,16 @@ const baseClasses = `
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react';
 
 <Listbox value={value} onChange={onChange}>
-  <ListboxButton className="relative cursor-pointer rounded-lg">
+  <ListboxButton className="relative cursor-pointer rounded-sm">
     {/* Button content */}
   </ListboxButton>
 
-  <ListboxOptions className="absolute z-[9999] mt-1 rounded-lg border">
+  <ListboxOptions className="absolute z-9999 mt-1 rounded-sm border">
     {options.map((option, index) => (
       <ListboxOption
         key={index}
         value={option.value}
-        className="data-focus:bg-primary/10 data-selected:text-primary"
+        className="data-focus:bg-primary-10 data-selected:text-primary"
       >
         {option.label}
       </ListboxOption>

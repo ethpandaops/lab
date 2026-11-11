@@ -7,7 +7,7 @@ const meta: Meta<typeof Popover> = {
   component: Popover,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -26,13 +26,13 @@ export const Default: Story = {
     <Popover className="relative">
       <PopoverButton variant="primary">Solutions</PopoverButton>
       <PopoverPanel anchor="bottom" className="flex flex-col">
-        <a href="#analytics" className="px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+        <a href="#analytics" className="px-3 py-2 text-sm text-foreground hover:bg-primary-10">
           Analytics
         </a>
-        <a href="#engagement" className="px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+        <a href="#engagement" className="px-3 py-2 text-sm text-foreground hover:bg-primary-10">
           Engagement
         </a>
-        <a href="#security" className="px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+        <a href="#security" className="px-3 py-2 text-sm text-foreground hover:bg-primary-10">
           Security
         </a>
       </PopoverPanel>
@@ -50,13 +50,13 @@ export const WithButtonVariants: Story = {
         Menu
       </PopoverButton>
       <PopoverPanel anchor="bottom" className="w-48">
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Profile
         </button>
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Settings
         </button>
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Sign out
         </button>
       </PopoverPanel>
@@ -74,13 +74,13 @@ export const WithIconButton: Story = {
         Settings
       </PopoverButton>
       <PopoverPanel anchor="bottom" className="w-48">
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Account
         </button>
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Privacy
         </button>
-        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary/10">
+        <button type="button" className="w-full px-3 py-2 text-left text-sm text-foreground hover:bg-primary-10">
           Notifications
         </button>
       </PopoverPanel>
@@ -97,10 +97,10 @@ export const PositionedTop: Story = {
       <Popover className="relative">
         <PopoverButton variant="outline">Open Above</PopoverButton>
         <PopoverPanel anchor="top" className="mb-2 flex flex-col">
-          <a href="#item1" className="px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item1" className="px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 1
           </a>
-          <a href="#item2" className="px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item2" className="px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 2
           </a>
         </PopoverPanel>
@@ -120,10 +120,10 @@ export const ButtonSizes: Story = {
           Small
         </PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#option1" className="block px-3 py-2 text-xs text-foreground hover:bg-primary/10">
+          <a href="#option1" className="block px-3 py-2 text-xs text-foreground hover:bg-primary-10">
             Option 1
           </a>
-          <a href="#option2" className="block px-3 py-2 text-xs text-foreground hover:bg-primary/10">
+          <a href="#option2" className="block px-3 py-2 text-xs text-foreground hover:bg-primary-10">
             Option 2
           </a>
         </PopoverPanel>
@@ -134,10 +134,10 @@ export const ButtonSizes: Story = {
           Medium
         </PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#option1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#option1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Option 1
           </a>
-          <a href="#option2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#option2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Option 2
           </a>
         </PopoverPanel>
@@ -148,10 +148,10 @@ export const ButtonSizes: Story = {
           Large
         </PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#option1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#option1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Option 1
           </a>
-          <a href="#option2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#option2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Option 2
           </a>
         </PopoverPanel>
@@ -175,15 +175,15 @@ export const RichContent: Story = {
           <p className="text-xs text-muted">Explore our product offerings</p>
         </div>
         <div>
-          <a href="#product1" className="group flex flex-col px-3 py-2 hover:bg-primary/10">
+          <a href="#product1" className="group flex flex-col px-3 py-2 hover:bg-primary-10">
             <span className="text-sm font-medium text-foreground group-hover:text-primary">Analytics</span>
             <span className="text-xs text-muted">Get insights into your data</span>
           </a>
-          <a href="#product2" className="group flex flex-col px-3 py-2 hover:bg-primary/10">
+          <a href="#product2" className="group flex flex-col px-3 py-2 hover:bg-primary-10">
             <span className="text-sm font-medium text-foreground group-hover:text-primary">Automation</span>
             <span className="text-xs text-muted">Streamline your workflows</span>
           </a>
-          <a href="#product3" className="group flex flex-col px-3 py-2 hover:bg-primary/10">
+          <a href="#product3" className="group flex flex-col px-3 py-2 hover:bg-primary-10">
             <span className="text-sm font-medium text-foreground group-hover:text-primary">Reports</span>
             <span className="text-xs text-muted">Create beautiful reports</span>
           </a>
@@ -202,10 +202,10 @@ export const MultiplePopovers: Story = {
       <Popover className="relative">
         <PopoverButton variant="primary">Menu 1</PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 1A
           </a>
-          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 1B
           </a>
         </PopoverPanel>
@@ -214,10 +214,10 @@ export const MultiplePopovers: Story = {
       <Popover className="relative">
         <PopoverButton variant="secondary">Menu 2</PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 2A
           </a>
-          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 2B
           </a>
         </PopoverPanel>
@@ -226,10 +226,10 @@ export const MultiplePopovers: Story = {
       <Popover className="relative">
         <PopoverButton variant="outline">Menu 3</PopoverButton>
         <PopoverPanel anchor="bottom">
-          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item1" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 3A
           </a>
-          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/10">
+          <a href="#item2" className="block px-3 py-2 text-sm text-foreground hover:bg-primary-10">
             Item 3B
           </a>
         </PopoverPanel>

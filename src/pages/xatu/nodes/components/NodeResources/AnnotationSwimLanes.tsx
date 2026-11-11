@@ -170,7 +170,7 @@ export function AnnotationSwimLanes({
           >
             {lane.label}
           </span>
-          <div className="relative grow bg-foreground/[0.03]" style={{ height: 10, borderRadius: 2 }}>
+          <div className="relative grow bg-foreground-3" style={{ height: 10, borderRadius: 2 }}>
             {lane.marks.map((mark, i) => (
               <div
                 key={i}

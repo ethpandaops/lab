@@ -206,7 +206,7 @@ export function ProbesView({
   const getRowClassName = useCallback(
     (_probe: CustodyProbe, rowId: string): string | undefined => {
       if (isLive && newItemIdsRef?.current?.has(rowId)) {
-        return 'animate-[row-new_0.3s_ease-out]';
+        return 'animate-row-new';
       }
       return undefined;
     },
@@ -230,7 +230,7 @@ export function ProbesView({
               e.stopPropagation();
               handleOpenDetails(info.row.original);
             }}
-            className="!p-1"
+            className="p-1!"
           >
             <EyeIcon className="size-3" />
           </Button>
@@ -294,10 +294,10 @@ export function ProbesView({
               <div
                 className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
-                    ? 'bg-success/10 text-success'
+                    ? 'bg-success-10 text-success'
                     : isFailure
-                      ? 'bg-warning/10 text-warning'
-                      : 'bg-danger/10 text-danger'
+                      ? 'bg-warning-10 text-warning'
+                      : 'bg-danger-10 text-danger'
                 }`}
               >
                 {icon}
@@ -698,7 +698,7 @@ export function ProbesView({
               size="sm"
               aria-pressed={isLive}
               onClick={onLiveModeToggle}
-              className={isLive ? 'bg-success/10! text-success! inset-ring-success/50!' : 'text-muted!'}
+              className={isLive ? 'bg-success-10! text-success! inset-ring-success-50!' : 'text-muted!'}
               leadingIcon={isLive ? <PauseIcon /> : <PlayIcon />}
             >
               {isLive && <span className="size-2 rounded-full bg-success" />}
@@ -719,7 +719,7 @@ export function ProbesView({
 
       {/* Live mode indicator bar */}
       {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-success/30 bg-success/10 px-4 py-2">
+        <div className="mb-4 flex items-center rounded-sm border border-success-30 bg-success-10 px-4 py-2">
           <div className="flex items-center gap-3">
             <SignalIcon className="size-5 text-success" />
             <div>
@@ -732,7 +732,7 @@ export function ProbesView({
 
       {/* Learn More Dialog */}
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About Custody Probes" size="lg">
-        <div className="space-y-4 text-sm leading-relaxed text-muted">
+        <div className="space-y-4 text-sm/relaxed text-muted">
           <p>
             <span className="font-medium text-foreground">
               Custody probes verify that peers are storing the data they claim.
@@ -741,7 +741,7 @@ export function ProbesView({
             commitments.
           </p>
           <p>The prober, a Xatu node, requests data from a peer.</p>
-          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+          <div className="rounded-sm border border-accent-20 bg-accent-5 p-3">
             <p className="text-foreground">
               <span className="font-medium">Result meanings:</span>
             </p>

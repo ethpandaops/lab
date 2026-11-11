@@ -14,12 +14,12 @@ export function TimelineGrid({ labelWidth }: TimelineGridProps): JSX.Element {
       {[0, 2, 4, 6, 8, 10, 12].map(sec => (
         <div
           key={sec}
-          className={clsx('absolute top-0 h-full border-l', sec === 4 ? 'border-success/50' : 'border-border/50')}
+          className={clsx('absolute top-0 h-full border-l', sec === 4 ? 'border-success-50' : 'border-border-50')}
           style={{ left: `${(sec / 12) * 100}%` }}
         />
       ))}
       {/* Attestation deadline highlight */}
-      <div className="absolute top-0 h-full bg-success/5" style={{ left: 0, width: `${(4 / 12) * 100}%` }} />
+      <div className="absolute top-0 h-full bg-success-5" style={{ left: 0, width: `${(4 / 12) * 100}%` }} />
     </div>
   );
 }

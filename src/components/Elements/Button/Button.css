@@ -1,37 +1,19 @@
-/* Hyper Button Animation - Pulsating Border Effect using Tailwind v4 */
+/* Hyper Button Animation - Pulsating Border Effect. --color-hyper is a light-dark() pair in tokens.css. */
 
 @keyframes hyper-pulse {
   0%,
   100% {
     box-shadow:
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 70%, transparent),
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 40%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-cyan-500) 50%, transparent);
+      0 0 0 0 color-mix(in srgb, var(--color-hyper) 70%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--color-hyper) 40%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-hyper) 50%, transparent);
     transform: scale(1);
   }
   50% {
     box-shadow:
       0 0 0 4px transparent,
       0 0 0 8px transparent,
-      inset 0 0 0 1px var(--color-cyan-500);
-    transform: scale(1.02);
-  }
-}
-
-@keyframes hyper-pulse-dark {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 70%, transparent),
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 40%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-cyan-400) 50%, transparent);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow:
-      0 0 0 4px transparent,
-      0 0 0 8px transparent,
-      inset 0 0 0 1px var(--color-cyan-400);
+      inset 0 0 0 1px var(--color-hyper);
     transform: scale(1.02);
   }
 }
@@ -41,27 +23,13 @@
   0%,
   100% {
     box-shadow:
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-500) 0%, transparent),
-      0 0 8px 0 color-mix(in srgb, var(--color-cyan-500) 0%, transparent);
+      0 0 0 0 color-mix(in srgb, var(--color-hyper) 0%, transparent),
+      0 0 8px 0 color-mix(in srgb, var(--color-hyper) 0%, transparent);
   }
   50% {
     box-shadow:
-      0 0 12px 2px color-mix(in srgb, var(--color-cyan-500) 40%, transparent),
-      0 0 20px 4px color-mix(in srgb, var(--color-cyan-500) 20%, transparent);
-  }
-}
-
-@keyframes hyper-pulse-blank-dark {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 0 color-mix(in srgb, var(--color-cyan-400) 0%, transparent),
-      0 0 8px 0 color-mix(in srgb, var(--color-cyan-400) 0%, transparent);
-  }
-  50% {
-    box-shadow:
-      0 0 12px 2px color-mix(in srgb, var(--color-cyan-400) 40%, transparent),
-      0 0 20px 4px color-mix(in srgb, var(--color-cyan-400) 20%, transparent);
+      0 0 12px 2px color-mix(in srgb, var(--color-hyper) 40%, transparent),
+      0 0 20px 4px color-mix(in srgb, var(--color-hyper) 20%, transparent);
   }
 }
 
@@ -85,27 +53,15 @@
   }
 }
 
-.button-hyper {
+@utility button-hyper {
   animation:
     hyper-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite,
     hyper-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.dark .button-hyper {
-  animation:
-    hyper-pulse-dark 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite,
-    hyper-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
 /* Special animation for blank variant - pulsating outer glow */
-.button-hyper-blank {
+@utility button-hyper-blank {
   animation:
     hyper-pulse-blank 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite,
-    hyper-glow-blank 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.dark .button-hyper-blank {
-  animation:
-    hyper-pulse-blank-dark 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite,
     hyper-glow-blank 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

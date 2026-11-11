@@ -8,10 +8,10 @@ import { TableColGroup } from './TableColGroup';
  */
 export function ContractTop100ListSkeleton(): JSX.Element {
   return (
-    <table className="w-full min-w-[600px] table-fixed border-collapse">
+    <table className="w-full min-w-150 table-fixed border-collapse">
       <TableColGroup />
       <thead className="sticky top-0 z-10 bg-surface">
-        <tr className="border-b border-border/50 text-2xs font-medium text-muted">
+        <tr className="border-b border-border-50 text-2xs font-medium text-muted">
           <th className="px-2 py-1.5 text-center">#</th>
           <th className="px-2 py-1.5 text-left">Contract</th>
           <th className="px-2 py-1.5 text-left">Owner</th>
@@ -20,7 +20,7 @@ export function ContractTop100ListSkeleton(): JSX.Element {
           <th className="px-2 py-1.5 text-right">2y Expiry</th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-border/50">
+      <tbody className="divide-y divide-border-50">
         {Array.from({ length: 8 }).map((_, i) => (
           <tr key={i}>
             <td className="px-2 py-1.5 text-center">
@@ -60,7 +60,7 @@ export function ContractTop100ListSkeletonMobile(): JSX.Element {
   return (
     <div>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="border-b border-border/50 px-3 py-3">
+        <div key={i} className="border-b border-border-50 px-3 py-3">
           <div className="flex items-start gap-3">
             {/* Rank badge skeleton */}
             <LoadingContainer className="size-7 shrink-0 rounded-xs" />

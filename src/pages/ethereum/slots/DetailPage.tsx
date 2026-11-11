@@ -460,7 +460,7 @@ export function DetailPage(): JSX.Element {
                 }}
                 aria-label="View Custody"
                 title="View Custody"
-                className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+                className="flex items-center gap-1.5 rounded-sm border border-accent-30 bg-accent-10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent-50 hover:bg-accent-20"
               >
                 <EyeIcon className="size-4" />
                 <span className="hidden sm:inline">View Custody</span>
@@ -472,7 +472,7 @@ export function DetailPage(): JSX.Element {
           search={{ slot }}
           aria-label="Xatu node resources"
           title="Xatu node resources"
-          className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+          className="flex items-center gap-1.5 rounded-sm border border-accent-30 bg-accent-10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent-50 hover:bg-accent-20"
         >
           <CpuChipIcon className="size-4" />
           <span className="hidden sm:inline">Xatu node resources</span>
@@ -911,7 +911,7 @@ export function DetailPage(): JSX.Element {
                           {blobDetails.map(blob => (
                             <div
                               key={`${blob.block_root}-${blob.blob_index}`}
-                              className="flex flex-col gap-2 rounded-sm border border-border bg-surface/50 p-4"
+                              className="flex flex-col gap-2 rounded-sm border border-border bg-surface-50 p-4"
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <span className="font-medium text-foreground">Blob {blob.blob_index}</span>
@@ -946,14 +946,14 @@ export function DetailPage(): JSX.Element {
                           {blobSubmitters.map((submitter, index) => (
                             <div
                               key={submitter.transaction_hash ?? index}
-                              className="flex items-center gap-4 rounded-sm border border-border bg-surface/50 p-4"
+                              className="flex items-center gap-4 rounded-sm border border-border bg-surface-50 p-4"
                             >
                               {/* Logo and Name */}
                               <div className="flex items-center gap-3">
                                 {submitter.name && submitter.name !== 'Unknown' ? (
                                   <BlobPosterLogo poster={submitter.name} size={32} />
                                 ) : (
-                                  <div className="flex size-8 items-center justify-center rounded-xs bg-muted/20">
+                                  <div className="flex size-8 items-center justify-center rounded-xs bg-muted-20">
                                     <QuestionMarkCircleIcon className="size-5 text-muted" />
                                   </div>
                                 )}

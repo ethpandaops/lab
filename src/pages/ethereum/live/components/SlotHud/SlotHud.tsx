@@ -49,15 +49,15 @@ function gweiOrNull(wei: string | null | undefined): number | null {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
-  orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
-  missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
+  canonical: { label: 'Proposed', cls: 'border-success-40 bg-success-10 text-success' },
+  orphaned: { label: 'Orphaned', cls: 'border-warning-40 bg-warning-10 text-warning' },
+  missed: { label: 'Missed', cls: 'border-danger-40 bg-danger-10 text-danger' },
 };
 
 const PAYLOAD_STATUS_META: Record<PayloadStatus, { label: string; cls: string }> = {
-  payload_present: { label: 'Delivered', cls: 'border-success/40 bg-success/10 text-success' },
-  payload_late: { label: 'Late', cls: 'border-warning/40 bg-warning/10 text-warning' },
-  payload_withheld: { label: 'Withheld', cls: 'border-danger/40 bg-danger/10 text-danger' },
+  payload_present: { label: 'Delivered', cls: 'border-success-40 bg-success-10 text-success' },
+  payload_late: { label: 'Late', cls: 'border-warning-40 bg-warning-10 text-warning' },
+  payload_withheld: { label: 'Withheld', cls: 'border-danger-40 bg-danger-10 text-danger' },
   pending: { label: 'Pending', cls: 'border-border bg-surface text-muted' },
 };
 
@@ -168,9 +168,9 @@ export function SlotHud({
   const blockType = bd ? (mevEth ? 'mev-boost' : 'self-built') : null;
 
   return (
-    <div className={clsx('flex h-[96px] w-full items-stretch', className)}>
+    <div className={clsx('flex h-24 w-full items-stretch', className)}>
       {/* Validation race — 7870 reference nodes */}
-      <Section title="Validation / 7870" className="flex-[1.3]">
+      <Section title="Validation / 7870" className="flex-share-13">
         <div className="flex flex-col gap-px">
           {clients.map((row, i) => (
             <Fade
@@ -323,7 +323,7 @@ export function SlotHud({
       {/* Block */}
       <Section
         title="Block"
-        className="flex-[0.9]"
+        className="flex-share-9"
         accessory={
           statusMeta ? (
             <Fade active={blockActive} className="ml-auto">

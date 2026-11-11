@@ -57,7 +57,7 @@ export function ForkCountdownSkeleton(): React.JSX.Element {
           <div key={unit} className="flex items-center gap-4">
             {index > 0 && <Separator />}
             <div className="text-center">
-              <div className="h-12 w-16 animate-pulse rounded-xs bg-muted/20"></div>
+              <div className="h-12 w-16 animate-pulse rounded-xs bg-muted-20"></div>
               <div className="mt-1 text-xs text-muted">{unit}</div>
             </div>
           </div>

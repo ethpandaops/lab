@@ -20,7 +20,7 @@ export function ClientLogo({
   if (hasError || client.toLowerCase() === 'unknown') {
     return (
       <div
-        className={`flex items-center justify-center rounded-sm bg-muted/50 text-muted ${className}`}
+        className={`flex items-center justify-center rounded-sm bg-muted-50 text-muted ${className}`}
         style={{ width: `${size}px`, height: `${size}px` }}
         title={client}
       >
@@ -36,7 +36,7 @@ export function ClientLogo({
       alt={decorative ? '' : client}
       className={clsx(
         'rounded-sm',
-        LIGHT_GLYPH_CLIENTS.has(normalizeClientName(client)) && 'invert dark:invert-0 star:invert-0',
+        LIGHT_GLYPH_CLIENTS.has(normalizeClientName(client)) && 'invert on-dark:invert-0',
         !linked && className
       )}
       style={{ width: `${size}px`, height: `${size}px` }}

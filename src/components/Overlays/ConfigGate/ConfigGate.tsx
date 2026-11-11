@@ -48,7 +48,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
           {errorMessage && <p className="mt-2 max-w-md text-center text-sm text-muted">{errorMessage}</p>}
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-white transition-colors hover:bg-danger/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8 dark:text-background"
+            className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-on-solid transition-colors hover:bg-danger-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8"
           >
             Reload Page
           </button>

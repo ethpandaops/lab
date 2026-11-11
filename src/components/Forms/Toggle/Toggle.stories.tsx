@@ -32,7 +32,7 @@ export const ThemeToggle: Story = {
     <ToggleWrapper
       leftIcon={<SunIcon />}
       rightIcon={<MoonIcon />}
-      leftColor="text-amber-500"
+      leftColor="text-data-amber"
       rightColor="text-primary"
       srLabel="Toggle theme"
     />
@@ -64,7 +64,7 @@ export const OnDarkBackground: Story = {
       <ToggleWrapper
         leftIcon={<SunIcon />}
         rightIcon={<MoonIcon />}
-        leftColor="text-amber-500"
+        leftColor="text-data-amber"
         rightColor="text-primary"
         srLabel="Toggle theme"
       />
@@ -78,7 +78,7 @@ export const SmallSize: Story = {
     <ToggleWrapper
       leftIcon={<SunIcon />}
       rightIcon={<MoonIcon />}
-      leftColor="text-amber-500"
+      leftColor="text-data-amber"
       rightColor="text-primary"
       srLabel="Toggle theme"
       size="small"
@@ -100,7 +100,7 @@ export const SizeComparison: Story = {
         <ToggleWrapper
           leftIcon={<SunIcon />}
           rightIcon={<MoonIcon />}
-          leftColor="text-amber-500"
+          leftColor="text-data-amber"
           rightColor="text-primary"
           srLabel="Toggle theme default"
         />
@@ -110,7 +110,7 @@ export const SizeComparison: Story = {
         <ToggleWrapper
           leftIcon={<SunIcon />}
           rightIcon={<MoonIcon />}
-          leftColor="text-amber-500"
+          leftColor="text-data-amber"
           rightColor="text-primary"
           srLabel="Toggle theme small"
           size="small"
@@ -130,7 +130,7 @@ export const Rounded: Story = {
     <ToggleWrapper
       leftIcon={<SunIcon />}
       rightIcon={<MoonIcon />}
-      leftColor="text-amber-500"
+      leftColor="text-data-amber"
       rightColor="text-primary"
       srLabel="Toggle theme"
       rounded
@@ -150,7 +150,7 @@ export const RoundedComparison: Story = {
         <ToggleWrapper
           leftIcon={<SunIcon />}
           rightIcon={<MoonIcon />}
-          leftColor="text-amber-500"
+          leftColor="text-data-amber"
           rightColor="text-primary"
           srLabel="Toggle without rounded"
         />
@@ -160,7 +160,7 @@ export const RoundedComparison: Story = {
         <ToggleWrapper
           leftIcon={<SunIcon />}
           rightIcon={<MoonIcon />}
-          leftColor="text-amber-500"
+          leftColor="text-data-amber"
           rightColor="text-primary"
           srLabel="Toggle with rounded"
           rounded

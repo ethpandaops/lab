@@ -1253,7 +1253,7 @@ export function MultiLineChart({
           <button
             onClick={() => setShowAggregate(!showAggregate)}
             className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-              showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+              showAggregate ? 'bg-muted-20 text-foreground' : 'text-muted hover:bg-muted-10'
             }`}
           >
             {showAggregate ? '✓' : '○'} {aggregateSeriesName}
@@ -1261,7 +1261,7 @@ export function MultiLineChart({
         </div>
       )}
       {/* One wrapping row: each group is a muted name followed by its series */}
-      <div className="flex max-h-[200px] flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
+      <div className="flex max-h-50 flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
         {legendGroups.map(group => (
           <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
             {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
@@ -1273,8 +1273,8 @@ export function MultiLineChart({
                   key={s.name}
                   onClick={() => toggleSeries(s.name)}
                   aria-pressed={isVisible}
-                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
-                    isVisible ? 'text-foreground' : 'text-muted/60'
+                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted-10 ${
+                    isVisible ? 'text-foreground' : 'text-muted-60'
                   }`}
                 >
                   <LegendSwatch series={s} color={seriesColor} active={isVisible} />
@@ -1327,7 +1327,7 @@ export function MultiLineChart({
                       setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
                     }
                   }}
-                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
+                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted-10 hover:text-foreground"
                 >
                   Show All
                 </span>
@@ -1349,20 +1349,20 @@ export function MultiLineChart({
             <div className="mb-3 flex gap-2">
               <button
                 onClick={selectAllFiltered}
-                className="bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                className="bg-primary-10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary-20"
               >
                 Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
               </button>
               <button
                 onClick={clearAllFiltered}
-                className="bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
+                className="bg-muted-10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted-20"
               >
                 Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
               </button>
             </div>
 
             {/* Series checkboxes */}
-            <div className="max-h-[300px] space-y-1 overflow-y-auto">
+            <div className="max-h-75 space-y-1 overflow-y-auto">
               {filteredSeriesBySearch.length === 0 ? (
                 <div className="py-4 text-center text-sm text-muted">No series match your search</div>
               ) : (
@@ -1372,7 +1372,7 @@ export function MultiLineChart({
                   return (
                     <label
                       key={s.name}
-                      className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors"
+                      className="flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
                     >
                       <input
                         type="checkbox"

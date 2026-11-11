@@ -9,7 +9,7 @@ export interface Stat {
   name: ReactNode;
   value: ReactNode;
   icon?: ForwardRefExoticComponent<SVGProps<SVGSVGElement>>;
-  /** Custom CSS class for the value text (e.g. 'text-red-500' for colored values) */
+  /** Custom CSS class for the value text (e.g. 'text-danger' for colored values) */
   valueClassName?: string;
   /** Subtitle text displayed below the value */
   subtitle?: ReactNode;

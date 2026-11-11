@@ -216,24 +216,24 @@ export function getOpcodeCategory(opcode: string): string {
  * Hex to Tailwind class mapping for FlameGraph compatibility
  */
 const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
-  [DATA_COLORS.amber]: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber/80' },
-  [DATA_COLORS.indigo]: { bg: 'bg-data-indigo', hover: 'hover:bg-data-indigo/80' },
-  [DATA_COLORS.violet]: { bg: 'bg-data-violet', hover: 'hover:bg-data-violet/80' },
-  [DATA_COLORS.cyan]: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan/80' },
-  [DATA_COLORS.teal]: { bg: 'bg-data-teal', hover: 'hover:bg-data-teal/80' },
-  [DATA_COLORS.blue]: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue/80' },
-  [DATA_COLORS.purple]: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple/80' },
-  [DATA_COLORS.green]: { bg: 'bg-data-green', hover: 'hover:bg-data-green/80' },
-  [DATA_COLORS.red]: { bg: 'bg-data-red', hover: 'hover:bg-data-red/80' },
-  [DATA_COLORS.pink]: { bg: 'bg-data-pink', hover: 'hover:bg-data-pink/80' },
-  [DATA_COLORS.orange]: { bg: 'bg-data-orange', hover: 'hover:bg-data-orange/80' },
-  [DATA_COLORS.slate]: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
-  '#78716c': { bg: 'bg-stone-500', hover: 'hover:bg-stone-400' },
-  [DATA_COLORS.lime]: { bg: 'bg-data-lime', hover: 'hover:bg-data-lime/80' },
-  [DATA_COLORS.yellow]: { bg: 'bg-data-yellow', hover: 'hover:bg-data-yellow/80' },
-  [DATA_COLORS.sky]: { bg: 'bg-data-sky', hover: 'hover:bg-data-sky/80' },
-  [DATA_COLORS.emerald]: { bg: 'bg-data-emerald', hover: 'hover:bg-data-emerald/80' },
-  [DATA_COLORS.fuchsia]: { bg: 'bg-data-fuchsia', hover: 'hover:bg-data-fuchsia/80' },
+  [DATA_COLORS.amber]: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber-80' },
+  [DATA_COLORS.indigo]: { bg: 'bg-data-indigo', hover: 'hover:bg-data-indigo-80' },
+  [DATA_COLORS.violet]: { bg: 'bg-data-violet', hover: 'hover:bg-data-violet-80' },
+  [DATA_COLORS.cyan]: { bg: 'bg-data-cyan', hover: 'hover:bg-data-cyan-80' },
+  [DATA_COLORS.teal]: { bg: 'bg-data-teal', hover: 'hover:bg-data-teal-80' },
+  [DATA_COLORS.blue]: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue-80' },
+  [DATA_COLORS.purple]: { bg: 'bg-data-purple', hover: 'hover:bg-data-purple-80' },
+  [DATA_COLORS.green]: { bg: 'bg-data-green', hover: 'hover:bg-data-green-80' },
+  [DATA_COLORS.red]: { bg: 'bg-data-red', hover: 'hover:bg-data-red-80' },
+  [DATA_COLORS.pink]: { bg: 'bg-data-pink', hover: 'hover:bg-data-pink-80' },
+  [DATA_COLORS.orange]: { bg: 'bg-data-orange', hover: 'hover:bg-data-orange-80' },
+  [DATA_COLORS.slate]: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' },
+  '#78716c': { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' },
+  [DATA_COLORS.lime]: { bg: 'bg-data-lime', hover: 'hover:bg-data-lime-80' },
+  [DATA_COLORS.yellow]: { bg: 'bg-data-yellow', hover: 'hover:bg-data-yellow-80' },
+  [DATA_COLORS.sky]: { bg: 'bg-data-sky', hover: 'hover:bg-data-sky-80' },
+  [DATA_COLORS.emerald]: { bg: 'bg-data-emerald', hover: 'hover:bg-data-emerald-80' },
+  [DATA_COLORS.fuchsia]: { bg: 'bg-data-fuchsia', hover: 'hover:bg-data-fuchsia-80' },
 };
 
 /**
@@ -242,7 +242,7 @@ const HEX_TO_TAILWIND: Record<string, { bg: string; hover: string }> = {
 export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
   Object.entries(CALL_TYPE_COLORS).map(([key, hex]) => [
     key,
-    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' },
   ])
 );
 
@@ -252,7 +252,7 @@ export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: s
 const FLAME_GRAPH_CATEGORY_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
   Object.entries(CATEGORY_COLORS).map(([key, hex]) => [
     key,
-    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },
+    HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' },
   ])
 );
 

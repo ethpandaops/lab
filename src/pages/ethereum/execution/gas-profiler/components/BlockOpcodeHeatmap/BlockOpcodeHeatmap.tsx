@@ -42,13 +42,13 @@ interface BlockOpcodeHeatmapProps {
  */
 function getColorIntensity(gas: number, maxGas: number): string {
   const ratio = maxGas > 0 ? gas / maxGas : 0;
-  if (ratio === 0) return 'bg-data-indigo/5';
-  if (ratio < 0.1) return 'bg-data-indigo/15';
-  if (ratio < 0.25) return 'bg-data-indigo/25';
-  if (ratio < 0.4) return 'bg-data-indigo/40';
-  if (ratio < 0.55) return 'bg-data-indigo/55';
-  if (ratio < 0.7) return 'bg-data-indigo/70';
-  if (ratio < 0.85) return 'bg-data-indigo/85';
+  if (ratio === 0) return 'bg-data-indigo-5';
+  if (ratio < 0.1) return 'bg-data-indigo-15';
+  if (ratio < 0.25) return 'bg-data-indigo-25';
+  if (ratio < 0.4) return 'bg-data-indigo-40';
+  if (ratio < 0.55) return 'bg-data-indigo-55';
+  if (ratio < 0.7) return 'bg-data-indigo-70';
+  if (ratio < 0.85) return 'bg-data-indigo-85';
   return 'bg-data-indigo';
 }
 
@@ -61,12 +61,12 @@ function Legend({ opcodeCount }: { opcodeCount: number }): JSX.Element {
       <div className="flex items-center gap-2 text-xs text-muted">
         <span>Low</span>
         <div className="flex gap-px">
-          <div className="size-3 bg-data-indigo/15" />
-          <div className="size-3 bg-data-indigo/25" />
-          <div className="size-3 bg-data-indigo/40" />
-          <div className="size-3 bg-data-indigo/55" />
-          <div className="size-3 bg-data-indigo/70" />
-          <div className="size-3 bg-data-indigo/85" />
+          <div className="size-3 bg-data-indigo-15" />
+          <div className="size-3 bg-data-indigo-25" />
+          <div className="size-3 bg-data-indigo-40" />
+          <div className="size-3 bg-data-indigo-55" />
+          <div className="size-3 bg-data-indigo-70" />
+          <div className="size-3 bg-data-indigo-85" />
           <div className="size-3 bg-data-indigo" />
         </div>
         <span>High</span>
@@ -164,7 +164,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
                     {/* Cell */}
                     <div
                       ref={el => setCellRef(opcode, el)}
-                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
+                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo-60' : ''}`}
                       onMouseEnter={() => setHoveredOpcode(opcode)}
                       onMouseLeave={() => setHoveredOpcode(null)}
                     />
@@ -194,7 +194,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>
@@ -441,7 +441,7 @@ function TransactionsViewHeatmap({
                             <div
                               key={opcode}
                               ref={el => setCellRef(cellKey, el)}
-                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
+                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo-60' : ''}`}
                               onMouseEnter={() => gas > 0 && setHoveredCell({ txHash, opcode })}
                               onMouseLeave={() => setHoveredCell(null)}
                             />
@@ -469,7 +469,7 @@ function TransactionsViewHeatmap({
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredCell.opcode}</div>
@@ -532,8 +532,8 @@ export function BlockOpcodeHeatmap({
         onClick={() => setViewMode('block')}
         className={`px-3 py-1 text-xs font-medium transition-colors ${
           viewMode === 'block'
-            ? 'bg-primary text-white'
-            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+            ? 'bg-primary text-on-fill'
+            : 'bg-surface text-muted hover:bg-surface-80 hover:text-foreground'
         }`}
       >
         Block
@@ -542,8 +542,8 @@ export function BlockOpcodeHeatmap({
         onClick={() => setViewMode('transactions')}
         className={`border-l border-border px-3 py-1 text-xs font-medium transition-colors ${
           viewMode === 'transactions'
-            ? 'bg-primary text-white'
-            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+            ? 'bg-primary text-on-fill'
+            : 'bg-surface text-muted hover:bg-surface-80 hover:text-foreground'
         }`}
       >
         By Transaction

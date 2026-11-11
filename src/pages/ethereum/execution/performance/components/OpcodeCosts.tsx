@@ -140,7 +140,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
                 <tr>
                   <td colSpan={3 + model.clients.length} className="px-1 pt-4 pb-1.5">
                     {/* Stays in view and wraps inside it while the matrix scrolls sideways */}
-                    <div className="sticky left-1 flex max-w-[calc(100vw-5rem)] flex-wrap gap-x-2 text-xs">
+                    <div className="sticky left-1 flex max-w-vw-less-20 flex-wrap gap-x-2 text-xs">
                       <span className="font-semibold text-foreground">{section.title}</span>
                       {section.note && <span className="text-muted">{section.note}</span>}
                     </div>

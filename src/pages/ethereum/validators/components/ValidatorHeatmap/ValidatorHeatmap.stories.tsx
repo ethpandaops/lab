@@ -179,7 +179,7 @@ function SkeletonPreview({ rows, height, showChrome, loading }: SkeletonPreviewP
         <div className="mb-4 flex items-center gap-3">
           <button
             type="button"
-            className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary-80"
           >
             <ArrowLeftIcon className="size-4" />
             Back to daily view
@@ -221,7 +221,7 @@ const meta = {
   component: SkeletonPreview,
   decorators: [
     (Story: React.ComponentType) => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

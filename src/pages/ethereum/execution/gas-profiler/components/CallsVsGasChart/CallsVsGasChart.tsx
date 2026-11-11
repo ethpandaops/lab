@@ -129,7 +129,7 @@ export function CallsVsGasChart({
                 onClick={() => setUseLogScale(!useLogScale)}
                 className={clsx(
                   'rounded-xs px-2 py-1 text-xs transition-colors',
-                  useLogScale ? 'bg-primary/10 text-primary' : 'bg-surface text-muted hover:text-foreground'
+                  useLogScale ? 'bg-primary-10 text-primary' : 'bg-surface text-muted hover:text-foreground'
                 )}
               >
                 Log Scale {useLogScale ? 'On' : 'Off'}

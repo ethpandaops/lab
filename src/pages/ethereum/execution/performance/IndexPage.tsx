@@ -363,7 +363,7 @@ function PerformanceSections({
                 tooltipFormatter={params => throughputTooltip(params, daily)}
               />
             ) : (
-              <div className="h-[340px] animate-pulse rounded-xs bg-background" />
+              <div className="h-85 animate-pulse rounded-xs bg-background" />
             )
           }
         </PopoutCard>
@@ -595,7 +595,7 @@ function GasCeiling({
 
       {/* Bars, today's marker and ticks share the middle column; the bar track keeps room on its
           right for the value label after the longest bar */}
-      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 pt-5 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+      <div className="grid min-w-0 flex-1 grid-cols-auto-fill items-center gap-x-3 gap-y-3 pt-5 sm:grid-cols-auto-fill-auto">
         {ceilings.map(({ client, mgas }, i) => {
           const fit = basis === 'p50' ? client.fitP50 : client.fitP95;
           return (
@@ -609,7 +609,7 @@ function GasCeiling({
               </div>
               <div className="relative col-start-2 mr-12 h-7" style={{ gridRow: i + 1 }}>
                 <div
-                  className="absolute inset-y-0 left-0 rounded-xs transition-[width] duration-500"
+                  className="absolute inset-y-0 left-0 rounded-xs transition-width duration-500"
                   style={{ width: `${(mgas / axisMax) * 100}%`, backgroundColor: client.color }}
                 />
                 <span
@@ -634,7 +634,7 @@ function GasCeiling({
           style={{ gridRow: `1 / span ${ceilings.length}` }}
         >
           <div
-            className="absolute inset-y-0 border-l-2 border-dashed border-foreground/60"
+            className="absolute inset-y-0 border-l-2 border-dashed border-foreground-60"
             style={{ left: `${(gasLimitM / axisMax) * 100}%` }}
           >
             <span className="absolute -top-5 -translate-x-1/2 text-xs font-semibold whitespace-nowrap text-foreground">
@@ -874,7 +874,7 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
                     '–'
                   )}
                 </td>
-                <td className="min-w-40 px-3 py-2.5 xl:w-[38%] xl:min-w-64">
+                <td className="min-w-40 px-3 py-2.5 xl:w-38/100 xl:min-w-64">
                   <div className="relative h-5 rounded-xs bg-background">
                     {b.perClient.map(p => (
                       <span

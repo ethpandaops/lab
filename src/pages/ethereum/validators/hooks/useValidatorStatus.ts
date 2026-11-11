@@ -71,7 +71,7 @@ export function getStatusIconConfig(status: string | null): StatusIconConfig {
     case 'withdrawal_done':
       return { icon: BanknotesIcon, colorClass: 'text-muted', label: 'Withdrawal Done' };
     case 'not_yet_deposited':
-      return { icon: MinusCircleIcon, colorClass: 'text-muted/40', label: 'Not Yet Deposited' };
+      return { icon: MinusCircleIcon, colorClass: 'text-muted-40', label: 'Not Yet Deposited' };
     default:
       return { icon: QuestionMarkCircleIcon, colorClass: 'text-warning', label: 'Unknown' };
   }

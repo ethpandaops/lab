@@ -16,14 +16,14 @@ export function ResourceGasHelp(): JSX.Element {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+        className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary-10 hover:text-primary"
       >
         <InformationCircleIcon className="size-4" />
         How is this calculated?
       </button>
 
       <Dialog open={open} onClose={() => setOpen(false)} title="How is resource gas calculated?" size="xl">
-        <div className="space-y-6 text-sm leading-relaxed text-foreground">
+        <div className="space-y-6 text-sm/relaxed text-foreground">
           <p className="text-muted">
             Every unit of EVM gas pays for a specific system resource. We decompose gas into 7 categories so you can see
             what a transaction actually spent its gas on.

@@ -35,8 +35,8 @@ function currentPreset(from: number, to: number, earliest: number | undefined): 
 
 const dateInputClass = clsx(
   'h-8 rounded-sm border border-border bg-surface px-2 text-sm text-foreground tabular-nums',
-  'transition-colors hover:border-primary/40 focus:border-primary focus:outline-hidden',
-  'scheme-light dark:scheme-dark disabled:cursor-not-allowed disabled:opacity-50'
+  'transition-colors hover:border-primary-40 focus:border-primary focus:outline-hidden',
+  'disabled:cursor-not-allowed disabled:opacity-50'
 );
 
 /**

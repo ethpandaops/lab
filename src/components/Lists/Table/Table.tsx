@@ -29,7 +29,7 @@ export function Table<T = unknown>({
   };
 
   const edgePadding = (index: number): string =>
-    clsx(index === 0 ? 'pl-(--table-inset)' : 'pl-3', index === columns.length - 1 ? 'pr-(--table-inset)' : 'pr-3');
+    clsx(index === 0 ? 'pl-table-inset' : 'pl-3', index === columns.length - 1 ? 'pr-table-inset' : 'pr-3');
 
   const table = (
     <table className="min-w-full divide-y divide-border">
@@ -92,12 +92,12 @@ export function Table<T = unknown>({
     return (
       <div
         className={clsx(
-          'overflow-x-auto [--table-inset:--spacing(4)] sm:[--table-inset:--spacing(6)]',
+          'overflow-x-auto table-inset',
           // On a page: its own surface, matching Card depth
           'rounded-sm bg-surface outline -outline-offset-1 outline-border',
           // Inside a Card body: transparent, flush to the card edges, aligned to the card inset
-          'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:bg-transparent in-data-[slot=card-body]:outline-none in-data-[slot=card-body]:[--table-inset:var(--card-inset)]',
-          'in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)'
+          'in-data-[slot=card-body]:mx-card-bleed in-data-[slot=card-body]:rounded-none in-data-[slot=card-body]:bg-transparent in-data-[slot=card-body]:inset-from-card in-data-[slot=card-body]:outline-none',
+          'in-data-[slot=card-body]:first:mt-card-bleed in-data-[slot=card-body]:last:mb-card-bleed'
         )}
       >
         {table}
@@ -119,9 +119,7 @@ export function Table<T = unknown>({
       <div className={title || description ? 'mt-8 flow-root' : 'flow-root'}>
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden rounded-sm border border-border [--table-inset:--spacing(4)] sm:[--table-inset:--spacing(6)]">
-              {table}
-            </div>
+            <div className="overflow-hidden rounded-sm border border-border table-inset">{table}</div>
           </div>
         </div>
       </div>

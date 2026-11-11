@@ -127,7 +127,7 @@ export function AttestationArrivalsChart({
   return (
     <PopoutCard title={title} anchorId={anchorId} subtitle={participationMessage} modalSize="fullscreen">
       {({ inModal }) => (
-        <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-88'}>
+        <div className={inModal ? 'h-vh-less-48' : 'h-88'}>
           <MultiLineChart
             series={series}
             xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: 12 }}

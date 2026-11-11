@@ -157,7 +157,7 @@ function SlotTimelineComponent({
               className={clsx(
                 phase.className,
                 'relative transition-colors duration-200',
-                index < phasePositions.length - 1 && 'border-r border-border/50'
+                index < phasePositions.length - 1 && 'border-r border-border-50'
               )}
               style={{ width: `${phase.widthPercent}%` }}
               title={phase.description ?? phase.label}
@@ -165,7 +165,7 @@ function SlotTimelineComponent({
               {/* Inline phase labels */}
               {showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center px-1">
-                  <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background/90')}>
+                  <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background-90')}>
                     {phase.label}
                   </span>
                 </div>
@@ -173,7 +173,7 @@ function SlotTimelineComponent({
               {/* Optional time labels inside segments */}
               {showTimeLabels && !showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background/80')}>
+                  <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background-80')}>
                     {phase.startTime / 1000}s
                   </span>
                 </div>
@@ -184,7 +184,7 @@ function SlotTimelineComponent({
           {/* Hover preview indicator */}
           {hoverPercent !== null && (
             <div
-              className="pointer-events-none absolute top-0 h-full w-0.5 bg-muted/60 transition-opacity duration-150"
+              className="pointer-events-none absolute top-0 h-full w-0.5 bg-muted-60 transition-opacity duration-150"
               style={{ left: `${hoverPercent}%` }}
             />
           )}
@@ -226,7 +226,7 @@ function SlotTimelineComponent({
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted/70">({phase.duration / 1000}s)</span>}
+                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted-70">({phase.duration / 1000}s)</span>}
               </span>
             </div>
           ))}

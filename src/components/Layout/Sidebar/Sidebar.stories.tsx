@@ -9,7 +9,7 @@ const meta = {
   component: Sidebar,
   decorators: [
     Story => (
-      <div className="min-h-screen min-w-[600px]">
+      <div className="min-h-screen min-w-150">
         <Story />
       </div>
     ),
@@ -47,9 +47,9 @@ function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }):
             aria-label="Toggle sidebar"
             aria-pressed={sidebarOpen}
           >
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:translate-y-2 group-aria-pressed:rotate-45" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:opacity-0" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:-translate-y-2 group-aria-pressed:-rotate-45" />
           </button>
           <span className="text-lg font-semibold text-foreground">The Lab</span>
         </div>

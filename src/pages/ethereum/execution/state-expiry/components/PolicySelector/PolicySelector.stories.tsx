@@ -18,24 +18,24 @@ const EXAMPLE_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     slot: {
       label: 'Slot',
       icon: CubeIcon,
-      textColor: 'text-blue-600 dark:text-blue-400',
-      selectedBg: 'bg-blue-500/25',
-      selectedRing: 'ring-blue-500 dark:ring-blue-400',
-      hoverBg: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/25',
-      rowHoverBg: 'bg-blue-500/10 dark:bg-blue-500/15',
-      cellBg: 'bg-blue-500/10 dark:bg-blue-500/10',
-      fillColor: 'bg-blue-500/30 dark:bg-blue-500/25',
+      textColor: 'text-data-blue',
+      selectedBg: 'bg-data-blue-25',
+      selectedRing: 'ring-data-blue',
+      hoverBg: 'hover:bg-data-blue-hover',
+      rowHoverBg: 'bg-data-blue-row',
+      cellBg: 'bg-data-blue-10',
+      fillColor: 'bg-data-blue-fill',
     },
     contract: {
       label: 'Contract',
       icon: DocumentTextIcon,
-      textColor: 'text-violet-600 dark:text-violet-400',
-      selectedBg: 'bg-violet-500/25',
-      selectedRing: 'ring-violet-500 dark:ring-violet-400',
-      hoverBg: 'hover:bg-violet-500/20 dark:hover:bg-violet-500/25',
-      rowHoverBg: 'bg-violet-500/10 dark:bg-violet-500/15',
-      cellBg: 'bg-violet-500/10 dark:bg-violet-500/10',
-      fillColor: 'bg-violet-500/30 dark:bg-violet-500/25',
+      textColor: 'text-data-violet',
+      selectedBg: 'bg-data-violet-25',
+      selectedRing: 'ring-data-violet',
+      hoverBg: 'hover:bg-data-violet-hover',
+      rowHoverBg: 'bg-data-violet-row',
+      cellBg: 'bg-data-violet-10',
+      fillColor: 'bg-data-violet-fill',
     },
   },
   policyConfig: {
@@ -80,7 +80,7 @@ const meta: Meta<typeof PolicySelector<ExpiryType, ExpiryPolicy>> = {
   component: PolicySelector,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),

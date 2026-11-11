@@ -64,8 +64,8 @@ export function StakeMovers({ entities, window }: StakeMoversProps): JSX.Element
   return (
     <Card title="Biggest movers" subtitle={`Change in active effective balance, ${window}`}>
       <div className="grid gap-6 lg:grid-cols-2">
-        {list(gained, 'Gained', 'bg-primary/70')}
-        {list(lost, 'Lost', 'bg-muted/50')}
+        {list(gained, 'Gained', 'bg-primary-70')}
+        {list(lost, 'Lost', 'bg-muted-50')}
       </div>
     </Card>
   );

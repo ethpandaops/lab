@@ -155,10 +155,10 @@ export function ContractTop100List(): JSX.Element {
       )}
 
       {!isLoading && !error && sortedData && sortedData.length > 0 && (
-        <table className="w-full min-w-[600px] table-fixed border-collapse">
+        <table className="w-full min-w-150 table-fixed border-collapse">
           <TableColGroup />
           <thead className="sticky top-0 z-10 bg-surface">
-            <tr className="border-b border-border/50 text-xs font-medium">
+            <tr className="border-b border-border-50 text-xs font-medium">
               <th className="px-2 py-1.5 text-center text-muted">#</th>
               <th className="px-2 py-1.5 text-left text-muted">Contract</th>
               <th className="px-2 py-1.5 text-left text-muted">Owner</th>
@@ -188,7 +188,7 @@ export function ContractTop100List(): JSX.Element {
               </SortHeader>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/50">
+          <tbody className="divide-y divide-border-50">
             {sortedData.map((item, idx) => (
               <ContractRow
                 key={item.contract.contract_address ?? idx}
@@ -232,12 +232,12 @@ export function ContractTop100List(): JSX.Element {
   return (
     <Card title="Top 100 Contracts" subtitle={expiryNote} className="h-120 overflow-hidden rounded-sm">
       {/* Mobile: Card layout. A plain scroller, since ScrollArea sizes its content to the widest row */}
-      <div className="h-[calc(30rem-52px)] overflow-y-auto md:hidden">
+      <div className="h-107 overflow-y-auto md:hidden">
         <div className="pb-10">{mobileContent}</div>
       </div>
 
       {/* Desktop: Table layout */}
-      <ScrollArea orientation="both" className="hidden h-[calc(30rem-52px)] md:block">
+      <ScrollArea orientation="both" className="hidden h-107 md:block">
         <div className="pb-10">{tableContent}</div>
       </ScrollArea>
     </Card>

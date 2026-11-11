@@ -52,7 +52,7 @@ export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
               onMouseEnter={() => setHovered(index)}
               className={clsx(
                 'aspect-square rounded-xs transition-opacity',
-                column ? 'bg-primary/70' : 'bg-border/60',
+                column ? 'bg-primary-70' : 'bg-border-60',
                 hovered !== null && hovered !== index && 'opacity-60'
               )}
             />

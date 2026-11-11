@@ -58,10 +58,8 @@ export function ProgressBar({
 
         {processedSegments.length > 0 && (
           <div
-            className={clsx(
-              'mt-6 hidden text-sm font-medium text-muted sm:grid',
-              `grid-cols-${processedSegments.length}`
-            )}
+            className="mt-6 hidden text-sm font-medium text-muted sm:grid"
+            style={{ gridTemplateColumns: `repeat(${processedSegments.length}, minmax(0, 1fr))` }}
           >
             {processedSegments.map((segment, index) => (
               <div

@@ -1,0 +1,669 @@
+/* The design tokens, and the only stylesheet with colour literals. The rules,
+ * and how to add a token: .claude/rules/styling.md. */
+
+/* No sources here: the entry stylesheet says what Tailwind scans. */
+@import 'tailwindcss' source(none);
+
+/* Light is the default scheme. Dark and star are dark schemes: every light-dark() pair
+ * takes its second value there, and star then swaps in its own palette below. */
+:root {
+  color-scheme: light;
+}
+
+html.dark,
+html.star {
+  color-scheme: dark;
+}
+
+/* For what a colour token cannot carry, such as swapping a logo for its dark version. */
+@custom-variant on-dark (&:where(.dark, .dark *, .star, .star *));
+
+@theme static {
+  /* Tailwind's defaults removed, so only these tokens compile: bg-red-500, text-7xl and
+   * shadow-2xl do not exist. */
+  --*: initial;
+
+  /* The 4px step every spacing and sizing class multiplies. */
+  --spacing: 0.25rem;
+
+  /* Tailwind's breakpoints, plus 3xl (1920px) and 4xl (2560px) for ultrawide monitors. */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+  --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 160rem;
+
+  /* Content widths: max-w-md, min-w-xl. */
+  --container-xs: 20rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-7xl: 80rem;
+
+  /* Geist for all UI text and numbers, Geist Mono for identifiers (hashes, graffiti, code).
+   * Space Grotesk is the brand display face: wordmark and landing hero only. */
+  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --default-font-family: var(--font-sans);
+  --default-mono-font-family: var(--font-mono);
+
+  /* Type sizes, each with its line height; text-sm/6 sets a line height from the spacing step.
+   * 2xs is for dense labels (axis ticks, HUD keys, badges in tight cells); never go smaller. */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: calc(2 / 1.5);
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: calc(2.25 / 1.875);
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: calc(2.5 / 2.25);
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --tracking-tight: -0.025em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  /* Named line heights for a type size: text-sm/tight, text-sm/relaxed. */
+  --leading-tight: 1.25;
+  --leading-relaxed: 1.625;
+
+  /* Two radii: rounded-xs (4px) for inline marks (badges, tags, skeleton bars) and rounded-sm
+   * (6px) for every container and control. md to 3xl alias rounded-sm so they cannot drift
+   * from it; 2xs (2px) is for the tiniest marks. rounded-full is for dots, avatars and tracks. */
+  --radius-2xs: 0.125rem;
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.375rem;
+  --radius-2xl: 0.375rem;
+  --radius-3xl: 0.375rem;
+
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Hairlines drawn as shadows, so they take no layout space. */
+  --shadow-divider: 1px 0 0 0 var(--color-border), 0 1px 0 0 var(--color-border);
+  --shadow-edge: inset -1px 0 0 var(--color-surface);
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Their keyframes are in base.css. */
+  --animate-spin: spin 1s linear infinite;
+  --animate-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-scroll-travel: scroll-travel 2s ease-in-out infinite;
+  --animate-highlight-new: highlight-new 0.5s ease-out;
+  --animate-row-new: row-new 0.3s ease-out;
+
+  /* Colours. A base colour is a light-dark(light, dark) pair, and star overrides its dark side
+   * in html.star below. Every other colour derives from the base ones, except the data and
+   * category colours, which read the same in every theme. */
+
+  /* Brand */
+  --color-primary: light-dark(#c95f3f, #e09770);
+  --color-secondary: light-dark(#dedbca, #3d3d3d);
+  --color-accent: light-dark(#d77651, #ebbd9e);
+
+  /* Surfaces, back to front, and the text on them. Dark has three distinct steps so panels
+   * read without shadows: page, panel, hairline. */
+  --color-background: light-dark(#efeee5, #0f0f0e);
+  --color-surface: light-dark(#fbfaf6, #181817);
+  --color-border: light-dark(#dcd7c5, #2c2b29);
+  --color-foreground: light-dark(#2c251e, #f5f5f4);
+  --color-muted: light-dark(#7d6b51, #a19f9a);
+
+  /* Status: earthy, about half Tailwind's chroma */
+  --color-success: light-dark(#337344, #76be86);
+  --color-warning: light-dark(#a56217, #e8a95c);
+  --color-danger: light-dark(#af3d36, #e2726b);
+
+  /* The hyper button's pulse. */
+  --color-hyper: light-dark(oklch(71.5% 0.143 215.221), oklch(78.9% 0.154 211.53));
+
+  /* Text and strokes on a solid fill: on-fill is white in every theme; on-solid flips to the
+   * page colour on dark. */
+  --color-on-fill: #ffffff;
+  --color-on-solid: light-dark(var(--color-on-fill), var(--color-background));
+
+  /* Beaconcha.in's logo disc. */
+  --color-beaconchain: #1d1d1b;
+
+  /* Overlays and outlines that tint by theme. */
+  --color-scrim: light-dark(rgb(0 0 0 / 30%), rgb(0 0 0 / 50%));
+  --color-hairline: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 10%));
+  /* The outline of an empty heatmap cell: neutral grey in every theme. */
+  --color-cell-empty: rgb(128 128 128 / 20%);
+  --color-cell-empty-hover: rgb(128 128 128 / 30%);
+
+  /* Panels: surface on light, the page colour on dark. well is the recessed body of a card. */
+  --color-panel: light-dark(var(--color-surface), var(--color-background));
+  --color-well: light-dark(var(--color-background), var(--color-background-50));
+
+  /* Text that reads as foreground on light and as muted on dark. */
+  --color-foreground-soft: light-dark(var(--color-foreground), var(--color-muted));
+
+  /* States and washes whose strength differs between light and dark. */
+  --color-primary-hover: light-dark(var(--color-primary-90), var(--color-primary-80));
+  --color-primary-soft: light-dark(var(--color-primary-10), var(--color-primary-20));
+  --color-primary-soft-hover: light-dark(var(--color-primary-20), var(--color-primary-30));
+  --color-primary-wash: light-dark(var(--color-primary-5), var(--color-primary-10));
+  --color-primary-halo: light-dark(var(--color-primary-20), var(--color-primary-10));
+  --color-primary-toggle: light-dark(var(--color-primary-30), var(--color-primary-40));
+  --color-accent-wash: light-dark(var(--color-accent-5), var(--color-accent-10));
+  --color-danger-hover: light-dark(var(--color-danger-90), var(--color-danger-80));
+  --color-danger-soft: light-dark(var(--color-danger-10), var(--color-danger-20));
+  --color-surface-hover: light-dark(var(--color-background), var(--color-muted-20));
+  --color-muted-hover: light-dark(var(--color-muted-10), var(--color-muted-20));
+  --color-muted-halo: light-dark(var(--color-muted-20), var(--color-muted-10));
+  --color-row-active: light-dark(var(--color-primary-10), var(--color-primary-5));
+  --color-dot-done: light-dark(var(--color-foreground-40), var(--color-border));
+  --color-dot-pending: light-dark(var(--color-border), var(--color-surface));
+  --color-code-highlight: light-dark(var(--color-data-emerald-30), var(--color-data-lime-30));
+  --color-data-blue-hover: light-dark(var(--color-data-blue-20), var(--color-data-blue-25));
+  --color-data-blue-row: light-dark(var(--color-data-blue-10), var(--color-data-blue-15));
+  --color-data-blue-fill: light-dark(var(--color-data-blue-30), var(--color-data-blue-25));
+  --color-data-violet-hover: light-dark(var(--color-data-violet-20), var(--color-data-violet-25));
+  --color-data-violet-row: light-dark(var(--color-data-violet-10), var(--color-data-violet-15));
+  --color-data-violet-fill: light-dark(var(--color-data-violet-30), var(--color-data-violet-25));
+
+  /* Tints: a colour at part of its strength, as bg-primary-10 for primary at 10%. */
+  --color-primary-5: color-mix(in oklab, var(--color-primary) 5%, transparent);
+  --color-primary-10: color-mix(in oklab, var(--color-primary) 10%, transparent);
+  --color-primary-15: color-mix(in oklab, var(--color-primary) 15%, transparent);
+  --color-primary-20: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  --color-primary-25: color-mix(in oklab, var(--color-primary) 25%, transparent);
+  --color-primary-30: color-mix(in oklab, var(--color-primary) 30%, transparent);
+  --color-primary-40: color-mix(in oklab, var(--color-primary) 40%, transparent);
+  --color-primary-50: color-mix(in oklab, var(--color-primary) 50%, transparent);
+  --color-primary-60: color-mix(in oklab, var(--color-primary) 60%, transparent);
+  --color-primary-70: color-mix(in oklab, var(--color-primary) 70%, transparent);
+  --color-primary-75: color-mix(in oklab, var(--color-primary) 75%, transparent);
+  --color-primary-80: color-mix(in oklab, var(--color-primary) 80%, transparent);
+  --color-primary-90: color-mix(in oklab, var(--color-primary) 90%, transparent);
+  --color-secondary-90: color-mix(in oklab, var(--color-secondary) 90%, transparent);
+  --color-accent-5: color-mix(in oklab, var(--color-accent) 5%, transparent);
+  --color-accent-10: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  --color-accent-20: color-mix(in oklab, var(--color-accent) 20%, transparent);
+  --color-accent-30: color-mix(in oklab, var(--color-accent) 30%, transparent);
+  --color-accent-50: color-mix(in oklab, var(--color-accent) 50%, transparent);
+  --color-accent-80: color-mix(in oklab, var(--color-accent) 80%, transparent);
+  --color-accent-90: color-mix(in oklab, var(--color-accent) 90%, transparent);
+  --color-background-15: color-mix(in oklab, var(--color-background) 15%, transparent);
+  --color-background-30: color-mix(in oklab, var(--color-background) 30%, transparent);
+  --color-background-50: color-mix(in oklab, var(--color-background) 50%, transparent);
+  --color-background-80: color-mix(in oklab, var(--color-background) 80%, transparent);
+  --color-background-90: color-mix(in oklab, var(--color-background) 90%, transparent);
+  --color-surface-20: color-mix(in oklab, var(--color-surface) 20%, transparent);
+  --color-surface-30: color-mix(in oklab, var(--color-surface) 30%, transparent);
+  --color-surface-40: color-mix(in oklab, var(--color-surface) 40%, transparent);
+  --color-surface-50: color-mix(in oklab, var(--color-surface) 50%, transparent);
+  --color-surface-80: color-mix(in oklab, var(--color-surface) 80%, transparent);
+  --color-border-10: color-mix(in oklab, var(--color-border) 10%, transparent);
+  --color-border-15: color-mix(in oklab, var(--color-border) 15%, transparent);
+  --color-border-20: color-mix(in oklab, var(--color-border) 20%, transparent);
+  --color-border-30: color-mix(in oklab, var(--color-border) 30%, transparent);
+  --color-border-40: color-mix(in oklab, var(--color-border) 40%, transparent);
+  --color-border-50: color-mix(in oklab, var(--color-border) 50%, transparent);
+  --color-border-60: color-mix(in oklab, var(--color-border) 60%, transparent);
+  --color-foreground-3: color-mix(in oklab, var(--color-foreground) 3%, transparent);
+  --color-foreground-5: color-mix(in oklab, var(--color-foreground) 5%, transparent);
+  --color-foreground-7: color-mix(in oklab, var(--color-foreground) 7%, transparent);
+  --color-foreground-12: color-mix(in oklab, var(--color-foreground) 12%, transparent);
+  --color-foreground-15: color-mix(in oklab, var(--color-foreground) 15%, transparent);
+  --color-foreground-25: color-mix(in oklab, var(--color-foreground) 25%, transparent);
+  --color-foreground-40: color-mix(in oklab, var(--color-foreground) 40%, transparent);
+  --color-foreground-60: color-mix(in oklab, var(--color-foreground) 60%, transparent);
+  --color-foreground-70: color-mix(in oklab, var(--color-foreground) 70%, transparent);
+  --color-foreground-80: color-mix(in oklab, var(--color-foreground) 80%, transparent);
+  --color-muted-5: color-mix(in oklab, var(--color-muted) 5%, transparent);
+  --color-muted-10: color-mix(in oklab, var(--color-muted) 10%, transparent);
+  --color-muted-15: color-mix(in oklab, var(--color-muted) 15%, transparent);
+  --color-muted-20: color-mix(in oklab, var(--color-muted) 20%, transparent);
+  --color-muted-30: color-mix(in oklab, var(--color-muted) 30%, transparent);
+  --color-muted-40: color-mix(in oklab, var(--color-muted) 40%, transparent);
+  --color-muted-50: color-mix(in oklab, var(--color-muted) 50%, transparent);
+  --color-muted-60: color-mix(in oklab, var(--color-muted) 60%, transparent);
+  --color-muted-70: color-mix(in oklab, var(--color-muted) 70%, transparent);
+  --color-success-5: color-mix(in oklab, var(--color-success) 5%, transparent);
+  --color-success-10: color-mix(in oklab, var(--color-success) 10%, transparent);
+  --color-success-15: color-mix(in oklab, var(--color-success) 15%, transparent);
+  --color-success-20: color-mix(in oklab, var(--color-success) 20%, transparent);
+  --color-success-25: color-mix(in oklab, var(--color-success) 25%, transparent);
+  --color-success-30: color-mix(in oklab, var(--color-success) 30%, transparent);
+  --color-success-40: color-mix(in oklab, var(--color-success) 40%, transparent);
+  --color-success-50: color-mix(in oklab, var(--color-success) 50%, transparent);
+  --color-success-60: color-mix(in oklab, var(--color-success) 60%, transparent);
+  --color-success-70: color-mix(in oklab, var(--color-success) 70%, transparent);
+  --color-success-75: color-mix(in oklab, var(--color-success) 75%, transparent);
+  --color-success-80: color-mix(in oklab, var(--color-success) 80%, transparent);
+  --color-success-90: color-mix(in oklab, var(--color-success) 90%, transparent);
+  --color-warning-5: color-mix(in oklab, var(--color-warning) 5%, transparent);
+  --color-warning-10: color-mix(in oklab, var(--color-warning) 10%, transparent);
+  --color-warning-15: color-mix(in oklab, var(--color-warning) 15%, transparent);
+  --color-warning-20: color-mix(in oklab, var(--color-warning) 20%, transparent);
+  --color-warning-30: color-mix(in oklab, var(--color-warning) 30%, transparent);
+  --color-warning-40: color-mix(in oklab, var(--color-warning) 40%, transparent);
+  --color-warning-50: color-mix(in oklab, var(--color-warning) 50%, transparent);
+  --color-warning-60: color-mix(in oklab, var(--color-warning) 60%, transparent);
+  --color-warning-70: color-mix(in oklab, var(--color-warning) 70%, transparent);
+  --color-warning-75: color-mix(in oklab, var(--color-warning) 75%, transparent);
+  --color-warning-80: color-mix(in oklab, var(--color-warning) 80%, transparent);
+  --color-danger-3: color-mix(in oklab, var(--color-danger) 3%, transparent);
+  --color-danger-5: color-mix(in oklab, var(--color-danger) 5%, transparent);
+  --color-danger-10: color-mix(in oklab, var(--color-danger) 10%, transparent);
+  --color-danger-15: color-mix(in oklab, var(--color-danger) 15%, transparent);
+  --color-danger-20: color-mix(in oklab, var(--color-danger) 20%, transparent);
+  --color-danger-30: color-mix(in oklab, var(--color-danger) 30%, transparent);
+  --color-danger-40: color-mix(in oklab, var(--color-danger) 40%, transparent);
+  --color-danger-50: color-mix(in oklab, var(--color-danger) 50%, transparent);
+  --color-danger-60: color-mix(in oklab, var(--color-danger) 60%, transparent);
+  --color-danger-70: color-mix(in oklab, var(--color-danger) 70%, transparent);
+  --color-danger-75: color-mix(in oklab, var(--color-danger) 75%, transparent);
+  --color-danger-80: color-mix(in oklab, var(--color-danger) 80%, transparent);
+  --color-danger-90: color-mix(in oklab, var(--color-danger) 90%, transparent);
+  --color-on-fill-20: color-mix(in oklab, var(--color-on-fill) 20%, transparent);
+  --color-on-solid-80: color-mix(in oklab, var(--color-on-solid) 80%, transparent);
+  --color-data-red-80: color-mix(in oklab, var(--color-data-red) 80%, transparent);
+  --color-data-orange-10: color-mix(in oklab, var(--color-data-orange) 10%, transparent);
+  --color-data-orange-20: color-mix(in oklab, var(--color-data-orange) 20%, transparent);
+  --color-data-orange-30: color-mix(in oklab, var(--color-data-orange) 30%, transparent);
+  --color-data-orange-80: color-mix(in oklab, var(--color-data-orange) 80%, transparent);
+  --color-data-amber-10: color-mix(in oklab, var(--color-data-amber) 10%, transparent);
+  --color-data-amber-20: color-mix(in oklab, var(--color-data-amber) 20%, transparent);
+  --color-data-amber-30: color-mix(in oklab, var(--color-data-amber) 30%, transparent);
+  --color-data-amber-50: color-mix(in oklab, var(--color-data-amber) 50%, transparent);
+  --color-data-amber-80: color-mix(in oklab, var(--color-data-amber) 80%, transparent);
+  --color-data-yellow-80: color-mix(in oklab, var(--color-data-yellow) 80%, transparent);
+  --color-data-lime-30: color-mix(in oklab, var(--color-data-lime) 30%, transparent);
+  --color-data-lime-80: color-mix(in oklab, var(--color-data-lime) 80%, transparent);
+  --color-data-green-50: color-mix(in oklab, var(--color-data-green) 50%, transparent);
+  --color-data-green-80: color-mix(in oklab, var(--color-data-green) 80%, transparent);
+  --color-data-emerald-30: color-mix(in oklab, var(--color-data-emerald) 30%, transparent);
+  --color-data-emerald-80: color-mix(in oklab, var(--color-data-emerald) 80%, transparent);
+  --color-data-teal-80: color-mix(in oklab, var(--color-data-teal) 80%, transparent);
+  --color-data-cyan-5: color-mix(in oklab, var(--color-data-cyan) 5%, transparent);
+  --color-data-cyan-10: color-mix(in oklab, var(--color-data-cyan) 10%, transparent);
+  --color-data-cyan-20: color-mix(in oklab, var(--color-data-cyan) 20%, transparent);
+  --color-data-cyan-30: color-mix(in oklab, var(--color-data-cyan) 30%, transparent);
+  --color-data-cyan-50: color-mix(in oklab, var(--color-data-cyan) 50%, transparent);
+  --color-data-cyan-80: color-mix(in oklab, var(--color-data-cyan) 80%, transparent);
+  --color-data-sky-20: color-mix(in oklab, var(--color-data-sky) 20%, transparent);
+  --color-data-sky-30: color-mix(in oklab, var(--color-data-sky) 30%, transparent);
+  --color-data-sky-80: color-mix(in oklab, var(--color-data-sky) 80%, transparent);
+  --color-data-blue-5: color-mix(in oklab, var(--color-data-blue) 5%, transparent);
+  --color-data-blue-10: color-mix(in oklab, var(--color-data-blue) 10%, transparent);
+  --color-data-blue-15: color-mix(in oklab, var(--color-data-blue) 15%, transparent);
+  --color-data-blue-20: color-mix(in oklab, var(--color-data-blue) 20%, transparent);
+  --color-data-blue-25: color-mix(in oklab, var(--color-data-blue) 25%, transparent);
+  --color-data-blue-30: color-mix(in oklab, var(--color-data-blue) 30%, transparent);
+  --color-data-blue-60: color-mix(in oklab, var(--color-data-blue) 60%, transparent);
+  --color-data-blue-80: color-mix(in oklab, var(--color-data-blue) 80%, transparent);
+  --color-data-indigo-5: color-mix(in oklab, var(--color-data-indigo) 5%, transparent);
+  --color-data-indigo-15: color-mix(in oklab, var(--color-data-indigo) 15%, transparent);
+  --color-data-indigo-25: color-mix(in oklab, var(--color-data-indigo) 25%, transparent);
+  --color-data-indigo-40: color-mix(in oklab, var(--color-data-indigo) 40%, transparent);
+  --color-data-indigo-55: color-mix(in oklab, var(--color-data-indigo) 55%, transparent);
+  --color-data-indigo-60: color-mix(in oklab, var(--color-data-indigo) 60%, transparent);
+  --color-data-indigo-70: color-mix(in oklab, var(--color-data-indigo) 70%, transparent);
+  --color-data-indigo-80: color-mix(in oklab, var(--color-data-indigo) 80%, transparent);
+  --color-data-indigo-85: color-mix(in oklab, var(--color-data-indigo) 85%, transparent);
+  --color-data-violet-10: color-mix(in oklab, var(--color-data-violet) 10%, transparent);
+  --color-data-violet-15: color-mix(in oklab, var(--color-data-violet) 15%, transparent);
+  --color-data-violet-20: color-mix(in oklab, var(--color-data-violet) 20%, transparent);
+  --color-data-violet-25: color-mix(in oklab, var(--color-data-violet) 25%, transparent);
+  --color-data-violet-30: color-mix(in oklab, var(--color-data-violet) 30%, transparent);
+  --color-data-violet-80: color-mix(in oklab, var(--color-data-violet) 80%, transparent);
+  --color-data-purple-5: color-mix(in oklab, var(--color-data-purple) 5%, transparent);
+  --color-data-purple-10: color-mix(in oklab, var(--color-data-purple) 10%, transparent);
+  --color-data-purple-20: color-mix(in oklab, var(--color-data-purple) 20%, transparent);
+  --color-data-purple-30: color-mix(in oklab, var(--color-data-purple) 30%, transparent);
+  --color-data-purple-50: color-mix(in oklab, var(--color-data-purple) 50%, transparent);
+  --color-data-purple-80: color-mix(in oklab, var(--color-data-purple) 80%, transparent);
+  --color-data-fuchsia-80: color-mix(in oklab, var(--color-data-fuchsia) 80%, transparent);
+  --color-data-pink-20: color-mix(in oklab, var(--color-data-pink) 20%, transparent);
+  --color-data-pink-80: color-mix(in oklab, var(--color-data-pink) 80%, transparent);
+  --color-data-rose-20: color-mix(in oklab, var(--color-data-rose) 20%, transparent);
+  --color-data-slate-40: color-mix(in oklab, var(--color-data-slate) 40%, transparent);
+  --color-data-slate-60: color-mix(in oklab, var(--color-data-slate) 60%, transparent);
+  --color-data-slate-80: color-mix(in oklab, var(--color-data-slate) 80%, transparent);
+  --color-blob-0-10: color-mix(in oklab, var(--color-blob-0) 10%, transparent);
+
+  /* Data hues: Tailwind's 500 hues at about 60% chroma, so charts sit with the earthy UI.
+   * Every data colour below (chart, blob, continent, performance) maps to one of these. */
+  --color-data-red: oklch(63.7% 0.147 25.3);
+  --color-data-orange: oklch(70.5% 0.132 47.6);
+  --color-data-amber: oklch(74% 0.117 70.1);
+  --color-data-yellow: oklch(74% 0.114 86);
+  --color-data-lime: oklch(74% 0.144 130.8);
+  --color-data-green: oklch(72.3% 0.136 149.6);
+  --color-data-emerald: oklch(69.6% 0.105 162.5);
+  --color-data-teal: oklch(70.4% 0.1 182.5);
+  --color-data-cyan: oklch(71.5% 0.1 215.2);
+  --color-data-sky: oklch(68.5% 0.105 237.3);
+  --color-data-blue: oklch(62.3% 0.133 259.8);
+  --color-data-indigo: oklch(62% 0.144 277.1);
+  --color-data-violet: oklch(62% 0.15 292.7);
+  --color-data-purple: oklch(62.7% 0.15 303.9);
+  --color-data-fuchsia: oklch(66.7% 0.15 322.1);
+  --color-data-pink: oklch(65.6% 0.149 354.3);
+  --color-data-rose: oklch(64.5% 0.15 16.4);
+  --color-data-slate: oklch(62% 0.03 257.4);
+
+  /* Blob index colours (0-5) for data availability. */
+  --color-blob-0: var(--color-data-cyan);
+  --color-blob-1: var(--color-data-pink);
+  --color-blob-2: var(--color-data-amber);
+  --color-blob-3: var(--color-data-green);
+  --color-blob-4: var(--color-data-violet);
+  --color-blob-5: var(--color-data-red);
+
+  /* Continents, for maps. */
+  --color-continent-af: var(--color-data-red);
+  --color-continent-as: var(--color-data-amber);
+  --color-continent-eu: var(--color-data-emerald);
+  --color-continent-na: var(--color-data-blue);
+  --color-continent-oc: var(--color-data-cyan);
+  --color-continent-sa: var(--color-data-violet);
+  --color-continent-an: var(--color-data-slate);
+
+  /* Timing, fast to slow: under 1s, 1-2s, 2-3s, 3-4s, 4s and over. */
+  --color-performance-excellent: var(--color-data-green);
+  --color-performance-good: var(--color-data-lime);
+  --color-performance-fair: var(--color-data-yellow);
+  --color-performance-slow: var(--color-data-orange);
+  --color-performance-poor: var(--color-data-red);
+
+  /* Series in multi-series charts, in order (0-14). */
+  --color-chart-0: var(--color-data-blue);
+  --color-chart-1: var(--color-data-emerald);
+  --color-chart-2: var(--color-data-amber);
+  --color-chart-3: var(--color-data-red);
+  --color-chart-4: var(--color-data-cyan);
+  --color-chart-5: var(--color-data-lime);
+  --color-chart-6: var(--color-data-orange);
+  --color-chart-7: var(--color-data-purple);
+  --color-chart-8: var(--color-data-pink);
+  --color-chart-9: var(--color-data-violet);
+  --color-chart-10: var(--color-data-teal);
+  --color-chart-11: var(--color-data-indigo);
+  --color-chart-12: var(--color-data-rose);
+  --color-chart-13: var(--color-data-fuchsia);
+  --color-chart-14: var(--color-data-sky);
+
+  /* Category tags (Badge colours, beacon and fork chips) in Tailwind's palette: one
+   * light-dark() pair per part. */
+  --color-tag-gray: light-dark(oklch(44.6% 0.03 256.802), oklch(70.7% 0.022 261.325));
+  --color-tag-gray-wash: light-dark(
+    oklch(98.5% 0.002 247.839),
+    color-mix(in oklab, oklch(70.7% 0.022 261.325) 10%, transparent)
+  );
+  --color-tag-gray-bg: light-dark(
+    oklch(96.7% 0.003 264.542),
+    color-mix(in oklab, oklch(70.7% 0.022 261.325) 10%, transparent)
+  );
+  --color-tag-gray-ring: light-dark(
+    color-mix(in oklab, oklch(55.1% 0.027 264.364) 10%, transparent),
+    color-mix(in oklab, oklch(70.7% 0.022 261.325) 20%, transparent)
+  );
+  --color-tag-gray-fill: light-dark(oklch(70.7% 0.022 261.325), oklch(70.7% 0.022 261.325));
+  --color-tag-gray-hover: light-dark(
+    color-mix(in oklab, oklch(55.1% 0.027 264.364) 20%, transparent),
+    color-mix(in oklab, oklch(55.1% 0.027 264.364) 30%, transparent)
+  );
+  --color-tag-gray-stroke: light-dark(
+    color-mix(in oklab, oklch(44.6% 0.03 256.802) 50%, transparent),
+    oklch(70.7% 0.022 261.325)
+  );
+  --color-tag-gray-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(44.6% 0.03 256.802) 75%, transparent),
+    oklch(87.2% 0.01 258.338)
+  );
+  /* Fork chips set gray text one step darker than Badge does. */
+  --color-tag-gray-chip: light-dark(oklch(37.3% 0.034 259.733), oklch(70.7% 0.022 261.325));
+  --color-tag-yellow: light-dark(oklch(47.6% 0.114 61.907), oklch(79.5% 0.184 86.047));
+  --color-tag-yellow-wash: light-dark(
+    oklch(98.7% 0.026 102.212),
+    color-mix(in oklab, oklch(85.2% 0.199 91.936) 10%, transparent)
+  );
+  --color-tag-yellow-bg: light-dark(
+    oklch(97.3% 0.071 103.193),
+    color-mix(in oklab, oklch(85.2% 0.199 91.936) 10%, transparent)
+  );
+  --color-tag-yellow-ring: light-dark(
+    color-mix(in oklab, oklch(68.1% 0.162 75.834) 20%, transparent),
+    color-mix(in oklab, oklch(85.2% 0.199 91.936) 20%, transparent)
+  );
+  --color-tag-yellow-fill: light-dark(oklch(79.5% 0.184 86.047), oklch(85.2% 0.199 91.936));
+  --color-tag-yellow-hover: light-dark(
+    color-mix(in oklab, oklch(68.1% 0.162 75.834) 20%, transparent),
+    color-mix(in oklab, oklch(79.5% 0.184 86.047) 30%, transparent)
+  );
+  --color-tag-yellow-stroke: light-dark(
+    color-mix(in oklab, oklch(55.4% 0.135 66.442) 50%, transparent),
+    oklch(90.5% 0.182 98.111)
+  );
+  --color-tag-yellow-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(55.4% 0.135 66.442) 75%, transparent),
+    oklch(94.5% 0.129 101.54)
+  );
+  --color-tag-teal: light-dark(oklch(51.1% 0.096 186.391), oklch(77.7% 0.152 181.912));
+  --color-tag-teal-wash: light-dark(
+    oklch(98.4% 0.014 180.72),
+    color-mix(in oklab, oklch(77.7% 0.152 181.912) 10%, transparent)
+  );
+  --color-tag-teal-bg: light-dark(
+    oklch(95.3% 0.051 180.801),
+    color-mix(in oklab, oklch(77.7% 0.152 181.912) 10%, transparent)
+  );
+  --color-tag-teal-ring: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.096 186.391) 10%, transparent),
+    color-mix(in oklab, oklch(77.7% 0.152 181.912) 30%, transparent)
+  );
+  --color-tag-teal-fill: light-dark(oklch(70.4% 0.14 182.503), oklch(77.7% 0.152 181.912));
+  --color-tag-teal-hover: light-dark(
+    color-mix(in oklab, oklch(60% 0.118 184.704) 20%, transparent),
+    color-mix(in oklab, oklch(70.4% 0.14 182.503) 30%, transparent)
+  );
+  --color-tag-teal-stroke: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.096 186.391) 50%, transparent),
+    oklch(77.7% 0.152 181.912)
+  );
+  --color-tag-teal-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.096 186.391) 75%, transparent),
+    oklch(85.5% 0.138 181.071)
+  );
+  --color-tag-blue: light-dark(oklch(48.8% 0.243 264.376), oklch(70.7% 0.165 254.624));
+  --color-tag-blue-wash: light-dark(
+    oklch(97% 0.014 254.604),
+    color-mix(in oklab, oklch(70.7% 0.165 254.624) 10%, transparent)
+  );
+  --color-tag-blue-bg: light-dark(
+    oklch(93.2% 0.032 255.585),
+    color-mix(in oklab, oklch(70.7% 0.165 254.624) 10%, transparent)
+  );
+  --color-tag-blue-ring: light-dark(
+    color-mix(in oklab, oklch(48.8% 0.243 264.376) 10%, transparent),
+    color-mix(in oklab, oklch(70.7% 0.165 254.624) 30%, transparent)
+  );
+  --color-tag-blue-fill: light-dark(oklch(62.3% 0.214 259.815), oklch(70.7% 0.165 254.624));
+  --color-tag-blue-hover: light-dark(
+    color-mix(in oklab, oklch(54.6% 0.245 262.881) 20%, transparent),
+    color-mix(in oklab, oklch(62.3% 0.214 259.815) 30%, transparent)
+  );
+  --color-tag-blue-stroke: light-dark(
+    color-mix(in oklab, oklch(48.8% 0.243 264.376) 50%, transparent),
+    oklch(70.7% 0.165 254.624)
+  );
+  --color-tag-blue-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(48.8% 0.243 264.376) 75%, transparent),
+    oklch(80.9% 0.105 251.813)
+  );
+  --color-tag-indigo: light-dark(oklch(45.7% 0.24 277.023), oklch(67.3% 0.182 276.935));
+  --color-tag-indigo-wash: light-dark(
+    oklch(96.2% 0.018 272.314),
+    color-mix(in oklab, oklch(67.3% 0.182 276.935) 10%, transparent)
+  );
+  --color-tag-indigo-bg: light-dark(
+    oklch(93% 0.034 272.788),
+    color-mix(in oklab, oklch(67.3% 0.182 276.935) 10%, transparent)
+  );
+  --color-tag-indigo-ring: light-dark(
+    color-mix(in oklab, oklch(45.7% 0.24 277.023) 10%, transparent),
+    color-mix(in oklab, oklch(67.3% 0.182 276.935) 30%, transparent)
+  );
+  --color-tag-indigo-fill: light-dark(oklch(58.5% 0.233 277.117), oklch(67.3% 0.182 276.935));
+  --color-tag-indigo-hover: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.262 276.966) 20%, transparent),
+    color-mix(in oklab, oklch(58.5% 0.233 277.117) 30%, transparent)
+  );
+  --color-tag-indigo-stroke: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.262 276.966) 50%, transparent),
+    oklch(67.3% 0.182 276.935)
+  );
+  --color-tag-indigo-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(51.1% 0.262 276.966) 75%, transparent),
+    oklch(78.5% 0.115 274.713)
+  );
+  --color-tag-purple: light-dark(oklch(49.6% 0.265 301.924), oklch(71.4% 0.203 305.504));
+  --color-tag-purple-wash: light-dark(
+    oklch(97.7% 0.014 308.299),
+    color-mix(in oklab, oklch(71.4% 0.203 305.504) 10%, transparent)
+  );
+  --color-tag-purple-bg: light-dark(
+    oklch(94.6% 0.033 307.174),
+    color-mix(in oklab, oklch(71.4% 0.203 305.504) 10%, transparent)
+  );
+  --color-tag-purple-ring: light-dark(
+    color-mix(in oklab, oklch(49.6% 0.265 301.924) 10%, transparent),
+    color-mix(in oklab, oklch(71.4% 0.203 305.504) 30%, transparent)
+  );
+  --color-tag-purple-fill: light-dark(oklch(62.7% 0.265 303.9), oklch(71.4% 0.203 305.504));
+  --color-tag-purple-hover: light-dark(
+    color-mix(in oklab, oklch(55.8% 0.288 302.321) 20%, transparent),
+    color-mix(in oklab, oklch(62.7% 0.265 303.9) 30%, transparent)
+  );
+  --color-tag-purple-stroke: light-dark(
+    color-mix(in oklab, oklch(54.1% 0.281 293.009) 50%, transparent),
+    oklch(70.2% 0.183 293.541)
+  );
+  --color-tag-purple-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(54.1% 0.281 293.009) 75%, transparent),
+    oklch(81.1% 0.111 293.571)
+  );
+  --color-tag-pink: light-dark(oklch(52.5% 0.223 3.958), oklch(71.8% 0.202 349.761));
+  --color-tag-pink-wash: light-dark(
+    oklch(97.1% 0.014 343.198),
+    color-mix(in oklab, oklch(71.8% 0.202 349.761) 10%, transparent)
+  );
+  --color-tag-pink-bg: light-dark(
+    oklch(94.8% 0.028 342.258),
+    color-mix(in oklab, oklch(71.8% 0.202 349.761) 10%, transparent)
+  );
+  --color-tag-pink-ring: light-dark(
+    color-mix(in oklab, oklch(52.5% 0.223 3.958) 10%, transparent),
+    color-mix(in oklab, oklch(71.8% 0.202 349.761) 20%, transparent)
+  );
+  --color-tag-pink-fill: light-dark(oklch(65.6% 0.241 354.308), oklch(71.8% 0.202 349.761));
+  --color-tag-pink-hover: light-dark(
+    color-mix(in oklab, oklch(59.2% 0.249 0.584) 20%, transparent),
+    color-mix(in oklab, oklch(65.6% 0.241 354.308) 30%, transparent)
+  );
+  --color-tag-pink-stroke: light-dark(
+    color-mix(in oklab, oklch(52.5% 0.223 3.958) 50%, transparent),
+    oklch(71.8% 0.202 349.761)
+  );
+  --color-tag-pink-stroke-hover: light-dark(
+    color-mix(in oklab, oklch(52.5% 0.223 3.958) 75%, transparent),
+    oklch(82.3% 0.12 346.018)
+  );
+  --color-tag-sky: light-dark(oklch(50% 0.134 242.749), oklch(74.6% 0.16 232.661));
+  --color-tag-sky-bg: light-dark(
+    oklch(95.1% 0.026 236.824),
+    color-mix(in oklab, oklch(74.6% 0.16 232.661) 10%, transparent)
+  );
+  --color-tag-slate: light-dark(oklch(37.2% 0.044 257.287), oklch(70.4% 0.04 256.788));
+  --color-tag-slate-bg: light-dark(
+    oklch(96.8% 0.007 247.896),
+    color-mix(in oklab, oklch(70.4% 0.04 256.788) 10%, transparent)
+  );
+  --color-tag-violet: light-dark(oklch(49.1% 0.27 292.581), oklch(70.2% 0.183 293.541));
+  --color-tag-violet-bg: light-dark(
+    oklch(94.3% 0.029 294.588),
+    color-mix(in oklab, oklch(70.2% 0.183 293.541) 10%, transparent)
+  );
+  --color-tag-amber: light-dark(oklch(55.5% 0.163 48.998), oklch(82.8% 0.189 84.429));
+  --color-tag-amber-bg: light-dark(
+    oklch(96.2% 0.059 95.617),
+    color-mix(in oklab, oklch(82.8% 0.189 84.429) 10%, transparent)
+  );
+
+  /* Phase text: the 700 shade on light, the data hue on dark. */
+  --color-phase-cyan: light-dark(oklch(52% 0.105 223.128), var(--color-data-cyan));
+  --color-phase-green: light-dark(oklch(52.7% 0.154 150.069), var(--color-data-green));
+  --color-phase-amber: light-dark(oklch(55.5% 0.163 48.998), var(--color-data-amber));
+  --color-phase-purple: light-dark(oklch(49.6% 0.265 301.924), var(--color-data-purple));
+
+  /* Contributor classes (corporate, internal). Individual uses primary, unclassified muted. */
+  --color-contributor-corporate: light-dark(oklch(55.8% 0.288 302.321), oklch(71.4% 0.203 305.504));
+  --color-contributor-corporate-bg: color-mix(in oklab, oklch(62.7% 0.265 303.9) 10%, transparent);
+  --color-contributor-corporate-ring: light-dark(
+    color-mix(in oklab, oklch(62.7% 0.265 303.9) 20%, transparent),
+    color-mix(in oklab, oklch(62.7% 0.265 303.9) 10%, transparent)
+  );
+  --color-contributor-internal: light-dark(oklch(54.6% 0.245 262.881), oklch(70.7% 0.165 254.624));
+  --color-contributor-internal-bg: color-mix(in oklab, oklch(62.3% 0.214 259.815) 10%, transparent);
+  --color-contributor-internal-ring: light-dark(
+    color-mix(in oklab, oklch(62.3% 0.214 259.815) 20%, transparent),
+    color-mix(in oklab, oklch(62.3% 0.214 259.815) 10%, transparent)
+  );
+}
+
+/* Star: aurora borealis, cyan and purple on deep blue. It replaces the dark side of the base
+ * colours; every colour derived from them follows. */
+html.star {
+  --color-primary: #1af7f7;
+  --color-secondary: #7d00e6;
+  --color-accent: #4dffff;
+  --color-background: #000a1a;
+  --color-surface: #0a1428;
+  --color-border: #1a2847;
+  --color-foreground: #e6ffff;
+  --color-muted: #009999;
+  /* Warmer than dark so success stays apart from the cyan muted text */
+  --color-success: #96c979;
+  --color-warning: #e8a95c;
+  --color-danger: #e2726b;
+  --color-hyper: oklch(71.5% 0.143 215.221);
+}

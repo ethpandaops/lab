@@ -9,7 +9,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -50,7 +50,7 @@ export const Basic: Story = {
   render: () => (
     <ScrollArea className="h-72 w-48 rounded-sm border border-border">
       <div className="p-4">
-        <h4 className="mb-4 text-sm leading-none font-medium text-foreground">Tags</h4>
+        <h4 className="mb-4 text-sm/none font-medium text-foreground">Tags</h4>
         {tags.map(tag => (
           <div key={tag} className="border-b border-border py-2 text-sm text-muted last:border-0">
             {tag}
@@ -71,7 +71,7 @@ export const Horizontal: Story = {
         {Array.from({ length: 20 }).map((_, i) => (
           <div
             key={i}
-            className="flex size-24 shrink-0 items-center justify-center rounded-sm bg-muted/30 text-sm font-medium text-muted"
+            className="flex size-24 shrink-0 items-center justify-center rounded-sm bg-muted-30 text-sm font-medium text-muted"
           >
             Item {i + 1}
           </div>
@@ -88,13 +88,13 @@ export const Horizontal: Story = {
 export const BothDirections: Story = {
   render: () => (
     <ScrollArea className="size-72 rounded-sm border border-border">
-      <div className="w-[600px] p-4">
-        <h4 className="mb-4 text-sm leading-none font-medium text-foreground">Wide & Tall Content</h4>
+      <div className="w-150 p-4">
+        <h4 className="mb-4 text-sm/none font-medium text-foreground">Wide & Tall Content</h4>
         <div className="grid grid-cols-6 gap-2">
           {Array.from({ length: 60 }).map((_, i) => (
             <div
               key={i}
-              className="flex size-16 items-center justify-center rounded-sm bg-muted/30 text-xs font-medium text-muted"
+              className="flex size-16 items-center justify-center rounded-sm bg-muted-30 text-xs font-medium text-muted"
             >
               {i + 1}
             </div>
@@ -119,8 +119,8 @@ export const InCard: Story = {
       <ScrollArea className="h-64">
         <div className="p-2">
           {Array.from({ length: 15 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-sm px-2 py-2 hover:bg-muted/10">
-              <div className="size-8 rounded-full bg-primary/20" />
+            <div key={i} className="flex items-center gap-3 rounded-sm px-2 py-2 hover:bg-muted-10">
+              <div className="size-8 rounded-full bg-primary-20" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Event {i + 1}</p>
                 <p className="text-xs text-muted">{i + 1} minutes ago</p>
@@ -139,7 +139,7 @@ export const InCard: Story = {
 export const DataTable: Story = {
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-sm bg-surface p-6">
+      <div className="min-w-200 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -149,7 +149,7 @@ export const DataTable: Story = {
       <ScrollArea className="w-full">
         <table className="w-max min-w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/20">
+            <tr className="border-b border-border bg-muted-20">
               {['Slot', 'Block', 'Proposer', 'Attestations', 'Deposits', 'Exits', 'Status', 'Time', 'Graffiti'].map(
                 header => (
                   <th key={header} className="px-4 py-3 text-left font-medium whitespace-nowrap text-foreground">
@@ -169,7 +169,7 @@ export const DataTable: Story = {
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{i % 3}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{i % 5}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
-                  <span className="rounded-full bg-success/20 px-2 py-0.5 text-xs text-success">Proposed</span>
+                  <span className="rounded-full bg-success-20 px-2 py-0.5 text-xs text-success">Proposed</span>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{i + 1}s ago</td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">ethPandaOps</td>
@@ -226,14 +226,14 @@ export const CodeBlock: Story = {
 export const HeatmapGrid: Story = {
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-sm bg-surface p-6">
+      <div className="min-w-200 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
   ],
   render: () => (
     <div className="rounded-sm border border-border">
-      <div className="border-b border-border bg-muted/20 px-4 py-3">
+      <div className="border-b border-border bg-muted-20 px-4 py-3">
         <h3 className="text-sm font-semibold text-foreground">Data Column Availability</h3>
         <p className="text-xs text-muted">128 columns</p>
       </div>
@@ -249,7 +249,7 @@ export const HeatmapGrid: Story = {
                     availability > 0.95
                       ? 'bg-success'
                       : availability > 0.8
-                        ? 'bg-success/70'
+                        ? 'bg-success-70'
                         : availability > 0.6
                           ? 'bg-warning'
                           : 'bg-danger';

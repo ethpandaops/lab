@@ -22,7 +22,7 @@ const meta = {
   component: DataAvailabilityHeatmap,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

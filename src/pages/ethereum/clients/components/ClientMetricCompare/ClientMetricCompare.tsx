@@ -134,7 +134,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
         <p className="text-sm text-muted">No data in this window.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-fill-2-1">
             <MultiLineChart
               series={series}
               xAxis={{ type: 'category', labels, name: weekly ? 'Week' : 'Date' }}
@@ -153,7 +153,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
               </thead>
               <tbody>
                 {table.map(entry => (
-                  <tr key={entry.client} className={clsx(entry.client === client && 'bg-primary/10')}>
+                  <tr key={entry.client} className={clsx(entry.client === client && 'bg-primary-10')}>
                     <td className="py-0.5 pl-1">
                       {entry.client === client ? (
                         <ClientLabel client={entry.client} noLink />

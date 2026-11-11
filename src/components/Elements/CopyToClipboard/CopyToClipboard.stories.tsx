@@ -10,7 +10,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -48,7 +48,7 @@ export const CustomTrigger: Story = {
     children: (
       <button
         type="button"
-        className="rounded-sm bg-primary px-4 py-2 text-sm/6 font-medium text-white transition-colors hover:bg-primary/90"
+        className="rounded-sm bg-primary px-4 py-2 text-sm/6 font-medium text-on-fill transition-colors hover:bg-primary-90"
       >
         Copy Text
       </button>
@@ -105,7 +105,7 @@ export const CopyJSON: Story = {
     children: (
       <button
         type="button"
-        className="rounded-sm bg-accent px-3 py-1.5 text-xs/5 font-medium text-white transition-colors hover:bg-accent/90"
+        className="rounded-sm bg-accent px-3 py-1.5 text-xs/5 font-medium text-on-fill transition-colors hover:bg-accent-90"
       >
         Copy JSON
       </button>
@@ -128,7 +128,7 @@ export const AsyncContent: Story = {
     children: (
       <button
         type="button"
-        className="rounded-sm bg-secondary px-4 py-2 text-sm/6 font-medium text-white transition-colors hover:bg-secondary/90"
+        className="rounded-sm bg-secondary px-4 py-2 text-sm/6 font-medium text-on-fill transition-colors hover:bg-secondary-90"
       >
         Copy Async Content
       </button>

@@ -59,8 +59,8 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
                 className={clsx(
                   'inline-flex items-center rounded-xs px-1.5 py-0.5 text-xs font-medium inset-ring',
                   sync.state === 'in-sync'
-                    ? 'bg-muted/10 text-muted inset-ring-border'
-                    : 'bg-warning/10 text-warning inset-ring-warning/20'
+                    ? 'bg-muted-10 text-muted inset-ring-border'
+                    : 'bg-warning-10 text-warning inset-ring-warning-20'
                 )}
                 title={sync.state === 'catching-up' ? `${formatMs(sync.lagMs)} behind the network median` : undefined}
               >

@@ -232,7 +232,7 @@ export function IndexPage(): JSX.Element {
             >
               {({ inModal }) =>
                 history.isLoading ? (
-                  <LoadingContainer className="h-[400px] w-full rounded-sm" shimmer={false} />
+                  <LoadingContainer className="h-100 w-full rounded-sm" shimmer={false} />
                 ) : history.error ? (
                   <Alert variant="error" title="Could not load stake history" description={history.error.message} />
                 ) : (

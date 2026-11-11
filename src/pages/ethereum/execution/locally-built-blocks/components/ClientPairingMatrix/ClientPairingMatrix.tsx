@@ -104,7 +104,7 @@ export function ClientPairingMatrix({
                         'flex min-w-20 flex-1 items-center justify-center rounded-sm border text-sm font-medium',
                         'h-10 transition-colors',
                         count > 0
-                          ? 'cursor-pointer hover:outline hover:outline-primary/60'
+                          ? 'cursor-pointer hover:outline hover:outline-primary-60'
                           : 'cursor-not-allowed opacity-50',
                         getIntensity(count, maxPairingCount)
                       )}

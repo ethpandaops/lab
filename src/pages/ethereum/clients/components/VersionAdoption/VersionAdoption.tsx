@@ -139,14 +139,14 @@ function AngleTitle({ title, color }: { title: string; color: string }): JSX.Ele
  * table so three fit side by side: labels and notes wrap instead of scrolling.
  */
 function AngleCard({ title, color, subtitle, version, previous, rows, children }: AngleCardProps): JSX.Element {
-  const cell = 'border-t border-border/60 py-2';
+  const cell = 'border-t border-border-60 py-2';
   return (
     <Card rounded title={<AngleTitle title={title} color={color} />} subtitle={subtitle}>
       <div className="flex flex-col gap-3">
         <div
           className={clsx(
             'grid items-baseline text-sm/5',
-            previous ? 'grid-cols-[minmax(6rem,1fr)_auto_auto]' : 'grid-cols-[minmax(6rem,1fr)_auto]'
+            previous ? 'grid-cols-label-auto-2' : 'grid-cols-label-auto'
           )}
         >
           <span className="pb-2 text-xs/5 text-muted">Metric</span>
@@ -255,7 +255,7 @@ export function VersionAdoption({
     entityCounts.isLoading ||
     peers.isLoading ||
     (consensus && (nodesLoading || nodeDays.isLoading));
-  if (isLoading) return <LoadingContainer className="h-[40rem] rounded-sm" />;
+  if (isLoading) return <LoadingContainer className="h-160 rounded-sm" />;
 
   const blocksNow = angleFacts(version, blocksNowDay);
   const blocksBefore = angleFacts(previousVersion, blocksNowDay);
@@ -420,7 +420,7 @@ export function VersionAdoption({
             { metric: `Entities, ${window}`, current: entityCount(version), previous: entityCount(previousVersion) },
           ]}
         >
-          <dl className="flex items-baseline justify-between gap-4 border-t border-border/60 pt-2 text-sm/5">
+          <dl className="flex items-baseline justify-between gap-4 border-t border-border-60 pt-2 text-sm/5">
             <dt className="text-muted">{formatClientName(client)} blocks with a known release, last 24h</dt>
             <dd className="font-medium text-foreground tabular-nums">{knownShare}</dd>
           </dl>

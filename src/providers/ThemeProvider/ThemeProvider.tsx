@@ -40,7 +40,7 @@ export function ThemeProvider({ children, themeOverride }: ThemeProviderProps): 
     }
 
     // Update theme-color meta tag for Safari/browser chrome
-    const themeColors: Record<Theme, string> = { light: '#efeee5', dark: '#1a1a1a', star: '#000a1a' };
+    const themeColors: Record<Theme, string> = { light: '#efeee5', dark: '#0f0f0e', star: '#000a1a' };
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
       meta.setAttribute('content', themeColors[effectiveTheme]);

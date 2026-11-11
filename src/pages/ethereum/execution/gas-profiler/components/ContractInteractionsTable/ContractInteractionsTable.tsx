@@ -32,16 +32,16 @@ function truncateAddress(address: string | null): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-data-orange/10', text: 'text-data-orange' };
+      return { bg: 'bg-data-orange-10', text: 'text-data-orange' };
     case 'CREATE2':
-      return { bg: 'bg-warning/10', text: 'text-warning' };
+      return { bg: 'bg-warning-10', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-data-purple/10', text: 'text-data-purple' };
+      return { bg: 'bg-data-purple-10', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan' };
+      return { bg: 'bg-data-cyan-10', text: 'text-data-cyan' };
     case 'CALL':
     default:
-      return { bg: 'bg-data-blue/10', text: 'text-data-blue' };
+      return { bg: 'bg-data-blue-10', text: 'text-data-blue' };
   }
 }
 
@@ -69,7 +69,7 @@ function ContractRow({
   const hasChildren = showImplementations && contract.implementations && contract.implementations.length > 0;
 
   return (
-    <tr className={clsx('transition-colors hover:bg-background', rowIndex % 2 === 0 ? 'bg-surface/30' : 'bg-surface')}>
+    <tr className={clsx('transition-colors hover:bg-background', rowIndex % 2 === 0 ? 'bg-surface-30' : 'bg-surface')}>
       <td className="px-4 py-2">
         <div className="flex items-center gap-2">
           {/* Cog icon for delegated contracts */}
@@ -161,7 +161,7 @@ function ImplementationRow({
   const pct = totalGas > 0 ? (contract.gas / totalGas) * 100 : 0;
 
   return (
-    <tr className="bg-surface/50 transition-colors hover:bg-background">
+    <tr className="bg-surface-50 transition-colors hover:bg-background">
       <td className="px-4 py-2">
         <div className="flex items-center gap-2 pl-7">
           {/* Indent + cog icon */}
@@ -192,7 +192,7 @@ function ImplementationRow({
       <td className="px-4 py-2 text-right">
         <div className="flex items-center justify-end gap-2">
           <div className="h-1.5 w-10 overflow-hidden rounded-full bg-border">
-            <div className="h-full bg-primary/50" style={{ width: `${Math.min(pct, 100)}%` }} />
+            <div className="h-full bg-primary-50" style={{ width: `${Math.min(pct, 100)}%` }} />
           </div>
           <span className="w-12 text-right text-xs text-muted">{pct.toFixed(1)}%</span>
         </div>
@@ -298,7 +298,7 @@ export function ContractInteractionsTable({
 
   if (contracts.length === 0) {
     return (
-      <div className="rounded-sm border border-border bg-surface/30 p-8 text-center text-sm text-muted">
+      <div className="rounded-sm border border-border bg-surface-30 p-8 text-center text-sm text-muted">
         No contract interactions
       </div>
     );

@@ -103,7 +103,7 @@ export function TopItemsByGasTable({
     );
 
     return (
-      <tr key={item.id} className="border-b border-border/50 last:border-0">
+      <tr key={item.id} className="border-b border-border-50 last:border-0">
         {/* First column: index or call type */}
         <td className="py-2 pr-2">
           {item.callType ? (

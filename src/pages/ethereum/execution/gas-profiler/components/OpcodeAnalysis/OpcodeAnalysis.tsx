@@ -218,13 +218,13 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
   const getColorIntensity = (gas: number): string => {
     const ratio = maxGas > 0 ? gas / maxGas : 0;
     // Indigo gradient: light to dark
-    if (ratio === 0) return 'bg-data-indigo/5';
-    if (ratio < 0.1) return 'bg-data-indigo/15';
-    if (ratio < 0.25) return 'bg-data-indigo/25';
-    if (ratio < 0.4) return 'bg-data-indigo/40';
-    if (ratio < 0.55) return 'bg-data-indigo/55';
-    if (ratio < 0.7) return 'bg-data-indigo/70';
-    if (ratio < 0.85) return 'bg-data-indigo/85';
+    if (ratio === 0) return 'bg-data-indigo-5';
+    if (ratio < 0.1) return 'bg-data-indigo-15';
+    if (ratio < 0.25) return 'bg-data-indigo-25';
+    if (ratio < 0.4) return 'bg-data-indigo-40';
+    if (ratio < 0.55) return 'bg-data-indigo-55';
+    if (ratio < 0.7) return 'bg-data-indigo-70';
+    if (ratio < 0.85) return 'bg-data-indigo-85';
     return 'bg-data-indigo';
   };
 
@@ -235,12 +235,12 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
         <div className="flex items-center gap-2 text-xs text-muted">
           <span>Low</span>
           <div className="flex gap-px">
-            <div className="size-3 bg-data-indigo/15" />
-            <div className="size-3 bg-data-indigo/25" />
-            <div className="size-3 bg-data-indigo/40" />
-            <div className="size-3 bg-data-indigo/55" />
-            <div className="size-3 bg-data-indigo/70" />
-            <div className="size-3 bg-data-indigo/85" />
+            <div className="size-3 bg-data-indigo-15" />
+            <div className="size-3 bg-data-indigo-25" />
+            <div className="size-3 bg-data-indigo-40" />
+            <div className="size-3 bg-data-indigo-55" />
+            <div className="size-3 bg-data-indigo-70" />
+            <div className="size-3 bg-data-indigo-85" />
             <div className="size-3 bg-data-indigo" />
           </div>
           <span>High</span>
@@ -300,7 +300,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>

@@ -8,7 +8,7 @@ const meta: Meta<typeof HeatmapChart> = {
   component: HeatmapChart,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -438,7 +438,7 @@ export const HighlightedRow: Story = {
             <button
               key={label}
               className={`rounded-xs px-3 py-1 text-sm ${
-                highlighted === i ? 'bg-primary text-white' : 'bg-surface text-foreground'
+                highlighted === i ? 'bg-primary text-on-fill' : 'bg-surface text-foreground'
               }`}
               onClick={() => setHighlighted(i)}
             >

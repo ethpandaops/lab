@@ -8,9 +8,18 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier/recommended';
-import { fixupPluginRules } from '@eslint/compat';
-import betterTailwindcss from 'eslint-plugin-better-tailwindcss';
+import betterTailwind from 'eslint-plugin-better-tailwindcss';
+import { getDefaultSelectors } from 'eslint-plugin-better-tailwindcss/defaults';
 import customRules from './eslint-rules/index.cjs';
+
+const noColor = 'Colours come from tokens in src/styles/tokens.css, used as Tailwind classes.';
+// A colour literal: hex, rgb() or hsl(); in a colour property, a named colour too.
+const colorLiteral = '^(?:#[0-9a-fA-F]{3,8}|(?:rgb|hsl)a?\\(.*\\))$';
+const colorProperty =
+  '^(?:color|background(?:Color)?|border(?:Top|Right|Bottom|Left)?Color|outlineColor|textDecorationColor|fill|stroke|caretColor|accentColor)$';
+// An opacity modifier (`bg-primary/10`). `w-1/2` is a fraction, and `text-sm/6` gives a type
+// size a line height from the spacing step.
+const modifier = '(?:^|:)!?(?!text-(?:2xs|xs|sm|base|lg|\\d?xl)/)[a-z-]*[a-z]/\\d+!?$';
 
 export default tseslint.config(
   {
@@ -60,6 +69,16 @@ export default tseslint.config(
           message:
             'The `any` type defeats the purpose of TypeScript. Use proper types instead or `unknown` if the type is truly unknown.',
         },
+        // Colour literals in inline styles and SVG colour attributes bypass the tokens.
+        { selector: `JSXAttribute[name.name='style'] Property > Literal[value=/${colorLiteral}/]`, message: noColor },
+        {
+          selector: `JSXAttribute[name.name='style'] Property[key.name=/${colorProperty}/] > Literal[value=/^(?!(?:currentColor|transparent|inherit|initial|unset|none)$)[a-zA-Z]+$/]`,
+          message: noColor,
+        },
+        {
+          selector: `JSXAttribute[name.name=/^(?:fill|stroke|color|stopColor|floodColor|lightingColor)$/] > Literal[value=/${colorLiteral}/]`,
+          message: noColor,
+        },
       ],
       '@typescript-eslint/explicit-function-return-type': [
         'warn',
@@ -77,46 +96,76 @@ export default tseslint.config(
       },
     },
   },
-  // Tailwind CSS conflict detection (Prettier handles sorting)
   {
-    plugins: {
-      'better-tailwindcss': fixupPluginRules(betterTailwindcss),
-    },
-    rules: {
-      // Correctness rules only - no styling/sorting rules
-      'better-tailwindcss/no-conflicting-classes': 'warn', // Less expensive than error
-      'better-tailwindcss/no-duplicate-classes': 'warn',
-      // Disabled: Custom component classes in @layer components are intentional
-      'better-tailwindcss/no-unknown-classes': 'off',
-      'better-tailwindcss/no-deprecated-classes': 'off', // Disable expensive rule - Tailwind 4 is stable
-      // Disable all stylistic rules (Prettier handles these)
-      'better-tailwindcss/enforce-consistent-class-order': 'off',
-      'better-tailwindcss/enforce-consistent-important-position': 'off',
-      'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
-      'better-tailwindcss/enforce-consistent-variable-syntax': 'off',
-      'better-tailwindcss/enforce-shorthand-classes': 'off',
-      'better-tailwindcss/no-unnecessary-whitespace': 'off',
-    },
+    // Class names must be tokens: Tailwind's defaults are reset in src/styles/tokens.css, so
+    // an unknown class is one no token covers. Besides className, clsx and the plugin's other
+    // defaults, it reads class constants and variant maps (`…ClassName`, `…Classes`,
+    // `…Styles`), props named `…ClassName`, helpers named `get…Class` or `get…Styles` written
+    // as arrow functions, and the router's activeProps / inactiveProps.
+    files: ['src/**/*.{ts,tsx}'],
+    // Tests pass placeholder class names to check that props reach the DOM.
+    ignores: ['src/**/*.test.{ts,tsx}'],
+    extends: [betterTailwind.configs['correctness-error']],
     settings: {
       'better-tailwindcss': {
-        // Point to Tailwind v4 CSS-based config
         entryPoint: 'src/index.css',
-        // Detect classes in these utility functions
-        callees: ['classnames', 'clsx', 'cn', 'cva'],
+        selectors: [
+          ...getDefaultSelectors(),
+          {
+            kind: 'variable',
+            name: '^[a-z][A-Za-z]*(?:Class|Classes|ClassName|Styles)$',
+            match: [{ type: 'strings' }, { type: 'objectValues' }],
+          },
+          { kind: 'attribute', name: '^[a-z][A-Za-z]*ClassName$', match: [{ type: 'strings' }] },
+          {
+            kind: 'variable',
+            name: '^get[A-Z][A-Za-z]*(?:Class|Classes|ClassName|Styles)$',
+            match: [{ type: 'anonymousFunctionReturn', match: [{ type: 'strings' }] }],
+          },
+          {
+            kind: 'attribute',
+            name: '^(?:active|inactive)Props$',
+            match: [{ type: 'objectValues', path: '^className$' }],
+          },
+        ],
       },
     },
+    rules: {
+      'better-tailwindcss/enforce-canonical-classes': 'error',
+      // dark and star mark the theme on <html>; a story may set one to preview it.
+      'better-tailwindcss/no-unknown-classes': ['error', { ignore: ['^dark$', '^star$'] }],
+      'better-tailwindcss/no-restricted-classes': [
+        'error',
+        {
+          restrict: [
+            { pattern: '\\[[^\\[\\]]*\\](?!:)', message: 'Arbitrary values bypass the tokens; add a token instead.' },
+            { pattern: '\\(--[^()]*\\)', message: 'Arbitrary variables bypass the tokens; add a token instead.' },
+            {
+              pattern: '(?:^|:)dark:',
+              message: 'Tokens change with the theme; give the colour a light-dark() pair instead of a dark: variant.',
+            },
+            {
+              pattern:
+                '(?:^|:)on-dark:!?(?:bg|text|border|ring|inset-ring|outline|fill|stroke|from|via|to|shadow|divide|decoration|accent|caret|placeholder)-',
+              message: 'on-dark: is for what a token cannot carry, such as images; colours are light-dark() tokens.',
+            },
+            { pattern: '(?:^|:)!?leading-', message: 'Line height comes with each text size; text-sm/6 sets another.' },
+            {
+              pattern: modifier,
+              message: 'Opacity tints skip the contrast checks; use a tint token (bg-primary-10) or add one.',
+            },
+          ],
+        },
+      ],
+    },
   },
-  // Custom color theming rules
+  // Custom rules
   {
     files: ['**/*.{ts,tsx}'], // Only TSX/TS files have JSX and className
     plugins: {
       lab: customRules,
     },
     rules: {
-      // Ban hardcoded colors (hex, rgb, hsl) in Tailwind classes
-      'lab/no-hardcoded-colors': 'error',
-      // Ban primitive color scales (terracotta-*, sand-*, neutral-*, aurora-*)
-      'lab/no-primitive-color-scales': 'error',
       // Validate route images exist
       'lab/validate-route-images': 'error',
     },

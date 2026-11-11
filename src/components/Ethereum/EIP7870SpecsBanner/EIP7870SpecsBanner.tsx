@@ -51,7 +51,7 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
               </thead>
               <tbody className="text-muted">
                 {CLUSTER_SPECS.map(cluster => (
-                  <tr key={cluster.name} className="border-b border-border/50 last:border-0">
+                  <tr key={cluster.name} className="border-b border-border-50 last:border-0">
                     <td className="py-2 pr-4">
                       <div className="flex items-center gap-2">
                         <ServerIcon className={clsx('size-4 shrink-0', CLUSTER_COLORS[cluster.name])} />
@@ -60,18 +60,18 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
                     </td>
                     <td className="py-2 pr-4">
                       <div>{cluster.cpu.model}</div>
-                      <div className="text-muted/70">up to {cluster.cpu.maxFrequency}</div>
+                      <div className="text-muted-70">up to {cluster.cpu.maxFrequency}</div>
                     </td>
                     <td className="py-2 pr-4">
                       {cluster.cpu.cores}c / {cluster.cpu.threads}t
                     </td>
                     <td className="py-2 pr-4">
                       <div>{cluster.cpu.passmarkSingle} Single</div>
-                      <div className="text-muted/70">{cluster.cpu.passmarkMulti} Multi</div>
+                      <div className="text-muted-70">{cluster.cpu.passmarkMulti} Multi</div>
                     </td>
                     <td className="py-2 pr-4">
                       <div>{cluster.memory.total}</div>
-                      <div className="text-muted/70">
+                      <div className="text-muted-70">
                         {cluster.memory.type} @ {cluster.memory.speed}
                       </div>
                     </td>
@@ -79,14 +79,14 @@ export function EIP7870SpecsBanner({ className }: EIP7870SpecsBannerProps): JSX.
                       <div>
                         {cluster.storage.model} {cluster.storage.capacity}
                       </div>
-                      <div className="text-muted/70">{cluster.storage.interface}</div>
+                      <div className="text-muted-70">{cluster.storage.interface}</div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
+          <div className="mt-3 flex items-center justify-between border-t border-border-50 pt-3">
             <p className="text-xs text-muted">Reference Xatu nodes are controlled by ethPandaOps.</p>
             <a
               href="https://eips.ethereum.org/EIPS/eip-7870"

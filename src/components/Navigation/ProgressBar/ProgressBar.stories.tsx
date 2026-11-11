@@ -150,7 +150,7 @@ export const CustomColors: Story = {
     progress: 75,
     statusMessage: 'Warning state (orange)',
     fillColor: 'bg-warning',
-    backgroundColor: 'bg-zinc-800',
+    backgroundColor: 'bg-foreground-80',
   },
 };
 
@@ -160,7 +160,7 @@ export const SuccessColor: Story = {
     progress: 100,
     statusMessage: 'All nodes ready!',
     fillColor: 'bg-success',
-    backgroundColor: 'bg-zinc-800',
+    backgroundColor: 'bg-foreground-80',
   },
 };
 
@@ -170,6 +170,6 @@ export const DangerColor: Story = {
     progress: 25,
     statusMessage: 'Critical issues detected',
     fillColor: 'bg-danger',
-    backgroundColor: 'bg-zinc-800',
+    backgroundColor: 'bg-foreground-80',
   },
 };

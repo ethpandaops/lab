@@ -90,7 +90,7 @@ export const InputLeading = ({ children, className, type }: InputSlotProps): Rea
             className: clsx(
               iconSizeStyles[size],
               'ml-3',
-              'pointer-events-none self-center text-muted dark:text-muted',
+              'pointer-events-none self-center text-muted',
               (children.props as { className?: string }).className
             ),
           } as Record<string, unknown>)}
@@ -107,8 +107,8 @@ export const InputLeading = ({ children, className, type }: InputSlotProps): Rea
     <div
       className={clsx(
         inline
-          ? 'shrink-0 text-base text-muted select-none sm:text-sm/6 dark:text-muted'
-          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-surface dark:text-muted dark:outline-border',
+          ? 'shrink-0 text-base text-muted select-none sm:text-sm/6'
+          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6',
         className
       )}
     >
@@ -188,7 +188,7 @@ export const InputTrailing = ({ children, className, type }: InputSlotProps): Re
             className: clsx(
               iconSizeStyles[size],
               'mr-3',
-              'pointer-events-none self-center text-muted dark:text-muted',
+              'pointer-events-none self-center text-muted',
               (children.props as { className?: string }).className
             ),
           } as Record<string, unknown>)}
@@ -213,8 +213,8 @@ export const InputTrailing = ({ children, className, type }: InputSlotProps): Re
     <div
       className={clsx(
         inline
-          ? 'shrink-0 text-base text-muted select-none sm:text-sm/6 dark:text-muted'
-          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6 dark:bg-surface dark:text-muted dark:outline-border',
+          ? 'shrink-0 text-base text-muted select-none sm:text-sm/6'
+          : 'flex shrink-0 items-center bg-surface px-3 text-base text-muted outline-1 -outline-offset-1 outline-border sm:text-sm/6',
         className
       )}
     >
@@ -374,7 +374,7 @@ const InputBase = ({
       return (
         <label
           htmlFor={inputId}
-          className="absolute -top-2 left-2 inline-block bg-surface px-1 text-xs font-medium text-foreground dark:bg-background dark:text-foreground"
+          className="absolute -top-2 left-2 inline-block bg-panel px-1 text-xs font-medium text-foreground"
         >
           {label}
         </label>
@@ -384,7 +384,7 @@ const InputBase = ({
     // Inset label
     if (labelVariant === 'inset') {
       return (
-        <label htmlFor={inputId} className="block text-xs font-medium text-foreground dark:text-muted">
+        <label htmlFor={inputId} className="block text-xs font-medium text-foreground-soft">
           {label}
         </label>
       );
@@ -473,19 +473,17 @@ const InputBase = ({
       return clsx(
         'block w-full border-0 bg-transparent text-foreground placeholder:text-muted shadow-none',
         textSize[size],
-        'outline-0 focus:outline-0 focus-visible:outline-0 ring-0 focus:ring-0',
-        'dark:bg-transparent dark:text-foreground dark:placeholder:text-muted'
+        'outline-0 focus:outline-0 focus-visible:outline-0 ring-0 focus:ring-0'
       );
     }
     if (needsFlex) {
       // Inline addons - minimal padding, transparent bg
       // Use !bg-transparent to override any bg-white from base styles
       return clsx(
-        'block min-w-0 grow border-0 !bg-transparent text-base text-foreground shadow-none outline-hidden placeholder:text-muted sm:text-sm/6',
+        'block min-w-0 grow border-0 bg-transparent! text-base text-foreground shadow-none outline-hidden placeholder:text-muted sm:text-sm/6',
         'focus:outline-hidden focus-visible:outline-hidden py-1.5',
         hasLeading ? 'pl-1' : 'pl-0',
-        hasTrailing ? 'pr-1' : 'pr-0',
-        'dark:text-foreground dark:placeholder:text-muted'
+        hasTrailing ? 'pr-1' : 'pr-0'
       );
     }
     if (needsGrid) {
@@ -560,10 +558,8 @@ const InputBase = ({
             className={clsx(
               'bg-surface outline-1 -outline-offset-1 outline-border',
               'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
-              'dark:bg-surface dark:outline-border dark:focus-within:outline-primary',
               insetPadding[size],
-              error &&
-                'outline-danger/50 focus-within:outline-danger dark:outline-danger/50 dark:focus-within:outline-danger'
+              error && 'outline-danger-50 focus-within:outline-danger'
             )}
           >
             {renderLabel()}
@@ -584,8 +580,7 @@ const InputBase = ({
           <div
             className={clsx(
               'flex items-center bg-surface px-3 outline-1 -outline-offset-1 outline-border',
-              'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
-              'dark:bg-surface dark:outline-border dark:focus-within:outline-primary'
+              'focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary'
             )}
           >
             {leadingSlot}

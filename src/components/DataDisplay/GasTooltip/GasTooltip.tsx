@@ -76,7 +76,7 @@ export function GasTooltip({
     <div
       id={`gas-tooltip-${type}`}
       role="tooltip"
-      className="fixed z-[9999] w-72 -translate-x-1/2 -translate-y-full rounded-sm border border-border bg-background p-3"
+      className="fixed z-9999 w-72 -translate-x-1/2 -translate-y-full rounded-sm border border-border bg-background p-3"
       style={{ top: position.top, left: position.left }}
     >
       {customContent ?? (
@@ -99,7 +99,7 @@ export function GasTooltip({
         onMouseLeave={handleMouseLeave}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        className="text-muted/60 transition-colors hover:text-muted focus:outline-none"
+        className="text-muted-60 transition-colors hover:text-muted focus:outline-none"
         aria-label={`Info about ${explanation.title}`}
         aria-describedby={isVisible ? `gas-tooltip-${type}` : undefined}
       >

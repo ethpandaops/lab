@@ -295,7 +295,7 @@ export function InspectPage(): JSX.Element {
 
         {hasAnalyzed && !error && !resolverError && knownIndices.length > 0 && (
           <div className={clsx('flex flex-col gap-10 transition-opacity', isPlaceholderData && 'opacity-60')}>
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               {identityList.length === 1 && (!endsEarlier || endStates) && (
                 <ValidatorIdentityCard identity={identityList[0]} endState={endStates?.get(identityList[0].index)} />
               )}

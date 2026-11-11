@@ -13,7 +13,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-sm bg-surface p-6">
+      <div className="min-w-200 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -401,10 +401,10 @@ export const CustomColors: Story = {
       ],
     },
     colorMap: {
-      total: { bg: 'bg-slate-600', hover: 'hover:bg-slate-500' },
-      engineering: { bg: 'bg-blue-500', hover: 'hover:bg-blue-400' },
-      marketing: { bg: 'bg-green-500', hover: 'hover:bg-green-400' },
-      operations: { bg: 'bg-amber-500', hover: 'hover:bg-amber-400' },
+      total: { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' },
+      engineering: { bg: 'bg-data-blue', hover: 'hover:bg-data-blue-80' },
+      marketing: { bg: 'bg-data-green', hover: 'hover:bg-data-green-80' },
+      operations: { bg: 'bg-data-amber', hover: 'hover:bg-data-amber-80' },
     } as FlameGraphColorMap,
     title: 'Budget Allocation',
     valueFormatter: (v: number) => `$${(v / 1000).toFixed(0)}K`,

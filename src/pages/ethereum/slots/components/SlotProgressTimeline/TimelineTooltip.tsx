@@ -37,7 +37,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
       </div>
 
       {/* Timing row - point-in-time events show just timestamp, not range/delta */}
-      <div className="mt-2 flex items-center gap-4 rounded bg-surface/50 px-2 py-1.5 font-mono text-sm">
+      <div className="mt-2 flex items-center gap-4 rounded-xs bg-surface-50 px-2 py-1.5 font-mono text-sm">
         {span.isPointInTime ? (
           <span className="font-semibold text-foreground">@ {formatMs(span.startMs)}</span>
         ) : (
@@ -51,7 +51,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
       </div>
 
       {/* Details grid */}
-      <div className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+      <div className="mt-2 grid grid-cols-auto-1fr gap-x-3 gap-y-1 text-sm">
         {/* Location */}
         {(span.city || span.country) && (
           <>
@@ -89,7 +89,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
                 </span>
               )}
               {span.methodVersion && (
-                <span className="ml-1 rounded bg-surface/50 px-1 text-xs text-muted">{span.methodVersion}</span>
+                <span className="ml-1 rounded-xs bg-surface-50 px-1 text-xs text-muted">{span.methodVersion}</span>
               )}
             </span>
           </>
@@ -130,13 +130,13 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
 
       {/* Node name (full path) */}
       {span.nodeName && (
-        <div className="mt-2 truncate rounded bg-surface/30 px-2 py-1 font-mono text-xs text-muted">
+        <div className="mt-2 truncate rounded-xs bg-surface-30 px-2 py-1 font-mono text-xs text-muted">
           {span.nodeName}
         </div>
       )}
 
       {/* Node ID */}
-      {span.nodeId && <div className="mt-1 font-mono text-xs text-muted/70">ID: {span.nodeId}</div>}
+      {span.nodeId && <div className="mt-1 font-mono text-xs text-muted-70">ID: {span.nodeId}</div>}
     </div>
   );
 }

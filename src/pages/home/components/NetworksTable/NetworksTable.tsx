@@ -71,7 +71,7 @@ export function NetworksTable({ group, now }: NetworksTableProps): JSX.Element {
   const columns: Column<Row>[] = [
     {
       header: 'Network',
-      headerClassName: 'w-[28%]',
+      headerClassName: 'w-28/100',
       accessor: row => (
         <span className="flex items-center gap-2 font-medium text-foreground">
           <NetworkIcon networkName={row.network.name} className="size-5" />
@@ -82,19 +82,19 @@ export function NetworksTable({ group, now }: NetworksTableProps): JSX.Element {
     {
       header: 'Fork',
       accessor: row => row.fork,
-      headerClassName: 'hidden w-[18%] sm:table-cell',
+      headerClassName: 'hidden w-18/100 sm:table-cell',
       cellClassName: 'hidden text-muted capitalize sm:table-cell',
     },
     {
       header: 'Head slot',
       accessor: row => String(row.headSlot),
-      headerClassName: 'w-[16%] text-right',
+      headerClassName: 'w-16/100 text-right',
       cellClassName: 'text-right',
     },
     {
       header: 'Epoch',
       accessor: row => String(row.headEpoch),
-      headerClassName: 'hidden w-[14%] text-right sm:table-cell',
+      headerClassName: 'hidden w-14/100 text-right sm:table-cell',
       cellClassName: 'hidden text-right text-muted sm:table-cell',
     },
     {

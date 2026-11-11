@@ -17,6 +17,8 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     exclude: ['src/**/*.stories.{ts,tsx}', 'node_modules'],
     setupFiles: ['./vitest.setup.ts'],
+    // Vitest stubs CSS imports; the token tests read tokens.css as text (?raw).
+    css: { include: [/\/src\/styles\/tokens\.css/] },
     // Vitest 4: Explicitly configure fake timers to avoid queueMicrotask OOM issues
     // See: https://github.com/vitest-dev/vitest/issues/7288
     fakeTimers: {

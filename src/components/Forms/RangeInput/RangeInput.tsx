@@ -53,9 +53,9 @@ export function RangeInput({
           '[&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-sm [&::-moz-range-track]:bg-border',
           // Thumb styles - with vertical centering
           '[&::-webkit-slider-thumb]:-mt-1 [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:transition-colors',
-          '[&::-webkit-slider-thumb]:hover:bg-primary/80',
+          '[&::-webkit-slider-thumb]:hover:bg-primary-80',
           '[&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-colors',
-          '[&::-moz-range-thumb]:hover:bg-primary/80',
+          '[&::-moz-range-thumb]:hover:bg-primary-80',
           // Focus styles
           'focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
         )}

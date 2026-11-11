@@ -925,7 +925,7 @@ export function BlockPage(): JSX.Element {
               disabled={!canGoPrev}
               className={clsx(
                 'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-                canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+                canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted-50'
               )}
             >
               <ChevronLeftIcon className="size-4" />
@@ -940,7 +940,7 @@ export function BlockPage(): JSX.Element {
               disabled={!canGoNext}
               className={clsx(
                 'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-                canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+                canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted-50'
               )}
             >
               Next
@@ -1010,7 +1010,7 @@ export function BlockPage(): JSX.Element {
             <Link
               to="/ethereum/execution/gas-profiler/simulate"
               search={{ block: blockNumber }}
-              className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+              className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary-10 hover:text-primary"
             >
               <BeakerIcon className="size-4" />
               Simulate

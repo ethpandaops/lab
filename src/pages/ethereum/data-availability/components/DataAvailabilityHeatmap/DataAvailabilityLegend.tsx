@@ -3,12 +3,12 @@ import type { DataAvailabilityLegendProps } from './DataAvailabilityHeatmap.type
 
 /** Availability bands, matching the cell colors */
 const BANDS = [
-  { label: '0-20%', className: 'bg-danger/70 text-white' },
-  { label: '20-40%', className: 'bg-danger/50 text-white' },
-  { label: '40-60%', className: 'bg-warning/50 text-foreground' },
-  { label: '60-80%', className: 'bg-warning/70 text-foreground' },
-  { label: '80-95%', className: 'bg-success/70 text-white' },
-  { label: '95-100%', className: 'bg-success/90 text-white' },
+  { label: '0-20%', className: 'bg-danger-70 text-on-fill' },
+  { label: '20-40%', className: 'bg-danger-50 text-on-fill' },
+  { label: '40-60%', className: 'bg-warning-50 text-foreground' },
+  { label: '60-80%', className: 'bg-warning-70 text-foreground' },
+  { label: '80-95%', className: 'bg-success-70 text-on-fill' },
+  { label: '95-100%', className: 'bg-success-90 text-on-fill' },
 ];
 
 /**

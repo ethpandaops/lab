@@ -16,7 +16,7 @@ export function PhaseConnection({
   return (
     <div
       className={clsx(
-        'relative bg-border/50',
+        'relative bg-border-50',
         isHorizontal && 'h-px w-full',
         !isHorizontal && 'h-full w-px',
         className
@@ -27,7 +27,7 @@ export function PhaseConnection({
       {/* Progress fill */}
       <div
         className={clsx(
-          'absolute bg-primary/20',
+          'absolute bg-primary-20',
           isHorizontal && 'top-0 left-0 h-full',
           !isHorizontal && 'top-0 left-0 w-full'
         )}

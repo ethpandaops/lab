@@ -166,12 +166,7 @@ export function GraffitiBlocksTable({
   return (
     <Card rounded title="Blocks">
       {/* The table stays the body's last child so it sits flush with the card's bottom edge */}
-      <div
-        className={clsx(
-          'flex flex-col gap-4 [&>:last-child]:transition-opacity',
-          isPlaceholderData && '[&>:last-child]:opacity-60'
-        )}
-      >
+      <div className={clsx('flex flex-col gap-4 *:last:transition-opacity', isPlaceholderData && '*:last:opacity-60')}>
         <div className="flex flex-wrap items-center gap-3">
           {toolbar}
           <BlockFilterPanel filters={search} fields={fields} onChange={onSearchChange} />

@@ -77,13 +77,13 @@ function FilterChip({
   onRemove: () => void;
 }): JSX.Element {
   return (
-    <span className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+    <span className="inline-flex items-center gap-1 rounded-xs border border-primary-30 bg-primary-10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
       <span className="max-w-32 truncate">{value}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
+        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary-20"
       >
         <XMarkIcon className="size-3" />
       </button>
@@ -139,7 +139,7 @@ function SliderField({
         step={step}
         value={value}
         onChange={e => onChange(Number(e.target.value))}
-        className="w-full cursor-pointer appearance-none rounded-sm bg-transparent focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-colors [&::-moz-range-thumb]:hover:bg-primary/80 [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-sm [&::-moz-range-track]:bg-border [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-sm [&::-webkit-slider-runnable-track]:bg-border [&::-webkit-slider-thumb]:-mt-1 [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:transition-colors [&::-webkit-slider-thumb]:hover:bg-primary/80"
+        className="w-full cursor-pointer appearance-none rounded-sm bg-transparent focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-colors [&::-moz-range-thumb]:hover:bg-primary-80 [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-sm [&::-moz-range-track]:bg-border [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-sm [&::-webkit-slider-runnable-track]:bg-border [&::-webkit-slider-thumb]:-mt-1 [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:transition-colors [&::-webkit-slider-thumb]:hover:bg-primary-80"
       />
     </div>
   );
@@ -212,7 +212,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
           <FunnelIcon className="size-4" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="text-primary-foreground flex size-5 items-center justify-center rounded-xs bg-primary text-xs">
+            <span className="flex size-5 items-center justify-center rounded-xs bg-primary text-xs text-on-fill">
               {activeFilterCount}
             </span>
           )}

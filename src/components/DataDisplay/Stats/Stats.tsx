@@ -16,7 +16,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
     <div
       className={clsx(
         // Inside a Card body, bleed to the card edges so the card is the only panel
-        'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)',
+        'in-data-[slot=card-body]:mx-card-bleed in-data-[slot=card-body]:first:mt-card-bleed in-data-[slot=card-body]:last:mb-card-bleed',
         className
       )}
     >
@@ -35,10 +35,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
           const Icon = item.icon;
 
           return (
-            <div
-              key={item.id}
-              className="relative flex min-w-0 flex-col px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
-            >
+            <div key={item.id} className="relative flex min-w-0 flex-col px-4 py-3.5 shadow-divider sm:px-5">
               <dt className="flex min-w-0 items-center gap-1.5 text-xs/5 font-medium text-muted">
                 {Icon && (
                   <Icon
@@ -93,7 +90,7 @@ export function Stats({ stats, title, className, gridClassName }: StatsProps): J
               {item.link && (
                 <Link
                   to={item.link.to}
-                  className="mt-2 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+                  className="mt-2 text-xs font-medium text-primary transition-colors hover:text-primary-80"
                 >
                   {item.link.label}
                   <span className="sr-only"> {item.name} stats</span>

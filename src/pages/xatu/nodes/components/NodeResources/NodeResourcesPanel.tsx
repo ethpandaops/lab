@@ -248,8 +248,8 @@ export function NodeResourcesPanel({
     return (
       <Card title="Xatu nodes" subtitle="Resource metrics from observoor eBPF agent">
         <div className="space-y-3">
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
-          <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30" />
+          <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30" />
         </div>
       </Card>
     );

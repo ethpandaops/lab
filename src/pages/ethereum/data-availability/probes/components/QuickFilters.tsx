@@ -138,8 +138,8 @@ export function QuickFilters({ currentFilters, onApplyPreset, onClearFilters }: 
               className={clsx(
                 'inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-medium transition-colors',
                 isActive
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-muted hover:border-primary/40 hover:text-foreground'
+                  ? 'border-primary bg-primary-10 text-primary'
+                  : 'border-border bg-surface text-muted hover:border-primary-40 hover:text-foreground'
               )}
             >
               {preset.blobPosterLogos ? (

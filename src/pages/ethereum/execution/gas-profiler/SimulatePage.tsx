@@ -645,7 +645,7 @@ export function SimulatePage(): JSX.Element {
 
       {/* Config Bar */}
       <Card className="mb-4 p-5">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_auto_auto_auto]">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-1fr-auto-3">
           {/* Start Block */}
           <div>
             <label className="mb-1.5 block text-xs text-muted">Start Block</label>
@@ -680,7 +680,7 @@ export function SimulatePage(): JSX.Element {
                   disabled={isRunning}
                   className={clsx(
                     'rounded-xs px-3 py-2 text-sm font-medium transition-colors',
-                    blockCount === count ? 'bg-primary text-white' : 'bg-surface text-muted hover:bg-primary/10',
+                    blockCount === count ? 'bg-primary text-on-fill' : 'bg-surface text-muted hover:bg-primary-10',
                     isRunning && 'cursor-not-allowed opacity-50'
                   )}
                 >
@@ -701,8 +701,8 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'flex items-center gap-1.5 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
                   isGlamsterdamApplied
-                    ? 'border-primary/30 bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary',
+                    ? 'border-primary-30 bg-primary-10 text-primary'
+                    : 'border-border bg-surface text-muted hover:border-primary-30 hover:bg-primary-10 hover:text-primary',
                   (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
                 )}
                 title="Apply Glamsterdam (EIP-8007) gas schedule preset"
@@ -717,7 +717,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'flex items-center gap-2 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
                   modifiedCount > 0
-                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    ? 'border-primary-30 bg-primary-10 text-primary'
                     : 'border-border bg-surface text-muted hover:text-foreground',
                   (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
                 )}
@@ -725,7 +725,7 @@ export function SimulatePage(): JSX.Element {
                 <AdjustmentsHorizontalIcon className="size-4" />
                 Configure
                 {modifiedCount > 0 && (
-                  <span className="rounded-xs bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
+                  <span className="rounded-xs bg-primary px-1.5 py-0.5 text-xs text-on-fill">{modifiedCount}</span>
                 )}
               </button>
             </div>
@@ -794,9 +794,9 @@ export function SimulatePage(): JSX.Element {
         )}
         {defaultsError &&
           (isSyncingError(defaultsError) ? (
-            <div className="mt-3 overflow-hidden rounded-sm border border-warning/30" role="status" aria-live="polite">
-              <div className="flex items-start gap-3 bg-warning/5 p-3.5">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning/15">
+            <div className="mt-3 overflow-hidden rounded-sm border border-warning-30" role="status" aria-live="polite">
+              <div className="flex items-start gap-3 bg-warning-5 p-3.5">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning-15">
                   <ArrowPathIcon className="size-4 animate-spin text-warning" style={{ animationDuration: '2s' }} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -893,7 +893,7 @@ export function SimulatePage(): JSX.Element {
                 </span>
                 {estimatedTimeRemaining !== null && (
                   <>
-                    <span className="size-0.5 rounded-full bg-muted/50" />
+                    <span className="size-0.5 rounded-full bg-muted-50" />
                     <span>~{estimatedTimeRemaining}s remaining</span>
                   </>
                 )}
@@ -902,7 +902,7 @@ export function SimulatePage(): JSX.Element {
           </div>
 
           {/* Segmented progress */}
-          <div className="flex h-1.5 gap-px bg-border/50">
+          <div className="flex h-1.5 gap-px bg-border-50">
             {Array.from({ length: simState.totalBlocks }).map((_, i) => (
               <div
                 key={i}
@@ -911,8 +911,8 @@ export function SimulatePage(): JSX.Element {
                   i < simState.completedBlocks
                     ? 'bg-primary'
                     : i === simState.completedBlocks
-                      ? 'animate-pulse bg-primary/40'
-                      : 'bg-border/30'
+                      ? 'animate-pulse bg-primary-40'
+                      : 'bg-border-30'
                 )}
               />
             ))}
@@ -1060,10 +1060,7 @@ export function SimulatePage(): JSX.Element {
             </button>
           )}
 
-          <div
-            ref={blockStripRef}
-            className="mx-5 flex gap-2 overflow-x-auto pb-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
+          <div ref={blockStripRef} className="mx-5 flex gap-2 overflow-x-auto pb-5">
             {simState.results.map((result, index) => {
               const delta = blockDeltas[index];
               const isSelected = selectedBlockIndex === index;
@@ -1080,14 +1077,14 @@ export function SimulatePage(): JSX.Element {
                   onClick={() => setSelectedBlockIndex(index)}
                   className={clsx(
                     'group relative flex shrink-0 flex-col rounded-sm border transition-all',
-                    isSelected ? 'border-primary bg-primary/10' : 'border-border bg-background hover:border-muted'
+                    isSelected ? 'border-primary bg-primary-10' : 'border-border bg-background hover:border-muted'
                   )}
                   style={{ minWidth: '7.5rem' }}
                 >
                   {/* Connector arrow to detail panel */}
                   {isSelected && (
                     <div className="absolute -bottom-4 left-1/2 z-10 -translate-x-1/2">
-                      <div className="size-0 border-x-[8px] border-t-[8px] border-x-transparent border-t-primary" />
+                      <div className="size-0 border-x-8 border-t-8 border-x-transparent border-t-primary" />
                     </div>
                   )}
                   {/* Top section: label + block number */}
@@ -1096,7 +1093,7 @@ export function SimulatePage(): JSX.Element {
                     <div
                       className={clsx(
                         'font-mono text-sm tabular-nums',
-                        isSelected ? 'font-bold text-foreground' : 'font-semibold text-foreground/80'
+                        isSelected ? 'font-bold text-foreground' : 'font-semibold text-foreground-80'
                       )}
                     >
                       {result.blockNumber}
@@ -1107,7 +1104,7 @@ export function SimulatePage(): JSX.Element {
                   <div
                     className={clsx(
                       'flex items-center gap-3 border-t px-3 pt-1.5 pb-2',
-                      isSelected ? 'border-primary/20' : 'border-border/60'
+                      isSelected ? 'border-primary-20' : 'border-border-60'
                     )}
                   >
                     <div>
@@ -1140,21 +1137,21 @@ export function SimulatePage(): JSX.Element {
                 <div
                   key={`pending-${i}`}
                   className={clsx(
-                    'flex shrink-0 flex-col rounded-sm border border-dashed border-border/60',
+                    'flex shrink-0 flex-col rounded-sm border border-dashed border-border-60',
                     i === 0 && 'animate-pulse'
                   )}
                   style={{ minWidth: '7.5rem' }}
                 >
                   <div className="px-3 pt-2 pb-1.5">
                     <div className="text-2xs font-semibold text-muted">Block</div>
-                    <div className="font-mono text-sm text-muted/30 tabular-nums">
+                    <div className="font-mono text-sm text-muted-30 tabular-nums">
                       {startBlockNumber !== null ? formatGas(startBlockNumber + simState.completedBlocks + i) : '...'}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 border-t border-dashed border-border/40 px-3 pt-1.5 pb-2">
+                  <div className="flex items-center gap-3 border-t border-dashed border-border-40 px-3 pt-1.5 pb-2">
                     <div>
-                      <div className="text-2xs text-muted/30">Delta</div>
-                      <div className="font-mono text-xs text-muted/20">—</div>
+                      <div className="text-2xs text-muted-30">Delta</div>
+                      <div className="font-mono text-xs text-muted-20">—</div>
                     </div>
                   </div>
                 </div>
@@ -1169,7 +1166,7 @@ export function SimulatePage(): JSX.Element {
           {/* Header with navigation */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-sm bg-primary/10">
+              <div className="flex size-8 items-center justify-center rounded-sm bg-primary-10">
                 <CubeIcon className="size-4 text-primary" />
               </div>
               <div>
@@ -1192,7 +1189,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'rounded-xs p-1.5 transition-colors',
                   selectedBlockIndex === 0
-                    ? 'cursor-not-allowed text-muted/30'
+                    ? 'cursor-not-allowed text-muted-30'
                     : 'text-muted hover:bg-surface hover:text-foreground'
                 )}
               >
@@ -1208,7 +1205,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'rounded-xs p-1.5 transition-colors',
                   selectedBlockIndex === simState.results.length - 1
-                    ? 'cursor-not-allowed text-muted/30'
+                    ? 'cursor-not-allowed text-muted-30'
                     : 'text-muted hover:bg-surface hover:text-foreground'
                 )}
               >

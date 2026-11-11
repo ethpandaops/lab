@@ -77,7 +77,7 @@ export const MultipleElements: Story = {
 
 export const CardSkeleton: Story = {
   render: () => (
-    <div className="w-full max-w-md rounded-sm bg-white p-6 shadow-sm dark:bg-zinc-800">
+    <div className="w-full max-w-md rounded-sm bg-surface p-6 shadow-sm">
       <div className="flex gap-x-4">
         <LoadingContainer className="size-12 rounded-full" />
         <div className="flex-1 space-y-3">

@@ -19,7 +19,7 @@ export function NodeStatus({ online, showLabel = false, className }: NodeStatusP
     >
       <span className="relative flex size-2 shrink-0">
         {online && showLabel && (
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success/60" />
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success-60" />
         )}
         <span
           className={clsx(

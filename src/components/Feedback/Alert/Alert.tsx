@@ -17,9 +17,9 @@ const base = {
   description: 'text-muted',
   descriptionBorder: 'text-muted',
   actionText: 'text-foreground',
-  actionHover: 'hover:bg-muted/10',
+  actionHover: 'hover:bg-muted-10',
   dismissText: 'text-muted hover:text-foreground',
-  dismissHover: 'hover:bg-muted/10',
+  dismissHover: 'hover:bg-muted-10',
 };
 
 const variantConfig = {

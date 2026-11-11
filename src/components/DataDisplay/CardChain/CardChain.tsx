@@ -11,22 +11,22 @@ function CardSkeleton(): JSX.Element {
     <div className="relative flex-1">
       <div className="relative">
         {/* 3D top face */}
-        <div className="absolute -top-2 right-1 left-1 h-3 rounded-t-xs bg-border/30" />
+        <div className="absolute -top-2 right-1 left-1 h-3 rounded-t-xs bg-border-30" />
         {/* Main card */}
-        <div className="animate-pulse rounded-xs border border-border/50 bg-surface p-4">
+        <div className="animate-pulse rounded-xs border border-border-50 bg-surface p-4">
           <div className="mb-3 pt-1">
-            <div className="mb-1 h-3 w-10 rounded-xs bg-border/50" />
-            <div className="h-6 w-24 rounded-xs bg-border/50" />
+            <div className="mb-1 h-3 w-10 rounded-xs bg-border-50" />
+            <div className="h-6 w-24 rounded-xs bg-border-50" />
           </div>
-          <div className="border-t border-border/50 pt-3">
+          <div className="border-t border-border-50 pt-3">
             <div className="flex gap-3">
               <div className="flex-1">
-                <div className="mb-1 h-3 w-8 rounded-xs bg-border/50" />
-                <div className="h-4 w-12 rounded-xs bg-border/50" />
+                <div className="mb-1 h-3 w-8 rounded-xs bg-border-50" />
+                <div className="h-4 w-12 rounded-xs bg-border-50" />
               </div>
               <div className="flex-1">
-                <div className="mb-1 h-3 w-10 rounded-xs bg-border/50" />
-                <div className="h-4 w-14 rounded-xs bg-border/50" />
+                <div className="mb-1 h-3 w-10 rounded-xs bg-border-50" />
+                <div className="h-4 w-14 rounded-xs bg-border-50" />
               </div>
             </div>
           </div>
@@ -53,23 +53,20 @@ function ChainCard({
 
   return (
     <div
-      className={clsx(
-        'relative transition-all duration-300',
-        isLast ? 'z-10 scale-105' : 'hover:z-10 hover:scale-[1.02]'
-      )}
+      className={clsx('relative transition-all duration-300', isLast ? 'z-10 scale-105' : 'hover:z-10 hover:scale-102')}
     >
       {/* Main card face */}
       <div
         className={clsx(
           'relative overflow-hidden rounded-sm border bg-surface transition-colors',
-          isHighlighted ? 'border-primary' : 'border-border group-hover:border-primary/50'
+          isHighlighted ? 'border-primary' : 'border-border group-hover:border-primary-50'
         )}
       >
         {/* Fill visualization (background) */}
         <div
           className={clsx(
             'absolute inset-x-0 bottom-0 transition-all duration-500',
-            isHighlighted ? 'bg-primary/10' : 'bg-muted/5'
+            isHighlighted ? 'bg-primary-10' : 'bg-muted-5'
           )}
           style={{ height: `${fillPercentage}%` }}
         />
@@ -79,7 +76,7 @@ function ChainCard({
           {/* Highlight badge */}
           {isHighlighted && (
             <div className="absolute -top-px right-3 rounded-b-xs bg-primary px-2 py-0.5">
-              <span className="text-2xs font-semibold tracking-wider text-white">{highlightBadgeText}</span>
+              <span className="text-2xs font-semibold tracking-wider text-on-fill">{highlightBadgeText}</span>
             </div>
           )}
 
@@ -100,7 +97,7 @@ function ChainCard({
           {item.stats && item.stats.length > 0 && (
             <div
               className={clsx(
-                'grid gap-x-3 border-t border-border/50 pt-3',
+                'grid gap-x-3 border-t border-border-50 pt-3',
                 item.stats.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
               )}
             >
@@ -117,9 +114,9 @@ function ChainCard({
         </div>
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/5 group-hover:opacity-100">
-          <div className="rounded-full bg-primary/90 p-2">
-            <ArrowRightIcon className="size-4 text-white" />
+        <div className="absolute inset-0 flex items-center justify-center bg-transparent opacity-0 transition-all duration-300 group-hover:bg-primary-5 group-hover:opacity-100">
+          <div className="rounded-full bg-primary-90 p-2">
+            <ArrowRightIcon className="size-4 text-on-fill" />
           </div>
         </div>
       </div>
@@ -155,16 +152,16 @@ function NavArrow({
       className={clsx(
         'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full border transition-all',
         loading
-          ? 'border-primary/50 bg-primary/5 text-primary'
+          ? 'border-primary-50 bg-primary-5 text-primary'
           : !disabled
-            ? 'border-border bg-surface text-muted hover:border-primary hover:bg-primary/10 hover:text-primary'
-            : 'cursor-not-allowed border-border/50 bg-surface/50 text-muted/30'
+            ? 'border-border bg-surface text-muted hover:border-primary hover:bg-primary-10 hover:text-primary'
+            : 'cursor-not-allowed border-border-50 bg-surface-50 text-muted-30'
       )}
       title={title}
     >
       {loading ? <ArrowPathIcon className="size-5 animate-spin" /> : <Icon className="size-5" />}
       {showBadge && (
-        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-semibold text-white">
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-2xs font-semibold text-on-fill">
           {badgeCount > 99 ? '99+' : badgeCount}
         </span>
       )}
@@ -248,7 +245,7 @@ export function CardChain({
       )}
     >
       {/* Flowing line connecting all cards */}
-      <div className="absolute top-1/2 right-[60px] left-[60px] h-[2px] -translate-y-1/2">
+      <div className="absolute top-1/2 right-15 left-15 h-0.5 -translate-y-1/2">
         <div className="h-full w-full bg-border" />
       </div>
 

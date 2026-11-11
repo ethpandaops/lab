@@ -136,7 +136,7 @@ export function SlotTimeline({
                   <div
                     className={clsx(
                       'rounded-sm px-1.5 py-0.5 text-xs font-medium',
-                      isNew ? 'bg-primary text-white' : 'bg-primary/20 text-foreground'
+                      isNew ? 'bg-primary text-on-fill' : 'bg-primary-20 text-foreground'
                     )}
                   >
                     {group.blocks.length}
@@ -170,7 +170,7 @@ export function SlotTimeline({
                           'flex min-w-20 flex-1 items-center justify-center rounded-sm border text-sm font-medium',
                           'h-10 transition-colors',
                           count > 0
-                            ? 'cursor-pointer hover:outline hover:outline-primary/60'
+                            ? 'cursor-pointer hover:outline hover:outline-primary-60'
                             : 'cursor-not-allowed opacity-50',
                           getIntensity(count, maxBlockCount),
                           isNew && styles.newBlockAnimation
@@ -208,7 +208,7 @@ export function SlotTimeline({
                         'flex min-w-20 flex-1 items-center justify-center rounded-sm border text-sm font-medium',
                         'h-10 transition-colors',
                         count > 0
-                          ? 'cursor-pointer hover:outline hover:outline-primary/60'
+                          ? 'cursor-pointer hover:outline hover:outline-primary-60'
                           : 'cursor-not-allowed opacity-50',
                         getIntensity(count, maxBlockCount),
                         isNew && styles.newBlockAnimation

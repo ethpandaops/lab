@@ -13,11 +13,11 @@ import type { DialogProps } from './Dialog.types';
 
 const sizeClasses = {
   sm: 'w-full max-w-96', // 384px - 24rem, constrained by viewport
-  md: 'w-full max-w-[28rem]', // 448px
-  lg: 'w-full max-w-[32rem]', // 512px
-  xl: 'w-full max-w-[56rem]', // 896px (increased from 672px for wider aspect ratio)
-  full: 'w-full max-w-[80rem]', // 1280px
-  fullscreen: 'w-[calc(100vw-2rem)] h-[calc(100dvh-2rem)]', // True fullscreen with minimal margin
+  md: 'w-full max-w-md', // 448px
+  lg: 'w-full max-w-lg', // 512px
+  xl: 'w-full max-w-4xl', // 896px (increased from 672px for wider aspect ratio)
+  full: 'w-full max-w-7xl', // 1280px
+  fullscreen: 'w-vw-less-8 h-dvh-less-8', // True fullscreen with minimal margin
 };
 
 /**
@@ -88,7 +88,7 @@ export function Dialog({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30 dark:bg-black/50" aria-hidden="true" />
+          <div className="fixed inset-0 bg-scrim" aria-hidden="true" />
         </TransitionChild>
 
         {/* Dialog container */}
@@ -118,7 +118,7 @@ export function Dialog({
                 <div className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
                   <div className="min-w-0 flex-1 space-y-1.5">
                     {title && <DialogTitle className="text-sm/6 font-semibold text-foreground">{title}</DialogTitle>}
-                    {description && <Description className="text-sm leading-5 text-muted">{description}</Description>}
+                    {description && <Description className="text-sm/5 text-muted">{description}</Description>}
                   </div>
                   {showCloseButton && !hideCloseButton && (
                     <button
@@ -138,7 +138,7 @@ export function Dialog({
                 className={clsx(
                   noPadding ? 'p-0' : 'px-4 py-4 sm:px-6 sm:py-5',
                   size === 'fullscreen' && 'flex-1 overflow-auto',
-                  size !== 'fullscreen' && 'max-h-[calc(100dvh-10rem)] overflow-y-auto'
+                  size !== 'fullscreen' && 'max-h-dvh-less-40 overflow-y-auto'
                 )}
               >
                 {!title && !showCloseButton && description && (

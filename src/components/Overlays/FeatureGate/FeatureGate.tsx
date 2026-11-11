@@ -36,7 +36,7 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
   // If feature is disabled for this network, show a message
   if (!isEnabled) {
     return (
-      <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
+      <div className="flex min-h-vh-less-16 flex-col items-center justify-center p-6">
         {/* Content */}
         <div className="relative flex flex-col items-center">
           <img src="/images/lab.png" className="mb-8 size-32 object-contain" alt="" />
@@ -71,7 +71,7 @@ export function FeatureGate({ children }: FeatureGateProps): JSX.Element {
           <div className="mt-8 flex gap-4">
             <Link
               to="/"
-              className="inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-on-fill transition-colors hover:bg-primary-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               Go Home
             </Link>

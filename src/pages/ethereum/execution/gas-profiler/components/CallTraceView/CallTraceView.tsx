@@ -28,18 +28,18 @@ function formatGasCompact(value: number): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-data-orange/20', text: 'text-data-orange' };
+      return { bg: 'bg-data-orange-20', text: 'text-data-orange' };
     case 'CREATE2':
-      return { bg: 'bg-warning/20', text: 'text-warning' };
+      return { bg: 'bg-warning-20', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-data-purple/20', text: 'text-data-purple' };
+      return { bg: 'bg-data-purple-20', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-data-cyan/20', text: 'text-data-cyan' };
+      return { bg: 'bg-data-cyan-20', text: 'text-data-cyan' };
     case 'CALLCODE':
-      return { bg: 'bg-data-pink/20', text: 'text-data-pink' };
+      return { bg: 'bg-data-pink-20', text: 'text-data-pink' };
     case 'CALL':
     default:
-      return { bg: 'bg-data-blue/20', text: 'text-data-blue' };
+      return { bg: 'bg-data-blue-20', text: 'text-data-blue' };
   }
 }
 
@@ -136,9 +136,9 @@ function OpcodeBreakdownView({
   const navigate = useNavigate();
   if (isLoading) {
     return (
-      <div className="border-y border-primary/30 bg-primary/5 px-4 py-3">
+      <div className="border-y border-primary-30 bg-primary-5 px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="size-3 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+          <div className="size-3 animate-spin rounded-full border-2 border-primary-30 border-t-primary" />
           <span className="text-xs text-muted">Loading opcode breakdown...</span>
         </div>
       </div>
@@ -147,7 +147,7 @@ function OpcodeBreakdownView({
 
   if (!opcodes || opcodes.length === 0) {
     return (
-      <div className="border-y border-primary/30 bg-primary/5 px-4 py-3">
+      <div className="border-y border-primary-30 bg-primary-5 px-4 py-3">
         <span className="text-xs text-muted">No opcode data available</span>
       </div>
     );
@@ -160,7 +160,7 @@ function OpcodeBreakdownView({
   const maxGas = topOpcodes[0]?.gas ?? 1;
 
   return (
-    <div className="border-y border-primary/30 bg-primary/5 px-4 py-3">
+    <div className="border-y border-primary-30 bg-primary-5 px-4 py-3">
       {/* Header with totals */}
       <div className="mb-3 flex items-center justify-between">
         <span className="text-xs font-medium text-primary">Opcode Gas Breakdown</span>
@@ -175,15 +175,15 @@ function OpcodeBreakdownView({
         {topOpcodes.map(op => (
           <div key={op.opcode} className="flex items-center gap-2">
             <span className="w-24 shrink-0 font-mono text-xs text-foreground">{op.opcode}</span>
-            <div className="relative h-4 flex-1 overflow-hidden rounded-xs bg-background/50">
+            <div className="relative h-4 flex-1 overflow-hidden rounded-xs bg-background-50">
               <div
                 className="h-full transition-all"
                 style={{ width: `${(op.gas / maxGas) * 100}%`, backgroundColor: getOpcodeColorHex(op.opcode) }}
               />
             </div>
             <span className="w-16 shrink-0 text-right text-xs text-muted">{op.gas.toLocaleString()}</span>
-            <span className="w-12 shrink-0 text-right text-xs text-muted/60">{op.percentage.toFixed(1)}%</span>
-            <span className="w-10 shrink-0 text-right text-xs text-muted/40">×{op.count}</span>
+            <span className="w-12 shrink-0 text-right text-xs text-muted-60">{op.percentage.toFixed(1)}%</span>
+            <span className="w-10 shrink-0 text-right text-xs text-muted-40">×{op.count}</span>
           </div>
         ))}
       </div>
@@ -381,9 +381,9 @@ function TraceRow({
     <>
       <div
         className={clsx(
-          'group flex items-center gap-2 border-b border-border/30 px-3 py-1.5 font-mono text-sm',
-          (frame.call_type || isContractCreation) && 'cursor-pointer hover:bg-surface/50',
-          hasError && 'bg-danger/5'
+          'group flex items-center gap-2 border-b border-border-30 px-3 py-1.5 font-mono text-sm',
+          (frame.call_type || isContractCreation) && 'cursor-pointer hover:bg-surface-50',
+          hasError && 'bg-danger-5'
         )}
         onClick={handleClick}
       >
@@ -410,7 +410,7 @@ function TraceRow({
           <span
             className={clsx(
               'shrink-0 rounded-xs px-1.5 py-0.5 text-xs font-medium',
-              isContractCreation ? 'bg-data-orange/20 text-data-orange' : callTypeStyles.bg,
+              isContractCreation ? 'bg-data-orange-20 text-data-orange' : callTypeStyles.bg,
               isContractCreation ? '' : callTypeStyles.text
             )}
           >
@@ -420,7 +420,7 @@ function TraceRow({
 
         {/* Precompile badge */}
         {isPrecompile && (
-          <span className="shrink-0 rounded-xs bg-data-rose/20 px-1.5 py-0.5 text-xs font-medium text-data-rose">
+          <span className="shrink-0 rounded-xs bg-data-rose-20 px-1.5 py-0.5 text-xs font-medium text-data-rose">
             precompile
           </span>
         )}
@@ -432,7 +432,7 @@ function TraceRow({
               className={clsx(
                 'cursor-pointer transition-colors',
                 isAddressHighlighted
-                  ? 'rounded-xs bg-warning/30 px-0.5 text-foreground'
+                  ? 'rounded-xs bg-warning-30 px-0.5 text-foreground'
                   : 'text-muted hover:text-foreground'
               )}
               onMouseEnter={handleContractMouseEnter}
@@ -445,7 +445,7 @@ function TraceRow({
           <span
             className={clsx(
               'cursor-pointer font-medium transition-colors',
-              isFunctionHighlighted && 'rounded-xs bg-data-emerald/30 px-0.5 text-foreground dark:bg-data-lime/30'
+              isFunctionHighlighted && 'rounded-xs bg-code-highlight px-0.5 text-foreground'
             )}
             onMouseEnter={node.functionName ? handleFunctionMouseEnter : undefined}
             onMouseLeave={node.functionName ? handleMouseLeave : undefined}
@@ -464,7 +464,7 @@ function TraceRow({
         {/* Opcode badges - storage writes (SSTORE) */}
         {opcodeStats && opcodeStats.sstoreCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-warning/20 px-1.5 py-0.5 text-xs text-warning transition-colors hover:bg-warning/30">
+            <span className="cursor-pointer rounded-xs bg-warning-20 px-1.5 py-0.5 text-xs text-warning transition-colors hover:bg-warning-30">
               {opcodeStats.sstoreCount} write{opcodeStats.sstoreCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -477,7 +477,7 @@ function TraceRow({
         {/* Opcode badges - storage reads (SLOAD) */}
         {opcodeStats && opcodeStats.sloadCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-data-sky/20 px-1.5 py-0.5 text-xs text-data-sky transition-colors hover:bg-data-sky/30">
+            <span className="cursor-pointer rounded-xs bg-data-sky-20 px-1.5 py-0.5 text-xs text-data-sky transition-colors hover:bg-data-sky-30">
               {opcodeStats.sloadCount} read{opcodeStats.sloadCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -490,7 +490,7 @@ function TraceRow({
         {/* Opcode badges - events/logs (LOG0-LOG4) */}
         {opcodeStats && opcodeStats.logCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-data-violet/20 px-1.5 py-0.5 text-xs text-data-violet transition-colors hover:bg-data-violet/30">
+            <span className="cursor-pointer rounded-xs bg-data-violet-20 px-1.5 py-0.5 text-xs text-data-violet transition-colors hover:bg-data-violet-30">
               {opcodeStats.logCount} event{opcodeStats.logCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -503,7 +503,7 @@ function TraceRow({
         {/* Opcode badges - contract creation (CREATE/CREATE2) */}
         {opcodeStats && opcodeStats.createCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-data-orange/20 px-1.5 py-0.5 text-xs text-data-orange transition-colors hover:bg-data-orange/30">
+            <span className="cursor-pointer rounded-xs bg-data-orange-20 px-1.5 py-0.5 text-xs text-data-orange transition-colors hover:bg-data-orange-30">
               {opcodeStats.createCount} deploy{opcodeStats.createCount > 1 ? 's' : ''}
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -515,7 +515,7 @@ function TraceRow({
         {/* Opcode badges - self destruct */}
         {opcodeStats && opcodeStats.selfdestructCount > 0 && (
           <button onClick={handleOpcodeToggle} className="group/badge relative shrink-0">
-            <span className="cursor-pointer rounded-xs bg-danger/20 px-1.5 py-0.5 text-xs text-danger transition-colors hover:bg-danger/30">
+            <span className="cursor-pointer rounded-xs bg-danger-20 px-1.5 py-0.5 text-xs text-danger transition-colors hover:bg-danger-30">
               selfdestruct
             </span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/badge:block">
@@ -549,8 +549,8 @@ function TraceRow({
             className={clsx(
               'group/opcode relative flex size-6 shrink-0 items-center justify-center rounded-sm border transition-colors',
               isOpcodeExpanded
-                ? 'border-primary/50 bg-primary/20 text-primary'
-                : 'border-border bg-surface/50 text-muted hover:border-primary/30 hover:bg-surface hover:text-foreground'
+                ? 'border-primary-50 bg-primary-20 text-primary'
+                : 'border-border bg-surface-50 text-muted hover:border-primary-30 hover:bg-surface hover:text-foreground'
             )}
           >
             <ChartBarIcon className="size-4" />
@@ -704,7 +704,7 @@ export function CallTraceView({
 
   if (!rootNode) {
     return (
-      <div className="rounded-sm border border-border bg-surface/30 p-8 text-center text-sm text-muted">
+      <div className="rounded-sm border border-border bg-surface-30 p-8 text-center text-sm text-muted">
         No call trace data
       </div>
     );
@@ -738,7 +738,7 @@ export function CallTraceView({
       </div>
 
       {/* Column headers */}
-      <div className="flex items-center gap-2 border-b border-border bg-surface/50 px-3 py-1.5 text-xs font-medium text-muted">
+      <div className="flex items-center gap-2 border-b border-border bg-surface-50 px-3 py-1.5 text-xs font-medium text-muted">
         <span className="flex-1">Call</span>
         <span className="w-20 text-right">Gas</span>
         <span className="w-2" />

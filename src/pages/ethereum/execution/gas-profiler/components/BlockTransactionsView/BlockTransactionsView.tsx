@@ -74,13 +74,13 @@ function shortAddress(address: string): string {
 function getTypeStyles(type: string): string {
   switch (type) {
     case 'Transfer':
-      return 'bg-data-cyan/10 text-data-cyan';
+      return 'bg-data-cyan-10 text-data-cyan';
     case 'CREATE':
-      return 'bg-data-orange/10 text-data-orange';
+      return 'bg-data-orange-10 text-data-orange';
     case 'CREATE2':
-      return 'bg-warning/10 text-warning';
+      return 'bg-warning-10 text-warning';
     default:
-      return 'bg-data-blue/10 text-data-blue';
+      return 'bg-data-blue-10 text-data-blue';
   }
 }
 
@@ -477,7 +477,7 @@ export function BlockTransactionsView({
                 <div
                   className={clsx(
                     'h-full rounded-full',
-                    pct > 30 ? 'bg-warning' : pct > 10 ? 'bg-primary' : 'bg-primary/60'
+                    pct > 30 ? 'bg-warning' : pct > 10 ? 'bg-primary' : 'bg-primary-60'
                   )}
                   style={{ width: `${Math.min(pct, 100)}%` }}
                 />

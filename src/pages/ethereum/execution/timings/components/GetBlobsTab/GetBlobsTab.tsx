@@ -54,7 +54,7 @@ function GetBlobsTabSkeleton(): JSX.Element {
           <Card key={index}>
             <div className="space-y-4 p-4">
               <LoadingContainer className="h-5 w-32 rounded-xs" />
-              <LoadingContainer className="h-[375px] w-full rounded-xs" />
+              <LoadingContainer className="h-93.75 w-full rounded-xs" />
             </div>
           </Card>
         ))}
@@ -197,7 +197,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             height={375}
           />
         ) : (
-          <div className="flex h-[375px] items-center justify-center text-muted">No histogram data available</div>
+          <div className="flex h-93.75 items-center justify-center text-muted">No histogram data available</div>
         )}
       </div>
     </PopoutCard>
@@ -527,7 +527,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   enableDataZoom={true}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No slot data available</div>
               )}
             </div>
           </PopoutCard>
@@ -593,7 +593,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
@@ -650,7 +650,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
@@ -671,7 +671,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             {statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
             ) : (
-              <div className="flex h-[250px] items-center justify-center text-muted">No status data available</div>
+              <div className="flex h-62.5 items-center justify-center text-muted">No status data available</div>
             )}
           </div>
         </PopoutCard>
@@ -688,9 +688,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
               {blobCountData.length > 0 ? (
                 <BarChart data={blobCountData} labels={blobCountLabels} color={themeColors.accent} height={250} />
               ) : (
-                <div className="flex h-[250px] items-center justify-center text-muted">
-                  No blob count data available
-                </div>
+                <div className="flex h-62.5 items-center justify-center text-muted">No blob count data available</div>
               )}
             </div>
           </PopoutCard>

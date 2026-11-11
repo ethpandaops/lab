@@ -15,11 +15,11 @@ const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
 
       const positionClasses = clsx(
         // Rounded corners (only when rounded prop is true)
-        rounded && isFirst && 'rounded-l-sm !rounded-r-none',
-        rounded && isLast && 'rounded-r-sm !rounded-l-none',
-        rounded && !isFirst && !isLast && '!rounded-none',
+        rounded && isFirst && 'rounded-l-sm rounded-r-none!',
+        rounded && isLast && 'rounded-r-sm rounded-l-none!',
+        rounded && !isFirst && !isLast && 'rounded-none!',
         // Square corners (when rounded prop is false)
-        !rounded && '!rounded-none',
+        !rounded && 'rounded-none!',
         // Negative margin for overlapping borders
         !isFirst && '-ml-px',
         // Focus z-index

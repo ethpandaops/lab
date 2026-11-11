@@ -224,7 +224,7 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
   ]);
 
   return (
-    <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={_height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={ref}

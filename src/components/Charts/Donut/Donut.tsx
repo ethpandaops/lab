@@ -224,7 +224,7 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={ref}

@@ -429,9 +429,7 @@ function Map2DChartComponent({
                 <tbody>
                   {hoveredPoint.nodes.map((node, idx) => (
                     <tr key={`${node.nodeId}-${idx}`} className="text-foreground">
-                      <td className="max-w-[180px] truncate py-0.5 pr-4 font-mono text-2xs opacity-80">
-                        {node.nodeId}
-                      </td>
+                      <td className="max-w-45 truncate py-0.5 pr-4 font-mono text-2xs opacity-80">{node.nodeId}</td>
                       <td className="py-0.5 pr-4">{node.username || <span className="text-muted">—</span>}</td>
                       <td className="py-0.5 pr-4 capitalize">
                         {node.client ? (
@@ -467,7 +465,7 @@ function Map2DChartComponent({
         opts={chartOpts}
         onEvents={onEvents}
       />
-      <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface px-2 py-1 text-xs text-muted">
+      <div className="pointer-events-none absolute bottom-2 left-2 rounded-xs bg-surface px-2 py-1 text-xs text-muted">
         Xatu nodes
       </div>
     </div>

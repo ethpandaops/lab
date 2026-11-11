@@ -12,7 +12,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[720px] rounded-sm bg-surface p-6">
+      <div className="min-w-180 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

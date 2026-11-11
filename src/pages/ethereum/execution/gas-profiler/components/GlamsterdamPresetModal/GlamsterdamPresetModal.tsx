@@ -229,7 +229,7 @@ export function GlamsterdamPresetModal({
             <div className="mb-3 flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-xs bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                  <span className="rounded-xs bg-primary-10 px-2 py-0.5 text-xs font-semibold text-primary">
                     {section.eip}
                   </span>
                   <h3 className="text-sm font-semibold text-foreground">{section.name}</h3>
@@ -265,7 +265,7 @@ export function GlamsterdamPresetModal({
                 return (
                   <div
                     key={param.key}
-                    className={clsx('flex items-center gap-2 rounded-xs py-1.5', isModified && 'bg-primary/5 px-2')}
+                    className={clsx('flex items-center gap-2 rounded-xs py-1.5', isModified && 'bg-primary-5 px-2')}
                   >
                     {/* Label */}
                     <div className="w-36 shrink-0">
@@ -282,7 +282,7 @@ export function GlamsterdamPresetModal({
                     {/* Default → New indicator */}
                     <span className="w-24 shrink-0 text-right font-mono text-2xs text-muted">
                       {defaultValue.toLocaleString()}
-                      <span className="mx-1 text-muted/50">&rarr;</span>
+                      <span className="mx-1 text-muted-50">&rarr;</span>
                     </span>
 
                     {/* Number Input */}
@@ -295,7 +295,7 @@ export function GlamsterdamPresetModal({
                       onChange={e => handleParamChange(param.key, Number(e.target.value))}
                       className={clsx(
                         'w-20 shrink-0 rounded-xs border bg-surface px-2 py-1 text-right font-mono text-xs focus:ring-1 focus:ring-primary focus:outline-hidden',
-                        isModified ? 'border-primary/30 text-primary' : 'border-border text-foreground'
+                        isModified ? 'border-primary-30 text-primary' : 'border-border text-foreground'
                       )}
                     />
 
@@ -336,7 +336,7 @@ export function GlamsterdamPresetModal({
 
             {/* Optional note about unsimulated parts */}
             {section.note && (
-              <div className="mt-2.5 flex items-start gap-2 rounded-xs bg-warning/5 px-3 py-2">
+              <div className="mt-2.5 flex items-start gap-2 rounded-xs bg-warning-5 px-3 py-2">
                 <ExclamationTriangleIcon className="mt-0.5 size-3.5 shrink-0 text-warning" />
                 <p className="text-2xs/4 text-muted">{section.note}</p>
               </div>
@@ -353,7 +353,7 @@ export function GlamsterdamPresetModal({
           <div className="space-y-2">
             {UNSUPPORTED_EIPS.map(eip => (
               <div key={eip.eip} className="flex items-start gap-3 rounded-xs bg-surface px-3 py-2.5">
-                <span className="shrink-0 rounded-xs bg-muted/10 px-2 py-0.5 text-xs font-semibold text-muted">
+                <span className="shrink-0 rounded-xs bg-muted-10 px-2 py-0.5 text-xs font-semibold text-muted">
                   {eip.eip}
                 </span>
                 <div className="min-w-0 flex-1">

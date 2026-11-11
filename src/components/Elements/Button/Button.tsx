@@ -3,7 +3,6 @@ import { Button as HeadlessButton } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ButtonProps } from './Button.types';
 import { buttonClassName } from './Button.styles';
-import './Button.css';
 
 const iconSizeStyles = {
   xs: 'size-4', // 16px - proportional to xs

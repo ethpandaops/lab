@@ -10,7 +10,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -214,7 +214,7 @@ export const WithComplexContent: Story = {
             <h3 className="text-sm/6 font-semibold text-foreground">Network Status</h3>
             <p className="mt-1 text-sm/5 text-muted">All systems operational</p>
           </div>
-          <span className="inline-flex items-center rounded-xs bg-success/10 px-2 py-1 text-xs font-medium text-success">
+          <span className="inline-flex items-center rounded-xs bg-success-10 px-2 py-1 text-xs font-medium text-success">
             Healthy
           </span>
         </div>
@@ -225,7 +225,7 @@ export const WithComplexContent: Story = {
             <h3 className="text-sm/6 font-semibold text-foreground">API Response Time</h3>
             <p className="mt-1 text-sm/5 text-muted">Average: 145ms</p>
           </div>
-          <span className="inline-flex items-center rounded-xs bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
+          <span className="inline-flex items-center rounded-xs bg-warning-10 px-2 py-1 text-xs font-medium text-warning">
             Degraded
           </span>
         </div>
@@ -236,7 +236,7 @@ export const WithComplexContent: Story = {
             <h3 className="text-sm/6 font-semibold text-foreground">Database Connection</h3>
             <p className="mt-1 text-sm/5 text-muted">Connection failed</p>
           </div>
-          <span className="inline-flex items-center rounded-xs bg-danger/10 px-2 py-1 text-xs font-medium text-danger">
+          <span className="inline-flex items-center rounded-xs bg-danger-10 px-2 py-1 text-xs font-medium text-danger">
             Error
           </span>
         </div>
@@ -409,7 +409,7 @@ export const CompactNoDividers: Story = {
         <ListContainer variant="simple" compact withDividers={false}>
           {items.map(item => (
             <ListItem key={item.id}>
-              <div className="rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary/10">
+              <div className="rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary-10">
                 <h3 className="text-sm/6 font-semibold text-foreground">{item.title}</h3>
               </div>
             </ListItem>

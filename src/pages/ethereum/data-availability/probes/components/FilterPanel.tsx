@@ -83,13 +83,13 @@ function FilterChip({
   const displayValue = Array.isArray(value) ? `${value.length} selected` : value;
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+    <span className="inline-flex items-center gap-1 rounded-xs border border-primary-30 bg-primary-10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
       <span className="max-w-32 truncate">{displayValue}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
+        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary-20"
       >
         <XMarkIcon className="size-3" />
       </button>
@@ -239,7 +239,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                 multiple
               >
                 <div className="relative">
-                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface py-2 pr-10 pl-3 text-left transition-all hover:border-primary/30 hover:bg-surface">
+                  <ListboxButton className="relative w-full cursor-pointer border border-border bg-surface py-2 pr-10 pl-3 text-left transition-all hover:border-primary-30 hover:bg-surface">
                     <span className="flex items-center gap-1">
                       {(draftFilters.blobPosters ?? []).length > 0 ? (
                         <>
@@ -260,7 +260,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                   </ListboxButton>
                   <ListboxOptions
                     transition
-                    className="absolute z-[9999] mt-1 max-h-60 w-full overflow-auto border border-border bg-surface data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
+                    className="absolute z-9999 mt-1 max-h-60 w-full overflow-auto border border-border bg-surface data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0"
                   >
                     {BLOB_POSTERS.map(poster => {
                       const displayName = BLOB_POSTER_DISPLAY_NAMES[poster] ?? poster;
@@ -268,7 +268,7 @@ export function FilterPanel({ filters, onFiltersChange, onClearAll }: FilterPane
                         <ListboxOption
                           key={poster}
                           value={displayName}
-                          className="relative cursor-pointer py-1.5 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:bg-primary/5"
+                          className="relative cursor-pointer py-1.5 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary-10 data-focus:text-primary data-selected:bg-primary-5"
                         >
                           {({ selected }) => (
                             <>

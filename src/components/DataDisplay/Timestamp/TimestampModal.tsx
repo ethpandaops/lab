@@ -283,7 +283,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         <div className="flex items-center gap-2">
           <span className="text-xs/5 font-medium text-muted">{label}</span>
           {isLive && (
-            <span className="flex items-center gap-1.5 rounded-xs bg-success/20 px-1.5 py-0.5 text-2xs/3 font-semibold text-success">
+            <span className="flex items-center gap-1.5 rounded-xs bg-success-20 px-1.5 py-0.5 text-2xs/3 font-semibold text-success">
               <span className="inline-flex size-1.5 rounded-full bg-success"></span>
               LIVE
             </span>
@@ -291,7 +291,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         </div>
         {badge && !isLive && (
           <div className="mt-1">
-            <span className="inline-block rounded-xs bg-accent/10 px-1.5 py-0.5 text-2xs/3 font-medium text-accent">
+            <span className="inline-block rounded-xs bg-accent-10 px-1.5 py-0.5 text-2xs/3 font-medium text-accent">
               {badge}
             </span>
           </div>
@@ -304,7 +304,7 @@ function TimestampRow({ label, value, onCopy, isCopied, badge, isLive }: Timesta
         <div
           className={clsx(
             'inline-flex rounded-xs p-2 transition-all',
-            isCopied ? 'bg-success/20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
+            isCopied ? 'bg-success-20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
           )}
           aria-label={`Copy ${label}`}
         >
@@ -381,7 +381,7 @@ function LinkableRow({ label, onCopy, isCopied, children }: LinkableRowProps): J
           onClick={onCopy}
           className={clsx(
             'inline-flex rounded-xs p-2 transition-all',
-            isCopied ? 'bg-success/20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
+            isCopied ? 'bg-success-20 text-success' : 'text-muted opacity-0 group-hover:opacity-100'
           )}
           aria-label={`Copy ${label}`}
         >

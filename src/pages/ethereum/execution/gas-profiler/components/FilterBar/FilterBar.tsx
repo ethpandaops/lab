@@ -124,8 +124,8 @@ export function FilterBar({
                 className={clsx(
                   'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
                   preset.active
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-foreground hover:border-primary/40',
+                    ? 'border-primary bg-primary-10 text-primary'
+                    : 'border-border bg-surface text-foreground hover:border-primary-40',
                   'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-border'
                 )}
               >
@@ -149,7 +149,7 @@ export function FilterBar({
           <FunnelIcon className="size-4" />
           Filters
           {chips.length > 0 && (
-            <span className="flex size-5 items-center justify-center rounded-xs bg-primary text-xs text-white">
+            <span className="flex size-5 items-center justify-center rounded-xs bg-primary text-xs text-on-fill">
               {chips.length}
             </span>
           )}
@@ -162,7 +162,7 @@ export function FilterBar({
               {chips.map(chip => (
                 <span
                   key={chip.id}
-                  className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                  className="inline-flex items-center gap-1 rounded-xs border border-primary-30 bg-primary-10 px-2 py-0.5 text-xs text-primary"
                 >
                   <span className="font-medium">{chip.label}:</span>
                   <span className="max-w-48 truncate">{chip.value}</span>
@@ -170,7 +170,7 @@ export function FilterBar({
                     type="button"
                     onClick={chip.onRemove}
                     aria-label={`Remove ${chip.label} filter`}
-                    className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
+                    className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary-20"
                   >
                     <XMarkIcon className="size-3" />
                   </button>

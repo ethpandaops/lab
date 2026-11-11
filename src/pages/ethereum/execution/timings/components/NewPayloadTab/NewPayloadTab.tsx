@@ -507,7 +507,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   enableDataZoom
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No slot data available</div>
               )
             }
           </PopoutCard>
@@ -648,7 +648,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                 height={inModal ? 600 : 300}
               />
             ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
+              <div className="flex h-75 items-center justify-center text-muted">No histogram data available</div>
             )
           }
         </PopoutCard>
@@ -663,7 +663,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
             statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={inModal ? 600 : 300} orientation="horizontal" />
             ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
+              <div className="flex h-75 items-center justify-center text-muted">No status data available</div>
             )
           }
         </PopoutCard>
@@ -1076,7 +1076,7 @@ function WinrateSection({
                       isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
                       isLeader ? 'border-border' : '',
                       !isLeader && isTopThree && medal ? medal.bg : '',
-                      !isTopThree ? 'bg-surface/20' : ''
+                      !isTopThree ? 'bg-surface-20' : ''
                     )}
                   >
                     {/* Proportional fill bar */}
@@ -1103,7 +1103,7 @@ function WinrateSection({
                         className={clsx(
                           'shrink-0 text-center font-semibold tabular-nums',
                           isLeader ? 'w-9 text-2xl/8' : isTopThree ? 'w-8 text-xl/7' : 'w-5 text-xs/5',
-                          isTopThree && medal ? medal.text : 'text-muted/50'
+                          isTopThree && medal ? medal.text : 'text-muted-50'
                         )}
                       >
                         {standing.rank}
@@ -1131,7 +1131,7 @@ function WinrateSection({
                           {standing.implementation}
                         </div>
                         {isTopThree && (
-                          <div className="text-2xs/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
+                          <div className="text-2xs/4 text-muted-60">{standing.totalWins.toLocaleString()} wins</div>
                         )}
                       </div>
 
@@ -1141,7 +1141,7 @@ function WinrateSection({
                           'shrink-0 font-semibold tracking-tight tabular-nums',
                           isLeader ? 'text-2xl/7 text-foreground' : '',
                           !isLeader && isTopThree && medal ? `text-lg/6 ${medal.text}` : '',
-                          !isTopThree ? 'text-sm/5 text-muted/70' : ''
+                          !isTopThree ? 'text-sm/5 text-muted-70' : ''
                         )}
                       >
                         {standing.winRate > 0 ? `${standing.winRate}%` : '—'}
@@ -1154,7 +1154,7 @@ function WinrateSection({
 
             {/* Wins in total; a tie counts for every tied client */}
             {totalWins > 0 && (
-              <div className="mt-3 text-center text-2xs text-muted/40 tabular-nums">
+              <div className="mt-3 text-center text-2xs text-muted-40 tabular-nums">
                 {totalWins.toLocaleString()} wins
               </div>
             )}
@@ -1167,7 +1167,7 @@ function WinrateSection({
 
 /** Rank styling for the podium positions (neutral: a rank is not a status) */
 const MEDAL_CONFIG: Record<number, { bg: string; text: string }> = {
-  1: { bg: 'bg-muted/10', text: 'text-foreground' },
-  2: { bg: 'bg-muted/10', text: 'text-foreground' },
-  3: { bg: 'bg-muted/5', text: 'text-foreground' },
+  1: { bg: 'bg-muted-10', text: 'text-foreground' },
+  2: { bg: 'bg-muted-10', text: 'text-foreground' },
+  3: { bg: 'bg-muted-5', text: 'text-foreground' },
 };

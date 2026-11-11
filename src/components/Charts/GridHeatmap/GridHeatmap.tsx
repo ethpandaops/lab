@@ -57,7 +57,7 @@ export function GridHeatmap<T = unknown>({
   // Cell sizing - 3xs uses flexible sizing to fill container, others use fixed sizes
   const cellSizeClass: Record<GridCellSize, string> = {
     '3xs': 'aspect-square', // Responsive - height matches width, actual width set by grid
-    '2xs': 'size-[9px]', // 9px - compact
+    '2xs': 'size-2.25', // 9px - compact
     xs: 'size-2.5', // 10px
     sm: 'size-3', // 12px
     md: 'size-4', // 16px

@@ -7,7 +7,7 @@ const meta: Meta<typeof GasTooltip> = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="flex min-h-[200px] min-w-[400px] items-center justify-center rounded-xs bg-surface p-6">
+      <div className="flex min-h-50 min-w-100 items-center justify-center rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),

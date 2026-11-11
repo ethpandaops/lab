@@ -50,9 +50,9 @@ export function SelectMenu<T>({
       <div className={clsx('relative', showLabel && 'mt-2', className)}>
         <ListboxButton
           className={clsx(
-            'relative h-8 cursor-pointer border border-border bg-surface pr-8 pl-2.5 text-left text-sm transition-colors hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50',
+            'relative h-8 cursor-pointer border border-border bg-surface pr-8 pl-2.5 text-left text-sm transition-colors hover:border-primary-40 disabled:cursor-not-allowed disabled:opacity-50',
             rounded && 'rounded-sm',
-            expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
+            expandToFit ? 'w-auto min-w-35' : 'w-full'
           )}
           data-disabled={disabled || undefined}
         >
@@ -73,15 +73,15 @@ export function SelectMenu<T>({
           anchor="bottom start"
           transition
           className={clsx(
-            'z-[9999] mt-1 max-h-60 overflow-auto rounded-sm border border-border bg-surface data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
-            expandToFit ? 'w-max' : 'w-[var(--button-width)]'
+            'z-9999 mt-1 max-h-60 overflow-auto rounded-sm border border-border bg-surface data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            expandToFit ? 'w-max' : 'w-button'
           )}
         >
           {options.map((option, index) => (
             <ListboxOption
               key={index}
               value={option.value}
-              className="relative cursor-pointer py-1.5 pr-9 pl-2.5 text-sm text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
+              className="relative cursor-pointer py-1.5 pr-9 pl-2.5 text-sm text-foreground transition-colors select-none data-focus:bg-primary-10 data-focus:text-primary data-selected:text-primary"
             >
               <span className="flex items-center gap-2">
                 {option.icon && <span className="flex size-5 shrink-0 items-center justify-center">{option.icon}</span>}

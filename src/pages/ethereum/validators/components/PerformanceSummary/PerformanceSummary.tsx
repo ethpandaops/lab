@@ -14,7 +14,7 @@ interface PerformanceSummaryProps {
 
 /** Skeleton placeholder shown in place of a value while loading */
 function ValueSkeleton(): JSX.Element {
-  return <span className="block h-8 w-20 animate-pulse rounded-xs bg-muted/20" />;
+  return <span className="block h-8 w-20 animate-pulse rounded-xs bg-muted-20" />;
 }
 
 /** Percentage with the given decimals; a dash when there is no rate */

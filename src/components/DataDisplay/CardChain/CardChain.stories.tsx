@@ -20,7 +20,7 @@ const meta: Meta<typeof CardChain> = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[900px] rounded-xs bg-background p-6">
+      <div className="min-w-225 rounded-xs bg-background p-6">
         <Story />
       </div>
     ),

@@ -501,7 +501,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             </div>
           </div>
 
-          <div className="h-[22vh] shrink-0 border-t border-border bg-surface">
+          <div className="h-vh-22 shrink-0 border-t border-border bg-surface">
             <LiveBottomBar
               activeFork={activeFork}
               blockVersion={slotData.blockDetails?.blockVersion}
@@ -516,8 +516,8 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
           </div>
         </div>
 
-        <div className="flex h-[calc(100vh-65px)] flex-col overflow-hidden lg:hidden">
-          <div className="h-[60px] shrink-0">
+        <div className="flex h-vh-less-16.25 flex-col overflow-hidden lg:hidden">
+          <div className="h-15 shrink-0">
             <MobileSlotHeader
               currentSlot={currentSlot}
               activeFork={activeFork}
@@ -539,7 +539,7 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             />
           </div>
 
-          <div className="h-[56px] shrink-0 overflow-hidden border-b border-border bg-surface px-3 py-2">
+          <div className="h-14 shrink-0 overflow-hidden border-b border-border bg-surface px-3 py-2">
             <LiveSlotTimeline
               phases={slotData.sidebarPhases}
               onTimeClick={handleTimeClick}
@@ -553,11 +553,11 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
             <LiveScrollingTimeline items={slotData.sidebarItems} autoScroll={true} height="100%" />
           </div>
 
-          <div className="h-[264px] shrink-0 overflow-hidden bg-background">
+          <div className="h-66 shrink-0 overflow-hidden bg-background">
             <LiveMapChart currentSlot={currentSlot} pointSizeMultiplier={1.5} />
           </div>
 
-          <div className="h-[25vh] shrink-0">
+          <div className="h-vh-25 shrink-0">
             <LiveBottomBar
               activeFork={activeFork}
               blockVersion={slotData.blockDetails?.blockVersion}

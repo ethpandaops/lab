@@ -1009,7 +1009,7 @@ export function TransactionPage(): JSX.Element {
             {/* Call Tree or Simple Transfer Message */}
             {isSimpleTransfer ? (
               <Card className="mb-6 p-6 text-center">
-                <div className="mb-3 inline-flex rounded-full bg-blob-0/10 p-3">
+                <div className="mb-3 inline-flex rounded-full bg-blob-0-10 p-3">
                   <svg className="size-6 text-blob-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"

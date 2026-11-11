@@ -566,7 +566,7 @@ function BPOParentForkCard({ bpo }: BPOParentForkCardProps): React.JSX.Element {
         params={{ fork: getForkSlug(bpo.parentFork) }}
         className="group flex items-center gap-4 rounded-sm border border-border p-4 transition-colors hover:bg-background"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface text-2xl transition-colors group-hover:border-accent/30">
+        <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface text-2xl transition-colors group-hover:border-accent-30">
           {bpo.parentFork.emoji}
         </div>
         <div className="flex-1">
@@ -610,9 +610,9 @@ function BlobScheduleCard({
                   className={clsx(
                     'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
                     isCurrent
-                      ? 'border-accent/30 bg-accent/20'
+                      ? 'border-accent-30 bg-accent-20'
                       : isActive
-                        ? 'border-accent/20 bg-surface'
+                        ? 'border-accent-20 bg-surface'
                         : 'border-border bg-surface'
                   )}
                 >

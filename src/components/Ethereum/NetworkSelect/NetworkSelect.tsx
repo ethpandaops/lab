@@ -56,8 +56,8 @@ export function NetworkSelect({
         <ListboxButton
           title={getNetworkFullLabel(currentNetwork)}
           className={clsx(
-            'relative flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface pr-8 pl-2.5 text-left transition-colors hover:border-primary/40',
-            expandToFit ? 'w-auto min-w-[140px]' : 'w-full'
+            'relative flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface pr-8 pl-2.5 text-left transition-colors hover:border-primary-40',
+            expandToFit ? 'w-auto min-w-35' : 'w-full'
           )}
         >
           <span className="flex size-5 shrink-0 items-center justify-center">
@@ -80,8 +80,8 @@ export function NetworkSelect({
           anchor="bottom start"
           transition
           className={clsx(
-            'z-[9999] mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
-            expandToFit ? 'w-max min-w-[var(--button-width)]' : 'w-[var(--button-width)]'
+            'z-9999 mt-1 max-h-96 overflow-auto rounded-sm border border-border bg-surface pb-1 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0',
+            expandToFit ? 'w-max min-w-button' : 'w-button'
           )}
         >
           {groups.map((group, index) => (
@@ -89,11 +89,11 @@ export function NetworkSelect({
               key={group.id}
               role="group"
               aria-label={group.label}
-              className={clsx(index > 0 && 'mt-1 border-t border-border/50')}
+              className={clsx(index > 0 && 'mt-1 border-t border-border-50')}
             >
               <div
                 aria-hidden="true"
-                className="px-3 pt-2.5 pb-1 text-2xs/3 font-semibold tracking-wider text-muted/60 uppercase"
+                className="px-3 pt-2.5 pb-1 text-2xs/3 font-semibold tracking-wider text-muted-60 uppercase"
               >
                 {group.label}
               </div>
@@ -102,7 +102,7 @@ export function NetworkSelect({
                   key={network.name}
                   value={network}
                   title={getNetworkFullLabel(network)}
-                  className="group relative flex cursor-pointer items-center gap-2 py-2 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary/10 data-focus:text-primary data-selected:text-primary"
+                  className="group relative flex cursor-pointer items-center gap-2 py-2 pr-9 pl-3 text-foreground transition-colors select-none data-focus:bg-primary-10 data-focus:text-primary data-selected:text-primary"
                 >
                   <span className="flex size-5 shrink-0 items-center justify-center">
                     <NetworkIcon networkName={network.name} />

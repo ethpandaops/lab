@@ -13,7 +13,7 @@ export interface ReferenceNodesInfoDialogProps {
 export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDialogProps): JSX.Element {
   return (
     <Dialog open={open} onClose={onClose} title="About reference Xatu nodes" size="lg">
-      <div className="space-y-4 text-sm leading-relaxed text-muted">
+      <div className="space-y-4 text-sm/relaxed text-muted">
         <p className="font-medium text-foreground">
           Reference Xatu nodes are controlled by ethPandaOps and follow EIP-7870 hardware specifications.
         </p>
@@ -32,13 +32,13 @@ export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDi
               </tr>
             </thead>
             <tbody className="text-muted">
-              <tr className="border-b border-border/50">
+              <tr className="border-b border-border-50">
                 <td className="py-2 pr-4">Full Node</td>
                 <td className="py-2 pr-4">32 GB</td>
                 <td className="py-2 pr-4">4c/8t</td>
                 <td className="py-2">50/15 Mbps</td>
               </tr>
-              <tr className="border-b border-border/50">
+              <tr className="border-b border-border-50">
                 <td className="py-2 pr-4">Attester</td>
                 <td className="py-2 pr-4">64 GB</td>
                 <td className="py-2 pr-4">8c/16t</td>
@@ -53,7 +53,7 @@ export function ReferenceNodesInfoDialog({ open, onClose }: ReferenceNodesInfoDi
             </tbody>
           </table>
         </div>
-        <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+        <div className="rounded-sm border border-accent-20 bg-accent-5 p-3">
           <p className="text-foreground">
             <span className="font-medium">Why filter by reference Xatu nodes?</span>{' '}
             <span className="italic">

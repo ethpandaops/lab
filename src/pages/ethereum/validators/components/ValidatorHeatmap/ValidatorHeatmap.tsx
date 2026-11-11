@@ -892,7 +892,7 @@ export function ValidatorHeatmap({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80"
+      className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary-80"
     >
       <ArrowLeftIcon className="size-3" />
       {label}
@@ -904,7 +904,7 @@ export function ValidatorHeatmap({
   if (isLoading) {
     return (
       <Card title={dailyTitle} className={className}>
-        <div className="h-64 animate-pulse rounded-xs bg-muted/10" />
+        <div className="h-64 animate-pulse rounded-xs bg-muted-10" />
       </Card>
     );
   }
@@ -912,8 +912,8 @@ export function ValidatorHeatmap({
   if (data.length === 0 && blockProposals.length === 0 && validatorIndicesProp.length === 0) {
     return (
       <Card title={dailyTitle} className={className}>
-        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-          <ChartBarIcon className="size-8 text-muted/40" />
+        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+          <ChartBarIcon className="size-8 text-muted-40" />
           <p className="text-sm text-muted">No attestation data in this range.</p>
         </div>
       </Card>
@@ -940,8 +940,8 @@ export function ValidatorHeatmap({
             }
             if (isSlotEmpty) {
               return (
-                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-                  <ChartBarIcon className="size-8 text-muted/40" />
+                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+                  <ChartBarIcon className="size-8 text-muted-40" />
                   <p className="text-sm text-muted">
                     {isProposalsMetric ? 'No block proposals for this hour.' : 'No slot data available for this hour.'}
                   </p>
@@ -998,8 +998,8 @@ export function ValidatorHeatmap({
             }
             if (isHourlyEmpty) {
               return (
-                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-                  <ChartBarIcon className="size-8 text-muted/40" />
+                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+                  <ChartBarIcon className="size-8 text-muted-40" />
                   <p className="text-sm text-muted">
                     {isProposalsMetric ? 'No block proposals for this day.' : 'No hourly data available for this day.'}
                   </p>
@@ -1047,8 +1047,8 @@ export function ValidatorHeatmap({
       <div className="mb-4">{metricControl}</div>
       <div ref={containerRef}>
         {activeDailyData.length === 0 ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-            <ChartBarIcon className="size-8 text-muted/40" />
+          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+            <ChartBarIcon className="size-8 text-muted-40" />
             <p className="text-sm text-muted">
               {isProposalsMetric ? 'No block proposals in this range.' : 'No attestation data in this range.'}
             </p>

@@ -33,7 +33,7 @@ export function ForkLabel({
     version: fork,
     name: fork,
     emoji: '🔮',
-    color: 'bg-muted/10 text-muted',
+    color: 'bg-muted-10 text-muted',
     description: `Upcoming fork: ${fork}`,
   };
 

@@ -33,13 +33,13 @@ export function ListPagination({
   const navClass = (enabled: boolean): string =>
     clsx(
       'flex items-center justify-center rounded-sm p-1 transition-colors',
-      enabled ? 'text-muted hover:bg-primary/10 hover:text-primary' : 'cursor-not-allowed text-muted/30'
+      enabled ? 'text-muted hover:bg-primary-10 hover:text-primary' : 'cursor-not-allowed text-muted-30'
     );
 
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-4 border-t border-border bg-surface/50 px-3 py-2',
+        'flex items-center justify-between gap-4 border-t border-border bg-surface-50 px-3 py-2',
         className
       )}
     >

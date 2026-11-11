@@ -42,9 +42,8 @@ const variantStyles: Record<
     itemMobileFull: 'px-4 sm:px-6',
   },
   flat: {
-    wrapper: 'overflow-hidden border border-border bg-surface dark:border-border dark:bg-background',
-    wrapperMobileFull:
-      'overflow-hidden border border-border bg-surface sm:rounded-sm dark:border-border dark:bg-background',
+    wrapper: 'overflow-hidden border border-border bg-panel',
+    wrapperMobileFull: 'overflow-hidden border border-border bg-panel sm:rounded-sm',
     list: '',
     listWithDividers: 'divide-y divide-border',
     item: 'px-6',

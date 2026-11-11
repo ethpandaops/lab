@@ -26,8 +26,8 @@ export function SentryFilter({ clients, value, onChange }: SentryFilterProps): J
           className={clsx(
             'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
             value === client
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-surface text-muted hover:border-primary/40'
+              ? 'border-primary bg-primary-10 text-primary'
+              : 'border-border bg-surface text-muted hover:border-primary-40'
           )}
         >
           <ClientLogo client={client} size={14} noLink />

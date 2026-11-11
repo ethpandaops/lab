@@ -828,7 +828,7 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
+        <div className="rounded-sm border border-danger-20 bg-danger-10 p-4 text-danger">
           Error loading data: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       </Container>
@@ -869,7 +869,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Learn More Dialog */}
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
-        <div className="space-y-4 text-sm leading-relaxed text-muted">
+        <div className="space-y-4 text-sm/relaxed text-muted">
           <p>
             Instead of every beacon node storing every blob, data is erasure coded with 2x redundancy and split into 128
             columns. Each P2P peer commits to storing a subset based on its identity and validator balance.
@@ -927,10 +927,10 @@ export function IndexPage(): JSX.Element {
                       <button
                         type="button"
                         onClick={crumb.onClick}
-                        className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                        className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent-10 hover:text-accent"
                       >
                         <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
-                        <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                        <span className="underline decoration-muted-50 underline-offset-2 group-hover:decoration-accent">
                           {crumb.label}
                         </span>
                       </button>
@@ -945,7 +945,7 @@ export function IndexPage(): JSX.Element {
               <button
                 type="button"
                 onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
-                className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                className="group flex items-center gap-1.5 rounded-sm bg-muted-30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent-10 hover:text-accent"
               >
                 <ArrowLeftIcon className="size-3.5" />
                 <span>Back</span>
@@ -954,7 +954,7 @@ export function IndexPage(): JSX.Element {
           )}
 
           {/* Legend Strip */}
-          <div className="rounded-sm bg-muted/30 px-3 py-2">
+          <div className="rounded-sm bg-muted-30 px-3 py-2">
             <DataAvailabilityLegend orientation="horizontal" />
           </div>
 

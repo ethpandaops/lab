@@ -128,9 +128,7 @@ export function OverviewTab({
       <Stats
         gridClassName={clsx(
           'grid grid-cols-2 gap-4',
-          layer === 'consensus'
-            ? 'lg:grid-cols-5 [&>:last-child]:col-span-2 lg:[&>:last-child]:col-span-1'
-            : 'lg:grid-cols-4'
+          layer === 'consensus' ? 'lg:grid-cols-5 *:last:col-span-2 lg:*:last:col-span-1' : 'lg:grid-cols-4'
         )}
         stats={[
           {

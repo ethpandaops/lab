@@ -11,7 +11,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -171,10 +171,10 @@ export const ShortTimeline: Story = {
 export const CustomPhases: Story = {
   args: {
     phases: [
-      { label: 'Init', duration: 2000, className: 'bg-primary', textClassName: 'text-white' },
-      { label: 'Process', duration: 5000, className: 'bg-secondary', textClassName: 'text-white' },
-      { label: 'Validate', duration: 2000, className: 'bg-success', textClassName: 'text-white' },
-      { label: 'Finalize', duration: 1000, className: 'bg-accent', textClassName: 'text-white' },
+      { label: 'Init', duration: 2000, className: 'bg-primary', textClassName: 'text-on-fill' },
+      { label: 'Process', duration: 5000, className: 'bg-secondary', textClassName: 'text-on-fill' },
+      { label: 'Validate', duration: 2000, className: 'bg-success', textClassName: 'text-on-fill' },
+      { label: 'Finalize', duration: 1000, className: 'bg-accent', textClassName: 'text-on-fill' },
     ],
     currentTime: 4500,
     showPhaseLabels: true,
@@ -188,26 +188,26 @@ export const CustomTextColors: Story = {
       {
         label: 'Light Phase',
         duration: 3000,
-        className: 'bg-white border border-border',
+        className: 'bg-surface border border-border',
         textClassName: 'text-foreground',
       },
       {
         label: 'Dark Phase',
         duration: 3000,
-        className: 'bg-slate-900',
-        textClassName: 'text-white',
+        className: 'bg-data-slate',
+        textClassName: 'text-on-fill',
       },
       {
         label: 'Accent Phase',
         duration: 3000,
-        className: 'bg-amber-200',
-        textClassName: 'text-amber-900',
+        className: 'bg-data-amber-30',
+        textClassName: 'text-foreground',
       },
       {
         label: 'Primary Phase',
         duration: 3000,
-        className: 'bg-cyan-500',
-        textClassName: 'text-cyan-50',
+        className: 'bg-data-cyan',
+        textClassName: 'text-on-fill',
       },
     ],
     currentTime: 6000,

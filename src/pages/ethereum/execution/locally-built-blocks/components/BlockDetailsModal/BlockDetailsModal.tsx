@@ -223,7 +223,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
         Slot <Slot slot={slot} />
       </span>
       <div className="flex items-center gap-3 text-xs text-muted">
-        <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
+        <span className="rounded-sm bg-primary-20 px-1.5 py-0.5 font-medium text-primary">
           {nodes.length} Xatu node{nodes.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -234,7 +234,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
     <Disclosure title={title}>
       <div className="space-y-3">
         {nodes.map((nodeGroup, index) => (
-          <div key={nodeGroup.nodeName} className="rounded-sm border border-border bg-background/30 p-3">
+          <div key={nodeGroup.nodeName} className="rounded-sm border border-border bg-background-30 p-3">
             <div className="mb-2 flex items-center gap-2 text-xs">
               <span className="text-muted">#{index + 1}</span>
               <span className="flex-1 truncate text-sm text-foreground">{nodeGroup.nodeName}</span>
@@ -268,7 +268,7 @@ function NodeCard({ nodeGroup, index }: { nodeGroup: NodeGroup; index: number })
       <span className="flex-1 truncate text-sm">{nodeName}</span>
       <div className="flex items-center gap-3 text-xs text-muted">
         {blocks.length > 1 && (
-          <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
+          <span className="rounded-sm bg-primary-20 px-1.5 py-0.5 font-medium text-primary">
             {blocks.length} blocks
           </span>
         )}

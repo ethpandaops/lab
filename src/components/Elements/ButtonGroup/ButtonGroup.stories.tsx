@@ -63,7 +63,7 @@ export const WithStat: Story = {
   args: {} as never,
   render: () => (
     <ButtonGroup>
-      <Button variant="soft" leadingIcon={<BookmarkIcon className="text-gray-400 dark:text-gray-500" />}>
+      <Button variant="soft" leadingIcon={<BookmarkIcon className="text-muted" />}>
         Bookmark
       </Button>
       <Button variant="soft">12k</Button>
@@ -81,25 +81,25 @@ const items = [
 export const WithDropdown: Story = {
   args: {} as never,
   render: () => (
-    <div className="inline-flex rounded-md shadow-xs dark:shadow-none">
-      <Button className="rounded-l-md !rounded-r-none !bg-white !text-gray-900 !shadow-none !inset-ring !inset-ring-gray-300 hover:!bg-gray-50 dark:!bg-white/10 dark:!text-white dark:!inset-ring-gray-700 dark:hover:!bg-white/20">
+    <div className="inline-flex rounded-md shadow-xs">
+      <Button variant="secondary" className="rounded-l-md rounded-r-none! shadow-none!">
         Save changes
       </Button>
       <Menu as="div" className="relative -ml-px block">
-        <MenuButton className="relative inline-flex items-center rounded-r-md bg-white px-2 py-2 text-gray-400 inset-ring inset-ring-gray-300 hover:bg-gray-50 focus:z-10 dark:bg-white/10 dark:inset-ring-gray-700 dark:hover:bg-white/20">
+        <MenuButton className="relative inline-flex items-center rounded-r-md bg-surface px-2 py-2 text-muted inset-ring inset-ring-border hover:bg-surface-hover focus:z-10">
           <span className="sr-only">Open options</span>
           <ChevronDownIcon aria-hidden="true" className="size-5" />
         </MenuButton>
         <MenuItems
           transition
-          className="absolute right-0 z-10 mt-2 -mr-1 w-56 origin-top-right rounded-md bg-white shadow-lg outline outline-black/5 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
+          className="absolute right-0 z-10 mt-2 -mr-1 w-56 origin-top-right rounded-md bg-surface shadow-lg outline outline-hairline transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
         >
           <div className="py-1">
             {items.map(item => (
               <MenuItem key={item.name}>
                 <a
                   href={item.href}
-                  className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden dark:text-gray-300 dark:data-focus:bg-white/5 dark:data-focus:text-white"
+                  className="block px-4 py-2 text-sm text-foreground-soft data-focus:bg-surface-hover data-focus:text-foreground data-focus:outline-hidden"
                 >
                   {item.name}
                 </a>
@@ -352,7 +352,7 @@ export const DisabledStates: Story = {
       <div className="flex flex-col items-start gap-2">
         <p className="text-sm/6 text-muted">Mixed with icon - one disabled</p>
         <ButtonGroup>
-          <Button variant="soft" disabled leadingIcon={<BookmarkIcon className="text-gray-400 dark:text-gray-500" />}>
+          <Button variant="soft" disabled leadingIcon={<BookmarkIcon className="text-muted" />}>
             Bookmark
           </Button>
           <Button variant="soft">12k</Button>
@@ -395,7 +395,7 @@ export const AllVariants: Story = {
       <div className="flex flex-col items-start gap-2">
         <p className="text-sm/6 text-muted">With stat (soft variant)</p>
         <ButtonGroup>
-          <Button variant="soft" leadingIcon={<BookmarkIcon className="text-gray-400 dark:text-gray-500" />}>
+          <Button variant="soft" leadingIcon={<BookmarkIcon className="text-muted" />}>
             Bookmark
           </Button>
           <Button variant="soft">12k</Button>

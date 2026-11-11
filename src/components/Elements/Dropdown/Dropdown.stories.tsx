@@ -18,7 +18,7 @@ const meta: Meta<typeof Dropdown> = {
   component: Dropdown,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -129,7 +129,7 @@ export const WithMinimalMenuIcon: Story = {
     trigger: (
       <button
         type="button"
-        className="flex items-center rounded-full text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-400 dark:hover:text-gray-300 dark:focus-visible:outline-primary"
+        className="flex items-center rounded-full text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <span className="sr-only">Open options</span>
         <EllipsisVerticalIcon aria-hidden="true" className="size-5" />

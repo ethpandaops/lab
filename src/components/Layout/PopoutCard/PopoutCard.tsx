@@ -108,7 +108,7 @@ export function PopoutCard({
   const modalContent = isRenderFunction ? children({ inModal: true }) : children;
 
   const iconButtonClassName =
-    'group rounded-sm p-1.5 text-muted transition-colors hover:bg-muted/20 hover:text-foreground focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50';
+    'group rounded-sm p-1.5 text-muted transition-colors hover:bg-muted-20 hover:text-foreground focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50';
   const iconClassName = 'size-4';
 
   // Combine subtitle and modalSubtitle for modal description
@@ -116,8 +116,8 @@ export function PopoutCard({
 
   // Render modal description box
   const descriptionBox = modalDescription ? (
-    <div className="rounded-sm bg-muted/10 px-4 py-3">
-      <p className="text-sm text-foreground dark:text-foreground">{modalDescription}</p>
+    <div className="rounded-sm bg-muted-10 px-4 py-3">
+      <p className="text-sm text-foreground">{modalDescription}</p>
     </div>
   ) : null;
 
@@ -129,7 +129,7 @@ export function PopoutCard({
     appendMetadataToDownload && showMetadata ? (
       <div
         className={clsx(
-          'grid grid-cols-12 gap-4 border-t border-border bg-muted/5 px-6 py-3',
+          'grid grid-cols-12 gap-4 border-t border-border bg-muted-5 px-6 py-3',
           noPadding ? 'mb-0' : '-mx-4 -mb-4 sm:-mx-5 sm:-mb-5'
         )}
       >
@@ -139,9 +139,9 @@ export function PopoutCard({
         </div>
         {metadataNetwork && (
           <div className="col-span-3 flex items-center justify-end">
-            <div className="inline-flex items-center gap-2 rounded-sm bg-muted/10 px-3 py-1.5">
+            <div className="inline-flex items-center gap-2 rounded-sm bg-muted-10 px-3 py-1.5">
               <NetworkIcon networkName={currentNetwork?.name || 'mainnet'} className="size-3.5" />
-              <p className="text-xs leading-none font-medium text-foreground">{metadataNetwork}</p>
+              <p className="text-xs/none font-medium text-foreground">{metadataNetwork}</p>
             </div>
           </div>
         )}
@@ -248,8 +248,7 @@ export function PopoutCard({
         <Card
           className={clsx(
             'flex h-full flex-col',
-            noPadding &&
-              '[&>div:last-child]:p-0 [&>div:last-child]:[--card-inset-y:0px] [&>div:last-child]:[--card-inset:0px]',
+            noPadding && '[&>div:last-child]:p-0 [&>div:last-child]:card-inset-none',
             className
           )}
           header={
@@ -257,7 +256,7 @@ export function PopoutCard({
             // isn't, so they never squeeze the title; export and expand stay top right
             <div className="flex items-start gap-x-2">
               <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-x-4 gap-y-3">
-                <div className="min-w-0 flex-[1_1_16rem]">
+                <div className="min-w-0 shrink grow basis-64">
                   <h3 className="text-sm/6 font-semibold wrap-break-word text-foreground">
                     {anchorId ? (
                       <ScrollAnchor id={anchorId} showLinkIcon={false} className="max-w-full">
@@ -342,7 +341,7 @@ export function PopoutCard({
           <div className="flex w-full items-start justify-between gap-x-2">
             {/* Header actions wrap below the title when there is no room beside it */}
             <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-2">
-              <span className="min-w-0 flex-[1_1_12rem] truncate">{title}</span>
+              <span className="min-w-0 shrink grow basis-48 truncate">{title}</span>
               {headerActions && !showModalLogo && (
                 <div className="flex max-w-full items-center font-normal">{headerActions}</div>
               )}
@@ -359,10 +358,10 @@ export function PopoutCard({
                     <button
                       type="button"
                       disabled={isDownloading}
-                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted/20 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+                      className="group shrink-0 rounded-sm p-1 transition-colors hover:bg-muted-20 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
                       aria-label="Export options"
                     >
-                      <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground dark:text-muted dark:group-hover:text-foreground" />
+                      <EllipsisVerticalIcon className="size-5 text-muted transition-colors group-hover:text-foreground" />
                     </button>
                   }
                   align="right"
@@ -392,7 +391,7 @@ export function PopoutCard({
         size={modalSize}
         // Fit the viewport whatever the header height (it grows when header actions wrap): the
         // body takes the remaining height and scrolls
-        className="flex max-h-[calc(100dvh-2rem)] flex-col [&>div:last-child]:max-h-none [&>div:last-child]:min-h-0 [&>div:last-child]:flex-1"
+        className="flex max-h-dvh-less-8 flex-col [&>div:last-child]:max-h-none [&>div:last-child]:min-h-0 [&>div:last-child]:flex-1"
       >
         {modalDescriptionPosition === 'above' && descriptionBox && <div className="mb-4">{descriptionBox}</div>}
         {modalContent}

@@ -37,7 +37,7 @@ export function VersionAdoption({ versions, isDaily }: VersionAdoptionProps): JS
                   <span className="truncate text-sm/6 font-medium text-foreground">{formatClientName(row.client)}</span>
                   <span className="truncate font-mono text-xs/6 text-muted">{row.version || '-'}</span>
                 </span>
-                <span className="h-2 flex-1 overflow-hidden rounded-full bg-border/50">
+                <span className="h-2 flex-1 overflow-hidden rounded-full bg-border-50">
                   <span
                     className="block h-full rounded-full"
                     style={{ width: `${share}%`, backgroundColor: getClientColor(row.client, index) }}

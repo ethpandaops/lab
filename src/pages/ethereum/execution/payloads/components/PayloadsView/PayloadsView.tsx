@@ -46,7 +46,7 @@ function getDurationColorClass(durationMs?: number): string {
   if (durationMs === undefined) return 'text-muted';
   if (durationMs < 500) return 'text-success';
   if (durationMs < 1000) return 'text-warning';
-  if (durationMs < 2000) return 'text-danger/70';
+  if (durationMs < 2000) return 'text-danger-70';
   return 'text-danger';
 }
 
@@ -364,7 +364,7 @@ export function PayloadsView({
         <button
           type="button"
           onClick={() => setLearnMoreOpen(true)}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary-30 bg-primary-10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary-50 hover:bg-primary-20"
         >
           <InformationCircleIcon className="size-4" />
           Learn more
@@ -410,8 +410,8 @@ export function PayloadsView({
           const isReferenceNode = row.node_class === 'eip7870-block-builder';
           const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
           return clsx(
-            'cursor-pointer transition-colors hover:bg-surface/50',
-            showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
+            'cursor-pointer transition-colors hover:bg-surface-50',
+            showReferenceHighlight && 'bg-primary-5 border-l-2 border-l-primary'
           );
         }}
         hideGlobalFilter

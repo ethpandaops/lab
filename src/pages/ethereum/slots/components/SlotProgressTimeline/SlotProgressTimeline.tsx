@@ -159,7 +159,7 @@ export function SlotProgressTimeline({
   if (isLoading || executionLoading) {
     return (
       <Card title="Slot Trace">
-        <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
+        <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
       </Card>
     );
   }
@@ -248,8 +248,8 @@ export function SlotProgressTimeline({
                   <div
                     key={span.id}
                     className={clsx(
-                      'relative flex items-center border-b border-border/30 transition-colors',
-                      isHovered && 'bg-surface/80'
+                      'relative flex items-center border-b border-border-30 transition-colors',
+                      isHovered && 'bg-surface-80'
                     )}
                     style={{ height: ROW_HEIGHT }}
                     onMouseEnter={() => handleMouseEnter(span)}
@@ -260,7 +260,7 @@ export function SlotProgressTimeline({
                     <div
                       className={clsx(
                         'flex shrink-0 items-center gap-1 px-2 font-mono text-xs',
-                        span.collapsible && 'cursor-pointer hover:bg-surface/50'
+                        span.collapsible && 'cursor-pointer hover:bg-surface-50'
                       )}
                       style={{ width: LABEL_WIDTH, paddingLeft: 8 + span.depth * 16 }}
                       onClick={span.collapsible ? () => toggleCollapse(span.id) : undefined}
@@ -306,7 +306,7 @@ export function SlotProgressTimeline({
                         className={clsx(
                           'absolute top-1 rounded-xs transition-all',
                           colors.bg,
-                          isHovered && 'ring-1 ring-white/20 brightness-110',
+                          isHovered && 'ring-1 ring-on-fill-20 brightness-110',
                           span.collapsible && 'cursor-pointer'
                         )}
                         style={{

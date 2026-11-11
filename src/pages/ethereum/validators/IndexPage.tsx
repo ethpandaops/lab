@@ -218,7 +218,7 @@ export function IndexPage(): JSX.Element {
               currentNetwork?.name !== 'mainnet' && (
                 <Link
                   to="/ethereum/validators/inspect"
-                  className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
+                  className="rounded-xs border border-primary bg-primary-10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary-20"
                 >
                   Inspect validators
                 </Link>
@@ -375,7 +375,7 @@ export function IndexPage(): JSX.Element {
               )}
             </PopoutCard>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
                 {({ inModal }) => (
                   <MultiLineChart
@@ -459,7 +459,7 @@ export function IndexPage(): JSX.Element {
               </PopoutCard>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard
                 title={`Validator operations ${perPeriod}`}
                 subtitle={opsStart}
@@ -536,7 +536,7 @@ export function IndexPage(): JSX.Element {
               </PopoutCard>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard
                 title={`Consensus rewards ${perPeriod}`}
                 subtitle={dataStart(d => d.rewards !== null)}

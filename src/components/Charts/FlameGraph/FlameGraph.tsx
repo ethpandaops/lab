@@ -22,8 +22,8 @@ const TOOLTIP_OFFSET = 12;
 const VIEWPORT_PADDING = 16;
 
 // Default colors
-const DEFAULT_COLOR = { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' };
-const ERROR_COLOR = { bg: 'bg-danger', hover: 'hover:bg-danger/80' };
+const DEFAULT_COLOR = { bg: 'bg-data-slate', hover: 'hover:bg-data-slate-80' };
+const ERROR_COLOR = { bg: 'bg-danger', hover: 'hover:bg-danger-80' };
 
 /**
  * Default formatter for values (K/M suffix)
@@ -392,7 +392,7 @@ export function FlameGraph({
                 <>
                   <ChevronRightIcon className="size-3 shrink-0 text-border" />
                   <div className="group relative">
-                    <button className="flex items-center gap-1 rounded-xs border border-border bg-surface/50 px-1.5 py-0.5 text-xs text-muted hover:border-primary/50 hover:text-foreground">
+                    <button className="flex items-center gap-1 rounded-xs border border-border bg-surface-50 px-1.5 py-0.5 text-xs text-muted hover:border-primary-50 hover:text-foreground">
                       <EllipsisHorizontalIcon className="size-3.5" />
                       <span>{zoomPath.length - 2}</span>
                     </button>
@@ -417,14 +417,14 @@ export function FlameGraph({
                                 className={clsx(
                                   'flex w-full items-center gap-2 rounded-xs px-2 py-1 text-left',
                                   isLast
-                                    ? 'bg-primary/10 text-foreground'
+                                    ? 'bg-primary-10 text-foreground'
                                     : 'text-muted hover:bg-surface hover:text-foreground'
                                 )}
                               >
                                 {node.category && nodeColors && (
                                   <span
                                     className={clsx(
-                                      'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white',
+                                      'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-on-fill',
                                       nodeColors.bg
                                     )}
                                   >
@@ -459,7 +459,7 @@ export function FlameGraph({
                         {parent.category && parentColors && (
                           <span
                             className={clsx(
-                              'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white',
+                              'rounded-xs px-1.5 py-0.5 text-2xs font-medium text-on-fill',
                               parentColors.bg
                             )}
                           >
@@ -485,7 +485,7 @@ export function FlameGraph({
                   >
                     {current.category && currentColors && (
                       <span
-                        className={clsx('rounded-xs px-1.5 py-0.5 text-2xs font-medium text-white', currentColors.bg)}
+                        className={clsx('rounded-xs px-1.5 py-0.5 text-2xs font-medium text-on-fill', currentColors.bg)}
                       >
                         {current.category}
                       </span>
@@ -505,7 +505,7 @@ export function FlameGraph({
           {isZoomed && (
             <button
               onClick={() => animateZoom([])}
-              className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:bg-primary/10 hover:text-foreground"
+              className="rounded-xs bg-surface px-2 py-1 text-xs text-muted transition-colors hover:bg-primary-10 hover:text-foreground"
             >
               Reset Zoom
             </button>
@@ -541,7 +541,7 @@ export function FlameGraph({
                   <div
                     key={flatNode.node.id}
                     className={clsx(
-                      'absolute flex items-center overflow-hidden rounded-xs px-1 text-xs text-white',
+                      'absolute flex items-center overflow-hidden rounded-xs px-1 text-xs text-on-fill',
                       colors.bg,
                       // Only show hover effect if clickable (has children or is not zoomed root)
                       hasChildren && !isZoomedRoot && colors.hover,
@@ -579,7 +579,7 @@ export function FlameGraph({
         createPortal(
           <div
             ref={tooltipRef}
-            className="pointer-events-none fixed z-[9999] max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background"
+            className="pointer-events-none fixed z-9999 max-w-md min-w-72 overflow-hidden rounded-sm border border-border bg-background"
             style={{
               left: tooltipPosition.x,
               top: tooltipPosition.y,
@@ -590,7 +590,7 @@ export function FlameGraph({
             ) : (
               <>
                 {/* Header */}
-                <div className="border-b border-border bg-surface/50 px-3 py-2">
+                <div className="border-b border-border bg-surface-50 px-3 py-2">
                   <div className="text-base/5 font-medium text-foreground">{hoveredNode.label}</div>
                   {/* Target name prominently displayed */}
                   {typeof hoveredNode.metadata?.targetName === 'string' && hoveredNode.metadata.targetName && (
@@ -600,7 +600,7 @@ export function FlameGraph({
                   {hoveredNode.category && (
                     <span
                       className={clsx(
-                        'mt-1.5 inline-block rounded-xs px-1.5 py-0.5 text-xs font-medium text-white',
+                        'mt-1.5 inline-block rounded-xs px-1.5 py-0.5 text-xs font-medium text-on-fill',
                         colorMap?.[hoveredNode.category]?.bg ?? 'bg-data-slate'
                       )}
                     >
@@ -698,7 +698,7 @@ export function FlameGraph({
 
                   {/* Error indicator */}
                   {hoveredNode.hasError && (
-                    <div className="mt-3 flex items-center gap-2 rounded-xs bg-danger/10 px-2 py-1.5 text-xs text-danger">
+                    <div className="mt-3 flex items-center gap-2 rounded-xs bg-danger-10 px-2 py-1.5 text-xs text-danger">
                       <span className="size-1.5 rounded-full bg-danger" />
                       <span>Error in this call</span>
                     </div>

@@ -86,7 +86,7 @@ function metricColumn(id: MetricId): DataTableColumn<EntityRow> {
       return (
         <span
           className={clsx(
-            comparison.verdict === 'thin' ? 'text-muted/70' : (verdictClass(comparison.verdict) ?? 'text-foreground')
+            comparison.verdict === 'thin' ? 'text-muted-70' : (verdictClass(comparison.verdict) ?? 'text-foreground')
           )}
           title={
             comparison.difference === null || comparison.verdict === 'thin'
@@ -172,7 +172,7 @@ export function EntitiesTable({
             aria-expanded={isOpen}
             aria-controls={`members-${entity}`}
             aria-label={`${isOpen ? 'Hide' : 'Show'} ${entityLabel(entity)} operators`}
-            className="-ml-1 rounded-xs p-0.5 text-muted hover:bg-primary/10 hover:text-foreground"
+            className="-ml-1 rounded-xs p-0.5 text-muted hover:bg-primary-10 hover:text-foreground"
           >
             <ChevronRightIcon className={clsx('size-4 transition-transform', isOpen && 'rotate-90')} />
           </button>
@@ -194,7 +194,7 @@ export function EntitiesTable({
       <div
         id={`members-${row.entity}`}
         // Stays in view when the table scrolls sideways on narrow screens
-        className="sticky left-(--table-inset) flex max-w-[calc(100vw-4.5rem)] flex-col gap-2 pl-5 lg:max-w-none"
+        className="sticky left-table-inset flex max-w-vw-less-18 flex-col gap-2 pl-5 lg:max-w-none"
       >
         <table className="w-full max-w-2xl text-xs/5">
           <thead>
@@ -228,7 +228,7 @@ export function EntitiesTable({
                   <td
                     className={clsx(
                       'py-0.5 pl-3 text-right whitespace-nowrap tabular-nums',
-                      comparison?.verdict === 'thin' ? 'text-muted/70' : 'text-foreground'
+                      comparison?.verdict === 'thin' ? 'text-muted-70' : 'text-foreground'
                     )}
                   >
                     {metric

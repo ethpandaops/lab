@@ -42,7 +42,7 @@ export function ScrollArea({
       <ScrollAreaPrimitive.Viewport
         ref={viewportRef}
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit]"
+        className="size-full rounded-inherit"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>

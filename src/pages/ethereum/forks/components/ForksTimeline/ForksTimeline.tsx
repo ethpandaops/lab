@@ -51,7 +51,7 @@ export function ForksTimeline({
                       className={clsx(
                         'absolute top-14 left-7 w-0.5',
                         blobItems.length > 0 ? '-bottom-6' : '-bottom-8',
-                        isActive ? 'bg-primary/30' : 'bg-border'
+                        isActive ? 'bg-primary-30' : 'bg-border'
                       )}
                     />
                   )}
@@ -62,9 +62,9 @@ export function ForksTimeline({
                       className={clsx(
                         'flex h-14 w-14 items-center justify-center rounded-sm border text-3xl transition-colors',
                         isCurrentFork
-                          ? 'border-primary/30 bg-primary/20'
+                          ? 'border-primary-30 bg-primary-20'
                           : isActive
-                            ? 'border-accent/20 bg-surface'
+                            ? 'border-accent-20 bg-surface'
                             : 'border-border bg-surface'
                       )}
                     >
@@ -198,9 +198,9 @@ export function ForksTimeline({
                               className={clsx(
                                 'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
                                 isCurrentBlob
-                                  ? 'border-accent/30 bg-accent/20'
+                                  ? 'border-accent-30 bg-accent-20'
                                   : isBlobActive
-                                    ? 'border-accent/20 bg-surface'
+                                    ? 'border-accent-20 bg-surface'
                                     : 'border-border bg-surface'
                               )}
                             >

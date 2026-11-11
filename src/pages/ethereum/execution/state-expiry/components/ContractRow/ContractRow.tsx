@@ -56,16 +56,16 @@ export function ContractRow({ item, index, hideSavings = false }: ContractRowPro
   const savings2y = hideSavings ? null : expirySavings(contract, expiry24m);
 
   return (
-    <tr className="group transition-colors hover:bg-muted/30">
+    <tr className="group transition-colors hover:bg-muted-30">
       {/* Index */}
       <td className="px-2 py-1.5 text-center whitespace-nowrap">
-        <span className="flex size-5 items-center justify-center rounded-xs bg-primary/10 text-xs font-bold text-primary">
+        <span className="flex size-5 items-center justify-center rounded-xs bg-primary-10 text-xs font-bold text-primary">
           {index}
         </span>
       </td>
 
       {/* Contract name/address with category badge */}
-      <td className="max-w-[250px] px-2 py-1.5">
+      <td className="max-w-62.5 px-2 py-1.5">
         <Link to="/ethereum/contracts/$address" params={{ address: contract_address ?? '' }} className="block">
           <span className="flex items-center gap-1.5">
             {contract_name ? (
@@ -84,7 +84,7 @@ export function ContractRow({ item, index, hideSavings = false }: ContractRowPro
       </td>
 
       {/* Owner */}
-      <td className="max-w-[120px] px-2 py-1.5 whitespace-nowrap">
+      <td className="max-w-30 px-2 py-1.5 whitespace-nowrap">
         <span className="block truncate text-xs text-muted">{account_owner ?? '—'}</span>
       </td>
 
@@ -130,11 +130,11 @@ export function ContractCard({ item, index, hideSavings = false }: ContractRowPr
     <Link
       to="/ethereum/contracts/$address"
       params={{ address: contract_address ?? '' }}
-      className="block border-b border-border/50 px-3 py-3 transition-colors hover:bg-muted/30"
+      className="block border-b border-border-50 px-3 py-3 transition-colors hover:bg-muted-30"
     >
       <div className="flex items-start gap-3">
         {/* Index badge */}
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-xs bg-primary/10 text-sm font-bold text-primary">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-xs bg-primary-10 text-sm font-bold text-primary">
           {index}
         </div>
 

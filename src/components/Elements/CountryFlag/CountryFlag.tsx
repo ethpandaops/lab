@@ -53,18 +53,18 @@ export function CountryFlag({ code, title, showUnknown = false, className }: Cou
 
   const label = title ? { role: 'img', 'aria-label': title, title } : { 'aria-hidden': true };
   // A className replaces the default 18 × 12 px, slightly rounded box rather than competing with it
-  const box = clsx('inline-block shrink-0 align-middle', className ?? 'h-3 w-[18px] rounded-[2px]');
+  const box = clsx('inline-block shrink-0 align-middle', className ?? 'h-3 w-4.5 rounded-2xs');
 
   if (!load) {
     return showUnknown ? <GlobeAltIcon className={clsx(box, 'text-muted')} {...label} /> : null;
   }
   return (
-    <span className={clsx(box, 'overflow-hidden bg-border/60')} data-country={key} {...label}>
+    <span className={clsx(box, 'overflow-hidden bg-border-60')} data-country={key} {...label}>
       {src && (
         <img
           src={src}
           alt=""
-          className="block size-full object-cover outline -outline-offset-1 outline-foreground/15"
+          className="block size-full object-cover outline -outline-offset-1 outline-foreground-15"
         />
       )}
     </span>

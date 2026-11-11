@@ -66,7 +66,7 @@ export function PeerTable({
             {formatClientName(row.client)}
           </span>
         ) : (
-          <span className="pl-[26px] text-muted">{row.client === 'other' ? 'Other' : 'Unknown'}</span>
+          <span className="pl-6.5 text-muted">{row.client === 'other' ? 'Other' : 'Unknown'}</span>
         ),
     },
     {

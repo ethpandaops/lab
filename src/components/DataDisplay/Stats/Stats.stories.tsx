@@ -18,7 +18,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -262,7 +262,7 @@ export const EnhancedStyle: Story = {
         value: '+59.8%',
         icon: FireIcon,
         iconColor: '#ef4444',
-        valueClassName: 'text-red-500',
+        valueClassName: 'text-danger',
         subtitle: '111.4M → 178.0M',
         accentColor: '#ef44444D',
       },
@@ -281,7 +281,7 @@ export const EnhancedStyle: Story = {
         value: '641',
         icon: ArrowsRightLeftIcon,
         iconColor: '#f59e0b',
-        valueClassName: 'text-amber-500',
+        valueClassName: 'text-warning',
         subtitle: '47.2% of txs',
         accentColor: '#f59e0b33',
       },
@@ -291,7 +291,7 @@ export const EnhancedStyle: Story = {
         value: '633',
         icon: ExclamationTriangleIcon,
         iconColor: '#ef4444',
-        valueClassName: 'text-red-500',
+        valueClassName: 'text-danger',
         subtitle: 'transactions changed outcome',
         accentColor: '#ef444433',
       },
@@ -328,7 +328,7 @@ export const EnhancedHealthy: Story = {
         value: '-12',
         icon: CursorArrowRaysIcon,
         iconColor: '#22c55e',
-        valueClassName: 'text-green-500',
+        valueClassName: 'text-success',
         subtitle: '24 → 12 total',
         accentColor: '#22c55e33',
       },

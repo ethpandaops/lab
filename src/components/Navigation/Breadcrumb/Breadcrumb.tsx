@@ -93,7 +93,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
                 <HomeIcon className="h-4 w-4" />
               </Link>
             </li>
-            <li aria-hidden="true" className="text-muted/50">
+            <li aria-hidden="true" className="text-muted-50">
               {separator}
             </li>
           </>
@@ -114,7 +114,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
                   {crumb.label}
                 </Link>
                 {index < breadcrumbs.length - 1 && (
-                  <span aria-hidden="true" className="text-muted/50">
+                  <span aria-hidden="true" className="text-muted-50">
                     {separator}
                   </span>
                 )}
@@ -124,7 +124,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
               <>
                 <span className="text-muted">{crumb.label}</span>
                 {index < breadcrumbs.length - 1 && (
-                  <span aria-hidden="true" className="text-muted/50">
+                  <span aria-hidden="true" className="text-muted-50">
                     {separator}
                   </span>
                 )}

@@ -41,23 +41,23 @@ const POLICY_SELECTOR_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
       label: 'Slot',
       icon: CubeIcon,
       textColor: 'text-data-blue',
-      selectedBg: 'bg-data-blue/25',
+      selectedBg: 'bg-data-blue-25',
       selectedRing: 'ring-data-blue',
-      hoverBg: 'hover:bg-data-blue/20 dark:hover:bg-data-blue/25',
-      rowHoverBg: 'bg-data-blue/10 dark:bg-data-blue/15',
-      cellBg: 'bg-data-blue/10',
-      fillColor: 'bg-data-blue/30 dark:bg-data-blue/25',
+      hoverBg: 'hover:bg-data-blue-hover',
+      rowHoverBg: 'bg-data-blue-row',
+      cellBg: 'bg-data-blue-10',
+      fillColor: 'bg-data-blue-fill',
     },
     contract: {
       label: 'Contract',
       icon: DocumentTextIcon,
       textColor: 'text-data-violet',
-      selectedBg: 'bg-data-violet/25',
+      selectedBg: 'bg-data-violet-25',
       selectedRing: 'ring-data-violet',
-      hoverBg: 'hover:bg-data-violet/20 dark:hover:bg-data-violet/25',
-      rowHoverBg: 'bg-data-violet/10 dark:bg-data-violet/15',
-      cellBg: 'bg-data-violet/10',
-      fillColor: 'bg-data-violet/30 dark:bg-data-violet/25',
+      hoverBg: 'hover:bg-data-violet-hover',
+      rowHoverBg: 'bg-data-violet-row',
+      cellBg: 'bg-data-violet-10',
+      fillColor: 'bg-data-violet-fill',
     },
   },
   policyConfig: {
@@ -374,7 +374,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-data-blue/30 bg-data-blue/10 px-2.5 py-1 text-data-blue hover:bg-data-blue/20"
+              className="inline-flex items-center gap-1.5 border border-data-blue-30 bg-data-blue-10 px-2.5 py-1 text-data-blue hover:bg-data-blue-20"
             >
               <CubeIcon className="size-3.5" />
               <span className="font-medium">Slot</span>
@@ -389,7 +389,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-data-violet/30 bg-data-violet/10 px-2.5 py-1 text-data-violet hover:bg-data-violet/20"
+              className="inline-flex items-center gap-1.5 border border-data-violet-30 bg-data-violet-10 px-2.5 py-1 text-data-violet hover:bg-data-violet-20"
             >
               <DocumentTextIcon className="size-3.5" />
               <span className="font-medium">Contract</span>
@@ -404,7 +404,7 @@ export function IndexPage(): JSX.Element {
           <Popover className="relative">
             <PopoverButton
               variant="blank"
-              className="inline-flex items-center gap-1.5 border border-border bg-muted/10 px-2.5 py-1 text-muted hover:bg-muted/20"
+              className="inline-flex items-center gap-1.5 border border-border bg-muted-10 px-2.5 py-1 text-muted hover:bg-muted-20"
             >
               <ClockIcon className="size-3.5" />
               <span className="font-medium">1-2y</span>

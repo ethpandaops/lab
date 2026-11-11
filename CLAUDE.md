@@ -69,7 +69,8 @@ src/
     @tanstack/react-query.gen.ts      # TanStack Query options - USE THIS for all API calls
   lab-api/                            # Generated lab-backend client from openapi/lab-backend.yaml (do not edit)
   utils/                              # Utility functions and helpers
-  index.css                           # Global styles and Tailwind theme config
+  index.css                           # Entry stylesheet: fonts, tokens, utilities, base styles; Tailwind scans src
+  styles/                             # tokens.css (every design token), base.css, utilities.css, token tests
 ```
 
 ## Architecture
@@ -134,7 +135,7 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Storybook stories for all core components
 - Write Vitest tests for all components, hooks, and utilities
 - Use JSDoc style comments for functions, components, hooks, and complex types
-- Use Tailwind v4 classes with semantic color tokens from `src/index.css` theme
+- Use Tailwind v4 classes with semantic color tokens from `src/styles/tokens.css`
 - Read API data through the generated query options (see [Data](#data))
 - Use path aliases (`@/`) over relative imports
 - Use `clsx` for conditional classes
@@ -203,7 +204,7 @@ Detailed standards for specific topics are in `.claude/rules/`:
 - [Charts](.claude/rules/charts.md) — Visual standards, axis formatting, grid padding, component architecture
 - [Forms](.claude/rules/forms.md) — Zod search param validation, react-hook-form patterns
 - [SEO](.claude/rules/seo.md) — Head meta hierarchy, feature images, route implementation
-- [Theming](.claude/rules/theming.md) — Two-tier color architecture, semantic tokens
+- [Styling](.claude/rules/styling.md) — Tokens, themes, Tailwind classes, adding a token
 - [Storybook](.claude/rules/storybook.md) — Decorator pattern, story title convention
 
 ## Layout

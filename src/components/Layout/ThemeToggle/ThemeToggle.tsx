@@ -45,7 +45,7 @@ export function ThemeToggle(): JSX.Element {
     <button
       type="button"
       onClick={cycleTheme}
-      className="flex h-8 w-8 items-center justify-center rounded-sm transition-colors hover:bg-primary/10 hover:text-primary"
+      className="flex h-8 w-8 items-center justify-center rounded-sm transition-colors hover:bg-primary-10 hover:text-primary"
       aria-label={`Current theme: ${getThemeLabel()}. Click to cycle themes.`}
       title={getThemeLabel()}
     >

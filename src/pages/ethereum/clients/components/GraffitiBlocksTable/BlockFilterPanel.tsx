@@ -105,14 +105,14 @@ function FilterChip({
   onRemove: () => void;
 }): JSX.Element {
   return (
-    <span className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+    <span className="inline-flex items-center gap-1 rounded-xs border border-primary-30 bg-primary-10 px-2 py-0.5 text-xs text-primary">
       <span className="font-medium">{label}:</span>
       <span className="max-w-48 truncate">{value}</span>
       <button
         type="button"
         onClick={onRemove}
         aria-label={`Remove ${label} filter`}
-        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary/20"
+        className="ml-0.5 rounded-xs p-0.5 transition-colors hover:bg-primary-20"
       >
         <XMarkIcon className="size-3" />
       </button>
@@ -302,7 +302,7 @@ export function BlockFilterPanel({ filters, fields, onChange }: BlockFilterPanel
                         until: undefined,
                       }))
                     }
-                    className="rounded-sm border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/40"
+                    className="rounded-sm border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary-40"
                   >
                     {preset.label}
                   </button>

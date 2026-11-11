@@ -237,7 +237,7 @@ export function EpochSlotsTable({
 
     return clsx({
       // Current slot - highlighted with accent color
-      'bg-accent/20 border-l-4 border-l-accent': isCurrent,
+      'bg-accent-20 border-l-4 border-l-accent': isCurrent,
       // Future slots - muted appearance
       'opacity-50': isFuture,
       // Past slots - normal appearance (default)

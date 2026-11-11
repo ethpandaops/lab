@@ -36,15 +36,15 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
   // failure = orange (transient/one-off failure - less severe)
   // missing = red (peer responded but didn't have the data - serious)
   const statusColor = isSuccess ? 'text-success' : isFailure ? 'text-warning' : 'text-danger';
-  const statusBg = isSuccess ? 'bg-success/10' : isFailure ? 'bg-warning/10' : 'bg-danger/10';
-  const statusBorder = isSuccess ? 'border-success/20' : isFailure ? 'border-warning/20' : 'border-danger/20';
+  const statusBg = isSuccess ? 'bg-success-10' : isFailure ? 'bg-warning-10' : 'bg-danger-10';
+  const statusBorder = isSuccess ? 'border-success-20' : isFailure ? 'border-warning-20' : 'border-danger-20';
 
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-2 py-4 sm:gap-6 sm:px-4 sm:py-6">
+    <div className="grid grid-cols-1fr-auto-1fr items-center gap-4 px-2 py-4 sm:gap-6 sm:px-4 sm:py-6">
       {/* PROBER (Left) */}
       <div className="flex flex-col items-center gap-2 justify-self-end">
         <div className="relative">
-          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
+          <ClientLogo client={probe.meta_client_implementation || 'Unknown'} size={44} className="sm:size-13" />
           {clientCountryCode && (
             <div className="absolute -right-2 -bottom-1 flex size-5 overflow-hidden rounded-full border border-background bg-surface sm:size-6">
               <CountryFlag code={clientCountryCode} showUnknown className="size-full" />
@@ -87,12 +87,12 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
             )}
             <span className={`text-xs font-semibold capitalize ${statusColor}`}>{probe.result}</span>
           </div>
-          <div className="flex items-center gap-2 leading-none">
-            <div className="hidden h-3 w-px bg-border/50 sm:block" />
+          <div className="flex items-center gap-2">
+            <div className="hidden h-3 w-px bg-border-50 sm:block" />
             <span className="font-mono text-2xs font-medium text-foreground sm:text-xs">
               {probe.response_time_ms ? `${probe.response_time_ms}ms` : '---'}
             </span>
-            <div className="h-3 w-px bg-border/50 sm:hidden" />
+            <div className="h-3 w-px bg-border-50 sm:hidden" />
             <span className="font-mono text-2xs font-medium text-foreground sm:hidden">
               {columnsCount} col{columnsCount !== 1 ? 's' : ''}
             </span>
@@ -110,7 +110,7 @@ export function ProbeFlow({ probe }: ProbeFlowProps): JSX.Element {
       {/* PEER (Right) */}
       <div className="flex flex-col items-center gap-2 justify-self-start">
         <div className="relative">
-          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={44} className="sm:size-[52px]" />
+          <ClientLogo client={probe.meta_peer_implementation || 'Unknown'} size={44} className="sm:size-13" />
           {peerCountryCode && (
             <div className="absolute -right-2 -bottom-1 flex size-5 overflow-hidden rounded-full border border-background bg-surface sm:size-6">
               <CountryFlag code={peerCountryCode} showUnknown className="size-full" />

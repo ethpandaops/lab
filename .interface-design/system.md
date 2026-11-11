@@ -18,39 +18,30 @@
 
 ### Color Architecture
 
-Two-tier system defined in `src/index.css`:
-
-**Tier 1 — Primitives** (never use directly in components):
-
-- `terracotta` (50–950): warm accent, the brand signature
-- `sand` (50–950): warm neutrals for light mode
-- `neutral` (50–950): grayscale for dark mode
-- `aurora-*` (cyan, green, purple, pink, blue): star mode
-
-**Tier 2 — Semantic** (always use these):
+Every colour is a token in `src/styles/tokens.css` (rules: `.claude/rules/styling.md`); Tailwind's palette is
+removed. Each base colour is a `light-dark(light, dark)` pair, and star, a dark scheme with its own palette, sets its
+values in `html.star`. Tints (`bg-primary-10`) and derived colours (`panel`, `on-solid`, `primary-hover`) follow all
+three themes, so components never carry `dark:` variants.
 
 - `primary` / `secondary` / `accent` — brand
 - `background` / `surface` / `foreground` / `muted` / `border` — UI structure
 - `success` / `warning` / `danger` — state
 
-**Theme mappings:**
+**Theme values:**
 
-| Token      | Light          | Dark           | Star              |
-| ---------- | -------------- | -------------- | ----------------- |
-| primary    | terracotta-600 | terracotta-400 | aurora-cyan-400   |
-| secondary  | sand-200       | neutral-900    | aurora-purple-600 |
-| accent     | terracotta-500 | terracotta-300 | aurora-cyan-300   |
-| background | sand-100       | neutral-950    | aurora-blue-950   |
-| surface    | sand-50        | #242424        | #0a1428           |
-| foreground | sand-950       | neutral-50     | aurora-cyan-50    |
-| muted      | sand-600       | neutral-400    | aurora-cyan-700   |
-| border     | sand-300       | neutral-800    | #1a2847           |
-| success    | #337344        | #76be86        | #96c979           |
-| warning    | #a56217        | #e8a95c        | #e8a95c           |
-| danger     | #af3d36        | #e2726b        | #e2726b           |
-
-Star is a dark theme: the `dark:` variant matches `.star` too, and `star:` overrides it where star needs
-something different.
+| Token      | Light   | Dark    | Star    |
+| ---------- | ------- | ------- | ------- |
+| primary    | #c95f3f | #e09770 | #1af7f7 |
+| secondary  | #dedbca | #3d3d3d | #7d00e6 |
+| accent     | #d77651 | #ebbd9e | #4dffff |
+| background | #efeee5 | #0f0f0e | #000a1a |
+| surface    | #fbfaf6 | #181817 | #0a1428 |
+| foreground | #2c251e | #f5f5f4 | #e6ffff |
+| muted      | #7d6b51 | #a19f9a | #009999 |
+| border     | #dcd7c5 | #2c2b29 | #1a2847 |
+| success    | #337344 | #76be86 | #96c979 |
+| warning    | #a56217 | #e8a95c | #e8a95c |
+| danger     | #af3d36 | #e2726b | #e2726b |
 
 **Programmatic access:**
 
@@ -109,17 +100,17 @@ no shadows in light mode, no lift on hover. The palette has three clearly separa
 page (`background`), panel (`surface`), hairline (`border`) — so panels read without shadows.
 The sidebar uses the page background, so content panels are the only raised surfaces.
 
-| Token      | Light    | Dark    |
-| ---------- | -------- | ------- |
-| background | sand-100 | #0f0f0e |
-| surface    | #fbfaf6  | #181817 |
-| border     | #dcd7c5  | #2c2b29 |
-| muted      | sand-700 | #a19f9a |
-| foreground | sand-950 | #f5f5f4 |
+| Token      | Light   | Dark    |
+| ---------- | ------- | ------- |
+| background | #efeee5 | #0f0f0e |
+| surface    | #fbfaf6 | #181817 |
+| border     | #dcd7c5 | #2c2b29 |
+| muted      | #7d6b51 | #a19f9a |
+| foreground | #2c251e | #f5f5f4 |
 
 ## Border Radius
 
-Two radii, set as tokens in `src/index.css`:
+Two radii, set as tokens in `src/styles/tokens.css`:
 
 | Class          | Value | Use                                                                                     |
 | -------------- | ----- | --------------------------------------------------------------------------------------- |
@@ -160,7 +151,7 @@ All UI text uses Geist (`font-sans`). Identifiers use Geist Mono (`font-mono`). 
 | Card title        | `text-sm/6 font-semibold text-foreground` (rendered by `Card title`) |
 | Card subtitle     | `text-xs/5 text-muted` (rendered by `Card subtitle`)                 |
 | Section header    | `text-xs font-semibold tracking-wider text-foreground`               |
-| Subsection header | `text-2xs font-semibold tracking-wider text-muted/60 uppercase`      |
+| Subsection header | `text-2xs font-semibold tracking-wider text-muted-60 uppercase`      |
 | Body text         | `text-sm text-foreground`                                            |
 | Metadata          | `text-xs text-muted`                                                 |
 | Dense label       | `text-2xs` (10px) — axis ticks, HUD keys, badges in tight cells      |
@@ -179,7 +170,7 @@ Filter rows mix selects, segmented controls and buttons, so they share one size:
 | Height  | `h-8` (32px) for SelectMenu, SegmentedControl, Button `sm`, filter inputs |
 | Text    | `text-sm` (selects, inputs, buttons), `text-xs font-medium` (segments)    |
 | Surface | `bg-surface border border-border` — no blur, no shadow                    |
-| Hover   | `hover:border-primary/40`                                                 |
+| Hover   | `hover:border-primary-40`                                                 |
 | Chevron | `size-4 text-muted`                                                       |
 
 ## Interactive States
@@ -187,10 +178,10 @@ Filter rows mix selects, segmented controls and buttons, so they share one size:
 | State            | Pattern                                                       |
 | ---------------- | ------------------------------------------------------------- |
 | Default link/nav | `text-muted`                                                  |
-| Hover            | `hover:bg-primary/10 hover:text-primary`                      |
-| Active/Selected  | `bg-primary/10 text-primary shadow-xs ring-1 ring-primary/20` |
+| Hover            | `hover:bg-primary-10 hover:text-primary`                      |
+| Active/Selected  | `bg-primary-10 text-primary shadow-xs ring-1 ring-primary-20` |
 | Transition       | `transition-all duration-200` or `transition-colors`          |
-| Icon button      | `rounded-sm p-1 transition-colors hover:bg-muted/20`          |
+| Icon button      | `rounded-sm p-1 transition-colors hover:bg-muted-20`          |
 | Icon in button   | `size-5 text-muted group-hover:text-foreground`               |
 
 ---
@@ -277,12 +268,12 @@ Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 
 ### App frame
 
-- Top bar: `h-12 border-b border-border bg-background/85 backdrop-blur-sm`, sticky on desktop, holds
+- Top bar: `h-12 border-b border-border bg-background`, sticky on desktop, holds
   the breadcrumb. Its rule continues the sidebar header's rule, so the frame is one line.
 - Breadcrumb: ancestors `text-muted hover:text-foreground`, current page `font-medium text-foreground`,
-  separators `text-muted/50`. No accent color.
-- Navigation states are neutral: hover `bg-foreground/5 text-foreground`, active
-  `bg-foreground/[0.07] text-foreground` with a primary icon. Primary color marks selection in
+  separators `text-muted-50`. No accent color.
+- Navigation states are neutral: hover `bg-foreground-5 text-foreground`, active
+  `bg-foreground-7 text-foreground` with a primary icon. Primary color marks selection in
   controls, not navigation.
 
 ### Sidebar
@@ -292,7 +283,7 @@ Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 - Border: `border-r border-border`
 - Nav items: `rounded-sm px-2 py-1 text-sm/5 font-medium`
 - Icons: `size-4 shrink-0`
-- Version badge: `text-[10px] text-muted/60`
+- Version badge: `text-2xs text-muted-60`
 
 ---
 
@@ -342,9 +333,9 @@ opts out. Legends stay: they toggle series.
 
 Borderless toggles (not native ECharts legend), with no rule between legend and chart:
 
-- `rounded-xs px-1.5 py-0.5 text-xs/5 hover:bg-muted/10`
+- `rounded-xs px-1.5 py-0.5 text-xs/5 hover:bg-muted-10`
 - Visible: `text-foreground`, filled dot
-- Hidden: `text-muted/60`, hollow dot
+- Hidden: `text-muted-60`, hollow dot
 - Color indicator: `h-2 w-2 rounded-full`
 
 ### Synchronized Crosshairs
@@ -395,8 +386,8 @@ Two-column responsive grid with time controls:
 `SegmentedControl` (`src/components/Forms/SegmentedControl`) — never hand-roll pill rows.
 
 - Track: `h-8 rounded-sm bg-surface p-0.5 ring-1 ring-border`
-- Selected segment: `bg-primary/15 text-primary` (the app-wide selected state)
-- Other segments: `text-muted hover:bg-muted/10 hover:text-foreground`
+- Selected segment: `bg-primary-15 text-primary` (the app-wide selected state)
+- Other segments: `text-muted hover:bg-muted-10 hover:text-foreground`
 
 ### Fork Annotations
 
@@ -425,7 +416,7 @@ Elements with fade-in start with `opacity: 0`.
 
 ## Don't
 
-- Use primitive color scales directly (`bg-terracotta-500`, `bg-sand-100`)
+- Use Tailwind's palette, colour literals, opacity modifiers or `dark:` variants; use a token or add one
 - Use locale formatting for slots/epochs (no commas)
 - Override chart grid config in wrapper components unless necessary
 - Mix depth strategies (shadows in dark mode, outlines in light mode)

@@ -15,13 +15,13 @@
 export function getClassificationBadgeClasses(classification: string): string {
   switch (classification) {
     case 'individual':
-      return 'bg-primary/10 text-primary inset-ring-primary/20 dark:bg-primary/10 dark:text-primary dark:inset-ring-primary/10';
+      return 'bg-primary-10 text-primary inset-ring-primary-halo';
     case 'corporate':
-      return 'bg-purple-500/10 text-purple-600 inset-ring-purple-500/20 dark:bg-purple-500/10 dark:text-purple-400 dark:inset-ring-purple-500/10';
+      return 'bg-contributor-corporate-bg text-contributor-corporate inset-ring-contributor-corporate-ring';
     case 'internal':
-      return 'bg-blue-500/10 text-blue-600 inset-ring-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:inset-ring-blue-500/10';
+      return 'bg-contributor-internal-bg text-contributor-internal inset-ring-contributor-internal-ring';
     default:
-      return 'bg-muted/10 text-muted inset-ring-muted/20 dark:bg-muted/10 dark:text-muted dark:inset-ring-muted/10';
+      return 'bg-muted-10 text-muted inset-ring-muted-halo';
   }
 }
 

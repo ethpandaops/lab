@@ -110,15 +110,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
       )}
 
       {/* Scrollable TabList Container */}
-      <div
-        ref={scrollContainerRef}
-        onScroll={updateArrowVisibility}
-        className="scrollbar-hide overflow-x-auto"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
+      <div ref={scrollContainerRef} onScroll={updateArrowVisibility} className="overflow-x-auto">
         <TabList className="flex gap-2 border-b border-border">{children}</TabList>
       </div>
 

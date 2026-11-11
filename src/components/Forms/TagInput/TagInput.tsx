@@ -132,7 +132,7 @@ export function TagInput({
           'flex max-h-40 cursor-text flex-wrap items-center gap-1.5 overflow-y-auto rounded-sm px-2 py-1.5',
           'bg-surface outline-1 -outline-offset-1 transition-colors',
           error
-            ? 'outline-danger/50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
+            ? 'outline-danger-50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
             : 'outline-border focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary',
           disabled && 'cursor-not-allowed opacity-50'
         )}

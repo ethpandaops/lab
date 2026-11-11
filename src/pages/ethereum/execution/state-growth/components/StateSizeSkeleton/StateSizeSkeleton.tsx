@@ -43,7 +43,7 @@ export function StateSizeSkeleton(): JSX.Element {
           <LoadingContainer className="h-5 w-48 rounded-xs" />
           <LoadingContainer className="mt-2 h-4 w-72 rounded-xs" />
         </div>
-        <LoadingContainer className="h-[480px] w-full rounded-xs" />
+        <LoadingContainer className="h-120 w-full rounded-xs" />
       </Card>
     </div>
   );

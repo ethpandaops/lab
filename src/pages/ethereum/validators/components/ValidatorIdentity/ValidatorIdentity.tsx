@@ -40,7 +40,7 @@ export function BeaconchainLink({ index }: { index: number }): JSX.Element | nul
       rel="noopener noreferrer"
       title="Open on beaconcha.in"
       aria-label={`Open validator ${index} on beaconcha.in`}
-      className="inline-flex rounded-sm p-1 transition-colors hover:bg-muted/20"
+      className="inline-flex rounded-sm p-1 transition-colors hover:bg-muted-20"
     >
       <BeaconchainIcon className="size-4" />
     </a>

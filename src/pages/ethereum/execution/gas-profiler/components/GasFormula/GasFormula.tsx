@@ -48,17 +48,17 @@ export interface GasFormulaProps {
 function getColorClasses(color: GasFormulaColor): { border: string; bg: string; text: string } {
   switch (color) {
     case 'blue':
-      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
+      return { border: 'border-data-blue-30', bg: 'bg-data-blue-5', text: 'text-data-blue' };
     case 'purple':
-      return { border: 'border-data-purple/30', bg: 'bg-data-purple/5', text: 'text-data-purple' };
+      return { border: 'border-data-purple-30', bg: 'bg-data-purple-5', text: 'text-data-purple' };
     case 'green':
-      return { border: 'border-success/30', bg: 'bg-success/5', text: 'text-success' };
+      return { border: 'border-success-30', bg: 'bg-success-5', text: 'text-success' };
     case 'amber':
-      return { border: 'border-warning/30', bg: 'bg-warning/5', text: 'text-warning' };
+      return { border: 'border-warning-30', bg: 'bg-warning-5', text: 'text-warning' };
     case 'cyan':
-      return { border: 'border-data-cyan/30', bg: 'bg-data-cyan/5', text: 'text-data-cyan' };
+      return { border: 'border-data-cyan-30', bg: 'bg-data-cyan-5', text: 'text-data-cyan' };
     default:
-      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
+      return { border: 'border-data-blue-30', bg: 'bg-data-blue-5', text: 'text-data-blue' };
   }
 }
 
@@ -140,7 +140,7 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
         <div className="border-t border-border" />
 
         {/* Result row */}
-        <div className="flex items-center justify-between rounded-xs border-l-2 border-primary/40 bg-primary/5 px-3 py-2.5">
+        <div className="flex items-center justify-between rounded-xs border-l-2 border-primary-40 bg-primary-5 px-3 py-2.5">
           <div className="flex items-center gap-2">
             <span className="w-4 text-center text-sm font-bold text-primary">=</span>
             <span className="text-xs font-medium text-primary">{result.label}</span>
@@ -180,12 +180,12 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
         })}
 
         {/* Equals sign */}
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10 text-lg font-bold text-primary">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-50 bg-primary-10 text-lg font-bold text-primary">
           =
         </div>
 
         {/* Result box */}
-        <div className="min-w-0 flex-1 basis-24 rounded-sm border-2 border-primary/40 bg-primary/5 px-3 py-2.5 text-center">
+        <div className="min-w-0 flex-1 basis-24 rounded-sm border-2 border-primary-40 bg-primary-5 px-3 py-2.5 text-center">
           <div className="flex items-center justify-center gap-1 text-xs text-primary">
             {result.label}
             {result.tooltip}

@@ -92,7 +92,7 @@ const meta: Meta<typeof ProbesView> = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-xs bg-surface p-6">
+      <div className="min-w-200 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),

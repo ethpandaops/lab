@@ -48,7 +48,7 @@ export interface PopoutCardProps {
    * // Dynamic content (larger in modal)
    * <PopoutCard title="Chart">
    *   {({ inModal }) => (
-   *     <div className={inModal ? "min-h-[600px]" : "h-72"}>
+   *     <div className={inModal ? "min-h-150" : "h-72"}>
    *       <MyChart />
    *     </div>
    *   )}

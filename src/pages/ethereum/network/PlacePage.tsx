@@ -67,7 +67,7 @@ export function CountryPage(): JSX.Element {
       <Header
         title={
           <span className="inline-flex items-center gap-3">
-            <CountryFlag code={code} className="h-5 w-[30px] rounded-xs" />
+            <CountryFlag code={code} className="h-5 w-7.5 rounded-xs" />
             {countryName(code)}
           </span>
         }

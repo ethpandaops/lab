@@ -14,7 +14,7 @@ export function NotFound(): JSX.Element {
         <h1 className="mt-8 text-2xl/8 font-semibold tracking-tight text-foreground">Page Not Found</h1>
         <Link
           to="/"
-          className="mt-8 inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="mt-8 inline-flex h-8 items-center rounded-sm bg-primary px-4 text-sm font-semibold text-on-fill transition-colors hover:bg-primary-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           Go Home
         </Link>

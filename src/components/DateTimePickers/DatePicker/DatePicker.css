@@ -5,11 +5,6 @@
  * Provides light and dark mode support through CSS variables.
  */
 
-/* Container wrapper */
-.date-picker-wrapper {
-  display: inline-block;
-}
-
 /* Main calendar container */
 .react-datepicker {
   font-family: var(--font-sans);

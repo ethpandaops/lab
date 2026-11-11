@@ -6,41 +6,34 @@ const baseStyles =
 
 const variantStyles = {
   primary: clsx(
-    'bg-primary text-white',
-    'hover:bg-primary/90 disabled:hover:bg-primary',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:hover:bg-primary/80'
+    'bg-primary text-on-fill',
+    'hover:bg-primary-hover disabled:hover:bg-primary',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   ),
   secondary: clsx(
     'bg-surface text-foreground inset-ring inset-ring-border',
-    'hover:bg-background disabled:hover:bg-surface',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:hover:bg-muted/20 dark:disabled:hover:bg-surface'
+    'hover:bg-surface-hover disabled:hover:bg-surface',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground'
   ),
   soft: clsx(
-    'bg-primary/10 text-primary',
-    'hover:bg-primary/20 disabled:hover:bg-primary/10',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
-    'dark:bg-primary/20',
-    'dark:hover:bg-primary/30 dark:disabled:hover:bg-primary/20'
+    'bg-primary-soft text-primary',
+    'hover:bg-primary-soft-hover disabled:hover:bg-primary-soft',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
   ),
   outline: clsx(
     'bg-transparent text-foreground inset-ring-1 inset-ring-border',
-    'hover:bg-muted/10 disabled:hover:bg-transparent',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border',
-    'dark:hover:bg-muted/20'
+    'hover:bg-muted-hover disabled:hover:bg-transparent',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border'
   ),
   danger: clsx(
-    'bg-danger text-white dark:text-background',
-    'hover:bg-danger/90 disabled:hover:bg-danger',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger',
-    'dark:hover:bg-danger/80'
+    'bg-danger text-on-solid',
+    'hover:bg-danger-hover disabled:hover:bg-danger',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger'
   ),
   blank: clsx(
     'bg-transparent text-foreground',
-    'hover:bg-muted/10 disabled:hover:bg-transparent',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground',
-    'dark:hover:bg-muted/10'
+    'hover:bg-muted-10 disabled:hover:bg-transparent',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground'
   ),
 };
 
@@ -80,11 +73,12 @@ export function buttonClassName({
   iconOnly = false,
   className,
 }: Pick<ButtonProps, 'variant' | 'size' | 'rounded' | 'iconOnly'> & { className?: string } = {}): string {
+  const radius = rounded ?? 'sm';
   return clsx(
     baseStyles,
     variantStyles[variant],
     iconOnly ? iconOnlySizeStyles[size] : sizeStyles[size],
-    roundedStyles[rounded ?? 'sm'],
+    roundedStyles[radius],
     className
   );
 }

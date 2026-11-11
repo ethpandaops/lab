@@ -290,7 +290,7 @@ export function IndexPage(): JSX.Element {
                   key={relay}
                   title={`Only blocks delivered by ${relay}`}
                   onClick={() => addFilter({ relay, source: undefined })}
-                  className="rounded-xs bg-muted/10 px-1.5 py-0.5 text-foreground hover:no-underline"
+                  className="rounded-xs bg-muted-10 px-1.5 py-0.5 text-foreground hover:no-underline"
                 >
                   {relay}
                 </FilterButton>

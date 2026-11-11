@@ -166,14 +166,14 @@ function formatActiveRange(firstSeen: number, lastSeen: number, bucketSeconds: n
 function getStatusStyle(status?: string): { bg: string; text: string } {
   switch (status?.toUpperCase()) {
     case 'VALID':
-      return { bg: 'bg-success/10', text: 'text-success' };
+      return { bg: 'bg-success-10', text: 'text-success' };
     case 'ERROR':
     case 'INVALID':
-      return { bg: 'bg-danger/10', text: 'text-danger' };
+      return { bg: 'bg-danger-10', text: 'text-danger' };
     case 'SYNCING':
-      return { bg: 'bg-warning/10', text: 'text-warning' };
+      return { bg: 'bg-warning-10', text: 'text-warning' };
     default:
-      return { bg: 'bg-muted/10', text: 'text-muted' };
+      return { bg: 'bg-muted-10', text: 'text-muted' };
   }
 }
 
@@ -238,7 +238,7 @@ function ExpandedRowContent({
   if (isLoading) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 flex items-center gap-2 text-sm text-muted">
             <div className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             Loading observations...
@@ -251,7 +251,7 @@ function ExpandedRowContent({
   if (error) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 text-sm text-danger">Failed to load observations</div>
         </td>
       </tr>
@@ -261,7 +261,7 @@ function ExpandedRowContent({
   if (observations.length === 0) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 text-sm text-muted">No individual observations found</div>
         </td>
       </tr>
@@ -270,7 +270,7 @@ function ExpandedRowContent({
 
   return (
     <tr>
-      <td colSpan={colSpan} className="bg-background/50 p-0">
+      <td colSpan={colSpan} className="bg-background-50 p-0">
         <div className="ml-8 border-l-2 border-border py-2 pl-4">
           <table className="w-full">
             <thead>
@@ -296,7 +296,7 @@ function ExpandedRowContent({
                               e.stopPropagation();
                               onClusterClick(clusterName);
                             }}
-                            className="rounded-xs p-0.5 transition-colors hover:bg-primary/10"
+                            className="rounded-xs p-0.5 transition-colors hover:bg-primary-10"
                             title={`View ${clusterName} cluster specs`}
                           >
                             <ServerIcon className={clsx('size-3.5 shrink-0', clusterColor)} />
@@ -733,7 +733,7 @@ export function ClientVersionBreakdown({
   if (aggregatedData.length === 0) {
     const emptyContent = (
       <>
-        <div className="flex h-[200px] items-center justify-center text-muted">No client version data available</div>
+        <div className="flex h-50 items-center justify-center text-muted">No client version data available</div>
       </>
     );
 
@@ -998,13 +998,13 @@ export function ClientVersionBreakdown({
                         <React.Fragment key={`sub-${subRow.client}-${subRow.version}-${subIndex}`}>
                           <tr
                             className={clsx(
-                              'bg-background/50 transition-colors hover:bg-background',
+                              'bg-background-50 transition-colors hover:bg-background',
                               canExpandNode && 'cursor-pointer',
                               isSubNodeExpanded && 'bg-background'
                             )}
                             onClick={handleSubRowClick}
                           >
-                            <td className="border-l-2 border-primary/30 py-3 pr-3 pl-10">
+                            <td className="border-l-2 border-primary-30 py-3 pr-3 pl-10">
                               <div className="flex items-center gap-2">
                                 {canExpandNode && (
                                   <ChevronRightIcon

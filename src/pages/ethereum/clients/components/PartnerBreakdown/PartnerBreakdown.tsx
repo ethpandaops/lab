@@ -140,8 +140,8 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
           No block or address paired it with {article} {other} client.
         </p>
       ) : (
-        <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full border-collapse sm:min-w-[36rem]">
+        <div className="mx-card-bleed overflow-x-auto px-card-inset">
+          <table className="w-full border-collapse sm:min-w-xl">
             <thead className="border-b border-border">
               <tr>
                 <Th>Client</Th>
@@ -160,16 +160,16 @@ export function PartnerShares({ client, layer, shareWindow }: PartnerSharesProps
                 <th aria-hidden className="sm:w-28" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-border-60">
               {partners.rows.map(row => (
                 <tr key={row.client}>
                   <td className="py-2 pr-3">
                     <ClientLabel client={row.client} />
                   </td>
-                  <td className="w-[34%] px-3 py-2">
+                  <td className="w-34/100 px-3 py-2">
                     <Share share={row.blockShare} color={getClientColor(row.client)} />
                   </td>
-                  <td className="w-[34%] px-3 py-2">
+                  <td className="w-34/100 px-3 py-2">
                     <Share share={row.addressShare} color={getClientColor(row.client)} />
                   </td>
                   <td className="py-2 pl-3 text-right">
@@ -286,13 +286,13 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
           No block in this window named {article} {other} client alongside it.
         </p>
       ) : (
-        <div className="-mx-[calc(var(--card-inset)-1px)] overflow-x-auto">
+        <div className="mx-card-bleed-inner overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="border-b border-border">
               <tr>
                 <th
                   scope="col"
-                  className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-(--card-inset) text-left align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground"
+                  className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-card-inset text-left align-bottom text-xs/5 font-medium whitespace-nowrap text-foreground"
                 >
                   Client
                 </th>
@@ -302,19 +302,19 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
                   </Th>
                 ))}
                 {detail.length > 0 && (
-                  <th scope="col" className="w-8 pr-(--card-inset)">
+                  <th scope="col" className="w-8 pr-card-inset">
                     <span className="sr-only">More</span>
                   </th>
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-border-60">
               {partners.map(partner => {
                 const open = expanded === partner;
                 return (
                   <Fragment key={partner}>
-                    <tr id={`partner-${partner}`} className="scroll-mt-24 target:bg-primary/10">
-                      <td className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-(--card-inset)">
+                    <tr id={`partner-${partner}`} className="scroll-mt-24 target:bg-primary-10">
+                      <td className="sticky left-0 z-10 bg-surface py-2 pr-3 pl-card-inset">
                         {partner === UNKNOWN_CLIENT ? (
                           <span className="text-sm/6 whitespace-nowrap text-muted">
                             With an unknown {layer === 'consensus' ? 'EL' : 'CL'}
@@ -332,13 +332,13 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
                         </td>
                       ))}
                       {detail.length > 0 && (
-                        <td className="py-2 pr-(--card-inset) pl-1 text-right">
+                        <td className="py-2 pr-card-inset pl-1 text-right">
                           <button
                             type="button"
                             onClick={() => setExpanded(open ? null : partner)}
                             aria-expanded={open}
                             aria-label={`${open ? 'Hide' : 'Show'} more metrics`}
-                            className="rounded-xs p-1 text-muted hover:bg-primary/10 hover:text-foreground"
+                            className="rounded-xs p-1 text-muted hover:bg-primary-10 hover:text-foreground"
                           >
                             <ChevronDownIcon className={clsx('size-4 transition-transform', open && 'rotate-180')} />
                           </button>
@@ -346,9 +346,9 @@ export function PartnerPerformance({ client, layer, shareWindow, from }: Partner
                       )}
                     </tr>
                     {open && (
-                      <tr className="bg-background/50">
+                      <tr className="bg-background-50">
                         <td colSpan={columns.length + 2} className="py-3">
-                          <dl className="sticky left-0 flex max-w-[calc(100vw-3rem)] flex-wrap gap-x-8 gap-y-2 px-(--card-inset) lg:max-w-none">
+                          <dl className="sticky left-0 flex max-w-vw-less-12 flex-wrap gap-x-8 gap-y-2 px-card-inset lg:max-w-none">
                             {detail.map(column => (
                               <div key={column.metric.id}>
                                 <dt className="text-xs/5 text-muted">{column.metric.label}</dt>

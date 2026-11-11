@@ -272,7 +272,7 @@ export function MapChart({
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="size-full">
       <ReactECharts
         theme={ECHARTS_THEME}
         option={option}

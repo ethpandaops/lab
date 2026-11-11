@@ -121,17 +121,17 @@ function FilterButton({
   // missing = red (peer responded but didn't have the data - serious)
   const defaultStyles = {
     all: 'bg-surface text-foreground hover:bg-background',
-    success: 'bg-surface text-success hover:bg-success/10',
-    failure: 'bg-surface text-warning hover:bg-warning/10',
-    missing: 'bg-surface text-danger hover:bg-danger/10',
+    success: 'bg-surface text-success hover:bg-success-10',
+    failure: 'bg-surface text-warning hover:bg-warning-10',
+    missing: 'bg-surface text-danger hover:bg-danger-10',
   };
 
   // Active state styles per variant
   const activeStyles = {
-    all: 'bg-primary/10 text-primary inset-ring-primary/50',
-    success: 'bg-success/20 text-success inset-ring-success/50',
-    failure: 'bg-warning/20 text-warning inset-ring-warning/50',
-    missing: 'bg-danger/20 text-danger inset-ring-danger/50',
+    all: 'bg-primary-10 text-primary inset-ring-primary-50',
+    success: 'bg-success-20 text-success inset-ring-success-50',
+    failure: 'bg-warning-20 text-warning inset-ring-warning-50',
+    missing: 'bg-danger-20 text-danger inset-ring-danger-50',
   };
 
   return (
@@ -294,7 +294,7 @@ export function CellProbeDialog({
             <Link
               to="/ethereum/data-availability/probes"
               search={probesLinkParams}
-              className="inline-flex items-center gap-1.5 rounded-xs border border-accent/50 bg-accent/10 px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
+              className="inline-flex items-center gap-1.5 rounded-xs border border-accent-50 bg-accent-10 px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent-20"
             >
               <MagnifyingGlassIcon className="size-3.5" />
               View All Probes
@@ -322,10 +322,10 @@ export function CellProbeDialog({
                 <div className="space-y-2 p-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-2 px-2 py-1.5">
-                      <div className="size-7 animate-pulse rounded-full bg-muted/50" />
+                      <div className="size-7 animate-pulse rounded-full bg-muted-50" />
                       <div className="flex flex-1 flex-col gap-1">
-                        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted/50" />
-                        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted/50" />
+                        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted-50" />
+                        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted-50" />
                       </div>
                     </div>
                   ))}

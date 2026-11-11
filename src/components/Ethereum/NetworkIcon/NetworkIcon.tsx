@@ -45,19 +45,9 @@ export function NetworkIcon({ networkName, className }: NetworkIconProps): JSX.E
     return (
       <>
         {/* Light mode */}
-        <img
-          src={icon.lightSrc}
-          alt=""
-          className={clsx('dark:hidden star:hidden', className || 'size-6')}
-          aria-hidden
-        />
+        <img src={icon.lightSrc} alt="" className={clsx('on-dark:hidden', className || 'size-6')} aria-hidden />
         {/* Dark/star mode */}
-        <img
-          src={icon.src}
-          alt=""
-          className={clsx('hidden dark:block star:block', className || 'size-6')}
-          aria-hidden
-        />
+        <img src={icon.src} alt="" className={clsx('hidden on-dark:block', className || 'size-6')} aria-hidden />
       </>
     );
   }

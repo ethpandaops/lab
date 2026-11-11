@@ -101,7 +101,7 @@ export function DataAvailabilityRowLabel({
       <Icon
         className={clsx(
           'size-3 shrink-0 transition-colors',
-          isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted/60'
+          isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted-60'
         )}
       />
 
@@ -109,7 +109,7 @@ export function DataAvailabilityRowLabel({
       <span
         className={clsx(
           'w-8 shrink-0 rounded-xs px-1 py-px text-center text-2xs font-medium transition-colors',
-          isHovered && effectiveCanDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
+          isHovered && effectiveCanDrillDown ? 'bg-accent-20 text-accent' : 'bg-muted-20 text-muted'
         )}
       >
         {typeLabel}
@@ -119,7 +119,7 @@ export function DataAvailabilityRowLabel({
       <span
         className={clsx(
           'flex-1 truncate text-right font-mono text-2xs transition-colors',
-          isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
+          isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground-80'
         )}
       >
         {label}

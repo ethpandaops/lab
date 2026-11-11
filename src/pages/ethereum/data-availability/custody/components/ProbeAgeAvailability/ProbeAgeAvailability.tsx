@@ -66,7 +66,7 @@ export function ProbeAgeAvailability({ data, isLoading, subtitle }: ProbeAgeAvai
             legendPosition="top"
             enableDataZoom
           />
-          <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
+          <div className="mx-card-bleed overflow-x-auto px-card-inset">
             <Table
               variant="nested"
               data={data.byClient}

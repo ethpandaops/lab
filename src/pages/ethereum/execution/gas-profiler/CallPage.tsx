@@ -68,16 +68,16 @@ async function copyToClipboard(text: string): Promise<boolean> {
 function getCallTypeStyles(callType: string): { bg: string; text: string; border: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-data-orange/10', text: 'text-data-orange', border: 'border-data-orange/30' };
+      return { bg: 'bg-data-orange-10', text: 'text-data-orange', border: 'border-data-orange-30' };
     case 'CREATE2':
-      return { bg: 'bg-data-amber/10', text: 'text-data-amber', border: 'border-data-amber/30' };
+      return { bg: 'bg-data-amber-10', text: 'text-data-amber', border: 'border-data-amber-30' };
     case 'DELEGATECALL':
-      return { bg: 'bg-data-purple/10', text: 'text-data-purple', border: 'border-data-purple/30' };
+      return { bg: 'bg-data-purple-10', text: 'text-data-purple', border: 'border-data-purple-30' };
     case 'STATICCALL':
-      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan', border: 'border-data-cyan/30' };
+      return { bg: 'bg-data-cyan-10', text: 'text-data-cyan', border: 'border-data-cyan-30' };
     case 'CALL':
     default:
-      return { bg: 'bg-data-blue/10', text: 'text-data-blue', border: 'border-data-blue/30' };
+      return { bg: 'bg-data-blue-10', text: 'text-data-blue', border: 'border-data-blue-30' };
   }
 }
 
@@ -437,7 +437,7 @@ export function CallPage(): JSX.Element {
             <>
               <ChevronRightIcon className={`size-3 text-border ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`} />
               <div className={`group relative ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`}>
-                <button className="flex items-center gap-1 rounded-xs border border-border bg-surface/50 px-1.5 py-0.5 text-xs text-muted hover:border-primary/50 hover:text-foreground">
+                <button className="flex items-center gap-1 rounded-xs border border-border bg-surface-50 px-1.5 py-0.5 text-xs text-muted hover:border-primary-50 hover:text-foreground">
                   <EllipsisHorizontalIcon className="size-3.5" />
                   {/* Mobile: show total depth, Desktop: show collapsed count */}
                   <span className="sm:hidden">{breadcrumbPath.length}</span>
@@ -471,7 +471,7 @@ export function CallPage(): JSX.Element {
                         return isLast ? (
                           <div
                             key={frame.call_frame_id}
-                            className="flex items-center gap-2 rounded-xs bg-primary/10 px-2 py-1"
+                            className="flex items-center gap-2 rounded-xs bg-primary-10 px-2 py-1"
                           >
                             <span className={`rounded-xs px-1 py-0.5 text-xs ${frameStyles.bg} ${frameStyles.text}`}>
                               {frameCallType}

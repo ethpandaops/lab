@@ -25,7 +25,7 @@ export function ListSection({
   const headerElement = nested ? (
     <div
       className={clsx(
-        'text-xs font-semibold tracking-wider text-muted/70 uppercase',
+        'text-xs font-semibold tracking-wider text-muted-70 uppercase',
         collapsible && 'cursor-pointer select-none',
         headerClassName
       )}

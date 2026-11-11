@@ -110,7 +110,7 @@ export function ScrollAnchor({
           className={clsx(
             'shrink-0 self-start rounded-sm p-1',
             'opacity-0 transition-all group-hover:opacity-100',
-            'hover:bg-muted/20 focus:outline-hidden focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary',
+            'hover:bg-muted-20 focus:outline-hidden focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary',
             'text-muted hover:text-foreground'
           )}
           aria-label="Copy link to clipboard"

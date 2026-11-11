@@ -94,7 +94,7 @@ function BottomBarComponent({
       {/* Mobile Layout - Tabbed */}
       <div className="flex h-full flex-col bg-background md:border-t md:border-border lg:hidden">
         <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab} className="flex min-h-0 flex-1 flex-col">
-          <TabList className="flex shrink-0 border-y border-border bg-surface/50">
+          <TabList className="flex shrink-0 border-y border-border bg-surface-50">
             {showBlobAvailability && <Tab className="flex-1">Propagation</Tab>}
             {showDataColumnAvailability && <Tab className="flex-1">Data Columns</Tab>}
             <Tab className="flex-1">Attestations</Tab>

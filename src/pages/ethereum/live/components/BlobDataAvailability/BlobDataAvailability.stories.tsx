@@ -14,7 +14,7 @@ const meta: Meta<typeof BlobDataAvailability> = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[1400px] rounded-sm bg-surface p-6">
+      <div className="min-w-350 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

@@ -9,7 +9,7 @@ const meta: Meta<typeof DatePicker> = {
   component: DatePicker,
   decorators: [
     (Story: React.ComponentType) => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

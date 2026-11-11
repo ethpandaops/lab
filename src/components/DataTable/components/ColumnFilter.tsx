@@ -44,7 +44,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Filter...'}
-          className="min-w-[120px]"
+          className="min-w-30"
         />
       </Input>
     );
@@ -107,7 +107,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Min...'}
-          className="min-w-[100px]"
+          className="min-w-25"
         />
       </Input>
     );
@@ -122,7 +122,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Date...'}
-          className="min-w-[140px]"
+          className="min-w-35"
         />
       </Input>
     );

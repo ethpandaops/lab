@@ -75,9 +75,9 @@ function MobileHeader({
           aria-pressed={sidebarOpen}
         >
           <span className="sr-only">Toggle sidebar</span>
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:translate-y-2 group-aria-pressed:rotate-45" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:opacity-0" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:-translate-y-2 group-aria-pressed:-rotate-45" />
         </button>
         <Link to="/" className="flex items-center gap-2">
           <img alt="Lab Logo" src="/images/lab.png" className="h-8 w-auto" />
@@ -235,7 +235,7 @@ function RootComponent(): JSX.Element {
 
                   {/* Main content */}
                   <main
-                    className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                    className={`bg-background pt-16.25 transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
                   >
                     <FeatureGate>
                       <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />

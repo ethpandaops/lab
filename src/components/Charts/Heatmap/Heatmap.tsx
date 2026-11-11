@@ -311,7 +311,7 @@ export function HeatmapChart({
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="size-full">
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         echarts={echarts}

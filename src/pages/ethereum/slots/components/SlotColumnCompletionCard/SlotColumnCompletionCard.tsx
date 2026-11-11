@@ -104,7 +104,7 @@ export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps
                   <span
                     key={column.column_index}
                     title={title}
-                    className="flex h-4 overflow-hidden rounded-xs bg-border/50"
+                    className="flex h-4 overflow-hidden rounded-xs bg-border-50"
                   >
                     {total > 0 &&
                       COMPLETION_PATHS.filter(p => counts[p] > 0).map(p => (
