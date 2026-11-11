@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
@@ -123,9 +123,10 @@ export function weekChunks(weeks: string[]): Chunk[] {
  * keeps its content and height instead of swapping in a skeleton.
  */
 export function useKeepPrevious<T extends { isLoading: boolean; settled: boolean }>(result: T): T {
-  const previous = useRef<T | undefined>(undefined);
-  if (result.settled) previous.current = result;
-  return result.isLoading && previous.current ? previous.current : result;
+  const [previous, setPrevious] = useState<T | undefined>(undefined);
+  // useQueries keeps a combined result's reference until its content changes, so each settled result is stored once
+  if (result.settled && result !== previous) setPrevious(result);
+  return result.isLoading && previous ? previous : result;
 }
 
 /** Joins the chunk queries; module scoped so React Query only re-runs it when a chunk changes */

@@ -61,38 +61,46 @@ export function useLiveProbeStream({
   const [displayedItems, setDisplayedItems] = useState<IntCustodyProbe[]>([]);
   const [error, setError] = useState<Error | null>(null);
 
+  // Clear the stream when it is disabled
+  const [wasEnabled, setWasEnabled] = useState(enabled);
+  if (enabled !== wasEnabled) {
+    setWasEnabled(enabled);
+    if (!enabled) {
+      setDisplayedItems([]);
+      setError(null);
+    }
+  }
+
   // Use refs for frequently-updated values to avoid re-renders
   const newItemIdsRef = useRef<Set<string>>(new Set());
   const queue = useRef<IntCustodyProbe[]>([]);
   const seenIds = useRef<Set<string>>(new Set());
-  const dripTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dripTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastBoundsMax = useRef<number | null>(null);
   const hitPageLimitRef = useRef(false);
 
+  // Latest filters for fetchForBounds; effects run in order, so the fetching effects below see them updated
   const filtersRef = useRef(filters);
   const fuluSlotRef = useRef(fuluSlot);
-  filtersRef.current = filters;
-  fuluSlotRef.current = fuluSlot;
+  useEffect(() => {
+    filtersRef.current = filters;
+    fuluSlotRef.current = fuluSlot;
+  }, [filters, fuluSlot]);
 
-  // Drip one item from queue to display, then schedule next drip
+  // Drip one item from queue to display; the drip timer stops once the queue is empty
   const drip = useCallback(() => {
     const item = queue.current.shift();
-    if (!item) {
-      dripTimer.current = null;
-      return;
+    if (item) {
+      const id = getProbeId(item);
+      newItemIdsRef.current.add(id);
+      setDisplayedItems(prev => [item, ...prev].slice(0, CONFIG.MAX_DISPLAY));
+
+      // Remove highlight after animation
+      setTimeout(() => newItemIdsRef.current.delete(id), 400);
     }
 
-    const id = getProbeId(item);
-    newItemIdsRef.current.add(id);
-    setDisplayedItems(prev => [item, ...prev].slice(0, CONFIG.MAX_DISPLAY));
-
-    // Remove highlight after animation
-    setTimeout(() => newItemIdsRef.current.delete(id), 400);
-
-    // Schedule next drip
-    if (queue.current.length > 0) {
-      dripTimer.current = setTimeout(drip, CONFIG.DRIP_INTERVAL);
-    } else {
+    if (queue.current.length === 0 && dripTimer.current) {
+      clearInterval(dripTimer.current);
       dripTimer.current = null;
     }
   }, []);
@@ -162,7 +170,7 @@ export function useLiveProbeStream({
 
           // Start dripping if not already running
           if (!dripTimer.current) {
-            dripTimer.current = setTimeout(drip, CONFIG.DRIP_INTERVAL);
+            dripTimer.current = setInterval(drip, CONFIG.DRIP_INTERVAL);
           }
         }
 
@@ -186,19 +194,15 @@ export function useLiveProbeStream({
     fetchForBounds(bounds.max);
   }, [enabled, bounds?.max, fetchForBounds]);
 
-  // Reset everything when disabled
+  // Reset the queue and timers when disabled; the state is cleared during render above
   useEffect(() => {
     if (enabled) return;
 
     // Stop drip timer
     if (dripTimer.current) {
-      clearTimeout(dripTimer.current);
+      clearInterval(dripTimer.current);
       dripTimer.current = null;
     }
-
-    // Reset state
-    setDisplayedItems([]);
-    setError(null);
 
     // Reset refs
     queue.current = [];
@@ -219,7 +223,7 @@ export function useLiveProbeStream({
     if (prevFilters.current !== '') {
       // Stop drip timer
       if (dripTimer.current) {
-        clearTimeout(dripTimer.current);
+        clearInterval(dripTimer.current);
         dripTimer.current = null;
       }
 

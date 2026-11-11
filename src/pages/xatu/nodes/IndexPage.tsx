@@ -27,6 +27,7 @@ import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
+import { useNow } from './hooks/useNow';
 import { formatMs, median } from './utils/node-stats';
 
 /** Count Xatu nodes by key */
@@ -50,8 +51,9 @@ export function IndexPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const contributor = search.contributor;
-  const { rows: allRows, block, isLoading, error } = useNodeRows(range);
-  const networkHistory = useNetworkHistory(range);
+  const now = useNow();
+  const { rows: allRows, block, isLoading, error } = useNodeRows(range, now);
+  const networkHistory = useNetworkHistory(range, now);
 
   if (isLoading) {
     return (
@@ -185,6 +187,7 @@ export function IndexPage(): JSX.Element {
             <ContributorHistory
               username={contributor}
               range={range}
+              nowSeconds={now}
               rangeLabel={rangeLabel}
               networkMedians={networkHistory.data?.medians ?? new Map<number, number>()}
             />

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from '@tanstack/react-router';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -27,14 +27,7 @@ import {
   type BPOInfo,
 } from '@/utils/forks';
 import { epochToTimestamp } from '@/utils/beacon';
-import {
-  ExternalResourcesCard,
-  ForkCountdown,
-  ForkQuickLinks,
-  ForkStatusBadge,
-  secondsToCountdown,
-  type CountdownTime,
-} from './components/ForkShared';
+import { ExternalResourcesCard, ForkCountdown, ForkQuickLinks, ForkStatusBadge } from './components/ForkShared';
 import { ForkReadiness } from './components/ForkReadiness';
 import { Route } from '@/routes/ethereum/forks/$fork';
 
@@ -217,24 +210,6 @@ function ForkDetailContent({
   currentNetwork,
   navigate,
 }: ForkDetailContentProps): React.JSX.Element {
-  const [countdown, setCountdown] = useState<CountdownTime>(() => {
-    const secondsUntilFork = calculateSecondsUntil(fork.epoch, fork.isActive, currentNetwork?.genesis_time);
-    return secondsToCountdown(secondsUntilFork);
-  });
-
-  useEffect(() => {
-    if (fork.isActive || !currentNetwork?.genesis_time) return;
-
-    const updateCountdown = (): void => {
-      const secondsUntilFork = calculateSecondsUntil(fork.epoch, fork.isActive, currentNetwork.genesis_time);
-      setCountdown(secondsToCountdown(secondsUntilFork));
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, [fork, currentNetwork]);
-
   // Get blob schedule items for this fork
   const blobItems = useMemo(() => {
     if (!currentNetwork?.blob_schedule) return [];
@@ -297,7 +272,6 @@ function ForkDetailContent({
           fork={fork}
           isCurrentFork={isCurrentFork}
           previousFork={previousFork}
-          countdown={countdown}
           genesisTime={currentNetwork?.genesis_time}
         />
 
@@ -337,24 +311,6 @@ function BPODetailContent({
   genesisTime,
   navigate,
 }: BPODetailContentProps): React.JSX.Element {
-  const [countdown, setCountdown] = useState<CountdownTime>(() => {
-    const secondsUntil = calculateSecondsUntil(bpo.epoch, bpo.isActive, genesisTime);
-    return secondsToCountdown(secondsUntil);
-  });
-
-  useEffect(() => {
-    if (bpo.isActive || !genesisTime) return;
-
-    const updateCountdown = (): void => {
-      const secondsUntil = calculateSecondsUntil(bpo.epoch, bpo.isActive, genesisTime);
-      setCountdown(secondsToCountdown(secondsUntil));
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, [bpo, genesisTime]);
-
   // Determine if this is the current BPO
   const isCurrentBPO = bpo.isActive && (!nextBPO || currentEpoch < nextBPO.epoch);
 
@@ -400,7 +356,7 @@ function BPODetailContent({
       </div>
 
       <div className="space-y-6">
-        <BPOHero bpo={bpo} isCurrentBPO={isCurrentBPO} countdown={countdown} genesisTime={genesisTime} />
+        <BPOHero bpo={bpo} isCurrentBPO={isCurrentBPO} genesisTime={genesisTime} />
 
         <BPOParentForkCard bpo={bpo} />
 
@@ -410,23 +366,10 @@ function BPODetailContent({
   );
 }
 
-// Helper functions
-function calculateSecondsUntil(epoch: number, isActive: boolean, genesisTime?: number): number {
-  if (isActive || !genesisTime) return 0;
-
-  const slot = epoch * 32;
-  const timestamp = genesisTime + slot * 12;
-  const nowInSeconds = Math.floor(Date.now() / 1000);
-  const seconds = timestamp - nowInSeconds;
-
-  return Math.max(0, seconds);
-}
-
 interface ForkHeroProps {
   fork: ForkInfo;
   isCurrentFork: boolean;
   previousFork: ForkInfo | null;
-  countdown: CountdownTime;
   genesisTime?: number;
 }
 
@@ -435,19 +378,17 @@ function ActivationStatus({
   isActive,
   isCurrent,
   epoch,
-  countdown,
   genesisTime,
 }: {
   isActive: boolean;
   isCurrent: boolean;
   epoch: number;
-  countdown: CountdownTime;
   genesisTime?: number;
 }): React.JSX.Element {
   if (!isActive) {
     return (
       <ForkCountdown
-        countdown={countdown}
+        timestamp={genesisTime ? epochToTimestamp(epoch, genesisTime) : undefined}
         footer={
           genesisTime && (
             <div className="mt-4 text-center text-sm text-muted">
@@ -473,7 +414,7 @@ function ActivationStatus({
   );
 }
 
-function ForkHero({ fork, isCurrentFork, previousFork, countdown, genesisTime }: ForkHeroProps): React.JSX.Element {
+function ForkHero({ fork, isCurrentFork, previousFork, genesisTime }: ForkHeroProps): React.JSX.Element {
   return (
     <Card>
       {/* Header with emoji and status badges */}
@@ -490,7 +431,6 @@ function ForkHero({ fork, isCurrentFork, previousFork, countdown, genesisTime }:
         isActive={fork.isActive}
         isCurrent={isCurrentFork}
         epoch={fork.epoch}
-        countdown={countdown}
         genesisTime={genesisTime}
       />
 
@@ -513,11 +453,10 @@ function ForkHero({ fork, isCurrentFork, previousFork, countdown, genesisTime }:
 interface BPOHeroProps {
   bpo: BPOInfo;
   isCurrentBPO: boolean;
-  countdown: CountdownTime;
   genesisTime?: number;
 }
 
-function BPOHero({ bpo, isCurrentBPO, countdown, genesisTime }: BPOHeroProps): React.JSX.Element {
+function BPOHero({ bpo, isCurrentBPO, genesisTime }: BPOHeroProps): React.JSX.Element {
   return (
     <Card>
       {/* Header with emoji and status badges */}
@@ -532,13 +471,7 @@ function BPOHero({ bpo, isCurrentBPO, countdown, genesisTime }: BPOHeroProps): R
         </p>
       </div>
 
-      <ActivationStatus
-        isActive={bpo.isActive}
-        isCurrent={isCurrentBPO}
-        epoch={bpo.epoch}
-        countdown={countdown}
-        genesisTime={genesisTime}
-      />
+      <ActivationStatus isActive={bpo.isActive} isCurrent={isCurrentBPO} epoch={bpo.epoch} genesisTime={genesisTime} />
 
       {/* Quick links */}
       <ForkQuickLinks epoch={bpo.epoch}>

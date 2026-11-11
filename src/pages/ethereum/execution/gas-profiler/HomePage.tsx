@@ -90,11 +90,9 @@ export function HomePage(): JSX.Element {
   const { data: bounds, isLoading: boundsLoading, error } = useGasProfilerBounds();
 
   // Initialize pinnedMax from bounds on first load
-  useEffect(() => {
-    if (bounds && pinnedMax === null) {
-      setPinnedMax(bounds.max);
-    }
-  }, [bounds, pinnedMax]);
+  if (bounds && pinnedMax === null) {
+    setPinnedMax(bounds.max);
+  }
 
   // Fetch recent blocks for visualization — pinned to anchorBlock
   const {

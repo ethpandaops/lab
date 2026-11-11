@@ -63,16 +63,19 @@ describe('useCanHover', () => {
       }
     });
 
-    matchMediaMock.mockReturnValue({
+    const mediaQueryList = {
       matches: true,
       addEventListener: addEventListenerMock,
       removeEventListener: removeEventListenerMock,
-    });
+    };
+    matchMediaMock.mockReturnValue(mediaQueryList);
 
     const { result } = renderHook(() => useCanHover());
     expect(result.current).toBe(true);
 
     act(() => {
+      // Like a real MediaQueryList, `matches` already holds the new value when 'change' fires
+      mediaQueryList.matches = false;
       changeHandler({ matches: false } as MediaQueryListEvent);
     });
 

@@ -1,4 +1,4 @@
-import { type JSX, useState, useCallback, useEffect } from 'react';
+import { type JSX, useState, useCallback } from 'react';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -57,15 +57,18 @@ export function TimestampModal({ open, onClose, timestamp, context }: TimestampM
 function TimestampModalContent({ timestamp }: TimestampModalContentProps): JSX.Element {
   const { currentNetwork } = useNetwork();
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [liveRelativeTime, setLiveRelativeTime] = useState<string>(getRelativeTime(timestamp));
+  const [liveRelativeTime, setLiveRelativeTime] = useState<string>(() => getRelativeTime(timestamp));
   const [nestedModalTimestamp, setNestedModalTimestamp] = useState<number | null>(null);
   const [nestedModalContext, setNestedModalContext] = useState<string | undefined>(undefined);
 
-  // Update live relative time every second
-  useEffect(() => {
+  // Restart the live relative time as soon as the timestamp changes
+  const [prevTimestamp, setPrevTimestamp] = useState(timestamp);
+  if (timestamp !== prevTimestamp) {
+    setPrevTimestamp(timestamp);
     setLiveRelativeTime(getRelativeTime(timestamp));
-  }, [timestamp]);
+  }
 
+  // Update live relative time every second
   useInterval(() => {
     setLiveRelativeTime(getRelativeTime(timestamp));
   }, 1000);

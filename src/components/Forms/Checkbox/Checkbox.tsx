@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Checkbox as HeadlessCheckbox } from '@headlessui/react';
 import type { CheckboxProps } from './Checkbox.types';
 
@@ -14,7 +15,8 @@ export function Checkbox({
   rounded = true,
   ...props
 }: CheckboxProps): React.JSX.Element {
-  const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  const generatedId = useId();
+  const checkboxId = id || `checkbox-${generatedId}`;
 
   return (
     <HeadlessCheckbox

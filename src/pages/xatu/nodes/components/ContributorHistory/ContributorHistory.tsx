@@ -20,6 +20,8 @@ const HISTORY_CHARTS: Array<{ metric: HistoryMetric; title: string; subtitle: st
 export interface ContributorHistoryProps {
   username: string;
   range: NodeRange;
+  /** Current unix time, so the charts end where the rest of the page does */
+  nowSeconds: number;
   rangeLabel: string;
   /** The network's median block arrival by bucket start, to tell when a Xatu node was catching up */
   networkMedians: Map<number, number>;
@@ -31,14 +33,15 @@ export interface ContributorHistoryProps {
 export function ContributorHistory({
   username,
   range,
+  nowSeconds,
   rangeLabel,
   networkMedians,
 }: ContributorHistoryProps): JSX.Element {
   const histories = {
-    block: useNodeHistory('block', range, { username }),
-    head: useNodeHistory('head', range, { username }),
-    attestation: useNodeHistory('attestation', range, { username }),
-    dataColumn: useNodeHistory('dataColumn', range, { username }),
+    block: useNodeHistory('block', range, { username }, nowSeconds),
+    head: useNodeHistory('head', range, { username }, nowSeconds),
+    attestation: useNodeHistory('attestation', range, { username }, nowSeconds),
+    dataColumn: useNodeHistory('dataColumn', range, { username }, nowSeconds),
   };
   const behindOf = (nodeId: string): Set<number> =>
     behindStarts(

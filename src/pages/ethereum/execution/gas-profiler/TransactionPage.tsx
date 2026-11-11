@@ -220,7 +220,7 @@ export function TransactionPage(): JSX.Element {
     // Code deposit is the difference between total EVM gas and opcode gas
     const codeDeposit = txData.metadata.evmGasUsed - totalOpcodeGas;
     return codeDeposit > 0 ? codeDeposit : 0;
-  }, [txData?.metadata.isContractCreation, txData?.metadata.evmGasUsed, opcodeMap]);
+  }, [txData, opcodeMap]);
 
   // Contract gas node type (for aggregated contract view, not call tree)
   interface ContractGasNode {
@@ -342,7 +342,7 @@ export function TransactionPage(): JSX.Element {
     topLevel.sort((a, b) => b.totalGas - a.totalGas);
 
     return topLevel;
-  }, [txData?.callFrames, contractOwners]);
+  }, [txData, contractOwners]);
 
   // Count contracts and implementations
   // An implementation is any contract that's DELEGATECALL-only (no CALL/STATICCALL)
@@ -389,7 +389,7 @@ export function TransactionPage(): JSX.Element {
     }
 
     return [...typeMap.values()].sort((a, b) => b.gasUsed - a.gasUsed);
-  }, [txData?.callFrames]);
+  }, [txData]);
 
   // Calculate opcode category breakdown for pie chart (by gas)
   const opcodeCategoryData = useMemo(() => {
@@ -402,7 +402,7 @@ export function TransactionPage(): JSX.Element {
     }
 
     return [...categoryMap.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-  }, [txData?.opcodeStats]);
+  }, [txData]);
 
   // Calculate opcode category breakdown for pie chart (by count)
   const opcodeCategoryCountData = useMemo(() => {
@@ -415,7 +415,7 @@ export function TransactionPage(): JSX.Element {
     }
 
     return [...categoryMap.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-  }, [txData?.opcodeStats]);
+  }, [txData]);
 
   // Call type distribution for pie chart (by count) - used for tab visibility check
   const callTypeChartData = useMemo(() => {
@@ -445,7 +445,7 @@ export function TransactionPage(): JSX.Element {
           callType: f.call_type ?? undefined,
         };
       });
-  }, [txData?.callFrames, contractOwners, functionSignatures]);
+  }, [txData, contractOwners, functionSignatures]);
 
   // Total EVM gas for percentage calculations (root frame's cumulative gas)
   const totalCallGas = useMemo(() => {
@@ -453,7 +453,7 @@ export function TransactionPage(): JSX.Element {
     // Root frame (depth 0) has total EVM gas in gas_cumulative
     const rootFrame = txData.callFrames.find(f => f.depth === 0);
     return rootFrame?.gas_cumulative ?? 0;
-  }, [txData?.callFrames]);
+  }, [txData]);
 
   // Handle call selection - navigate to call page
   const handleFrameSelect = useCallback(
@@ -521,7 +521,7 @@ export function TransactionPage(): JSX.Element {
   const totalEvmGas = useMemo(() => {
     if (!txData?.opcodeStats) return 0;
     return txData.opcodeStats.reduce((sum: number, op: OpcodeStats) => sum + op.totalGas, 0);
-  }, [txData?.opcodeStats]);
+  }, [txData]);
 
   // Handle treemap click - show popover instead of direct navigation
   const handleTreemapClick = useCallback(

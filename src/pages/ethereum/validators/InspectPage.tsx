@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
@@ -73,7 +73,11 @@ export function InspectPage(): JSX.Element {
   const [tags, setTags] = useState<string[]>(() => tagsFromUrl(search.indices));
   const [range, setRange] = useState<{ from?: number; to?: number }>({ from: search.from, to: search.to });
   const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('inclusion');
-  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  // Analyse straight away when the URL already names validators
+  const [hasAnalyzed, setHasAnalyzed] = useState(() => {
+    const { valid, pubkeys } = parseValidatorIndices(tagsFromUrl(search.indices));
+    return valid.length > 0 || pubkeys.length > 0;
+  });
   // When Activity was last asked to run to now; reset with each range, so its requests stay the same in between
   const [activityNow, setActivityNow] = useState(() => Date.now());
   const [selection, setSelection] = useState<ValidatorSelection>({
@@ -216,16 +220,6 @@ export function InspectPage(): JSX.Element {
     (nextFrom: number, nextTo: number) => applyRange({ from: nextFrom, to: nextTo }),
     [applyRange]
   );
-
-  // Analyse straight away when the URL already names validators
-  const hasInitialized = useRef(false);
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-    const { valid, pubkeys } = parseValidatorIndices(tagsFromUrl(search.indices));
-    if (valid.length > 0 || pubkeys.length > 0) setHasAnalyzed(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const loading = isResolving || isLoading || rangeFrom === undefined;
   const busy = loading || isPlaceholderData;

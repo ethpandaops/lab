@@ -13,19 +13,25 @@ interface DataAvailabilityRowLabelProps extends RowLabelRenderProps {
 }
 
 /**
- * Get icon component for the row type based on granularity
+ * Icon for the row type based on granularity
  * The icon represents what type of data this row shows
  */
-function getRowIcon(granularity: DataAvailabilityGranularity): React.ComponentType<{ className?: string }> {
+function RowIcon({
+  granularity,
+  className,
+}: {
+  granularity: DataAvailabilityGranularity;
+  className: string;
+}): React.JSX.Element {
   switch (granularity) {
     case 'window':
-      return CalendarDaysIcon; // Days
+      return <CalendarDaysIcon className={className} />; // Days
     case 'day':
-      return ClockIcon; // Hours
+      return <ClockIcon className={className} />; // Hours
     case 'hour':
-      return CubeIcon; // Epochs
+      return <CubeIcon className={className} />; // Epochs
     case 'epoch':
-      return Square2StackIcon; // Slots
+      return <Square2StackIcon className={className} />; // Slots
   }
 }
 
@@ -65,7 +71,6 @@ export function DataAvailabilityRowLabel({
   disabled,
   disabledReason,
 }: DataAvailabilityRowLabelProps): React.JSX.Element {
-  const Icon = getRowIcon(granularity);
   const typeLabel = getRowTypeLabel(granularity);
 
   // Disabled rows can't be drilled down into
@@ -98,7 +103,8 @@ export function DataAvailabilityRowLabel({
       title={tooltip}
     >
       {/* Type icon */}
-      <Icon
+      <RowIcon
+        granularity={granularity}
         className={clsx(
           'size-3 shrink-0 transition-colors',
           isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted-60'

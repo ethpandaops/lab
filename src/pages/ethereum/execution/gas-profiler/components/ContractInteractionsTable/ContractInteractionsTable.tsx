@@ -1,5 +1,5 @@
 import { Button } from '@/components/Elements/Button';
-import React, { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { type JSX, useState, useCallback, useMemo } from 'react';
 import { ChevronRightIcon, ChevronDownIcon, CogIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { ContractInteractionsTableProps, ContractInteractionItem } from './ContractInteractionsTable.types';
@@ -235,24 +235,20 @@ export function ContractInteractionsTable({
   initialVisibleCount = 10,
 }: ContractInteractionsTableProps): JSX.Element {
   const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
-  const [expandedContracts, setExpandedContracts] = useState<Set<string>>(new Set());
-  const [sortField, setSortField] = useState<ContractSortField>('gas');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-
-  // Auto-expand contracts with implementations on mount
-  useEffect(() => {
+  // Contracts with implementations start expanded
+  const [expandedContracts, setExpandedContracts] = useState<Set<string>>(() => {
+    const toExpand = new Set<string>();
     if (showImplementations) {
-      const toExpand = new Set<string>();
       contracts.forEach(contract => {
         if (contract.implementations && contract.implementations.length > 0) {
           toExpand.add(contract.address);
         }
       });
-      if (toExpand.size > 0) {
-        setExpandedContracts(toExpand);
-      }
     }
-  }, [contracts, showImplementations]);
+    return toExpand;
+  });
+  const [sortField, setSortField] = useState<ContractSortField>('gas');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const toggleExpand = useCallback((address: string) => {
     setExpandedContracts(prev => {

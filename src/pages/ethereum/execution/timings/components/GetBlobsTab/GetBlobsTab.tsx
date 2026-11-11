@@ -388,9 +388,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     };
   });
 
-  // Ensure valid bounds (fallback to now if no data)
-  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
-  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
+  // Without duration points, the axis spans whatever points the chart has
+  const trendAxisMin = trendMinTime === Infinity ? 'dataMin' : trendMinTime;
+  const trendAxisMax = trendMaxTime === -Infinity ? 'dataMax' : trendMaxTime;
 
   // Axis and tooltip labels for the trend charts' hourly/daily buckets
   const formatTrendAxis = (value: number | string): string => {
@@ -562,8 +562,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -617,8 +617,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{

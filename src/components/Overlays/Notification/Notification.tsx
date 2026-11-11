@@ -26,16 +26,13 @@ const getPositionClasses = (position: NotificationPosition): string => {
 };
 
 /**
- * Get icon component for notification variant
+ * Icon component for each notification variant
  */
-const getVariantIcon = (variant: NotificationVariant): typeof InformationCircleIcon => {
-  const icons: Record<NotificationVariant, typeof InformationCircleIcon> = {
-    info: InformationCircleIcon,
-    success: CheckCircleIcon,
-    warning: ExclamationTriangleIcon,
-    danger: XCircleIcon,
-  };
-  return icons[variant];
+const VARIANT_ICONS: Record<NotificationVariant, typeof InformationCircleIcon> = {
+  info: InformationCircleIcon,
+  success: CheckCircleIcon,
+  warning: ExclamationTriangleIcon,
+  danger: XCircleIcon,
 };
 
 /**
@@ -95,7 +92,7 @@ export function Notification({
   showCloseButton = false,
   className = '',
 }: NotificationProps): JSX.Element {
-  const Icon = getVariantIcon(variant);
+  const Icon = VARIANT_ICONS[variant];
 
   // Auto-dismiss after duration
   useEffect(() => {

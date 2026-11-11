@@ -44,7 +44,7 @@ export function SlotProgressTimeline({
 }: SlotProgressTimelineProps): JSX.Element {
   const canHover = useCanHover();
   const [hoveredSpan, setHoveredSpan] = useState<TraceSpan | null>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number; containerWidth: number } | null>(null);
   const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
   const [excludeOutliers, setExcludeOutliers] = useState(true);
   const hasInitializedCollapsed = useRef(false);
@@ -149,7 +149,11 @@ export function SlotProgressTimeline({
       if (!canHover) return;
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        setMousePos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+          containerWidth: containerRef.current.clientWidth,
+        });
       }
     },
     [canHover]
@@ -336,11 +340,7 @@ export function SlotProgressTimeline({
 
         {/* Floating Tooltip */}
         {hoveredSpan && mousePos && (
-          <TimelineTooltip
-            span={hoveredSpan}
-            position={mousePos}
-            containerWidth={containerRef.current?.clientWidth ?? 400}
-          />
+          <TimelineTooltip span={hoveredSpan} position={mousePos} containerWidth={mousePos.containerWidth} />
         )}
       </div>
 

@@ -262,7 +262,7 @@ export function IndexPage(): JSX.Element {
     const latest = data?.signallingLatest ? rowTime(data.signallingLatest) : null;
     if (latest === null || !domain) return null;
     return domain[1] - latest > DAY_SECONDS ? formatBucket(latest, isDaily) : null;
-  }, [data?.signallingLatest, domain, isDaily]);
+  }, [data, domain, isDaily]);
 
   // ==========================================================================
   // Series

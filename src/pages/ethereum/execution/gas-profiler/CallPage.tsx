@@ -190,7 +190,7 @@ export function CallPage(): JSX.Element {
   const currentFrame = useMemo<IntTransactionCallFrame | null>(() => {
     if (!txData?.callFrames) return null;
     return txData.callFrames.find(f => f.call_frame_id === callIdNum) ?? null;
-  }, [txData?.callFrames, callIdNum]);
+  }, [txData, callIdNum]);
 
   // Find child frames (frames whose parent is this frame)
   const childFrames = useMemo<IntTransactionCallFrame[]>(() => {
@@ -198,7 +198,7 @@ export function CallPage(): JSX.Element {
     return txData.callFrames
       .filter(f => f.parent_call_frame_id === callIdNum)
       .sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
-  }, [txData?.callFrames, callIdNum]);
+  }, [txData, callIdNum]);
 
   // Find all descendant frames (for trace view) - current frame + all children recursively
   const descendantFrames = useMemo<IntTransactionCallFrame[]>(() => {
@@ -233,7 +233,7 @@ export function CallPage(): JSX.Element {
     }
 
     return descendants.sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
-  }, [txData?.callFrames, currentFrame]);
+  }, [txData, currentFrame]);
 
   // Build breadcrumb path from root to current frame
   // Skip depth 0 (transaction root) since we show "TX" separately
@@ -251,7 +251,7 @@ export function CallPage(): JSX.Element {
 
     // Filter out depth 0 (TX root) since we show it separately
     return path.filter(f => (f.depth ?? 0) > 0);
-  }, [txData?.callFrames, currentFrame]);
+  }, [txData, currentFrame]);
 
   // Calculate child gas (cumulative - self)
   const childGas = useMemo(() => {
@@ -300,7 +300,7 @@ export function CallPage(): JSX.Element {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [currentFrame?.target_address]);
+  }, [currentFrame]);
 
   // Tab state based on URL hash
   const getTabIndexFromHash = useCallback((): number => {

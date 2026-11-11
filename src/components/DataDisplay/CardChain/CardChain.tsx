@@ -192,7 +192,8 @@ export function CardChain({
   const prevIdsRef = useRef<(string | number)[]>([]);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   const [animationKey, setAnimationKey] = useState(0);
-  const fetchDirectionRef = useRef<'left' | 'right' | null>(null);
+  // The arrow last clicked, so only its button spins while that load is fetching
+  const [fetchDirection, setFetchDirection] = useState<'left' | 'right' | null>(null);
 
   useEffect(() => {
     if (isLoading || items.length === 0) return;
@@ -219,7 +220,7 @@ export function CardChain({
         setSlideDirection('right'); // older blocks → cards enter from left
       }
       setAnimationKey(k => k + 1);
-      fetchDirectionRef.current = null;
+      setFetchDirection(null);
     }
 
     prevIdsRef.current = currentIds;
@@ -258,11 +259,11 @@ export function CardChain({
           <NavArrow
             direction="left"
             onClick={() => {
-              fetchDirectionRef.current = 'left';
+              setFetchDirection('left');
               onLoadPrevious();
             }}
             disabled={!hasPreviousItems || isLoading}
-            loading={isFetching && fetchDirectionRef.current === 'left'}
+            loading={isFetching && fetchDirection === 'left'}
             title={hasPreviousItems ? 'Load previous items' : 'No previous items available'}
           />
         )}
@@ -313,11 +314,11 @@ export function CardChain({
           <NavArrow
             direction="right"
             onClick={() => {
-              fetchDirectionRef.current = 'right';
+              setFetchDirection('right');
               onLoadNext();
             }}
             disabled={isLoading}
-            loading={isFetching && fetchDirectionRef.current === 'right'}
+            loading={isFetching && fetchDirection === 'right'}
             badgeCount={nextItemCount}
             title="Load next items"
           />

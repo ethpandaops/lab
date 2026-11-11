@@ -91,10 +91,8 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     };
   }, []); // Only run once on mount - ref will always have latest value
 
-  // Initialize current network from URL params or default
-  useEffect(() => {
-    if (!networks.length || currentNetwork) return;
-
+  // Initialize current network from URL params or default, as soon as the networks load
+  if (!currentNetwork && networks.length > 0) {
     const urlNetworkName = search.network;
     let initialNetwork: Network | undefined;
 
@@ -109,32 +107,38 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
 
     if (initialNetwork) {
       setCurrentNetworkState(initialNetwork);
+    }
+  }
 
-      // Update URL to match the network selection (only if router is available)
-      // Remove network param for mainnet (it's the default)
-      // Add/update network param for non-mainnet networks
-      if (hasRouter) {
-        const shouldHaveParam = initialNetwork.name !== 'mainnet';
-        const hasParam = search.network !== undefined;
+  // Once the network is initialized, update URL to match it (only if router is available)
+  const isUrlInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!currentNetwork || isUrlInitializedRef.current) return;
+    isUrlInitializedRef.current = true;
 
-        if (shouldHaveParam && search.network !== initialNetwork.name) {
-          // Non-mainnet network: add/update the param
-          navigate({
-            to: '.',
-            search: prev => ({ ...prev, network: initialNetwork.name }),
-            replace: true,
-          });
-        } else if (!shouldHaveParam && hasParam) {
-          // Mainnet: remove the param by setting to undefined
-          navigate({
-            to: '.',
-            search: prev => ({ ...prev, network: undefined }),
-            replace: true,
-          });
-        }
+    // Remove network param for mainnet (it's the default)
+    // Add/update network param for non-mainnet networks
+    if (hasRouter) {
+      const shouldHaveParam = currentNetwork.name !== 'mainnet';
+      const hasParam = search.network !== undefined;
+
+      if (shouldHaveParam && search.network !== currentNetwork.name) {
+        // Non-mainnet network: add/update the param
+        navigate({
+          to: '.',
+          search: prev => ({ ...prev, network: currentNetwork.name }),
+          replace: true,
+        });
+      } else if (!shouldHaveParam && hasParam) {
+        // Mainnet: remove the param by setting to undefined
+        navigate({
+          to: '.',
+          search: prev => ({ ...prev, network: undefined }),
+          replace: true,
+        });
       }
     }
-  }, [networks, currentNetwork, search.network, navigate, hasRouter]);
+  }, [currentNetwork, search.network, navigate, hasRouter]);
 
   // Invalidate queries when network changes (URL rewriting happens in interceptor)
   useEffect(() => {

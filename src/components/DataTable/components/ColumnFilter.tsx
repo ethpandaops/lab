@@ -1,4 +1,4 @@
-import { type JSX, useState, useEffect } from 'react';
+import { type JSX, useState } from 'react';
 import type { Column } from '@tanstack/react-table';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -15,11 +15,13 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
   const [textValue, setTextValue] = useState<string>((filterValue as string) || '');
 
   // Sync text value with filter value
-  useEffect(() => {
+  const [prevFilterValue, setPrevFilterValue] = useState(filterValue);
+  if (filterValue !== prevFilterValue) {
+    setPrevFilterValue(filterValue);
     if (meta?.filterType === 'text') {
       setTextValue((filterValue as string) || '');
     }
-  }, [filterValue, meta?.filterType]);
+  }
 
   // No filter type specified
   if (!meta?.filterType) {

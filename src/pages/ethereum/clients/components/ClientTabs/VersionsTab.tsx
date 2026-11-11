@@ -58,10 +58,8 @@ export function VersionsTab({
     [blocks]
   );
   const blocksLoading = history.isLoading || releasesLoading || nodes.isLoading;
-  const latestPoints = useMemo(
-    () => (latest?.version ? adoptionByDay(days, latest.version) : []),
-    [days, latest?.version]
-  );
+  const latestVersion = latest?.version;
+  const latestPoints = useMemo(() => (latestVersion ? adoptionByDay(days, latestVersion) : []), [days, latestVersion]);
   const latestDay = [...latestPoints].reverse().find(point => point.atLeast !== null)?.day;
   const onLatest = shareStat(latestPoints, 'atLeast', SHARE_WINDOW_TEXT[shareWindow]);
 

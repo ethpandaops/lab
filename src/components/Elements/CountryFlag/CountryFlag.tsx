@@ -30,21 +30,17 @@ function loaderFor(code: string | null | undefined): (() => Promise<string>) | u
 export function CountryFlag({ code, title, showUnknown = false, className }: CountryFlagProps): JSX.Element | null {
   const key = code?.toUpperCase() ?? '';
   const load = loaderFor(code);
-  const [src, setSrc] = useState<string | undefined>(() => loaded.get(key));
+  // The flag this component loaded itself; one already loaded comes straight from the cache
+  const [fetched, setFetched] = useState<{ key: string; src: string }>();
+  const src = fetched?.key === key ? fetched.src : loaded.get(key);
 
   useEffect(() => {
-    if (!load) return;
-    const cached = loaded.get(key);
-    if (cached) {
-      setSrc(cached);
-      return;
-    }
+    if (!load || loaded.has(key)) return;
     let current = true;
-    setSrc(undefined);
     load().then(svg => {
       const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
       loaded.set(key, url);
-      if (current) setSrc(url);
+      if (current) setFetched({ key, src: url });
     });
     return () => {
       current = false;

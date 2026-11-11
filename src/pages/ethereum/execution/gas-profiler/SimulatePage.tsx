@@ -44,7 +44,7 @@ import { GasScheduleDrawer } from './components/GasScheduleDrawer';
 import { BlockSimulationResultsV2 } from './components/BlockSimulationResultsV2';
 import { GlamsterdamPresetModal } from './components/GlamsterdamPresetModal';
 import { useGasSchedule } from './hooks/useGasSchedule';
-import type { GasSchedule, BlockSimulationResult } from './SimulatePage.types';
+import type { GasSchedule, GasScheduleDefaults, BlockSimulationResult } from './SimulatePage.types';
 import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -111,6 +111,15 @@ function getDeltaColor(percent: number): string {
   if (percent < -5) return 'text-success';
   if (percent > 5) return 'text-danger';
   return 'text-muted';
+}
+
+/** Count of schedule parameters that differ from the defaults (every parameter while the defaults are unknown) */
+function countModifiedParams(schedule: GasSchedule, defaults: GasScheduleDefaults | undefined): number {
+  if (!defaults) return Object.keys(schedule).length;
+  return Object.keys(schedule).filter(key => {
+    const defaultParam = defaults.parameters[key];
+    return schedule[key] !== undefined && defaultParam && schedule[key] !== defaultParam.value;
+  }).length;
 }
 
 /** Detect backend syncing errors (503 from the proxy), as thrown or as a simulation's error message. */
@@ -279,13 +288,10 @@ export function SimulatePage(): JSX.Element {
   const defaultsErrorMessage = apiErrorMessage(defaultsError);
 
   // Count of modified gas parameters
-  const modifiedCount = useMemo(() => {
-    if (!gasScheduleDefaults) return Object.keys(gasSchedule).length;
-    return Object.keys(gasSchedule).filter(key => {
-      const defaultParam = gasScheduleDefaults.parameters[key];
-      return gasSchedule[key] !== undefined && defaultParam && gasSchedule[key] !== defaultParam.value;
-    }).length;
-  }, [gasSchedule, gasScheduleDefaults]);
+  const modifiedCount = useMemo(
+    () => countModifiedParams(gasSchedule, gasScheduleDefaults),
+    [gasSchedule, gasScheduleDefaults]
+  );
 
   // Check if Glamsterdam preset is currently applied
   const isGlamsterdamApplied = useMemo(
@@ -467,13 +473,13 @@ export function SimulatePage(): JSX.Element {
   // Simulate a single block (API call)
   const { mutateAsync: simulateBlock } = useMutation(simulateBlockMutation());
   const simulateSingleBlock = useCallback(
-    async (blockNumber: number): Promise<BlockSimulationResult> => {
+    async (blockNumber: number, schedule: GasSchedule): Promise<BlockSimulationResult> => {
       if (!currentNetwork) {
         throw new Error('No network selected');
       }
 
       const overrides = Object.fromEntries(
-        Object.entries(gasSchedule).filter((entry): entry is [string, number] => entry[1] !== undefined)
+        Object.entries(schedule).filter((entry): entry is [string, number] => entry[1] !== undefined)
       );
       const apiResult = await simulateBlock({
         path: { network: currentNetwork.name },
@@ -482,83 +488,88 @@ export function SimulatePage(): JSX.Element {
 
       return transformApiResponse(apiResult);
     },
-    [gasSchedule, currentNetwork, useMaxGasLimit, simulateBlock]
+    [currentNetwork, useMaxGasLimit, simulateBlock]
   );
 
   // Run the range simulation
   const [gasWarning, setGasWarning] = useState(false);
 
-  const handleSimulate = useCallback(async () => {
-    if (startBlockNumber === null) {
-      setInputError('Enter a valid start block');
-      return;
-    }
-
-    if (modifiedCount === 0) {
-      setGasWarning(true);
-      setDrawerOpen(true);
-      return;
-    }
-
-    setGasWarning(false);
-    cancelledRef.current = false;
-    setSelectedBlockIndex(null);
-
-    setSimState({
-      status: 'running',
-      currentBlock: startBlockNumber,
-      completedBlocks: 0,
-      totalBlocks: blockCount,
-      results: [],
-      error: null,
-      startTime: Date.now(),
-    });
-
-    const results: BlockSimulationResult[] = [];
-
-    for (let i = 0; i < blockCount; i++) {
-      if (cancelledRef.current) {
-        setSimState(prev => ({ ...prev, status: 'cancelled' }));
+  const runSimulation = useCallback(
+    async (schedule: GasSchedule) => {
+      if (startBlockNumber === null) {
+        setInputError('Enter a valid start block');
         return;
       }
 
-      const currentBlockNum = startBlockNumber + i;
+      if (countModifiedParams(schedule, gasScheduleDefaults) === 0) {
+        setGasWarning(true);
+        setDrawerOpen(true);
+        return;
+      }
+
+      setGasWarning(false);
+      cancelledRef.current = false;
+      setSelectedBlockIndex(null);
+
+      setSimState({
+        status: 'running',
+        currentBlock: startBlockNumber,
+        completedBlocks: 0,
+        totalBlocks: blockCount,
+        results: [],
+        error: null,
+        startTime: Date.now(),
+      });
+
+      const results: BlockSimulationResult[] = [];
+
+      for (let i = 0; i < blockCount; i++) {
+        if (cancelledRef.current) {
+          setSimState(prev => ({ ...prev, status: 'cancelled' }));
+          return;
+        }
+
+        const currentBlockNum = startBlockNumber + i;
+
+        setSimState(prev => ({
+          ...prev,
+          currentBlock: currentBlockNum,
+        }));
+
+        try {
+          const result = await simulateSingleBlock(currentBlockNum, schedule);
+          results.push(result);
+
+          setSimState(prev => ({
+            ...prev,
+            completedBlocks: prev.completedBlocks + 1,
+            results: [...results],
+          }));
+
+          // Auto-select first block when it completes
+          if (results.length === 1) {
+            setSelectedBlockIndex(0);
+          }
+        } catch (err) {
+          setSimState(prev => ({
+            ...prev,
+            status: 'error',
+            error: apiErrorMessage(err) ?? `Failed to simulate block ${currentBlockNum}`,
+          }));
+          return;
+        }
+      }
 
       setSimState(prev => ({
         ...prev,
-        currentBlock: currentBlockNum,
+        status: 'completed',
+        currentBlock: null,
       }));
+    },
+    [startBlockNumber, blockCount, simulateSingleBlock, gasScheduleDefaults]
+  );
 
-      try {
-        const result = await simulateSingleBlock(currentBlockNum);
-        results.push(result);
-
-        setSimState(prev => ({
-          ...prev,
-          completedBlocks: prev.completedBlocks + 1,
-          results: [...results],
-        }));
-
-        // Auto-select first block when it completes
-        if (results.length === 1) {
-          setSelectedBlockIndex(0);
-        }
-      } catch (err) {
-        setSimState(prev => ({
-          ...prev,
-          status: 'error',
-          error: apiErrorMessage(err) ?? `Failed to simulate block ${currentBlockNum}`,
-        }));
-        return;
-      }
-    }
-
-    setSimState(prev => ({
-      ...prev,
-      status: 'completed',
-      currentBlock: null,
-    }));
-  }, [startBlockNumber, blockCount, simulateSingleBlock, modifiedCount]);
+  const handleSimulate = useCallback(() => runSimulation(gasSchedule), [runSimulation, gasSchedule]);
 
   // Cancel simulation
   const handleCancel = useCallback(() => {
@@ -590,23 +601,15 @@ export function SimulatePage(): JSX.Element {
 
   const modifiedParamNames = useMemo(() => modifiedEntries.map(([key]) => key), [modifiedEntries]);
 
-  // Pending simulate flag - triggers simulation on next render after preset is applied
-  const [pendingSimulate, setPendingSimulate] = useState(false);
-
-  // Auto-simulate after preset application
-  useEffect(() => {
-    if (pendingSimulate) {
-      setPendingSimulate(false);
-      handleSimulate();
-    }
-  }, [pendingSimulate, handleSimulate]);
-
   // Handle preset modal "Apply & Simulate"
-  const handlePresetApplyAndSimulate = useCallback((presetValues: Record<string, number>) => {
-    setGasSchedule(presetValues as GasSchedule);
-    setGasWarning(false);
-    setPendingSimulate(true);
-  }, []);
+  const handlePresetApplyAndSimulate = useCallback(
+    (presetValues: Record<string, number>) => {
+      setGasSchedule(presetValues);
+      setGasWarning(false);
+      void runSimulation(presetValues);
+    },
+    [runSimulation]
+  );
 
   // Handle preset modal "Cancel" - resets gas schedule to empty
   const handlePresetCancel = useCallback(() => {

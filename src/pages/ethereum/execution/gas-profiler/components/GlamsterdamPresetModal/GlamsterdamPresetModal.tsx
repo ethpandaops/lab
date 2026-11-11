@@ -141,18 +141,13 @@ export function GlamsterdamPresetModal({
 }: GlamsterdamPresetModalProps): JSX.Element {
   // Local copy of preset values that the user can tweak before applying
   const [values, setValues] = useState<Record<string, number>>({ ...GLAMSTERDAM_PRESET });
+  const [wasOpen, setWasOpen] = useState(open);
 
   // Reset local values when modal opens
-  const handleOpen = useCallback(() => {
-    setValues({ ...GLAMSTERDAM_PRESET });
-  }, []);
-
-  // Reset local values when modal becomes visible
-  // (useEffect-like behavior via checking open state)
-  useMemo(() => {
-    if (open) handleOpen();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setValues({ ...GLAMSTERDAM_PRESET });
+  }
 
   const handleParamChange = useCallback((key: string, value: number) => {
     setValues(prev => ({ ...prev, [key]: value }));

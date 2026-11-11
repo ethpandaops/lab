@@ -1,4 +1,4 @@
-import { type JSX, useState, useEffect } from 'react';
+import { type JSX, useState, useEffect, useSyncExternalStore } from 'react';
 import {
   createRootRouteWithContext,
   Outlet,
@@ -98,13 +98,37 @@ function MobileHeader({
 
 const SIDEBAR_COLLAPSED_KEY = 'lab-sidebar-collapsed';
 
+/**
+ * Detect Apple Watch using multiple heuristics
+ * Apple Watch reports as iPhone but has distinctive screen dimensions
+ */
+function isAppleWatchScreen(): boolean {
+  const isIOS = /iPhone/.test(navigator.userAgent);
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  // Apple Watch specific dimensions (all models: 312-416px wide, 340-502px tall)
+  // Exclude iPhone dimensions which start at 375px wide minimum (iPhone SE)
+  const isWatchWidth = screenWidth >= 312 && screenWidth <= 416;
+  const isWatchHeight = screenHeight >= 340 && screenHeight <= 502;
+  const isTooSmallForPhone = screenWidth < 375; // iPhones are 375px+ wide
+
+  return isIOS && isWatchWidth && isWatchHeight && isTooSmallForPhone;
+}
+
+/** Re-reads the screen check whenever the window resizes */
+function subscribeToResize(onResize: () => void): () => void {
+  window.addEventListener('resize', onResize);
+  return () => window.removeEventListener('resize', onResize);
+}
+
 function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
   });
-  const [isAppleWatch, setIsAppleWatch] = useState(false);
+  const isAppleWatch = useSyncExternalStore(subscribeToResize, isAppleWatchScreen);
   const router = useRouter();
   const { embed, theme: themeOverride } = useSearch({ from: '__root__' });
 
@@ -112,31 +136,6 @@ function RootComponent(): JSX.Element {
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
-
-  // Detect Apple Watch using multiple heuristics
-  // Apple Watch reports as iPhone but has distinctive screen dimensions
-  useEffect(() => {
-    const checkIsAppleWatch = (): void => {
-      const isIOS = /iPhone/.test(navigator.userAgent);
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-
-      // Apple Watch specific dimensions (all models: 312-416px wide, 340-502px tall)
-      // Exclude iPhone dimensions which start at 375px wide minimum (iPhone SE)
-      const isWatchWidth = screenWidth >= 312 && screenWidth <= 416;
-      const isWatchHeight = screenHeight >= 340 && screenHeight <= 502;
-      const isTooSmallForPhone = screenWidth < 375; // iPhones are 375px+ wide
-
-      setIsAppleWatch(isIOS && isWatchWidth && isWatchHeight && isTooSmallForPhone);
-    };
-
-    checkIsAppleWatch();
-    window.addEventListener('resize', checkIsAppleWatch);
-
-    return () => {
-      window.removeEventListener('resize', checkIsAppleWatch);
-    };
-  }, []);
 
   // Close sidebar on route navigation (path changes or network search param changes)
   useEffect(() => {

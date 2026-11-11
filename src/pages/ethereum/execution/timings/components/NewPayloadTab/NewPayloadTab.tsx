@@ -76,7 +76,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     : newPayloadByElClientDaily;
 
   // Filter to VALID status only for duration-based charts
-  const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
+  const validPayloadByElClient = useMemo(
+    () => newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID'),
+    [newPayloadByElClient]
+  );
 
   // Hourly data is already filtered to VALID status in the SQL query (via quantileIf)
   // so we can use it directly for the summary table
@@ -289,9 +292,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     };
   });
 
-  // Ensure valid bounds (fallback to now if no data)
-  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
-  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
+  // Without duration points, the axis spans whatever points the chart has
+  const trendAxisMin = trendMinTime === Infinity ? 'dataMin' : trendMinTime;
+  const trendAxisMax = trendMaxTime === -Infinity ? 'dataMax' : trendMaxTime;
 
   // Axis and tooltip labels for the trend charts' hourly/daily buckets
   const formatTrendAxis = (value: number | string): string => {
@@ -542,8 +545,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -593,8 +596,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{

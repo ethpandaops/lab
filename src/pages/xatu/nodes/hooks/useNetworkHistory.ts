@@ -38,11 +38,16 @@ const EMPTY: NetworkHistory = { spread: new Map(), medians: new Map() };
 /**
  * Block arrival across every Xatu node per hour, day or week of a range, from the network rollups, so a page that
  * only needs the baseline doesn't read every node's rows.
+ *
+ * @param nowSeconds - Current unix time, from `useNow`
  */
-export function useNetworkHistory(range: NodeRange): { data: NetworkHistory | null; isLoading: boolean } {
+export function useNetworkHistory(
+  range: NodeRange,
+  nowSeconds: number
+): { data: NetworkHistory | null; isLoading: boolean } {
   const { currentNetwork } = useNetwork();
   const { granularity } = NODE_RANGE_CONFIG[range];
-  const buckets = getBuckets(range, Date.now() / 1000);
+  const buckets = getBuckets(range, nowSeconds);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['xatu-nodes', 'network-history', currentNetwork?.name, range, buckets[0]],

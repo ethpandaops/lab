@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useRef, useMemo, memo } from 'react';
+import { type JSX, useCallback, useEffect, useRef, useMemo, memo } from 'react';
 import clsx from 'clsx';
 import type { ScrollingTimelineProps, TimelineItem } from './ScrollingTimeline.types';
 
@@ -11,7 +11,7 @@ interface TimelineItemComponentProps {
   item: TimelineItem;
   status: 'active' | 'completed' | 'pending';
   formatTime: (timestamp: number) => string;
-  onRefChange: (el: HTMLDivElement | null) => void;
+  onRefChange: (id: string, el: HTMLDivElement | null) => void;
 }
 
 const TimelineItemComponent = memo(function TimelineItemComponent({
@@ -20,9 +20,16 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
   formatTime,
   onRefChange,
 }: TimelineItemComponentProps): JSX.Element {
+  const ref = useCallback(
+    (el: HTMLDivElement | null) => {
+      onRefChange(item.id, el);
+    },
+    [onRefChange, item.id]
+  );
+
   return (
     <div
-      ref={onRefChange}
+      ref={ref}
       className={clsx(
         'relative flex items-center gap-x-2 px-3 py-1 transition-all duration-300',
         status === 'active' && 'bg-row-active',
@@ -96,8 +103,14 @@ export function ScrollingTimeline({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  // Store stable ref callbacks per item ID to prevent TimelineItemComponent re-renders
-  const refCallbacks = useRef<Map<string, (el: HTMLDivElement | null) => void>>(new Map());
+  // One stable ref callback for every item, so TimelineItemComponent doesn't re-render
+  const handleItemRef = useCallback((id: string, el: HTMLDivElement | null) => {
+    if (el) {
+      itemRefs.current.set(id, el);
+    } else {
+      itemRefs.current.delete(id);
+    }
+  }, []);
 
   // Auto-scroll to the active item based on currentTime
   const lastScrolledItemRef = useRef<string | null>(null);
@@ -186,26 +199,13 @@ export function ScrollingTimeline({
           {items.map(item => {
             const status = itemStatuses.get(item.id) || 'pending';
 
-            // Get or create stable ref callback for this item
-            let refCallback = refCallbacks.current.get(item.id);
-            if (!refCallback) {
-              refCallback = (el: HTMLDivElement | null) => {
-                if (el) {
-                  itemRefs.current.set(item.id, el);
-                } else {
-                  itemRefs.current.delete(item.id);
-                }
-              };
-              refCallbacks.current.set(item.id, refCallback);
-            }
-
             return (
               <TimelineItemComponent
                 key={item.id}
                 item={item}
                 status={status}
                 formatTime={formatTime}
-                onRefChange={refCallback}
+                onRefChange={handleItemRef}
               />
             );
           })}

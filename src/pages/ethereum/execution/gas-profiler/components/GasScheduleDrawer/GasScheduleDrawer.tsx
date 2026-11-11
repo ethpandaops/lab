@@ -154,8 +154,6 @@ export function GasScheduleDrawer({
   // Committed schedule - only updates when user finishes an interaction (mouseup/blur),
   // not during drag or typing, to avoid layout shifts in Active Changes section
   const [committedSchedule, setCommittedSchedule] = useState<GasSchedule>(schedule);
-  const scheduleRef = useRef(schedule);
-  scheduleRef.current = schedule;
 
   // Build category groups from defaults
   const groups = useMemo((): CategoryGroup[] => {
@@ -250,8 +248,8 @@ export function GasScheduleDrawer({
 
   // Commit the current schedule (called on slider release / input blur)
   const commitSchedule = useCallback(() => {
-    setCommittedSchedule(scheduleRef.current);
-  }, []);
+    setCommittedSchedule(schedule);
+  }, [schedule]);
 
   // Filter groups by search and active category
   const filteredGroups = useMemo(() => {

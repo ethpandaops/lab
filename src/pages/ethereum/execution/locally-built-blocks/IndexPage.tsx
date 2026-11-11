@@ -1,4 +1,4 @@
-import { type JSX, useCallback, useMemo, useRef } from 'react';
+import { type JSX, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
@@ -34,6 +34,11 @@ const FALLBACK_HISTORY_SECONDS = 365 * 24 * 3600;
 
 const WINDOW_OPTIONS = TIME_WINDOWS.map(value => ({ value, label: value === 'all' ? 'All' : value }));
 
+/** Now in unix seconds, rounded down to the minute */
+function currentMinute(): number {
+  return Math.floor(Date.now() / 1000 / 60) * 60;
+}
+
 /** The block filters out of a search, every key present so a navigation also clears removed filters */
 function pickBlockFilters(search: BlockFilters): BlockFilters {
   return Object.fromEntries(BLOCK_FILTER_KEYS.map(key => [key, search[key]]));
@@ -47,14 +52,15 @@ export function IndexPage(): JSX.Element {
   const genesisTime = currentNetwork?.genesis_time ?? 0;
 
   const timeWindow: TimeWindow = search.window ?? DEFAULT_TIME_WINDOW;
+  // The minute the window was picked; it reaches back from there
+  const [windowPickedAt, setWindowPickedAt] = useState(currentMinute);
   // All history starts at the table's start, never genesis
   const { data: tableBounds, isLoading: boundsLoading } = useTableBounds('fct_prepared_block');
   const windowStart = useMemo(() => {
-    const minute = Math.floor(Date.now() / 1000 / 60) * 60;
-    if (timeWindow !== 'all') return minute - TIME_WINDOW_SECONDS[timeWindow];
+    if (timeWindow !== 'all') return windowPickedAt - TIME_WINDOW_SECONDS[timeWindow];
     if (boundsLoading) return undefined;
-    return tableBounds?.min ?? minute - FALLBACK_HISTORY_SECONDS;
-  }, [timeWindow, boundsLoading, tableBounds?.min]);
+    return tableBounds?.min ?? windowPickedAt - FALLBACK_HISTORY_SECONDS;
+  }, [timeWindow, windowPickedAt, boundsLoading, tableBounds?.min]);
   const filters = pickBlockFilters(search);
   const isFiltered = Object.values(filters).some(value => value !== undefined);
   const hasSlotRange = filters.slotFrom !== undefined || filters.slotTo !== undefined;
@@ -119,15 +125,16 @@ export function IndexPage(): JSX.Element {
         <SegmentedControl
           options={WINDOW_OPTIONS}
           value={hasSlotRange ? ('' as TimeWindow) : timeWindow}
-          onChange={value =>
+          onChange={value => {
+            if (value !== timeWindow) setWindowPickedAt(currentMinute());
             setSearch({
               window: value === DEFAULT_TIME_WINDOW ? undefined : value,
               slotFrom: undefined,
               slotTo: undefined,
               page: undefined,
               cursor: undefined,
-            })
-          }
+            });
+          }}
           ariaLabel="Time window"
         />
         <BlocksFilterPanel

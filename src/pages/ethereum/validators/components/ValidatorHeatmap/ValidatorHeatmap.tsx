@@ -279,6 +279,35 @@ function formatHourLabel(timestamp: number): string {
   return `${String(date.getUTCHours()).padStart(2, '0')}:00 UTC`;
 }
 
+/** Skeleton loader that mimics the heatmap grid layout during drill-down loading.
+ *  Padding matches ECharts grid defaults: top=16, right=90, bottom=50, left=60. */
+function HeatmapSkeleton({ rows, height }: { rows: number; height: number }): JSX.Element {
+  return (
+    <div className="relative" style={{ height }}>
+      {/* Y-axis label placeholders */}
+      <div className="absolute flex flex-col justify-evenly" style={{ top: 16, bottom: 50, left: 8, width: 48 }}>
+        {Array.from({ length: rows }, (_, i) => (
+          <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
+        ))}
+      </div>
+      {/* Grid row shimmer bars */}
+      <div className="absolute flex flex-col justify-evenly gap-1" style={{ top: 16, right: 90, bottom: 50, left: 60 }}>
+        {Array.from({ length: rows }, (_, i) => (
+          <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
+        ))}
+      </div>
+      {/* X-axis placeholder */}
+      <div className="absolute" style={{ left: 60, right: 90, bottom: 24 }}>
+        <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
+      </div>
+      {/* Visual map placeholder */}
+      <div className="absolute" style={{ right: 24, top: '25%', bottom: '25%', width: 16 }}>
+        <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Heatmap visualization showing daily performance across multiple validators.
  * Supports drill-down from daily to hourly to slot-level granularity.
@@ -787,33 +816,6 @@ export function ValidatorHeatmap({
   const dailyChartHeight = Math.max(200, activeDailyYLabels.length * ROW_HEIGHT + CHART_PADDING);
   const hourlyChartHeight = Math.max(200, (activeHourlyYLabels.length || expectedRows) * ROW_HEIGHT + CHART_PADDING);
   const slotChartHeight = Math.max(200, (activeSlotYLabels.length || expectedRows) * ROW_HEIGHT + CHART_PADDING);
-
-  /** Skeleton loader that mimics the heatmap grid layout during drill-down loading.
-   *  Padding matches ECharts grid defaults: top=16, right=90, bottom=50, left=60. */
-  const HeatmapSkeleton = ({ rows, height }: { rows: number; height: number }): JSX.Element => (
-    <div className="relative" style={{ height }}>
-      {/* Y-axis label placeholders */}
-      <div className="absolute flex flex-col justify-evenly" style={{ top: 16, bottom: 50, left: 8, width: 48 }}>
-        {Array.from({ length: rows }, (_, i) => (
-          <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
-        ))}
-      </div>
-      {/* Grid row shimmer bars */}
-      <div className="absolute flex flex-col justify-evenly gap-1" style={{ top: 16, right: 90, bottom: 50, left: 60 }}>
-        {Array.from({ length: rows }, (_, i) => (
-          <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
-        ))}
-      </div>
-      {/* X-axis placeholder */}
-      <div className="absolute" style={{ left: 60, right: 90, bottom: 24 }}>
-        <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
-      </div>
-      {/* Visual map placeholder */}
-      <div className="absolute" style={{ right: 24, top: '25%', bottom: '25%', width: 16 }}>
-        <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
-      </div>
-    </div>
-  );
 
   // Daily tooltip formatter
   const dailyTooltipFormatter = (params: { value: [number, number, number] }): string => {

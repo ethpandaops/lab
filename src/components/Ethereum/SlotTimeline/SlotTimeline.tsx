@@ -37,14 +37,11 @@ function SlotTimelineComponent({
   const totalDuration = slotDuration ?? phases.reduce((sum, phase) => sum + phase.duration, 0);
 
   // Calculate cumulative positions for each phase
-  let cumulativeTime = 0;
-  const phasePositions = phases.map(phase => {
-    const startTime = cumulativeTime;
+  const phasePositions = phases.map((phase, index) => {
+    const startTime = phases.slice(0, index).reduce((sum, earlier) => sum + earlier.duration, 0);
     const endTime = startTime + phase.duration;
     const startPercent = (startTime / totalDuration) * 100;
     const widthPercent = (phase.duration / totalDuration) * 100;
-
-    cumulativeTime = endTime;
 
     return {
       ...phase,

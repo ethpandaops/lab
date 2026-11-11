@@ -161,6 +161,26 @@ function formatActiveRange(firstSeen: number, lastSeen: number, bucketSeconds: n
 }
 
 /**
+ * Sort direction arrow, shown on the sorted column only
+ */
+function SortIcon({
+  field,
+  sortField,
+  sortDirection,
+}: {
+  field: SortField;
+  sortField: SortField;
+  sortDirection: SortDirection;
+}): JSX.Element | null {
+  if (sortField !== field) return null;
+  return sortDirection === 'asc' ? (
+    <ChevronUpIcon className="ml-1 inline size-4" />
+  ) : (
+    <ChevronDownIcon className="ml-1 inline size-4" />
+  );
+}
+
+/**
  * Get status badge styling
  */
 function getStatusStyle(status?: string): { bg: string; text: string } {
@@ -720,15 +740,6 @@ export function ClientVersionBreakdown({
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }): JSX.Element | null => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' ? (
-      <ChevronUpIcon className="ml-1 inline size-4" />
-    ) : (
-      <ChevronDownIcon className="ml-1 inline size-4" />
-    );
-  };
-
   const headerClass =
     'cursor-pointer select-none py-3 px-3 text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
 
@@ -758,45 +769,45 @@ export function ClientVersionBreakdown({
             <tr>
               <th className={clsx(headerClass, 'pl-4')} onClick={() => handleSort('client')}>
                 Client
-                <SortIcon field="client" />
+                <SortIcon field="client" sortField={sortField} sortDirection={sortDirection} />
               </th>
               <th className={headerClass} onClick={() => handleSort('version')}>
                 Version
-                <SortIcon field="version" />
+                <SortIcon field="version" sortField={sortField} sortDirection={sortDirection} />
               </th>
               {hasActivity && (
                 <th className={headerClass} onClick={() => handleSort('active')}>
                   Active
-                  <SortIcon field="active" />
+                  <SortIcon field="active" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgDuration')}>
                 Avg (ms)
-                <SortIcon field="avgDuration" />
+                <SortIcon field="avgDuration" sortField={sortField} sortDirection={sortDirection} />
               </th>
               {hasHourlyData && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p50Duration')}>
                   P50 (ms)
-                  <SortIcon field="p50Duration" />
+                  <SortIcon field="p50Duration" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {hasHourlyData && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p95Duration')}>
                   P95 (ms)
-                  <SortIcon field="p95Duration" />
+                  <SortIcon field="p95Duration" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {!hideRange && <th className={clsx(headerClass, 'text-right')}>Range</th>}
               {showBlobCount && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
                   {blobCountLabel}
-                  <SortIcon field="avgBlobCount" />
+                  <SortIcon field="avgBlobCount" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {!hideObservations && (
                 <th className={clsx(headerClass, 'pr-4 text-right')} onClick={() => handleSort('observations')}>
                   Observations
-                  <SortIcon field="observations" />
+                  <SortIcon field="observations" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
             </tr>

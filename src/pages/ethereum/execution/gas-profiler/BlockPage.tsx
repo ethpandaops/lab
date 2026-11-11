@@ -185,7 +185,7 @@ export function BlockPage(): JSX.Element {
   const maxBlockDepth = useMemo(() => {
     if (!data?.transactions?.length) return 0;
     return Math.max(...data.transactions.map(tx => tx.maxDepth));
-  }, [data?.transactions]);
+  }, [data]);
 
   // Block opcode data (from API) - transformed for OpcodeAnalysis component
   const opcodeStats = useMemo(() => {
@@ -227,13 +227,13 @@ export function BlockPage(): JSX.Element {
   const callTypeChartData = useMemo(() => {
     if (!data?.callTypeDistribution) return [];
     return data.callTypeDistribution.map(d => ({ name: d.callType, value: d.count }));
-  }, [data?.callTypeDistribution]);
+  }, [data]);
 
   // Call type distribution for pie chart - by gas
   const callTypeGasChartData = useMemo(() => {
     if (!data?.callTypeDistribution) return [];
     return data.callTypeDistribution.map(d => ({ name: d.callType, value: d.gasUsed }));
-  }, [data?.callTypeDistribution]);
+  }, [data]);
 
   // ============================================================================
   // CHART OPTIONS
@@ -454,7 +454,7 @@ export function BlockPage(): JSX.Element {
         },
       },
     };
-  }, [data?.transactions, totalBlockGas, colors]);
+  }, [data, totalBlockGas, colors]);
 
   // Block Gas Breakdown - aggregate intrinsic, EVM execution, and refunds
   const blockGasBreakdown = useMemo(() => {
@@ -476,7 +476,7 @@ export function BlockPage(): JSX.Element {
     const totalEvm = totalReceipt + totalRefund - totalIntrinsic;
 
     return { totalIntrinsic, totalEvm, totalRefund, totalReceipt };
-  }, [data?.transactions, blockNumber, currentNetwork]);
+  }, [data, blockNumber, currentNetwork]);
 
   // Determine refund cap percentage based on fork (London changed from 50% to 20%)
   const refundCapPercent = useMemo(() => {
@@ -497,13 +497,13 @@ export function BlockPage(): JSX.Element {
         index: tx.transactionIndex,
         hasError: tx.hasErrors,
       }));
-  }, [data?.transactions]);
+  }, [data]);
 
   // Transaction gas values for histogram
   const transactionGasValues = useMemo(() => {
     if (!data?.transactions?.length) return [];
     return data.transactions.map(tx => tx.totalGasUsed);
-  }, [data?.transactions]);
+  }, [data]);
 
   // Contract treemap data
   const contractTreemapOption = useMemo(() => {
@@ -584,13 +584,13 @@ export function BlockPage(): JSX.Element {
         show: false,
       },
     };
-  }, [data?.allContractsByGas, data?.totalContractGas, colors]);
+  }, [data, colors]);
 
   // Count of flows shown in Sankey
   const sankeyFlowCount = useMemo(() => {
     if (!data?.txContractFlows?.length) return 0;
     return Math.min(data.txContractFlows.length, 15);
-  }, [data?.txContractFlows]);
+  }, [data]);
 
   // Sankey diagram showing tx → contract flow
   const contractFlowSankeyOption = useMemo(() => {
@@ -778,7 +778,7 @@ export function BlockPage(): JSX.Element {
         },
       },
     };
-  }, [data?.txContractFlows, colors]);
+  }, [data, colors]);
 
   // Click handler for contracts treemap - show popover with options
   const handleContractTreemapClick = (params: {

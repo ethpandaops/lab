@@ -248,7 +248,7 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/data-availability/custody/' });
 
   // Derive drill-down state from URL
-  const currentLevel = deriveCurrentLevel(search);
+  const currentLevel = useMemo(() => deriveCurrentLevel(search), [search]);
 
   // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
   const timezone = 'UTC' as const;

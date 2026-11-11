@@ -1,15 +1,4 @@
-import {
-  type JSX,
-  type ReactNode,
-  useMemo,
-  useRef,
-  useCallback,
-  useEffect,
-  use,
-  useState,
-  memo,
-  createContext,
-} from 'react';
+import { type JSX, type ReactNode, useMemo, useCallback, use, memo, createContext } from 'react';
 import { useSlotPlayerState, useSlotPlayerActions, useSlotPlayerProgress } from '@/hooks/useSlotPlayer';
 import { useForks } from '@/hooks/useForks';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -67,7 +56,6 @@ function useSlotLiveData(): SlotLiveDataContextValue {
 }
 
 interface SlotLiveDataProviderProps {
-  currentSlot: number;
   sortedMapPoints: MapPointWithTiming[];
   deduplicatedBlobTimeline: Array<{ blobId: string; time: number; color?: string }>;
   sortedContinentalSeries: ContinentalPropagationSeries[];
@@ -79,8 +67,12 @@ interface SlotLiveDataProviderProps {
   children: ReactNode;
 }
 
+/** The first `count` items of a list, or the list itself once all of them are in view */
+function prefix<T>(items: T[], count: number): T[] {
+  return count === items.length ? items : items.slice(0, count);
+}
+
 function SlotLiveDataProvider({
-  currentSlot,
   sortedMapPoints,
   deduplicatedBlobTimeline,
   sortedContinentalSeries,
@@ -93,172 +85,84 @@ function SlotLiveDataProvider({
 }: SlotLiveDataProviderProps): JSX.Element {
   const { slotProgress } = useSlotPlayerProgress();
   const quantizedTime = Math.min(SLOT_DURATION_MS, Math.floor(slotProgress / PROGRESS_BUCKET_MS) * PROGRESS_BUCKET_MS);
-  const [dataVersion, setDataVersion] = useState(0);
 
-  const mapIndexRef = useRef(-1);
-  const visibleMapPointsRef = useRef<typeof sortedMapPoints>([]);
-  const blobIndexRef = useRef(-1);
-  const deduplicatedBlobDataRef = useRef<typeof deduplicatedBlobTimeline>([]);
-  const continentalIndicesRef = useRef<number[]>([]);
-  const visibleContinentalPropagationDataRef = useRef<typeof sortedContinentalSeries>([]);
-  const attestationChartValuesRef = useRef<(number | null)[]>([]);
-  const ptcChartValuesRef = useRef<(number | null)[]>([]);
-  const lastChartTimeRef = useRef(-1);
-  const visibleDataColumnsRef = useRef<DataColumnFirstSeenPoint[]>([]);
-  const visibleDataColumnIdsRef = useRef<Set<number>>(new Set());
+  // The visible lists are memoised on what is in view rather than on the time, so each keeps its reference between
+  // ticks that bring nothing new into view
+  const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, quantizedTime);
+  const visibleMapPoints = useMemo(() => prefix(sortedMapPoints, mapIndex), [sortedMapPoints, mapIndex]);
 
-  const timeFilteredDataRef = useRef<TimeFilteredData>({
-    visibleMapPoints: [],
-    attestationCount: 0,
-    attestationPercentage: 0,
-    deduplicatedBlobData: [],
-    visibleContinentalPropagationData: [],
-    attestationChartValues: [],
-    ptcChartValues: [],
-    dataColumnFirstSeenData: [],
-  });
+  const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, quantizedTime);
+  const deduplicatedBlobData = useMemo(
+    () => prefix(deduplicatedBlobTimeline, blobIndex),
+    [deduplicatedBlobTimeline, blobIndex]
+  );
 
-  useEffect(() => {
-    mapIndexRef.current = -1;
-    blobIndexRef.current = -1;
-    continentalIndicesRef.current = [];
-    lastChartTimeRef.current = -1;
-    visibleMapPointsRef.current = [];
-    deduplicatedBlobDataRef.current = [];
-    visibleContinentalPropagationDataRef.current = [];
-    attestationChartValuesRef.current = [];
-    ptcChartValuesRef.current = [];
-    visibleDataColumnsRef.current = [];
-    visibleDataColumnIdsRef.current = new Set();
-    timeFilteredDataRef.current = {
-      visibleMapPoints: [],
-      attestationCount: 0,
-      attestationPercentage: 0,
-      deduplicatedBlobData: [],
-      visibleContinentalPropagationData: [],
-      attestationChartValues: [],
-      ptcChartValues: [],
-      dataColumnFirstSeenData: [],
-    };
-    setDataVersion(prev => prev + 1);
-    // Only reset on a genuine slot change. The grow effect below re-derives the
-    // visible sets from the latest data every tick, so resetting on mid-slot
-    // data-reference changes (e.g. background refetches) just clears and
-    // regrows the map — the source of the dot "flicker".
-  }, [currentSlot]);
-
-  useEffect(() => {
-    let mutated = false;
-
-    const mapIndex = upperBound(sortedMapPoints, point => point.earliestSeenTime, quantizedTime);
-    if (mapIndex !== mapIndexRef.current) {
-      visibleMapPointsRef.current =
-        mapIndex === sortedMapPoints.length ? sortedMapPoints : sortedMapPoints.slice(0, mapIndex);
-      mapIndexRef.current = mapIndex;
-      timeFilteredDataRef.current.visibleMapPoints = visibleMapPointsRef.current;
-      mutated = true;
-    }
-
-    const attestationCount = attestationActualCount;
-    const attestationPercentage =
-      attestationTotalExpected > 0 ? (attestationCount / attestationTotalExpected) * 100 : 0;
-
-    if (timeFilteredDataRef.current.attestationCount !== attestationCount) {
-      timeFilteredDataRef.current.attestationCount = attestationCount;
-      mutated = true;
-    }
-    if (timeFilteredDataRef.current.attestationPercentage !== attestationPercentage) {
-      timeFilteredDataRef.current.attestationPercentage = attestationPercentage;
-      mutated = true;
-    }
-
-    const blobIndex = upperBound(deduplicatedBlobTimeline, blob => blob.time, quantizedTime);
-    if (blobIndex !== blobIndexRef.current) {
-      deduplicatedBlobDataRef.current =
-        blobIndex === deduplicatedBlobTimeline.length
-          ? deduplicatedBlobTimeline
-          : deduplicatedBlobTimeline.slice(0, blobIndex);
-      blobIndexRef.current = blobIndex;
-      timeFilteredDataRef.current.deduplicatedBlobData = deduplicatedBlobDataRef.current;
-      mutated = true;
-    }
-
-    let continentalChanged = false;
-    const newContinentalIndices = sortedContinentalSeries.map((continent, idx) => {
-      const dataIndex = upperBound(continent.data, point => point.time, quantizedTime);
-      if (continentalIndicesRef.current[idx] !== dataIndex) {
-        continentalChanged = true;
-      }
-      return dataIndex;
-    });
-
-    if (continentalChanged || continentalIndicesRef.current.length !== newContinentalIndices.length) {
-      visibleContinentalPropagationDataRef.current = sortedContinentalSeries.map((continent, idx) => {
-        const dataIndex = newContinentalIndices[idx];
+  // The latest propagation point in view across every continent; the visible series only change when it does
+  const continentalCutoff = sortedContinentalSeries.reduce((latest, continent) => {
+    const time = continent.data[upperBound(continent.data, point => point.time, quantizedTime) - 1]?.time;
+    return time !== undefined && time > latest ? time : latest;
+  }, -Infinity);
+  const visibleContinentalPropagationData = useMemo(
+    () =>
+      sortedContinentalSeries.map(continent => {
+        const dataIndex = upperBound(continent.data, point => point.time, continentalCutoff);
         return dataIndex === continent.data.length
           ? continent
-          : {
-              ...continent,
-              data: continent.data.slice(0, dataIndex),
-            };
-      });
-      continentalIndicesRef.current = newContinentalIndices;
-      timeFilteredDataRef.current.visibleContinentalPropagationData = visibleContinentalPropagationDataRef.current;
-      mutated = true;
-    }
+          : { ...continent, data: continent.data.slice(0, dataIndex) };
+      }),
+    [sortedContinentalSeries, continentalCutoff]
+  );
 
-    const roundedTime = Math.floor(quantizedTime / PROGRESS_BUCKET_MS) * PROGRESS_BUCKET_MS;
-    if (roundedTime !== lastChartTimeRef.current) {
-      attestationChartValuesRef.current = TIME_POINTS.map(time => {
-        if (time > quantizedTime) return null;
-        return attestationTimeToCount.get(time) ?? 0;
-      });
-      ptcChartValuesRef.current = TIME_POINTS.map(time => {
-        if (time > quantizedTime) return null;
-        return ptcTimeToCount.get(time) ?? 0;
-      });
-      lastChartTimeRef.current = roundedTime;
-      timeFilteredDataRef.current.attestationChartValues = attestationChartValuesRef.current;
-      timeFilteredDataRef.current.ptcChartValues = ptcChartValuesRef.current;
-      mutated = true;
-    }
+  const attestationChartValues = useMemo(
+    () => TIME_POINTS.map(time => (time > quantizedTime ? null : (attestationTimeToCount.get(time) ?? 0))),
+    [attestationTimeToCount, quantizedTime]
+  );
+  const ptcChartValues = useMemo(
+    () => TIME_POINTS.map(time => (time > quantizedTime ? null : (ptcTimeToCount.get(time) ?? 0))),
+    [ptcTimeToCount, quantizedTime]
+  );
 
-    const newlyVisibleColumns: DataColumnFirstSeenPoint[] = [];
-    for (const point of dataColumnFirstSeenData) {
-      if (point.time <= quantizedTime && !visibleDataColumnIdsRef.current.has(point.columnId)) {
-        visibleDataColumnIdsRef.current.add(point.columnId);
-        newlyVisibleColumns.push(point);
-      }
+  // Columns in order of arrival, so the ones in view are a prefix, shown in column order
+  const columnsByArrival = useMemo(
+    () => [...dataColumnFirstSeenData].sort((a, b) => a.time - b.time),
+    [dataColumnFirstSeenData]
+  );
+  const columnIndex = upperBound(columnsByArrival, point => point.time, quantizedTime);
+  const visibleDataColumns = useMemo(() => {
+    const byColumn = new Map<number, DataColumnFirstSeenPoint>();
+    for (const point of columnsByArrival.slice(0, columnIndex)) {
+      if (!byColumn.has(point.columnId)) byColumn.set(point.columnId, point);
     }
+    return [...byColumn.values()].sort((a, b) => a.columnId - b.columnId);
+  }, [columnsByArrival, columnIndex]);
 
-    if (newlyVisibleColumns.length > 0) {
-      visibleDataColumnsRef.current = [...visibleDataColumnsRef.current, ...newlyVisibleColumns].sort(
-        (a, b) => a.columnId - b.columnId
-      );
-      timeFilteredDataRef.current.dataColumnFirstSeenData = visibleDataColumnsRef.current;
-      mutated = true;
-    }
+  const attestationPercentage =
+    attestationTotalExpected > 0 ? (attestationActualCount / attestationTotalExpected) * 100 : 0;
 
-    if (mutated) {
-      setDataVersion(prev => prev + 1);
-    }
-  }, [
-    quantizedTime,
-    sortedMapPoints,
-    deduplicatedBlobTimeline,
-    sortedContinentalSeries,
-    attestationTimeToCount,
-    ptcTimeToCount,
-    attestationActualCount,
-    attestationTotalExpected,
-    dataColumnFirstSeenData,
-  ]);
-
-  const value = useMemo<SlotLiveDataContextValue>(() => {
-    // Reference dataVersion so the dependency is honored
-    void dataVersion;
-    return { timeFilteredData: timeFilteredDataRef.current };
-  }, [dataVersion]);
+  const value = useMemo<SlotLiveDataContextValue>(
+    () => ({
+      timeFilteredData: {
+        visibleMapPoints,
+        attestationCount: attestationActualCount,
+        attestationPercentage,
+        deduplicatedBlobData,
+        visibleContinentalPropagationData,
+        attestationChartValues,
+        ptcChartValues,
+        dataColumnFirstSeenData: visibleDataColumns,
+      },
+    }),
+    [
+      visibleMapPoints,
+      attestationActualCount,
+      attestationPercentage,
+      deduplicatedBlobData,
+      visibleContinentalPropagationData,
+      attestationChartValues,
+      ptcChartValues,
+      visibleDataColumns,
+    ]
+  );
 
   return <SlotLiveDataContext value={value}>{children}</SlotLiveDataContext>;
 }
@@ -443,7 +347,6 @@ export function SlotViewLayout({ mode }: SlotViewLayoutProps): JSX.Element {
 
   return (
     <SlotLiveDataProvider
-      currentSlot={currentSlot}
       sortedMapPoints={sortedMapPoints}
       deduplicatedBlobTimeline={deduplicatedBlobTimeline}
       sortedContinentalSeries={sortedContinentalSeries}

@@ -1,8 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNetwork } from '@/hooks/useNetwork';
+import type { Network } from '@/hooks/useNetwork';
 import { useInterval } from '@/hooks/useInterval';
 import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import type { SlotEpochData } from './useBeaconClock.types';
+
+/**
+ * Read the current slot on a network from its genesis_time.
+ *
+ * @returns The slot, or 0 when genesis_time is missing or invalid or the time is before genesis
+ */
+function readSlot(network: Network | null, getCurrentTime: () => number): number {
+  // Validate genesis_time exists and is valid
+  if (!network?.genesis_time || network.genesis_time <= 0) {
+    if (network) {
+      console.warn('[useBeaconClock] Invalid genesis_time:', network.genesis_time);
+    }
+    return 0;
+  }
+
+  const now = Math.floor(getCurrentTime() / 1000);
+  const elapsed = now - network.genesis_time;
+
+  // Handle pre-genesis or invalid time (e.g., system clock issues)
+  if (elapsed < 0) {
+    console.warn('[useBeaconClock] Current time is before genesis_time. Elapsed:', elapsed);
+    return 0;
+  }
+
+  return Math.floor(elapsed / SECONDS_PER_SLOT);
+}
 
 /**
  * Hook to access the Beacon Chain clock (current slot and epoch).
@@ -45,49 +72,21 @@ import type { SlotEpochData } from './useBeaconClock.types';
  */
 export function useBeaconClock(getCurrentTime: () => number = () => Date.now()): SlotEpochData {
   const { currentNetwork } = useNetwork();
-  const [slot, setSlot] = useState<number>(0);
-  const [epoch, setEpoch] = useState<number>(0);
+  const genesisTime = currentNetwork?.genesis_time;
 
-  // Reset state immediately when network changes to avoid showing stale values
-  useEffect(() => {
-    setSlot(0);
-    setEpoch(0);
-  }, [currentNetwork]);
+  // The slot, with the genesis_time it was read against
+  const [clock, setClock] = useState(() => ({ genesisTime, slot: readSlot(currentNetwork, getCurrentTime) }));
+
+  // Read the clock again as soon as the network changes, so the previous network's slot never shows
+  if (clock.genesisTime !== genesisTime) {
+    setClock({ genesisTime, slot: readSlot(currentNetwork, getCurrentTime) });
+  }
 
   const calculateSlotAndEpoch = useCallback((): void => {
-    // Validate genesis_time exists and is valid
-    if (!currentNetwork?.genesis_time || currentNetwork.genesis_time <= 0) {
-      if (currentNetwork && (!currentNetwork.genesis_time || currentNetwork.genesis_time <= 0)) {
-        console.warn('[useBeaconClock] Invalid genesis_time:', currentNetwork.genesis_time);
-      }
-      setSlot(0);
-      setEpoch(0);
-      return;
-    }
-
-    const now = Math.floor(getCurrentTime() / 1000);
-    const elapsed = now - currentNetwork.genesis_time;
-
-    // Handle pre-genesis or invalid time (e.g., system clock issues)
-    if (elapsed < 0) {
-      console.warn('[useBeaconClock] Current time is before genesis_time. Elapsed:', elapsed);
-      setSlot(0);
-      setEpoch(0);
-      return;
-    }
-
-    const newSlot = Math.floor(elapsed / SECONDS_PER_SLOT);
-    const newEpoch = Math.floor(newSlot / SLOTS_PER_EPOCH);
-
-    // Only update state if values have changed (prevents 11/12 unnecessary re-renders per slot)
-    setSlot(prev => (prev !== newSlot ? newSlot : prev));
-    setEpoch(prev => (prev !== newEpoch ? newEpoch : prev));
-  }, [currentNetwork, getCurrentTime]);
-
-  // Calculate immediately on mount or network change
-  useEffect(() => {
-    calculateSlotAndEpoch();
-  }, [calculateSlotAndEpoch]);
+    const slot = readSlot(currentNetwork, getCurrentTime);
+    // Only update state if the slot has changed (prevents 11/12 unnecessary re-renders per slot)
+    setClock(prev => (prev.genesisTime === genesisTime && prev.slot === slot ? prev : { genesisTime, slot }));
+  }, [currentNetwork, genesisTime, getCurrentTime]);
 
   // Update every second using declarative interval hook
   useInterval(calculateSlotAndEpoch, currentNetwork ? 1000 : null);
@@ -107,5 +106,6 @@ export function useBeaconClock(getCurrentTime: () => number = () => Date.now()):
     };
   }, [calculateSlotAndEpoch]);
 
-  return { slot, epoch };
+  const { slot } = clock;
+  return { slot, epoch: Math.floor(slot / SLOTS_PER_EPOCH) };
 }

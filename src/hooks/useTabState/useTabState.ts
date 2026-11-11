@@ -55,7 +55,8 @@ function matchesTab(tab: TabConfig, id: string): boolean {
 export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as { tab?: string };
-  const [shouldScrollToAnchor, setShouldScrollToAnchor] = useState(false);
+  // Bumped to scroll to the URL's anchor once the selected tab's content has rendered
+  const [anchorScrollRequest, setAnchorScrollRequest] = useState(0);
 
   /**
    * Determine initial tab index from URL
@@ -98,7 +99,7 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
           replace: true,
           hash,
         });
-        setShouldScrollToAnchor(true);
+        setAnchorScrollRequest(request => request + 1);
         return anchorIndex;
       }
     }
@@ -113,56 +114,48 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
    * Uses retry logic to handle async data loading
    */
   useEffect(() => {
-    if (!shouldScrollToAnchor) return;
+    if (anchorScrollRequest === 0) return;
 
     const hash = window.location.hash.replace('#', '');
-    if (!hash) {
-      setShouldScrollToAnchor(false);
-      return;
-    }
+    if (!hash) return;
 
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max (50 * 100ms)
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const tryScroll = (): void => {
       const element = document.getElementById(hash);
       if (element) {
         // Element found - scroll to it
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setShouldScrollToAnchor(false);
       } else if (attempts < maxAttempts) {
         // Element not found yet - retry
         attempts++;
-        setTimeout(tryScroll, 100);
-      } else {
-        // Give up after max attempts
-        setShouldScrollToAnchor(false);
+        timeoutId = setTimeout(tryScroll, 100);
       }
+      // Otherwise give up after max attempts
     };
 
     // Start scrolling attempts after a brief delay to let the tab panel render
-    const timeoutId = setTimeout(tryScroll, 100);
+    timeoutId = setTimeout(tryScroll, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [shouldScrollToAnchor]);
+  }, [anchorScrollRequest]);
 
   /**
-   * Sync with URL changes (browser back/forward)
+   * Sync with URL changes (browser back/forward), and with tabs that move or appear under the URL's tab
    */
-  useEffect(() => {
-    const tabId = searchParams.tab;
-    if (tabId) {
-      const index = tabs.findIndex(tab => matchesTab(tab, tabId));
-      if (index >= 0 && index !== selectedIndex) {
-        setSelectedIndex(index);
-
-        // Check if there's also a hash to scroll to
-        if (window.location.hash) {
-          setShouldScrollToAnchor(true);
-        }
-      }
+  const urlTabId = searchParams.tab;
+  const urlIndex = urlTabId ? tabs.findIndex(tab => matchesTab(tab, urlTabId)) : -1;
+  const [prevUrlIndex, setPrevUrlIndex] = useState(urlIndex);
+  if (urlIndex !== prevUrlIndex) {
+    setPrevUrlIndex(urlIndex);
+    if (urlIndex >= 0 && urlIndex !== selectedIndex) {
+      setSelectedIndex(urlIndex);
+      // Scroll to the URL's anchor too, if it has one
+      setAnchorScrollRequest(request => request + 1);
     }
-  }, [searchParams.tab, tabs, selectedIndex]);
+  }
 
   /**
    * Handle tab changes - update URL and manage scrolling
@@ -189,7 +182,7 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
         replace: true,
         hash: currentHash,
       });
-      setShouldScrollToAnchor(true);
+      setAnchorScrollRequest(request => request + 1);
     } else {
       // Clear the hash when switching tabs
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

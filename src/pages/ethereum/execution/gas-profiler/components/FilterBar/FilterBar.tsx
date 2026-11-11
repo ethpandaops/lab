@@ -71,11 +71,13 @@ export function FilterBar({
 }: FilterBarProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [draftSearch, setDraftSearch] = useState(search);
+  const [prevSearch, setPrevSearch] = useState(search);
 
   // Follow external changes (chip removal, clear all, back/forward)
-  useEffect(() => {
+  if (search !== prevSearch) {
+    setPrevSearch(search);
     setDraftSearch(search);
-  }, [search]);
+  }
 
   // Commit typing after a short pause so every keystroke doesn't rewrite the URL
   useEffect(() => {

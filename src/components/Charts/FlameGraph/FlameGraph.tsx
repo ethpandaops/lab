@@ -124,6 +124,36 @@ function getCategories(node: FlameGraphNode, categories: Set<string> = new Set()
 }
 
 /**
+ * Find a node by ID in the tree
+ */
+function findNodeById(node: FlameGraphNode | null, id: string): FlameGraphNode | null {
+  if (!node) return null;
+  if (node.id === id) return node;
+  if (node.children) {
+    for (const child of node.children) {
+      const found = findNodeById(child, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+/**
+ * Find the path from root to a node (returns array of IDs including the target)
+ */
+function findPathToNode(root: FlameGraphNode | null, targetId: string, path: string[] = []): string[] | null {
+  if (!root) return null;
+  if (root.id === targetId) return [...path, root.id];
+  if (root.children) {
+    for (const child of root.children) {
+      const found = findPathToNode(child, targetId, [...path, root.id]);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+/**
  * FlameGraph - Hierarchical visualization for nested data
  *
  * A generic component for visualizing hierarchical data where:
@@ -162,55 +192,28 @@ export function FlameGraph({
   // Zoom state: track the path of zoomed node IDs (not objects, which become stale)
   const [zoomPathIds, setZoomPathIds] = useState<string[]>([]);
 
+  // Reset zoom only when the root node changes (not when children change, e.g., opcodes toggled)
+  const rootId = data?.id;
+  const [zoomRootId, setZoomRootId] = useState(rootId);
+  if (zoomRootId !== rootId) {
+    setZoomRootId(rootId);
+    setZoomPathIds([]);
+  }
+
   // Simple fade animation state for smooth zoom transitions
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Find a node by ID in the tree
-  const findNodeById = useCallback((node: FlameGraphNode | null, id: string): FlameGraphNode | null => {
-    if (!node) return null;
-    if (node.id === id) return node;
-    if (node.children) {
-      for (const child of node.children) {
-        const found = findNodeById(child, id);
-        if (found) return found;
-      }
-    }
-    return null;
-  }, []);
-
-  // Find the path from root to a node (returns array of IDs including the target)
-  const findPathToNode = useCallback(
-    (root: FlameGraphNode | null, targetId: string, path: string[] = []): string[] | null => {
-      if (!root) return null;
-      if (root.id === targetId) return [...path, root.id];
-      if (root.children) {
-        for (const child of root.children) {
-          const found = findPathToNode(child, targetId, [...path, root.id]);
-          if (found) return found;
-        }
-      }
-      return null;
-    },
-    []
-  );
 
   // Resolve zoom path IDs to actual nodes from the current tree
   const zoomPath = useMemo(() => {
     if (!data) return [];
     return zoomPathIds.map(id => findNodeById(data, id)).filter((node): node is FlameGraphNode => node !== null);
-  }, [zoomPathIds, data, findNodeById]);
+  }, [zoomPathIds, data]);
 
   // The currently zoomed node (last in resolved path, or root if empty)
   const zoomedNode = useMemo(() => {
     if (zoomPath.length === 0) return data;
     return zoomPath[zoomPath.length - 1];
   }, [zoomPath, data]);
-
-  // Reset zoom only when the root node changes (not when children change, e.g., opcodes toggled)
-  const rootId = data?.id;
-  useEffect(() => {
-    setZoomPathIds([]);
-  }, [rootId]);
 
   // Flatten tree and calculate layout from the zoomed node
   const {
@@ -339,7 +342,7 @@ export function FlameGraph({
         onNodeClick?.(node);
       }
     },
-    [zoomedNode, onNodeClick, data, findPathToNode, animateZoom, zoomPathIds]
+    [zoomedNode, onNodeClick, data, animateZoom, zoomPathIds]
   );
 
   // Handle breadcrumb navigation

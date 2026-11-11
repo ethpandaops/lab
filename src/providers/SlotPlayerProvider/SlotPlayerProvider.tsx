@@ -448,39 +448,36 @@ export function SlotPlayerProvider({
   }, [playbackSpeed]);
   const currentSlotRef = useRef(currentSlot);
   useEffect(() => {
-    currentSlotRef.current = currentSlot;
+    // Actions and the playback loop write this ref themselves. A slot set during render (the bounds checks below)
+    // can't, so hand it to the loop here, restarting its progress like every other slot change.
+    if (currentSlotRef.current !== currentSlot) {
+      currentSlotRef.current = currentSlot;
+      slotProgressRef.current = 0;
+      lastProgressBucketRef.current = 0;
+    }
   }, [currentSlot]);
   const pauseReasonRef = useRef(pauseReason);
   useEffect(() => {
     pauseReasonRef.current = pauseReason;
   }, [pauseReason]);
 
-  // Initialize currentSlot when bounds data is loaded
-  // Only run if currentSlot is still 0 (not yet initialized) and no explicit initialSlot was provided
-  useEffect(() => {
-    if (boundsData && currentSlot === 0 && initialSlot === undefined) {
-      const newInitialSlot = getInitialSlot();
-      setCurrentSlot(newInitialSlot);
-      currentSlotRef.current = newInitialSlot;
-      setSlotProgressSafe(0);
-    }
-  }, [boundsData, currentSlot, initialSlot, getInitialSlot, setSlotProgressSafe]);
-
-  // Handle bounds update race conditions - clamp currentSlot to valid range
-  // Skip clamping if currentSlot is 0 (waiting for initialization)
-  useEffect(() => {
-    if (boundsData && currentSlot !== 0) {
-      if (currentSlot < minSlot) {
-        setCurrentSlot(minSlot);
-        currentSlotRef.current = minSlot;
-        setSlotProgressSafe(0);
-      } else if (currentSlot > maxSlot) {
-        setCurrentSlot(maxSlot);
-        currentSlotRef.current = maxSlot;
-        setSlotProgressSafe(0);
+  if (boundsData) {
+    let boundedSlot = currentSlot;
+    if (currentSlot === 0) {
+      // Initialize currentSlot when bounds data is loaded
+      // Only if currentSlot is still 0 (not yet initialized) and no explicit initialSlot was provided
+      if (initialSlot === undefined) {
+        boundedSlot = getInitialSlot();
       }
+    } else {
+      // Handle bounds update race conditions - clamp currentSlot to valid range
+      boundedSlot = Math.min(Math.max(currentSlot, minSlot), maxSlot);
     }
-  }, [boundsData, currentSlot, minSlot, maxSlot, setSlotProgressSafe]);
+    if (boundedSlot !== currentSlot) {
+      setCurrentSlot(boundedSlot);
+      setSlotProgress(0);
+    }
+  }
 
   // Jump to live when network changes
   // Use a ref to track the previous network to detect changes
@@ -514,14 +511,8 @@ export function SlotPlayerProvider({
     }
   }, [maxSlot]);
 
-  useEffect(() => {
-    if (!isPlaying && pauseReason === 'boundary' && mode === 'continuous' && currentSlot < maxSlot) {
-      setIsPlaying(true);
-      setPauseReason(null);
-      isPlayingRef.current = true;
-      pauseReasonRef.current = null;
-    }
-  }, [maxSlot, currentSlot, isPlaying, pauseReason, mode]);
+  // Paused at the live edge boundary in continuous mode: the playback loop keeps running to resume once newer slots arrive
+  const isWaitingAtBoundary = !isPlaying && pauseReason === 'boundary' && mode === 'continuous';
 
   // Calculate derived state
   // Both wallClockSlot and currentSlot are now actual slot numbers - direct comparison
@@ -538,7 +529,7 @@ export function SlotPlayerProvider({
   // Using useLayoutEffect to ensure cleanup happens synchronously before re-paint,
   // preventing the animation frame from escaping cleanup logic
   useLayoutEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying && !isWaitingAtBoundary) {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -550,8 +541,21 @@ export function SlotPlayerProvider({
 
     const animate = (currentTime: number): void => {
       if (!isPlayingRef.current) {
-        animationFrameRef.current = null;
-        return;
+        if (pauseReasonRef.current !== 'boundary' || modeRef.current !== 'continuous') {
+          animationFrameRef.current = null;
+          return;
+        }
+
+        // Auto-resume when newer slots arrive past the live edge boundary in continuous mode
+        if (currentSlotRef.current >= maxSlotRef.current) {
+          lastProcessedTime = currentTime;
+          animationFrameRef.current = requestAnimationFrame(animate);
+          return;
+        }
+        isPlayingRef.current = true;
+        setIsPlaying(true);
+        pauseReasonRef.current = null;
+        setPauseReason(null);
       }
 
       const deltaTime = currentTime - lastProcessedTime;
@@ -608,7 +612,7 @@ export function SlotPlayerProvider({
         animationFrameRef.current = null;
       }
     };
-  }, [isPlaying, slotDuration, callbacks, setSlotProgressSafe]);
+  }, [isPlaying, isWaitingAtBoundary, slotDuration, callbacks, setSlotProgressSafe]);
 
   // Define actions using useCallback for optimal performance
   const play = useCallback(() => {

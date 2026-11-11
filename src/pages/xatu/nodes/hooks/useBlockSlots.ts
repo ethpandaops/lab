@@ -11,13 +11,18 @@ type ListFn = Parameters<typeof fetchAllPages>[0];
 /**
  * Slots that had a block (canonical or orphaned) in each hour, day or week of a range, by bucket start. A bucket the
  * proposal table hasn't written yet is absent; every bucket is when the network has no proposal table.
+ *
+ * @param nowSeconds - Current unix time, from `useNow`
  */
-export function useBlockSlots(range: NodeRange): { data: Map<number, number> | null; isLoading: boolean } {
+export function useBlockSlots(
+  range: NodeRange,
+  nowSeconds: number
+): { data: Map<number, number> | null; isLoading: boolean } {
   const { currentNetwork } = useNetwork();
   const { granularity } = NODE_RANGE_CONFIG[range];
   // There is no weekly proposal table, so weeks add up their days
   const tableGranularity = granularity === 'weekly' ? 'daily' : granularity;
-  const buckets = getBuckets(range, Date.now() / 1000, undefined, tableGranularity);
+  const buckets = getBuckets(range, nowSeconds, undefined, tableGranularity);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['xatu-nodes', 'block-slots', currentNetwork?.name, range, buckets[0]],
