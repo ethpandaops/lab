@@ -1165,8 +1165,6 @@ export function MultiLineChart({
               type: 'inside' as const,
               xAxisIndex: 0,
               filterMode: 'none' as const,
-              zoomOnMouseWheel: true,
-              moveOnMouseWheel: false,
               moveOnMouseMove: true,
               start: zoomRange.start,
               end: zoomRange.end,

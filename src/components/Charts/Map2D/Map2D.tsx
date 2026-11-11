@@ -10,6 +10,7 @@ import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map
 const EMPTY_ROUTES: RouteData[] = [];
 const EMPTY_POINTS: PointData[] = [];
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useCanHover } from '@/hooks/useCanHover';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 
@@ -47,6 +48,7 @@ function Map2DChartComponent({
   resetKey,
 }: Map2DChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
+  const canHover = useCanHover();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState<HoveredPointInfo | null>(null);
   const chartRef = useRef<ReactECharts | null>(null);
@@ -307,7 +309,8 @@ function Map2DChartComponent({
         : undefined,
       geo: {
         map: 'world',
-        roam: roam,
+        // A one-finger drag would pan the map instead of scrolling the page, so touch screens only pinch-zoom
+        roam: roam === true && !canHover ? 'scale' : roam,
         silent: false,
         center: [20, 20], // Center slightly towards Europe
         zoom: 1.2, // Balanced zoom level
@@ -336,6 +339,7 @@ function Map2DChartComponent({
     lineColor,
     title,
     roam,
+    canHover,
     createScatterSeries,
     themeColors.primary,
     themeColors.foreground,
