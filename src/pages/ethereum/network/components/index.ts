@@ -16,3 +16,4 @@ export * from './ChurnCharts';
 export * from './ColumnCustody';
 export * from './DayBarsCard';
 export * from './SubnetCharts';
+export * from './GoodbyeCharts';

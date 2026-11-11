@@ -468,6 +468,10 @@ import {
   fctPeerForkReadinessByClClientDailyServiceList,
   fctPeerForkReadinessByElClientDailyServiceGet,
   fctPeerForkReadinessByElClientDailyServiceList,
+  fctPeerGoodbyeByClClientDailyServiceGet,
+  fctPeerGoodbyeByClClientDailyServiceList,
+  fctPeerGoodbyeDailyServiceGet,
+  fctPeerGoodbyeDailyServiceList,
   fctPeerHostingByElClientDailyServiceGet,
   fctPeerHostingByElClientDailyServiceList,
   fctPeerPartialMessageSupportByClientDailyServiceGet,
@@ -536,6 +540,20 @@ import {
   fctSyncCommitteeRewardByValidatorWeeklyServiceList,
   fctTokenContractStorageStateByBlockDailyServiceGet,
   fctTokenContractStorageStateByBlockDailyServiceList,
+  fctTransactionInclusionDailyServiceGet,
+  fctTransactionInclusionDailyServiceList,
+  fctTransactionInclusionHourlyServiceGet,
+  fctTransactionInclusionHourlyServiceList,
+  fctTransactionInclusionServiceGet,
+  fctTransactionInclusionServiceList,
+  fctTransactionMempoolOutcome7dServiceGet,
+  fctTransactionMempoolOutcome7dServiceList,
+  fctTransactionMempoolOutcomeDailyServiceGet,
+  fctTransactionMempoolOutcomeDailyServiceList,
+  fctTransactionMempoolOutcomeHourlyServiceGet,
+  fctTransactionMempoolOutcomeHourlyServiceList,
+  fctTransactionReplacementServiceGet,
+  fctTransactionReplacementServiceList,
   fctValidatorBalanceDailyServiceGet,
   fctValidatorBalanceDailyServiceList,
   fctValidatorBalanceHourlyServiceGet,
@@ -738,6 +756,8 @@ import {
   intTransactionCallFrameOpcodeResourceGasServiceList,
   intTransactionCallFrameServiceGet,
   intTransactionCallFrameServiceList,
+  intTransactionMempoolObservationHourlyServiceGet,
+  intTransactionMempoolObservationHourlyServiceList,
   intTransactionOpcodeGasServiceGet,
   intTransactionOpcodeGasServiceList,
   intTransactionReceiptSizeServiceGet,
@@ -2139,6 +2159,18 @@ import type {
   FctPeerForkReadinessByElClientDailyServiceListData,
   FctPeerForkReadinessByElClientDailyServiceListError,
   FctPeerForkReadinessByElClientDailyServiceListResponse,
+  FctPeerGoodbyeByClClientDailyServiceGetData,
+  FctPeerGoodbyeByClClientDailyServiceGetError,
+  FctPeerGoodbyeByClClientDailyServiceGetResponse,
+  FctPeerGoodbyeByClClientDailyServiceListData,
+  FctPeerGoodbyeByClClientDailyServiceListError,
+  FctPeerGoodbyeByClClientDailyServiceListResponse,
+  FctPeerGoodbyeDailyServiceGetData,
+  FctPeerGoodbyeDailyServiceGetError,
+  FctPeerGoodbyeDailyServiceGetResponse,
+  FctPeerGoodbyeDailyServiceListData,
+  FctPeerGoodbyeDailyServiceListError,
+  FctPeerGoodbyeDailyServiceListResponse,
   FctPeerHostingByElClientDailyServiceGetData,
   FctPeerHostingByElClientDailyServiceGetError,
   FctPeerHostingByElClientDailyServiceGetResponse,
@@ -2343,6 +2375,48 @@ import type {
   FctTokenContractStorageStateByBlockDailyServiceListData,
   FctTokenContractStorageStateByBlockDailyServiceListError,
   FctTokenContractStorageStateByBlockDailyServiceListResponse,
+  FctTransactionInclusionDailyServiceGetData,
+  FctTransactionInclusionDailyServiceGetError,
+  FctTransactionInclusionDailyServiceGetResponse,
+  FctTransactionInclusionDailyServiceListData,
+  FctTransactionInclusionDailyServiceListError,
+  FctTransactionInclusionDailyServiceListResponse,
+  FctTransactionInclusionHourlyServiceGetData,
+  FctTransactionInclusionHourlyServiceGetError,
+  FctTransactionInclusionHourlyServiceGetResponse,
+  FctTransactionInclusionHourlyServiceListData,
+  FctTransactionInclusionHourlyServiceListError,
+  FctTransactionInclusionHourlyServiceListResponse,
+  FctTransactionInclusionServiceGetData,
+  FctTransactionInclusionServiceGetError,
+  FctTransactionInclusionServiceGetResponse,
+  FctTransactionInclusionServiceListData,
+  FctTransactionInclusionServiceListError,
+  FctTransactionInclusionServiceListResponse,
+  FctTransactionMempoolOutcome7dServiceGetData,
+  FctTransactionMempoolOutcome7dServiceGetError,
+  FctTransactionMempoolOutcome7dServiceGetResponse,
+  FctTransactionMempoolOutcome7dServiceListData,
+  FctTransactionMempoolOutcome7dServiceListError,
+  FctTransactionMempoolOutcome7dServiceListResponse,
+  FctTransactionMempoolOutcomeDailyServiceGetData,
+  FctTransactionMempoolOutcomeDailyServiceGetError,
+  FctTransactionMempoolOutcomeDailyServiceGetResponse,
+  FctTransactionMempoolOutcomeDailyServiceListData,
+  FctTransactionMempoolOutcomeDailyServiceListError,
+  FctTransactionMempoolOutcomeDailyServiceListResponse,
+  FctTransactionMempoolOutcomeHourlyServiceGetData,
+  FctTransactionMempoolOutcomeHourlyServiceGetError,
+  FctTransactionMempoolOutcomeHourlyServiceGetResponse,
+  FctTransactionMempoolOutcomeHourlyServiceListData,
+  FctTransactionMempoolOutcomeHourlyServiceListError,
+  FctTransactionMempoolOutcomeHourlyServiceListResponse,
+  FctTransactionReplacementServiceGetData,
+  FctTransactionReplacementServiceGetError,
+  FctTransactionReplacementServiceGetResponse,
+  FctTransactionReplacementServiceListData,
+  FctTransactionReplacementServiceListError,
+  FctTransactionReplacementServiceListResponse,
   FctValidatorBalanceDailyServiceGetData,
   FctValidatorBalanceDailyServiceGetError,
   FctValidatorBalanceDailyServiceGetResponse,
@@ -2949,6 +3023,12 @@ import type {
   IntTransactionCallFrameServiceListData,
   IntTransactionCallFrameServiceListError,
   IntTransactionCallFrameServiceListResponse,
+  IntTransactionMempoolObservationHourlyServiceGetData,
+  IntTransactionMempoolObservationHourlyServiceGetError,
+  IntTransactionMempoolObservationHourlyServiceGetResponse,
+  IntTransactionMempoolObservationHourlyServiceListData,
+  IntTransactionMempoolObservationHourlyServiceListError,
+  IntTransactionMempoolObservationHourlyServiceListResponse,
   IntTransactionOpcodeGasServiceGetData,
   IntTransactionOpcodeGasServiceGetError,
   IntTransactionOpcodeGasServiceGetResponse,
@@ -16606,6 +16686,120 @@ export const fctPeerForkReadinessByElClientDailyServiceGetOptions = (
     queryKey: fctPeerForkReadinessByElClientDailyServiceGetQueryKey(options),
   });
 
+export const fctPeerGoodbyeByClClientDailyServiceListQueryKey = (
+  options?: Options<FctPeerGoodbyeByClClientDailyServiceListData>
+) => createQueryKey('fctPeerGoodbyeByClClientDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the consensus client of the peer and the reason code it gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export const fctPeerGoodbyeByClClientDailyServiceListOptions = (
+  options?: Options<FctPeerGoodbyeByClClientDailyServiceListData>
+) =>
+  queryOptions<
+    FctPeerGoodbyeByClClientDailyServiceListResponse,
+    FctPeerGoodbyeByClClientDailyServiceListError,
+    FctPeerGoodbyeByClClientDailyServiceListResponse,
+    ReturnType<typeof fctPeerGoodbyeByClClientDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerGoodbyeByClClientDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerGoodbyeByClClientDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerGoodbyeByClClientDailyServiceGetQueryKey = (
+  options: Options<FctPeerGoodbyeByClClientDailyServiceGetData>
+) => createQueryKey('fctPeerGoodbyeByClClientDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerGoodbyeByClClientDailyServiceGetOptions = (
+  options: Options<FctPeerGoodbyeByClClientDailyServiceGetData>
+) =>
+  queryOptions<
+    FctPeerGoodbyeByClClientDailyServiceGetResponse,
+    FctPeerGoodbyeByClClientDailyServiceGetError,
+    FctPeerGoodbyeByClClientDailyServiceGetResponse,
+    ReturnType<typeof fctPeerGoodbyeByClClientDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerGoodbyeByClClientDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerGoodbyeByClClientDailyServiceGetQueryKey(options),
+  });
+
+export const fctPeerGoodbyeDailyServiceListQueryKey = (options?: Options<FctPeerGoodbyeDailyServiceListData>) =>
+  createQueryKey('fctPeerGoodbyeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the reason code the peer gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export const fctPeerGoodbyeDailyServiceListOptions = (options?: Options<FctPeerGoodbyeDailyServiceListData>) =>
+  queryOptions<
+    FctPeerGoodbyeDailyServiceListResponse,
+    FctPeerGoodbyeDailyServiceListError,
+    FctPeerGoodbyeDailyServiceListResponse,
+    ReturnType<typeof fctPeerGoodbyeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerGoodbyeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerGoodbyeDailyServiceListQueryKey(options),
+  });
+
+export const fctPeerGoodbyeDailyServiceGetQueryKey = (options: Options<FctPeerGoodbyeDailyServiceGetData>) =>
+  createQueryKey('fctPeerGoodbyeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctPeerGoodbyeDailyServiceGetOptions = (options: Options<FctPeerGoodbyeDailyServiceGetData>) =>
+  queryOptions<
+    FctPeerGoodbyeDailyServiceGetResponse,
+    FctPeerGoodbyeDailyServiceGetError,
+    FctPeerGoodbyeDailyServiceGetResponse,
+    ReturnType<typeof fctPeerGoodbyeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctPeerGoodbyeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctPeerGoodbyeDailyServiceGetQueryKey(options),
+  });
+
 export const fctPeerHostingByElClientDailyServiceListQueryKey = (
   options?: Options<FctPeerHostingByElClientDailyServiceListData>
 ) => createQueryKey('fctPeerHostingByElClientDailyServiceList', options);
@@ -18596,6 +18790,418 @@ export const fctTokenContractStorageStateByBlockDailyServiceGetOptions = (
       return data;
     },
     queryKey: fctTokenContractStorageStateByBlockDailyServiceGetQueryKey(options),
+  });
+
+export const fctTransactionInclusionServiceListQueryKey = (options?: Options<FctTransactionInclusionServiceListData>) =>
+  createQueryKey('fctTransactionInclusionServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per transaction included in a canonical beacon block execution payload. Carries no mempool or relay context so it can cover the full post-Merge history
+ */
+export const fctTransactionInclusionServiceListOptions = (options?: Options<FctTransactionInclusionServiceListData>) =>
+  queryOptions<
+    FctTransactionInclusionServiceListResponse,
+    FctTransactionInclusionServiceListError,
+    FctTransactionInclusionServiceListResponse,
+    ReturnType<typeof fctTransactionInclusionServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionServiceListQueryKey(options),
+  });
+
+export const fctTransactionInclusionServiceGetQueryKey = (options: Options<FctTransactionInclusionServiceGetData>) =>
+  createQueryKey('fctTransactionInclusionServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by slot_start_date_time
+ */
+export const fctTransactionInclusionServiceGetOptions = (options: Options<FctTransactionInclusionServiceGetData>) =>
+  queryOptions<
+    FctTransactionInclusionServiceGetResponse,
+    FctTransactionInclusionServiceGetError,
+    FctTransactionInclusionServiceGetResponse,
+    ReturnType<typeof fctTransactionInclusionServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionServiceGetQueryKey(options),
+  });
+
+export const fctTransactionInclusionDailyServiceListQueryKey = (
+  options?: Options<FctTransactionInclusionDailyServiceListData>
+) => createQueryKey('fctTransactionInclusionDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export const fctTransactionInclusionDailyServiceListOptions = (
+  options?: Options<FctTransactionInclusionDailyServiceListData>
+) =>
+  queryOptions<
+    FctTransactionInclusionDailyServiceListResponse,
+    FctTransactionInclusionDailyServiceListError,
+    FctTransactionInclusionDailyServiceListResponse,
+    ReturnType<typeof fctTransactionInclusionDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionDailyServiceListQueryKey(options),
+  });
+
+export const fctTransactionInclusionDailyServiceGetQueryKey = (
+  options: Options<FctTransactionInclusionDailyServiceGetData>
+) => createQueryKey('fctTransactionInclusionDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctTransactionInclusionDailyServiceGetOptions = (
+  options: Options<FctTransactionInclusionDailyServiceGetData>
+) =>
+  queryOptions<
+    FctTransactionInclusionDailyServiceGetResponse,
+    FctTransactionInclusionDailyServiceGetError,
+    FctTransactionInclusionDailyServiceGetResponse,
+    ReturnType<typeof fctTransactionInclusionDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionDailyServiceGetQueryKey(options),
+  });
+
+export const fctTransactionInclusionHourlyServiceListQueryKey = (
+  options?: Options<FctTransactionInclusionHourlyServiceListData>
+) => createQueryKey('fctTransactionInclusionHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export const fctTransactionInclusionHourlyServiceListOptions = (
+  options?: Options<FctTransactionInclusionHourlyServiceListData>
+) =>
+  queryOptions<
+    FctTransactionInclusionHourlyServiceListResponse,
+    FctTransactionInclusionHourlyServiceListError,
+    FctTransactionInclusionHourlyServiceListResponse,
+    ReturnType<typeof fctTransactionInclusionHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionHourlyServiceListQueryKey(options),
+  });
+
+export const fctTransactionInclusionHourlyServiceGetQueryKey = (
+  options: Options<FctTransactionInclusionHourlyServiceGetData>
+) => createQueryKey('fctTransactionInclusionHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctTransactionInclusionHourlyServiceGetOptions = (
+  options: Options<FctTransactionInclusionHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctTransactionInclusionHourlyServiceGetResponse,
+    FctTransactionInclusionHourlyServiceGetError,
+    FctTransactionInclusionHourlyServiceGetResponse,
+    ReturnType<typeof fctTransactionInclusionHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionInclusionHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionInclusionHourlyServiceGetQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcome7dServiceListQueryKey = (
+  options?: Options<FctTransactionMempoolOutcome7dServiceListData>
+) => createQueryKey('fctTransactionMempoolOutcome7dServiceList', options);
+
+/**
+ * List records
+ *
+ * One immutable row per transaction hash observed in the public mempool, stating its fixed-horizon outcome within 7 days of first sighting. An observation episode starts when a hash is sighted with no sightings in the preceding 7 days. A hash re-sighted after more than 7 days of silence starts a new episode and a new row
+ */
+export const fctTransactionMempoolOutcome7dServiceListOptions = (
+  options?: Options<FctTransactionMempoolOutcome7dServiceListData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcome7dServiceListResponse,
+    FctTransactionMempoolOutcome7dServiceListError,
+    FctTransactionMempoolOutcome7dServiceListResponse,
+    ReturnType<typeof fctTransactionMempoolOutcome7dServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcome7dServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcome7dServiceListQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcome7dServiceGetQueryKey = (
+  options: Options<FctTransactionMempoolOutcome7dServiceGetData>
+) => createQueryKey('fctTransactionMempoolOutcome7dServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by first_seen_date_time
+ */
+export const fctTransactionMempoolOutcome7dServiceGetOptions = (
+  options: Options<FctTransactionMempoolOutcome7dServiceGetData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcome7dServiceGetResponse,
+    FctTransactionMempoolOutcome7dServiceGetError,
+    FctTransactionMempoolOutcome7dServiceGetResponse,
+    ReturnType<typeof fctTransactionMempoolOutcome7dServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcome7dServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcome7dServiceGetQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcomeDailyServiceListQueryKey = (
+  options?: Options<FctTransactionMempoolOutcomeDailyServiceListData>
+) => createQueryKey('fctTransactionMempoolOutcomeDailyServiceList', options);
+
+/**
+ * List records
+ *
+ * Daily cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export const fctTransactionMempoolOutcomeDailyServiceListOptions = (
+  options?: Options<FctTransactionMempoolOutcomeDailyServiceListData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcomeDailyServiceListResponse,
+    FctTransactionMempoolOutcomeDailyServiceListError,
+    FctTransactionMempoolOutcomeDailyServiceListResponse,
+    ReturnType<typeof fctTransactionMempoolOutcomeDailyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcomeDailyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcomeDailyServiceListQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcomeDailyServiceGetQueryKey = (
+  options: Options<FctTransactionMempoolOutcomeDailyServiceGetData>
+) => createQueryKey('fctTransactionMempoolOutcomeDailyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by day_start_date
+ */
+export const fctTransactionMempoolOutcomeDailyServiceGetOptions = (
+  options: Options<FctTransactionMempoolOutcomeDailyServiceGetData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcomeDailyServiceGetResponse,
+    FctTransactionMempoolOutcomeDailyServiceGetError,
+    FctTransactionMempoolOutcomeDailyServiceGetResponse,
+    ReturnType<typeof fctTransactionMempoolOutcomeDailyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcomeDailyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcomeDailyServiceGetQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcomeHourlyServiceListQueryKey = (
+  options?: Options<FctTransactionMempoolOutcomeHourlyServiceListData>
+) => createQueryKey('fctTransactionMempoolOutcomeHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * Hourly cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export const fctTransactionMempoolOutcomeHourlyServiceListOptions = (
+  options?: Options<FctTransactionMempoolOutcomeHourlyServiceListData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcomeHourlyServiceListResponse,
+    FctTransactionMempoolOutcomeHourlyServiceListError,
+    FctTransactionMempoolOutcomeHourlyServiceListResponse,
+    ReturnType<typeof fctTransactionMempoolOutcomeHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcomeHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcomeHourlyServiceListQueryKey(options),
+  });
+
+export const fctTransactionMempoolOutcomeHourlyServiceGetQueryKey = (
+  options: Options<FctTransactionMempoolOutcomeHourlyServiceGetData>
+) => createQueryKey('fctTransactionMempoolOutcomeHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const fctTransactionMempoolOutcomeHourlyServiceGetOptions = (
+  options: Options<FctTransactionMempoolOutcomeHourlyServiceGetData>
+) =>
+  queryOptions<
+    FctTransactionMempoolOutcomeHourlyServiceGetResponse,
+    FctTransactionMempoolOutcomeHourlyServiceGetError,
+    FctTransactionMempoolOutcomeHourlyServiceGetResponse,
+    ReturnType<typeof fctTransactionMempoolOutcomeHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionMempoolOutcomeHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionMempoolOutcomeHourlyServiceGetQueryKey(options),
+  });
+
+export const fctTransactionReplacementServiceListQueryKey = (
+  options?: Options<FctTransactionReplacementServiceListData>
+) => createQueryKey('fctTransactionReplacementServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per publicly observed attempt in nonce groups with at least two attempts, emitted when the group resolves. A nonce group is all transactions sharing a from address and nonce whose first sightings fall within 7 days of the group anchor
+ */
+export const fctTransactionReplacementServiceListOptions = (
+  options?: Options<FctTransactionReplacementServiceListData>
+) =>
+  queryOptions<
+    FctTransactionReplacementServiceListResponse,
+    FctTransactionReplacementServiceListError,
+    FctTransactionReplacementServiceListResponse,
+    ReturnType<typeof fctTransactionReplacementServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionReplacementServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionReplacementServiceListQueryKey(options),
+  });
+
+export const fctTransactionReplacementServiceGetQueryKey = (
+  options: Options<FctTransactionReplacementServiceGetData>
+) => createQueryKey('fctTransactionReplacementServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by group_first_seen_date_time
+ */
+export const fctTransactionReplacementServiceGetOptions = (options: Options<FctTransactionReplacementServiceGetData>) =>
+  queryOptions<
+    FctTransactionReplacementServiceGetResponse,
+    FctTransactionReplacementServiceGetError,
+    FctTransactionReplacementServiceGetResponse,
+    ReturnType<typeof fctTransactionReplacementServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await fctTransactionReplacementServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: fctTransactionReplacementServiceGetQueryKey(options),
   });
 
 export const fctValidatorBalanceServiceListQueryKey = (options?: Options<FctValidatorBalanceServiceListData>) =>
@@ -24405,6 +25011,66 @@ export const intTransactionCallFrameOpcodeResourceGasServiceGetOptions = (
       return data;
     },
     queryKey: intTransactionCallFrameOpcodeResourceGasServiceGetQueryKey(options),
+  });
+
+export const intTransactionMempoolObservationHourlyServiceListQueryKey = (
+  options?: Options<IntTransactionMempoolObservationHourlyServiceListData>
+) => createQueryKey('intTransactionMempoolObservationHourlyServiceList', options);
+
+/**
+ * List records
+ *
+ * One row per transaction hash per hour in which it was sighted in the public mempool by at least one sentry. Rows summarise the sightings within that hour only. A transaction sighted across multiple hours has multiple rows
+ */
+export const intTransactionMempoolObservationHourlyServiceListOptions = (
+  options?: Options<IntTransactionMempoolObservationHourlyServiceListData>
+) =>
+  queryOptions<
+    IntTransactionMempoolObservationHourlyServiceListResponse,
+    IntTransactionMempoolObservationHourlyServiceListError,
+    IntTransactionMempoolObservationHourlyServiceListResponse,
+    ReturnType<typeof intTransactionMempoolObservationHourlyServiceListQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionMempoolObservationHourlyServiceList({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionMempoolObservationHourlyServiceListQueryKey(options),
+  });
+
+export const intTransactionMempoolObservationHourlyServiceGetQueryKey = (
+  options: Options<IntTransactionMempoolObservationHourlyServiceGetData>
+) => createQueryKey('intTransactionMempoolObservationHourlyServiceGet', options);
+
+/**
+ * Get record
+ *
+ * Retrieve a single record by hour_start_date_time
+ */
+export const intTransactionMempoolObservationHourlyServiceGetOptions = (
+  options: Options<IntTransactionMempoolObservationHourlyServiceGetData>
+) =>
+  queryOptions<
+    IntTransactionMempoolObservationHourlyServiceGetResponse,
+    IntTransactionMempoolObservationHourlyServiceGetError,
+    IntTransactionMempoolObservationHourlyServiceGetResponse,
+    ReturnType<typeof intTransactionMempoolObservationHourlyServiceGetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await intTransactionMempoolObservationHourlyServiceGet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: intTransactionMempoolObservationHourlyServiceGetQueryKey(options),
   });
 
 export const intTransactionOpcodeGasServiceListQueryKey = (options?: Options<IntTransactionOpcodeGasServiceListData>) =>

@@ -10,6 +10,8 @@ import {
   fctPeerCountByCountryDailyServiceList,
   fctPeerCountByElCountryDailyServiceList,
   fctPeerCountBySourceDailyServiceList,
+  fctPeerGoodbyeByClClientDailyServiceList,
+  fctPeerGoodbyeDailyServiceList,
   fctPeerReachabilityByClClientDailyServiceList,
   fctPeerSubnetCoverageDailyServiceList,
   fctPeerSubnetDailyServiceList,
@@ -24,6 +26,8 @@ import type {
   FctPeerCustodyCoverageDaily,
   FctPeerCountByCountryDaily,
   FctPeerCountBySourceDaily,
+  FctPeerGoodbyeByClClientDaily,
+  FctPeerGoodbyeDaily,
   FctPeerReachabilityByClClientDaily,
   FctPeerSubnetCoverageDaily,
   FctPeerSubnetDaily,
@@ -63,6 +67,11 @@ export interface OverviewCensus {
     networkTypes: UseRangeDaysResult<FctPeerChurnDaily>;
     clients: UseRangeDaysResult<FctPeerChurnByClClientDaily>;
   };
+  /** Goodbyes our sentries received by reason code, network-wide and by client, each day */
+  goodbyes: {
+    reasons: UseRangeDaysResult<FctPeerGoodbyeDaily>;
+    clients: UseRangeDaysResult<FctPeerGoodbyeByClClientDaily>;
+  };
   /** Attestation and sync subnets per peer by client, and peers per subnet, each day; every subnet on the latest day */
   subnets: {
     clients: UseRangeDaysResult<FctPeerAttnetCountByClClientDaily>;
@@ -91,6 +100,8 @@ const TABLES = {
   countries: { consensus: 'fct_peer_count_by_country_daily', execution: 'fct_peer_count_by_el_country_daily' },
   churn: 'fct_peer_churn_daily',
   churnClients: 'fct_peer_churn_by_cl_client_daily',
+  goodbyes: 'fct_peer_goodbye_daily',
+  goodbyeClients: 'fct_peer_goodbye_by_cl_client_daily',
   attnets: 'fct_peer_attnet_count_by_cl_client_daily',
   subnetCoverage: 'fct_peer_subnet_coverage_daily',
   subnets: 'fct_peer_subnet_daily',
@@ -142,6 +153,12 @@ export function useOverviewCensus(days: number | null, layer: ClientLayer): Over
   const churnClients = useRangeDays<FctPeerChurnByClClientDaily>(
     fctPeerChurnByClClientDailyServiceList as ListFn,
     TABLES.churnClients,
+    days
+  );
+  const goodbyes = useRangeDays<FctPeerGoodbyeDaily>(fctPeerGoodbyeDailyServiceList as ListFn, TABLES.goodbyes, days);
+  const goodbyeClients = useRangeDays<FctPeerGoodbyeByClClientDaily>(
+    fctPeerGoodbyeByClClientDailyServiceList as ListFn,
+    TABLES.goodbyeClients,
     days
   );
   const attnets = useRangeDays<FctPeerAttnetCountByClClientDaily>(
@@ -208,6 +225,7 @@ export function useOverviewCensus(days: number | null, layer: ClientLayer): Over
     countryCodes,
     countries: { rows: countries.rows, isLoading: latestCountries.isLoading || countries.isLoading },
     churn: { networkTypes: churn, clients: churnClients },
+    goodbyes: { reasons: goodbyes, clients: goodbyeClients },
     subnets: { clients: attnets, coverage: subnetCoverage, latest: latestSubnets },
     columns: { coverage: columnCoverage, latest: latestColumns },
     clReadiness,
@@ -218,6 +236,8 @@ export function useOverviewCensus(days: number | null, layer: ClientLayer): Over
       reachability,
       churn,
       churnClients,
+      goodbyes,
+      goodbyeClients,
       attnets,
       subnetCoverage,
       latestSubnets,

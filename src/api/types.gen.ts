@@ -13062,6 +13062,70 @@ export type FctPeerForkReadinessByElClientDaily = {
 };
 
 /**
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the consensus client of the peer and the reason code it gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export type FctPeerGoodbyeByClClientDaily = {
+  /**
+   * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers)
+   */
+  client?: string;
+  /**
+   * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific
+   */
+  code?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each
+   */
+  goodbye_count?: number;
+  /**
+   * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each
+   */
+  peer_count?: number;
+  /**
+   * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received
+   */
+  reason?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Daily libp2p Goodbye messages our sentries received from remote peers, by the reason code the peer gave for disconnecting. Rows are written once the day is complete. The first day of data and a day after a whole day without goodbyes are left out, as they are partial.
+ */
+export type FctPeerGoodbyeDaily = {
+  /**
+   * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific
+   */
+  code?: number;
+  /**
+   * Start of the day period
+   */
+  day_start_date?: string;
+  /**
+   * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each
+   */
+  goodbye_count?: number;
+  /**
+   * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each
+   */
+  peer_count?: number;
+  /**
+   * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received
+   */
+  reason?: string;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
  * Daily execution nodes by client, without versions, with hosting and IPv6 counts. Execution nodes our discovery crawler found in the day on the network genesis and its current fork, one count per node with its latest record.
  */
 export type FctPeerHostingByElClientDaily = {
@@ -14347,6 +14411,684 @@ export type FctTokenContractStorageStateByBlockDaily = {
    * Timestamp when the record was last updated
    */
   updated_date_time?: number;
+};
+
+/**
+ * One row per transaction included in a canonical beacon block execution payload. Carries no mempool or relay context so it can cover the full post-Merge history
+ */
+export type FctTransactionInclusion = {
+  /**
+   * The maximum gas provided for the blob transaction execution
+   */
+  blob_gas?: number | null;
+  /**
+   * The max blob fee the user has set for the transaction in wei
+   */
+  blob_gas_fee_cap?: string | null;
+  /**
+   * The hashes of the blob commitments for blob transactions
+   */
+  blob_hashes?: Array<string>;
+  /**
+   * The execution block number, null when the block is not yet present in fct_block
+   */
+  block_number?: number | null;
+  /**
+   * The beacon block root hash
+   */
+  block_root?: string;
+  /**
+   * The beacon block version
+   */
+  block_version?: string;
+  /**
+   * The size of the call data of the transaction in bytes
+   */
+  call_data_size?: number;
+  /**
+   * The epoch number containing the slot
+   */
+  epoch?: number;
+  /**
+   * The wall clock time when the epoch started
+   */
+  epoch_start_date_time?: number;
+  /**
+   * The address of the account that sent the transaction
+   */
+  from?: string;
+  /**
+   * The maximum gas provided for the transaction execution
+   */
+  gas?: number;
+  /**
+   * The max fee the user has set for the transaction in wei
+   */
+  gas_fee_cap?: string | null;
+  /**
+   * The gas price of the transaction in wei
+   */
+  gas_price?: string;
+  /**
+   * The priority fee (tip) the user has set for the transaction in wei
+   */
+  gas_tip_cap?: string | null;
+  /**
+   * The transaction hash
+   */
+  hash?: string;
+  /**
+   * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern
+   */
+  is_cancel_shape?: boolean;
+  /**
+   * The nonce of the sender account at the time of the transaction
+   */
+  nonce?: number;
+  /**
+   * The position of the transaction in the execution payload
+   */
+  position?: number;
+  /**
+   * The size of the transaction data in bytes
+   */
+  size?: number;
+  /**
+   * The slot number of the beacon block containing the transaction
+   */
+  slot?: number;
+  /**
+   * The wall clock time when the slot started
+   */
+  slot_start_date_time?: number;
+  /**
+   * The address of the transaction recipient, null for contract creation
+   */
+  to?: string | null;
+  /**
+   * The type of the transaction
+   */
+  type?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The value transferred with the transaction in wei
+   */
+  value?: string;
+};
+
+/**
+ * Daily counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export type FctTransactionInclusionDaily = {
+  /**
+   * Total blob commitments across included transactions this day
+   */
+  blob_count?: number;
+  /**
+   * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern
+   */
+  cancel_shape_count?: number;
+  /**
+   * Included transactions with no recipient address
+   */
+  contract_creation_count?: number;
+  /**
+   * Start of the day period, bucketed by inclusion slot time
+   */
+  day_start_date?: string;
+  /**
+   * Number of transactions included in canonical blocks this day
+   */
+  included_count?: number;
+  /**
+   * Included transactions whose block matched a known relay payload-delivered record
+   */
+  relay_delivered_count?: number;
+  /**
+   * Included transactions of any other type
+   */
+  type_other_count?: number;
+  /**
+   * Included legacy type 0 transactions
+   */
+  type0_count?: number;
+  /**
+   * Included access list type 1 transactions
+   */
+  type1_count?: number;
+  /**
+   * Included dynamic fee type 2 transactions
+   */
+  type2_count?: number;
+  /**
+   * Included blob type 3 transactions
+   */
+  type3_count?: number;
+  /**
+   * Included set code type 4 transactions
+   */
+  type4_count?: number;
+  /**
+   * Distinct sender addresses across included transactions this day
+   */
+  unique_senders?: number;
+  /**
+   * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built
+   */
+  unknown_build_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * Hourly counts of transactions included in canonical blocks, split by build path and transaction type
+ */
+export type FctTransactionInclusionHourly = {
+  /**
+   * Total blob commitments across included transactions this hour
+   */
+  blob_count?: number;
+  /**
+   * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern
+   */
+  cancel_shape_count?: number;
+  /**
+   * Included transactions with no recipient address
+   */
+  contract_creation_count?: number;
+  /**
+   * Start of the hour period, bucketed by inclusion slot time
+   */
+  hour_start_date_time?: number;
+  /**
+   * Number of transactions included in canonical blocks this hour
+   */
+  included_count?: number;
+  /**
+   * Included transactions whose block matched a known relay payload-delivered record
+   */
+  relay_delivered_count?: number;
+  /**
+   * Included transactions of any other type
+   */
+  type_other_count?: number;
+  /**
+   * Included legacy type 0 transactions
+   */
+  type0_count?: number;
+  /**
+   * Included access list type 1 transactions
+   */
+  type1_count?: number;
+  /**
+   * Included dynamic fee type 2 transactions
+   */
+  type2_count?: number;
+  /**
+   * Included blob type 3 transactions
+   */
+  type3_count?: number;
+  /**
+   * Included set code type 4 transactions
+   */
+  type4_count?: number;
+  /**
+   * Distinct sender addresses across included transactions this hour
+   */
+  unique_senders?: number;
+  /**
+   * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built
+   */
+  unknown_build_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+};
+
+/**
+ * One immutable row per transaction hash observed in the public mempool, stating its fixed-horizon outcome within 7 days of first sighting. An observation episode starts when a hash is sighted with no sightings in the preceding 7 days. A hash re-sighted after more than 7 days of silence starts a new episode and a new row
+ */
+export type FctTransactionMempoolOutcome7d = {
+  /**
+   * The maximum gas provided for the blob transaction execution
+   */
+  blob_gas?: number | null;
+  /**
+   * The max blob fee the user has set for the transaction in wei
+   */
+  blob_gas_fee_cap?: string | null;
+  /**
+   * The hashes of the blob commitments for blob transactions
+   */
+  blob_hashes?: Array<string>;
+  /**
+   * The size of the call data of the transaction in bytes
+   */
+  call_data_size?: number;
+  /**
+   * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon
+   */
+  first_seen_date_time?: number;
+  /**
+   * The address of the account that sent the transaction
+   */
+  from?: string;
+  /**
+   * The maximum gas provided for the transaction execution
+   */
+  gas?: number;
+  /**
+   * The max fee the user has set for the transaction in wei
+   */
+  gas_fee_cap?: string | null;
+  /**
+   * The gas price of the transaction in wei
+   */
+  gas_price?: string;
+  /**
+   * The priority fee (tip) the user has set for the transaction in wei
+   */
+  gas_tip_cap?: string | null;
+  /**
+   * The transaction hash
+   */
+  hash?: string;
+  /**
+   * Whether a sighting occurred in the final hour before the 7 day deadline. Sensor evidence of continued circulation, only meaningful when outcome is unincluded
+   */
+  in_mempool_at_deadline?: boolean;
+  /**
+   * The beacon block root of the including block, when outcome is included
+   */
+  included_block_root?: string | null;
+  /**
+   * The position of the transaction in the execution payload, when outcome is included
+   */
+  included_position?: number | null;
+  /**
+   * The slot of the beacon block that included the transaction, when outcome is included
+   */
+  included_slot?: number | null;
+  /**
+   * The wall clock time when the inclusion slot started, when outcome is included
+   */
+  included_slot_start_date_time?: number | null;
+  /**
+   * Whether the including block matched a known relay payload-delivered record, when outcome is included. False is not proof the block was locally built
+   */
+  included_via_known_relay?: boolean | null;
+  /**
+   * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern
+   */
+  is_cancel_shape?: boolean;
+  /**
+   * Latest sighting of the transaction within the 7 day horizon
+   */
+  last_seen_date_time?: number;
+  /**
+   * The nonce of the sender account at the time of the transaction
+   */
+  nonce?: number;
+  /**
+   * Whether the transaction was first sighted after its nonce had already been consumed by another transaction
+   */
+  observed_after_nonce_consumed?: boolean;
+  /**
+   * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later
+   */
+  outcome?: string;
+  /**
+   * Peak number of distinct sentries sighting the transaction within any single hour of the horizon
+   */
+  peak_hourly_unique_sentries?: number;
+  /**
+   * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded
+   */
+  resolution_date_time?: number;
+  /**
+   * Number of sightings within the 7 day horizon across all sentries
+   */
+  sighting_count?: number;
+  /**
+   * The size of the transaction data in bytes
+   */
+  size?: number;
+  /**
+   * The address of the transaction recipient, null for contract creation
+   */
+  to?: string | null;
+  /**
+   * The type of the transaction
+   */
+  type?: number | null;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The value transferred with the transaction in wei
+   */
+  value?: string;
+  /**
+   * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started
+   */
+  wait_ms?: number | null;
+  /**
+   * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed
+   */
+  winner_hash?: string | null;
+  /**
+   * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed
+   */
+  winner_slot_start_date_time?: number | null;
+};
+
+/**
+ * Daily cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export type FctTransactionMempoolOutcomeDaily = {
+  /**
+   * Observed blob type 3 transactions first sighted this day
+   */
+  blob_observed_count?: number;
+  /**
+   * Median wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p50?: number | null;
+  /**
+   * p90 wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p90?: number | null;
+  /**
+   * p99 wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p99?: number | null;
+  /**
+   * Number of included blob transactions contributing to the blob wait quantiles
+   */
+  blob_wait_sample_count?: number;
+  /**
+   * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern
+   */
+  cancel_shape_count?: number;
+  /**
+   * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards
+   */
+  day_start_date?: string;
+  /**
+   * Unincluded transactions with a sighting in the final hour before the 7 day deadline
+   */
+  in_mempool_at_deadline_count?: number;
+  /**
+   * Observed transactions included within 7 days of first sighting
+   */
+  included_count?: number;
+  /**
+   * Included observed transactions whose block matched a known relay payload-delivered record
+   */
+  included_relay_delivered_count?: number;
+  /**
+   * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built
+   */
+  included_unknown_build_count?: number;
+  /**
+   * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting
+   */
+  multi_attempt_nonce_group_count?: number;
+  /**
+   * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles
+   */
+  negative_wait_count?: number;
+  /**
+   * Observed transactions whose nonce was consumed by a different transaction within 7 days
+   */
+  nonce_consumed_count?: number;
+  /**
+   * Distinct from and nonce pairs across transactions first sighted this day
+   */
+  nonce_group_count?: number;
+  /**
+   * Observed transactions first sighted after their nonce had already been consumed
+   */
+  observed_after_nonce_consumed_count?: number;
+  /**
+   * Transactions first sighted in the public mempool this day
+   */
+  observed_count?: number;
+  /**
+   * Non-winning attempts across multi-attempt nonce groups anchored to this day
+   */
+  replaced_attempt_count?: number;
+  /**
+   * Observed transactions with no inclusion of their nonce within 7 days
+   */
+  unincluded_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Median milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p50?: number | null;
+  /**
+   * p90 milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p90?: number | null;
+  /**
+   * p99 milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p99?: number | null;
+  /**
+   * Number of included transactions contributing to the wait quantiles
+   */
+  wait_sample_count?: number;
+};
+
+/**
+ * Hourly cohort outcomes for transactions first sighted in the public mempool, resolved at the fixed 7 day horizon
+ */
+export type FctTransactionMempoolOutcomeHourly = {
+  /**
+   * Observed blob type 3 transactions first sighted this hour
+   */
+  blob_observed_count?: number;
+  /**
+   * Median wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p50?: number | null;
+  /**
+   * p90 wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p90?: number | null;
+  /**
+   * p99 wait milliseconds over included blob transactions with non-negative waits
+   */
+  blob_wait_ms_p99?: number | null;
+  /**
+   * Number of included blob transactions contributing to the blob wait quantiles
+   */
+  blob_wait_sample_count?: number;
+  /**
+   * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern
+   */
+  cancel_shape_count?: number;
+  /**
+   * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards
+   */
+  hour_start_date_time?: number;
+  /**
+   * Unincluded transactions with a sighting in the final hour before the 7 day deadline
+   */
+  in_mempool_at_deadline_count?: number;
+  /**
+   * Observed transactions included within 7 days of first sighting
+   */
+  included_count?: number;
+  /**
+   * Included observed transactions whose block matched a known relay payload-delivered record
+   */
+  included_relay_delivered_count?: number;
+  /**
+   * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built
+   */
+  included_unknown_build_count?: number;
+  /**
+   * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting
+   */
+  multi_attempt_nonce_group_count?: number;
+  /**
+   * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles
+   */
+  negative_wait_count?: number;
+  /**
+   * Observed transactions whose nonce was consumed by a different transaction within 7 days
+   */
+  nonce_consumed_count?: number;
+  /**
+   * Distinct from and nonce pairs across transactions first sighted this hour
+   */
+  nonce_group_count?: number;
+  /**
+   * Observed transactions first sighted after their nonce had already been consumed
+   */
+  observed_after_nonce_consumed_count?: number;
+  /**
+   * Transactions first sighted in the public mempool this hour
+   */
+  observed_count?: number;
+  /**
+   * Non-winning attempts across multi-attempt nonce groups anchored to this hour
+   */
+  replaced_attempt_count?: number;
+  /**
+   * Observed transactions with no inclusion of their nonce within 7 days
+   */
+  unincluded_count?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * Median milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p50?: number | null;
+  /**
+   * p90 milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p90?: number | null;
+  /**
+   * p99 milliseconds from first sighting to inclusion slot start, over included transactions with non-negative waits
+   */
+  wait_ms_p99?: number | null;
+  /**
+   * Number of included transactions contributing to the wait quantiles
+   */
+  wait_sample_count?: number;
+};
+
+/**
+ * One row per publicly observed attempt in nonce groups with at least two attempts, emitted when the group resolves. A nonce group is all transactions sharing a from address and nonce whose first sightings fall within 7 days of the group anchor
+ */
+export type FctTransactionReplacement = {
+  /**
+   * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash
+   */
+  attempt_index?: number;
+  /**
+   * Earliest sighting of this attempt
+   */
+  first_seen_date_time?: number;
+  /**
+   * The address of the account that sent the attempts
+   */
+  from?: string;
+  /**
+   * The max fee of the attempt in wei
+   */
+  gas_fee_cap?: string | null;
+  /**
+   * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null
+   */
+  gas_fee_cap_delta?: string | null;
+  /**
+   * The gas price of the attempt in wei
+   */
+  gas_price?: string;
+  /**
+   * The priority fee (tip) of the attempt in wei
+   */
+  gas_tip_cap?: string | null;
+  /**
+   * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null
+   */
+  gas_tip_cap_delta?: string | null;
+  /**
+   * Total number of publicly observed attempts in the group window
+   */
+  group_attempt_count?: number;
+  /**
+   * Earliest sighting of any attempt in the nonce group, the anchor of the group window
+   */
+  group_first_seen_date_time?: number;
+  /**
+   * Outcome of the nonce group within 7 days of the group anchor: included or unincluded
+   */
+  group_outcome?: string;
+  /**
+   * The transaction hash of this attempt
+   */
+  hash?: string;
+  /**
+   * Whether the attempt is a self-transfer of zero value, the common wallet cancellation pattern
+   */
+  is_cancel_shape?: boolean;
+  /**
+   * Whether this attempt is the one that was included on chain
+   */
+  is_winner?: boolean;
+  /**
+   * The nonce the attempts compete for
+   */
+  nonce?: number;
+  /**
+   * Whether this attempt was first sighted after the group had already resolved
+   */
+  observed_after_resolution?: boolean;
+  /**
+   * The hash of the attempt immediately before this one in the group, null for the first attempt
+   */
+  previous_hash?: string | null;
+  /**
+   * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded
+   */
+  resolution_date_time?: number;
+  /**
+   * The address of the attempt recipient, null for contract creation
+   */
+  to?: string | null;
+  /**
+   * The type of the transaction
+   */
+  type?: number | null;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The value transferred with the attempt in wei
+   */
+  value?: string;
+  /**
+   * The hash of the included attempt, null when the group resolved unincluded
+   */
+  winner_hash?: string | null;
 };
 
 /**
@@ -16902,6 +17644,20 @@ export type GetFctPeerForkReadinessByElClientDailyResponse = {
 };
 
 /**
+ * Response for getting a single fct_peer_goodbye_by_cl_client_daily record
+ */
+export type GetFctPeerGoodbyeByClClientDailyResponse = {
+  item?: FctPeerGoodbyeByClClientDaily;
+};
+
+/**
+ * Response for getting a single fct_peer_goodbye_daily record
+ */
+export type GetFctPeerGoodbyeDailyResponse = {
+  item?: FctPeerGoodbyeDaily;
+};
+
+/**
  * Response for getting a single fct_peer_hosting_by_el_client_daily record
  */
 export type GetFctPeerHostingByElClientDailyResponse = {
@@ -17137,6 +17893,55 @@ export type GetFctSyncCommitteeRewardByValidatorWeeklyResponse = {
  */
 export type GetFctTokenContractStorageStateByBlockDailyResponse = {
   item?: FctTokenContractStorageStateByBlockDaily;
+};
+
+/**
+ * Response for getting a single fct_transaction_inclusion_daily record
+ */
+export type GetFctTransactionInclusionDailyResponse = {
+  item?: FctTransactionInclusionDaily;
+};
+
+/**
+ * Response for getting a single fct_transaction_inclusion_hourly record
+ */
+export type GetFctTransactionInclusionHourlyResponse = {
+  item?: FctTransactionInclusionHourly;
+};
+
+/**
+ * Response for getting a single fct_transaction_inclusion record
+ */
+export type GetFctTransactionInclusionResponse = {
+  item?: FctTransactionInclusion;
+};
+
+/**
+ * Response for getting a single fct_transaction_mempool_outcome_7d record
+ */
+export type GetFctTransactionMempoolOutcome7dResponse = {
+  item?: FctTransactionMempoolOutcome7d;
+};
+
+/**
+ * Response for getting a single fct_transaction_mempool_outcome_daily record
+ */
+export type GetFctTransactionMempoolOutcomeDailyResponse = {
+  item?: FctTransactionMempoolOutcomeDaily;
+};
+
+/**
+ * Response for getting a single fct_transaction_mempool_outcome_hourly record
+ */
+export type GetFctTransactionMempoolOutcomeHourlyResponse = {
+  item?: FctTransactionMempoolOutcomeHourly;
+};
+
+/**
+ * Response for getting a single fct_transaction_replacement record
+ */
+export type GetFctTransactionReplacementResponse = {
+  item?: FctTransactionReplacement;
 };
 
 /**
@@ -17844,6 +18649,13 @@ export type GetIntTransactionCallFrameOpcodeResourceGasResponse = {
  */
 export type GetIntTransactionCallFrameResponse = {
   item?: IntTransactionCallFrame;
+};
+
+/**
+ * Response for getting a single int_transaction_mempool_observation_hourly record
+ */
+export type GetIntTransactionMempoolObservationHourlyResponse = {
+  item?: IntTransactionMempoolObservationHourly;
 };
 
 /**
@@ -21981,6 +22793,120 @@ export type IntTransactionCallFrameOpcodeResourceGas = {
 };
 
 /**
+ * One row per transaction hash per hour in which it was sighted in the public mempool by at least one sentry. Rows summarise the sightings within that hour only. A transaction sighted across multiple hours has multiple rows
+ */
+export type IntTransactionMempoolObservationHourly = {
+  /**
+   * The maximum gas provided for the blob transaction execution
+   */
+  blob_gas?: number | null;
+  /**
+   * The max blob fee the user has set for the transaction in wei
+   */
+  blob_gas_fee_cap?: string | null;
+  /**
+   * The hashes of the blob commitments for blob transactions
+   */
+  blob_hashes?: Array<string>;
+  /**
+   * The size of the call data of the transaction in bytes
+   */
+  call_data_size?: number;
+  /**
+   * Earliest sighting of the transaction by any sentry within this hour
+   */
+  first_seen_date_time?: number;
+  /**
+   * City of the first-sighting sentry
+   */
+  first_sentry_geo_city?: string;
+  /**
+   * Continent code of the first-sighting sentry
+   */
+  first_sentry_geo_continent_code?: string;
+  /**
+   * Country of the first-sighting sentry
+   */
+  first_sentry_geo_country?: string;
+  /**
+   * Country code of the first-sighting sentry
+   */
+  first_sentry_geo_country_code?: string;
+  /**
+   * Name of the sentry with the earliest sighting this hour, ties broken by sentry name
+   */
+  first_sentry_name?: string;
+  /**
+   * The address of the account that sent the transaction
+   */
+  from?: string;
+  /**
+   * The maximum gas provided for the transaction execution
+   */
+  gas?: number;
+  /**
+   * The max fee the user has set for the transaction in wei
+   */
+  gas_fee_cap?: string | null;
+  /**
+   * The gas price of the transaction in wei
+   */
+  gas_price?: string;
+  /**
+   * The priority fee (tip) the user has set for the transaction in wei
+   */
+  gas_tip_cap?: string | null;
+  /**
+   * The transaction hash
+   */
+  hash?: string;
+  /**
+   * The start of the hour bucket the sightings fall in
+   */
+  hour_start_date_time?: number;
+  /**
+   * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern
+   */
+  is_cancel_shape?: boolean;
+  /**
+   * Latest sighting of the transaction by any sentry within this hour
+   */
+  last_seen_date_time?: number;
+  /**
+   * The nonce of the sender account at the time of the transaction
+   */
+  nonce?: number;
+  /**
+   * Number of sightings of the transaction within this hour across all sentries
+   */
+  sighting_count?: number;
+  /**
+   * The size of the transaction data in bytes
+   */
+  size?: number;
+  /**
+   * The address of the transaction recipient, null for contract creation
+   */
+  to?: string | null;
+  /**
+   * The type of the transaction
+   */
+  type?: number | null;
+  /**
+   * Number of distinct sentries that sighted the transaction within this hour
+   */
+  unique_sentries?: number;
+  /**
+   * Timestamp when the record was last updated
+   */
+  updated_date_time?: number;
+  /**
+   * The value transferred with the transaction in wei
+   */
+  value?: string;
+};
+
+/**
  * Aggregated opcode-level gas usage per transaction. Source: canonical_execution_transaction_structlog
  */
 export type IntTransactionOpcodeGas = {
@@ -25375,6 +26301,34 @@ export type ListFctPeerForkReadinessByElClientDailyResponse = {
 };
 
 /**
+ * Response for listing fct_peer_goodbye_by_cl_client_daily records
+ */
+export type ListFctPeerGoodbyeByClClientDailyResponse = {
+  /**
+   * The list of fct_peer_goodbye_by_cl_client_daily.
+   */
+  fct_peer_goodbye_by_cl_client_daily?: Array<FctPeerGoodbyeByClClientDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_peer_goodbye_daily records
+ */
+export type ListFctPeerGoodbyeDailyResponse = {
+  /**
+   * The list of fct_peer_goodbye_daily.
+   */
+  fct_peer_goodbye_daily?: Array<FctPeerGoodbyeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
  * Response for listing fct_peer_hosting_by_el_client_daily records
  */
 export type ListFctPeerHostingByElClientDailyResponse = {
@@ -25844,6 +26798,104 @@ export type ListFctTokenContractStorageStateByBlockDailyResponse = {
    * The list of fct_token_contract_storage_state_by_block_daily.
    */
   fct_token_contract_storage_state_by_block_daily?: Array<FctTokenContractStorageStateByBlockDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_inclusion_daily records
+ */
+export type ListFctTransactionInclusionDailyResponse = {
+  /**
+   * The list of fct_transaction_inclusion_daily.
+   */
+  fct_transaction_inclusion_daily?: Array<FctTransactionInclusionDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_inclusion_hourly records
+ */
+export type ListFctTransactionInclusionHourlyResponse = {
+  /**
+   * The list of fct_transaction_inclusion_hourly.
+   */
+  fct_transaction_inclusion_hourly?: Array<FctTransactionInclusionHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_inclusion records
+ */
+export type ListFctTransactionInclusionResponse = {
+  /**
+   * The list of fct_transaction_inclusion.
+   */
+  fct_transaction_inclusion?: Array<FctTransactionInclusion>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_mempool_outcome_7d records
+ */
+export type ListFctTransactionMempoolOutcome7dResponse = {
+  /**
+   * The list of fct_transaction_mempool_outcome_7d.
+   */
+  fct_transaction_mempool_outcome_7d?: Array<FctTransactionMempoolOutcome7d>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_mempool_outcome_daily records
+ */
+export type ListFctTransactionMempoolOutcomeDailyResponse = {
+  /**
+   * The list of fct_transaction_mempool_outcome_daily.
+   */
+  fct_transaction_mempool_outcome_daily?: Array<FctTransactionMempoolOutcomeDaily>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_mempool_outcome_hourly records
+ */
+export type ListFctTransactionMempoolOutcomeHourlyResponse = {
+  /**
+   * The list of fct_transaction_mempool_outcome_hourly.
+   */
+  fct_transaction_mempool_outcome_hourly?: Array<FctTransactionMempoolOutcomeHourly>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing fct_transaction_replacement records
+ */
+export type ListFctTransactionReplacementResponse = {
+  /**
+   * The list of fct_transaction_replacement.
+   */
+  fct_transaction_replacement?: Array<FctTransactionReplacement>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -27258,6 +28310,20 @@ export type ListIntTransactionCallFrameResponse = {
    * The list of int_transaction_call_frame.
    */
   int_transaction_call_frame?: Array<IntTransactionCallFrame>;
+  /**
+   * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+   */
+  next_page_token?: string;
+};
+
+/**
+ * Response for listing int_transaction_mempool_observation_hourly records
+ */
+export type ListIntTransactionMempoolObservationHourlyResponse = {
+  /**
+   * The list of int_transaction_mempool_observation_hourly.
+   */
+  int_transaction_mempool_observation_hourly?: Array<IntTransactionMempoolObservationHourly>;
   /**
    * A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
    */
@@ -145420,6 +146486,650 @@ export type FctPeerForkReadinessByElClientDailyServiceGetResponses = {
 export type FctPeerForkReadinessByElClientDailyServiceGetResponse =
   FctPeerForkReadinessByElClientDailyServiceGetResponses[keyof FctPeerForkReadinessByElClientDailyServiceGetResponses];
 
+export type FctPeerGoodbyeByClClientDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: eq)
+     */
+    client_eq?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: ne)
+     */
+    client_ne?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: contains)
+     */
+    client_contains?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: starts_with)
+     */
+    client_starts_with?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: ends_with)
+     */
+    client_ends_with?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: like)
+     */
+    client_like?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: not_like)
+     */
+    client_not_like?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: in_values) (comma-separated list)
+     */
+    client_in_values?: string;
+    /**
+     * Consensus client of the remote peer from its agent: lighthouse, lodestar, nimbus, prysm, teku, grandine, caplin (erigon), silver or ethlambda, unknown when the agent was not known, other for every other agent (libp2p tools, crawlers) (filter: not_in_values) (comma-separated list)
+     */
+    client_not_in_values?: string;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: eq)
+     */
+    code_eq?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: ne)
+     */
+    code_ne?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: lt)
+     */
+    code_lt?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: lte)
+     */
+    code_lte?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: gt)
+     */
+    code_gt?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: gte)
+     */
+    code_gte?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: between_min)
+     */
+    code_between_min?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: between_max_value)
+     */
+    code_between_max_value?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: in_values) (comma-separated list)
+     */
+    code_in_values?: string;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: not_in_values) (comma-separated list)
+     */
+    code_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: eq)
+     */
+    reason_eq?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: ne)
+     */
+    reason_ne?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: contains)
+     */
+    reason_contains?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: starts_with)
+     */
+    reason_starts_with?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: ends_with)
+     */
+    reason_ends_with?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: like)
+     */
+    reason_like?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: not_like)
+     */
+    reason_not_like?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: in_values) (comma-separated list)
+     */
+    reason_in_values?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: not_in_values) (comma-separated list)
+     */
+    reason_not_in_values?: string;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: eq)
+     */
+    goodbye_count_eq?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: ne)
+     */
+    goodbye_count_ne?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: lt)
+     */
+    goodbye_count_lt?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: lte)
+     */
+    goodbye_count_lte?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: gt)
+     */
+    goodbye_count_gt?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: gte)
+     */
+    goodbye_count_gte?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: between_min)
+     */
+    goodbye_count_between_min?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: between_max_value)
+     */
+    goodbye_count_between_max_value?: number;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: in_values) (comma-separated list)
+     */
+    goodbye_count_in_values?: string;
+    /**
+     * Goodbye messages with the code our sentries received from the client in the day. A peer that says goodbye to several sentries counts once for each (filter: not_in_values) (comma-separated list)
+     */
+    goodbye_count_not_in_values?: string;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Unique remote peers of the client that sent the code in the day. A peer that sent several codes counts under each (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_goodbye_by_cl_client_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerGoodbyeByClClientDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_goodbye_by_cl_client_daily';
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceListError =
+  FctPeerGoodbyeByClClientDailyServiceListErrors[keyof FctPeerGoodbyeByClClientDailyServiceListErrors];
+
+export type FctPeerGoodbyeByClClientDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerGoodbyeByClClientDailyResponse;
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceListResponse =
+  FctPeerGoodbyeByClClientDailyServiceListResponses[keyof FctPeerGoodbyeByClClientDailyServiceListResponses];
+
+export type FctPeerGoodbyeByClClientDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_goodbye_by_cl_client_daily/{day_start_date}';
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceGetError =
+  FctPeerGoodbyeByClClientDailyServiceGetErrors[keyof FctPeerGoodbyeByClClientDailyServiceGetErrors];
+
+export type FctPeerGoodbyeByClClientDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerGoodbyeByClClientDailyResponse;
+};
+
+export type FctPeerGoodbyeByClClientDailyServiceGetResponse =
+  FctPeerGoodbyeByClClientDailyServiceGetResponses[keyof FctPeerGoodbyeByClClientDailyServiceGetResponses];
+
+export type FctPeerGoodbyeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: eq)
+     */
+    code_eq?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: ne)
+     */
+    code_ne?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: lt)
+     */
+    code_lt?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: lte)
+     */
+    code_lte?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: gt)
+     */
+    code_gt?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: gte)
+     */
+    code_gte?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: between_min)
+     */
+    code_between_min?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: between_max_value)
+     */
+    code_between_max_value?: number;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: in_values) (comma-separated list)
+     */
+    code_in_values?: string;
+    /**
+     * Goodbye reason code the remote peer sent: 1 client shutdown, 2 irrelevant network, 3 fault/error, 128 unable to verify network, 129 too many peers, 250 peer score too low, 251 banned. Other codes are client specific (filter: not_in_values) (comma-separated list)
+     */
+    code_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: eq)
+     */
+    reason_eq?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: ne)
+     */
+    reason_ne?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: contains)
+     */
+    reason_contains?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: starts_with)
+     */
+    reason_starts_with?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: ends_with)
+     */
+    reason_ends_with?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: like)
+     */
+    reason_like?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: not_like)
+     */
+    reason_not_like?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: in_values) (comma-separated list)
+     */
+    reason_in_values?: string;
+    /**
+     * Reason text our sentries give the code, such as client has too many peers. Codes they do not know read as unknown goodbye value of N received (filter: not_in_values) (comma-separated list)
+     */
+    reason_not_in_values?: string;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: eq)
+     */
+    goodbye_count_eq?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: ne)
+     */
+    goodbye_count_ne?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: lt)
+     */
+    goodbye_count_lt?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: lte)
+     */
+    goodbye_count_lte?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: gt)
+     */
+    goodbye_count_gt?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: gte)
+     */
+    goodbye_count_gte?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: between_min)
+     */
+    goodbye_count_between_min?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: between_max_value)
+     */
+    goodbye_count_between_max_value?: number;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: in_values) (comma-separated list)
+     */
+    goodbye_count_in_values?: string;
+    /**
+     * Goodbye messages with the code our sentries received in the day. A peer that says goodbye to several sentries counts once for each (filter: not_in_values) (comma-separated list)
+     */
+    goodbye_count_not_in_values?: string;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: eq)
+     */
+    peer_count_eq?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: ne)
+     */
+    peer_count_ne?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: lt)
+     */
+    peer_count_lt?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: lte)
+     */
+    peer_count_lte?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: gt)
+     */
+    peer_count_gt?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: gte)
+     */
+    peer_count_gte?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: between_min)
+     */
+    peer_count_between_min?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: between_max_value)
+     */
+    peer_count_between_max_value?: number;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: in_values) (comma-separated list)
+     */
+    peer_count_in_values?: string;
+    /**
+     * Unique remote peers that sent the code in the day. A peer that sent several codes counts under each (filter: not_in_values) (comma-separated list)
+     */
+    peer_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_peer_goodbye_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctPeerGoodbyeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_peer_goodbye_daily';
+};
+
+export type FctPeerGoodbyeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerGoodbyeDailyServiceListError =
+  FctPeerGoodbyeDailyServiceListErrors[keyof FctPeerGoodbyeDailyServiceListErrors];
+
+export type FctPeerGoodbyeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctPeerGoodbyeDailyResponse;
+};
+
+export type FctPeerGoodbyeDailyServiceListResponse =
+  FctPeerGoodbyeDailyServiceListResponses[keyof FctPeerGoodbyeDailyServiceListResponses];
+
+export type FctPeerGoodbyeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_peer_goodbye_daily/{day_start_date}';
+};
+
+export type FctPeerGoodbyeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctPeerGoodbyeDailyServiceGetError =
+  FctPeerGoodbyeDailyServiceGetErrors[keyof FctPeerGoodbyeDailyServiceGetErrors];
+
+export type FctPeerGoodbyeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctPeerGoodbyeDailyResponse;
+};
+
+export type FctPeerGoodbyeDailyServiceGetResponse =
+  FctPeerGoodbyeDailyServiceGetResponses[keyof FctPeerGoodbyeDailyServiceGetResponses];
+
 export type FctPeerHostingByElClientDailyServiceListData = {
   body?: never;
   path?: never;
@@ -157387,6 +159097,6026 @@ export type FctTokenContractStorageStateByBlockDailyServiceGetResponses = {
 
 export type FctTokenContractStorageStateByBlockDailyServiceGetResponse =
   FctTokenContractStorageStateByBlockDailyServiceGetResponses[keyof FctTokenContractStorageStateByBlockDailyServiceGetResponses];
+
+export type FctTransactionInclusionServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The wall clock time when the slot started (filter: eq)
+     */
+    slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the slot started (filter: ne)
+     */
+    slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the slot started (filter: lt)
+     */
+    slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the slot started (filter: lte)
+     */
+    slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the slot started (filter: gt)
+     */
+    slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the slot started (filter: gte)
+     */
+    slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_min)
+     */
+    slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the slot started (filter: between_max_value)
+     */
+    slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the slot started (filter: in_values) (comma-separated list)
+     */
+    slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the slot started (filter: not_in_values) (comma-separated list)
+     */
+    slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root hash (filter: eq)
+     */
+    block_root_eq?: string;
+    /**
+     * The beacon block root hash (filter: ne)
+     */
+    block_root_ne?: string;
+    /**
+     * The beacon block root hash (filter: contains)
+     */
+    block_root_contains?: string;
+    /**
+     * The beacon block root hash (filter: starts_with)
+     */
+    block_root_starts_with?: string;
+    /**
+     * The beacon block root hash (filter: ends_with)
+     */
+    block_root_ends_with?: string;
+    /**
+     * The beacon block root hash (filter: like)
+     */
+    block_root_like?: string;
+    /**
+     * The beacon block root hash (filter: not_like)
+     */
+    block_root_not_like?: string;
+    /**
+     * The beacon block root hash (filter: in_values) (comma-separated list)
+     */
+    block_root_in_values?: string;
+    /**
+     * The beacon block root hash (filter: not_in_values) (comma-separated list)
+     */
+    block_root_not_in_values?: string;
+    /**
+     * The position of the transaction in the execution payload (filter: eq)
+     */
+    position_eq?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: ne)
+     */
+    position_ne?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: lt)
+     */
+    position_lt?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: lte)
+     */
+    position_lte?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: gt)
+     */
+    position_gt?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: gte)
+     */
+    position_gte?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: between_min)
+     */
+    position_between_min?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: between_max_value)
+     */
+    position_between_max_value?: number;
+    /**
+     * The position of the transaction in the execution payload (filter: in_values) (comma-separated list)
+     */
+    position_in_values?: string;
+    /**
+     * The position of the transaction in the execution payload (filter: not_in_values) (comma-separated list)
+     */
+    position_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: eq)
+     */
+    slot_eq?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: ne)
+     */
+    slot_ne?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: lt)
+     */
+    slot_lt?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: lte)
+     */
+    slot_lte?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: gt)
+     */
+    slot_gt?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: gte)
+     */
+    slot_gte?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: between_min)
+     */
+    slot_between_min?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: between_max_value)
+     */
+    slot_between_max_value?: number;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: in_values) (comma-separated list)
+     */
+    slot_in_values?: string;
+    /**
+     * The slot number of the beacon block containing the transaction (filter: not_in_values) (comma-separated list)
+     */
+    slot_not_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: eq)
+     */
+    epoch_eq?: number;
+    /**
+     * The epoch number containing the slot (filter: ne)
+     */
+    epoch_ne?: number;
+    /**
+     * The epoch number containing the slot (filter: lt)
+     */
+    epoch_lt?: number;
+    /**
+     * The epoch number containing the slot (filter: lte)
+     */
+    epoch_lte?: number;
+    /**
+     * The epoch number containing the slot (filter: gt)
+     */
+    epoch_gt?: number;
+    /**
+     * The epoch number containing the slot (filter: gte)
+     */
+    epoch_gte?: number;
+    /**
+     * The epoch number containing the slot (filter: between_min)
+     */
+    epoch_between_min?: number;
+    /**
+     * The epoch number containing the slot (filter: between_max_value)
+     */
+    epoch_between_max_value?: number;
+    /**
+     * The epoch number containing the slot (filter: in_values) (comma-separated list)
+     */
+    epoch_in_values?: string;
+    /**
+     * The epoch number containing the slot (filter: not_in_values) (comma-separated list)
+     */
+    epoch_not_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: eq)
+     */
+    epoch_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the epoch started (filter: ne)
+     */
+    epoch_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lt)
+     */
+    epoch_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: lte)
+     */
+    epoch_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gt)
+     */
+    epoch_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the epoch started (filter: gte)
+     */
+    epoch_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_min)
+     */
+    epoch_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the epoch started (filter: between_max_value)
+     */
+    epoch_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the epoch started (filter: in_values) (comma-separated list)
+     */
+    epoch_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the epoch started (filter: not_in_values) (comma-separated list)
+     */
+    epoch_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block version (filter: eq)
+     */
+    block_version_eq?: string;
+    /**
+     * The beacon block version (filter: ne)
+     */
+    block_version_ne?: string;
+    /**
+     * The beacon block version (filter: contains)
+     */
+    block_version_contains?: string;
+    /**
+     * The beacon block version (filter: starts_with)
+     */
+    block_version_starts_with?: string;
+    /**
+     * The beacon block version (filter: ends_with)
+     */
+    block_version_ends_with?: string;
+    /**
+     * The beacon block version (filter: like)
+     */
+    block_version_like?: string;
+    /**
+     * The beacon block version (filter: not_like)
+     */
+    block_version_not_like?: string;
+    /**
+     * The beacon block version (filter: in_values) (comma-separated list)
+     */
+    block_version_in_values?: string;
+    /**
+     * The beacon block version (filter: not_in_values) (comma-separated list)
+     */
+    block_version_not_in_values?: string;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: eq)
+     */
+    block_number_eq?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: ne)
+     */
+    block_number_ne?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: lt)
+     */
+    block_number_lt?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: lte)
+     */
+    block_number_lte?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: gt)
+     */
+    block_number_gt?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: gte)
+     */
+    block_number_gte?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: between_min)
+     */
+    block_number_between_min?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: between_max_value)
+     */
+    block_number_between_max_value?: number;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: in_values) (comma-separated list)
+     */
+    block_number_in_values?: string;
+    /**
+     * The execution block number, null when the block is not yet present in fct_block (filter: not_in_values) (comma-separated list)
+     */
+    block_number_not_in_values?: string;
+    /**
+     * The transaction hash (filter: eq)
+     */
+    hash_eq?: string;
+    /**
+     * The transaction hash (filter: ne)
+     */
+    hash_ne?: string;
+    /**
+     * The transaction hash (filter: contains)
+     */
+    hash_contains?: string;
+    /**
+     * The transaction hash (filter: starts_with)
+     */
+    hash_starts_with?: string;
+    /**
+     * The transaction hash (filter: ends_with)
+     */
+    hash_ends_with?: string;
+    /**
+     * The transaction hash (filter: like)
+     */
+    hash_like?: string;
+    /**
+     * The transaction hash (filter: not_like)
+     */
+    hash_not_like?: string;
+    /**
+     * The transaction hash (filter: in_values) (comma-separated list)
+     */
+    hash_in_values?: string;
+    /**
+     * The transaction hash (filter: not_in_values) (comma-separated list)
+     */
+    hash_not_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: eq)
+     */
+    from_eq?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ne)
+     */
+    from_ne?: string;
+    /**
+     * The address of the account that sent the transaction (filter: contains)
+     */
+    from_contains?: string;
+    /**
+     * The address of the account that sent the transaction (filter: starts_with)
+     */
+    from_starts_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ends_with)
+     */
+    from_ends_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: like)
+     */
+    from_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_like)
+     */
+    from_not_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: in_values) (comma-separated list)
+     */
+    from_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_in_values) (comma-separated list)
+     */
+    from_not_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: eq)
+     */
+    to_eq?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ne)
+     */
+    to_ne?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: contains)
+     */
+    to_contains?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: starts_with)
+     */
+    to_starts_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ends_with)
+     */
+    to_ends_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: like)
+     */
+    to_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_like)
+     */
+    to_not_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: in_values) (comma-separated list)
+     */
+    to_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_in_values) (comma-separated list)
+     */
+    to_not_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: eq)
+     */
+    nonce_eq?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: ne)
+     */
+    nonce_ne?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lt)
+     */
+    nonce_lt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lte)
+     */
+    nonce_lte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gt)
+     */
+    nonce_gt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gte)
+     */
+    nonce_gte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_min)
+     */
+    nonce_between_min?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_max_value)
+     */
+    nonce_between_max_value?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: in_values) (comma-separated list)
+     */
+    nonce_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    nonce_not_in_values?: string;
+    /**
+     * The type of the transaction (filter: eq)
+     */
+    type_eq?: number;
+    /**
+     * The type of the transaction (filter: ne)
+     */
+    type_ne?: number;
+    /**
+     * The type of the transaction (filter: lt)
+     */
+    type_lt?: number;
+    /**
+     * The type of the transaction (filter: lte)
+     */
+    type_lte?: number;
+    /**
+     * The type of the transaction (filter: gt)
+     */
+    type_gt?: number;
+    /**
+     * The type of the transaction (filter: gte)
+     */
+    type_gte?: number;
+    /**
+     * The type of the transaction (filter: between_min)
+     */
+    type_between_min?: number;
+    /**
+     * The type of the transaction (filter: between_max_value)
+     */
+    type_between_max_value?: number;
+    /**
+     * The type of the transaction (filter: in_values) (comma-separated list)
+     */
+    type_in_values?: string;
+    /**
+     * The type of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    type_not_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: eq)
+     */
+    gas_price_eq?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ne)
+     */
+    gas_price_ne?: string;
+    /**
+     * The gas price of the transaction in wei (filter: contains)
+     */
+    gas_price_contains?: string;
+    /**
+     * The gas price of the transaction in wei (filter: starts_with)
+     */
+    gas_price_starts_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ends_with)
+     */
+    gas_price_ends_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: like)
+     */
+    gas_price_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_like)
+     */
+    gas_price_not_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_price_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_price_not_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: eq)
+     */
+    gas_tip_cap_eq?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ne)
+     */
+    gas_tip_cap_ne?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: contains)
+     */
+    gas_tip_cap_contains?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_tip_cap_starts_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_tip_cap_ends_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: like)
+     */
+    gas_tip_cap_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_tip_cap_not_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_tip_cap_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_tip_cap_not_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: eq)
+     */
+    gas_fee_cap_eq?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ne)
+     */
+    gas_fee_cap_ne?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: contains)
+     */
+    gas_fee_cap_contains?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_fee_cap_starts_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_fee_cap_ends_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: like)
+     */
+    gas_fee_cap_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_fee_cap_not_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_fee_cap_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_fee_cap_not_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: eq)
+     */
+    size_eq?: number;
+    /**
+     * The size of the transaction data in bytes (filter: ne)
+     */
+    size_ne?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lt)
+     */
+    size_lt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lte)
+     */
+    size_lte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gt)
+     */
+    size_gt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gte)
+     */
+    size_gte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_min)
+     */
+    size_between_min?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_max_value)
+     */
+    size_between_max_value?: number;
+    /**
+     * The size of the transaction data in bytes (filter: in_values) (comma-separated list)
+     */
+    size_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: not_in_values) (comma-separated list)
+     */
+    size_not_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: eq)
+     */
+    call_data_size_eq?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: ne)
+     */
+    call_data_size_ne?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lt)
+     */
+    call_data_size_lt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lte)
+     */
+    call_data_size_lte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gt)
+     */
+    call_data_size_gt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gte)
+     */
+    call_data_size_gte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_min)
+     */
+    call_data_size_between_min?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_max_value)
+     */
+    call_data_size_between_max_value?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: in_values) (comma-separated list)
+     */
+    call_data_size_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: not_in_values) (comma-separated list)
+     */
+    call_data_size_not_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: eq)
+     */
+    blob_gas_eq?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: ne)
+     */
+    blob_gas_ne?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lt)
+     */
+    blob_gas_lt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lte)
+     */
+    blob_gas_lte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gt)
+     */
+    blob_gas_gt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gte)
+     */
+    blob_gas_gte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_min)
+     */
+    blob_gas_between_min?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_max_value)
+     */
+    blob_gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: in_values) (comma-separated list)
+     */
+    blob_gas_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_not_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: eq)
+     */
+    blob_gas_fee_cap_eq?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ne)
+     */
+    blob_gas_fee_cap_ne?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: contains)
+     */
+    blob_gas_fee_cap_contains?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    blob_gas_fee_cap_starts_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    blob_gas_fee_cap_ends_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: like)
+     */
+    blob_gas_fee_cap_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_like)
+     */
+    blob_gas_fee_cap_not_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_not_in_values?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has)
+     */
+    blob_hashes_has?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_all_values)
+     */
+    blob_hashes_has_all_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_any_values)
+     */
+    blob_hashes_has_any_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_eq)
+     */
+    blob_hashes_length_eq?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gt)
+     */
+    blob_hashes_length_gt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gte)
+     */
+    blob_hashes_length_gte?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lt)
+     */
+    blob_hashes_length_lt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lte)
+     */
+    blob_hashes_length_lte?: number;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    is_cancel_shape_eq?: boolean;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    is_cancel_shape_ne?: boolean;
+    /**
+     * The maximum number of fct_transaction_inclusion to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionInclusion` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_inclusion';
+};
+
+export type FctTransactionInclusionServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionServiceListError =
+  FctTransactionInclusionServiceListErrors[keyof FctTransactionInclusionServiceListErrors];
+
+export type FctTransactionInclusionServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionInclusionResponse;
+};
+
+export type FctTransactionInclusionServiceListResponse =
+  FctTransactionInclusionServiceListResponses[keyof FctTransactionInclusionServiceListResponses];
+
+export type FctTransactionInclusionServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The wall clock time when the slot started
+     */
+    slot_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_inclusion/{slot_start_date_time}';
+};
+
+export type FctTransactionInclusionServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionServiceGetError =
+  FctTransactionInclusionServiceGetErrors[keyof FctTransactionInclusionServiceGetErrors];
+
+export type FctTransactionInclusionServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionInclusionResponse;
+};
+
+export type FctTransactionInclusionServiceGetResponse =
+  FctTransactionInclusionServiceGetResponses[keyof FctTransactionInclusionServiceGetResponses];
+
+export type FctTransactionInclusionDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, bucketed by inclusion slot time (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: eq)
+     */
+    included_count_eq?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: ne)
+     */
+    included_count_ne?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: lt)
+     */
+    included_count_lt?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: lte)
+     */
+    included_count_lte?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: gt)
+     */
+    included_count_gt?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: gte)
+     */
+    included_count_gte?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: between_min)
+     */
+    included_count_between_min?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: between_max_value)
+     */
+    included_count_between_max_value?: number;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: in_values) (comma-separated list)
+     */
+    included_count_in_values?: string;
+    /**
+     * Number of transactions included in canonical blocks this day (filter: not_in_values) (comma-separated list)
+     */
+    included_count_not_in_values?: string;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: eq)
+     */
+    relay_delivered_count_eq?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: ne)
+     */
+    relay_delivered_count_ne?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: lt)
+     */
+    relay_delivered_count_lt?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: lte)
+     */
+    relay_delivered_count_lte?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: gt)
+     */
+    relay_delivered_count_gt?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: gte)
+     */
+    relay_delivered_count_gte?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: between_min)
+     */
+    relay_delivered_count_between_min?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: between_max_value)
+     */
+    relay_delivered_count_between_max_value?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: in_values) (comma-separated list)
+     */
+    relay_delivered_count_in_values?: string;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: not_in_values) (comma-separated list)
+     */
+    relay_delivered_count_not_in_values?: string;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: eq)
+     */
+    unknown_build_count_eq?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: ne)
+     */
+    unknown_build_count_ne?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lt)
+     */
+    unknown_build_count_lt?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lte)
+     */
+    unknown_build_count_lte?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gt)
+     */
+    unknown_build_count_gt?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gte)
+     */
+    unknown_build_count_gte?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_min)
+     */
+    unknown_build_count_between_min?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_max_value)
+     */
+    unknown_build_count_between_max_value?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: in_values) (comma-separated list)
+     */
+    unknown_build_count_in_values?: string;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: not_in_values) (comma-separated list)
+     */
+    unknown_build_count_not_in_values?: string;
+    /**
+     * Included legacy type 0 transactions (filter: eq)
+     */
+    type0_count_eq?: number;
+    /**
+     * Included legacy type 0 transactions (filter: ne)
+     */
+    type0_count_ne?: number;
+    /**
+     * Included legacy type 0 transactions (filter: lt)
+     */
+    type0_count_lt?: number;
+    /**
+     * Included legacy type 0 transactions (filter: lte)
+     */
+    type0_count_lte?: number;
+    /**
+     * Included legacy type 0 transactions (filter: gt)
+     */
+    type0_count_gt?: number;
+    /**
+     * Included legacy type 0 transactions (filter: gte)
+     */
+    type0_count_gte?: number;
+    /**
+     * Included legacy type 0 transactions (filter: between_min)
+     */
+    type0_count_between_min?: number;
+    /**
+     * Included legacy type 0 transactions (filter: between_max_value)
+     */
+    type0_count_between_max_value?: number;
+    /**
+     * Included legacy type 0 transactions (filter: in_values) (comma-separated list)
+     */
+    type0_count_in_values?: string;
+    /**
+     * Included legacy type 0 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type0_count_not_in_values?: string;
+    /**
+     * Included access list type 1 transactions (filter: eq)
+     */
+    type1_count_eq?: number;
+    /**
+     * Included access list type 1 transactions (filter: ne)
+     */
+    type1_count_ne?: number;
+    /**
+     * Included access list type 1 transactions (filter: lt)
+     */
+    type1_count_lt?: number;
+    /**
+     * Included access list type 1 transactions (filter: lte)
+     */
+    type1_count_lte?: number;
+    /**
+     * Included access list type 1 transactions (filter: gt)
+     */
+    type1_count_gt?: number;
+    /**
+     * Included access list type 1 transactions (filter: gte)
+     */
+    type1_count_gte?: number;
+    /**
+     * Included access list type 1 transactions (filter: between_min)
+     */
+    type1_count_between_min?: number;
+    /**
+     * Included access list type 1 transactions (filter: between_max_value)
+     */
+    type1_count_between_max_value?: number;
+    /**
+     * Included access list type 1 transactions (filter: in_values) (comma-separated list)
+     */
+    type1_count_in_values?: string;
+    /**
+     * Included access list type 1 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type1_count_not_in_values?: string;
+    /**
+     * Included dynamic fee type 2 transactions (filter: eq)
+     */
+    type2_count_eq?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: ne)
+     */
+    type2_count_ne?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: lt)
+     */
+    type2_count_lt?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: lte)
+     */
+    type2_count_lte?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: gt)
+     */
+    type2_count_gt?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: gte)
+     */
+    type2_count_gte?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: between_min)
+     */
+    type2_count_between_min?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: between_max_value)
+     */
+    type2_count_between_max_value?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: in_values) (comma-separated list)
+     */
+    type2_count_in_values?: string;
+    /**
+     * Included dynamic fee type 2 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type2_count_not_in_values?: string;
+    /**
+     * Included blob type 3 transactions (filter: eq)
+     */
+    type3_count_eq?: number;
+    /**
+     * Included blob type 3 transactions (filter: ne)
+     */
+    type3_count_ne?: number;
+    /**
+     * Included blob type 3 transactions (filter: lt)
+     */
+    type3_count_lt?: number;
+    /**
+     * Included blob type 3 transactions (filter: lte)
+     */
+    type3_count_lte?: number;
+    /**
+     * Included blob type 3 transactions (filter: gt)
+     */
+    type3_count_gt?: number;
+    /**
+     * Included blob type 3 transactions (filter: gte)
+     */
+    type3_count_gte?: number;
+    /**
+     * Included blob type 3 transactions (filter: between_min)
+     */
+    type3_count_between_min?: number;
+    /**
+     * Included blob type 3 transactions (filter: between_max_value)
+     */
+    type3_count_between_max_value?: number;
+    /**
+     * Included blob type 3 transactions (filter: in_values) (comma-separated list)
+     */
+    type3_count_in_values?: string;
+    /**
+     * Included blob type 3 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type3_count_not_in_values?: string;
+    /**
+     * Included set code type 4 transactions (filter: eq)
+     */
+    type4_count_eq?: number;
+    /**
+     * Included set code type 4 transactions (filter: ne)
+     */
+    type4_count_ne?: number;
+    /**
+     * Included set code type 4 transactions (filter: lt)
+     */
+    type4_count_lt?: number;
+    /**
+     * Included set code type 4 transactions (filter: lte)
+     */
+    type4_count_lte?: number;
+    /**
+     * Included set code type 4 transactions (filter: gt)
+     */
+    type4_count_gt?: number;
+    /**
+     * Included set code type 4 transactions (filter: gte)
+     */
+    type4_count_gte?: number;
+    /**
+     * Included set code type 4 transactions (filter: between_min)
+     */
+    type4_count_between_min?: number;
+    /**
+     * Included set code type 4 transactions (filter: between_max_value)
+     */
+    type4_count_between_max_value?: number;
+    /**
+     * Included set code type 4 transactions (filter: in_values) (comma-separated list)
+     */
+    type4_count_in_values?: string;
+    /**
+     * Included set code type 4 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type4_count_not_in_values?: string;
+    /**
+     * Included transactions of any other type (filter: eq)
+     */
+    type_other_count_eq?: number;
+    /**
+     * Included transactions of any other type (filter: ne)
+     */
+    type_other_count_ne?: number;
+    /**
+     * Included transactions of any other type (filter: lt)
+     */
+    type_other_count_lt?: number;
+    /**
+     * Included transactions of any other type (filter: lte)
+     */
+    type_other_count_lte?: number;
+    /**
+     * Included transactions of any other type (filter: gt)
+     */
+    type_other_count_gt?: number;
+    /**
+     * Included transactions of any other type (filter: gte)
+     */
+    type_other_count_gte?: number;
+    /**
+     * Included transactions of any other type (filter: between_min)
+     */
+    type_other_count_between_min?: number;
+    /**
+     * Included transactions of any other type (filter: between_max_value)
+     */
+    type_other_count_between_max_value?: number;
+    /**
+     * Included transactions of any other type (filter: in_values) (comma-separated list)
+     */
+    type_other_count_in_values?: string;
+    /**
+     * Included transactions of any other type (filter: not_in_values) (comma-separated list)
+     */
+    type_other_count_not_in_values?: string;
+    /**
+     * Total blob commitments across included transactions this day (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Total blob commitments across included transactions this day (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Total blob commitments across included transactions this day (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Included transactions with no recipient address (filter: eq)
+     */
+    contract_creation_count_eq?: number;
+    /**
+     * Included transactions with no recipient address (filter: ne)
+     */
+    contract_creation_count_ne?: number;
+    /**
+     * Included transactions with no recipient address (filter: lt)
+     */
+    contract_creation_count_lt?: number;
+    /**
+     * Included transactions with no recipient address (filter: lte)
+     */
+    contract_creation_count_lte?: number;
+    /**
+     * Included transactions with no recipient address (filter: gt)
+     */
+    contract_creation_count_gt?: number;
+    /**
+     * Included transactions with no recipient address (filter: gte)
+     */
+    contract_creation_count_gte?: number;
+    /**
+     * Included transactions with no recipient address (filter: between_min)
+     */
+    contract_creation_count_between_min?: number;
+    /**
+     * Included transactions with no recipient address (filter: between_max_value)
+     */
+    contract_creation_count_between_max_value?: number;
+    /**
+     * Included transactions with no recipient address (filter: in_values) (comma-separated list)
+     */
+    contract_creation_count_in_values?: string;
+    /**
+     * Included transactions with no recipient address (filter: not_in_values) (comma-separated list)
+     */
+    contract_creation_count_not_in_values?: string;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    cancel_shape_count_eq?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    cancel_shape_count_ne?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lt)
+     */
+    cancel_shape_count_lt?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lte)
+     */
+    cancel_shape_count_lte?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gt)
+     */
+    cancel_shape_count_gt?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gte)
+     */
+    cancel_shape_count_gte?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_min)
+     */
+    cancel_shape_count_between_min?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_max_value)
+     */
+    cancel_shape_count_between_max_value?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: in_values) (comma-separated list)
+     */
+    cancel_shape_count_in_values?: string;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: not_in_values) (comma-separated list)
+     */
+    cancel_shape_count_not_in_values?: string;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: eq)
+     */
+    unique_senders_eq?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: ne)
+     */
+    unique_senders_ne?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: lt)
+     */
+    unique_senders_lt?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: lte)
+     */
+    unique_senders_lte?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: gt)
+     */
+    unique_senders_gt?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: gte)
+     */
+    unique_senders_gte?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: between_min)
+     */
+    unique_senders_between_min?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: between_max_value)
+     */
+    unique_senders_between_max_value?: number;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: in_values) (comma-separated list)
+     */
+    unique_senders_in_values?: string;
+    /**
+     * Distinct sender addresses across included transactions this day (filter: not_in_values) (comma-separated list)
+     */
+    unique_senders_not_in_values?: string;
+    /**
+     * The maximum number of fct_transaction_inclusion_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionInclusionDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_inclusion_daily';
+};
+
+export type FctTransactionInclusionDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionDailyServiceListError =
+  FctTransactionInclusionDailyServiceListErrors[keyof FctTransactionInclusionDailyServiceListErrors];
+
+export type FctTransactionInclusionDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionInclusionDailyResponse;
+};
+
+export type FctTransactionInclusionDailyServiceListResponse =
+  FctTransactionInclusionDailyServiceListResponses[keyof FctTransactionInclusionDailyServiceListResponses];
+
+export type FctTransactionInclusionDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, bucketed by inclusion slot time
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_inclusion_daily/{day_start_date}';
+};
+
+export type FctTransactionInclusionDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionDailyServiceGetError =
+  FctTransactionInclusionDailyServiceGetErrors[keyof FctTransactionInclusionDailyServiceGetErrors];
+
+export type FctTransactionInclusionDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionInclusionDailyResponse;
+};
+
+export type FctTransactionInclusionDailyServiceGetResponse =
+  FctTransactionInclusionDailyServiceGetResponses[keyof FctTransactionInclusionDailyServiceGetResponses];
+
+export type FctTransactionInclusionHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period, bucketed by inclusion slot time (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: eq)
+     */
+    included_count_eq?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: ne)
+     */
+    included_count_ne?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: lt)
+     */
+    included_count_lt?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: lte)
+     */
+    included_count_lte?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: gt)
+     */
+    included_count_gt?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: gte)
+     */
+    included_count_gte?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: between_min)
+     */
+    included_count_between_min?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: between_max_value)
+     */
+    included_count_between_max_value?: number;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: in_values) (comma-separated list)
+     */
+    included_count_in_values?: string;
+    /**
+     * Number of transactions included in canonical blocks this hour (filter: not_in_values) (comma-separated list)
+     */
+    included_count_not_in_values?: string;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: eq)
+     */
+    relay_delivered_count_eq?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: ne)
+     */
+    relay_delivered_count_ne?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: lt)
+     */
+    relay_delivered_count_lt?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: lte)
+     */
+    relay_delivered_count_lte?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: gt)
+     */
+    relay_delivered_count_gt?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: gte)
+     */
+    relay_delivered_count_gte?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: between_min)
+     */
+    relay_delivered_count_between_min?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: between_max_value)
+     */
+    relay_delivered_count_between_max_value?: number;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: in_values) (comma-separated list)
+     */
+    relay_delivered_count_in_values?: string;
+    /**
+     * Included transactions whose block matched a known relay payload-delivered record (filter: not_in_values) (comma-separated list)
+     */
+    relay_delivered_count_not_in_values?: string;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: eq)
+     */
+    unknown_build_count_eq?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: ne)
+     */
+    unknown_build_count_ne?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lt)
+     */
+    unknown_build_count_lt?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lte)
+     */
+    unknown_build_count_lte?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gt)
+     */
+    unknown_build_count_gt?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gte)
+     */
+    unknown_build_count_gte?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_min)
+     */
+    unknown_build_count_between_min?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_max_value)
+     */
+    unknown_build_count_between_max_value?: number;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: in_values) (comma-separated list)
+     */
+    unknown_build_count_in_values?: string;
+    /**
+     * Included transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: not_in_values) (comma-separated list)
+     */
+    unknown_build_count_not_in_values?: string;
+    /**
+     * Included legacy type 0 transactions (filter: eq)
+     */
+    type0_count_eq?: number;
+    /**
+     * Included legacy type 0 transactions (filter: ne)
+     */
+    type0_count_ne?: number;
+    /**
+     * Included legacy type 0 transactions (filter: lt)
+     */
+    type0_count_lt?: number;
+    /**
+     * Included legacy type 0 transactions (filter: lte)
+     */
+    type0_count_lte?: number;
+    /**
+     * Included legacy type 0 transactions (filter: gt)
+     */
+    type0_count_gt?: number;
+    /**
+     * Included legacy type 0 transactions (filter: gte)
+     */
+    type0_count_gte?: number;
+    /**
+     * Included legacy type 0 transactions (filter: between_min)
+     */
+    type0_count_between_min?: number;
+    /**
+     * Included legacy type 0 transactions (filter: between_max_value)
+     */
+    type0_count_between_max_value?: number;
+    /**
+     * Included legacy type 0 transactions (filter: in_values) (comma-separated list)
+     */
+    type0_count_in_values?: string;
+    /**
+     * Included legacy type 0 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type0_count_not_in_values?: string;
+    /**
+     * Included access list type 1 transactions (filter: eq)
+     */
+    type1_count_eq?: number;
+    /**
+     * Included access list type 1 transactions (filter: ne)
+     */
+    type1_count_ne?: number;
+    /**
+     * Included access list type 1 transactions (filter: lt)
+     */
+    type1_count_lt?: number;
+    /**
+     * Included access list type 1 transactions (filter: lte)
+     */
+    type1_count_lte?: number;
+    /**
+     * Included access list type 1 transactions (filter: gt)
+     */
+    type1_count_gt?: number;
+    /**
+     * Included access list type 1 transactions (filter: gte)
+     */
+    type1_count_gte?: number;
+    /**
+     * Included access list type 1 transactions (filter: between_min)
+     */
+    type1_count_between_min?: number;
+    /**
+     * Included access list type 1 transactions (filter: between_max_value)
+     */
+    type1_count_between_max_value?: number;
+    /**
+     * Included access list type 1 transactions (filter: in_values) (comma-separated list)
+     */
+    type1_count_in_values?: string;
+    /**
+     * Included access list type 1 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type1_count_not_in_values?: string;
+    /**
+     * Included dynamic fee type 2 transactions (filter: eq)
+     */
+    type2_count_eq?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: ne)
+     */
+    type2_count_ne?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: lt)
+     */
+    type2_count_lt?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: lte)
+     */
+    type2_count_lte?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: gt)
+     */
+    type2_count_gt?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: gte)
+     */
+    type2_count_gte?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: between_min)
+     */
+    type2_count_between_min?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: between_max_value)
+     */
+    type2_count_between_max_value?: number;
+    /**
+     * Included dynamic fee type 2 transactions (filter: in_values) (comma-separated list)
+     */
+    type2_count_in_values?: string;
+    /**
+     * Included dynamic fee type 2 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type2_count_not_in_values?: string;
+    /**
+     * Included blob type 3 transactions (filter: eq)
+     */
+    type3_count_eq?: number;
+    /**
+     * Included blob type 3 transactions (filter: ne)
+     */
+    type3_count_ne?: number;
+    /**
+     * Included blob type 3 transactions (filter: lt)
+     */
+    type3_count_lt?: number;
+    /**
+     * Included blob type 3 transactions (filter: lte)
+     */
+    type3_count_lte?: number;
+    /**
+     * Included blob type 3 transactions (filter: gt)
+     */
+    type3_count_gt?: number;
+    /**
+     * Included blob type 3 transactions (filter: gte)
+     */
+    type3_count_gte?: number;
+    /**
+     * Included blob type 3 transactions (filter: between_min)
+     */
+    type3_count_between_min?: number;
+    /**
+     * Included blob type 3 transactions (filter: between_max_value)
+     */
+    type3_count_between_max_value?: number;
+    /**
+     * Included blob type 3 transactions (filter: in_values) (comma-separated list)
+     */
+    type3_count_in_values?: string;
+    /**
+     * Included blob type 3 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type3_count_not_in_values?: string;
+    /**
+     * Included set code type 4 transactions (filter: eq)
+     */
+    type4_count_eq?: number;
+    /**
+     * Included set code type 4 transactions (filter: ne)
+     */
+    type4_count_ne?: number;
+    /**
+     * Included set code type 4 transactions (filter: lt)
+     */
+    type4_count_lt?: number;
+    /**
+     * Included set code type 4 transactions (filter: lte)
+     */
+    type4_count_lte?: number;
+    /**
+     * Included set code type 4 transactions (filter: gt)
+     */
+    type4_count_gt?: number;
+    /**
+     * Included set code type 4 transactions (filter: gte)
+     */
+    type4_count_gte?: number;
+    /**
+     * Included set code type 4 transactions (filter: between_min)
+     */
+    type4_count_between_min?: number;
+    /**
+     * Included set code type 4 transactions (filter: between_max_value)
+     */
+    type4_count_between_max_value?: number;
+    /**
+     * Included set code type 4 transactions (filter: in_values) (comma-separated list)
+     */
+    type4_count_in_values?: string;
+    /**
+     * Included set code type 4 transactions (filter: not_in_values) (comma-separated list)
+     */
+    type4_count_not_in_values?: string;
+    /**
+     * Included transactions of any other type (filter: eq)
+     */
+    type_other_count_eq?: number;
+    /**
+     * Included transactions of any other type (filter: ne)
+     */
+    type_other_count_ne?: number;
+    /**
+     * Included transactions of any other type (filter: lt)
+     */
+    type_other_count_lt?: number;
+    /**
+     * Included transactions of any other type (filter: lte)
+     */
+    type_other_count_lte?: number;
+    /**
+     * Included transactions of any other type (filter: gt)
+     */
+    type_other_count_gt?: number;
+    /**
+     * Included transactions of any other type (filter: gte)
+     */
+    type_other_count_gte?: number;
+    /**
+     * Included transactions of any other type (filter: between_min)
+     */
+    type_other_count_between_min?: number;
+    /**
+     * Included transactions of any other type (filter: between_max_value)
+     */
+    type_other_count_between_max_value?: number;
+    /**
+     * Included transactions of any other type (filter: in_values) (comma-separated list)
+     */
+    type_other_count_in_values?: string;
+    /**
+     * Included transactions of any other type (filter: not_in_values) (comma-separated list)
+     */
+    type_other_count_not_in_values?: string;
+    /**
+     * Total blob commitments across included transactions this hour (filter: eq)
+     */
+    blob_count_eq?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: ne)
+     */
+    blob_count_ne?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: lt)
+     */
+    blob_count_lt?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: lte)
+     */
+    blob_count_lte?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: gt)
+     */
+    blob_count_gt?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: gte)
+     */
+    blob_count_gte?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: between_min)
+     */
+    blob_count_between_min?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: between_max_value)
+     */
+    blob_count_between_max_value?: number;
+    /**
+     * Total blob commitments across included transactions this hour (filter: in_values) (comma-separated list)
+     */
+    blob_count_in_values?: string;
+    /**
+     * Total blob commitments across included transactions this hour (filter: not_in_values) (comma-separated list)
+     */
+    blob_count_not_in_values?: string;
+    /**
+     * Included transactions with no recipient address (filter: eq)
+     */
+    contract_creation_count_eq?: number;
+    /**
+     * Included transactions with no recipient address (filter: ne)
+     */
+    contract_creation_count_ne?: number;
+    /**
+     * Included transactions with no recipient address (filter: lt)
+     */
+    contract_creation_count_lt?: number;
+    /**
+     * Included transactions with no recipient address (filter: lte)
+     */
+    contract_creation_count_lte?: number;
+    /**
+     * Included transactions with no recipient address (filter: gt)
+     */
+    contract_creation_count_gt?: number;
+    /**
+     * Included transactions with no recipient address (filter: gte)
+     */
+    contract_creation_count_gte?: number;
+    /**
+     * Included transactions with no recipient address (filter: between_min)
+     */
+    contract_creation_count_between_min?: number;
+    /**
+     * Included transactions with no recipient address (filter: between_max_value)
+     */
+    contract_creation_count_between_max_value?: number;
+    /**
+     * Included transactions with no recipient address (filter: in_values) (comma-separated list)
+     */
+    contract_creation_count_in_values?: string;
+    /**
+     * Included transactions with no recipient address (filter: not_in_values) (comma-separated list)
+     */
+    contract_creation_count_not_in_values?: string;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    cancel_shape_count_eq?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    cancel_shape_count_ne?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lt)
+     */
+    cancel_shape_count_lt?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lte)
+     */
+    cancel_shape_count_lte?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gt)
+     */
+    cancel_shape_count_gt?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gte)
+     */
+    cancel_shape_count_gte?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_min)
+     */
+    cancel_shape_count_between_min?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_max_value)
+     */
+    cancel_shape_count_between_max_value?: number;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: in_values) (comma-separated list)
+     */
+    cancel_shape_count_in_values?: string;
+    /**
+     * Included transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: not_in_values) (comma-separated list)
+     */
+    cancel_shape_count_not_in_values?: string;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: eq)
+     */
+    unique_senders_eq?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: ne)
+     */
+    unique_senders_ne?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: lt)
+     */
+    unique_senders_lt?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: lte)
+     */
+    unique_senders_lte?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: gt)
+     */
+    unique_senders_gt?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: gte)
+     */
+    unique_senders_gte?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: between_min)
+     */
+    unique_senders_between_min?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: between_max_value)
+     */
+    unique_senders_between_max_value?: number;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: in_values) (comma-separated list)
+     */
+    unique_senders_in_values?: string;
+    /**
+     * Distinct sender addresses across included transactions this hour (filter: not_in_values) (comma-separated list)
+     */
+    unique_senders_not_in_values?: string;
+    /**
+     * The maximum number of fct_transaction_inclusion_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionInclusionHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_inclusion_hourly';
+};
+
+export type FctTransactionInclusionHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionHourlyServiceListError =
+  FctTransactionInclusionHourlyServiceListErrors[keyof FctTransactionInclusionHourlyServiceListErrors];
+
+export type FctTransactionInclusionHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionInclusionHourlyResponse;
+};
+
+export type FctTransactionInclusionHourlyServiceListResponse =
+  FctTransactionInclusionHourlyServiceListResponses[keyof FctTransactionInclusionHourlyServiceListResponses];
+
+export type FctTransactionInclusionHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period, bucketed by inclusion slot time
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_inclusion_hourly/{hour_start_date_time}';
+};
+
+export type FctTransactionInclusionHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionInclusionHourlyServiceGetError =
+  FctTransactionInclusionHourlyServiceGetErrors[keyof FctTransactionInclusionHourlyServiceGetErrors];
+
+export type FctTransactionInclusionHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionInclusionHourlyResponse;
+};
+
+export type FctTransactionInclusionHourlyServiceGetResponse =
+  FctTransactionInclusionHourlyServiceGetResponses[keyof FctTransactionInclusionHourlyServiceGetResponses];
+
+export type FctTransactionMempoolOutcome7dServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: eq)
+     */
+    first_seen_date_time_eq?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: ne)
+     */
+    first_seen_date_time_ne?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: lt)
+     */
+    first_seen_date_time_lt?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: lte)
+     */
+    first_seen_date_time_lte?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: gt)
+     */
+    first_seen_date_time_gt?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: gte)
+     */
+    first_seen_date_time_gte?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: between_min)
+     */
+    first_seen_date_time_between_min?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: between_max_value)
+     */
+    first_seen_date_time_between_max_value?: number;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: in_values) (comma-separated list)
+     */
+    first_seen_date_time_in_values?: string;
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_date_time_not_in_values?: string;
+    /**
+     * The transaction hash (filter: eq)
+     */
+    hash_eq?: string;
+    /**
+     * The transaction hash (filter: ne)
+     */
+    hash_ne?: string;
+    /**
+     * The transaction hash (filter: contains)
+     */
+    hash_contains?: string;
+    /**
+     * The transaction hash (filter: starts_with)
+     */
+    hash_starts_with?: string;
+    /**
+     * The transaction hash (filter: ends_with)
+     */
+    hash_ends_with?: string;
+    /**
+     * The transaction hash (filter: like)
+     */
+    hash_like?: string;
+    /**
+     * The transaction hash (filter: not_like)
+     */
+    hash_not_like?: string;
+    /**
+     * The transaction hash (filter: in_values) (comma-separated list)
+     */
+    hash_in_values?: string;
+    /**
+     * The transaction hash (filter: not_in_values) (comma-separated list)
+     */
+    hash_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: eq)
+     */
+    from_eq?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ne)
+     */
+    from_ne?: string;
+    /**
+     * The address of the account that sent the transaction (filter: contains)
+     */
+    from_contains?: string;
+    /**
+     * The address of the account that sent the transaction (filter: starts_with)
+     */
+    from_starts_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ends_with)
+     */
+    from_ends_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: like)
+     */
+    from_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_like)
+     */
+    from_not_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: in_values) (comma-separated list)
+     */
+    from_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_in_values) (comma-separated list)
+     */
+    from_not_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: eq)
+     */
+    to_eq?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ne)
+     */
+    to_ne?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: contains)
+     */
+    to_contains?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: starts_with)
+     */
+    to_starts_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ends_with)
+     */
+    to_ends_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: like)
+     */
+    to_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_like)
+     */
+    to_not_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: in_values) (comma-separated list)
+     */
+    to_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_in_values) (comma-separated list)
+     */
+    to_not_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: eq)
+     */
+    nonce_eq?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: ne)
+     */
+    nonce_ne?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lt)
+     */
+    nonce_lt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lte)
+     */
+    nonce_lte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gt)
+     */
+    nonce_gt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gte)
+     */
+    nonce_gte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_min)
+     */
+    nonce_between_min?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_max_value)
+     */
+    nonce_between_max_value?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: in_values) (comma-separated list)
+     */
+    nonce_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    nonce_not_in_values?: string;
+    /**
+     * The type of the transaction (filter: eq)
+     */
+    type_eq?: number;
+    /**
+     * The type of the transaction (filter: ne)
+     */
+    type_ne?: number;
+    /**
+     * The type of the transaction (filter: lt)
+     */
+    type_lt?: number;
+    /**
+     * The type of the transaction (filter: lte)
+     */
+    type_lte?: number;
+    /**
+     * The type of the transaction (filter: gt)
+     */
+    type_gt?: number;
+    /**
+     * The type of the transaction (filter: gte)
+     */
+    type_gte?: number;
+    /**
+     * The type of the transaction (filter: between_min)
+     */
+    type_between_min?: number;
+    /**
+     * The type of the transaction (filter: between_max_value)
+     */
+    type_between_max_value?: number;
+    /**
+     * The type of the transaction (filter: in_values) (comma-separated list)
+     */
+    type_in_values?: string;
+    /**
+     * The type of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    type_not_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: eq)
+     */
+    gas_price_eq?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ne)
+     */
+    gas_price_ne?: string;
+    /**
+     * The gas price of the transaction in wei (filter: contains)
+     */
+    gas_price_contains?: string;
+    /**
+     * The gas price of the transaction in wei (filter: starts_with)
+     */
+    gas_price_starts_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ends_with)
+     */
+    gas_price_ends_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: like)
+     */
+    gas_price_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_like)
+     */
+    gas_price_not_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_price_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_price_not_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: eq)
+     */
+    gas_tip_cap_eq?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ne)
+     */
+    gas_tip_cap_ne?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: contains)
+     */
+    gas_tip_cap_contains?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_tip_cap_starts_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_tip_cap_ends_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: like)
+     */
+    gas_tip_cap_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_tip_cap_not_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_tip_cap_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_tip_cap_not_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: eq)
+     */
+    gas_fee_cap_eq?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ne)
+     */
+    gas_fee_cap_ne?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: contains)
+     */
+    gas_fee_cap_contains?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_fee_cap_starts_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_fee_cap_ends_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: like)
+     */
+    gas_fee_cap_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_fee_cap_not_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_fee_cap_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_fee_cap_not_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: eq)
+     */
+    size_eq?: number;
+    /**
+     * The size of the transaction data in bytes (filter: ne)
+     */
+    size_ne?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lt)
+     */
+    size_lt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lte)
+     */
+    size_lte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gt)
+     */
+    size_gt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gte)
+     */
+    size_gte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_min)
+     */
+    size_between_min?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_max_value)
+     */
+    size_between_max_value?: number;
+    /**
+     * The size of the transaction data in bytes (filter: in_values) (comma-separated list)
+     */
+    size_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: not_in_values) (comma-separated list)
+     */
+    size_not_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: eq)
+     */
+    call_data_size_eq?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: ne)
+     */
+    call_data_size_ne?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lt)
+     */
+    call_data_size_lt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lte)
+     */
+    call_data_size_lte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gt)
+     */
+    call_data_size_gt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gte)
+     */
+    call_data_size_gte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_min)
+     */
+    call_data_size_between_min?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_max_value)
+     */
+    call_data_size_between_max_value?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: in_values) (comma-separated list)
+     */
+    call_data_size_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: not_in_values) (comma-separated list)
+     */
+    call_data_size_not_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: eq)
+     */
+    blob_gas_eq?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: ne)
+     */
+    blob_gas_ne?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lt)
+     */
+    blob_gas_lt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lte)
+     */
+    blob_gas_lte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gt)
+     */
+    blob_gas_gt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gte)
+     */
+    blob_gas_gte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_min)
+     */
+    blob_gas_between_min?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_max_value)
+     */
+    blob_gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: in_values) (comma-separated list)
+     */
+    blob_gas_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_not_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: eq)
+     */
+    blob_gas_fee_cap_eq?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ne)
+     */
+    blob_gas_fee_cap_ne?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: contains)
+     */
+    blob_gas_fee_cap_contains?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    blob_gas_fee_cap_starts_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    blob_gas_fee_cap_ends_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: like)
+     */
+    blob_gas_fee_cap_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_like)
+     */
+    blob_gas_fee_cap_not_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_not_in_values?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has)
+     */
+    blob_hashes_has?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_all_values)
+     */
+    blob_hashes_has_all_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_any_values)
+     */
+    blob_hashes_has_any_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_eq)
+     */
+    blob_hashes_length_eq?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gt)
+     */
+    blob_hashes_length_gt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gte)
+     */
+    blob_hashes_length_gte?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lt)
+     */
+    blob_hashes_length_lt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lte)
+     */
+    blob_hashes_length_lte?: number;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    is_cancel_shape_eq?: boolean;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    is_cancel_shape_ne?: boolean;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: eq)
+     */
+    last_seen_date_time_eq?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: ne)
+     */
+    last_seen_date_time_ne?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: lt)
+     */
+    last_seen_date_time_lt?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: lte)
+     */
+    last_seen_date_time_lte?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: gt)
+     */
+    last_seen_date_time_gt?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: gte)
+     */
+    last_seen_date_time_gte?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: between_min)
+     */
+    last_seen_date_time_between_min?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: between_max_value)
+     */
+    last_seen_date_time_between_max_value?: number;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_time_in_values?: string;
+    /**
+     * Latest sighting of the transaction within the 7 day horizon (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_time_not_in_values?: string;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: eq)
+     */
+    sighting_count_eq?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: ne)
+     */
+    sighting_count_ne?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: lt)
+     */
+    sighting_count_lt?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: lte)
+     */
+    sighting_count_lte?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: gt)
+     */
+    sighting_count_gt?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: gte)
+     */
+    sighting_count_gte?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: between_min)
+     */
+    sighting_count_between_min?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: between_max_value)
+     */
+    sighting_count_between_max_value?: number;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: in_values) (comma-separated list)
+     */
+    sighting_count_in_values?: string;
+    /**
+     * Number of sightings within the 7 day horizon across all sentries (filter: not_in_values) (comma-separated list)
+     */
+    sighting_count_not_in_values?: string;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: eq)
+     */
+    peak_hourly_unique_sentries_eq?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: ne)
+     */
+    peak_hourly_unique_sentries_ne?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: lt)
+     */
+    peak_hourly_unique_sentries_lt?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: lte)
+     */
+    peak_hourly_unique_sentries_lte?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: gt)
+     */
+    peak_hourly_unique_sentries_gt?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: gte)
+     */
+    peak_hourly_unique_sentries_gte?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: between_min)
+     */
+    peak_hourly_unique_sentries_between_min?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: between_max_value)
+     */
+    peak_hourly_unique_sentries_between_max_value?: number;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: in_values) (comma-separated list)
+     */
+    peak_hourly_unique_sentries_in_values?: string;
+    /**
+     * Peak number of distinct sentries sighting the transaction within any single hour of the horizon (filter: not_in_values) (comma-separated list)
+     */
+    peak_hourly_unique_sentries_not_in_values?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: eq)
+     */
+    outcome_eq?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: ne)
+     */
+    outcome_ne?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: contains)
+     */
+    outcome_contains?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: starts_with)
+     */
+    outcome_starts_with?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: ends_with)
+     */
+    outcome_ends_with?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: like)
+     */
+    outcome_like?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: not_like)
+     */
+    outcome_not_like?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: in_values) (comma-separated list)
+     */
+    outcome_in_values?: string;
+    /**
+     * Outcome within 7 days of first sighting: included, nonce_consumed (a different transaction with the same from and nonce was included) or unincluded. The statement is fixed to the horizon and remains true even if the transaction is included later (filter: not_in_values) (comma-separated list)
+     */
+    outcome_not_in_values?: string;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: eq)
+     */
+    resolution_date_time_eq?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: ne)
+     */
+    resolution_date_time_ne?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: lt)
+     */
+    resolution_date_time_lt?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: lte)
+     */
+    resolution_date_time_lte?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: gt)
+     */
+    resolution_date_time_gt?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: gte)
+     */
+    resolution_date_time_gte?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: between_min)
+     */
+    resolution_date_time_between_min?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: between_max_value)
+     */
+    resolution_date_time_between_max_value?: number;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: in_values) (comma-separated list)
+     */
+    resolution_date_time_in_values?: string;
+    /**
+     * When the outcome was determined: the inclusion slot start for included, the winner inclusion slot start for nonce_consumed, or first_seen_date_time plus 7 days for unincluded (filter: not_in_values) (comma-separated list)
+     */
+    resolution_date_time_not_in_values?: string;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: eq)
+     */
+    included_slot_eq?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: ne)
+     */
+    included_slot_ne?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: lt)
+     */
+    included_slot_lt?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: lte)
+     */
+    included_slot_lte?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: gt)
+     */
+    included_slot_gt?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: gte)
+     */
+    included_slot_gte?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: between_min)
+     */
+    included_slot_between_min?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: between_max_value)
+     */
+    included_slot_between_max_value?: number;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: in_values) (comma-separated list)
+     */
+    included_slot_in_values?: string;
+    /**
+     * The slot of the beacon block that included the transaction, when outcome is included (filter: not_in_values) (comma-separated list)
+     */
+    included_slot_not_in_values?: string;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: eq)
+     */
+    included_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: ne)
+     */
+    included_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: lt)
+     */
+    included_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: lte)
+     */
+    included_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: gt)
+     */
+    included_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: gte)
+     */
+    included_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: between_min)
+     */
+    included_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: between_max_value)
+     */
+    included_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: in_values) (comma-separated list)
+     */
+    included_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the inclusion slot started, when outcome is included (filter: not_in_values) (comma-separated list)
+     */
+    included_slot_start_date_time_not_in_values?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: eq)
+     */
+    included_block_root_eq?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: ne)
+     */
+    included_block_root_ne?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: contains)
+     */
+    included_block_root_contains?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: starts_with)
+     */
+    included_block_root_starts_with?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: ends_with)
+     */
+    included_block_root_ends_with?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: like)
+     */
+    included_block_root_like?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: not_like)
+     */
+    included_block_root_not_like?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: in_values) (comma-separated list)
+     */
+    included_block_root_in_values?: string;
+    /**
+     * The beacon block root of the including block, when outcome is included (filter: not_in_values) (comma-separated list)
+     */
+    included_block_root_not_in_values?: string;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: eq)
+     */
+    included_position_eq?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: ne)
+     */
+    included_position_ne?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: lt)
+     */
+    included_position_lt?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: lte)
+     */
+    included_position_lte?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: gt)
+     */
+    included_position_gt?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: gte)
+     */
+    included_position_gte?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: between_min)
+     */
+    included_position_between_min?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: between_max_value)
+     */
+    included_position_between_max_value?: number;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: in_values) (comma-separated list)
+     */
+    included_position_in_values?: string;
+    /**
+     * The position of the transaction in the execution payload, when outcome is included (filter: not_in_values) (comma-separated list)
+     */
+    included_position_not_in_values?: string;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: eq)
+     */
+    wait_ms_eq?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: ne)
+     */
+    wait_ms_ne?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: lt)
+     */
+    wait_ms_lt?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: lte)
+     */
+    wait_ms_lte?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: gt)
+     */
+    wait_ms_gt?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: gte)
+     */
+    wait_ms_gte?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: between_min)
+     */
+    wait_ms_between_min?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: between_max_value)
+     */
+    wait_ms_between_max_value?: number;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: in_values) (comma-separated list)
+     */
+    wait_ms_in_values?: string;
+    /**
+     * Milliseconds from first sighting to the inclusion slot start, when outcome is included. Negative when the transaction was first sighted after its inclusion slot started (filter: not_in_values) (comma-separated list)
+     */
+    wait_ms_not_in_values?: string;
+    /**
+     * Whether the including block matched a known relay payload-delivered record, when outcome is included. False is not proof the block was locally built (filter: eq)
+     */
+    included_via_known_relay_eq?: boolean;
+    /**
+     * Whether the including block matched a known relay payload-delivered record, when outcome is included. False is not proof the block was locally built (filter: ne)
+     */
+    included_via_known_relay_ne?: boolean;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: eq)
+     */
+    winner_hash_eq?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: ne)
+     */
+    winner_hash_ne?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: contains)
+     */
+    winner_hash_contains?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: starts_with)
+     */
+    winner_hash_starts_with?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: ends_with)
+     */
+    winner_hash_ends_with?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: like)
+     */
+    winner_hash_like?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: not_like)
+     */
+    winner_hash_not_like?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: in_values) (comma-separated list)
+     */
+    winner_hash_in_values?: string;
+    /**
+     * The hash of the transaction that consumed the nonce, when outcome is nonce_consumed (filter: not_in_values) (comma-separated list)
+     */
+    winner_hash_not_in_values?: string;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: eq)
+     */
+    winner_slot_start_date_time_eq?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: ne)
+     */
+    winner_slot_start_date_time_ne?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: lt)
+     */
+    winner_slot_start_date_time_lt?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: lte)
+     */
+    winner_slot_start_date_time_lte?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: gt)
+     */
+    winner_slot_start_date_time_gt?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: gte)
+     */
+    winner_slot_start_date_time_gte?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: between_min)
+     */
+    winner_slot_start_date_time_between_min?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: between_max_value)
+     */
+    winner_slot_start_date_time_between_max_value?: number;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: in_values) (comma-separated list)
+     */
+    winner_slot_start_date_time_in_values?: string;
+    /**
+     * The wall clock time when the winner inclusion slot started, when outcome is nonce_consumed (filter: not_in_values) (comma-separated list)
+     */
+    winner_slot_start_date_time_not_in_values?: string;
+    /**
+     * Whether the transaction was first sighted after its nonce had already been consumed by another transaction (filter: eq)
+     */
+    observed_after_nonce_consumed_eq?: boolean;
+    /**
+     * Whether the transaction was first sighted after its nonce had already been consumed by another transaction (filter: ne)
+     */
+    observed_after_nonce_consumed_ne?: boolean;
+    /**
+     * Whether a sighting occurred in the final hour before the 7 day deadline. Sensor evidence of continued circulation, only meaningful when outcome is unincluded (filter: eq)
+     */
+    in_mempool_at_deadline_eq?: boolean;
+    /**
+     * Whether a sighting occurred in the final hour before the 7 day deadline. Sensor evidence of continued circulation, only meaningful when outcome is unincluded (filter: ne)
+     */
+    in_mempool_at_deadline_ne?: boolean;
+    /**
+     * The maximum number of fct_transaction_mempool_outcome_7d to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionMempoolOutcome7d` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_mempool_outcome_7d';
+};
+
+export type FctTransactionMempoolOutcome7dServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcome7dServiceListError =
+  FctTransactionMempoolOutcome7dServiceListErrors[keyof FctTransactionMempoolOutcome7dServiceListErrors];
+
+export type FctTransactionMempoolOutcome7dServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionMempoolOutcome7dResponse;
+};
+
+export type FctTransactionMempoolOutcome7dServiceListResponse =
+  FctTransactionMempoolOutcome7dServiceListResponses[keyof FctTransactionMempoolOutcome7dServiceListResponses];
+
+export type FctTransactionMempoolOutcome7dServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Earliest sighting of the transaction within its observation episode, the anchor of the 7 day horizon
+     */
+    first_seen_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_mempool_outcome_7d/{first_seen_date_time}';
+};
+
+export type FctTransactionMempoolOutcome7dServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcome7dServiceGetError =
+  FctTransactionMempoolOutcome7dServiceGetErrors[keyof FctTransactionMempoolOutcome7dServiceGetErrors];
+
+export type FctTransactionMempoolOutcome7dServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionMempoolOutcome7dResponse;
+};
+
+export type FctTransactionMempoolOutcome7dServiceGetResponse =
+  FctTransactionMempoolOutcome7dServiceGetResponses[keyof FctTransactionMempoolOutcome7dServiceGetResponses];
+
+export type FctTransactionMempoolOutcomeDailyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: eq)
+     */
+    day_start_date_eq?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: ne)
+     */
+    day_start_date_ne?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: contains)
+     */
+    day_start_date_contains?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: starts_with)
+     */
+    day_start_date_starts_with?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: ends_with)
+     */
+    day_start_date_ends_with?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: like)
+     */
+    day_start_date_like?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: not_like)
+     */
+    day_start_date_not_like?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: in_values) (comma-separated list)
+     */
+    day_start_date_in_values?: string;
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards (filter: not_in_values) (comma-separated list)
+     */
+    day_start_date_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: eq)
+     */
+    observed_count_eq?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: ne)
+     */
+    observed_count_ne?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: lt)
+     */
+    observed_count_lt?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: lte)
+     */
+    observed_count_lte?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: gt)
+     */
+    observed_count_gt?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: gte)
+     */
+    observed_count_gte?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: between_min)
+     */
+    observed_count_between_min?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: between_max_value)
+     */
+    observed_count_between_max_value?: number;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: in_values) (comma-separated list)
+     */
+    observed_count_in_values?: string;
+    /**
+     * Transactions first sighted in the public mempool this day (filter: not_in_values) (comma-separated list)
+     */
+    observed_count_not_in_values?: string;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: eq)
+     */
+    included_count_eq?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: ne)
+     */
+    included_count_ne?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: lt)
+     */
+    included_count_lt?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: lte)
+     */
+    included_count_lte?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: gt)
+     */
+    included_count_gt?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: gte)
+     */
+    included_count_gte?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: between_min)
+     */
+    included_count_between_min?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: between_max_value)
+     */
+    included_count_between_max_value?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: in_values) (comma-separated list)
+     */
+    included_count_in_values?: string;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: not_in_values) (comma-separated list)
+     */
+    included_count_not_in_values?: string;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: eq)
+     */
+    nonce_consumed_count_eq?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: ne)
+     */
+    nonce_consumed_count_ne?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: lt)
+     */
+    nonce_consumed_count_lt?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: lte)
+     */
+    nonce_consumed_count_lte?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: gt)
+     */
+    nonce_consumed_count_gt?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: gte)
+     */
+    nonce_consumed_count_gte?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: between_min)
+     */
+    nonce_consumed_count_between_min?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: between_max_value)
+     */
+    nonce_consumed_count_between_max_value?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: in_values) (comma-separated list)
+     */
+    nonce_consumed_count_in_values?: string;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: not_in_values) (comma-separated list)
+     */
+    nonce_consumed_count_not_in_values?: string;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: eq)
+     */
+    unincluded_count_eq?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: ne)
+     */
+    unincluded_count_ne?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: lt)
+     */
+    unincluded_count_lt?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: lte)
+     */
+    unincluded_count_lte?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: gt)
+     */
+    unincluded_count_gt?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: gte)
+     */
+    unincluded_count_gte?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: between_min)
+     */
+    unincluded_count_between_min?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: between_max_value)
+     */
+    unincluded_count_between_max_value?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: in_values) (comma-separated list)
+     */
+    unincluded_count_in_values?: string;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: not_in_values) (comma-separated list)
+     */
+    unincluded_count_not_in_values?: string;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: eq)
+     */
+    included_relay_delivered_count_eq?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: ne)
+     */
+    included_relay_delivered_count_ne?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: lt)
+     */
+    included_relay_delivered_count_lt?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: lte)
+     */
+    included_relay_delivered_count_lte?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: gt)
+     */
+    included_relay_delivered_count_gt?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: gte)
+     */
+    included_relay_delivered_count_gte?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: between_min)
+     */
+    included_relay_delivered_count_between_min?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: between_max_value)
+     */
+    included_relay_delivered_count_between_max_value?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: in_values) (comma-separated list)
+     */
+    included_relay_delivered_count_in_values?: string;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: not_in_values) (comma-separated list)
+     */
+    included_relay_delivered_count_not_in_values?: string;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: eq)
+     */
+    included_unknown_build_count_eq?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: ne)
+     */
+    included_unknown_build_count_ne?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lt)
+     */
+    included_unknown_build_count_lt?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lte)
+     */
+    included_unknown_build_count_lte?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gt)
+     */
+    included_unknown_build_count_gt?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gte)
+     */
+    included_unknown_build_count_gte?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_min)
+     */
+    included_unknown_build_count_between_min?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_max_value)
+     */
+    included_unknown_build_count_between_max_value?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: in_values) (comma-separated list)
+     */
+    included_unknown_build_count_in_values?: string;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: not_in_values) (comma-separated list)
+     */
+    included_unknown_build_count_not_in_values?: string;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: eq)
+     */
+    in_mempool_at_deadline_count_eq?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: ne)
+     */
+    in_mempool_at_deadline_count_ne?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: lt)
+     */
+    in_mempool_at_deadline_count_lt?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: lte)
+     */
+    in_mempool_at_deadline_count_lte?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: gt)
+     */
+    in_mempool_at_deadline_count_gt?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: gte)
+     */
+    in_mempool_at_deadline_count_gte?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: between_min)
+     */
+    in_mempool_at_deadline_count_between_min?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: between_max_value)
+     */
+    in_mempool_at_deadline_count_between_max_value?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: in_values) (comma-separated list)
+     */
+    in_mempool_at_deadline_count_in_values?: string;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: not_in_values) (comma-separated list)
+     */
+    in_mempool_at_deadline_count_not_in_values?: string;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    cancel_shape_count_eq?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    cancel_shape_count_ne?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lt)
+     */
+    cancel_shape_count_lt?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lte)
+     */
+    cancel_shape_count_lte?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gt)
+     */
+    cancel_shape_count_gt?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gte)
+     */
+    cancel_shape_count_gte?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_min)
+     */
+    cancel_shape_count_between_min?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_max_value)
+     */
+    cancel_shape_count_between_max_value?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: in_values) (comma-separated list)
+     */
+    cancel_shape_count_in_values?: string;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: not_in_values) (comma-separated list)
+     */
+    cancel_shape_count_not_in_values?: string;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: eq)
+     */
+    observed_after_nonce_consumed_count_eq?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: ne)
+     */
+    observed_after_nonce_consumed_count_ne?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: lt)
+     */
+    observed_after_nonce_consumed_count_lt?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: lte)
+     */
+    observed_after_nonce_consumed_count_lte?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: gt)
+     */
+    observed_after_nonce_consumed_count_gt?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: gte)
+     */
+    observed_after_nonce_consumed_count_gte?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: between_min)
+     */
+    observed_after_nonce_consumed_count_between_min?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: between_max_value)
+     */
+    observed_after_nonce_consumed_count_between_max_value?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: in_values) (comma-separated list)
+     */
+    observed_after_nonce_consumed_count_in_values?: string;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: not_in_values) (comma-separated list)
+     */
+    observed_after_nonce_consumed_count_not_in_values?: string;
+    /**
+     * Filter wait_ms_p50 using value
+     */
+    wait_ms_p50_value?: number;
+    /**
+     * Filter wait_ms_p90 using value
+     */
+    wait_ms_p90_value?: number;
+    /**
+     * Filter wait_ms_p99 using value
+     */
+    wait_ms_p99_value?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: eq)
+     */
+    wait_sample_count_eq?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: ne)
+     */
+    wait_sample_count_ne?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: lt)
+     */
+    wait_sample_count_lt?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: lte)
+     */
+    wait_sample_count_lte?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: gt)
+     */
+    wait_sample_count_gt?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: gte)
+     */
+    wait_sample_count_gte?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: between_min)
+     */
+    wait_sample_count_between_min?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: between_max_value)
+     */
+    wait_sample_count_between_max_value?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: in_values) (comma-separated list)
+     */
+    wait_sample_count_in_values?: string;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    wait_sample_count_not_in_values?: string;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: eq)
+     */
+    negative_wait_count_eq?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: ne)
+     */
+    negative_wait_count_ne?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: lt)
+     */
+    negative_wait_count_lt?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: lte)
+     */
+    negative_wait_count_lte?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: gt)
+     */
+    negative_wait_count_gt?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: gte)
+     */
+    negative_wait_count_gte?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: between_min)
+     */
+    negative_wait_count_between_min?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: between_max_value)
+     */
+    negative_wait_count_between_max_value?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: in_values) (comma-separated list)
+     */
+    negative_wait_count_in_values?: string;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    negative_wait_count_not_in_values?: string;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: eq)
+     */
+    blob_observed_count_eq?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: ne)
+     */
+    blob_observed_count_ne?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: lt)
+     */
+    blob_observed_count_lt?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: lte)
+     */
+    blob_observed_count_lte?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: gt)
+     */
+    blob_observed_count_gt?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: gte)
+     */
+    blob_observed_count_gte?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: between_min)
+     */
+    blob_observed_count_between_min?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: between_max_value)
+     */
+    blob_observed_count_between_max_value?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: in_values) (comma-separated list)
+     */
+    blob_observed_count_in_values?: string;
+    /**
+     * Observed blob type 3 transactions first sighted this day (filter: not_in_values) (comma-separated list)
+     */
+    blob_observed_count_not_in_values?: string;
+    /**
+     * Filter blob_wait_ms_p50 using value
+     */
+    blob_wait_ms_p50_value?: number;
+    /**
+     * Filter blob_wait_ms_p90 using value
+     */
+    blob_wait_ms_p90_value?: number;
+    /**
+     * Filter blob_wait_ms_p99 using value
+     */
+    blob_wait_ms_p99_value?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: eq)
+     */
+    blob_wait_sample_count_eq?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: ne)
+     */
+    blob_wait_sample_count_ne?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: lt)
+     */
+    blob_wait_sample_count_lt?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: lte)
+     */
+    blob_wait_sample_count_lte?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: gt)
+     */
+    blob_wait_sample_count_gt?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: gte)
+     */
+    blob_wait_sample_count_gte?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: between_min)
+     */
+    blob_wait_sample_count_between_min?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: between_max_value)
+     */
+    blob_wait_sample_count_between_max_value?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: in_values) (comma-separated list)
+     */
+    blob_wait_sample_count_in_values?: string;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    blob_wait_sample_count_not_in_values?: string;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: eq)
+     */
+    nonce_group_count_eq?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: ne)
+     */
+    nonce_group_count_ne?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: lt)
+     */
+    nonce_group_count_lt?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: lte)
+     */
+    nonce_group_count_lte?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: gt)
+     */
+    nonce_group_count_gt?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: gte)
+     */
+    nonce_group_count_gte?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: between_min)
+     */
+    nonce_group_count_between_min?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: between_max_value)
+     */
+    nonce_group_count_between_max_value?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: in_values) (comma-separated list)
+     */
+    nonce_group_count_in_values?: string;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this day (filter: not_in_values) (comma-separated list)
+     */
+    nonce_group_count_not_in_values?: string;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: eq)
+     */
+    multi_attempt_nonce_group_count_eq?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: ne)
+     */
+    multi_attempt_nonce_group_count_ne?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: lt)
+     */
+    multi_attempt_nonce_group_count_lt?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: lte)
+     */
+    multi_attempt_nonce_group_count_lte?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: gt)
+     */
+    multi_attempt_nonce_group_count_gt?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: gte)
+     */
+    multi_attempt_nonce_group_count_gte?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: between_min)
+     */
+    multi_attempt_nonce_group_count_between_min?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: between_max_value)
+     */
+    multi_attempt_nonce_group_count_between_max_value?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: in_values) (comma-separated list)
+     */
+    multi_attempt_nonce_group_count_in_values?: string;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this day by their earliest attempt sighting (filter: not_in_values) (comma-separated list)
+     */
+    multi_attempt_nonce_group_count_not_in_values?: string;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: eq)
+     */
+    replaced_attempt_count_eq?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: ne)
+     */
+    replaced_attempt_count_ne?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: lt)
+     */
+    replaced_attempt_count_lt?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: lte)
+     */
+    replaced_attempt_count_lte?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: gt)
+     */
+    replaced_attempt_count_gt?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: gte)
+     */
+    replaced_attempt_count_gte?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: between_min)
+     */
+    replaced_attempt_count_between_min?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: between_max_value)
+     */
+    replaced_attempt_count_between_max_value?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: in_values) (comma-separated list)
+     */
+    replaced_attempt_count_in_values?: string;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this day (filter: not_in_values) (comma-separated list)
+     */
+    replaced_attempt_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_transaction_mempool_outcome_daily to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionMempoolOutcomeDaily` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_mempool_outcome_daily';
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceListError =
+  FctTransactionMempoolOutcomeDailyServiceListErrors[keyof FctTransactionMempoolOutcomeDailyServiceListErrors];
+
+export type FctTransactionMempoolOutcomeDailyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionMempoolOutcomeDailyResponse;
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceListResponse =
+  FctTransactionMempoolOutcomeDailyServiceListResponses[keyof FctTransactionMempoolOutcomeDailyServiceListResponses];
+
+export type FctTransactionMempoolOutcomeDailyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the day period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the day has been processed and never change afterwards
+     */
+    day_start_date: string;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_mempool_outcome_daily/{day_start_date}';
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceGetError =
+  FctTransactionMempoolOutcomeDailyServiceGetErrors[keyof FctTransactionMempoolOutcomeDailyServiceGetErrors];
+
+export type FctTransactionMempoolOutcomeDailyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionMempoolOutcomeDailyResponse;
+};
+
+export type FctTransactionMempoolOutcomeDailyServiceGetResponse =
+  FctTransactionMempoolOutcomeDailyServiceGetResponses[keyof FctTransactionMempoolOutcomeDailyServiceGetResponses];
+
+export type FctTransactionMempoolOutcomeHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: eq)
+     */
+    observed_count_eq?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: ne)
+     */
+    observed_count_ne?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: lt)
+     */
+    observed_count_lt?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: lte)
+     */
+    observed_count_lte?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: gt)
+     */
+    observed_count_gt?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: gte)
+     */
+    observed_count_gte?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: between_min)
+     */
+    observed_count_between_min?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: between_max_value)
+     */
+    observed_count_between_max_value?: number;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: in_values) (comma-separated list)
+     */
+    observed_count_in_values?: string;
+    /**
+     * Transactions first sighted in the public mempool this hour (filter: not_in_values) (comma-separated list)
+     */
+    observed_count_not_in_values?: string;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: eq)
+     */
+    included_count_eq?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: ne)
+     */
+    included_count_ne?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: lt)
+     */
+    included_count_lt?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: lte)
+     */
+    included_count_lte?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: gt)
+     */
+    included_count_gt?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: gte)
+     */
+    included_count_gte?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: between_min)
+     */
+    included_count_between_min?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: between_max_value)
+     */
+    included_count_between_max_value?: number;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: in_values) (comma-separated list)
+     */
+    included_count_in_values?: string;
+    /**
+     * Observed transactions included within 7 days of first sighting (filter: not_in_values) (comma-separated list)
+     */
+    included_count_not_in_values?: string;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: eq)
+     */
+    nonce_consumed_count_eq?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: ne)
+     */
+    nonce_consumed_count_ne?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: lt)
+     */
+    nonce_consumed_count_lt?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: lte)
+     */
+    nonce_consumed_count_lte?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: gt)
+     */
+    nonce_consumed_count_gt?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: gte)
+     */
+    nonce_consumed_count_gte?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: between_min)
+     */
+    nonce_consumed_count_between_min?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: between_max_value)
+     */
+    nonce_consumed_count_between_max_value?: number;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: in_values) (comma-separated list)
+     */
+    nonce_consumed_count_in_values?: string;
+    /**
+     * Observed transactions whose nonce was consumed by a different transaction within 7 days (filter: not_in_values) (comma-separated list)
+     */
+    nonce_consumed_count_not_in_values?: string;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: eq)
+     */
+    unincluded_count_eq?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: ne)
+     */
+    unincluded_count_ne?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: lt)
+     */
+    unincluded_count_lt?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: lte)
+     */
+    unincluded_count_lte?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: gt)
+     */
+    unincluded_count_gt?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: gte)
+     */
+    unincluded_count_gte?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: between_min)
+     */
+    unincluded_count_between_min?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: between_max_value)
+     */
+    unincluded_count_between_max_value?: number;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: in_values) (comma-separated list)
+     */
+    unincluded_count_in_values?: string;
+    /**
+     * Observed transactions with no inclusion of their nonce within 7 days (filter: not_in_values) (comma-separated list)
+     */
+    unincluded_count_not_in_values?: string;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: eq)
+     */
+    included_relay_delivered_count_eq?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: ne)
+     */
+    included_relay_delivered_count_ne?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: lt)
+     */
+    included_relay_delivered_count_lt?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: lte)
+     */
+    included_relay_delivered_count_lte?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: gt)
+     */
+    included_relay_delivered_count_gt?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: gte)
+     */
+    included_relay_delivered_count_gte?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: between_min)
+     */
+    included_relay_delivered_count_between_min?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: between_max_value)
+     */
+    included_relay_delivered_count_between_max_value?: number;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: in_values) (comma-separated list)
+     */
+    included_relay_delivered_count_in_values?: string;
+    /**
+     * Included observed transactions whose block matched a known relay payload-delivered record (filter: not_in_values) (comma-separated list)
+     */
+    included_relay_delivered_count_not_in_values?: string;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: eq)
+     */
+    included_unknown_build_count_eq?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: ne)
+     */
+    included_unknown_build_count_ne?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lt)
+     */
+    included_unknown_build_count_lt?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: lte)
+     */
+    included_unknown_build_count_lte?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gt)
+     */
+    included_unknown_build_count_gt?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: gte)
+     */
+    included_unknown_build_count_gte?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_min)
+     */
+    included_unknown_build_count_between_min?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: between_max_value)
+     */
+    included_unknown_build_count_between_max_value?: number;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: in_values) (comma-separated list)
+     */
+    included_unknown_build_count_in_values?: string;
+    /**
+     * Included observed transactions whose block matched no known relay payload-delivered record. Not proof the block was locally built (filter: not_in_values) (comma-separated list)
+     */
+    included_unknown_build_count_not_in_values?: string;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: eq)
+     */
+    in_mempool_at_deadline_count_eq?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: ne)
+     */
+    in_mempool_at_deadline_count_ne?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: lt)
+     */
+    in_mempool_at_deadline_count_lt?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: lte)
+     */
+    in_mempool_at_deadline_count_lte?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: gt)
+     */
+    in_mempool_at_deadline_count_gt?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: gte)
+     */
+    in_mempool_at_deadline_count_gte?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: between_min)
+     */
+    in_mempool_at_deadline_count_between_min?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: between_max_value)
+     */
+    in_mempool_at_deadline_count_between_max_value?: number;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: in_values) (comma-separated list)
+     */
+    in_mempool_at_deadline_count_in_values?: string;
+    /**
+     * Unincluded transactions with a sighting in the final hour before the 7 day deadline (filter: not_in_values) (comma-separated list)
+     */
+    in_mempool_at_deadline_count_not_in_values?: string;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    cancel_shape_count_eq?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    cancel_shape_count_ne?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lt)
+     */
+    cancel_shape_count_lt?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: lte)
+     */
+    cancel_shape_count_lte?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gt)
+     */
+    cancel_shape_count_gt?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: gte)
+     */
+    cancel_shape_count_gte?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_min)
+     */
+    cancel_shape_count_between_min?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: between_max_value)
+     */
+    cancel_shape_count_between_max_value?: number;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: in_values) (comma-separated list)
+     */
+    cancel_shape_count_in_values?: string;
+    /**
+     * Observed transactions that are self-transfers of zero value, the common wallet cancellation pattern (filter: not_in_values) (comma-separated list)
+     */
+    cancel_shape_count_not_in_values?: string;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: eq)
+     */
+    observed_after_nonce_consumed_count_eq?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: ne)
+     */
+    observed_after_nonce_consumed_count_ne?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: lt)
+     */
+    observed_after_nonce_consumed_count_lt?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: lte)
+     */
+    observed_after_nonce_consumed_count_lte?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: gt)
+     */
+    observed_after_nonce_consumed_count_gt?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: gte)
+     */
+    observed_after_nonce_consumed_count_gte?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: between_min)
+     */
+    observed_after_nonce_consumed_count_between_min?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: between_max_value)
+     */
+    observed_after_nonce_consumed_count_between_max_value?: number;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: in_values) (comma-separated list)
+     */
+    observed_after_nonce_consumed_count_in_values?: string;
+    /**
+     * Observed transactions first sighted after their nonce had already been consumed (filter: not_in_values) (comma-separated list)
+     */
+    observed_after_nonce_consumed_count_not_in_values?: string;
+    /**
+     * Filter wait_ms_p50 using value
+     */
+    wait_ms_p50_value?: number;
+    /**
+     * Filter wait_ms_p90 using value
+     */
+    wait_ms_p90_value?: number;
+    /**
+     * Filter wait_ms_p99 using value
+     */
+    wait_ms_p99_value?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: eq)
+     */
+    wait_sample_count_eq?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: ne)
+     */
+    wait_sample_count_ne?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: lt)
+     */
+    wait_sample_count_lt?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: lte)
+     */
+    wait_sample_count_lte?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: gt)
+     */
+    wait_sample_count_gt?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: gte)
+     */
+    wait_sample_count_gte?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: between_min)
+     */
+    wait_sample_count_between_min?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: between_max_value)
+     */
+    wait_sample_count_between_max_value?: number;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: in_values) (comma-separated list)
+     */
+    wait_sample_count_in_values?: string;
+    /**
+     * Number of included transactions contributing to the wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    wait_sample_count_not_in_values?: string;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: eq)
+     */
+    negative_wait_count_eq?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: ne)
+     */
+    negative_wait_count_ne?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: lt)
+     */
+    negative_wait_count_lt?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: lte)
+     */
+    negative_wait_count_lte?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: gt)
+     */
+    negative_wait_count_gt?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: gte)
+     */
+    negative_wait_count_gte?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: between_min)
+     */
+    negative_wait_count_between_min?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: between_max_value)
+     */
+    negative_wait_count_between_max_value?: number;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: in_values) (comma-separated list)
+     */
+    negative_wait_count_in_values?: string;
+    /**
+     * Included transactions first sighted after their inclusion slot started, excluded from the wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    negative_wait_count_not_in_values?: string;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: eq)
+     */
+    blob_observed_count_eq?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: ne)
+     */
+    blob_observed_count_ne?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: lt)
+     */
+    blob_observed_count_lt?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: lte)
+     */
+    blob_observed_count_lte?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: gt)
+     */
+    blob_observed_count_gt?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: gte)
+     */
+    blob_observed_count_gte?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: between_min)
+     */
+    blob_observed_count_between_min?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: between_max_value)
+     */
+    blob_observed_count_between_max_value?: number;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: in_values) (comma-separated list)
+     */
+    blob_observed_count_in_values?: string;
+    /**
+     * Observed blob type 3 transactions first sighted this hour (filter: not_in_values) (comma-separated list)
+     */
+    blob_observed_count_not_in_values?: string;
+    /**
+     * Filter blob_wait_ms_p50 using value
+     */
+    blob_wait_ms_p50_value?: number;
+    /**
+     * Filter blob_wait_ms_p90 using value
+     */
+    blob_wait_ms_p90_value?: number;
+    /**
+     * Filter blob_wait_ms_p99 using value
+     */
+    blob_wait_ms_p99_value?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: eq)
+     */
+    blob_wait_sample_count_eq?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: ne)
+     */
+    blob_wait_sample_count_ne?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: lt)
+     */
+    blob_wait_sample_count_lt?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: lte)
+     */
+    blob_wait_sample_count_lte?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: gt)
+     */
+    blob_wait_sample_count_gt?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: gte)
+     */
+    blob_wait_sample_count_gte?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: between_min)
+     */
+    blob_wait_sample_count_between_min?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: between_max_value)
+     */
+    blob_wait_sample_count_between_max_value?: number;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: in_values) (comma-separated list)
+     */
+    blob_wait_sample_count_in_values?: string;
+    /**
+     * Number of included blob transactions contributing to the blob wait quantiles (filter: not_in_values) (comma-separated list)
+     */
+    blob_wait_sample_count_not_in_values?: string;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: eq)
+     */
+    nonce_group_count_eq?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: ne)
+     */
+    nonce_group_count_ne?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: lt)
+     */
+    nonce_group_count_lt?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: lte)
+     */
+    nonce_group_count_lte?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: gt)
+     */
+    nonce_group_count_gt?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: gte)
+     */
+    nonce_group_count_gte?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: between_min)
+     */
+    nonce_group_count_between_min?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: between_max_value)
+     */
+    nonce_group_count_between_max_value?: number;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: in_values) (comma-separated list)
+     */
+    nonce_group_count_in_values?: string;
+    /**
+     * Distinct from and nonce pairs across transactions first sighted this hour (filter: not_in_values) (comma-separated list)
+     */
+    nonce_group_count_not_in_values?: string;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: eq)
+     */
+    multi_attempt_nonce_group_count_eq?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: ne)
+     */
+    multi_attempt_nonce_group_count_ne?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: lt)
+     */
+    multi_attempt_nonce_group_count_lt?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: lte)
+     */
+    multi_attempt_nonce_group_count_lte?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: gt)
+     */
+    multi_attempt_nonce_group_count_gt?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: gte)
+     */
+    multi_attempt_nonce_group_count_gte?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: between_min)
+     */
+    multi_attempt_nonce_group_count_between_min?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: between_max_value)
+     */
+    multi_attempt_nonce_group_count_between_max_value?: number;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: in_values) (comma-separated list)
+     */
+    multi_attempt_nonce_group_count_in_values?: string;
+    /**
+     * Nonce groups with at least two observed attempts, anchored to this hour by their earliest attempt sighting (filter: not_in_values) (comma-separated list)
+     */
+    multi_attempt_nonce_group_count_not_in_values?: string;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: eq)
+     */
+    replaced_attempt_count_eq?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: ne)
+     */
+    replaced_attempt_count_ne?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: lt)
+     */
+    replaced_attempt_count_lt?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: lte)
+     */
+    replaced_attempt_count_lte?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: gt)
+     */
+    replaced_attempt_count_gt?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: gte)
+     */
+    replaced_attempt_count_gte?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: between_min)
+     */
+    replaced_attempt_count_between_min?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: between_max_value)
+     */
+    replaced_attempt_count_between_max_value?: number;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: in_values) (comma-separated list)
+     */
+    replaced_attempt_count_in_values?: string;
+    /**
+     * Non-winning attempts across multi-attempt nonce groups anchored to this hour (filter: not_in_values) (comma-separated list)
+     */
+    replaced_attempt_count_not_in_values?: string;
+    /**
+     * The maximum number of fct_transaction_mempool_outcome_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionMempoolOutcomeHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_mempool_outcome_hourly';
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceListError =
+  FctTransactionMempoolOutcomeHourlyServiceListErrors[keyof FctTransactionMempoolOutcomeHourlyServiceListErrors];
+
+export type FctTransactionMempoolOutcomeHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionMempoolOutcomeHourlyResponse;
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceListResponse =
+  FctTransactionMempoolOutcomeHourlyServiceListResponses[keyof FctTransactionMempoolOutcomeHourlyServiceListResponses];
+
+export type FctTransactionMempoolOutcomeHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Start of the hour period, bucketed by first sighting time. Rows are complete once the 7 day horizon for the hour has been processed and never change afterwards
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_mempool_outcome_hourly/{hour_start_date_time}';
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceGetError =
+  FctTransactionMempoolOutcomeHourlyServiceGetErrors[keyof FctTransactionMempoolOutcomeHourlyServiceGetErrors];
+
+export type FctTransactionMempoolOutcomeHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionMempoolOutcomeHourlyResponse;
+};
+
+export type FctTransactionMempoolOutcomeHourlyServiceGetResponse =
+  FctTransactionMempoolOutcomeHourlyServiceGetResponses[keyof FctTransactionMempoolOutcomeHourlyServiceGetResponses];
+
+export type FctTransactionReplacementServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: eq)
+     */
+    group_first_seen_date_time_eq?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: ne)
+     */
+    group_first_seen_date_time_ne?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: lt)
+     */
+    group_first_seen_date_time_lt?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: lte)
+     */
+    group_first_seen_date_time_lte?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: gt)
+     */
+    group_first_seen_date_time_gt?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: gte)
+     */
+    group_first_seen_date_time_gte?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: between_min)
+     */
+    group_first_seen_date_time_between_min?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: between_max_value)
+     */
+    group_first_seen_date_time_between_max_value?: number;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: in_values) (comma-separated list)
+     */
+    group_first_seen_date_time_in_values?: string;
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window (filter: not_in_values) (comma-separated list)
+     */
+    group_first_seen_date_time_not_in_values?: string;
+    /**
+     * The address of the account that sent the attempts (filter: eq)
+     */
+    from_eq?: string;
+    /**
+     * The address of the account that sent the attempts (filter: ne)
+     */
+    from_ne?: string;
+    /**
+     * The address of the account that sent the attempts (filter: contains)
+     */
+    from_contains?: string;
+    /**
+     * The address of the account that sent the attempts (filter: starts_with)
+     */
+    from_starts_with?: string;
+    /**
+     * The address of the account that sent the attempts (filter: ends_with)
+     */
+    from_ends_with?: string;
+    /**
+     * The address of the account that sent the attempts (filter: like)
+     */
+    from_like?: string;
+    /**
+     * The address of the account that sent the attempts (filter: not_like)
+     */
+    from_not_like?: string;
+    /**
+     * The address of the account that sent the attempts (filter: in_values) (comma-separated list)
+     */
+    from_in_values?: string;
+    /**
+     * The address of the account that sent the attempts (filter: not_in_values) (comma-separated list)
+     */
+    from_not_in_values?: string;
+    /**
+     * The nonce the attempts compete for (filter: eq)
+     */
+    nonce_eq?: number;
+    /**
+     * The nonce the attempts compete for (filter: ne)
+     */
+    nonce_ne?: number;
+    /**
+     * The nonce the attempts compete for (filter: lt)
+     */
+    nonce_lt?: number;
+    /**
+     * The nonce the attempts compete for (filter: lte)
+     */
+    nonce_lte?: number;
+    /**
+     * The nonce the attempts compete for (filter: gt)
+     */
+    nonce_gt?: number;
+    /**
+     * The nonce the attempts compete for (filter: gte)
+     */
+    nonce_gte?: number;
+    /**
+     * The nonce the attempts compete for (filter: between_min)
+     */
+    nonce_between_min?: number;
+    /**
+     * The nonce the attempts compete for (filter: between_max_value)
+     */
+    nonce_between_max_value?: number;
+    /**
+     * The nonce the attempts compete for (filter: in_values) (comma-separated list)
+     */
+    nonce_in_values?: string;
+    /**
+     * The nonce the attempts compete for (filter: not_in_values) (comma-separated list)
+     */
+    nonce_not_in_values?: string;
+    /**
+     * The transaction hash of this attempt (filter: eq)
+     */
+    hash_eq?: string;
+    /**
+     * The transaction hash of this attempt (filter: ne)
+     */
+    hash_ne?: string;
+    /**
+     * The transaction hash of this attempt (filter: contains)
+     */
+    hash_contains?: string;
+    /**
+     * The transaction hash of this attempt (filter: starts_with)
+     */
+    hash_starts_with?: string;
+    /**
+     * The transaction hash of this attempt (filter: ends_with)
+     */
+    hash_ends_with?: string;
+    /**
+     * The transaction hash of this attempt (filter: like)
+     */
+    hash_like?: string;
+    /**
+     * The transaction hash of this attempt (filter: not_like)
+     */
+    hash_not_like?: string;
+    /**
+     * The transaction hash of this attempt (filter: in_values) (comma-separated list)
+     */
+    hash_in_values?: string;
+    /**
+     * The transaction hash of this attempt (filter: not_in_values) (comma-separated list)
+     */
+    hash_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: eq)
+     */
+    attempt_index_eq?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: ne)
+     */
+    attempt_index_ne?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: lt)
+     */
+    attempt_index_lt?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: lte)
+     */
+    attempt_index_lte?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: gt)
+     */
+    attempt_index_gt?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: gte)
+     */
+    attempt_index_gte?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: between_min)
+     */
+    attempt_index_between_min?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: between_max_value)
+     */
+    attempt_index_between_max_value?: number;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: in_values) (comma-separated list)
+     */
+    attempt_index_in_values?: string;
+    /**
+     * The 1-based rank of this attempt within the group, ordered by first sighting with ties broken by hash (filter: not_in_values) (comma-separated list)
+     */
+    attempt_index_not_in_values?: string;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: eq)
+     */
+    group_attempt_count_eq?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: ne)
+     */
+    group_attempt_count_ne?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: lt)
+     */
+    group_attempt_count_lt?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: lte)
+     */
+    group_attempt_count_lte?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: gt)
+     */
+    group_attempt_count_gt?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: gte)
+     */
+    group_attempt_count_gte?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: between_min)
+     */
+    group_attempt_count_between_min?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: between_max_value)
+     */
+    group_attempt_count_between_max_value?: number;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: in_values) (comma-separated list)
+     */
+    group_attempt_count_in_values?: string;
+    /**
+     * Total number of publicly observed attempts in the group window (filter: not_in_values) (comma-separated list)
+     */
+    group_attempt_count_not_in_values?: string;
+    /**
+     * Earliest sighting of this attempt (filter: eq)
+     */
+    first_seen_date_time_eq?: number;
+    /**
+     * Earliest sighting of this attempt (filter: ne)
+     */
+    first_seen_date_time_ne?: number;
+    /**
+     * Earliest sighting of this attempt (filter: lt)
+     */
+    first_seen_date_time_lt?: number;
+    /**
+     * Earliest sighting of this attempt (filter: lte)
+     */
+    first_seen_date_time_lte?: number;
+    /**
+     * Earliest sighting of this attempt (filter: gt)
+     */
+    first_seen_date_time_gt?: number;
+    /**
+     * Earliest sighting of this attempt (filter: gte)
+     */
+    first_seen_date_time_gte?: number;
+    /**
+     * Earliest sighting of this attempt (filter: between_min)
+     */
+    first_seen_date_time_between_min?: number;
+    /**
+     * Earliest sighting of this attempt (filter: between_max_value)
+     */
+    first_seen_date_time_between_max_value?: number;
+    /**
+     * Earliest sighting of this attempt (filter: in_values) (comma-separated list)
+     */
+    first_seen_date_time_in_values?: string;
+    /**
+     * Earliest sighting of this attempt (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_date_time_not_in_values?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: eq)
+     */
+    previous_hash_eq?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: ne)
+     */
+    previous_hash_ne?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: contains)
+     */
+    previous_hash_contains?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: starts_with)
+     */
+    previous_hash_starts_with?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: ends_with)
+     */
+    previous_hash_ends_with?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: like)
+     */
+    previous_hash_like?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: not_like)
+     */
+    previous_hash_not_like?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: in_values) (comma-separated list)
+     */
+    previous_hash_in_values?: string;
+    /**
+     * The hash of the attempt immediately before this one in the group, null for the first attempt (filter: not_in_values) (comma-separated list)
+     */
+    previous_hash_not_in_values?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: eq)
+     */
+    to_eq?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: ne)
+     */
+    to_ne?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: contains)
+     */
+    to_contains?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: starts_with)
+     */
+    to_starts_with?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: ends_with)
+     */
+    to_ends_with?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: like)
+     */
+    to_like?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: not_like)
+     */
+    to_not_like?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: in_values) (comma-separated list)
+     */
+    to_in_values?: string;
+    /**
+     * The address of the attempt recipient, null for contract creation (filter: not_in_values) (comma-separated list)
+     */
+    to_not_in_values?: string;
+    /**
+     * The type of the transaction (filter: eq)
+     */
+    type_eq?: number;
+    /**
+     * The type of the transaction (filter: ne)
+     */
+    type_ne?: number;
+    /**
+     * The type of the transaction (filter: lt)
+     */
+    type_lt?: number;
+    /**
+     * The type of the transaction (filter: lte)
+     */
+    type_lte?: number;
+    /**
+     * The type of the transaction (filter: gt)
+     */
+    type_gt?: number;
+    /**
+     * The type of the transaction (filter: gte)
+     */
+    type_gte?: number;
+    /**
+     * The type of the transaction (filter: between_min)
+     */
+    type_between_min?: number;
+    /**
+     * The type of the transaction (filter: between_max_value)
+     */
+    type_between_max_value?: number;
+    /**
+     * The type of the transaction (filter: in_values) (comma-separated list)
+     */
+    type_in_values?: string;
+    /**
+     * The type of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    type_not_in_values?: string;
+    /**
+     * The gas price of the attempt in wei (filter: eq)
+     */
+    gas_price_eq?: string;
+    /**
+     * The gas price of the attempt in wei (filter: ne)
+     */
+    gas_price_ne?: string;
+    /**
+     * The gas price of the attempt in wei (filter: contains)
+     */
+    gas_price_contains?: string;
+    /**
+     * The gas price of the attempt in wei (filter: starts_with)
+     */
+    gas_price_starts_with?: string;
+    /**
+     * The gas price of the attempt in wei (filter: ends_with)
+     */
+    gas_price_ends_with?: string;
+    /**
+     * The gas price of the attempt in wei (filter: like)
+     */
+    gas_price_like?: string;
+    /**
+     * The gas price of the attempt in wei (filter: not_like)
+     */
+    gas_price_not_like?: string;
+    /**
+     * The gas price of the attempt in wei (filter: in_values) (comma-separated list)
+     */
+    gas_price_in_values?: string;
+    /**
+     * The gas price of the attempt in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_price_not_in_values?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: eq)
+     */
+    gas_tip_cap_eq?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: ne)
+     */
+    gas_tip_cap_ne?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: contains)
+     */
+    gas_tip_cap_contains?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: starts_with)
+     */
+    gas_tip_cap_starts_with?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: ends_with)
+     */
+    gas_tip_cap_ends_with?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: like)
+     */
+    gas_tip_cap_like?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: not_like)
+     */
+    gas_tip_cap_not_like?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: in_values) (comma-separated list)
+     */
+    gas_tip_cap_in_values?: string;
+    /**
+     * The priority fee (tip) of the attempt in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_tip_cap_not_in_values?: string;
+    /**
+     * The max fee of the attempt in wei (filter: eq)
+     */
+    gas_fee_cap_eq?: string;
+    /**
+     * The max fee of the attempt in wei (filter: ne)
+     */
+    gas_fee_cap_ne?: string;
+    /**
+     * The max fee of the attempt in wei (filter: contains)
+     */
+    gas_fee_cap_contains?: string;
+    /**
+     * The max fee of the attempt in wei (filter: starts_with)
+     */
+    gas_fee_cap_starts_with?: string;
+    /**
+     * The max fee of the attempt in wei (filter: ends_with)
+     */
+    gas_fee_cap_ends_with?: string;
+    /**
+     * The max fee of the attempt in wei (filter: like)
+     */
+    gas_fee_cap_like?: string;
+    /**
+     * The max fee of the attempt in wei (filter: not_like)
+     */
+    gas_fee_cap_not_like?: string;
+    /**
+     * The max fee of the attempt in wei (filter: in_values) (comma-separated list)
+     */
+    gas_fee_cap_in_values?: string;
+    /**
+     * The max fee of the attempt in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_fee_cap_not_in_values?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The value transferred with the attempt in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: eq)
+     */
+    gas_tip_cap_delta_eq?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: ne)
+     */
+    gas_tip_cap_delta_ne?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: contains)
+     */
+    gas_tip_cap_delta_contains?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: starts_with)
+     */
+    gas_tip_cap_delta_starts_with?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: ends_with)
+     */
+    gas_tip_cap_delta_ends_with?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: like)
+     */
+    gas_tip_cap_delta_like?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: not_like)
+     */
+    gas_tip_cap_delta_not_like?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: in_values) (comma-separated list)
+     */
+    gas_tip_cap_delta_in_values?: string;
+    /**
+     * This attempt gas_tip_cap minus the previous attempt gas_tip_cap, null for the first attempt or when either side is null (filter: not_in_values) (comma-separated list)
+     */
+    gas_tip_cap_delta_not_in_values?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: eq)
+     */
+    gas_fee_cap_delta_eq?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: ne)
+     */
+    gas_fee_cap_delta_ne?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: contains)
+     */
+    gas_fee_cap_delta_contains?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: starts_with)
+     */
+    gas_fee_cap_delta_starts_with?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: ends_with)
+     */
+    gas_fee_cap_delta_ends_with?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: like)
+     */
+    gas_fee_cap_delta_like?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: not_like)
+     */
+    gas_fee_cap_delta_not_like?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: in_values) (comma-separated list)
+     */
+    gas_fee_cap_delta_in_values?: string;
+    /**
+     * This attempt gas_fee_cap minus the previous attempt gas_fee_cap, null for the first attempt or when either side is null (filter: not_in_values) (comma-separated list)
+     */
+    gas_fee_cap_delta_not_in_values?: string;
+    /**
+     * Whether the attempt is a self-transfer of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    is_cancel_shape_eq?: boolean;
+    /**
+     * Whether the attempt is a self-transfer of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    is_cancel_shape_ne?: boolean;
+    /**
+     * Whether this attempt is the one that was included on chain (filter: eq)
+     */
+    is_winner_eq?: boolean;
+    /**
+     * Whether this attempt is the one that was included on chain (filter: ne)
+     */
+    is_winner_ne?: boolean;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: eq)
+     */
+    group_outcome_eq?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: ne)
+     */
+    group_outcome_ne?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: contains)
+     */
+    group_outcome_contains?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: starts_with)
+     */
+    group_outcome_starts_with?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: ends_with)
+     */
+    group_outcome_ends_with?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: like)
+     */
+    group_outcome_like?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: not_like)
+     */
+    group_outcome_not_like?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: in_values) (comma-separated list)
+     */
+    group_outcome_in_values?: string;
+    /**
+     * Outcome of the nonce group within 7 days of the group anchor: included or unincluded (filter: not_in_values) (comma-separated list)
+     */
+    group_outcome_not_in_values?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: eq)
+     */
+    winner_hash_eq?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: ne)
+     */
+    winner_hash_ne?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: contains)
+     */
+    winner_hash_contains?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: starts_with)
+     */
+    winner_hash_starts_with?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: ends_with)
+     */
+    winner_hash_ends_with?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: like)
+     */
+    winner_hash_like?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: not_like)
+     */
+    winner_hash_not_like?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: in_values) (comma-separated list)
+     */
+    winner_hash_in_values?: string;
+    /**
+     * The hash of the included attempt, null when the group resolved unincluded (filter: not_in_values) (comma-separated list)
+     */
+    winner_hash_not_in_values?: string;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: eq)
+     */
+    resolution_date_time_eq?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: ne)
+     */
+    resolution_date_time_ne?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: lt)
+     */
+    resolution_date_time_lt?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: lte)
+     */
+    resolution_date_time_lte?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: gt)
+     */
+    resolution_date_time_gt?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: gte)
+     */
+    resolution_date_time_gte?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: between_min)
+     */
+    resolution_date_time_between_min?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: between_max_value)
+     */
+    resolution_date_time_between_max_value?: number;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: in_values) (comma-separated list)
+     */
+    resolution_date_time_in_values?: string;
+    /**
+     * When the group resolved: the winner inclusion slot start, or the group anchor plus 7 days when unincluded (filter: not_in_values) (comma-separated list)
+     */
+    resolution_date_time_not_in_values?: string;
+    /**
+     * Whether this attempt was first sighted after the group had already resolved (filter: eq)
+     */
+    observed_after_resolution_eq?: boolean;
+    /**
+     * Whether this attempt was first sighted after the group had already resolved (filter: ne)
+     */
+    observed_after_resolution_ne?: boolean;
+    /**
+     * The maximum number of fct_transaction_replacement to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListFctTransactionReplacement` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/fct_transaction_replacement';
+};
+
+export type FctTransactionReplacementServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionReplacementServiceListError =
+  FctTransactionReplacementServiceListErrors[keyof FctTransactionReplacementServiceListErrors];
+
+export type FctTransactionReplacementServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListFctTransactionReplacementResponse;
+};
+
+export type FctTransactionReplacementServiceListResponse =
+  FctTransactionReplacementServiceListResponses[keyof FctTransactionReplacementServiceListResponses];
+
+export type FctTransactionReplacementServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * Earliest sighting of any attempt in the nonce group, the anchor of the group window
+     */
+    group_first_seen_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/fct_transaction_replacement/{group_first_seen_date_time}';
+};
+
+export type FctTransactionReplacementServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type FctTransactionReplacementServiceGetError =
+  FctTransactionReplacementServiceGetErrors[keyof FctTransactionReplacementServiceGetErrors];
+
+export type FctTransactionReplacementServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetFctTransactionReplacementResponse;
+};
+
+export type FctTransactionReplacementServiceGetResponse =
+  FctTransactionReplacementServiceGetResponses[keyof FctTransactionReplacementServiceGetResponses];
 
 export type FctValidatorBalanceServiceListData = {
   body?: never;
@@ -206001,6 +213731,1066 @@ export type IntTransactionCallFrameOpcodeResourceGasServiceGetResponses = {
 
 export type IntTransactionCallFrameOpcodeResourceGasServiceGetResponse =
   IntTransactionCallFrameOpcodeResourceGasServiceGetResponses[keyof IntTransactionCallFrameOpcodeResourceGasServiceGetResponses];
+
+export type IntTransactionMempoolObservationHourlyServiceListData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * The start of the hour bucket the sightings fall in (filter: eq)
+     */
+    hour_start_date_time_eq?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: ne)
+     */
+    hour_start_date_time_ne?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: lt)
+     */
+    hour_start_date_time_lt?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: lte)
+     */
+    hour_start_date_time_lte?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: gt)
+     */
+    hour_start_date_time_gt?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: gte)
+     */
+    hour_start_date_time_gte?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: between_min)
+     */
+    hour_start_date_time_between_min?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: between_max_value)
+     */
+    hour_start_date_time_between_max_value?: number;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: in_values) (comma-separated list)
+     */
+    hour_start_date_time_in_values?: string;
+    /**
+     * The start of the hour bucket the sightings fall in (filter: not_in_values) (comma-separated list)
+     */
+    hour_start_date_time_not_in_values?: string;
+    /**
+     * The transaction hash (filter: eq)
+     */
+    hash_eq?: string;
+    /**
+     * The transaction hash (filter: ne)
+     */
+    hash_ne?: string;
+    /**
+     * The transaction hash (filter: contains)
+     */
+    hash_contains?: string;
+    /**
+     * The transaction hash (filter: starts_with)
+     */
+    hash_starts_with?: string;
+    /**
+     * The transaction hash (filter: ends_with)
+     */
+    hash_ends_with?: string;
+    /**
+     * The transaction hash (filter: like)
+     */
+    hash_like?: string;
+    /**
+     * The transaction hash (filter: not_like)
+     */
+    hash_not_like?: string;
+    /**
+     * The transaction hash (filter: in_values) (comma-separated list)
+     */
+    hash_in_values?: string;
+    /**
+     * The transaction hash (filter: not_in_values) (comma-separated list)
+     */
+    hash_not_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: eq)
+     */
+    updated_date_time_eq?: number;
+    /**
+     * Timestamp when the record was last updated (filter: ne)
+     */
+    updated_date_time_ne?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lt)
+     */
+    updated_date_time_lt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: lte)
+     */
+    updated_date_time_lte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gt)
+     */
+    updated_date_time_gt?: number;
+    /**
+     * Timestamp when the record was last updated (filter: gte)
+     */
+    updated_date_time_gte?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_min)
+     */
+    updated_date_time_between_min?: number;
+    /**
+     * Timestamp when the record was last updated (filter: between_max_value)
+     */
+    updated_date_time_between_max_value?: number;
+    /**
+     * Timestamp when the record was last updated (filter: in_values) (comma-separated list)
+     */
+    updated_date_time_in_values?: string;
+    /**
+     * Timestamp when the record was last updated (filter: not_in_values) (comma-separated list)
+     */
+    updated_date_time_not_in_values?: string;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: eq)
+     */
+    first_seen_date_time_eq?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: ne)
+     */
+    first_seen_date_time_ne?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: lt)
+     */
+    first_seen_date_time_lt?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: lte)
+     */
+    first_seen_date_time_lte?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: gt)
+     */
+    first_seen_date_time_gt?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: gte)
+     */
+    first_seen_date_time_gte?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: between_min)
+     */
+    first_seen_date_time_between_min?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: between_max_value)
+     */
+    first_seen_date_time_between_max_value?: number;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: in_values) (comma-separated list)
+     */
+    first_seen_date_time_in_values?: string;
+    /**
+     * Earliest sighting of the transaction by any sentry within this hour (filter: not_in_values) (comma-separated list)
+     */
+    first_seen_date_time_not_in_values?: string;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: eq)
+     */
+    last_seen_date_time_eq?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: ne)
+     */
+    last_seen_date_time_ne?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: lt)
+     */
+    last_seen_date_time_lt?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: lte)
+     */
+    last_seen_date_time_lte?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: gt)
+     */
+    last_seen_date_time_gt?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: gte)
+     */
+    last_seen_date_time_gte?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: between_min)
+     */
+    last_seen_date_time_between_min?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: between_max_value)
+     */
+    last_seen_date_time_between_max_value?: number;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: in_values) (comma-separated list)
+     */
+    last_seen_date_time_in_values?: string;
+    /**
+     * Latest sighting of the transaction by any sentry within this hour (filter: not_in_values) (comma-separated list)
+     */
+    last_seen_date_time_not_in_values?: string;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: eq)
+     */
+    sighting_count_eq?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: ne)
+     */
+    sighting_count_ne?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: lt)
+     */
+    sighting_count_lt?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: lte)
+     */
+    sighting_count_lte?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: gt)
+     */
+    sighting_count_gt?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: gte)
+     */
+    sighting_count_gte?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: between_min)
+     */
+    sighting_count_between_min?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: between_max_value)
+     */
+    sighting_count_between_max_value?: number;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: in_values) (comma-separated list)
+     */
+    sighting_count_in_values?: string;
+    /**
+     * Number of sightings of the transaction within this hour across all sentries (filter: not_in_values) (comma-separated list)
+     */
+    sighting_count_not_in_values?: string;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: eq)
+     */
+    unique_sentries_eq?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: ne)
+     */
+    unique_sentries_ne?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: lt)
+     */
+    unique_sentries_lt?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: lte)
+     */
+    unique_sentries_lte?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: gt)
+     */
+    unique_sentries_gt?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: gte)
+     */
+    unique_sentries_gte?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: between_min)
+     */
+    unique_sentries_between_min?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: between_max_value)
+     */
+    unique_sentries_between_max_value?: number;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: in_values) (comma-separated list)
+     */
+    unique_sentries_in_values?: string;
+    /**
+     * Number of distinct sentries that sighted the transaction within this hour (filter: not_in_values) (comma-separated list)
+     */
+    unique_sentries_not_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: eq)
+     */
+    from_eq?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ne)
+     */
+    from_ne?: string;
+    /**
+     * The address of the account that sent the transaction (filter: contains)
+     */
+    from_contains?: string;
+    /**
+     * The address of the account that sent the transaction (filter: starts_with)
+     */
+    from_starts_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: ends_with)
+     */
+    from_ends_with?: string;
+    /**
+     * The address of the account that sent the transaction (filter: like)
+     */
+    from_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_like)
+     */
+    from_not_like?: string;
+    /**
+     * The address of the account that sent the transaction (filter: in_values) (comma-separated list)
+     */
+    from_in_values?: string;
+    /**
+     * The address of the account that sent the transaction (filter: not_in_values) (comma-separated list)
+     */
+    from_not_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: eq)
+     */
+    to_eq?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ne)
+     */
+    to_ne?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: contains)
+     */
+    to_contains?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: starts_with)
+     */
+    to_starts_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: ends_with)
+     */
+    to_ends_with?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: like)
+     */
+    to_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_like)
+     */
+    to_not_like?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: in_values) (comma-separated list)
+     */
+    to_in_values?: string;
+    /**
+     * The address of the transaction recipient, null for contract creation (filter: not_in_values) (comma-separated list)
+     */
+    to_not_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: eq)
+     */
+    nonce_eq?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: ne)
+     */
+    nonce_ne?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lt)
+     */
+    nonce_lt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: lte)
+     */
+    nonce_lte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gt)
+     */
+    nonce_gt?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: gte)
+     */
+    nonce_gte?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_min)
+     */
+    nonce_between_min?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: between_max_value)
+     */
+    nonce_between_max_value?: number;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: in_values) (comma-separated list)
+     */
+    nonce_in_values?: string;
+    /**
+     * The nonce of the sender account at the time of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    nonce_not_in_values?: string;
+    /**
+     * The type of the transaction (filter: eq)
+     */
+    type_eq?: number;
+    /**
+     * The type of the transaction (filter: ne)
+     */
+    type_ne?: number;
+    /**
+     * The type of the transaction (filter: lt)
+     */
+    type_lt?: number;
+    /**
+     * The type of the transaction (filter: lte)
+     */
+    type_lte?: number;
+    /**
+     * The type of the transaction (filter: gt)
+     */
+    type_gt?: number;
+    /**
+     * The type of the transaction (filter: gte)
+     */
+    type_gte?: number;
+    /**
+     * The type of the transaction (filter: between_min)
+     */
+    type_between_min?: number;
+    /**
+     * The type of the transaction (filter: between_max_value)
+     */
+    type_between_max_value?: number;
+    /**
+     * The type of the transaction (filter: in_values) (comma-separated list)
+     */
+    type_in_values?: string;
+    /**
+     * The type of the transaction (filter: not_in_values) (comma-separated list)
+     */
+    type_not_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: eq)
+     */
+    gas_eq?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: ne)
+     */
+    gas_ne?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lt)
+     */
+    gas_lt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: lte)
+     */
+    gas_lte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gt)
+     */
+    gas_gt?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: gte)
+     */
+    gas_gte?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_min)
+     */
+    gas_between_min?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: between_max_value)
+     */
+    gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the transaction execution (filter: in_values) (comma-separated list)
+     */
+    gas_in_values?: string;
+    /**
+     * The maximum gas provided for the transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    gas_not_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: eq)
+     */
+    gas_price_eq?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ne)
+     */
+    gas_price_ne?: string;
+    /**
+     * The gas price of the transaction in wei (filter: contains)
+     */
+    gas_price_contains?: string;
+    /**
+     * The gas price of the transaction in wei (filter: starts_with)
+     */
+    gas_price_starts_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: ends_with)
+     */
+    gas_price_ends_with?: string;
+    /**
+     * The gas price of the transaction in wei (filter: like)
+     */
+    gas_price_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_like)
+     */
+    gas_price_not_like?: string;
+    /**
+     * The gas price of the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_price_in_values?: string;
+    /**
+     * The gas price of the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_price_not_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: eq)
+     */
+    gas_tip_cap_eq?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ne)
+     */
+    gas_tip_cap_ne?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: contains)
+     */
+    gas_tip_cap_contains?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_tip_cap_starts_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_tip_cap_ends_with?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: like)
+     */
+    gas_tip_cap_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_tip_cap_not_like?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_tip_cap_in_values?: string;
+    /**
+     * The priority fee (tip) the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_tip_cap_not_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: eq)
+     */
+    gas_fee_cap_eq?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ne)
+     */
+    gas_fee_cap_ne?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: contains)
+     */
+    gas_fee_cap_contains?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    gas_fee_cap_starts_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    gas_fee_cap_ends_with?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: like)
+     */
+    gas_fee_cap_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_like)
+     */
+    gas_fee_cap_not_like?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    gas_fee_cap_in_values?: string;
+    /**
+     * The max fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    gas_fee_cap_not_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: eq)
+     */
+    value_eq?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ne)
+     */
+    value_ne?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: contains)
+     */
+    value_contains?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: starts_with)
+     */
+    value_starts_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: ends_with)
+     */
+    value_ends_with?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: like)
+     */
+    value_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_like)
+     */
+    value_not_like?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    value_in_values?: string;
+    /**
+     * The value transferred with the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    value_not_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: eq)
+     */
+    size_eq?: number;
+    /**
+     * The size of the transaction data in bytes (filter: ne)
+     */
+    size_ne?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lt)
+     */
+    size_lt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: lte)
+     */
+    size_lte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gt)
+     */
+    size_gt?: number;
+    /**
+     * The size of the transaction data in bytes (filter: gte)
+     */
+    size_gte?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_min)
+     */
+    size_between_min?: number;
+    /**
+     * The size of the transaction data in bytes (filter: between_max_value)
+     */
+    size_between_max_value?: number;
+    /**
+     * The size of the transaction data in bytes (filter: in_values) (comma-separated list)
+     */
+    size_in_values?: string;
+    /**
+     * The size of the transaction data in bytes (filter: not_in_values) (comma-separated list)
+     */
+    size_not_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: eq)
+     */
+    call_data_size_eq?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: ne)
+     */
+    call_data_size_ne?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lt)
+     */
+    call_data_size_lt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: lte)
+     */
+    call_data_size_lte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gt)
+     */
+    call_data_size_gt?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: gte)
+     */
+    call_data_size_gte?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_min)
+     */
+    call_data_size_between_min?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: between_max_value)
+     */
+    call_data_size_between_max_value?: number;
+    /**
+     * The size of the call data of the transaction in bytes (filter: in_values) (comma-separated list)
+     */
+    call_data_size_in_values?: string;
+    /**
+     * The size of the call data of the transaction in bytes (filter: not_in_values) (comma-separated list)
+     */
+    call_data_size_not_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: eq)
+     */
+    blob_gas_eq?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: ne)
+     */
+    blob_gas_ne?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lt)
+     */
+    blob_gas_lt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: lte)
+     */
+    blob_gas_lte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gt)
+     */
+    blob_gas_gt?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: gte)
+     */
+    blob_gas_gte?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_min)
+     */
+    blob_gas_between_min?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: between_max_value)
+     */
+    blob_gas_between_max_value?: number;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: in_values) (comma-separated list)
+     */
+    blob_gas_in_values?: string;
+    /**
+     * The maximum gas provided for the blob transaction execution (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_not_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: eq)
+     */
+    blob_gas_fee_cap_eq?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ne)
+     */
+    blob_gas_fee_cap_ne?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: contains)
+     */
+    blob_gas_fee_cap_contains?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: starts_with)
+     */
+    blob_gas_fee_cap_starts_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: ends_with)
+     */
+    blob_gas_fee_cap_ends_with?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: like)
+     */
+    blob_gas_fee_cap_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_like)
+     */
+    blob_gas_fee_cap_not_like?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_in_values?: string;
+    /**
+     * The max blob fee the user has set for the transaction in wei (filter: not_in_values) (comma-separated list)
+     */
+    blob_gas_fee_cap_not_in_values?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has)
+     */
+    blob_hashes_has?: string;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_all_values)
+     */
+    blob_hashes_has_all_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: has_any_values)
+     */
+    blob_hashes_has_any_values?: Array<string>;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_eq)
+     */
+    blob_hashes_length_eq?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gt)
+     */
+    blob_hashes_length_gt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_gte)
+     */
+    blob_hashes_length_gte?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lt)
+     */
+    blob_hashes_length_lt?: number;
+    /**
+     * The hashes of the blob commitments for blob transactions (filter: length_lte)
+     */
+    blob_hashes_length_lte?: number;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: eq)
+     */
+    is_cancel_shape_eq?: boolean;
+    /**
+     * Whether the transaction is a self-transfer of zero value, the common wallet cancellation pattern (filter: ne)
+     */
+    is_cancel_shape_ne?: boolean;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: eq)
+     */
+    first_sentry_name_eq?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: ne)
+     */
+    first_sentry_name_ne?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: contains)
+     */
+    first_sentry_name_contains?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: starts_with)
+     */
+    first_sentry_name_starts_with?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: ends_with)
+     */
+    first_sentry_name_ends_with?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: like)
+     */
+    first_sentry_name_like?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: not_like)
+     */
+    first_sentry_name_not_like?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: in_values) (comma-separated list)
+     */
+    first_sentry_name_in_values?: string;
+    /**
+     * Name of the sentry with the earliest sighting this hour, ties broken by sentry name (filter: not_in_values) (comma-separated list)
+     */
+    first_sentry_name_not_in_values?: string;
+    /**
+     * City of the first-sighting sentry (filter: eq)
+     */
+    first_sentry_geo_city_eq?: string;
+    /**
+     * City of the first-sighting sentry (filter: ne)
+     */
+    first_sentry_geo_city_ne?: string;
+    /**
+     * City of the first-sighting sentry (filter: contains)
+     */
+    first_sentry_geo_city_contains?: string;
+    /**
+     * City of the first-sighting sentry (filter: starts_with)
+     */
+    first_sentry_geo_city_starts_with?: string;
+    /**
+     * City of the first-sighting sentry (filter: ends_with)
+     */
+    first_sentry_geo_city_ends_with?: string;
+    /**
+     * City of the first-sighting sentry (filter: like)
+     */
+    first_sentry_geo_city_like?: string;
+    /**
+     * City of the first-sighting sentry (filter: not_like)
+     */
+    first_sentry_geo_city_not_like?: string;
+    /**
+     * City of the first-sighting sentry (filter: in_values) (comma-separated list)
+     */
+    first_sentry_geo_city_in_values?: string;
+    /**
+     * City of the first-sighting sentry (filter: not_in_values) (comma-separated list)
+     */
+    first_sentry_geo_city_not_in_values?: string;
+    /**
+     * Country of the first-sighting sentry (filter: eq)
+     */
+    first_sentry_geo_country_eq?: string;
+    /**
+     * Country of the first-sighting sentry (filter: ne)
+     */
+    first_sentry_geo_country_ne?: string;
+    /**
+     * Country of the first-sighting sentry (filter: contains)
+     */
+    first_sentry_geo_country_contains?: string;
+    /**
+     * Country of the first-sighting sentry (filter: starts_with)
+     */
+    first_sentry_geo_country_starts_with?: string;
+    /**
+     * Country of the first-sighting sentry (filter: ends_with)
+     */
+    first_sentry_geo_country_ends_with?: string;
+    /**
+     * Country of the first-sighting sentry (filter: like)
+     */
+    first_sentry_geo_country_like?: string;
+    /**
+     * Country of the first-sighting sentry (filter: not_like)
+     */
+    first_sentry_geo_country_not_like?: string;
+    /**
+     * Country of the first-sighting sentry (filter: in_values) (comma-separated list)
+     */
+    first_sentry_geo_country_in_values?: string;
+    /**
+     * Country of the first-sighting sentry (filter: not_in_values) (comma-separated list)
+     */
+    first_sentry_geo_country_not_in_values?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: eq)
+     */
+    first_sentry_geo_country_code_eq?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: ne)
+     */
+    first_sentry_geo_country_code_ne?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: contains)
+     */
+    first_sentry_geo_country_code_contains?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: starts_with)
+     */
+    first_sentry_geo_country_code_starts_with?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: ends_with)
+     */
+    first_sentry_geo_country_code_ends_with?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: like)
+     */
+    first_sentry_geo_country_code_like?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: not_like)
+     */
+    first_sentry_geo_country_code_not_like?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: in_values) (comma-separated list)
+     */
+    first_sentry_geo_country_code_in_values?: string;
+    /**
+     * Country code of the first-sighting sentry (filter: not_in_values) (comma-separated list)
+     */
+    first_sentry_geo_country_code_not_in_values?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: eq)
+     */
+    first_sentry_geo_continent_code_eq?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: ne)
+     */
+    first_sentry_geo_continent_code_ne?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: contains)
+     */
+    first_sentry_geo_continent_code_contains?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: starts_with)
+     */
+    first_sentry_geo_continent_code_starts_with?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: ends_with)
+     */
+    first_sentry_geo_continent_code_ends_with?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: like)
+     */
+    first_sentry_geo_continent_code_like?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: not_like)
+     */
+    first_sentry_geo_continent_code_not_like?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: in_values) (comma-separated list)
+     */
+    first_sentry_geo_continent_code_in_values?: string;
+    /**
+     * Continent code of the first-sighting sentry (filter: not_in_values) (comma-separated list)
+     */
+    first_sentry_geo_continent_code_not_in_values?: string;
+    /**
+     * The maximum number of int_transaction_mempool_observation_hourly to return. If unspecified, at most 100 items will be returned. The maximum value is 10000; values above 10000 will be coerced to 10000.
+     */
+    page_size?: number;
+    /**
+     * A page token, received from a previous `ListIntTransactionMempoolObservationHourly` call. Provide this to retrieve the subsequent page.
+     */
+    page_token?: string;
+    /**
+     * The order of results. Format: comma-separated list of fields. Example: "foo,bar" or "foo desc,bar" for descending order on foo. If unspecified, results will be returned in the default order.
+     */
+    order_by?: string;
+  };
+  url: '/api/v1/int_transaction_mempool_observation_hourly';
+};
+
+export type IntTransactionMempoolObservationHourlyServiceListErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionMempoolObservationHourlyServiceListError =
+  IntTransactionMempoolObservationHourlyServiceListErrors[keyof IntTransactionMempoolObservationHourlyServiceListErrors];
+
+export type IntTransactionMempoolObservationHourlyServiceListResponses = {
+  /**
+   * OK
+   */
+  200: ListIntTransactionMempoolObservationHourlyResponse;
+};
+
+export type IntTransactionMempoolObservationHourlyServiceListResponse =
+  IntTransactionMempoolObservationHourlyServiceListResponses[keyof IntTransactionMempoolObservationHourlyServiceListResponses];
+
+export type IntTransactionMempoolObservationHourlyServiceGetData = {
+  body?: never;
+  path: {
+    /**
+     * The start of the hour bucket the sightings fall in
+     */
+    hour_start_date_time: number;
+  };
+  query?: never;
+  url: '/api/v1/int_transaction_mempool_observation_hourly/{hour_start_date_time}';
+};
+
+export type IntTransactionMempoolObservationHourlyServiceGetErrors = {
+  /**
+   * Default error response
+   */
+  default: Status;
+};
+
+export type IntTransactionMempoolObservationHourlyServiceGetError =
+  IntTransactionMempoolObservationHourlyServiceGetErrors[keyof IntTransactionMempoolObservationHourlyServiceGetErrors];
+
+export type IntTransactionMempoolObservationHourlyServiceGetResponses = {
+  /**
+   * OK
+   */
+  200: GetIntTransactionMempoolObservationHourlyResponse;
+};
+
+export type IntTransactionMempoolObservationHourlyServiceGetResponse =
+  IntTransactionMempoolObservationHourlyServiceGetResponses[keyof IntTransactionMempoolObservationHourlyServiceGetResponses];
 
 export type IntTransactionOpcodeGasServiceListData = {
   body?: never;
