@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import type { Granularity } from '../../constants';
-import type { BucketSpread } from '../../hooks/useNetworkHistory';
-import { formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import type { Granularity } from '@/pages/xatu/nodes/constants';
+import type { BucketSpread } from '@/pages/xatu/nodes/hooks/useNetworkHistory';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface NetworkArrivalChartProps {
   buckets: number[];

@@ -23,13 +23,13 @@ import {
 import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { derivePayloadStatus } from '@/utils/epbs';
 import { EIP7870_REFERENCE_TAG } from '@/constants';
-import { slotToTimestamp } from '../../utils';
-import { useBlockDetailsData } from '../useBlockDetailsData';
-import { useMapData } from '../useMapData';
-import { useSidebarData } from '../useSidebarData';
-import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
-import { useDataColumnAvailabilityData } from '../useDataColumnAvailabilityData';
-import { useAttestationData } from '../useAttestationData';
+import { slotToTimestamp } from '@/pages/ethereum/live/utils';
+import { useBlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData';
+import { useMapData } from '@/pages/ethereum/live/hooks/useMapData';
+import { useSidebarData } from '@/pages/ethereum/live/hooks/useSidebarData';
+import { useBlobAvailabilityData } from '@/pages/ethereum/live/hooks/useBlobAvailabilityData';
+import { useDataColumnAvailabilityData } from '@/pages/ethereum/live/hooks/useDataColumnAvailabilityData';
+import { useAttestationData } from '@/pages/ethereum/live/hooks/useAttestationData';
 import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import type { SlotViewData } from './useSlotViewData.types';
 

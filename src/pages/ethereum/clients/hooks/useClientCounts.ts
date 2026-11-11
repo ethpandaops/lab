@@ -19,8 +19,13 @@ import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd, completeUtcDays, currentUtcDate, toUtcDate } from '@/utils/time';
 import { fillTimeKeys } from '@/pages/ethereum/execution/overview/overview.utils';
-import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '../constants';
-import { entityQuery, isEntityGroup, toClientCountRecords, type ClientCountRecord } from '../utils/client-share';
+import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '@/pages/ethereum/clients/constants';
+import {
+  entityQuery,
+  isEntityGroup,
+  toClientCountRecords,
+  type ClientCountRecord,
+} from '@/pages/ethereum/clients/utils/client-share';
 import { chunksFor } from './useVersionCounts';
 
 export interface UseClientCountsResult {

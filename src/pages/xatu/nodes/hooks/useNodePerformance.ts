@@ -6,7 +6,7 @@ import {
 } from '@/api/sdk.gen';
 import type { FctAttestationObservationByNode, FctBlockFirstSeenByNode, FctHeadFirstSeenByNode } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { summarize, type Summary } from '../utils/node-stats';
+import { summarize, type Summary } from '@/pages/xatu/nodes/utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Attestation arrival a node saw in one slot */

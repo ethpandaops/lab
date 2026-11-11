@@ -1,6 +1,6 @@
 import type { FctEpochSummaryCanonical, FctEpochSummaryCanonicalServiceListData } from '@/api/types.gen';
 import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
-import type { EpochFilters } from '../IndexPage.types';
+import type { EpochFilters } from '@/pages/ethereum/epochs/IndexPage.types';
 
 /** One row of the epoch list */
 export interface EpochRow {

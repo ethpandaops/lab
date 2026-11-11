@@ -9,7 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { RadarChartProps } from './Radar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { legendItem, legendItemSize } from '../chartChrome';
+import { legendItem, legendItemSize } from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();

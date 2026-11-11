@@ -3,7 +3,7 @@ import { Button } from '@/components/Elements/Button';
 import { Input } from '@/components/Forms/Input';
 import { FilterBar, type FilterChipItem, FilterRange, FilterToggle, formatRange } from '@/components/Forms/FilterBar';
 import { DateTimeRange } from '@/components/Forms/DateTimeRange';
-import type { EpochFilters } from '../../IndexPage.types';
+import type { EpochFilters } from '@/pages/ethereum/epochs/IndexPage.types';
 
 export interface EpochsFiltersProps {
   filters: EpochFilters;

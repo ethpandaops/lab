@@ -2,8 +2,8 @@ import { type JSX, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { weiToEth } from '@/utils';
-import type { ClientValidationRow } from '../../hooks/useSlotViewData/useSlotViewData.types';
-import type { BlockDetailsData } from '../../hooks/useBlockDetailsData/useBlockDetailsData.types';
+import type { ClientValidationRow } from '@/pages/ethereum/live/hooks/useSlotViewData/useSlotViewData.types';
+import type { BlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData/useBlockDetailsData.types';
 
 export interface MobileSlotStatsProps {
   clientValidation: ClientValidationRow[];

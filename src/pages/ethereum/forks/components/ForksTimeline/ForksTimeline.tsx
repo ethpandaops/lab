@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ForkStatusBadge } from '../ForkShared';
+import { ForkStatusBadge } from '@/pages/ethereum/forks/components/ForkShared';
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';

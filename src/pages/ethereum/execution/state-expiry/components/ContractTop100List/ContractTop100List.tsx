@@ -3,8 +3,13 @@ import clsx from 'clsx';
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/16/solid';
 import { Card } from '@/components/Layout/Card';
 import { ScrollArea } from '@/components/Layout/ScrollArea';
-import { expirySavings, storageSize, useContractTop100Data, type ContractTop100Item } from '../../hooks';
-import { ContractRow, ContractCard } from '../ContractRow';
+import {
+  expirySavings,
+  storageSize,
+  useContractTop100Data,
+  type ContractTop100Item,
+} from '@/pages/ethereum/execution/state-expiry/hooks';
+import { ContractRow, ContractCard } from '@/pages/ethereum/execution/state-expiry/components/ContractRow';
 import { ContractTop100ListSkeleton, ContractTop100ListSkeletonMobile } from './ContractTop100ListSkeleton';
 import { TableColGroup } from './TableColGroup';
 

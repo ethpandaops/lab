@@ -13,7 +13,7 @@ import {
   ForkQuickLinks,
   secondsToCountdown,
   type CountdownTime,
-} from '../ForkShared';
+} from '@/pages/ethereum/forks/components/ForkShared';
 
 interface ForksHeaderProps {
   activeFork: ForkInfo | null;

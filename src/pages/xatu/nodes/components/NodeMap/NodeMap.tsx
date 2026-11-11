@@ -2,7 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { Map2DChart } from '@/components/Charts/Map2D';
 import type { PointData } from '@/components/Charts/Map2D/Map2D.types';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import type { NodeRow } from '../../hooks/useNodeRows';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
 
 export interface NodeMapProps {
   rows: NodeRow[];

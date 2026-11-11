@@ -7,9 +7,9 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Card } from '@/components/Layout/Card';
 import { getClassificationBadgeClasses, getClassificationLabel } from '@/utils';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '../../utils/node-stats';
-import { NodeStatus } from '../NodeStatus';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
+import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '@/pages/xatu/nodes/utils/node-stats';
+import { NodeStatus } from '@/pages/xatu/nodes/components/NodeStatus';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 export interface NodeHeaderProps {

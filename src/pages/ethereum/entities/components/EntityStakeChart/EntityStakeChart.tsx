@@ -7,7 +7,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { formatDayLabel } from '@/pages/ethereum/validators/utils/overview';
 import { getDataVizColors } from '@/utils';
 
-import type { EntityStakeDay } from '../../hooks';
+import type { EntityStakeDay } from '@/pages/ethereum/entities/hooks';
 
 export interface EntityStakeChartProps {
   /** Days in the window, oldest first */

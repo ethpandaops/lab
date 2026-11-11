@@ -22,7 +22,7 @@ import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 import { dateCategoryTicks, formatUtcTime, timeAxisTicks } from './MultiLine.utils';
-import { clientLogoHtml, formatAxisNumber } from '../chartChrome';
+import { clientLogoHtml, formatAxisNumber } from '@/components/Charts/chartChrome';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { isKnownClient } from '@/utils/ethereum';

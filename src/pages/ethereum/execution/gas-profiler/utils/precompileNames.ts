@@ -1,4 +1,4 @@
-import type { ContractOwnerMap } from '../hooks/useContractOwners';
+import type { ContractOwnerMap } from '@/pages/ethereum/execution/gas-profiler/hooks/useContractOwners';
 
 /**
  * Map of EVM precompiled contract addresses to their human-readable names.

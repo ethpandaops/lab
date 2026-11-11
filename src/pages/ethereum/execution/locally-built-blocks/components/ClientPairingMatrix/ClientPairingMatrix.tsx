@@ -2,10 +2,10 @@ import { type JSX, useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { BlockDetailsModal } from '../BlockDetailsModal';
-import { getIntensity } from '../../utils';
+import { BlockDetailsModal } from '@/pages/ethereum/execution/locally-built-blocks/components/BlockDetailsModal';
+import { getIntensity } from '@/pages/ethereum/execution/locally-built-blocks/utils';
 import type { ClientPairingMatrixProps } from './ClientPairingMatrix.types';
-import type { ParsedBlock } from '../../hooks';
+import type { ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 /**
  * Displays a matrix showing which execution clients pair with which consensus clients

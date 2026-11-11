@@ -6,7 +6,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useGasProfilerBounds } from './useGasProfilerBounds';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
-import { getPrecompileOwnerMap } from '../utils/precompileNames';
+import { getPrecompileOwnerMap } from '@/pages/ethereum/execution/gas-profiler/utils/precompileNames';
 
 /**
  * Summary of a transaction within a block

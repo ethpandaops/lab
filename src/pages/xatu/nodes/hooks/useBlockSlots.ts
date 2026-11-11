@@ -3,8 +3,8 @@ import { fctBlockProposalStatusDailyServiceList, fctBlockProposalStatusHourlySer
 import type { FctBlockProposalStatusDaily, FctBlockProposalStatusHourly } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NODE_RANGE_CONFIG, type NodeRange } from '../constants';
-import { bucketFilter, getBuckets, rowBucket, weekStart } from '../utils/time-buckets';
+import { NODE_RANGE_CONFIG, type NodeRange } from '@/pages/xatu/nodes/constants';
+import { bucketFilter, getBuckets, rowBucket, weekStart } from '@/pages/xatu/nodes/utils/time-buckets';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 

@@ -20,8 +20,13 @@ import {
   PATH_LABELS,
   VERDICT_COLORS,
   WRAPPED_COMPLETION_MS,
-} from '../constants';
-import type { CompletionPath, PartialRecord, PathRecord, PeerRecord } from '../IndexPage.types';
+} from '@/pages/ethereum/data-availability/partial-columns/constants';
+import type {
+  CompletionPath,
+  PartialRecord,
+  PathRecord,
+  PeerRecord,
+} from '@/pages/ethereum/data-availability/partial-columns/IndexPage.types';
 
 export { formatClientName };
 

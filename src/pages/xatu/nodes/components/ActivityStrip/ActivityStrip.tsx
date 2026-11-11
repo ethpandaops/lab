@@ -2,10 +2,10 @@ import { type JSX, useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { useTimezone } from '@/hooks/useTimezone';
-import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
-import { formatMs } from '../../utils/node-stats';
-import { SLOTS_PER_BUCKET } from '../../constants';
-import { bucketHeading } from '../../utils/time-buckets';
+import { rowsByBucket, type NodeHistory } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { SLOTS_PER_BUCKET } from '@/pages/xatu/nodes/constants';
+import { bucketHeading } from '@/pages/xatu/nodes/utils/time-buckets';
 
 export interface ActivityStripProps {
   /** The node's block rollups */

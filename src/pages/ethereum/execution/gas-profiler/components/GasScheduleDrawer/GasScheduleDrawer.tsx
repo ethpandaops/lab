@@ -4,8 +4,8 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Transition, Transitio
 import { XMarkIcon, MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import type { GasSchedule, GasScheduleDefaults } from '../../SimulatePage.types';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
+import type { GasSchedule, GasScheduleDefaults } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
+import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
 
 /** Category ordering for display */
 const CATEGORY_ORDER = [

@@ -9,8 +9,8 @@ import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import type { UseRangeEndsResult } from '../../hooks/useRangeEnds';
-import type { PlaceCensusRow } from '../../hooks/usePlaceCensus';
+import type { UseRangeEndsResult } from '@/pages/ethereum/network/hooks/useRangeEnds';
+import type { PlaceCensusRow } from '@/pages/ethereum/network/hooks/usePlaceCensus';
 import {
   countDelta,
   dayStart,
@@ -19,8 +19,8 @@ import {
   rankPlaces,
   shareDelta,
   total,
-} from '../../utils/network-census';
-import { clientSeries } from '../../utils/network-series';
+} from '@/pages/ethereum/network/utils/network-census';
+import { clientSeries } from '@/pages/ethereum/network/utils/network-series';
 
 export interface PlaceOverviewProps<T extends PlaceCensusRow> {
   /** The place's rows on the range's first and last days */

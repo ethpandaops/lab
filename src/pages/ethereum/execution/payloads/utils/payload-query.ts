@@ -1,7 +1,7 @@
 import type { IntEngineNewPayloadServiceListData } from '@/api/types.gen';
 import { slotToTimestamp } from '@/utils/beacon';
 import type { TimeWindow } from '@/utils/widening-window';
-import type { PayloadsSearch } from '../IndexPage.types';
+import type { PayloadsSearch } from '@/pages/ethereum/execution/payloads/IndexPage.types';
 
 export type PayloadQuery = NonNullable<IntEngineNewPayloadServiceListData['query']>;
 

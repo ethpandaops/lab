@@ -4,9 +4,9 @@ import { fctPeerPartialMessageSupportByClientDailyServiceList } from '@/api/sdk.
 import type { FctPeerPartialMessageSupportByClientDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { PAGE_SIZE } from '../constants';
+import { PAGE_SIZE } from '@/pages/ethereum/clients/constants';
 import { completeUtcDays } from '@/utils/time';
-import { peerClient } from '../utils/client-versions';
+import { peerClient } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface UsePeerSupportResult {
   /** Latest full day of partial-column support for the client's peers, one row per version */

@@ -4,7 +4,7 @@ import { intTransactionCallFrameOpcodeGasServiceList } from '@/api/sdk.gen';
 import type { IntTransactionCallFrameOpcodeGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { OpcodeStats } from '../IndexPage.types';
+import type { OpcodeStats } from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
 
 export interface UseFrameOpcodesOptions {
   /** Block number containing the transaction */

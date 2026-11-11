@@ -62,6 +62,12 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [{ group: ['../*'], message: 'Import through the @/ alias instead of parent-relative paths.' }],
+        },
+      ],
       'no-restricted-syntax': [
         'error',
         {
@@ -169,6 +175,11 @@ export default tseslint.config(
       // Validate route images exist
       'lab/validate-route-images': 'error',
     },
+  },
+  {
+    // The design-sync bundle resolves modules through its own path map (.design-sync/tsconfig.paths.json).
+    files: ['.design-sync/**'],
+    rules: { 'no-restricted-imports': 'off' },
   },
   // TanStack Router route files export both components and Route objects
   {

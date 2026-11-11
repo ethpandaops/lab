@@ -16,7 +16,7 @@ import {
   type OpcodeCost,
   type OpcodeCostModel,
   type OpcodeMeta,
-} from '../utils/opcode-costs';
+} from '@/pages/ethereum/execution/performance/utils/opcode-costs';
 import { MethodologyButton } from './MethodologyDialog';
 
 export interface OpcodeCardProps {

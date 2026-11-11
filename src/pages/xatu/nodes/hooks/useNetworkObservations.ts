@@ -2,8 +2,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctBlockFirstSeenByNodeServiceList } from '@/api/sdk.gen';
 import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NETWORK_WINDOW_SLOTS } from '../constants';
-import { quantile } from '../utils/node-stats';
+import { NETWORK_WINDOW_SLOTS } from '@/pages/xatu/nodes/constants';
+import { quantile } from '@/pages/xatu/nodes/utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Block arrival across every node in one slot */

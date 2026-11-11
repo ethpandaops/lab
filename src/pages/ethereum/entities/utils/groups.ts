@@ -1,6 +1,6 @@
 import { ENTITY_GROUPS, entityGroupOf, entityLabel, isEntityGroup } from '@/pages/ethereum/clients/utils/client-share';
 
-import type { EntityStake } from '../hooks/useEntityStake';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks/useEntityStake';
 import { addCounts, EMPTY_COUNTS, type PerformanceCounts } from './performance';
 
 export { entityGroupOf, entityLabel, isEntityGroup };

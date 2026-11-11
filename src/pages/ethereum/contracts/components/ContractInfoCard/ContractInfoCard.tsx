@@ -5,7 +5,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { useNetwork } from '@/hooks/useNetwork';
-import { getLabelColor } from '../../utils';
+import { getLabelColor } from '@/pages/ethereum/contracts/utils';
 import type { ContractInfoCardProps } from './ContractInfoCard.types';
 
 /** Known source info for external links */

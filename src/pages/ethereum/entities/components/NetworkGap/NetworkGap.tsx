@@ -14,7 +14,7 @@ import {
   METRICS,
   type MetricId,
   type PerformanceCounts,
-} from '../../utils/performance';
+} from '@/pages/ethereum/entities/utils/performance';
 
 export interface NetworkGapProps {
   /** Named entities, largest stake first */

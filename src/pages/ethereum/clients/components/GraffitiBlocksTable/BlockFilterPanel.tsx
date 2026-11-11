@@ -10,8 +10,8 @@ import { Dialog } from '@/components/Overlays/Dialog';
 import { useTimezone } from '@/hooks/useTimezone';
 import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS } from '@/utils/ethereum';
 import { GRAFFITI_FORMAT_LABELS, UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
-import { useEntityOptions } from '../../hooks/useEntityOptions';
-import { entityLabel } from '../../utils/client-share';
+import { useEntityOptions } from '@/pages/ethereum/clients/hooks/useEntityOptions';
+import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import {
   BLOCK_FILTER_KEYS,
   clearFilters,
@@ -21,8 +21,8 @@ import {
   type BlockFilterKey,
   type BlockFilters,
   type BlockSearch,
-} from '../../utils/block-filters';
-import { EntityFilter } from '../EntityFilter';
+} from '@/pages/ethereum/clients/utils/block-filters';
+import { EntityFilter } from '@/pages/ethereum/clients/components/EntityFilter';
 
 export interface BlockFilterPanelProps {
   filters: BlockFilters;

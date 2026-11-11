@@ -41,9 +41,9 @@ import {
 } from '@/pages/ethereum/clients/api/client-models';
 import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import type { fetchAllPages } from '@/utils/api-pagination';
-import { CUSTODY_COLUMNS_START, EL_CRAWL_START, TOP_PLACES } from '../constants';
-import { onChainRows } from '../utils/network-census';
-import { topCountries, type ConcentrationRow, type CountryDayRow } from '../utils/network-series';
+import { CUSTODY_COLUMNS_START, EL_CRAWL_START, TOP_PLACES } from '@/pages/ethereum/network/constants';
+import { onChainRows } from '@/pages/ethereum/network/utils/network-census';
+import { topCountries, type ConcentrationRow, type CountryDayRow } from '@/pages/ethereum/network/utils/network-series';
 import { useRangeDays, type UseRangeDaysResult } from './useRangeDays';
 import { useRangeEnds, type UseRangeEndsResult } from './useRangeEnds';
 

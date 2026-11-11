@@ -4,8 +4,12 @@ import type { FctPreparedBlock } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { offsetPageToken } from '@/utils/page-token';
 import { encodeTimeCursor, parseTimeCursor } from '@/utils/widening-window';
-import type { BlockSortKey } from '../IndexPage.types';
-import { type PreparedBlockQuery, fetchNewestPreparedBlocks, preparedBlockOrder } from '../utils/block-query';
+import type { BlockSortKey } from '@/pages/ethereum/execution/locally-built-blocks/IndexPage.types';
+import {
+  type PreparedBlockQuery,
+  fetchNewestPreparedBlocks,
+  preparedBlockOrder,
+} from '@/pages/ethereum/execution/locally-built-blocks/utils/block-query';
 
 export interface UsePreparedBlocksResult {
   blocks: FctPreparedBlock[];

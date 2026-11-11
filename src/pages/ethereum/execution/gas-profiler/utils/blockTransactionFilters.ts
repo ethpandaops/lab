@@ -1,5 +1,5 @@
-import type { TransactionSummary } from '../hooks/useBlockTransactions';
-import type { TransactionOpcodeProfile } from '../hooks/useBlockTransactionOpcodes';
+import type { TransactionSummary } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactions';
+import type { TransactionOpcodeProfile } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
 
 /**
  * Numeric columns the block transaction table can sort by.

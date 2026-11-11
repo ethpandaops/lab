@@ -5,7 +5,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { useNetwork } from '@/hooks/useNetwork';
 import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { derivePayloadStatus, isSelfBuiltPayload, formatWeiAsEth, type PayloadStatus } from '@/utils/epbs';
-import { useSlotPayloadData } from '../../hooks/useSlotPayloadData';
+import { useSlotPayloadData } from '@/pages/ethereum/slots/hooks/useSlotPayloadData';
 import type { SlotPayloadCardProps } from './SlotPayloadCard.types';
 
 const STATUS_LABELS: Record<PayloadStatus, string> = {

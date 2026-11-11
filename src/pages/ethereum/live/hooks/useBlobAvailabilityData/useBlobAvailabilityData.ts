@@ -4,7 +4,7 @@ import type {
   BlobDataPoint,
   DataAvailabilityRatePoint,
   ContinentalPropagationSeries,
-} from '../../components/BlobDataAvailability/BlobDataAvailability.types';
+} from '@/pages/ethereum/live/components/BlobDataAvailability/BlobDataAvailability.types';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 // Module-level constants - static, cached

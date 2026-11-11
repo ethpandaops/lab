@@ -2,7 +2,7 @@ import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { BarChart } from '@/components/Charts/Bar';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
+import { CATEGORY_COLORS, getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();

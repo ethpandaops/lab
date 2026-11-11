@@ -3,7 +3,7 @@ import React, { type JSX, useState, useCallback, useEffect, useMemo } from 'reac
 import { ChevronRightIcon, ChevronDownIcon, CogIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { ContractInteractionsTableProps, ContractInteractionItem } from './ContractInteractionsTable.types';
-import { ContractStorageButton } from '../ContractStorageButton';
+import { ContractStorageButton } from '@/pages/ethereum/execution/gas-profiler/components/ContractStorageButton';
 
 /**
  * Sort field options for contracts table

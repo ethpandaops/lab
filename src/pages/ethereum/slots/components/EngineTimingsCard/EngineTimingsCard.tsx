@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
-import type { SlotEngineTimingsData } from '../../hooks/useSlotEngineTimings';
+import type { SlotEngineTimingsData } from '@/pages/ethereum/slots/hooks/useSlotEngineTimings';
 import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 

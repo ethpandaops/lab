@@ -1,4 +1,4 @@
-import type { SlotData } from '../../hooks/useEpochDetailData.types';
+import type { SlotData } from '@/pages/ethereum/epochs/hooks/useEpochDetailData.types';
 
 /**
  * Props for the EpochSlotsTable component

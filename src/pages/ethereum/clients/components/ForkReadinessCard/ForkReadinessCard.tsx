@@ -4,13 +4,17 @@ import { Card } from '@/components/Layout/Card';
 import { Badge } from '@/components/Elements/Badge';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { meetsMinVersion } from '@/utils/version';
-import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
-import { useCensus } from '../../hooks/useCensus';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { sum } from '../../utils/census';
-import type { ClientLayer } from '../../utils/client-share';
-import { displayVersion, type VersionCount } from '../../utils/client-versions';
-import type { ForkRequirement } from '../../utils/fork-requirements';
+import {
+  CENSUS_TABLES,
+  RESOLVED_STATUSES,
+  type FctPeerCountByElClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
+import { useCensus } from '@/pages/ethereum/clients/hooks/useCensus';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { sum } from '@/pages/ethereum/clients/utils/census';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
+import { displayVersion, type VersionCount } from '@/pages/ethereum/clients/utils/client-versions';
+import type { ForkRequirement } from '@/pages/ethereum/clients/utils/fork-requirements';
 
 export interface ForkReadinessCardProps {
   client: string;

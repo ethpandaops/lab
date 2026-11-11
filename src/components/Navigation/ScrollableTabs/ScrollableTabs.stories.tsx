@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TabGroup, TabPanel, TabPanels } from '@headlessui/react';
 import { ScrollableTabs } from './ScrollableTabs';
-import { Tab } from '../Tab';
+import { Tab } from '@/components/Navigation/Tab';
 
 const meta = {
   title: 'Components/Navigation/ScrollableTabs',

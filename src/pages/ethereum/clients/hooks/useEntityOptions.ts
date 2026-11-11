@@ -4,8 +4,8 @@ import { fctValidatorCountByEntityByStatusDailyServiceList } from '@/api/sdk.gen
 import type { FctValidatorCountByEntityByStatusDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { ENTITY_OPTIONS_STATUS, PAGE_SIZE } from '../constants';
-import { toEntityOptions, type EntityOption } from '../utils/client-share';
+import { ENTITY_OPTIONS_STATUS, PAGE_SIZE } from '@/pages/ethereum/clients/constants';
+import { toEntityOptions, type EntityOption } from '@/pages/ethereum/clients/utils/client-share';
 
 export interface UseEntityOptionsResult {
   /** Entities with active validators, largest first */

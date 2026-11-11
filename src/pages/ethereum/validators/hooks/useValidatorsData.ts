@@ -12,9 +12,13 @@ import {
 import { fetchAllPages } from '@/utils/api-pagination';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
-import { weekStartOf } from '../utils/week';
-import { rollupPeriods } from '../utils/range';
-import { MISSED_OR_ORPHANED, proposalStatus, type ProposalStatus } from '../utils/proposal-status';
+import { weekStartOf } from '@/pages/ethereum/validators/utils/week';
+import { rollupPeriods } from '@/pages/ethereum/validators/utils/range';
+import {
+  MISSED_OR_ORPHANED,
+  proposalStatus,
+  type ProposalStatus,
+} from '@/pages/ethereum/validators/utils/proposal-status';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,

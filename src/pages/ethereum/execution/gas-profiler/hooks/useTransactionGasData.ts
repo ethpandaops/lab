@@ -4,10 +4,17 @@ import { intTransactionCallFrameServiceList, intTransactionOpcodeGasServiceList 
 import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { TransactionMetadata, CallTreeNode, OpcodeStats } from '../IndexPage.types';
+import type {
+  TransactionMetadata,
+  CallTreeNode,
+  OpcodeStats,
+} from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
 import { useFunctionSignatures, type FunctionSignatureMap } from './useFunctionSignatures';
-import { getPrecompileOwnerMap, isPrecompileAddress } from '../utils/precompileNames';
+import {
+  getPrecompileOwnerMap,
+  isPrecompileAddress,
+} from '@/pages/ethereum/execution/gas-profiler/utils/precompileNames';
 
 /**
  * Per-call-frame opcode statistics for "interesting" opcodes

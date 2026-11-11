@@ -14,7 +14,7 @@ import {
   verdictClass,
   type MetricId,
   type PerformanceCounts,
-} from '../../utils/performance';
+} from '@/pages/ethereum/entities/utils/performance';
 
 export interface PerformanceStatsProps {
   /** Every validator's counts */

@@ -10,7 +10,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { SLOTS_PER_EPOCH, slotToEpoch, slotToTimestamp, timestampToSlot } from '@/utils/beacon';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { EpochFilters } from '../IndexPage.types';
+import type { EpochFilters } from '@/pages/ethereum/epochs/IndexPage.types';
 import {
   encodeEpochCursor,
   epochBounds,
@@ -22,7 +22,7 @@ import {
   summariseEpochs,
   summaryQuery,
   type EpochRow,
-} from '../utils/epoch-query';
+} from '@/pages/ethereum/epochs/utils/epoch-query';
 
 /**
  * Extra finalized epochs read with a participation range, for those the server keeps by basis points that fall just

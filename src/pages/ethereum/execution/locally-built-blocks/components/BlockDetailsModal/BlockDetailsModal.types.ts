@@ -1,4 +1,4 @@
-import type { ParsedBlock } from '../../hooks';
+import type { ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 export interface BlockDetailsModalProps {
   /**

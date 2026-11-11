@@ -5,7 +5,7 @@ import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { formatSlot } from '@/utils';
-import { formatSeconds } from '../../utils/partial-columns';
+import { formatSeconds } from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
 
 export interface SlowestBlocksProps {
   blocks: FctBlockDataColumnCompletion[];

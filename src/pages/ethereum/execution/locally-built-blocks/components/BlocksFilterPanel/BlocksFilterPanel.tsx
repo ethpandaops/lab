@@ -4,8 +4,8 @@ import { FilterBar, type FilterChipItem, FilterField, FilterRange, formatRange }
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu, type SelectMenuOption } from '@/components/Forms/SelectMenu';
 import { formatClientName } from '@/utils/graffiti';
-import type { BlockFilters } from '../../IndexPage.types';
-import type { NodeRoster } from '../../hooks';
+import type { BlockFilters } from '@/pages/ethereum/execution/locally-built-blocks/IndexPage.types';
+import type { NodeRoster } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 export interface BlocksFilterPanelProps {
   filters: BlockFilters;

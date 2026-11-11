@@ -5,7 +5,7 @@ import { formatClientName } from '@/utils/graffiti';
 import type { SeriesData } from '@/components/Charts/MultiLine';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { OTHER_VERSION_COLOR, type VersionCount } from './client-versions';
-import { RESOLVED_STATUSES } from '../api/client-models';
+import { RESOLVED_STATUSES } from '@/pages/ethereum/clients/api/client-models';
 import type { ClientLayer, ClientSummary } from './client-share';
 
 /**

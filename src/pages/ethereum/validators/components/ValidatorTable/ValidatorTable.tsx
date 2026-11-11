@@ -9,10 +9,10 @@ import type {
   BalanceDailyDataPoint,
   SyncCommitteeDailyDataPoint,
   BlockProposalDataPoint,
-} from '../../hooks/useValidatorsData.types';
-import { DailyBreakdownTable } from '../DailyBreakdownTable';
-import { BeaconchainLink } from '../ValidatorIdentity/ValidatorIdentity';
-import type { ValidatorSelection } from '../ValidatorHeatmap';
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { DailyBreakdownTable } from '@/pages/ethereum/validators/components/DailyBreakdownTable';
+import { BeaconchainLink } from '@/pages/ethereum/validators/components/ValidatorIdentity/ValidatorIdentity';
+import type { ValidatorSelection } from '@/pages/ethereum/validators/components/ValidatorHeatmap';
 
 interface ValidatorTableProps {
   /** Array of validator metrics */

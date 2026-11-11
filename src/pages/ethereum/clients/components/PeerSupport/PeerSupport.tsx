@@ -5,7 +5,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import type { DimClientRelease, FctPeerPartialMessageSupportByClientDaily } from '@/api/types.gen';
 import { compareVersions } from '@/utils/version';
-import { displayVersion } from '../../utils/client-versions';
+import { displayVersion } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface PeerSupportProps {
   client: string;

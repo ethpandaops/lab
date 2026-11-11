@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
-import { axisCeiling, formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import { rowsByBucket, type NodeHistory } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { axisCeiling, formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface ColumnArrivalChartProps {
   history: NodeHistory;

@@ -1,5 +1,8 @@
-import type { CallTreeNode } from '../IndexPage.types';
-import type { AllCallFrameOpcodesMap, CallFrameOpcodeData } from '../hooks/useAllCallFrameOpcodes';
+import type { CallTreeNode } from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
+import type {
+  AllCallFrameOpcodesMap,
+  CallFrameOpcodeData,
+} from '@/pages/ethereum/execution/gas-profiler/hooks/useAllCallFrameOpcodes';
 import { getOpcodeCategory } from './opcodeUtils';
 
 /**

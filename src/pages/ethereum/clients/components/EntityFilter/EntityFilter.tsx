@@ -2,7 +2,7 @@ import { type JSX, useMemo, useState } from 'react';
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { ChevronUpDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
 import clsx from 'clsx';
-import { entityLabel, type EntityOption } from '../../utils/client-share';
+import { entityLabel, type EntityOption } from '@/pages/ethereum/clients/utils/client-share';
 
 export interface EntityFilterProps {
   /** Selected entity, undefined for all */

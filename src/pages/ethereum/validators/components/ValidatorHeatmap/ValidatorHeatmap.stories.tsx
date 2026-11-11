@@ -11,7 +11,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import { ValidatorHeatmap } from './ValidatorHeatmap';
 import type { HeatmapMetric } from './ValidatorHeatmap';
-import type { AttestationDailyDataPoint } from '../../hooks/useValidatorsData.types';
+import type { AttestationDailyDataPoint } from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
 
 /** Generate mock daily attestation data */
 function generateMockDailyData(validatorIndices: number[], from: number, to: number): AttestationDailyDataPoint[] {

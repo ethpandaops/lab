@@ -10,9 +10,9 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { TableCard, TableSearch } from '@/pages/ethereum/validators/components';
 import { formatCompact } from '@/pages/ethereum/validators/utils/overview';
 
-import type { EntityStake } from '../../hooks';
-import { groupName } from '../../utils/groups';
-import { formatEthChange } from '../../utils/overview';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks';
+import { groupName } from '@/pages/ethereum/entities/utils/groups';
+import { formatEthChange } from '@/pages/ethereum/entities/utils/overview';
 import {
   compare,
   formatSample,
@@ -23,7 +23,7 @@ import {
   type Comparison,
   type MetricId,
   type PerformanceCounts,
-} from '../../utils/performance';
+} from '@/pages/ethereum/entities/utils/performance';
 
 type View = 'stake' | 'attestations' | 'proposals';
 

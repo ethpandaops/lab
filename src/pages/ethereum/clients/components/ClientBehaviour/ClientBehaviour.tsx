@@ -5,14 +5,19 @@ import type { Stat } from '@/components/DataDisplay/Stats/Stats.types';
 import type {
   FctAttestationVoteCorrectnessByClientDaily,
   FctBlockProposalByClientDaily,
-} from '../../api/client-models';
-import type { ClientLayer } from '../../utils/client-share';
-import { UNKNOWN_CLIENT } from '../../constants';
-import { latestDay as latestDayOf } from '../../utils/census';
-import { sinceSuffix } from '../../utils/client-versions';
-import { ClientMetricCompare } from '../ClientMetricCompare';
-import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
-import { useAttestationRows, useProposalRows } from '../../hooks/usePerformanceRows';
+} from '@/pages/ethereum/clients/api/client-models';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
+import { UNKNOWN_CLIENT } from '@/pages/ethereum/clients/constants';
+import { latestDay as latestDayOf } from '@/pages/ethereum/clients/utils/census';
+import { sinceSuffix } from '@/pages/ethereum/clients/utils/client-versions';
+import { ClientMetricCompare } from '@/pages/ethereum/clients/components/ClientMetricCompare';
+import {
+  ATTESTATION_METRICS,
+  PROPOSAL_METRICS,
+  ratio,
+  type ClientMetric,
+} from '@/pages/ethereum/clients/utils/client-metrics';
+import { useAttestationRows, useProposalRows } from '@/pages/ethereum/clients/hooks/usePerformanceRows';
 
 export interface ClientBehaviourProps {
   /** Client the page is about, highlighted; none on the clients overview */

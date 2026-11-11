@@ -2,8 +2,8 @@ import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { Link } from '@tanstack/react-router';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
-import { useBlockTransactionOpcodes } from '../../hooks/useBlockTransactionOpcodes';
+import { CATEGORY_COLORS, getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils';
+import { useBlockTransactionOpcodes } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
 
 /**
  * Format gas value with suffixes (K, M, B)

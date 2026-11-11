@@ -1,4 +1,4 @@
-import type { TxSummary } from '../SimulatePage.types';
+import type { TxSummary } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 
 export const SIM_TX_SORT_FIELDS = ['impact', 'delta', 'index', 'originalGas', 'simulatedGas', 'reverts'] as const;
 export type SimTxSortField = (typeof SIM_TX_SORT_FIELDS)[number];

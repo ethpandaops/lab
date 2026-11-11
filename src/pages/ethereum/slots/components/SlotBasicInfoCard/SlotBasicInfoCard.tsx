@@ -19,8 +19,8 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useIsPageEnabled } from '@/hooks/useIsPageEnabled';
 import { useNetwork } from '@/hooks/useNetwork';
 import { GRAFFITI_FORMAT_LABELS, formatClientName } from '@/utils/graffiti';
-import { useSlotProposerClient, type ProposerClientField } from '../../hooks/useSlotProposerClient';
-import { noDataBefore } from '../../hooks/useSlotTableCoverage';
+import { useSlotProposerClient, type ProposerClientField } from '@/pages/ethereum/slots/hooks/useSlotProposerClient';
+import { noDataBefore } from '@/pages/ethereum/slots/hooks/useSlotTableCoverage';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 

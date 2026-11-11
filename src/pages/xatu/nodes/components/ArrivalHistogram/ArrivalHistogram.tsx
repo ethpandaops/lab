@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { hoveredIndex, renderTooltip } from '../../utils/chart-tooltip';
-import { histogram } from '../../utils/node-stats';
+import { hoveredIndex, renderTooltip } from '@/pages/xatu/nodes/utils/chart-tooltip';
+import { histogram } from '@/pages/xatu/nodes/utils/node-stats';
 
 export interface ArrivalHistogramProps {
   title: string;

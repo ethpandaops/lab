@@ -6,14 +6,23 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { getClientColor } from '@/utils/ethereum';
-import { CENSUS_TABLES, type FctPeerCountByClientPairDaily } from '../../api/client-models';
-import { SHARE_WINDOW_TEXT, UNKNOWN_CLIENT, type ShareWindow } from '../../constants';
-import { useCensus, useClientCounts } from '../../hooks';
-import { usePairMetrics, type AttestationPairRow, type ProposalPairRow } from '../../hooks/usePairMetrics';
-import { partnerRows, type ClientLayer, type PartnerRow } from '../../utils/client-share';
-import { sinceSuffix } from '../../utils/client-versions';
-import { ATTESTATION_METRICS, PROPOSAL_METRICS, ratio, type ClientMetric } from '../../utils/client-metrics';
-import { ShareBar } from '../ShareBar';
+import { CENSUS_TABLES, type FctPeerCountByClientPairDaily } from '@/pages/ethereum/clients/api/client-models';
+import { SHARE_WINDOW_TEXT, UNKNOWN_CLIENT, type ShareWindow } from '@/pages/ethereum/clients/constants';
+import { useCensus, useClientCounts } from '@/pages/ethereum/clients/hooks';
+import {
+  usePairMetrics,
+  type AttestationPairRow,
+  type ProposalPairRow,
+} from '@/pages/ethereum/clients/hooks/usePairMetrics';
+import { partnerRows, type ClientLayer, type PartnerRow } from '@/pages/ethereum/clients/utils/client-share';
+import { sinceSuffix } from '@/pages/ethereum/clients/utils/client-versions';
+import {
+  ATTESTATION_METRICS,
+  PROPOSAL_METRICS,
+  ratio,
+  type ClientMetric,
+} from '@/pages/ethereum/clients/utils/client-metrics';
+import { ShareBar } from '@/pages/ethereum/clients/components/ShareBar';
 
 /** The other layer's name, for labels */
 function otherLabel(layer: ClientLayer): string {

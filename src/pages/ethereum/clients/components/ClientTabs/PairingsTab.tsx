@@ -7,11 +7,11 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { fctBlockGraffitiClientVersionPairDailyServiceList } from '@/api/sdk.gen';
 import type { FctBlockGraffitiClientVersionPairDaily } from '@/api/types.gen';
-import { RESOLVED_STATUSES } from '../../api/client-models';
-import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, UNKNOWN_CLIENT } from '../../constants';
-import { useDailyByClient } from '../../hooks';
-import { windowStart } from '../../utils/client-versions';
-import { PartnerShares } from '../PartnerBreakdown';
+import { RESOLVED_STATUSES } from '@/pages/ethereum/clients/api/client-models';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, UNKNOWN_CLIENT } from '@/pages/ethereum/clients/constants';
+import { useDailyByClient } from '@/pages/ethereum/clients/hooks';
+import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
+import { PartnerShares } from '@/pages/ethereum/clients/components/PartnerBreakdown';
 import type { ClientTabProps } from './ClientTabs.types';
 
 interface VersionPairing {

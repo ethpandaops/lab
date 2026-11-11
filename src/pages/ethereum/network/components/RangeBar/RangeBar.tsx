@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import { RANGE_OPTIONS, type NetworkRange } from '../../constants';
-import { dayStart } from '../../utils/network-census';
+import { RANGE_OPTIONS, type NetworkRange } from '@/pages/ethereum/network/constants';
+import { dayStart } from '@/pages/ethereum/network/utils/network-census';
 
 export interface RangeBarProps {
   range: NetworkRange;

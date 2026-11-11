@@ -26,7 +26,7 @@ import {
   opcodeCosts,
   summariseBuildLines,
   type BuildLineStats,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface ReferenceEngineProps {
   client: string;

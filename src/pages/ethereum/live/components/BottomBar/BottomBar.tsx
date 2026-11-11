@@ -2,9 +2,9 @@ import { type JSX, memo, useState } from 'react';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { Tab } from '@/components/Navigation/Tab';
-import { BlobDataAvailability } from '../BlobDataAvailability';
-import { DataColumnDataAvailability } from '../DataColumnDataAvailability';
-import { AttestationArrivals } from '../AttestationArrivals';
+import { BlobDataAvailability } from '@/pages/ethereum/live/components/BlobDataAvailability';
+import { DataColumnDataAvailability } from '@/pages/ethereum/live/components/DataColumnDataAvailability';
+import { AttestationArrivals } from '@/pages/ethereum/live/components/AttestationArrivals';
 import type { BottomBarProps } from './BottomBar.types';
 
 function BottomBarComponent({

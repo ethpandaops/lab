@@ -10,11 +10,15 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease, FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
-import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '../../hooks';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { censusVersionCounts, PEER_SOURCE, sum } from '../../utils/census';
-import type { ClientLayer } from '../../utils/client-share';
+import {
+  CENSUS_TABLES,
+  RESOLVED_STATUSES,
+  type FctPeerCountByElClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
+import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '@/pages/ethereum/clients/hooks';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { censusVersionCounts, PEER_SOURCE, sum } from '@/pages/ethereum/clients/utils/census';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import {
   adoptionByDay,
   countVersionsByDay,
@@ -24,7 +28,7 @@ import {
   type AdoptionPoint,
   type VersionCount,
   type VersionDay,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 /** Whether the chart draws the share on exactly the version or on it or newer */
 type ShareMode = 'atLeast' | 'exact';

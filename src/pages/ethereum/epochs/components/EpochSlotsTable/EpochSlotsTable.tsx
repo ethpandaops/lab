@@ -12,7 +12,7 @@ import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useTablesBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 import { timestampToSlot } from '@/utils/beacon';
-import type { SlotData } from '../../hooks/useEpochDetailData.types';
+import type { SlotData } from '@/pages/ethereum/epochs/hooks/useEpochDetailData.types';
 import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
 
 /**

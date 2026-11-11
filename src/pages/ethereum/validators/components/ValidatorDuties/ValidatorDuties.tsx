@@ -1,11 +1,11 @@
 import { type JSX, useState } from 'react';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { FctBlockProposerByValidator } from '@/api/types.gen';
-import { ValidatorEvents } from '../ValidatorEvents';
+import { ValidatorEvents } from '@/pages/ethereum/validators/components/ValidatorEvents';
 import { AttestationDuties } from './AttestationDuties';
 import { ProposalDuties } from './ProposalDuties';
 import { SyncDuties } from './SyncDuties';
-import { InspectSection } from '../InspectSection';
+import { InspectSection } from '@/pages/ethereum/validators/components/InspectSection';
 
 type ActivityTab = 'attestations' | 'proposals' | 'sync' | 'events';
 

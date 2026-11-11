@@ -14,7 +14,7 @@ import {
   fctBlockServiceList,
   intBlockProposerCanonicalServiceList,
 } from '@/api/sdk.gen';
-import type { SlotFilters, SlotSort } from '../IndexPage.types';
+import type { SlotFilters, SlotSort } from '@/pages/ethereum/slots/IndexPage.types';
 import {
   SORT_COLUMNS,
   applyRow,
@@ -30,7 +30,7 @@ import {
   type SlotFacts,
   type SlotRow,
   type SlotTable,
-} from '../utils/slot-query';
+} from '@/pages/ethereum/slots/utils/slot-query';
 
 /** Driver rows read per request while filters are checked here */
 const SCAN_BATCH = 250;

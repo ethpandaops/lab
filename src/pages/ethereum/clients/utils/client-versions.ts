@@ -8,7 +8,7 @@ import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } fro
 import { compareVersions } from '@/utils/version';
 import { completeBucketEnd } from '@/utils/time';
 import { findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
-import { RESOLVED_STATUSES } from '../api/client-models';
+import { RESOLVED_STATUSES } from '@/pages/ethereum/clients/api/client-models';
 
 export { releaseName, releaseUrl, type ClientRelease } from '@/utils/graffiti';
 import type { ClientLayer } from './client-share';

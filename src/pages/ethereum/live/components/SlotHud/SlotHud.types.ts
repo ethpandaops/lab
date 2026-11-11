@@ -1,5 +1,8 @@
-import type { ClientValidationRow, EpbsSlotData } from '../../hooks/useSlotViewData/useSlotViewData.types';
-import type { BlockDetailsData } from '../../hooks/useBlockDetailsData/useBlockDetailsData.types';
+import type {
+  ClientValidationRow,
+  EpbsSlotData,
+} from '@/pages/ethereum/live/hooks/useSlotViewData/useSlotViewData.types';
+import type { BlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData/useBlockDetailsData.types';
 
 export interface SlotHudProps {
   /** Live time within the slot, in milliseconds (0–12000) — gates fade-ins. */

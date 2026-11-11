@@ -11,9 +11,9 @@ import {
   fctBlockProposalByEntityGroupDailyList,
   type FctAttestationVoteCorrectnessByEntityDaily,
   type FctBlockProposalByEntityDaily,
-} from '../api/entity-models';
-import { groupId, isEntityGroup } from '../utils/groups';
-import { addCounts, EMPTY_COUNTS, toCounts, type PerformanceCounts } from '../utils/performance';
+} from '@/pages/ethereum/entities/api/entity-models';
+import { groupId, isEntityGroup } from '@/pages/ethereum/entities/utils/groups';
+import { addCounts, EMPTY_COUNTS, toCounts, type PerformanceCounts } from '@/pages/ethereum/entities/utils/performance';
 
 export interface UseEntityPerformanceHistoryResult {
   /** Days from the start to the end, oldest first */

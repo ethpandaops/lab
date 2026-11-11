@@ -4,8 +4,8 @@ import { ArrowTopRightOnSquareIcon, ExclamationTriangleIcon, ArrowPathIcon } fro
 import clsx from 'clsx';
 import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
-import type { GasScheduleDefaults } from '../../SimulatePage.types';
-import { GLAMSTERDAM_PRESET } from '../../SimulatePage.types';
+import type { GasScheduleDefaults } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
+import { GLAMSTERDAM_PRESET } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 
 /**
  * EIP section definition for the preset modal

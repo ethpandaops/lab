@@ -12,9 +12,14 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor, normalizeClientName } from '@/utils';
 import type { FctEngineGetBlobsByElClientHourly, FctEngineGetBlobsByElClientDaily } from '@/api/types.gen';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
-import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import type { EngineTimingsData } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
+import {
+  PER_SLOT_CHART_RANGES,
+  HOURLY_CHART_RANGES,
+  TIME_RANGE_CONFIG,
+  type TimeRange,
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
+import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;

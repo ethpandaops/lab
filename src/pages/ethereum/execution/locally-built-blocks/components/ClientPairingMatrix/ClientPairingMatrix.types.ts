@@ -1,4 +1,4 @@
-import type { ClientPairingMap, ParsedBlock } from '../../hooks';
+import type { ClientPairingMap, ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 export interface ClientPairingMatrixProps {
   executionClients: string[];

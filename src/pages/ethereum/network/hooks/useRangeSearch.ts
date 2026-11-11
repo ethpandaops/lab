@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { DEFAULT_RANGE, type NetworkRange } from '../constants';
+import { DEFAULT_RANGE, type NetworkRange } from '@/pages/ethereum/network/constants';
 
 /** The network page's range from its `t` search param, and a setter that keeps the other params */
 export function useRangeSearch(): {

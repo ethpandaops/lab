@@ -6,8 +6,8 @@ import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { Toggle } from '@/components/Forms/Toggle';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { FunnelIcon, XMarkIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
-import type { FilterValues } from '../../IndexPage.types';
-import { ENGINE_STATUS_VALUES, DEFAULT_DURATION_MIN } from '../../IndexPage.types';
+import type { FilterValues } from '@/pages/ethereum/execution/payloads/IndexPage.types';
+import { ENGINE_STATUS_VALUES, DEFAULT_DURATION_MIN } from '@/pages/ethereum/execution/payloads/IndexPage.types';
 
 type FilterPanelProps = {
   filters: FilterValues;

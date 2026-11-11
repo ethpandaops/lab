@@ -12,9 +12,9 @@ import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClien
 import { formatBytes } from '@/utils/number';
 import { formatGasToMillions } from '@/utils/gas';
 import { formatWeiAsEth } from '@/utils/epbs';
-import type { BlockSortKey } from '../../IndexPage.types';
-import { nodeIdOf } from '../../utils/block-query';
-import { parseExecutionClient } from '../../utils';
+import type { BlockSortKey } from '@/pages/ethereum/execution/locally-built-blocks/IndexPage.types';
+import { nodeIdOf } from '@/pages/ethereum/execution/locally-built-blocks/utils/block-query';
+import { parseExecutionClient } from '@/pages/ethereum/execution/locally-built-blocks/utils';
 
 export interface PreparedBlocksTableProps {
   blocks: FctPreparedBlock[];

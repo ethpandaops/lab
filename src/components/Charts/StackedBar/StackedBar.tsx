@@ -9,7 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { StackedBarProps } from './StackedBar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { getChartTooltipChrome } from '../chartChrome';
+import { getChartTooltipChrome } from '@/components/Charts/chartChrome';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { isKnownClient } from '@/utils/ethereum';
 

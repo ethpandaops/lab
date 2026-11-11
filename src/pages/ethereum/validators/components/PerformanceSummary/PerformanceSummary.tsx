@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats';
-import type { AggregateSummary } from '../../hooks/useValidatorsData.types';
+import type { AggregateSummary } from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
 
 interface PerformanceSummaryProps {
   /** Aggregate summary data */

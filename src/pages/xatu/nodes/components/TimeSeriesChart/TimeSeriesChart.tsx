@@ -3,9 +3,9 @@ import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimezone } from '@/hooks/useTimezone';
-import type { Granularity } from '../../constants';
-import { hoveredIndex, renderTooltip, type TooltipRow } from '../../utils/chart-tooltip';
-import { bucketAxisLabel, bucketHeading } from '../../utils/time-buckets';
+import type { Granularity } from '@/pages/xatu/nodes/constants';
+import { hoveredIndex, renderTooltip, type TooltipRow } from '@/pages/xatu/nodes/utils/chart-tooltip';
+import { bucketAxisLabel, bucketHeading } from '@/pages/xatu/nodes/utils/time-buckets';
 
 export interface TimeSeriesChartProps {
   title: string;

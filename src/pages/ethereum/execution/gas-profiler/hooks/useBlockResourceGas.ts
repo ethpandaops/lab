@@ -3,8 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { intBlockResourceGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntBlockResourceGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { toResourceEntries, getResourceRefund, getTotalResourceGas } from '../utils/resourceGas';
-import type { ResourceGasEntry } from '../utils/resourceGas';
+import {
+  toResourceEntries,
+  getResourceRefund,
+  getTotalResourceGas,
+} from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import type { ResourceGasEntry } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface UseBlockResourceGasOptions {
   blockNumber: number | null;

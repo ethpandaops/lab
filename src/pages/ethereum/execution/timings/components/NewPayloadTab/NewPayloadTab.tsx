@@ -18,9 +18,14 @@ import type {
   FctEngineNewPayloadWinrateDaily,
   IntEngineNewPayloadFastestExecutionByNodeClass,
 } from '@/api/types.gen';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
-import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import type { EngineTimingsData } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
+import {
+  PER_SLOT_CHART_RANGES,
+  HOURLY_CHART_RANGES,
+  TIME_RANGE_CONFIG,
+  type TimeRange,
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
+import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;

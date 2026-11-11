@@ -14,10 +14,10 @@ import type {
   FctHeadFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
 } from '@/api/types.gen';
-import { useSlotNodeResources } from '../../hooks/useSlotNodeResources';
-import { useSlotNodeMemory } from '../../hooks/useSlotNodeMemory';
-import { useSlotNodeDiskIo } from '../../hooks/useSlotNodeDiskIo';
-import { useSlotNodeNetworkIo } from '../../hooks/useSlotNodeNetworkIo';
+import { useSlotNodeResources } from '@/pages/xatu/nodes/hooks/useSlotNodeResources';
+import { useSlotNodeMemory } from '@/pages/xatu/nodes/hooks/useSlotNodeMemory';
+import { useSlotNodeDiskIo } from '@/pages/xatu/nodes/hooks/useSlotNodeDiskIo';
+import { useSlotNodeNetworkIo } from '@/pages/xatu/nodes/hooks/useSlotNodeNetworkIo';
 import { NodeSelector, type NodeClientInfo } from './NodeSelector';
 import { CpuUtilizationChart } from './CpuUtilizationChart';
 import { MemoryUsageChart } from './MemoryUsageChart';

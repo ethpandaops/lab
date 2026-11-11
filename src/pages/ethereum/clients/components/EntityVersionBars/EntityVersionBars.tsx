@@ -13,7 +13,7 @@ import {
   summariseVersions,
   versionColors,
   type VersionCount,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface EntityVersionBarsProps {
   client: string;

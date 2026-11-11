@@ -6,8 +6,8 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getDataVizColors } from '@/utils';
 import type { FctValidatorBalanceDaily } from '@/api/types.gen';
-import { useValidatorRewards } from '../../hooks/useValidatorRewards';
-import { formatDayLabel } from '../../utils/overview';
+import { useValidatorRewards } from '@/pages/ethereum/validators/hooks/useValidatorRewards';
+import { formatDayLabel } from '@/pages/ethereum/validators/utils/overview';
 
 interface ValidatorBalanceProps {
   balances: FctValidatorBalanceDaily[];

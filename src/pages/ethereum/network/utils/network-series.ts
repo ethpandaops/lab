@@ -3,7 +3,7 @@ import type { FctPeerConcentrationElDaily, FctPeerCountByCountryDaily } from '@/
 import { CONSENSUS_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { OTHER_VERSION_COLOR } from '@/pages/ethereum/clients/utils/client-versions';
-import type { PlaceCensusRow } from '../hooks/usePlaceCensus';
+import type { PlaceCensusRow } from '@/pages/ethereum/network/hooks/usePlaceCensus';
 import { layerCounts, sumBy } from './network-census';
 
 type DayRow = { day_start_date?: string };

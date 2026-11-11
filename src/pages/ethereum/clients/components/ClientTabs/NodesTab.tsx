@@ -6,9 +6,9 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { getClientColor } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
-import { displayVersion } from '../../utils/client-versions';
-import { NodeTable } from '../NodeTable';
-import { ShareTable } from '../ShareTable';
+import { displayVersion } from '@/pages/ethereum/clients/utils/client-versions';
+import { NodeTable } from '@/pages/ethereum/clients/components/NodeTable';
+import { ShareTable } from '@/pages/ethereum/clients/components/ShareTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */

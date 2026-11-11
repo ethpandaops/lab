@@ -9,7 +9,7 @@ import { Epoch } from '@/components/Ethereum/Epoch';
 import { useNetwork } from '@/hooks/useNetwork';
 import { epochToTimestamp } from '@/utils';
 import type { DimValidatorStatus } from '@/api/types.gen';
-import type { ValidatorIdentity as Identity } from '../../hooks/useValidatorIdentity';
+import type { ValidatorIdentity as Identity } from '@/pages/ethereum/validators/hooks/useValidatorIdentity';
 
 /** Status and balances at one point in time */
 export type ValidatorState = Pick<Identity, 'status' | 'slashed' | 'balanceEth' | 'effectiveBalanceEth'>;

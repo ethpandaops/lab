@@ -5,7 +5,7 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Slot } from '@/components/Ethereum/Slot';
 import { formatSlot } from '@/utils';
 import type { BlockDetailsModalProps } from './BlockDetailsModal.types';
-import type { ParsedBlock } from '../../hooks';
+import type { ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 /**
  * Formats a wei value to ETH with proper formatting

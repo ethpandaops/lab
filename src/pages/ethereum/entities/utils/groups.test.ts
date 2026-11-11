@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { EntityStake } from '../hooks/useEntityStake';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks/useEntityStake';
 import { countsOf, groupCounts, groupMembers, groupStakes } from './groups';
 import { metricById, metricValue, toCounts } from './performance';
 

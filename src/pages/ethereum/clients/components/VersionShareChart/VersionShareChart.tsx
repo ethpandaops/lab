@@ -3,7 +3,11 @@ import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { compareVersions } from '@/utils/version';
-import { OTHER_VERSION_COLOR, groupVersionLines, type VersionDay } from '../../utils/client-versions';
+import {
+  OTHER_VERSION_COLOR,
+  groupVersionLines,
+  type VersionDay,
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface VersionShareChartProps {
   days: VersionDay[];

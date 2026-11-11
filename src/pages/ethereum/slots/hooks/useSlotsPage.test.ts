@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { SlotFilters, SlotSort } from '../IndexPage.types';
-import { GAS_PER_BLOB, VALUE_SORT_SECONDS } from '../utils/slot-query';
+import type { SlotFilters, SlotSort } from '@/pages/ethereum/slots/IndexPage.types';
+import { GAS_PER_BLOB, VALUE_SORT_SECONDS } from '@/pages/ethereum/slots/utils/slot-query';
 import { fetchSlotsPage, type SlotsPageArgs } from './useSlotsPage';
 
 type Row = Record<string, unknown> & { slot: number; slot_start_date_time: number };

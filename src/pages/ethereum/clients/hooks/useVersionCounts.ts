@@ -12,10 +12,10 @@ import {
   fctBlockGraffitiClientVersionByEntityWeeklyList,
   fctBlockGraffitiClientVersionDailyList,
   fctBlockGraffitiClientVersionHourlyList,
-} from '../api/client-models';
-import { PAGE_SIZE } from '../constants';
-import { entityQuery, type ClientLayer } from '../utils/client-share';
-import { toVersionCounts, type VersionCount } from '../utils/client-versions';
+} from '@/pages/ethereum/clients/api/client-models';
+import { PAGE_SIZE } from '@/pages/ethereum/clients/constants';
+import { entityQuery, type ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
+import { toVersionCounts, type VersionCount } from '@/pages/ethereum/clients/utils/client-versions';
 
 const DAY = 86400;
 /** Hourly windows load in chunks of this many days, in parallel */

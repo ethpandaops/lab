@@ -10,11 +10,11 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { DimClientRelease } from '@/api/types.gen';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { OTHER_VERSION_COLOR, type LatestAdoption } from '../../utils/client-versions';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { PEER_SOURCE, peerShareChart, unifiedClientRows } from '../../utils/census';
-import type { ClientLayer, ClientSummary } from '../../utils/client-share';
-import { ShareBar } from '../ShareBar';
+import { OTHER_VERSION_COLOR, type LatestAdoption } from '@/pages/ethereum/clients/utils/client-versions';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { PEER_SOURCE, peerShareChart, unifiedClientRows } from '@/pages/ethereum/clients/utils/census';
+import type { ClientLayer, ClientSummary } from '@/pages/ethereum/clients/utils/client-share';
+import { ShareBar } from '@/pages/ethereum/clients/components/ShareBar';
 
 export interface LayerClientsProps {
   layer: ClientLayer;

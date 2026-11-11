@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import type { PhaseConnectionProps } from '../../SlotProgressTimeline.types';
+import type { PhaseConnectionProps } from '@/components/Ethereum/SlotProgressTimeline/SlotProgressTimeline.types';
 
 /**
  * PhaseConnection - Simple line between phases in the slot timeline

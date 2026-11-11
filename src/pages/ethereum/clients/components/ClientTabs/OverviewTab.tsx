@@ -9,14 +9,19 @@ import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { formatClientName } from '@/utils/graffiti';
 import { compareVersions } from '@/utils/version';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT, UNKNOWN_CLIENT } from '../../constants';
+import {
+  SHARE_WINDOW_DAYS,
+  SHARE_WINDOW_OPTIONS,
+  SHARE_WINDOW_TEXT,
+  UNKNOWN_CLIENT,
+} from '@/pages/ethereum/clients/constants';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { useCensus, useClientCounts } from '../../hooks';
-import { CENSUS_TABLES } from '../../api/client-models';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { peerShareChart, unifiedClientRows } from '../../utils/census';
-import { clientOf, summariseClients } from '../../utils/client-share';
-import { displayVersion, windowStart } from '../../utils/client-versions';
+import { useCensus, useClientCounts } from '@/pages/ethereum/clients/hooks';
+import { CENSUS_TABLES } from '@/pages/ethereum/clients/api/client-models';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { peerShareChart, unifiedClientRows } from '@/pages/ethereum/clients/utils/census';
+import { clientOf, summariseClients } from '@/pages/ethereum/clients/utils/client-share';
+import { displayVersion, windowStart } from '@/pages/ethereum/clients/utils/client-versions';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */

@@ -1,8 +1,8 @@
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
-import type { ShareWindow, VersionWindow } from '../../constants';
-import type { ClientLayer } from '../../utils/client-share';
-import type { VersionCount } from '../../utils/client-versions';
-import type { ForkRequirement } from '../../utils/fork-requirements';
+import type { ShareWindow, VersionWindow } from '@/pages/ethereum/clients/constants';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
+import type { VersionCount } from '@/pages/ethereum/clients/utils/client-versions';
+import type { ForkRequirement } from '@/pages/ethereum/clients/utils/fork-requirements';
 
 /** Data the client page loads once and its tabs share */
 export interface ClientTabProps {

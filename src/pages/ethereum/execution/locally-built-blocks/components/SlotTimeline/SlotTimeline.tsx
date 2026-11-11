@@ -1,13 +1,13 @@
 import { type JSX, useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import type { SlotTimelineProps } from './SlotTimeline.types';
-import type { ParsedBlock } from '../../hooks';
+import type { ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 import { useInterval } from '@/hooks/useInterval';
-import { BlockDetailsModal } from '../BlockDetailsModal';
+import { BlockDetailsModal } from '@/pages/ethereum/execution/locally-built-blocks/components/BlockDetailsModal';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { formatSlot } from '@/utils';
-import { getIntensity } from '../../utils';
+import { getIntensity } from '@/pages/ethereum/execution/locally-built-blocks/utils';
 import styles from './SlotTimeline.module.css';
 
 /**

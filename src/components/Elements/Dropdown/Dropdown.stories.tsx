@@ -12,7 +12,7 @@ import {
   UserPlusIcon,
 } from '@heroicons/react/20/solid';
 import { Dropdown, DropdownItem, DropdownHeader, DropdownSection } from './Dropdown';
-import { Button } from '../Button';
+import { Button } from '@/components/Elements/Button';
 
 const meta: Meta<typeof Dropdown> = {
   title: 'Components/Elements/Dropdown',

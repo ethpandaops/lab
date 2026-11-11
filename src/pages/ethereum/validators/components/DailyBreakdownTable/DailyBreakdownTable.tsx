@@ -7,12 +7,12 @@ import type {
   BalanceDailyDataPoint,
   SyncCommitteeDailyDataPoint,
   BlockProposalDataPoint,
-} from '../../hooks/useValidatorsData.types';
-import { useHourlyData, useSlotData } from '../../hooks';
-import { getStatusIconConfig } from '../../hooks/useValidatorStatus';
-import { weekStartOf } from '../../utils/week';
-import { weekSpan } from '../../utils/range';
-import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { useHourlyData, useSlotData } from '@/pages/ethereum/validators/hooks';
+import { getStatusIconConfig } from '@/pages/ethereum/validators/hooks/useValidatorStatus';
+import { weekStartOf } from '@/pages/ethereum/validators/utils/week';
+import { weekSpan } from '@/pages/ethereum/validators/utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 
 interface DailyBreakdownTableProps {
   /** Daily attestation data for the validator */

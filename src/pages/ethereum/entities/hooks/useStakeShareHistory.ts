@@ -10,9 +10,9 @@ import {
   ENTITY_TABLES,
   fctValidatorStakeByEntityGroupDailyList,
   type FctValidatorStakeByEntityGroupDaily,
-} from '../api/entity-models';
-import { groupId, isEntityGroup } from '../utils/groups';
-import { daysBack } from '../utils/overview';
+} from '@/pages/ethereum/entities/api/entity-models';
+import { groupId, isEntityGroup } from '@/pages/ethereum/entities/utils/groups';
+import { daysBack } from '@/pages/ethereum/entities/utils/overview';
 
 const GWEI = 1e9;
 const PAGE_SIZE = 10_000;

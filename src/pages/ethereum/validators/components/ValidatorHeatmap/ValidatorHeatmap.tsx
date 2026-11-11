@@ -8,12 +8,15 @@ import { HeatmapChart } from '@/components/Charts/Heatmap';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { formatSlot } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import type { AttestationDailyDataPoint, BlockProposalDataPoint } from '../../hooks/useValidatorsData.types';
-import { useHourlyData, useSlotData } from '../../hooks';
-import type { AttestationSlotDataPoint } from '../../hooks';
-import { formatStatusLabel } from '../../hooks/useValidatorStatus';
-import { weekSpan } from '../../utils/range';
-import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
+import type {
+  AttestationDailyDataPoint,
+  BlockProposalDataPoint,
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { useHourlyData, useSlotData } from '@/pages/ethereum/validators/hooks';
+import type { AttestationSlotDataPoint } from '@/pages/ethereum/validators/hooks';
+import { formatStatusLabel } from '@/pages/ethereum/validators/hooks/useValidatorStatus';
+import { weekSpan } from '@/pages/ethereum/validators/utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 
 const DAY = 86_400;
 

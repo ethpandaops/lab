@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { HistoryRow } from '../hooks/useNodeHistory';
+import type { HistoryRow } from '@/pages/xatu/nodes/hooks/useNodeHistory';
 import { behindStarts, medianByClient, summarizeByNode } from './history';
 import { bucketFilter, getBuckets, parseBucket, weekStart, weightedMedian } from './time-buckets';
 

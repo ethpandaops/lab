@@ -9,9 +9,9 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import type { UsePeerListResult } from '../../hooks/usePeerList';
-import { countryName, dayStart } from '../../utils/network-census';
-import { isHosting, shortPeerId } from '../../utils/network-peers';
+import type { UsePeerListResult } from '@/pages/ethereum/network/hooks/usePeerList';
+import { countryName, dayStart } from '@/pages/ethereum/network/utils/network-census';
+import { isHosting, shortPeerId } from '@/pages/ethereum/network/utils/network-peers';
 
 export interface PeerTableProps {
   title: string;

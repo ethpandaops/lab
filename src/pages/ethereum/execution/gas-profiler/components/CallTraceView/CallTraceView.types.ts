@@ -1,5 +1,5 @@
 import type { IntTransactionCallFrame } from '@/api/types.gen';
-import type { CallFrameOpcodeStats } from '../../hooks/useTransactionGasData';
+import type { CallFrameOpcodeStats } from '@/pages/ethereum/execution/gas-profiler/hooks/useTransactionGasData';
 
 /**
  * Enriched call frame with resolved names

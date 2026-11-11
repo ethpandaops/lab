@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { RESOURCE_COLORS } from '../../utils/resourceGas';
-import type { OpcodeResourceRow } from '../../utils/resourceGas';
+import { RESOURCE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import type { OpcodeResourceRow } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface ResourceGasTableProps {
   /** Per-opcode resource attribution rows */

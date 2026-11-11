@@ -1,5 +1,5 @@
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '../constants';
+import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '@/pages/xatu/nodes/constants';
 
 /** Distribution summary of a set of millisecond timings */
 export interface Summary {

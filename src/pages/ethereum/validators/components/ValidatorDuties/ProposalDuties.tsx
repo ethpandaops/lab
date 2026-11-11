@@ -9,8 +9,8 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { useTableBounds } from '@/hooks/useBounds';
 import type { FctBlockProposerByValidator } from '@/api/types.gen';
-import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
-import { MISSED_OR_ORPHANED } from '../../utils/proposal-status';
+import { TableCard, TableSearch, ValidatorFilter } from '@/pages/ethereum/validators/components/TableCard';
+import { MISSED_OR_ORPHANED } from '@/pages/ethereum/validators/utils/proposal-status';
 
 const STATUS_COLORS: Record<string, 'green' | 'red' | 'orange'> = {
   canonical: 'green',

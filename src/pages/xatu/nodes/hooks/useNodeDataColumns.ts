@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { fctBlockDataColumnSidecarFirstSeenByNodeServiceList } from '@/api/sdk.gen';
 import type { FctBlockDataColumnSidecarFirstSeenByNode } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NETWORK_WINDOW_SLOTS } from '../constants';
-import { median, summarize, type Summary } from '../utils/node-stats';
+import { NETWORK_WINDOW_SLOTS } from '@/pages/xatu/nodes/constants';
+import { median, summarize, type Summary } from '@/pages/xatu/nodes/utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Arrival of the columns a node saw in one slot */

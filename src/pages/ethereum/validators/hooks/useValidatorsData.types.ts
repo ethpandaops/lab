@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '../utils/proposal-status';
+import type { ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,

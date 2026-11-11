@@ -15,10 +15,13 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { TagInput } from '@/components/Forms/TagInput';
 import { formatBytes } from '@/utils';
-import type { TransactionSummary, TxContractFlow } from '../../hooks/useBlockTransactions';
-import { useBlockTransactionOpcodes } from '../../hooks/useBlockTransactionOpcodes';
-import type { GasProfilerBlockSearch } from '../../IndexPage.types';
-import { getOpcodeCategory } from '../../utils/opcodeUtils';
+import type {
+  TransactionSummary,
+  TxContractFlow,
+} from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactions';
+import { useBlockTransactionOpcodes } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
+import type { GasProfilerBlockSearch } from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
+import { getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
 import {
   BLOCK_TX_FILTER_KEYS,
   DEFAULT_BLOCK_TX_PAGE_SIZE,
@@ -33,8 +36,14 @@ import {
   needsOpcodeProfiles,
   parseOpcodeList,
   sortBlockTransactions,
-} from '../../utils/blockTransactionFilters';
-import { type ActiveFilterChip, FilterBar, FilterField, type FilterPreset, RangeFields } from '../FilterBar';
+} from '@/pages/ethereum/execution/gas-profiler/utils/blockTransactionFilters';
+import {
+  type ActiveFilterChip,
+  FilterBar,
+  FilterField,
+  type FilterPreset,
+  RangeFields,
+} from '@/pages/ethereum/execution/gas-profiler/components/FilterBar';
 
 const ROUTE = '/ethereum/execution/gas-profiler/block/$blockNumber';
 

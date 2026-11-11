@@ -4,7 +4,7 @@
  */
 import { client as apiClient } from '@/api/client.gen';
 import type { fetchAllPages } from '@/utils/api-pagination';
-import type { AttestationColumns, ProposalColumns } from '../utils/performance';
+import type { AttestationColumns, ProposalColumns } from '@/pages/ethereum/entities/utils/performance';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 

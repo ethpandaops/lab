@@ -41,7 +41,7 @@ import {
   HOURLY_CHART_RANGES,
   PERCENTILE_WINDOW,
   type TimeRange,
-} from '../IndexPage.types';
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
 
 export interface EngineTimingsData {
   // newPayload per-EL-client aggregations (includes per-slot granularity)

@@ -1,4 +1,4 @@
-import { ExplorerLinks } from '../ExplorerLinks';
+import { ExplorerLinks } from '@/pages/ethereum/execution/gas-profiler/components/ExplorerLinks';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -22,15 +22,15 @@ import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
-import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
+import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
+import { getEtherscanBaseUrl, isMainnet } from '@/pages/ethereum/execution/gas-profiler/utils/explorerLinks';
 import type {
   BlockSimulationResult,
   TxSummary,
   OpcodeSummary,
   CallError,
   GasProfilerSimulateSearch,
-} from '../../SimulatePage.types';
+} from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 import {
   DEFAULT_SIM_TX_PAGE_SIZE,
   DEFAULT_SIM_TX_SORT,
@@ -39,10 +39,16 @@ import {
   type SimTxSortField,
   filterSimulationTransactions,
   sortSimulationTransactions,
-} from '../../utils/simulationTransactionFilters';
-import { formatRangeChip } from '../../utils/blockTransactionFilters';
-import { type ActiveFilterChip, FilterBar, FilterField, type FilterPreset, RangeFields } from '../FilterBar';
-import { ListPagination } from '../ListPagination';
+} from '@/pages/ethereum/execution/gas-profiler/utils/simulationTransactionFilters';
+import { formatRangeChip } from '@/pages/ethereum/execution/gas-profiler/utils/blockTransactionFilters';
+import {
+  type ActiveFilterChip,
+  FilterBar,
+  FilterField,
+  type FilterPreset,
+  RangeFields,
+} from '@/pages/ethereum/execution/gas-profiler/components/FilterBar';
+import { ListPagination } from '@/pages/ethereum/execution/gas-profiler/components/ListPagination';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { getDataVizColors } from '@/utils/dataVizColors';

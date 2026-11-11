@@ -4,8 +4,8 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { Card } from '@/components/Layout/Card';
 
-import type { EntityStake } from '../../hooks';
-import { formatEthChange } from '../../utils/overview';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks';
+import { formatEthChange } from '@/pages/ethereum/entities/utils/overview';
 
 /** Entities shown on each side */
 const PER_SIDE = 8;

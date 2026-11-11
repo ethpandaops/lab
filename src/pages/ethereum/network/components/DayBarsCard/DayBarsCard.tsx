@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
 import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import { dayStart } from '../../utils/network-census';
+import { dayStart } from '@/pages/ethereum/network/utils/network-census';
 
 export interface DayBarsCardProps {
   title: string;

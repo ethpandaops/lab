@@ -8,7 +8,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { DonutProps } from './Donut.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { getChartTooltipChrome, legendItem } from '../chartChrome';
+import { getChartTooltipChrome, legendItem } from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();

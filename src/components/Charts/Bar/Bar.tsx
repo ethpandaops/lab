@@ -17,7 +17,7 @@ import {
   getChartValueAxisName,
   getChartValueSplitLine,
   clientAxisLabel,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level

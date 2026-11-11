@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import type { EpochFilters } from '../IndexPage.types';
+import type { EpochFilters } from '@/pages/ethereum/epochs/IndexPage.types';
 import { fetchEpochsPage, type EpochsPageResult } from './useEpochsData';
 
 /**

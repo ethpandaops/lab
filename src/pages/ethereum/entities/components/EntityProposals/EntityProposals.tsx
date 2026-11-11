@@ -27,7 +27,7 @@ import {
   useEntityBlocksByStatus,
   type ProposalStatus,
   type StatusBlock,
-} from '../../hooks/useEntityBlocksByStatus';
+} from '@/pages/ethereum/entities/hooks/useEntityBlocksByStatus';
 
 export interface EntityProposalsProps {
   entity: string;

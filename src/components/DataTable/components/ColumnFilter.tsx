@@ -2,7 +2,7 @@ import { type JSX, useState, useEffect } from 'react';
 import type { Column } from '@tanstack/react-table';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import type { DataTableColumnMeta } from '../DataTable.types';
+import type { DataTableColumnMeta } from '@/components/DataTable/DataTable.types';
 
 interface ColumnFilterProps<TData> {
   column: Column<TData>;

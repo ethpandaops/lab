@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import type { ThemeColors } from '@/hooks/useThemeColors';
-import type { PartialRecord, PathRecord, PeerRecord } from '../IndexPage.types';
+import type {
+  PartialRecord,
+  PathRecord,
+  PeerRecord,
+} from '@/pages/ethereum/data-availability/partial-columns/IndexPage.types';
 import {
   buildAdoptionSeries,
   buildCellSourceSeries,

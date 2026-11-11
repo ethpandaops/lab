@@ -6,8 +6,8 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd } from '@/utils/time';
-import { PAGE_SIZE } from '../constants';
-import { windowStart } from '../utils/client-versions';
+import { PAGE_SIZE } from '@/pages/ethereum/clients/constants';
+import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
 import { chunksFor, useKeepPrevious } from './useVersionCounts';
 
 const NODE_VERSIONS_TABLE = 'fct_head_first_seen_by_node_daily';

@@ -23,7 +23,7 @@ import {
 } from '@/api/@tanstack/react-query.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
-import type { SlotTableCoverage } from '../useSlotTableCoverage';
+import type { SlotTableCoverage } from '@/pages/ethereum/slots/hooks/useSlotTableCoverage';
 import type {
   FctBlock,
   FctBlockHead,

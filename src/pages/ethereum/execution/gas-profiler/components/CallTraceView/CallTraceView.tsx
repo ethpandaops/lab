@@ -3,11 +3,14 @@ import { useNavigate } from '@tanstack/react-router';
 import { ChevronRightIcon, ChevronDownIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { CallTraceViewProps, EnrichedCallFrame, CallFrameExtendedData } from './CallTraceView.types';
-import { ContractStorageButton } from '../ContractStorageButton';
-import type { CallFrameOpcodeStats } from '../../hooks/useTransactionGasData';
-import { useCallFrameOpcodes, type OpcodeBreakdown } from '../../hooks/useCallFrameOpcodes';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
-import { isPrecompileAddress } from '../../utils/precompileNames';
+import { ContractStorageButton } from '@/pages/ethereum/execution/gas-profiler/components/ContractStorageButton';
+import type { CallFrameOpcodeStats } from '@/pages/ethereum/execution/gas-profiler/hooks/useTransactionGasData';
+import {
+  useCallFrameOpcodes,
+  type OpcodeBreakdown,
+} from '@/pages/ethereum/execution/gas-profiler/hooks/useCallFrameOpcodes';
+import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
+import { isPrecompileAddress } from '@/pages/ethereum/execution/gas-profiler/utils/precompileNames';
 import type { IntTransactionCallFrame } from '@/api/types.gen';
 import { getDataVizColors } from '@/utils/dataVizColors';
 

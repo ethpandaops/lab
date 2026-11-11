@@ -16,7 +16,7 @@ import { BASE_URL } from '@/utils/api-config';
 import { createQueryClient } from '@/utils/query-client';
 import { getBoundsQueryKey, getConfigQueryKey } from '@/lab-api/@tanstack/react-query.gen';
 import { createCatchAllAssetHandler } from './assetHandlers';
-import '../src/index.css';
+import '@/index.css';
 
 // Get the base path from environment
 const basePath = (import.meta.env.STORYBOOK_BASE_PATH || '').replace(/\/$/, '');

@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { clsx } from 'clsx';
 import { ClockIcon, XCircleIcon, BeakerIcon, FireIcon, QueueListIcon } from '@heroicons/react/24/outline';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import type { FilterValues } from '../../IndexPage.types';
-import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
+import type { FilterValues } from '@/pages/ethereum/execution/payloads/IndexPage.types';
+import { DEFAULT_DURATION_MIN } from '@/pages/ethereum/execution/payloads/IndexPage.types';
 
 /**
  * Quick filter preset definition

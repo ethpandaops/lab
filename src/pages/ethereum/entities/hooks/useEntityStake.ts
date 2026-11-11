@@ -7,8 +7,8 @@ import type { FctValidatorStakeByEntityDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 
-import { ENTITIES_WINDOW_DAYS, type EntitiesWindow } from '../constants';
-import { addDays, dayOf, sampleDays } from '../utils/overview';
+import { ENTITIES_WINDOW_DAYS, type EntitiesWindow } from '@/pages/ethereum/entities/constants';
+import { addDays, dayOf, sampleDays } from '@/pages/ethereum/entities/utils/overview';
 
 const GWEI = 1e9;
 const PAGE_SIZE = 10_000;

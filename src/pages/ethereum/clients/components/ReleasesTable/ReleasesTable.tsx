@@ -8,7 +8,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { DimClientRelease } from '@/api/types.gen';
 import { meetsMinVersion } from '@/utils/version';
 import { findReleaseByVersion } from '@/utils/graffiti';
-import { releaseName, releaseUrl, type VersionSummary } from '../../utils/client-versions';
+import { releaseName, releaseUrl, type VersionSummary } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface ReleasesTableProps {
   client: string;

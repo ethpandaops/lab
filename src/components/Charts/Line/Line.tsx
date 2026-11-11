@@ -17,7 +17,7 @@ import {
   getChartTooltipChrome,
   getChartValueAxisName,
   getChartValueSplitLine,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();

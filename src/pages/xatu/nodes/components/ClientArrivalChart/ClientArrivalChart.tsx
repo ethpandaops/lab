@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import type { NodeHistory } from '../../hooks/useNodeHistory';
-import { medianByClient } from '../../utils/history';
-import { formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import type { NodeHistory } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { medianByClient } from '@/pages/xatu/nodes/utils/history';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface ClientArrivalChartProps {
   /** Block rollups of every node */

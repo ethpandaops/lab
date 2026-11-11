@@ -2,7 +2,7 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { getGasScheduleOptions } from '@/lab-api/@tanstack/react-query.gen';
 import type { GetGasScheduleError } from '@/lab-api';
 import { useNetwork } from '@/hooks/useNetwork';
-import type { GasScheduleDefaults } from '../SimulatePage.types';
+import type { GasScheduleDefaults } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 
 /**
  * Parameters for useGasSchedule hook

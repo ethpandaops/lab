@@ -26,7 +26,12 @@ import type {
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { currentUtcDate } from '@/utils/time';
-import { rollupBlocks, slowestBlocks, type PerformanceRollup, type SlowBlock } from '../utils/performance';
+import {
+  rollupBlocks,
+  slowestBlocks,
+  type PerformanceRollup,
+  type SlowBlock,
+} from '@/pages/ethereum/execution/performance/utils/performance';
 
 /** Rows of the per-slot timing table read to find the slowest blocks' candidate slots */
 const SLOWEST_CANDIDATE_ROWS = 100;

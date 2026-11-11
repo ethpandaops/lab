@@ -1,4 +1,7 @@
-import type { FctAttestationVoteCorrectnessByClientDaily, FctBlockProposalByClientDaily } from '../api/client-models';
+import type {
+  FctAttestationVoteCorrectnessByClientDaily,
+  FctBlockProposalByClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
 
 /** A metric as a ratio of two sums over a client's rows, so it combines across days */
 export interface ClientMetric<T> {

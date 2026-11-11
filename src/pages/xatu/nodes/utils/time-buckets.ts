@@ -1,6 +1,6 @@
 import type { TimezoneMode } from '@/contexts/TimezoneContext';
 import { completeBucketEnd, type RollupGrain } from '@/utils/time';
-import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
+import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '@/pages/xatu/nodes/constants';
 
 const HOUR = 3600;
 const DAY = 86400;

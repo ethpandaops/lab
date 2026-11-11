@@ -4,7 +4,7 @@ import type { FctCustodyProbeBySlotAgeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { currentUtcDate } from '@/utils/time';
-import { summariseProbeAge, type ProbeAgeSummary } from '../utils/probe-age';
+import { summariseProbeAge, type ProbeAgeSummary } from '@/pages/ethereum/data-availability/custody/utils/probe-age';
 
 /**
  * Custody probes per complete UTC day, slot age bucket and probed peer client, summarised by slot age. The daily

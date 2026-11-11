@@ -5,8 +5,8 @@ import type { FctPreparedBlockByNodeDaily } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { toUtcDate } from '@/utils/time';
-import { parseExecutionClient } from '../utils';
-import { nodeIdOf } from '../utils/block-query';
+import { parseExecutionClient } from '@/pages/ethereum/execution/locally-built-blocks/utils';
+import { nodeIdOf } from '@/pages/ethereum/execution/locally-built-blocks/utils/block-query';
 
 /** Past this many days the roster reads every day and keeps the window's in memory, instead of listing them */
 const MAX_LISTED_DAYS = 31;

@@ -20,7 +20,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { slotToTimestamp } from '@/utils/beacon';
 import { formatSlot } from '@/utils';
-import { ProbeFlow } from '../ProbeFlow';
+import { ProbeFlow } from '@/pages/ethereum/data-availability/probes/components/ProbeFlow';
 
 export interface ProbeDetailDialogProps {
   /** The probe to display */

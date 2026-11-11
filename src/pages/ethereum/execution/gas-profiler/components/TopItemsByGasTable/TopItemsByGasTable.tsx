@@ -1,7 +1,7 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CALL_TYPE_COLORS } from '../../utils';
+import { CALL_TYPE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();

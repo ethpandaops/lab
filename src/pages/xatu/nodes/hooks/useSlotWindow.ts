@@ -1,8 +1,8 @@
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
-import { WINDOW_STEP_SLOTS } from '../constants';
-import { getSlotWindow } from '../utils/node-stats';
+import { WINDOW_STEP_SLOTS } from '@/pages/xatu/nodes/constants';
+import { getSlotWindow } from '@/pages/xatu/nodes/utils/node-stats';
 
 export interface SlotWindow {
   network: string;

@@ -2,7 +2,7 @@ import type { JSX, ReactNode } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import type { NodeRow } from '../../hooks/useNodeRows';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
 
 export interface LocationsBreakdownProps {
   /** Rows that carry a location */

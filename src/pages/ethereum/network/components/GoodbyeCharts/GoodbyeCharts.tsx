@@ -8,16 +8,16 @@ import { Table } from '@/components/Lists/Table';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
 import { CONSENSUS_CLIENTS_SET } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { SeriesCard } from '../SeriesCard';
-import { dayStart, formatShare } from '../../utils/network-census';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { dayStart, formatShare } from '@/pages/ethereum/network/utils/network-census';
 import {
   clientGoodbyes,
   goodbyeReason,
   reasonsIn,
   TOO_MANY_PEERS,
   type GoodbyeReason,
-} from '../../utils/network-goodbyes';
-import { dayShares, seriesDays } from '../../utils/network-series';
+} from '@/pages/ethereum/network/utils/network-goodbyes';
+import { dayShares, seriesDays } from '@/pages/ethereum/network/utils/network-series';
 
 export interface GoodbyeChartsProps {
   /** Goodbyes per reason code, every day of the range */

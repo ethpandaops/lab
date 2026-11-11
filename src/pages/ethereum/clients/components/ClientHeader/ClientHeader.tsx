@@ -1,7 +1,7 @@
 import type { JSX, ReactNode } from 'react';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Badge } from '@/components/Elements/Badge';
-import type { ClientLayer } from '../../utils/client-share';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 
 export interface ClientHeaderProps {
   client: string;

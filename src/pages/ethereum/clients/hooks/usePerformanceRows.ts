@@ -3,8 +3,8 @@ import {
   fctBlockProposalByClientDailyList,
   type FctAttestationVoteCorrectnessByClientDaily,
   type FctBlockProposalByClientDaily,
-} from '../api/client-models';
-import type { ClientLayer } from '../utils/client-share';
+} from '@/pages/ethereum/clients/api/client-models';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import { useDailyByClient, type UseDailyByClientResult } from './useDailyByClient';
 
 /** Blocks proposed with each client of a layer per day, over a window */

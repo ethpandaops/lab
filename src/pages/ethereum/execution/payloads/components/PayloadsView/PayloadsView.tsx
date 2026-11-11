@@ -12,11 +12,11 @@ import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { IntEngineNewPayload } from '@/api/types.gen';
-import { FilterPanel } from '../FilterPanel';
-import { QuickFilters } from '../QuickFilters';
-import { ReferenceNodesInfoDialog } from '../../../timings/components/ReferenceNodesInfoDialog';
-import type { FilterValues } from '../../IndexPage.types';
-import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
+import { FilterPanel } from '@/pages/ethereum/execution/payloads/components/FilterPanel';
+import { QuickFilters } from '@/pages/ethereum/execution/payloads/components/QuickFilters';
+import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
+import type { FilterValues } from '@/pages/ethereum/execution/payloads/IndexPage.types';
+import { DEFAULT_DURATION_MIN } from '@/pages/ethereum/execution/payloads/IndexPage.types';
 import {
   CheckCircleIcon,
   XCircleIcon,

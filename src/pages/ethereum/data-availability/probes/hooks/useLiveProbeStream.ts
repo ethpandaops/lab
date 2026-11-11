@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { intCustodyProbeServiceList } from '@/api/sdk.gen';
 import type { IntCustodyProbe } from '@/api/types.gen';
-import type { FilterValues } from '../components/FilterPanel';
+import type { FilterValues } from '@/pages/ethereum/data-availability/probes/components/FilterPanel';
 import { useBounds } from '@/hooks/useBounds';
 
 const CONFIG = {

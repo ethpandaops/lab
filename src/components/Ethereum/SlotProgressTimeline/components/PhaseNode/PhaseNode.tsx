@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import type { PhaseNodeProps } from '../../SlotProgressTimeline.types';
+import type { PhaseNodeProps } from '@/components/Ethereum/SlotProgressTimeline/SlotProgressTimeline.types';
 
 /**
  * PhaseNode - Indicator for a phase in the slot timeline

@@ -2,7 +2,7 @@ import { fctPreparedBlockServiceList } from '@/api/sdk.gen';
 import type { FctPreparedBlock, FctPreparedBlockServiceListData } from '@/api/types.gen';
 import { slotToTimestamp } from '@/utils/beacon';
 import { fetchNewestFirst, nowEnd, type NewestFirstPage, type TimeCursor } from '@/utils/widening-window';
-import type { BlockFilters, BlockSortKey } from '../IndexPage.types';
+import type { BlockFilters, BlockSortKey } from '@/pages/ethereum/execution/locally-built-blocks/IndexPage.types';
 
 export type PreparedBlockQuery = NonNullable<FctPreparedBlockServiceListData['query']>;
 

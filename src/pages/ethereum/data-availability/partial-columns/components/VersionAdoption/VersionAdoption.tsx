@@ -2,7 +2,11 @@ import type { JSX } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { getClientColor } from '@/utils/ethereum';
-import { formatClientName, shareOf, type VersionSummary } from '../../utils/partial-columns';
+import {
+  formatClientName,
+  shareOf,
+  type VersionSummary,
+} from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
 
 export interface VersionAdoptionProps {
   /** Consensus client versions with subscribing peers, grouped by client and newest first */

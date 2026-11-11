@@ -20,7 +20,7 @@ import {
   getChartAxisNameStyle,
   getChartTitleTextStyle,
   getChartTooltipChrome,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 
 // Register ECharts components
 echarts.use([

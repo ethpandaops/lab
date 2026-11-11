@@ -1,9 +1,16 @@
 import type { JSX } from 'react';
 import type { FctPeerChurnByClClientDaily, FctPeerChurnDaily } from '@/api/types.gen';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import { SeriesCard } from '../SeriesCard';
-import { CHURN_WINDOW_DAYS } from '../../constants';
-import { clientShareLines, dayShares, daySums, line, seriesDays, stackLayer } from '../../utils/network-series';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { CHURN_WINDOW_DAYS } from '@/pages/ethereum/network/constants';
+import {
+  clientShareLines,
+  dayShares,
+  daySums,
+  line,
+  seriesDays,
+  stackLayer,
+} from '@/pages/ethereum/network/utils/network-series';
 
 export interface ChurnChartsProps {
   /** Churn rows per network type, every day of the range */

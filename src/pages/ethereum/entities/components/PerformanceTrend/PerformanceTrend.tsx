@@ -16,7 +16,7 @@ import {
   METRICS,
   type MetricId,
   type PerformanceCounts,
-} from '../../utils/performance';
+} from '@/pages/ethereum/entities/utils/performance';
 
 export interface PerformanceTrendProps {
   entity: string;

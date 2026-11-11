@@ -3,8 +3,8 @@ import { fctNodeLastSeenServiceList } from '@/api/sdk.gen';
 import type { FctNodeLastSeen } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { NodeRange } from '../constants';
-import { getBuckets } from '../utils/time-buckets';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { getBuckets } from '@/pages/xatu/nodes/utils/time-buckets';
 
 /** Rows from libp2p gossip name tysm sentries "prysm"; read them as tysm like the rollups and every other page */
 function tysmClient(node: FctNodeLastSeen): FctNodeLastSeen {

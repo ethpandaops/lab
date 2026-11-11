@@ -5,7 +5,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd } from '@/utils/time';
-import { PAGE_SIZE } from '../constants';
+import { PAGE_SIZE } from '@/pages/ethereum/clients/constants';
 import { chunksFor, useKeepPrevious } from './useVersionCounts';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];

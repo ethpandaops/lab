@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { formatClientName } from '../../utils/partial-columns';
+import { formatClientName } from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
 
 export interface SentryFilterProps {
   /** Sentry consensus clients with data in the window */

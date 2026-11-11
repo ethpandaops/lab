@@ -2,12 +2,12 @@ import type { JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChevronRightIcon } from '@heroicons/react/16/solid';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '../../constants';
-import { useReferenceEngine } from '../../hooks';
-import { windowStart } from '../../utils/client-versions';
-import { PerformanceHeadline } from '../ClientBehaviour';
-import { PartnerPerformance } from '../PartnerBreakdown';
-import { ReferenceEngine } from '../ReferenceEngine';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '@/pages/ethereum/clients/constants';
+import { useReferenceEngine } from '@/pages/ethereum/clients/hooks';
+import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
+import { PerformanceHeadline } from '@/pages/ethereum/clients/components/ClientBehaviour';
+import { PartnerPerformance } from '@/pages/ethereum/clients/components/PartnerBreakdown';
+import { ReferenceEngine } from '@/pages/ethereum/clients/components/ReferenceEngine';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /**

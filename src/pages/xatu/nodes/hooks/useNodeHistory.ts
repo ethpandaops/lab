@@ -26,8 +26,8 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
-import { bucketFilter, getBuckets, rowBucket, type BucketColumns } from '../utils/time-buckets';
+import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '@/pages/xatu/nodes/constants';
+import { bucketFilter, getBuckets, rowBucket, type BucketColumns } from '@/pages/xatu/nodes/utils/time-buckets';
 
 /** Rollup family: block, head and attestation arrival, data column completion, engine API calls */
 export type HistoryMetric = 'block' | 'head' | 'attestation' | 'dataColumn' | 'newPayload' | 'getBlobs';

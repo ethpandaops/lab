@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import type { FctNodeLastSeen } from '@/api/types.gen';
-import type { NodeRange } from '../constants';
-import { summarizeByNode } from '../utils/history';
-import { isNodeOnline } from '../utils/node-stats';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { summarizeByNode } from '@/pages/xatu/nodes/utils/history';
+import { isNodeOnline } from '@/pages/xatu/nodes/utils/node-stats';
 import { useLastSeenNodes } from './useLastSeenNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 import { useStableNodes } from './useStableNodes';

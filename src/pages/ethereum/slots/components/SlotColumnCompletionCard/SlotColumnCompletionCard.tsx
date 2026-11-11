@@ -10,7 +10,7 @@ import {
 } from '@/pages/ethereum/data-availability/partial-columns/constants';
 import type { CompletionPath } from '@/pages/ethereum/data-availability/partial-columns/IndexPage.types';
 import { formatSeconds, formatShare } from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
-import type { SlotColumnCompletion } from '../../hooks/useSlotColumnCompletion';
+import type { SlotColumnCompletion } from '@/pages/ethereum/slots/hooks/useSlotColumnCompletion';
 
 export interface SlotColumnCompletionCardProps {
   data: SlotColumnCompletion;

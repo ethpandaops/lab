@@ -2,7 +2,7 @@ import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/Elements/Badge';
 import { getLabelColor } from '@/pages/ethereum/contracts/utils';
-import { expirySavings, storageSize, type ContractTop100Item } from '../../hooks';
+import { expirySavings, storageSize, type ContractTop100Item } from '@/pages/ethereum/execution/state-expiry/hooks';
 
 interface ContractRowProps {
   item: ContractTop100Item;
