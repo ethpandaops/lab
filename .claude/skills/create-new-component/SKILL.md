@@ -23,6 +23,7 @@ This skill creates React components following Lab's established architecture pat
 **STOP AND ASK QUESTIONS** unless the user has provided complete specifications.
 
 Ask the user to clarify:
+
 1. **Component scope**: Is this reusable across pages (core) or page-specific?
 2. **Category**: Which category fits best? (see Component Categories below)
 3. **Functionality**: What should this component do? What props are needed?
@@ -34,8 +35,10 @@ Only proceed after understanding the requirements.
 ## Component Architecture
 
 ### Core Components (`src/components/`)
+
 **When**: Reusable across multiple pages/sections
 **Requirements**:
+
 - Generic and configurable via props
 - No page-specific business logic
 - No direct API calls (accept data via props)
@@ -44,8 +47,10 @@ Only proceed after understanding the requirements.
 - Compose from other core components when logical
 
 ### Page-Scoped Components (`src/pages/[section]/components/`)
+
 **When**: Used within specific page/section only
 **Requirements**:
+
 - Page-specific business logic allowed
 - Can use hooks (useNetwork, API hooks, etc.)
 - Compose/extend core components
@@ -55,9 +60,11 @@ Only proceed after understanding the requirements.
 ## Component Categories
 
 ### Core Component Categories (src/components/)
+
 - Use `ls` to list the components in the `src/components/` directory.
 
 ### Page Sections (src/pages/)
+
 - Use `ls` to list the pages in the `src/pages/` directory.
 
 ## Standard Component Structure
@@ -73,7 +80,9 @@ ComponentName/
 ## Implementation Steps
 
 ### 1. Research Existing Components
+
 Before implementing, examine similar existing components:
+
 - Check category for existing patterns
 - Review how props are structured
 - Observe Tailwind class patterns
@@ -82,11 +91,13 @@ Before implementing, examine similar existing components:
 ### 2. Create Component Structure
 
 **For Core Components:**
+
 ```
 src/components/[Category]/[ComponentName]/
 ```
 
 **For Page-Scoped Components:**
+
 ```
 src/pages/[section]/components/[ComponentName]/
 ```
@@ -94,6 +105,7 @@ src/pages/[section]/components/[ComponentName]/
 ### 3. Implement Component File
 
 **Key Patterns:**
+
 ```tsx
 import { forwardRef } from 'react';
 import type { ComponentNameProps } from './ComponentName.types';
@@ -125,12 +137,14 @@ ComponentName.displayName = 'ComponentName';
 ```
 
 **Semantic Colors:**
+
 - Use tokens: `bg-surface`, `text-foreground`, `text-muted`, `border-border`
 - Brand: `bg-primary`, `text-primary`, `bg-secondary`, `bg-accent`
 - States: `text-success`, `text-warning`, `text-error`
 - Avoid hard-coded colors (no `text-gray-500`)
 
 **Conditional Classes:**
+
 ```tsx
 import { clsx } from 'clsx';
 
@@ -167,6 +181,7 @@ export interface ComponentNameProps extends ComponentPropsWithoutRef<'element'> 
 ### 5. Create Storybook Stories (Core Components Only)
 
 **Required Template:**
+
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ComponentName } from './ComponentName';
@@ -214,6 +229,7 @@ export const AllVariants: Story = {
 ```
 
 **Story Best Practices:**
+
 - Use full nested path: `Components/[Category]/ComponentName`
 - Include `decorators` with `bg-surface` wrapper
 - Show all variants/states
@@ -231,6 +247,7 @@ export { ComponentName } from './ComponentName';
 ## Composition Patterns
 
 ### Core Composing Core
+
 ```tsx
 // NetworkSelect composes SelectMenu
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -248,6 +265,7 @@ export function NetworkSelect({ showLabel = true }: Props) {
 ```
 
 ### Page-Scoped Composing Core
+
 ```tsx
 // UserCard composes Card, Badge, ClientLogo
 import { Card } from '@/components/Layout/Card';
@@ -268,6 +286,7 @@ export function UserCard({ username, clients }: Props) {
 ## Common Component Patterns
 
 ### Icon Handling (Heroicons)
+
 ```tsx
 import { cloneElement, isValidElement } from 'react';
 
@@ -281,6 +300,7 @@ import { cloneElement, isValidElement } from 'react';
 ```
 
 ### Size Variants
+
 ```tsx
 const sizeClasses = {
   sm: 'px-2 py-1 text-sm',
@@ -290,6 +310,7 @@ const sizeClasses = {
 ```
 
 ### Interactive States
+
 ```tsx
 const baseClasses = `
   inline-flex items-center
@@ -301,6 +322,7 @@ const baseClasses = `
 ```
 
 ### Headless UI Integration
+
 ```tsx
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react';
 
@@ -326,6 +348,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headless
 ## Validation Checklist
 
 Before completing:
+
 - [ ] Matches existing component patterns in category
 - [ ] Uses semantic Tailwind tokens (not hard-coded colors)
 - [ ] TypeScript types properly defined
@@ -335,7 +358,7 @@ Before completing:
 - [ ] Stories include all variants/states
 - [ ] Component composes existing components when appropriate
 - [ ] No page-specific logic in core components
-- [ ] Accessibility attributes included (aria-*, role)
+- [ ] Accessibility attributes included (aria-\*, role)
 - [ ] Dark mode handled via semantic tokens
 - [ ] Icon handling uses cloneElement pattern
 - [ ] `pnpm lint` passes
@@ -345,11 +368,13 @@ Before completing:
 ## Testing in Storybook
 
 For core components, use Storybook for iteration:
+
 ```bash
 pnpm storybook
 ```
 
 Use Playwright MCP tools to:
+
 1. Navigate to component story
 2. Take screenshots of variants
 3. Test interactions
@@ -358,6 +383,7 @@ Use Playwright MCP tools to:
 ## Common Mistakes to Avoid
 
 ❌ **DON'T**:
+
 - Create new component without asking scope questions
 - Hard-code colors (`text-gray-500` instead of `text-muted`)
 - Skip Storybook stories for core components
@@ -367,6 +393,7 @@ Use Playwright MCP tools to:
 - Create standalone files (use folder structure)
 
 ✅ **DO**:
+
 - Research existing patterns first
 - Ask clarifying questions
 - Use semantic color tokens

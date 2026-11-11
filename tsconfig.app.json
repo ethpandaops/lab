@@ -24,7 +24,7 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src", "src/routeTree.gen.ts", "src/types/**/*.d.ts"],

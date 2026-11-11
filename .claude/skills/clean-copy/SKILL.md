@@ -32,7 +32,7 @@ field, or the value beside it already says the thing, the caption is noise. A fi
 The tell: copy that rules out a failure rather than describing a behaviour.
 
 > Cancel upload
-> *Always keeps the files already transferred — never wipes the folder like the old cancel did.*
+> _Always keeps the files already transferred — never wipes the folder like the old cancel did._
 
 That second clause exists because of a bug. The user doesn't know about the bug, doesn't share
 your memory of fixing it, and now has a worry they arrived without. **The fix for a fixed bug
@@ -48,16 +48,16 @@ component; an explanatory `<p>` gets deleted, not shortened to a stub.
 
 Copy stays when the user genuinely cannot act without it:
 
-- A real consequence at the moment of choosing. Under a destructive button: *"Anything not yet
-  synced is lost."* They need it before they click, and they can't infer it.
-- A compatibility or scope fact they can't see. *"Works with keys issued after March; older
-  keys need rotating first."* The checkbox alone doesn't tell them whether it applies to them.
-- What a blank state means and what to do next. *"No projects yet. Create one and it will
-  appear here."*
+- A real consequence at the moment of choosing. Under a destructive button: _"Anything not yet
+  synced is lost."_ They need it before they click, and they can't infer it.
+- A compatibility or scope fact they can't see. _"Works with keys issued after March; older
+  keys need rotating first."_ The checkbox alone doesn't tell them whether it applies to them.
+- What a blank state means and what to do next. _"No projects yet. Create one and it will
+  appear here."_
 - Units, scale, or format on a bare value.
 
-Note the first example is one sentence. Had it continued *"— only use this when a sync is
-stuck"*, that half would go: it instructs the user on when they're allowed to press a button
+Note the first example is one sentence. Had it continued _"— only use this when a sync is
+stuck"_, that half would go: it instructs the user on when they're allowed to press a button
 they can already see. Keep the consequence, cut the permission slip.
 
 ## Working style

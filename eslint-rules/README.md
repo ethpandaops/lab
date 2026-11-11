@@ -23,6 +23,7 @@ Lab uses a **two-tier color architecture** defined in `src/index.css`:
 Validates that all images referenced in route meta tags (og:image, twitter:image) actually exist in the public directory.
 
 **❌ Incorrect:**
+
 ```tsx
 // In src/routes/xatu/contributors.tsx
 export const Route = createFileRoute('/xatu/contributors')({
@@ -36,6 +37,7 @@ export const Route = createFileRoute('/xatu/contributors')({
 ```
 
 **✅ Correct:**
+
 ```tsx
 // In src/routes/xatu/contributors.tsx
 export const Route = createFileRoute('/xatu/contributors')({
@@ -49,11 +51,13 @@ export const Route = createFileRoute('/xatu/contributors')({
 ```
 
 **Image Path Convention:**
+
 - Images should be placed at: `public/images/[section]/[page-name].png`
 - Referenced as: `/images/[section]/[page-name].png`
 - Example: `public/images/xatu/contributors.png` → `/images/xatu/contributors.png`
 
 **When to create images:**
+
 - Every page should have a feature image for social sharing (og:image, twitter:image)
 - Images should be PNG format
 - Follow the section-based directory structure
@@ -63,6 +67,7 @@ export const Route = createFileRoute('/xatu/contributors')({
 Bans hardcoded color values (hex, RGB, HSL, named colors) in Tailwind className strings and React inline styles.
 
 **❌ Incorrect:**
+
 ```tsx
 // Tailwind arbitrary values
 <div className="bg-[#ff0000]">Red background</div>
@@ -78,6 +83,7 @@ Bans hardcoded color values (hex, RGB, HSL, named colors) in Tailwind className 
 ```
 
 **✅ Correct:**
+
 ```tsx
 // Tailwind semantic tokens
 <div className="bg-danger">Red background</div>
@@ -100,6 +106,7 @@ const themeColors = useThemeColors();
 ```
 
 **Disabling the rule for specific cases:**
+
 ```tsx
 // For legitimate use cases (e.g., dynamic colors from API):
 // eslint-disable-next-line lab/no-hardcoded-colors
@@ -116,6 +123,7 @@ const themeColors = useThemeColors();
 Bans direct usage of primitive color scales in Tailwind className strings.
 
 **❌ Incorrect:**
+
 ```tsx
 <div className="bg-terracotta-500">Terracotta background</div>
 <div className="text-sand-600">Sand text</div>
@@ -125,6 +133,7 @@ Bans direct usage of primitive color scales in Tailwind className strings.
 ```
 
 **✅ Correct:**
+
 ```tsx
 <div className="bg-primary">Primary background</div>
 <div className="text-foreground">Foreground text</div>
@@ -213,6 +222,7 @@ You can disable rules for specific lines or blocks using ESLint comments:
 ```
 
 **When to disable:**
+
 - Dynamic colors from external APIs or user input
 - Third-party library requirements
 - Data visualization with specific color requirements
@@ -227,6 +237,7 @@ pnpm eslint path/to/file.tsx
 ```
 
 Example violations:
+
 - `className="bg-[#ff0000]"` → triggers `lab/no-hardcoded-colors`
 - `style={{ color: '#ff0000' }}` → triggers `lab/no-hardcoded-colors`
 - `className="bg-terracotta-500"` → triggers `lab/no-primitive-color-scales`

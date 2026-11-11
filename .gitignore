@@ -37,6 +37,7 @@ storybook-static
 
 # Playwright
 .playwright-mcp
+/test-results/
 
 # Tanstack
 .tanstack

@@ -73,11 +73,13 @@ src/
 ### Component & State Philosophy
 
 **Core/Shared** (`src/components/`, `src/hooks/`, `src/contexts/`):
+
 - App-wide reusable building blocks — generic and configurable
 - Work in any context without page logic
 - Core components include Storybook stories
 
 **Page-Scoped** (`src/pages/[section]/[page-name]/components|hooks|contexts|providers|utils/`):
+
 - Used within specific page/section only
 - Compose/extend core items for page needs
 - Contain page-specific business logic

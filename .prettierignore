@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+src/api/
+src/routeTree.gen.ts
+public/mockServiceWorker.js
+public/data/
+.design-sync/
