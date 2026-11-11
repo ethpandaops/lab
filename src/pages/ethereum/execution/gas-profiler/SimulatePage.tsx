@@ -1,6 +1,7 @@
 import { Badge } from '@/components/Elements/Badge';
 import { type JSX, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useSearch, Link } from '@tanstack/react-router';
+import { useMutation } from '@tanstack/react-query';
 import {
   ArrowLeftIcon,
   BeakerIcon,
@@ -36,11 +37,14 @@ import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { simulateBlockMutation } from '@/lab-api/@tanstack/react-query.gen';
+import type { BlockSimulation } from '@/lab-api';
+import { apiErrorMessage } from '@/utils/api-error';
 import { GasScheduleDrawer } from './components/GasScheduleDrawer';
 import { BlockSimulationResultsV2 } from './components/BlockSimulationResultsV2';
 import { GlamsterdamPresetModal } from './components/GlamsterdamPresetModal';
 import { useGasSchedule } from './hooks/useGasSchedule';
-import type { GasSchedule, BlockSimulationResult, CallError } from './SimulatePage.types';
+import type { GasSchedule, BlockSimulationResult } from './SimulatePage.types';
 import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -109,17 +113,11 @@ function getDeltaColor(percent: number): string {
   return 'text-muted';
 }
 
-/** Detect backend syncing errors (503 from the proxy). */
+/** Detect backend syncing errors (503 from the proxy), as thrown or as a simulation's error message. */
 function isSyncingError(error: unknown): boolean {
-  if (error instanceof Error) {
-    return error.message.includes('currently syncing');
-  }
+  const message = typeof error === 'string' ? error : apiErrorMessage(error);
 
-  if (typeof error === 'string') {
-    return error.includes('currently syncing');
-  }
-
-  return false;
+  return message?.includes('currently syncing') ?? false;
 }
 
 function calculateAggregateStats(results: BlockSimulationResult[]): AggregateStats {
@@ -159,50 +157,10 @@ function calculateAggregateStats(results: BlockSimulationResult[]): AggregateSta
 // API
 // ============================================================================
 
-/**
- * API response from the backend (matches Erigon response structure)
- */
-interface ApiBlockSimulationResponse {
-  blockNumber: number;
-  baseFork: string;
-  customSchedule: GasSchedule;
-  original: {
-    gasUsed: number;
-    gasLimit: number;
-    wouldExceedLimit: boolean;
-  };
-  simulated: {
-    gasUsed: number;
-    gasLimit: number;
-    wouldExceedLimit: boolean;
-  };
-  transactions: Array<{
-    hash: string;
-    index: number;
-    originalStatus: string;
-    simulatedStatus: string;
-    originalGas: number;
-    simulatedGas: number;
-    deltaPercent: number;
-    diverged: boolean;
-    originalReverts: number;
-    simulatedReverts: number;
-    originalErrors: CallError[] | null;
-    simulatedErrors: CallError[] | null;
-    error?: string;
-  }>;
-  opcodeBreakdown: Record<
-    string,
-    { originalCount: number; originalGas: number; simulatedCount: number; simulatedGas: number }
-  >;
-}
-
 /** Transform API response to match frontend types */
-function transformApiResponse(response: ApiBlockSimulationResponse): BlockSimulationResult {
+function transformApiResponse(response: BlockSimulation): BlockSimulationResult {
   return {
     blockNumber: response.blockNumber,
-    baseFork: response.baseFork,
-    customSchedule: response.customSchedule,
     original: response.original,
     simulated: response.simulated,
     transactions: response.transactions.map(tx => ({
@@ -318,6 +276,7 @@ export function SimulatePage(): JSX.Element {
     isLoading: defaultsLoading,
     error: defaultsError,
   } = useGasSchedule({ blockNumber: startBlockNumber });
+  const defaultsErrorMessage = apiErrorMessage(defaultsError);
 
   // Count of modified gas parameters
   const modifiedCount = useMemo(() => {
@@ -506,32 +465,24 @@ export function SimulatePage(): JSX.Element {
   );
 
   // Simulate a single block (API call)
+  const { mutateAsync: simulateBlock } = useMutation(simulateBlockMutation());
   const simulateSingleBlock = useCallback(
     async (blockNumber: number): Promise<BlockSimulationResult> => {
       if (!currentNetwork) {
         throw new Error('No network selected');
       }
 
-      const response = await fetch(`/api/v1/gas-profiler/${currentNetwork.name}/simulate-block`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          blockNumber,
-          gasSchedule: { overrides: gasSchedule },
-          ...(useMaxGasLimit && { maxGasLimit: true }),
-        }),
+      const overrides = Object.fromEntries(
+        Object.entries(gasSchedule).filter((entry): entry is [string, number] => entry[1] !== undefined)
+      );
+      const apiResult = await simulateBlock({
+        path: { network: currentNetwork.name },
+        body: { blockNumber, gasSchedule: { overrides }, ...(useMaxGasLimit && { maxGasLimit: true }) },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || `Failed to simulate block ${blockNumber}`;
-        throw new Error(errorMessage);
-      }
-
-      const apiResult: ApiBlockSimulationResponse = await response.json();
       return transformApiResponse(apiResult);
     },
-    [gasSchedule, currentNetwork, useMaxGasLimit]
+    [gasSchedule, currentNetwork, useMaxGasLimit, simulateBlock]
   );
 
   // Run the range simulation
@@ -596,7 +547,7 @@ export function SimulatePage(): JSX.Element {
         setSimState(prev => ({
           ...prev,
           status: 'error',
-          error: err instanceof Error ? err.message : 'Unknown error',
+          error: apiErrorMessage(err) ?? `Failed to simulate block ${currentBlockNum}`,
         }));
         return;
       }
@@ -857,7 +808,11 @@ export function SimulatePage(): JSX.Element {
           ) : (
             <Alert
               variant="error"
-              description={`Error loading gas schedule: ${defaultsError.message}`}
+              description={
+                defaultsErrorMessage
+                  ? `Error loading gas schedule: ${defaultsErrorMessage}`
+                  : 'Error loading gas schedule'
+              }
               accentBorder
               className="mt-3"
             />

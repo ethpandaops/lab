@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { GasSchedule as ForkGasSchedule } from '@/lab-api';
 import { SIM_TX_SORT_FIELDS } from './utils/simulationTransactionFilters';
 
 /**
@@ -80,21 +81,10 @@ export interface GasSchedule {
 }
 
 /**
- * Gas parameter with value and description from API
- */
-export interface GasParameterInfo {
-  value: number;
-  description: string;
-}
-
-/**
  * Gas schedule defaults with descriptions from API
  * Contains both the numeric values and human-readable descriptions for tooltips
  */
-export interface GasScheduleDefaults {
-  /** Map of parameter names to their values and descriptions */
-  parameters: Record<string, GasParameterInfo>;
-}
+export type GasScheduleDefaults = ForkGasSchedule;
 
 /**
  * Glamsterdam (EIP-8007) gas schedule preset.
@@ -201,8 +191,6 @@ export interface OpcodeSummary {
  */
 export interface BlockSimulationResult {
   blockNumber: number;
-  baseFork: string;
-  customSchedule: GasSchedule;
   original: BlockGasSummary;
   simulated: BlockGasSummary;
   transactions: TxSummary[];

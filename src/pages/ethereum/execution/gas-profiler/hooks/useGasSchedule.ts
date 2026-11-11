@@ -1,13 +1,8 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { getGasScheduleOptions } from '@/lab-api/@tanstack/react-query.gen';
+import type { GetGasScheduleError } from '@/lab-api';
 import { useNetwork } from '@/hooks/useNetwork';
-import type { GasScheduleDefaults, GasParameterInfo } from '../SimulatePage.types';
-
-/**
- * API response from the backend (new format with descriptions)
- */
-interface ApiGasScheduleResponse {
-  parameters: Record<string, GasParameterInfo>;
-}
+import type { GasScheduleDefaults } from '../SimulatePage.types';
 
 /**
  * Parameters for useGasSchedule hook
@@ -32,35 +27,13 @@ export interface UseGasScheduleParams {
  * // }
  * ```
  */
-export function useGasSchedule({ blockNumber }: UseGasScheduleParams): UseQueryResult<GasScheduleDefaults, Error> {
+export function useGasSchedule({
+  blockNumber,
+}: UseGasScheduleParams): UseQueryResult<GasScheduleDefaults, GetGasScheduleError> {
   const { currentNetwork } = useNetwork();
 
-  return useQuery<GasScheduleDefaults>({
-    queryKey: ['gas-schedule', currentNetwork?.name, blockNumber],
-    queryFn: async () => {
-      if (!currentNetwork) {
-        throw new Error('No network selected');
-      }
-
-      if (blockNumber === null) {
-        throw new Error('Block number is required');
-      }
-
-      const response = await fetch(`/api/v1/gas-profiler/${currentNetwork.name}/gas-schedule?block=${blockNumber}`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || `Failed to fetch gas schedule: ${response.status}`;
-        throw new Error(errorMessage);
-      }
-
-      const data: ApiGasScheduleResponse = await response.json();
-
-      // Return the full response with parameters including descriptions
-      return {
-        parameters: data.parameters,
-      };
-    },
+  return useQuery({
+    ...getGasScheduleOptions({ path: { network: currentNetwork?.name ?? '' }, query: { block: blockNumber ?? 0 } }),
     enabled: !!currentNetwork && blockNumber !== null,
     staleTime: 1000 * 60 * 60, // 1 hour - gas schedule for a block never changes
     gcTime: 1000 * 60 * 60 * 24, // 24 hours
