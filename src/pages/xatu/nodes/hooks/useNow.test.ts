@@ -1,9 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '@/test-utils';
+import { NOW_MS } from '@/test-utils/time';
 import { useNow } from './useNow';
-
-/** A fixed minute boundary, so the clock's first value is a whole number of seconds */
-const NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0);
 
 describe('useNow', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { chunksFor, useKeepPrevious, weekChunks } from './useVersionCounts';
 
 const to = Date.UTC(2026, 10, 5) / 1000;

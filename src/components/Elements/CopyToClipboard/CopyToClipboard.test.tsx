@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, type MockInstance } from 'vitest';
 import { render, screen, waitFor } from '@/test-utils';
 import userEvent from '@testing-library/user-event';
 import { NotificationProvider } from '@/providers/NotificationProvider';
@@ -21,22 +21,20 @@ global.ClipboardItem = class ClipboardItem {
 } as unknown as typeof ClipboardItem;
 
 describe('CopyToClipboard', () => {
-  let mockWriteText: ReturnType<typeof vi.fn>;
-  let mockWrite: ReturnType<typeof vi.fn>;
-
-  beforeEach(() => {
-    // Use vi.spyOn to mock navigator.clipboard methods
-    mockWriteText = vi.fn().mockResolvedValue(undefined);
-    mockWrite = vi.fn().mockResolvedValue(undefined);
-
-    vi.stubGlobal('navigator', {
-      ...navigator,
-      clipboard: {
-        writeText: mockWriteText,
-        write: mockWrite,
-      },
-    });
-  });
+  /**
+   * A user, and spies on the clipboard. userEvent.setup() puts its own clipboard on
+   * navigator, so the spies go on that one, after it.
+   */
+  const setup = (): {
+    user: ReturnType<typeof userEvent.setup>;
+    writeText: MockInstance<Clipboard['writeText']>;
+    write: MockInstance<Clipboard['write']>;
+  } => {
+    const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    const write = vi.spyOn(navigator.clipboard, 'write').mockResolvedValue(undefined);
+    return { user, writeText, write };
+  };
 
   it('renders default clipboard icon button', () => {
     renderWithProvider(<CopyToClipboard content="test" />);
@@ -54,8 +52,8 @@ describe('CopyToClipboard', () => {
     expect(button).toBeInTheDocument();
   });
 
-  it.skip('copies text content to clipboard on click', async () => {
-    const user = userEvent.setup();
+  it('copies text content to clipboard on click', async () => {
+    const { user, writeText } = setup();
 
     renderWithProvider(<CopyToClipboard content="Hello World" />);
 
@@ -71,12 +69,12 @@ describe('CopyToClipboard', () => {
     });
 
     // Then verify the clipboard API was called
-    expect(mockWriteText).toHaveBeenCalledWith('Hello World');
+    expect(writeText).toHaveBeenCalledWith('Hello World');
   });
 
-  it.skip('copies blob content to clipboard on click', async () => {
-    mockWrite.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+  it('copies blob content to clipboard on click', async () => {
+    const { user, write } = setup();
+    write.mockResolvedValue(undefined);
     const blob = new Blob(['test'], { type: 'text/plain' });
 
     renderWithProvider(<CopyToClipboard content={blob} />);
@@ -90,7 +88,7 @@ describe('CopyToClipboard', () => {
     });
 
     // Then verify the clipboard API was called
-    expect(mockWrite).toHaveBeenCalledWith([
+    expect(write).toHaveBeenCalledWith([
       expect.objectContaining({
         types: ['text/plain'],
       }),
@@ -98,8 +96,8 @@ describe('CopyToClipboard', () => {
   });
 
   it('shows success notification after successful copy', async () => {
-    mockWriteText.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+    const { user, writeText } = setup();
+    writeText.mockResolvedValue(undefined);
 
     renderWithProvider(<CopyToClipboard content="test" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -112,8 +110,8 @@ describe('CopyToClipboard', () => {
   });
 
   it('shows custom success message when provided', async () => {
-    mockWriteText.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+    const { user, writeText } = setup();
+    writeText.mockResolvedValue(undefined);
 
     renderWithProvider(<CopyToClipboard content="test" successMessage="Custom success!" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -125,9 +123,9 @@ describe('CopyToClipboard', () => {
     });
   });
 
-  it.skip('shows error notification when copy fails', async () => {
-    mockWriteText.mockRejectedValue(new Error('Copy failed'));
-    const user = userEvent.setup();
+  it('shows error notification when copy fails', async () => {
+    const { user, writeText } = setup();
+    writeText.mockRejectedValue(new Error('Copy failed'));
 
     renderWithProvider(<CopyToClipboard content="test" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -139,9 +137,9 @@ describe('CopyToClipboard', () => {
     });
   });
 
-  it.skip('shows custom error message when provided', async () => {
-    mockWriteText.mockRejectedValue(new Error('Copy failed'));
-    const user = userEvent.setup();
+  it('shows custom error message when provided', async () => {
+    const { user, writeText } = setup();
+    writeText.mockRejectedValue(new Error('Copy failed'));
 
     renderWithProvider(<CopyToClipboard content="test" errorMessage="Custom error!" />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -154,9 +152,9 @@ describe('CopyToClipboard', () => {
   });
 
   it('calls onSuccess callback after successful copy', async () => {
-    mockWriteText.mockResolvedValue(undefined);
+    const { user, writeText } = setup();
+    writeText.mockResolvedValue(undefined);
     const onSuccess = vi.fn();
-    const user = userEvent.setup();
 
     renderWithProvider(<CopyToClipboard content="test" onSuccess={onSuccess} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -168,11 +166,11 @@ describe('CopyToClipboard', () => {
     });
   });
 
-  it.skip('calls onError callback when copy fails', async () => {
+  it('calls onError callback when copy fails', async () => {
+    const { user, writeText } = setup();
     const error = new Error('Copy failed');
-    mockWriteText.mockRejectedValue(error);
+    writeText.mockRejectedValue(error);
     const onError = vi.fn();
-    const user = userEvent.setup();
 
     renderWithProvider(<CopyToClipboard content="test" onError={onError} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
@@ -185,15 +183,15 @@ describe('CopyToClipboard', () => {
   });
 
   it('does not copy when disabled', async () => {
-    mockWriteText.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+    const { user, writeText } = setup();
+    writeText.mockResolvedValue(undefined);
 
     renderWithProvider(<CopyToClipboard content="test" disabled />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });
 
     await user.click(button);
 
-    expect(mockWriteText).not.toHaveBeenCalled();
+    expect(writeText).not.toHaveBeenCalled();
   });
 
   it('applies custom className to default button', () => {
@@ -208,9 +206,9 @@ describe('CopyToClipboard', () => {
     expect(button).toBeInTheDocument();
   });
 
-  it.skip('handles async content preparation', async () => {
-    mockWriteText.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+  it('handles async content preparation', async () => {
+    const { user, writeText } = setup();
+    writeText.mockResolvedValue(undefined);
     const asyncContent = vi.fn().mockResolvedValue('Async content');
 
     renderWithProvider(<CopyToClipboard content={asyncContent} />);
@@ -225,12 +223,12 @@ describe('CopyToClipboard', () => {
 
     // Then verify the async function was called and clipboard API was called
     expect(asyncContent).toHaveBeenCalled();
-    expect(mockWriteText).toHaveBeenCalledWith('Async content');
+    expect(writeText).toHaveBeenCalledWith('Async content');
   });
 
-  it.skip('handles async blob content', async () => {
-    mockWrite.mockResolvedValue(undefined);
-    const user = userEvent.setup();
+  it('handles async blob content', async () => {
+    const { user, write } = setup();
+    write.mockResolvedValue(undefined);
     const blob = new Blob(['async test'], { type: 'text/plain' });
     const asyncContent = vi.fn().mockResolvedValue(blob);
 
@@ -246,7 +244,7 @@ describe('CopyToClipboard', () => {
 
     // Then verify the async function was called and clipboard API was called
     expect(asyncContent).toHaveBeenCalled();
-    expect(mockWrite).toHaveBeenCalledWith([
+    expect(write).toHaveBeenCalledWith([
       expect.objectContaining({
         types: ['text/plain'],
       }),
@@ -254,9 +252,9 @@ describe('CopyToClipboard', () => {
   });
 
   it('shows error notification when async content preparation fails', async () => {
+    const { user } = setup();
     const error = new Error('Preparation failed');
     const asyncContent = vi.fn().mockRejectedValue(error);
-    const user = userEvent.setup();
 
     renderWithProvider(<CopyToClipboard content={asyncContent} />);
     const button = screen.getByRole('button', { name: /copy to clipboard/i });

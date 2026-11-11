@@ -200,13 +200,6 @@ export default defineConfig(
     },
   },
   {
-    files: ['src/**/*.test.{ts,tsx}'],
-    rules: {
-      'vitest/no-disabled-tests': 'off',
-      'no-restricted-imports': ['error', { patterns: [noParentImports] }],
-    },
-  },
-  {
     // The design-sync bundle resolves modules through its own path map (.design-sync/tsconfig.paths.json).
     files: ['.design-sync/**'],
     rules: { 'no-restricted-imports': 'off' },
