@@ -82,6 +82,9 @@ export function chunksFor(grain: UseVersionCountsOptions['grain'], from: number 
     return chunks;
   }
 
+  // No complete day yet, such as a table whose data starts today: an empty day list is not a valid query
+  if (from !== undefined && Math.floor(from / DAY) * DAY >= to) return [];
+
   if (from !== undefined && (to - from) / DAY <= MAX_LISTED_DAYS) {
     const days: string[] = [];
     for (let day = Math.floor(from / DAY) * DAY; day < to; day += DAY) days.push(isoDay(day));

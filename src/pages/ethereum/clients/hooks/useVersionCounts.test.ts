@@ -20,6 +20,15 @@ describe('chunksFor', () => {
     expect(chunks).toHaveLength(1);
     expect(chunks[0].query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
   });
+
+  it('reads nothing when the data starts after the last complete day', () => {
+    expect(chunksFor('daily', to + 7 * 3600, to)).toEqual([]);
+    expect(chunksFor('daily', to, to)).toEqual([]);
+  });
+
+  it('still lists the last complete day when the data starts during it', () => {
+    expect(chunksFor('daily', to - 3600, to)[0].query).toEqual({ day_start_date_in_values: '2026-11-04' });
+  });
 });
 
 describe('weekChunks', () => {

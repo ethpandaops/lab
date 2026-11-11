@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
+import { $ZodError } from 'zod/v4/core';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
@@ -8,6 +9,13 @@ import { PAGE_SIZE } from '../constants';
 import { chunksFor, useKeepPrevious } from './useVersionCounts';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
+
+/** Retries a failed chunk a few times, unlike the app default of forever, so one broken table settles as an error
+ * instead of loading forever and holding back the pages that wait on it. A request the API client rejects before
+ * sending fails the same way every time, so it is not retried. */
+function retryChunk(failureCount: number, error: unknown): boolean {
+  return !(error instanceof $ZodError) && failureCount < 3;
+}
 
 export interface UseDailyByClientResult<T> {
   rows: T[];
@@ -56,6 +64,7 @@ export function useDailyByClient<T extends { day_start_date?: string }>(
         fetchAllPages<T>(list, { query: { ...chunk.query, ...filters, page_size: PAGE_SIZE } }, dataKey, signal),
       enabled: !!currentNetwork && filters !== null && !bounds.isLoading,
       staleTime: chunk.open ? 10 * 60 * 1000 : Infinity,
+      retry: retryChunk,
     })),
     combine: combine<T>,
   });
