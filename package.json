@@ -36,7 +36,7 @@
     "@tanstack/react-table": "8.21.3",
     "@tanstack/router-plugin": "1.159.5",
     "clsx": "2.1.1",
-    "country-flag-icons": "^1.6.20",
+    "country-flag-icons": "1.6.20",
     "culori": "4.0.2",
     "echarts": "6.0.0",
     "echarts-for-react": "3.0.6",
@@ -102,13 +102,6 @@
     "workerDirectory": [
       "public"
     ]
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "echarts-gl>echarts": "6"
-      }
-    }
   },
   "volta": {
     "node": "24.13.0",
