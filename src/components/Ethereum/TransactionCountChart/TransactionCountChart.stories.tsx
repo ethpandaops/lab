@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TransactionCountChart } from './TransactionCountChart';
+import { seededRandom } from '@/test-utils/random';
 import { NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(26);
 
 const meta = {
   title: 'Components/Ethereum/TransactionCountChart',
@@ -28,7 +31,7 @@ export const SlotGranularity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Math.floor(Math.random() * 100 + 50), // 50-150 transactions per slot
+      value: Math.floor(random() * 100 + 50), // 50-150 transactions per slot
     })),
     xAxis: {
       name: 'Slot',
@@ -45,7 +48,7 @@ export const EpochGranularity: Story = {
   args: {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 300000 + i,
-      value: Math.floor(Math.random() * 2000 + 3000), // 3000-5000 transactions per epoch
+      value: Math.floor(random() * 2000 + 3000), // 3000-5000 transactions per epoch
     })),
     xAxis: {
       name: 'Epoch',
@@ -61,7 +64,7 @@ export const BlockGranularity: Story = {
   args: {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 20000000 + i,
-      value: Math.floor(Math.random() * 150 + 50), // 50-200 transactions per block
+      value: Math.floor(random() * 150 + 50), // 50-200 transactions per block
     })),
     xAxis: {
       name: 'Block Number',
@@ -77,7 +80,7 @@ export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
       x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
-      value: Math.floor(Math.random() * 50000 + 900000), // 900k-950k daily transactions
+      value: Math.floor(random() * 50000 + 900000), // 900k-950k daily transactions
     })),
     xAxis: {
       name: 'Date',
@@ -98,7 +101,7 @@ export const HighActivity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Math.floor(Math.random() * 50 + 150), // 150-200 transactions (congested)
+      value: Math.floor(random() * 50 + 150), // 150-200 transactions (congested)
     })),
     xAxis: {
       name: 'Slot',
@@ -116,7 +119,7 @@ export const LowActivity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Math.floor(Math.random() * 30 + 10), // 10-40 transactions (quiet)
+      value: Math.floor(random() * 30 + 10), // 10-40 transactions (quiet)
     })),
     xAxis: {
       name: 'Slot',

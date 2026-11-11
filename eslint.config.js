@@ -185,6 +185,17 @@ export default defineConfig(
     rules: { 'no-restricted-syntax': 'off' },
   },
   {
+    // Tests and stories see the same data on every run (src/test-utils/time.ts and random.ts).
+    files: ['src/**/*.test.{ts,tsx}', 'src/**/*.stories.tsx'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        { object: 'Date', property: 'now', message: 'Take the time from NOW_MS in @/test-utils/time.' },
+        { object: 'Math', property: 'random', message: 'Use seededRandom from @/test-utils/random.' },
+      ],
+    },
+  },
+  {
     files: ['src/**/*.test.{ts,tsx}'],
     plugins: { vitest },
     rules: {

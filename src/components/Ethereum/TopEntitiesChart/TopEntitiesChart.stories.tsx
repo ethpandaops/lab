@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { EntityMetricDataPoint } from './TopEntitiesChart.types';
 import { TopEntitiesChart } from './TopEntitiesChart';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(25);
 
 const meta: Meta<typeof TopEntitiesChart> = {
   title: 'Components/Ethereum/TopEntitiesChart',
@@ -35,11 +38,11 @@ function generateEntityData(
   for (let x = minX; x <= maxX; x++) {
     for (let e = 0; e < entityCount; e++) {
       // Random chance of having data for this entity at this x
-      if (Math.random() > 0.3) {
+      if (random() > 0.3) {
         data.push({
           x,
           entity: `${entityPrefix} ${e + 1}`,
-          count: Math.floor(Math.random() * 50) + 1,
+          count: Math.floor(random() * 50) + 1,
         });
       }
     }
@@ -114,7 +117,7 @@ export const SingleEntity: Story = {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
       entity: 'Solo Validator',
-      count: Math.floor(Math.random() * 20) + 1,
+      count: Math.floor(random() * 20) + 1,
     })),
     xAxis: { name: 'Slot' },
     yAxis: { name: 'Missed Attestations' },

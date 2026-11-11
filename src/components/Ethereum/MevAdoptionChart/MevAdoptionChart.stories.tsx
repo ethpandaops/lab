@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MevAdoptionChart } from './MevAdoptionChart';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(23);
 
 const meta = {
   title: 'Components/Ethereum/MevAdoptionChart',
@@ -85,7 +88,7 @@ export const NoAdoption: Story = {
 export const LargeDataset: Story = {
   args: {
     data: Array.from({ length: 225 }, () => ({
-      hasMev: Math.random() > 0.15, // ~85% MEV
+      hasMev: random() > 0.15, // ~85% MEV
     })),
     subtitle: 'MEV-boost usage over 7 epochs',
   },
@@ -97,7 +100,7 @@ export const LargeDataset: Story = {
 export const SmallDataset: Story = {
   args: {
     data: Array.from({ length: 32 }, () => ({
-      hasMev: Math.random() > 0.25, // ~75% MEV
+      hasMev: random() > 0.25, // ~75% MEV
     })),
   },
 };

@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ScatterAndLineChart } from './ScatterAndLine';
 import type { ScatterSeries, LineSeries } from './ScatterAndLine.types';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(15);
 
 const meta = {
   title: 'Components/Charts/ScatterAndLine',
@@ -24,8 +27,8 @@ type Story = StoryObj<typeof meta>;
 // Sample data generators
 const generateScatterData = (count: number, xRange: [number, number], yRange: [number, number]): [number, number][] => {
   return Array.from({ length: count }, () => [
-    Math.random() * (xRange[1] - xRange[0]) + xRange[0],
-    Math.random() * (yRange[1] - yRange[0]) + yRange[0],
+    random() * (xRange[1] - xRange[0]) + xRange[0],
+    random() * (yRange[1] - yRange[0]) + yRange[0],
   ]);
 };
 

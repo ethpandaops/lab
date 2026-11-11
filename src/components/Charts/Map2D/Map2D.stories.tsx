@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Map2DChart } from './Map2D';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(14);
 
 const meta: Meta<typeof Map2DChart> = {
   title: 'Components/Charts/Map2D',
@@ -46,12 +49,12 @@ const sampleRoutes = [
 const generateManyPoints = (count: number): Array<{ name: string; coords: [number, number]; value: number }> => {
   const points = [];
   for (let i = 0; i < count; i++) {
-    const lat = Math.random() * 180 - 90;
-    const lon = Math.random() * 360 - 180;
+    const lat = random() * 180 - 90;
+    const lon = random() * 360 - 180;
     points.push({
       name: `Point ${i}`,
       coords: [lon, lat] as [number, number],
-      value: Math.floor(Math.random() * 100) + 1,
+      value: Math.floor(random() * 100) + 1,
     });
   }
   return points;

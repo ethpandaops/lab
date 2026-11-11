@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { GridHeatmap } from './GridHeatmap';
 import type { GridRow } from './GridHeatmap.types';
 import { useState } from 'react';
+import { seededRandom } from '@/test-utils/random';
 
 /**
  * Simple metric data structure for demos
@@ -58,13 +59,14 @@ function SampleCell({
  * Generate sample grid data
  */
 function generateSampleData(rows: number, columns: number): GridRow<MetricData>[] {
+  const random = seededRandom(1);
   return Array.from({ length: rows }, (_, rowIndex) => ({
     identifier: `row-${rowIndex}`,
     label: `Row ${rowIndex + 1}`,
     cells: Array.from({ length: columns }, (_, colIndex) => ({
       columnIndex: colIndex,
       data: {
-        value: Math.floor(Math.random() * 100),
+        value: Math.floor(random() * 100),
         label: `R${rowIndex + 1}C${colIndex + 1}`,
       },
     })),
@@ -270,14 +272,15 @@ function AvailabilityCell({
  * Generate availability data (similar to DA heatmap)
  */
 function generateAvailabilityData(rows: number, columns: number): GridRow<AvailabilityData>[] {
+  const random = seededRandom(2);
   return Array.from({ length: rows }, (_, rowIndex) => ({
     identifier: `row-${rowIndex}`,
     label: `Row ${rowIndex + 1}`,
     cells: Array.from({ length: columns }, (_, colIndex) => {
       // Randomly have some cells with no data
-      const hasData = Math.random() > 0.15;
-      const totalCount = hasData ? Math.floor(Math.random() * 100) + 20 : 0;
-      const successCount = hasData ? Math.floor(totalCount * Math.random()) : 0;
+      const hasData = random() > 0.15;
+      const totalCount = hasData ? Math.floor(random() * 100) + 20 : 0;
+      const successCount = hasData ? Math.floor(totalCount * random()) : 0;
       const availability = hasData ? successCount / totalCount : 0;
 
       return {

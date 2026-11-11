@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BlockValueChart } from './BlockValueChart';
+import { seededRandom } from '@/test-utils/random';
 import { NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(21);
 
 const meta = {
   title: 'Components/Ethereum/BlockValueChart',
@@ -31,7 +34,7 @@ export const SlotGranularity: Story = {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
       // ~30% MEV slots with values between 0.01-0.5 ETH
-      value: Math.random() > 0.7 ? Math.random() * 0.49 + 0.01 : 0,
+      value: random() > 0.7 ? random() * 0.49 + 0.01 : 0,
     })),
     xAxis: {
       name: 'Slot',
@@ -49,7 +52,7 @@ export const EpochGranularity: Story = {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 300000 + i,
       // Average ~2-8 ETH total MEV per epoch
-      value: Math.random() * 6 + 2,
+      value: random() * 6 + 2,
     })),
     xAxis: {
       name: 'Epoch',
@@ -66,7 +69,7 @@ export const BlockGranularity: Story = {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 20000000 + i,
       // ~40% MEV blocks with values between 0.01-0.8 ETH
-      value: Math.random() > 0.6 ? Math.random() * 0.79 + 0.01 : 0,
+      value: random() > 0.6 ? random() * 0.79 + 0.01 : 0,
     })),
     xAxis: {
       name: 'Block Number',
@@ -83,7 +86,7 @@ export const TimestampGranularity: Story = {
     data: Array.from({ length: 30 }, (_, i) => ({
       x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
       // Daily MEV total: 50-200 ETH
-      value: Math.random() * 150 + 50,
+      value: random() * 150 + 50,
     })),
     xAxis: {
       name: 'Date',
@@ -105,7 +108,7 @@ export const HighMEVPeriod: Story = {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
       // 60% MEV slots with higher values (0.1-1.5 ETH)
-      value: Math.random() > 0.4 ? Math.random() * 1.4 + 0.1 : 0,
+      value: random() > 0.4 ? random() * 1.4 + 0.1 : 0,
     })),
     xAxis: {
       name: 'Slot',
@@ -124,7 +127,7 @@ export const LowMEVPeriod: Story = {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
       // 15% MEV slots with lower values (0.001-0.05 ETH)
-      value: Math.random() > 0.85 ? Math.random() * 0.049 + 0.001 : 0,
+      value: random() > 0.85 ? random() * 0.049 + 0.001 : 0,
     })),
     xAxis: {
       name: 'Slot',
@@ -142,11 +145,11 @@ export const MajorMEVOpportunity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => {
       // Slot 15 has a major MEV opportunity (5+ ETH)
-      if (i === 15) return { x: 10000000 + i, value: Math.random() * 3 + 5 };
+      if (i === 15) return { x: 10000000 + i, value: random() * 3 + 5 };
       // Other slots have normal MEV activity
       return {
         x: 10000000 + i,
-        value: Math.random() > 0.7 ? Math.random() * 0.3 + 0.01 : 0,
+        value: random() > 0.7 ? random() * 0.3 + 0.01 : 0,
       };
     }),
     xAxis: {

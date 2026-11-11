@@ -12,9 +12,11 @@ import { formatSlot } from '@/utils';
 import { ValidatorHeatmap } from './ValidatorHeatmap';
 import type { HeatmapMetric } from './ValidatorHeatmap';
 import type { AttestationDailyDataPoint } from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { seededRandom } from '@/test-utils/random';
 
 /** Generate mock daily attestation data */
 function generateMockDailyData(validatorIndices: number[], from: number, to: number): AttestationDailyDataPoint[] {
+  const random = seededRandom(30);
   const points: AttestationDailyDataPoint[] = [];
   const startDate = new Date(from * 1000);
   startDate.setUTCHours(0, 0, 0, 0);
@@ -28,11 +30,11 @@ function generateMockDailyData(validatorIndices: number[], from: number, to: num
       points.push({
         timestamp,
         validatorIndex,
-        inclusionRate: 95 + Math.random() * 5,
-        headCorrectRate: 90 + Math.random() * 10,
-        targetCorrectRate: 95 + Math.random() * 5,
-        sourceCorrectRate: 98 + Math.random() * 2,
-        avgInclusionDistance: 1 + Math.random() * 0.5,
+        inclusionRate: 95 + random() * 5,
+        headCorrectRate: 90 + random() * 10,
+        targetCorrectRate: 95 + random() * 5,
+        sourceCorrectRate: 98 + random() * 2,
+        avgInclusionDistance: 1 + random() * 0.5,
       });
     }
     current.setUTCDate(current.getUTCDate() + 1);
@@ -69,16 +71,17 @@ function generateMockHourlyGrid(validatorIndices: number[]): {
   data: [number, number, number][];
   yLabels: string[];
 } {
+  const random = seededRandom(31);
   const yLabels = validatorIndices.map(v => formatSlot(v));
   const data: [number, number, number][] = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let v = 0; v < validatorIndices.length; v++) {
-      data.push([hour, v, 90 + Math.random() * 10]);
+      data.push([hour, v, 90 + random() * 10]);
     }
   }
   // Sprinkle a few NO_DATA cells
   for (let v = 0; v < validatorIndices.length; v++) {
-    const missingHour = Math.floor(Math.random() * 24);
+    const missingHour = Math.floor(random() * 24);
     const idx = data.findIndex(([h, vi]) => h === missingHour && vi === v);
     if (idx !== -1) data[idx] = [missingHour, v, NO_DATA];
   }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ScrollArea, ScrollBar } from './ScrollArea';
+import { seededRandom } from '@/test-utils/random';
 
 const meta = {
   title: 'Components/Layout/ScrollArea',
@@ -247,36 +248,39 @@ export const HeatmapGrid: Story = {
       </div>
     ),
   ],
-  render: () => (
-    <div className="rounded-sm border border-border">
-      <div className="border-b border-border bg-muted-20 px-4 py-3">
-        <h3 className="text-sm font-semibold text-foreground">Data Column Availability</h3>
-        <p className="text-xs text-muted">128 columns</p>
-      </div>
-      <ScrollArea className="w-full">
-        <div className="p-4">
-          {heatmapRows.map(row => (
-            <div key={row} className="mb-1 flex items-center gap-2">
-              <span className="w-20 text-xs text-muted">Row {row}</span>
-              <div className="flex gap-px">
-                {heatmapColumns.map(column => {
-                  const availability = Math.random();
-                  const color =
-                    availability > 0.95
-                      ? 'bg-success'
-                      : availability > 0.8
-                        ? 'bg-success-70'
-                        : availability > 0.6
-                          ? 'bg-warning'
-                          : 'bg-danger';
-                  return <div key={column} className={`size-2 rounded-sm ${color}`} title={`Col ${column}`} />;
-                })}
-              </div>
-            </div>
-          ))}
+  render: () => {
+    const random = seededRandom(27);
+    return (
+      <div className="rounded-sm border border-border">
+        <div className="border-b border-border bg-muted-20 px-4 py-3">
+          <h3 className="text-sm font-semibold text-foreground">Data Column Availability</h3>
+          <p className="text-xs text-muted">128 columns</p>
         </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-    </div>
-  ),
+        <ScrollArea className="w-full">
+          <div className="p-4">
+            {heatmapRows.map(row => (
+              <div key={row} className="mb-1 flex items-center gap-2">
+                <span className="w-20 text-xs text-muted">Row {row}</span>
+                <div className="flex gap-px">
+                  {heatmapColumns.map(column => {
+                    const availability = random();
+                    const color =
+                      availability > 0.95
+                        ? 'bg-success'
+                        : availability > 0.8
+                          ? 'bg-success-70'
+                          : availability > 0.6
+                            ? 'bg-warning'
+                            : 'bg-danger';
+                    return <div key={column} className={`size-2 rounded-sm ${color}`} title={`Col ${column}`} />;
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+    );
+  },
 };

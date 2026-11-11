@@ -2,14 +2,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { ProbesView } from './components/ProbesView';
 import type { IntCustodyProbe } from '@/api/types.gen';
+import { seededRandom } from '@/test-utils/random';
 import { freezeNow, NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(28);
 
 // Use generated type directly
 type CustodyProbe = IntCustodyProbe;
 
 /** Picks a random element of a non-empty list */
 function pick<T>(items: readonly [T, ...T[]]): T {
-  return items[Math.floor(Math.random() * items.length)] ?? items[0];
+  return items[Math.floor(random() * items.length)] ?? items[0];
 }
 
 /**
@@ -51,31 +54,31 @@ function generateMockProbes(count: number): CustodyProbe[] {
   const baseTime = NOW_MS;
 
   return Array.from({ length: count }, (_, i) => {
-    const result = results[Math.floor(Math.random() * 100) < 75 ? 0 : Math.floor(Math.random() * 3)];
+    const result = results[Math.floor(random() * 100) < 75 ? 0 : Math.floor(random() * 3)];
     const peerCountry = pick(countries);
     const clientCountry = pick(countries);
-    const peerAsn = asns[Math.floor(Math.random() * asns.length)];
+    const peerAsn = asns[Math.floor(random() * asns.length)];
 
     return {
-      event_date_time: baseTime - i * 12000 - Math.floor(Math.random() * 5000),
-      slots: [Math.floor(Math.random() * 1000000) + 8000000],
-      column_indices: Array.from({ length: Math.floor(Math.random() * 4) + 1 }, () => Math.floor(Math.random() * 128)),
-      peer_id_unique_key: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER),
+      event_date_time: baseTime - i * 12000 - Math.floor(random() * 5000),
+      slots: [Math.floor(random() * 1000000) + 8000000],
+      column_indices: Array.from({ length: Math.floor(random() * 4) + 1 }, () => Math.floor(random() * 128)),
+      peer_id_unique_key: Math.floor(random() * Number.MAX_SAFE_INTEGER),
       result,
-      response_time_ms: result === 'success' ? Math.floor(Math.random() * 500) + 50 : undefined,
-      meta_peer_implementation: clients[Math.floor(Math.random() * clients.length)],
-      meta_peer_version: `v${Math.floor(Math.random() * 3) + 4}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`,
+      response_time_ms: result === 'success' ? Math.floor(random() * 500) + 50 : undefined,
+      meta_peer_implementation: clients[Math.floor(random() * clients.length)],
+      meta_peer_version: `v${Math.floor(random() * 3) + 4}.${Math.floor(random() * 10)}.${Math.floor(random() * 10)}`,
       meta_peer_platform: 'linux/amd64',
       meta_peer_geo_country: peerCountry,
       meta_peer_geo_city: pick(cities[peerCountry]),
       meta_peer_geo_autonomous_system_organization: peerAsn?.org,
       meta_peer_geo_autonomous_system_number: peerAsn?.number,
-      error: result === 'failure' ? errors[Math.floor(Math.random() * errors.length)] : undefined,
-      meta_client_implementation: clients[Math.floor(Math.random() * clients.length)],
-      meta_client_version: `v${Math.floor(Math.random() * 3) + 4}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`,
+      error: result === 'failure' ? errors[Math.floor(random() * errors.length)] : undefined,
+      meta_client_implementation: clients[Math.floor(random() * clients.length)],
+      meta_client_version: `v${Math.floor(random() * 3) + 4}.${Math.floor(random() * 10)}.${Math.floor(random() * 10)}`,
       meta_client_geo_country: clientCountry,
       meta_client_geo_city: pick(cities[clientCountry]),
-      classification: Math.random() > 0.7 ? 'internal' : Math.random() > 0.5 ? 'corporate' : 'external',
+      classification: random() > 0.7 ? 'internal' : random() > 0.5 ? 'corporate' : 'external',
     };
   });
 }

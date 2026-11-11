@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BlockArrivalTimesChart } from './BlockArrivalTimesChart';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(19);
 
 const meta = {
   title: 'Components/Ethereum/BlockArrivalTimesChart',
@@ -33,7 +36,7 @@ const generateSampleData = (): Array<{
   return Array.from({ length: 32 }, (_, i) => {
     const slot = 10000000 + i;
     // Simulate block arrival times in milliseconds (most arrive early, some late)
-    const baseTime = 500 + Math.random() * 1000; // 0.5-1.5 seconds base
+    const baseTime = 500 + random() * 1000; // 0.5-1.5 seconds base
     return {
       x: slot,
       min: Math.max(100, baseTime - 400),
@@ -75,7 +78,7 @@ export const HighVariation: Story = {
     data: Array.from({ length: 32 }, (_, i) => {
       const slot = 10000000 + i;
       // Simulate higher variation
-      const baseTime = 800 + Math.random() * 2000;
+      const baseTime = 800 + random() * 2000;
       return {
         x: slot,
         min: Math.max(100, baseTime - 700),
@@ -108,7 +111,7 @@ export const MissedBlocks: Story = {
           max: null,
         };
       }
-      const baseTime = 500 + Math.random() * 1000;
+      const baseTime = 500 + random() * 1000;
       return {
         x: slot,
         min: Math.max(100, baseTime - 400),
