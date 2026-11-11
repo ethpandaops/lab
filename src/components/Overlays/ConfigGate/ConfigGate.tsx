@@ -1,5 +1,6 @@
 import { type JSX, useEffect } from 'react';
 import { useConfig } from '@/hooks/useConfig';
+import { apiErrorMessage } from '@/utils/api-error';
 
 interface ConfigGateProps {
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
   // Show error state if initial config fetch failed
   if (!config) {
     console.error('Config error:', error);
+    const errorMessage = apiErrorMessage(error);
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
@@ -43,7 +45,7 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
           <h1 className="mt-6 text-xl/8 font-semibold tracking-tight text-danger sm:mt-8 sm:text-2xl/8">
             Failed to Load Configuration
           </h1>
-          {error && <p className="mt-2 max-w-md text-center text-sm text-muted">{error.message}</p>}
+          {errorMessage && <p className="mt-2 max-w-md text-center text-sm text-muted">{errorMessage}</p>}
           <button
             onClick={() => window.location.reload()}
             className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-white transition-colors hover:bg-danger/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8 dark:text-background"

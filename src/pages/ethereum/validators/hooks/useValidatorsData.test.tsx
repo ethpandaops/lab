@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import type { JSX, ReactNode } from 'react';
 import { client } from '@/api/client.gen';
+import { client as labClient } from '@/lab-api/client.gen';
+import { createQueryClient } from '@/utils/query-client';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import { useValidatorsData } from './useValidatorsData';
@@ -40,7 +42,7 @@ const ATTESTATIONS = {
 };
 
 function wrapper({ children }: { children: ReactNode }): JSX.Element {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const queryClient = createQueryClient({ retry: false });
   return (
     <QueryClientProvider client={queryClient}>
       <NetworkContext.Provider
@@ -54,7 +56,10 @@ function wrapper({ children }: { children: ReactNode }): JSX.Element {
 
 describe('useValidatorsData', () => {
   // Node's fetch needs an absolute URL
-  beforeAll(() => client.setConfig({ baseUrl: 'http://localhost' }));
+  beforeAll(() => {
+    client.setConfig({ baseUrl: 'http://localhost' });
+    labClient.setConfig({ baseUrl: 'http://localhost' });
+  });
   afterEach(() => vi.unstubAllGlobals());
 
   it('weights the inclusion delay by attestations and leaves rates with nothing to divide by empty', async () => {
@@ -194,8 +199,8 @@ describe('useValidatorsData', () => {
     const proposal = (ts: number, status: string): object => ({ validator_index: 1, slot_start_date_time: ts, status });
     vi.stubGlobal(
       'fetch',
-      vi.fn(async (request: Request | string) => {
-        const url = new URL(typeof request === 'string' ? `http://localhost${request}` : request.url);
+      vi.fn(async (request: Request) => {
+        const url = new URL(request.url);
         const body = url.pathname.endsWith('/bounds')
           ? { fct_block_proposer_head: { min: headStart, max: day + 86400 } }
           : url.pathname.endsWith('fct_block_proposer_by_validator')

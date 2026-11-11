@@ -171,7 +171,7 @@ export function getNextFork(network: Network, epoch: number): ForkInfo | null {
  * ```
  */
 export function isForkActive(network: Network, forkName: ForkName, epoch?: number): boolean {
-  const fork = network.forks.consensus[forkName];
+  const fork = network.forks.consensus?.[forkName];
   if (!fork) {
     return false;
   }
@@ -198,7 +198,7 @@ export function isForkActive(network: Network, forkName: ForkName, epoch?: numbe
  * ```
  */
 export function getForkEpoch(network: Network, forkName: ForkName): number | null {
-  const fork = network.forks.consensus[forkName];
+  const fork = network.forks.consensus?.[forkName];
   return fork?.epoch ?? null;
 }
 

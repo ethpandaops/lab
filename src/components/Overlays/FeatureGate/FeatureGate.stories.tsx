@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse } from 'msw';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   RouterProvider,
   createMemoryHistory,
@@ -11,6 +11,7 @@ import {
 import { FeatureGate } from './FeatureGate';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
+import { createQueryClient } from '@/utils/query-client';
 import { mockBounds } from '../../../../.storybook/mocks';
 
 /**
@@ -96,14 +97,7 @@ export const Default: Story = {
     },
   },
   render: () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: 0,
-          staleTime: Infinity,
-        },
-      },
-    });
+    const queryClient = createQueryClient({ retry: false, staleTime: Infinity });
 
     // Create root and child routes
     const rootRoute = createRootRoute();

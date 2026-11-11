@@ -1,7 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useBounds, useTableBounds, useTablesBounds } from './useBounds';
+import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { client } from '@/lab-api/client.gen';
+import { createQueryClient } from '@/utils/query-client';
+import { useBounds, useNetworksBounds, useTableBounds, useTablesBounds } from './useBounds';
 import type { Bounds } from './useBounds.types';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import { type ReactNode } from 'react';
@@ -9,6 +11,13 @@ import { NetworkContext } from '@/contexts/NetworkContext';
 
 // Mock fetch globally
 global.fetch = vi.fn();
+
+/** A JSON response, as the API sends it. */
+const json = (body: unknown): Response =>
+  new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+
+/** The URLs fetch was called with, in order. */
+const fetchedUrls = (): string[] => vi.mocked(fetch).mock.calls.map(([request]) => (request as Request).url);
 
 const mockNetwork: Network = {
   name: 'mainnet',
@@ -31,14 +40,11 @@ describe('useBounds', () => {
     fct_validator: { min: 500, max: 4500 },
   };
 
+  // jsdom's fetch needs absolute URLs
+  beforeAll(() => client.setConfig({ baseUrl: 'http://localhost' }));
+
   beforeEach(() => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
+    queryClient = createQueryClient({ retry: false });
 
     vi.clearAllMocks();
   });
@@ -69,10 +75,7 @@ describe('useBounds', () => {
 
   describe('useBounds - basic functionality', () => {
     it('should fetch and return bounds data', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useBounds(), {
         wrapper: createWrapper(),
@@ -89,10 +92,7 @@ describe('useBounds', () => {
     });
 
     it('should fetch from correct endpoint with network name', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       renderHook(() => useBounds(), {
         wrapper: createWrapper(),
@@ -102,7 +102,7 @@ describe('useBounds', () => {
         expect(fetch).toHaveBeenCalled();
       });
 
-      expect(fetch).toHaveBeenCalledWith('/api/v1/mainnet/bounds');
+      expect(fetchedUrls()).toEqual(['http://localhost/api/v1/mainnet/bounds']);
     });
 
     it('should not fetch when network is null', () => {
@@ -144,25 +144,19 @@ describe('useBounds', () => {
       // Network becomes available
       currentNetwork = mockNetwork;
 
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       rerender();
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith('/api/v1/mainnet/bounds');
+        expect(fetchedUrls()).toEqual(['http://localhost/api/v1/mainnet/bounds']);
       });
     });
   });
 
   describe('useBounds - with selector', () => {
     it('should apply selector to transform data', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(
         () =>
@@ -182,10 +176,7 @@ describe('useBounds', () => {
     });
 
     it('should allow selecting specific table', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(
         () =>
@@ -205,10 +196,7 @@ describe('useBounds', () => {
     });
 
     it('should allow complex selector transformations', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(
         () =>
@@ -230,10 +218,12 @@ describe('useBounds', () => {
 
   describe('useBounds - error handling', () => {
     it('should handle fetch errors', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: false,
-        statusText: 'Not Found',
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(
+        new Response('network not found or bounds unavailable\n', {
+          status: 404,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        })
+      );
 
       const { result } = renderHook(() => useBounds(), {
         wrapper: createWrapper(),
@@ -243,8 +233,7 @@ describe('useBounds', () => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(result.current.error).toBeDefined();
-      expect(result.current.error?.message).toContain('Failed to fetch bounds');
+      expect(result.current.error).toBe('network not found or bounds unavailable\n');
     });
 
     it('should handle network errors', async () => {
@@ -258,7 +247,7 @@ describe('useBounds', () => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(result.current.error?.message).toBe('Network error');
+      expect(result.current.error).toHaveProperty('message', 'Network error');
     });
   });
 
@@ -287,43 +276,35 @@ describe('useBounds', () => {
         </QueryClientProvider>
       );
 
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { rerender } = renderHook(() => useBounds(), {
         wrapper: DynamicWrapper,
       });
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith('/api/v1/mainnet/bounds');
+        expect(fetchedUrls()).toEqual(['http://localhost/api/v1/mainnet/bounds']);
       });
 
       // Change network
       currentNetwork = sepoliaNetwork;
 
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       rerender();
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith('/api/v1/sepolia/bounds');
+        expect(fetchedUrls()).toEqual([
+          'http://localhost/api/v1/mainnet/bounds',
+          'http://localhost/api/v1/sepolia/bounds',
+        ]);
       });
-
-      expect(fetch).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('useTableBounds', () => {
     it('should return bounds for specific table', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTableBounds('fct_block'), {
         wrapper: createWrapper(),
@@ -337,10 +318,7 @@ describe('useBounds', () => {
     });
 
     it('should return undefined for non-existent table', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTableBounds('non_existent_table'), {
         wrapper: createWrapper(),
@@ -354,10 +332,7 @@ describe('useBounds', () => {
     });
 
     it('should work with different table names', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTableBounds('fct_attestation'), {
         wrapper: createWrapper(),
@@ -371,10 +346,7 @@ describe('useBounds', () => {
     });
 
     it('should use cached bounds data', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const wrapper = createWrapper();
 
@@ -403,10 +375,7 @@ describe('useBounds', () => {
 
   describe('useTablesBounds', () => {
     it('should return bounds for multiple tables', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'fct_attestation']), {
         wrapper: createWrapper(),
@@ -423,10 +392,7 @@ describe('useBounds', () => {
     });
 
     it('should calculate aggregate bounds correctly', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'fct_attestation']), {
         wrapper: createWrapper(),
@@ -445,10 +411,7 @@ describe('useBounds', () => {
     });
 
     it('should handle three tables correctly', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'fct_attestation', 'fct_transaction']), {
         wrapper: createWrapper(),
@@ -468,10 +431,7 @@ describe('useBounds', () => {
     });
 
     it('should skip non-existent tables', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'non_existent_table', 'fct_attestation']), {
         wrapper: createWrapper(),
@@ -490,10 +450,7 @@ describe('useBounds', () => {
     });
 
     it('should handle empty table list', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds([]), {
         wrapper: createWrapper(),
@@ -513,10 +470,7 @@ describe('useBounds', () => {
     });
 
     it('should handle single table', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block']), {
         wrapper: createWrapper(),
@@ -538,10 +492,7 @@ describe('useBounds', () => {
       // Table A: [1000, 5000]
       // Table B: [2000, 6000]
       // Intersection: [2000, 5000] (maxOfMins to minOfMaxes)
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'fct_attestation']), {
         wrapper: createWrapper(),
@@ -560,10 +511,7 @@ describe('useBounds', () => {
       // Table A: [1000, 5000]
       // Table B: [2000, 6000]
       // Union: [1000, 6000] (minOfMins to maxOfMaxes)
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { result } = renderHook(() => useTablesBounds(['fct_block', 'fct_attestation']), {
         wrapper: createWrapper(),
@@ -581,10 +529,7 @@ describe('useBounds', () => {
 
   describe('caching behavior', () => {
     it('should cache data per network', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const { unmount } = renderHook(() => useBounds(), {
         wrapper: createWrapper(),
@@ -606,10 +551,7 @@ describe('useBounds', () => {
     });
 
     it('should share data between all three hook variants', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockBounds,
-      } as Response);
+      vi.mocked(fetch).mockResolvedValueOnce(json(mockBounds));
 
       const wrapper = createWrapper();
 
@@ -625,6 +567,35 @@ describe('useBounds', () => {
 
       // Should only fetch once for all three
       expect(fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('useNetworksBounds', () => {
+    it("should fetch each network's bounds by name, sharing the current network's with useBounds", async () => {
+      const sepoliaBounds: Bounds = { fct_block: { min: 10, max: 20 } };
+      vi.mocked(fetch).mockImplementation(async request =>
+        json((request as Request).url.includes('/sepolia/') ? sepoliaBounds : mockBounds)
+      );
+
+      const wrapper = createWrapper();
+      const { result: current } = renderHook(() => useBounds(), { wrapper });
+
+      await waitFor(() => {
+        expect(current.current.isSuccess).toBe(true);
+      });
+
+      const { result } = renderHook(() => useNetworksBounds(['mainnet', 'sepolia']), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.sepolia.isSuccess).toBe(true);
+      });
+
+      expect(result.current.mainnet.data).toEqual(mockBounds);
+      expect(result.current.sepolia.data).toEqual(sepoliaBounds);
+      expect(fetchedUrls()).toEqual([
+        'http://localhost/api/v1/mainnet/bounds',
+        'http://localhost/api/v1/sepolia/bounds',
+      ]);
     });
   });
 });

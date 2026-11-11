@@ -6,11 +6,14 @@ import { useBounds } from '@/hooks/useBounds';
 import type { Network } from '@/hooks/useNetwork';
 import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext';
 import { client } from '@/api/client.gen';
-import { BASE_URL, PATH_PREFIX, isRootPath } from '@/utils/api-config';
+import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 interface NetworkProviderProps {
   children: ReactNode;
 }
+
+/** The lab-api operations whose queries a network switch leaves alone (operationIds in openapi/lab-backend.yaml). */
+const NETWORK_FREE_QUERIES = new Set(['getConfig', 'getBounds']);
 
 /**
  * Internal component that fetches bounds data for the current network.
@@ -58,24 +61,22 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     currentNetworkRef.current = currentNetwork;
   }, [currentNetwork]);
 
-  // Set up request interceptor to rewrite URLs (only once)
+  // Set up request interceptor to rewrite CBT URLs to the current network (only once). lab-backend's own routes go
+  // through the lab-api client, which names the network itself.
   useEffect(() => {
     const unsubscribe = client.interceptors.request.use(async request => {
+      if (!currentNetworkRef.current) {
+        return request;
+      }
+
+      // Only rewrite if network is not already in the path
       const url = new URL(request.url);
+      const expectedPath = `${BASE_URL}${PATH_PREFIX}/${currentNetworkRef.current.name}/`;
+      if (!url.pathname.startsWith(expectedPath)) {
+        url.pathname = url.pathname.replace(`${BASE_URL}${PATH_PREFIX}/`, expectedPath);
 
-      if (!isRootPath(url.pathname)) {
-        if (!currentNetworkRef.current) {
-          return request;
-        }
-
-        // Only rewrite if network is not already in the path
-        const expectedPath = `${BASE_URL}${PATH_PREFIX}/${currentNetworkRef.current.name}/`;
-        if (!url.pathname.startsWith(expectedPath)) {
-          url.pathname = url.pathname.replace(`${BASE_URL}${PATH_PREFIX}/`, expectedPath);
-
-          // Create new request with rewritten URL
-          request = new Request(url.toString(), request);
-        }
+        // Create new request with rewritten URL
+        request = new Request(url.toString(), request);
       }
 
       return request;
@@ -138,15 +139,16 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   // Invalidate queries when network changes (URL rewriting happens in interceptor)
   useEffect(() => {
     if (currentNetwork) {
-      // Invalidate all network-specific queries to refetch with new network
-      // Don't invalidate admin queries (config, etc)
+      // Refetch everything the network switch changes. Config has no network and bounds name theirs, so they stay.
       queryClient.invalidateQueries({
         predicate: query => {
-          const queryKey = query.queryKey[0];
-          if (typeof queryKey === 'string') {
-            return !['config', 'bounds'].includes(queryKey);
-          }
-          return true;
+          const [key] = query.queryKey;
+          return !(
+            typeof key === 'object' &&
+            key !== null &&
+            '_id' in key &&
+            NETWORK_FREE_QUERIES.has(String(key._id))
+          );
         },
       });
     }

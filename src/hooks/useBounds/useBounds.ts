@@ -1,16 +1,18 @@
 import { type UseQueryResult, useQueries, useQuery } from '@tanstack/react-query';
+import { getBoundsOptions } from '@/lab-api/@tanstack/react-query.gen';
+import type { GetBoundsError } from '@/lab-api';
 import type { Bounds, TableBounds, TablesBoundsResult, AggregateBounds } from './useBounds.types';
-import { BASE_URL, PATH_PREFIX, REFETCH_INTERVALS } from '@/utils/api-config';
+import { REFETCH_INTERVALS } from '@/utils/api-config';
 import { useNetwork } from '@/hooks/useNetwork';
 
-async function fetchBounds(network: string): Promise<Bounds> {
-  const response = await fetch(`${BASE_URL}${PATH_PREFIX}/${network}/bounds`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch bounds: ${response.statusText}`);
-  }
-
-  return response.json();
+/** Bounds never go stale and stay cached for good; a refetch every 5 seconds keeps them current. */
+function boundsOptions(network: string): ReturnType<typeof getBoundsOptions> {
+  return {
+    ...getBoundsOptions({ path: { network } }),
+    refetchInterval: REFETCH_INTERVALS.BOUNDS,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  };
 }
 
 interface UseBoundsOptions<TData = Bounds> {
@@ -36,10 +38,9 @@ interface UseBoundsOptions<TData = Bounds> {
  * ```tsx
  * // Get all bounds
  * function MyComponent() {
- *   const { data: bounds, isLoading, error } = useBounds();
+ *   const { data: bounds } = useBounds();
  *
- *   if (isLoading && !bounds) return <div>Loading...</div>;
- *   if (error && !bounds) return <div>Error: {error.message}</div>;
+ *   if (!bounds) return <div>Loading...</div>;
  *
  *   return (
  *     <div>
@@ -58,16 +59,12 @@ interface UseBoundsOptions<TData = Bounds> {
  * }
  * ```
  */
-export function useBounds<TData = Bounds>(options?: UseBoundsOptions<TData>): UseQueryResult<TData, Error> {
+export function useBounds<TData = Bounds>(options?: UseBoundsOptions<TData>): UseQueryResult<TData, GetBoundsError> {
   const { currentNetwork } = useNetwork();
 
   return useQuery({
-    queryKey: ['bounds', currentNetwork?.name],
-    queryFn: () => fetchBounds(currentNetwork!.name),
-    enabled: !!currentNetwork, // Only run query when network is available
-    refetchInterval: REFETCH_INTERVALS.BOUNDS,
-    staleTime: Infinity, // Never consider data stale - always use cached data if available
-    gcTime: Infinity, // Keep cached data forever
+    ...boundsOptions(currentNetwork?.name ?? ''),
+    enabled: !!currentNetwork,
     select: options?.select,
   });
 }
@@ -88,7 +85,7 @@ export function useBounds<TData = Bounds>(options?: UseBoundsOptions<TData>): Us
  * }
  * ```
  */
-export function useTableBounds(tableName: string): UseQueryResult<TableBounds | undefined, Error> {
+export function useTableBounds(tableName: string): UseQueryResult<TableBounds | undefined, GetBoundsError> {
   return useBounds({
     select: bounds => bounds[tableName],
   });
@@ -118,7 +115,7 @@ export function useTableBounds(tableName: string): UseQueryResult<TableBounds | 
  * }
  * ```
  */
-export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoundsResult, Error> {
+export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoundsResult, GetBoundsError> {
   return useBounds({
     select: bounds => {
       const tables = tableNames.reduce(
@@ -152,15 +149,7 @@ export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoun
  * Bounds for several networks at once, keyed by network name. Shares the cache with useBounds,
  * so the current network's bounds are not fetched twice.
  */
-export function useNetworksBounds(networkNames: string[]): Record<string, UseQueryResult<Bounds, Error>> {
-  const results = useQueries({
-    queries: networkNames.map(name => ({
-      queryKey: ['bounds', name],
-      queryFn: () => fetchBounds(name),
-      refetchInterval: REFETCH_INTERVALS.BOUNDS,
-      staleTime: Infinity,
-      gcTime: Infinity,
-    })),
-  });
+export function useNetworksBounds(networkNames: string[]): Record<string, UseQueryResult<Bounds, GetBoundsError>> {
+  const results = useQueries({ queries: networkNames.map(boundsOptions) });
   return Object.fromEntries(networkNames.map((name, index) => [name, results[index]]));
 }

@@ -314,7 +314,7 @@ describe('useNetwork', () => {
       expect(result.current.currentNetwork?.chain_id).toBe(1);
       expect(result.current.currentNetwork?.genesis_time).toBe(1606824000);
       expect(result.current.currentNetwork?.genesis_delay).toBe(604800);
-      expect(result.current.currentNetwork?.forks.consensus.electra).toBeDefined();
+      expect(result.current.currentNetwork?.forks.consensus?.electra).toBeDefined();
     });
   });
 

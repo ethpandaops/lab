@@ -1,15 +1,16 @@
 import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import type { JSX, ReactNode } from 'react';
 import { client } from '@/api/client.gen';
+import { createQueryClient } from '@/utils/query-client';
 import { useValidatorStatus } from './useValidatorStatus';
 
 // Raw API text: an unset epoch is 2^64 - 1, which JSON.parse rounds up to 2^64
 const BODY = `{"dim_validator_status":[{"validator_index":1,"epoch":0,"epoch_start_date_time":1606824023,"status":"active_ongoing","activation_epoch":0,"exit_epoch":18446744073709551615,"withdrawable_epoch":18446744073709551615}]}`;
 
 function wrapper({ children }: { children: ReactNode }): JSX.Element {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = createQueryClient({ retry: false });
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 

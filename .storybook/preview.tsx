@@ -1,13 +1,15 @@
 import type { Preview, ReactRenderer } from '@storybook/react-vite';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { NetworkProvider } from '../src/providers/NetworkProvider';
 import { ThemeProvider } from '../src/providers/ThemeProvider';
 import { ConfigGate } from '../src/components/Overlays/ConfigGate';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import { handlers, mockConfig, mockBounds } from './mocks';
+import { createQueryClient } from '../src/utils/query-client';
+import { getBoundsQueryKey, getConfigQueryKey } from '../src/lab-api/@tanstack/react-query.gen';
 import '../src/index.css';
 
 // Get the base path from environment
@@ -60,25 +62,21 @@ const preview: Preview = {
       const queryOptions = context.parameters.tanstackQuery?.queries || {};
 
       // Create QueryClient inside decorator for proper isolation per story
-      const queryClient = new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: 0, // No retries by default
-            staleTime: Infinity,
-            ...queryOptions, // Story-level overrides
-          },
-        },
+      const queryClient = createQueryClient({
+        retry: false,
+        staleTime: Infinity,
+        ...queryOptions, // Story-level overrides
       });
 
       // Hydrate the QueryClient with mock data (unless story opts out via parameters.hydration = false)
-      // This mirrors the hydration pattern in __root.tsx
+      // This mirrors the configuration and bounds lab-backend injects into the page
       if (context.parameters.hydration !== false) {
         // Hydrate config
-        queryClient.setQueryData(['config'], mockConfig);
+        queryClient.setQueryData(getConfigQueryKey(), mockConfig);
 
         // Hydrate bounds for each network
         mockConfig.networks.forEach(network => {
-          queryClient.setQueryData(['bounds', network.name], mockBounds);
+          queryClient.setQueryData(getBoundsQueryKey({ path: { network: network.name } }), mockBounds);
         });
       }
 

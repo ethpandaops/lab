@@ -8,7 +8,6 @@ import {
   useSearch,
   retainSearchParams,
 } from '@tanstack/react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { z } from 'zod';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
@@ -22,8 +21,6 @@ import { Sidebar } from '@/components/Layout/Sidebar';
 import { Breadcrumb } from '@/components/Navigation/Breadcrumb';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useNetwork } from '@/hooks/useNetwork';
-import type { Config } from '@/hooks/useConfig';
-import type { Bounds } from '@/hooks/useBounds';
 
 // Define router context interface
 interface MyRouterContext {
@@ -47,36 +44,12 @@ export type RootSearch = z.infer<typeof rootSearchSchema>;
 // Extend Window interface for type safety
 declare global {
   interface Window {
-    __CONFIG__?: Config;
-    __BOUNDS__?: Record<string, Bounds>;
     __VERSION__?: {
       version: string;
       git_commit: string;
       build_date: string;
     };
   }
-}
-
-// Create QueryClient for hydrated data
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: Infinity, // Keep retrying forever - critical queries like config/bounds need to succeed
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff, max 30s
-    },
-  },
-});
-
-// Hydrate the config query if the global variable exists
-if (typeof window !== 'undefined' && window.__CONFIG__) {
-  queryClient.setQueryData(['config'], window.__CONFIG__);
-}
-
-// Hydrate bounds queries for each network if the global variable exists
-if (typeof window !== 'undefined' && window.__BOUNDS__) {
-  Object.entries(window.__BOUNDS__).forEach(([networkName, boundsData]) => {
-    queryClient.setQueryData(['bounds', networkName], boundsData);
-  });
 }
 
 /**
@@ -192,60 +165,24 @@ function RootComponent(): JSX.Element {
   // Show clown emoji for Apple Watch screens
   if (isAppleWatch) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider themeOverride={themeOverride}>
-          <div className="flex min-h-dvh items-center justify-center bg-background p-4">
-            <span
-              className="text-center"
-              style={{ fontSize: '80vw', lineHeight: '1' }}
-              role="img"
-              aria-label="Clown face"
-            >
-              🤡
-            </span>
-          </div>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ThemeProvider themeOverride={themeOverride}>
+        <div className="flex min-h-dvh items-center justify-center bg-background p-4">
+          <span
+            className="text-center"
+            style={{ fontSize: '80vw', lineHeight: '1' }}
+            role="img"
+            aria-label="Clown face"
+          >
+            🤡
+          </span>
+        </div>
+      </ThemeProvider>
     );
   }
 
   // Embed mode: minimal layout without sidebar, header, or breadcrumb
   if (embed) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider themeOverride={themeOverride}>
-          <NotificationProvider>
-            <TimezoneProvider>
-              <ConfigGate>
-                <NetworkProvider>
-                  <SharedCrosshairsProvider>
-                    <HeadContent />
-                    <main className="relative min-h-dvh bg-background">
-                      {/* ethPandaOps logo watermark */}
-                      <a
-                        href="https://lab.ethpandaops.io"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
-                      >
-                        <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
-                      </a>
-                      <FeatureGate>
-                        <Outlet />
-                      </FeatureGate>
-                    </main>
-                  </SharedCrosshairsProvider>
-                </NetworkProvider>
-              </ConfigGate>
-            </TimezoneProvider>
-          </NotificationProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    );
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
       <ThemeProvider themeOverride={themeOverride}>
         <NotificationProvider>
           <TimezoneProvider>
@@ -253,35 +190,65 @@ function RootComponent(): JSX.Element {
               <NetworkProvider>
                 <SharedCrosshairsProvider>
                   <HeadContent />
-                  <div className="bg-background">
-                    {/* Sidebar (mobile + desktop) */}
-                    <Sidebar
-                      sidebarOpen={sidebarOpen}
-                      setSidebarOpen={setSidebarOpen}
-                      collapsed={sidebarCollapsed}
-                      setCollapsed={setSidebarCollapsed}
-                    />
-
-                    {/* Mobile header */}
-                    <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-                    {/* Main content */}
-                    <main
-                      className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                  <main className="relative min-h-dvh bg-background">
+                    {/* ethPandaOps logo watermark */}
+                    <a
+                      href="https://lab.ethpandaops.io"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
                     >
-                      <FeatureGate>
-                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />
-                        <Outlet />
-                      </FeatureGate>
-                    </main>
-                  </div>
+                      <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
+                    </a>
+                    <FeatureGate>
+                      <Outlet />
+                    </FeatureGate>
+                  </main>
                 </SharedCrosshairsProvider>
               </NetworkProvider>
             </ConfigGate>
           </TimezoneProvider>
         </NotificationProvider>
       </ThemeProvider>
-    </QueryClientProvider>
+    );
+  }
+
+  return (
+    <ThemeProvider themeOverride={themeOverride}>
+      <NotificationProvider>
+        <TimezoneProvider>
+          <ConfigGate>
+            <NetworkProvider>
+              <SharedCrosshairsProvider>
+                <HeadContent />
+                <div className="bg-background">
+                  {/* Sidebar (mobile + desktop) */}
+                  <Sidebar
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    collapsed={sidebarCollapsed}
+                    setCollapsed={setSidebarCollapsed}
+                  />
+
+                  {/* Mobile header */}
+                  <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+                  {/* Main content */}
+                  <main
+                    className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                  >
+                    <FeatureGate>
+                      <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />
+                      <Outlet />
+                    </FeatureGate>
+                  </main>
+                </div>
+              </SharedCrosshairsProvider>
+            </NetworkProvider>
+          </ConfigGate>
+        </TimezoneProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }
 

@@ -165,7 +165,7 @@ export function forkIdNextLabel(value: string | undefined, network: Network | nu
   if (!value) return 'No fork scheduled';
   const point = Number(value);
   if (!network || !Number.isFinite(point)) return value;
-  const consensus = Object.entries(network.forks.consensus).find(([, fork]) => fork?.timestamp === point);
+  const consensus = Object.entries(network.forks.consensus ?? {}).find(([, fork]) => fork?.timestamp === point);
   if (consensus) return forkDisplayName(network, consensus[0]);
   const execution = Object.entries(network.forks.execution ?? {}).find(
     ([, fork]) => fork?.block === point || fork?.timestamp === point

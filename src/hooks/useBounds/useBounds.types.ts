@@ -1,9 +1,7 @@
-export interface TableBounds {
-  min: number;
-  max: number;
-}
+import type { TableBounds } from '@/lab-api';
 
-export type Bounds = Record<string, TableBounds>;
+/** The bounds' types, generated from lab-backend's spec in `openapi/lab-backend.yaml`. */
+export type { Bounds, TableBounds } from '@/lab-api';
 
 /**
  * Aggregated statistics across multiple tables.

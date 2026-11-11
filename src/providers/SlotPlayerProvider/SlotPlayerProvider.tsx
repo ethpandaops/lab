@@ -349,7 +349,10 @@ export function SlotPlayerProvider({
   const { currentNetwork } = useNetwork();
 
   // Get slot bounds from the API (TanStack Query handles retries internally)
-  const { data: boundsData, isLoading, error } = useTablesBounds(tables);
+  const { data: boundsData, isLoading, error: boundsError } = useTablesBounds(tables);
+
+  // The client throws the response body, but the meta context reports an Error; memoized to keep its identity
+  const error = useMemo(() => (boundsError ? new Error('Failed to load bounds') : null), [boundsError]);
 
   // Get current wall clock slot for staleness checking
   const { slot: wallClockSlot } = useBeaconClock();
