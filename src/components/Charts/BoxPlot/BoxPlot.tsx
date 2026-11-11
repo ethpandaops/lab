@@ -195,7 +195,7 @@ export function BoxPlot({
         trigger: 'item' as const,
         ...getChartTooltipChrome(themeColors),
         formatter: (params: { seriesName: string; name: string; value: number[] }) => {
-          const [min, q1, median, q3, max] = params.value;
+          const [min = 0, q1 = 0, median = 0, q3 = 0, max = 0] = params.value;
           return `
             <div style="font-weight: 600; margin-bottom: 4px;">${params.seriesName}</div>
             <div style="display: flex; flex-direction: column; gap: 2px;">

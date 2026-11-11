@@ -47,7 +47,7 @@ export const generateWindowLevelData = (numDays: number = 19): DataAvailabilityR
   return Array.from({ length: numDays }, (_, dayIndex) => {
     const date = new Date(today);
     date.setDate(date.getDate() - (numDays - 1 - dayIndex));
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toISOString().slice(0, 10);
     const dayLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     return {

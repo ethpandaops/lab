@@ -3,6 +3,9 @@ import { MoonIcon, SunIcon, SparklesIcon } from '@heroicons/react/24/solid';
 import { useTheme } from '@/hooks/useTheme';
 import type { Theme } from '@/contexts/ThemeContext';
 
+/** The theme each click moves to */
+const NEXT_THEME: Record<Theme, Theme> = { light: 'dark', dark: 'star', star: 'light' };
+
 /**
  * ThemeToggle component that cycles through light, dark, and star themes.
  *
@@ -13,10 +16,7 @@ export function ThemeToggle(): JSX.Element {
   const { theme, setTheme } = useTheme();
 
   const cycleTheme = (): void => {
-    const themeOrder: Theme[] = ['light', 'dark', 'star'];
-    const currentIndex = themeOrder.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themeOrder.length;
-    setTheme(themeOrder[nextIndex]);
+    setTheme(NEXT_THEME[theme]);
   };
 
   const getThemeIcon = (): JSX.Element => {

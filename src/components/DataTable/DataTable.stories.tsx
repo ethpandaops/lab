@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { DataTable } from './DataTable';
 import type { DataTableColumn } from './DataTable.types';
 import { Badge } from '@/components/Elements/Badge';
-import { createColumnHelper } from '@tanstack/react-table';
+import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 
 interface User {
   id: string;
@@ -126,32 +126,33 @@ const sampleData: User[] = [
   },
 ];
 
-const columnHelper = createColumnHelper<User>();
-
 const basicColumns: DataTableColumn<User>[] = [
-  columnHelper.accessor('name', {
+  {
+    accessorKey: 'name',
     header: 'Name',
-    cell: info => <span className="font-medium text-foreground">{info.getValue()}</span>,
+    cell: ({ row }) => <span className="font-medium text-foreground">{row.original.name}</span>,
     meta: {
       filterType: 'text',
       filterPlaceholder: 'Search names...',
       enableHiding: true,
       cellClassName: 'font-medium text-foreground',
     },
-  }),
-  columnHelper.accessor('email', {
+  },
+  {
+    accessorKey: 'email',
     header: 'Email',
-    cell: info => info.getValue(),
+    cell: ({ row }) => row.original.email,
     meta: {
       filterType: 'text',
       filterPlaceholder: 'Search emails...',
       enableHiding: true,
     },
-  }),
-  columnHelper.accessor('role', {
+  },
+  {
+    accessorKey: 'role',
     header: 'Role',
-    cell: info => {
-      const role = info.getValue();
+    cell: ({ row }) => {
+      const role = row.original.role;
       const colorMap = {
         admin: 'red' as const,
         user: 'blue' as const,
@@ -169,11 +170,12 @@ const basicColumns: DataTableColumn<User>[] = [
       filterPlaceholder: 'All roles',
       enableHiding: true,
     },
-  }),
-  columnHelper.accessor('status', {
+  },
+  {
+    accessorKey: 'status',
     header: 'Status',
-    cell: info => {
-      const status = info.getValue();
+    cell: ({ row }) => {
+      const status = row.original.status;
       return (
         <Badge color={status === 'active' ? 'green' : 'gray'} dot>
           {status}
@@ -189,24 +191,26 @@ const basicColumns: DataTableColumn<User>[] = [
       filterPlaceholder: 'All statuses',
       enableHiding: true,
     },
-  }),
-  columnHelper.accessor('age', {
+  },
+  {
+    accessorKey: 'age',
     header: 'Age',
-    cell: info => info.getValue(),
+    cell: ({ row }) => row.original.age,
     meta: {
       filterType: 'number-range',
       filterPlaceholder: 'Min age...',
       enableHiding: true,
     },
-  }),
-  columnHelper.accessor('createdAt', {
+  },
+  {
+    accessorKey: 'createdAt',
     header: 'Created',
-    cell: info => new Date(info.getValue()).toLocaleDateString(),
+    cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
     meta: {
       filterType: 'date-range',
       enableHiding: true,
     },
-  }),
+  },
 ];
 
 const meta: Meta<typeof DataTable<User>> = {
@@ -272,8 +276,8 @@ export const Clickable: Story = {
 
 export const Controlled: Story = {
   render: () => {
-    const [columnFilters, setColumnFilters] = useState([]);
-    const [sorting, setSorting] = useState([]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] = useState({});
 
     return (
@@ -297,17 +301,19 @@ export const MinimalColumns: Story = {
   args: {
     data: sampleData,
     columns: [
-      columnHelper.accessor('name', {
+      {
+        accessorKey: 'name',
         header: 'Name',
-        cell: info => <span className="font-medium text-foreground">{info.getValue()}</span>,
+        cell: ({ row }) => <span className="font-medium text-foreground">{row.original.name}</span>,
         meta: {
           cellClassName: 'font-medium text-foreground',
         },
-      }),
-      columnHelper.accessor('email', {
+      },
+      {
+        accessorKey: 'email',
         header: 'Email',
-        cell: info => info.getValue(),
-      }),
+        cell: ({ row }) => row.original.email,
+      },
     ],
     title: 'Minimal Example',
     description: 'Just name and email columns, no filters',

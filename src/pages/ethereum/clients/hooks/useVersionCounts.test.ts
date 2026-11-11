@@ -18,7 +18,7 @@ describe('chunksFor', () => {
   it('lists the days of a short window', () => {
     const chunks = chunksFor('daily', to - 2 * 86400, to);
     expect(chunks).toHaveLength(1);
-    expect(chunks[0].query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
+    expect(chunks[0]?.query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
   });
 
   it('reads nothing when the data starts after the last complete day', () => {
@@ -27,7 +27,7 @@ describe('chunksFor', () => {
   });
 
   it('still lists the last complete day when the data starts during it', () => {
-    expect(chunksFor('daily', to - 3600, to)[0].query).toEqual({ day_start_date_in_values: '2026-11-04' });
+    expect(chunksFor('daily', to - 3600, to)[0]?.query).toEqual({ day_start_date_in_values: '2026-11-04' });
   });
 });
 

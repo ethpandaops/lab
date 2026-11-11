@@ -112,10 +112,11 @@ export function IndexPage(): JSX.Element {
         .filter(f => f.name !== 'phase0')
         .flatMap(f => {
           const idx = history.days.findIndex(d => d >= dayOf(epochToTimestamp(f.epoch, currentNetwork.genesis_time)));
-          if (idx <= 0) return [];
+          const dayLabel = labels[idx];
+          if (idx <= 0 || dayLabel === undefined) return [];
           return [
             {
-              xValue: labels[idx],
+              xValue: dayLabel,
               label: f.displayName,
               labelPosition: 'end' as const,
               color: DATA_COLORS.violet,
@@ -162,7 +163,7 @@ export function IndexPage(): JSX.Element {
         <Alert variant="info" title="No entity data for this network" />
       )}
 
-      {!stake.error && !stake.isLoading && named.length > 0 && (
+      {!stake.error && !stake.isLoading && largest && (
         <div className="flex flex-col gap-10">
           <InspectSection title="Stake" meta={stakeWindow || undefined}>
             <Stats

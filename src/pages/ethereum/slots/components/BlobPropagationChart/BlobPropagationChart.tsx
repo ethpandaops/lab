@@ -119,7 +119,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
       const lower = Math.floor(index);
       const upper = Math.ceil(index);
       const weight = index % 1;
-      return sortedValues[lower] * (1 - weight) + sortedValues[upper] * weight;
+      return (sortedValues[lower] ?? 0) * (1 - weight) + (sortedValues[upper] ?? 0) * weight;
     };
 
     const minData: [number, number | null][] = [];
@@ -130,12 +130,14 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
 
     columnIndices.forEach(colIndex => {
       const times = columnGroups.get(colIndex)!.sort((a, b) => a - b);
+      const min = times[0];
+      const max = times.at(-1);
 
-      minData.push([colIndex, times[0] / 1000]); // Convert to seconds
+      minData.push([colIndex, min === undefined ? null : min / 1000]); // Convert to seconds
       p05Data.push([colIndex, calculatePercentile(times, 5) / 1000]);
       p50Data.push([colIndex, calculatePercentile(times, 50) / 1000]);
       p90Data.push([colIndex, calculatePercentile(times, 90) / 1000]);
-      maxData.push([colIndex, times[times.length - 1] / 1000]);
+      maxData.push([colIndex, max === undefined ? null : max / 1000]);
     });
 
     // Create multi-line series matching BlockArrivalTimesChart style
@@ -215,7 +217,7 @@ export function BlobPropagationChart({ blobPropagationData }: BlobPropagationCha
 
     // Calculate overall median propagation time
     const allTimes = blobPropagationData.map(p => p.seen_slot_start_diff).sort((a, b) => a - b);
-    const median = allTimes[Math.floor(allTimes.length / 2)];
+    const median = allTimes[Math.floor(allTimes.length / 2)] ?? 0;
 
     return {
       blobCount: uniqueBlobs.size,

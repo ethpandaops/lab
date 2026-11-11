@@ -25,7 +25,9 @@ describe('getBuckets', () => {
     const buckets = getBuckets('30d', now);
     expect(buckets).toHaveLength(30);
     expect(buckets[29]).toBe(Date.UTC(2026, 9, 29) / 1000);
-    expect(buckets[1] - buckets[0]).toBe(DAY);
+    const [first, second] = buckets;
+    if (first === undefined || second === undefined) throw new Error('Expected at least two buckets');
+    expect(second - first).toBe(DAY);
   });
 
   it('starts all history at the Monday of the earliest week with data and ends with the last complete week', () => {

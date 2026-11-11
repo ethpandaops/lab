@@ -46,7 +46,9 @@ function reasonBars(rows: FctPeerGoodbyeDaily[], days: string[], reasons: Goodby
  */
 export function GoodbyeCharts({ reasons, clients }: GoodbyeChartsProps): JSX.Element {
   const days = seriesDays(reasons, peers);
-  if (days.length === 0) {
+  const firstDay = days[0];
+  const lastDay = days.at(-1);
+  if (firstDay === undefined || lastDay === undefined) {
     return (
       <Card rounded>
         <p className="text-sm text-muted">No goodbyes were counted in this range.</p>
@@ -58,7 +60,7 @@ export function GoodbyeCharts({ reasons, clients }: GoodbyeChartsProps): JSX.Ele
   const restDays = seriesDays(rest, peers);
   const byClient = clientGoodbyes(clients);
   const clientReasons = reasonsIn(clients);
-  const span = `${formatDataDate(dayStart(days[0]))} to ${formatDataDate(dayStart(days[days.length - 1]))}`;
+  const span = `${formatDataDate(dayStart(firstDay))} to ${formatDataDate(dayStart(lastDay))}`;
 
   return (
     <div className="flex flex-col gap-3">

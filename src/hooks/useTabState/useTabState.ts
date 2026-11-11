@@ -88,12 +88,13 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
 
       // Check if it's an anchor within a tab
       const anchorIndex = tabs.findIndex(tab => tab.anchors?.includes(hash));
-      if (anchorIndex >= 0) {
+      const anchorTab = tabs[anchorIndex];
+      if (anchorTab) {
         // Migrate to new format, preserving the anchor
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
         (navigate as any)({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
-          search: (prev: any) => ({ ...prev, tab: tabs[anchorIndex].id }),
+          search: (prev: any) => ({ ...prev, tab: anchorTab.id }),
           replace: true,
           hash,
         });
@@ -168,6 +169,7 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
    */
   const onChange = (index: number): void => {
     const newTab = tabs[index];
+    if (!newTab) return;
     setSelectedIndex(index);
 
     const currentHash = window.location.hash.replace('#', '');

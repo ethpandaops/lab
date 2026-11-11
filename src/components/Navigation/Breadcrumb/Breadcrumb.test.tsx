@@ -2,6 +2,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test-utils';
 import { Breadcrumb } from './Breadcrumb';
 
+/** The parts of a matched route that Breadcrumb reads */
+interface RouteMatch {
+  pathname: string;
+  context: { getBreadcrumb: () => { label: string; show?: boolean } };
+}
+
+// Breadcrumb selects the route matches from the router state; the mock returns them as selected
+const useRouterState = vi.hoisted(() => vi.fn<() => RouteMatch[]>());
+
 // Mock TanStack Router hooks
 vi.mock('@tanstack/react-router', async importOriginal => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
@@ -10,21 +19,18 @@ vi.mock('@tanstack/react-router', async importOriginal => ({
       {children}
     </a>
   ),
-  useRouterState: vi.fn(),
+  useRouterState,
 }));
-
-// Import after mocking
-import { useRouterState } from '@tanstack/react-router';
 
 describe('Breadcrumb', () => {
   it('should not render when there are no breadcrumbs', () => {
-    vi.mocked(useRouterState).mockReturnValue([]);
+    useRouterState.mockReturnValue([]);
     const { container } = render(<Breadcrumb />);
     expect(container.firstChild).toBeNull();
   });
 
   it('should not render when there is only one breadcrumb', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -37,7 +43,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should render breadcrumbs when there are multiple items', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -60,7 +66,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should render home icon when showHome is true', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -80,7 +86,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should not render home icon when showHome is false', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -100,7 +106,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should mark the last breadcrumb as active', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -122,7 +128,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should filter out breadcrumbs with show: false', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -143,7 +149,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should use custom separator', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {
@@ -163,7 +169,7 @@ describe('Breadcrumb', () => {
   });
 
   it('should apply custom className', () => {
-    vi.mocked(useRouterState).mockReturnValue([
+    useRouterState.mockReturnValue([
       {
         pathname: '/ethereum',
         context: {

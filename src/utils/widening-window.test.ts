@@ -6,6 +6,7 @@ import {
   nextTimeCursor,
   parseTimeCursor,
   wideningWindows,
+  type NewestFirstPage,
   type TimeWindow,
 } from './widening-window';
 
@@ -79,7 +80,9 @@ describe('fetchNewestFirst', () => {
     const page = await fetchNewestFirst({ pageSize: 10, end: END, floor: END - 400 * DAY, timeOf, fetchWindow });
     expect(calls).toEqual([{ gte: END - HOUR, lt: END }]);
     expect(page.rows.map(row => row.id)).toEqual(rows.slice(0, 10).map(row => row.id));
-    expect(page.next).toEqual({ end: rows[9].t + 1, skip: 1 });
+    const oldestShown = rows[9];
+    if (!oldestShown) throw new Error('Expected a tenth row');
+    expect(page.next).toEqual({ end: oldestShown.t + 1, skip: 1 });
   });
 
   it('widens one window at a time until the page and one row past it fill', async () => {
@@ -148,7 +151,7 @@ describe('fetchNewestFirst', () => {
     while (cursor && pages < 10) {
       // Round-trip through the URL form, as the pages do
       const parsed = parseTimeCursor(encodeTimeCursor(cursor))!;
-      const page = await fetchNewestFirst({
+      const page: NewestFirstPage<Row> = await fetchNewestFirst({
         pageSize: 4,
         end: parsed.end,
         skip: parsed.skip,

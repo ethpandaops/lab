@@ -35,6 +35,6 @@ describe('clientGoodbyes', () => {
     ]);
     expect(clients.map(entry => entry.client)).toEqual(['teku', 'lighthouse', 'unknown', 'other']);
     expect(clients[0]).toMatchObject({ goodbyes: 37, peers: 14 });
-    expect(Object.fromEntries(clients[0].byReason)).toEqual({ '129': 10, '250': 2, other: 2 });
+    expect(Object.fromEntries(clients[0]?.byReason ?? [])).toEqual({ '129': 10, '250': 2, other: 2 });
   });
 });

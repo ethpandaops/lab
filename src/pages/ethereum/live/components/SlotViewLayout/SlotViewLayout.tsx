@@ -41,7 +41,8 @@ function upperBound<T>(array: T[], accessor: (item: T) => number, target: number
 
   while (low < high) {
     const mid = Math.floor((low + high) / 2);
-    if (accessor(array[mid]) <= target) {
+    const item = array[mid];
+    if (item !== undefined && accessor(item) <= target) {
       low = mid + 1;
     } else {
       high = mid;

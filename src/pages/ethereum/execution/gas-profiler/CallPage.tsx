@@ -506,7 +506,8 @@ export function CallPage(): JSX.Element {
             <span className="hidden items-center gap-2 sm:inline-flex">
               <ChevronRightIcon className="size-3 text-border" />
               {(() => {
-                const parent = breadcrumbPath[breadcrumbPath.length - 2];
+                const parent = breadcrumbPath.at(-2);
+                if (!parent) return null;
                 const parentIsContractCreation = !parent.target_address && parent.depth === 0;
                 const parentCallType = parentIsContractCreation ? 'CREATE' : parent.call_type || 'CALL';
                 const parentStyles = getCallTypeStyles(parentCallType);

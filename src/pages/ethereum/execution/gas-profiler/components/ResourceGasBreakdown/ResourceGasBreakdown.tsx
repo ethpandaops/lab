@@ -106,6 +106,7 @@ export function ResourceGasBreakdown({
             barWidth="65%"
             tooltipFormatter={params => {
               const p = Array.isArray(params) ? params[0] : params;
+              if (!p) return '';
               const val = typeof p.value === 'number' ? p.value : 0;
               const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
               return `<strong>${p.name as string}</strong><br/>${formatGas(val)} gas (${pct}%)`;

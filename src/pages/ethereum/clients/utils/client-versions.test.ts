@@ -58,8 +58,10 @@ describe('findRelease', () => {
 
 describe('previousRelease', () => {
   it('should be the highest full release below, ignoring prereleases', () => {
-    expect(previousRelease(releases, releases[0])?.version).toBe('v8.3.1');
-    expect(previousRelease(releases, releases[4])).toBeUndefined();
+    const [newest, , , , oldest] = releases;
+    if (!newest || !oldest) throw new Error('expected five release fixtures');
+    expect(previousRelease(releases, newest)?.version).toBe('v8.3.1');
+    expect(previousRelease(releases, oldest)).toBeUndefined();
   });
 });
 
@@ -102,7 +104,7 @@ describe('toVersionCounts', () => {
       ['v8.3.2', 'commit_untagged', 2],
       [null, 'commit_zero', 9],
     ]);
-    expect(rows[0].time).toBe(Date.UTC(2026, 10, 1) / 1000);
+    expect(rows[0]?.time).toBe(Date.UTC(2026, 10, 1) / 1000);
     expect(summariseVersions(rows)).toMatchObject([{ version: 'v8.3.2', blocks: 7, untaggedBlocks: 2, share: 100 }]);
   });
 });
@@ -222,11 +224,11 @@ describe('build lines', () => {
         avg_gas_used: 36_000_000,
       },
     ]);
-    expect(line.line).toBe('2.9.0');
-    expect(line.p50).toBeCloseTo(65);
+    expect(line?.line).toBe('2.9.0');
+    expect(line?.p50).toBeCloseTo(65);
     // (30M*100 + 36M*300) / (60*100 + 80*300) = 460,000 gas per ms = 460 MGas/s
-    expect(line.mgasPerSecond).toBeCloseTo(460);
-    expect(line.builds).toEqual(['2.9.0-aaaaaaaa', '2.9.0-bbbbbbbb']);
+    expect(line?.mgasPerSecond).toBeCloseTo(460);
+    expect(line?.builds).toEqual(['2.9.0-aaaaaaaa', '2.9.0-bbbbbbbb']);
   });
 
   it('should take each line percentile from the window, not from the daily rows', () => {
@@ -289,7 +291,7 @@ describe('compareOpcodeCosts', () => {
       ['SLOAD', true],
       ['CALL', false],
     ]);
-    expect(changes[0].change).toBeCloseTo(-0.5);
+    expect(changes[0]?.change).toBeCloseTo(-0.5);
   });
 });
 
@@ -428,7 +430,7 @@ describe('groupVersionLines', () => {
     );
     expect(result.level).toBe('minor');
     expect(result.top.sort()).toEqual(['v7.0.x', 'v8.1.x', 'v8.2.x']);
-    expect(Object.fromEntries(result.days[0].counts)).toEqual({ 'v8.2.x': 60 });
+    expect(Object.fromEntries(result.days[0]?.counts ?? [])).toEqual({ 'v8.2.x': 60 });
   });
 
   it('gives each stretch of a long window its main release', () => {

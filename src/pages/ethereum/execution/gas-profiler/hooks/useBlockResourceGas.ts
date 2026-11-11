@@ -47,11 +47,7 @@ export function useBlockResourceGas({ blockNumber }: UseBlockResourceGasOptions)
     staleTime: 5 * 60 * 1000,
   });
 
-  const record = useMemo<IntBlockResourceGas | null>(() => {
-    const items = data?.int_block_resource_gas;
-    if (!items?.length) return null;
-    return items[0];
-  }, [data]);
+  const record = useMemo<IntBlockResourceGas | null>(() => data?.int_block_resource_gas?.[0] ?? null, [data]);
 
   const entries = useMemo(() => toResourceEntries(record), [record]);
   const refund = useMemo(() => getResourceRefund(record), [record]);

@@ -22,13 +22,15 @@ export interface SeriesCardProps {
  * A daily series over the range in a card, with the days it covers as its subtitle.
  */
 export function SeriesCard({ title, days, series, yName, percent, empty }: SeriesCardProps): JSX.Element {
+  const firstDay = days[0];
+  const lastDay = days.at(-1);
   return (
     <Card
       rounded
       title={title}
       subtitle={
-        days.length > 0
-          ? `Each day, ${formatDataDate(dayStart(days[0]))} to ${formatDataDate(dayStart(days[days.length - 1]))}`
+        firstDay !== undefined && lastDay !== undefined
+          ? `Each day, ${formatDataDate(dayStart(firstDay))} to ${formatDataDate(dayStart(lastDay))}`
           : undefined
       }
     >

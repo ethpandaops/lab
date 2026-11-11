@@ -113,11 +113,11 @@ export function getActiveFork(network: Network, epoch: number): ForkInfo | null 
   const activeForks = forks.filter(f => epoch >= f.epoch);
 
   // Return the most recent one (last in the filtered list, since they're sorted by epoch)
-  if (activeForks.length === 0) {
+  const fork = activeForks.at(-1);
+  if (!fork) {
     return null;
   }
 
-  const fork = activeForks[activeForks.length - 1];
   return {
     ...fork,
     isActive: true,
@@ -145,12 +145,13 @@ export function getNextFork(network: Network, epoch: number): ForkInfo | null {
   const upcomingForks = forks.filter(f => epoch < f.epoch);
 
   // Return the first one (earliest upcoming fork)
-  if (upcomingForks.length === 0) {
+  const fork = upcomingForks[0];
+  if (!fork) {
     return null;
   }
 
   return {
-    ...upcomingForks[0],
+    ...fork,
     isActive: false,
   };
 }

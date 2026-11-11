@@ -61,6 +61,8 @@ export function PlaceOverview<T extends PlaceCensusRow>({
     place.start && all.start ? { part: total(place.start, peers), whole: total(all.start, peers) } : null;
 
   const chart = useMemo(() => clientSeries(days), [days]);
+  const firstDay = chart.days[0];
+  const lastDay = chart.days.at(-1);
   const local = layerCounts(place.end, 'consensus', peers);
   const network = layerCounts(all.end, 'consensus', peers);
   const networkShare = new Map(network.clients.map(row => [row.client, (row.count / network.whole) * 100]));
@@ -98,8 +100,8 @@ export function PlaceOverview<T extends PlaceCensusRow>({
         rounded
         title="Consensus peers"
         subtitle={
-          chart.days.length > 0
-            ? `Each day by client, ${formatDataDate(dayStart(chart.days[0]))} to ${formatDataDate(dayStart(chart.days[chart.days.length - 1]))}`
+          firstDay !== undefined && lastDay !== undefined
+            ? `Each day by client, ${formatDataDate(dayStart(firstDay))} to ${formatDataDate(dayStart(lastDay))}`
             : undefined
         }
       >

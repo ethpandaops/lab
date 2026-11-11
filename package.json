@@ -15,7 +15,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --project unit --coverage",
     "lint": "eslint . --cache --cache-location .eslintcache",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
     "knip": "KNIP_DISABLE_RAW_TRANSFER=1 knip",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

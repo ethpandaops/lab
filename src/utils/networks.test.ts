@@ -70,7 +70,7 @@ describe('networks utilities', () => {
     it('should order devnets by genesis rather than alphabetically', () => {
       const groups = groupNetworks([network('fusaka-devnet-9', 900), network('fusaka-devnet-10', 1000)]);
 
-      expect(groups[0].networks.map(n => n.name)).toEqual(['fusaka-devnet-10', 'fusaka-devnet-9']);
+      expect(groups[0]?.networks.map(n => n.name)).toEqual(['fusaka-devnet-10', 'fusaka-devnet-9']);
     });
 
     it('should omit empty groups', () => {

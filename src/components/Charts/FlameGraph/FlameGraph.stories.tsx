@@ -483,34 +483,30 @@ export const SingleNode: Story = {
   },
 };
 
+// Create deep tree programmatically
+const createDeepTree = (depth: number, maxDepth: number, value: number): FlameGraphNode => {
+  const hasChildren = depth < maxDepth;
+  const childValue = hasChildren ? Math.floor(value * 0.8) : 0;
+  return {
+    id: `depth-${depth}`,
+    label: `Level ${depth}`,
+    value,
+    selfValue: value - childValue,
+    category: ['cpu', 'memory', 'io', 'network'][depth % 4],
+    children: hasChildren ? [createDeepTree(depth + 1, maxDepth, childValue)] : undefined,
+  };
+};
+
 /**
  * Deep nesting
  */
 export const DeepNesting: Story = {
-  render: () => {
-    // Create deep tree programmatically
-    const createDeepTree = (depth: number, maxDepth: number, value: number): FlameGraphNode => {
-      const hasChildren = depth < maxDepth;
-      const childValue = hasChildren ? Math.floor(value * 0.8) : 0;
-      return {
-        id: `depth-${depth}`,
-        label: `Level ${depth}`,
-        value,
-        selfValue: value - childValue,
-        category: ['cpu', 'memory', 'io', 'network'][depth % 4],
-        children: hasChildren ? [createDeepTree(depth + 1, maxDepth, childValue)] : undefined,
-      };
-    };
-
-    return (
-      <FlameGraph
-        data={createDeepTree(0, 10, 1000)}
-        colorMap={PROCESS_TYPE_COLORS}
-        title="Deep Call Stack"
-        valueUnit="ms"
-        height={350}
-      />
-    );
+  args: {
+    data: createDeepTree(0, 10, 1000),
+    colorMap: PROCESS_TYPE_COLORS,
+    title: 'Deep Call Stack',
+    valueUnit: 'ms',
+    height: 350,
   },
 };
 
@@ -518,6 +514,9 @@ export const DeepNesting: Story = {
  * Selection demo with state
  */
 export const SelectionDemo: Story = {
+  args: {
+    data: EVM_CALL_TREE,
+  },
   render: () => {
     const [selected, setSelected] = useState<string | undefined>(undefined);
     return (

@@ -159,7 +159,9 @@ export function GlamsterdamPresetModal({
   }, []);
 
   const handleResetParam = useCallback((key: string) => {
-    setValues(prev => ({ ...prev, [key]: GLAMSTERDAM_PRESET[key] }));
+    const preset = GLAMSTERDAM_PRESET[key];
+    if (preset === undefined) return;
+    setValues(prev => ({ ...prev, [key]: preset }));
   }, []);
 
   // Count how many values differ from GLAMSTERDAM_PRESET defaults

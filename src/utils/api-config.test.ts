@@ -25,9 +25,10 @@ describe('API client Int64 handling', () => {
       '6292022559433348801',
       '-42',
     ]);
-    expect(data?.int_custody_probe?.[0].slot).toBe(15558666);
+    expect(data?.int_custody_probe?.[0]?.slot).toBe(15558666);
 
-    expect(requests).toHaveLength(1);
-    expect(new URL(requests[0].url).searchParams.get('peer_id_unique_key_in_values')).toBe('6292022559433348801');
+    expect(requests.map(request => new URL(request.url).searchParams.get('peer_id_unique_key_in_values'))).toEqual([
+      '6292022559433348801',
+    ]);
   });
 });

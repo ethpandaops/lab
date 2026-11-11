@@ -151,7 +151,7 @@ export function medianWithInterval(values: number[], seed = 1): { value: number;
   const rand = seededRandom(seed);
   const medians: number[] = [];
   for (let s = 0; s < BOOTSTRAP_SAMPLES; s++) {
-    const draw = values.map(() => values[Math.floor(rand() * values.length)]);
+    const draw = values.map(() => values[Math.floor(rand() * values.length)] ?? value);
     medians.push(median(draw));
   }
   medians.sort((a, b) => a - b);
@@ -218,10 +218,10 @@ export function buildOpcodeCostModel(
         .sort((a, b) => a[0] - b[0])
         .map(([day, rows]) => ({
           day,
-          blocks: rows[0].block_count ?? 0,
+          blocks: rows[0]?.block_count ?? 0,
           nsPerOp: rows.map(r => r.ns_per_op ?? 0),
           ratio: rows.map(r => r.price_ratio ?? 0),
-          versions: rows[0].meta_execution_versions ?? [],
+          versions: rows[0]?.meta_execution_versions ?? [],
         }));
       for (const d of daily) {
         windowStart = Math.min(windowStart, d.day);
@@ -229,11 +229,11 @@ export function buildOpcodeCostModel(
       }
       const ratios: OpcodeCost[] = OPCODE_GROUPS.map((_, i) => {
         const r = medianWithInterval(
-          daily.map(d => d.ratio[i]),
+          daily.flatMap(d => d.ratio[i] ?? []),
           i + 1
         );
         const ns = medianWithInterval(
-          daily.map(d => d.nsPerOp[i]),
+          daily.flatMap(d => d.nsPerOp[i] ?? []),
           i + 1
         );
         return { ratio: r.value, lo: r.lo, hi: r.hi, nsPerOp: ns.value, nsLo: ns.lo, nsHi: ns.hi };
@@ -269,7 +269,10 @@ export function repricingCandidates(model: OpcodeCostModel, limit: number): Repr
     .map((opcode, i) => {
       if (opcode.pricedFor !== 'execution' || opcode.gasShare < MIN_GAS_SHARE) return null;
       const worst = model.clients
-        .map(c => ({ client: c.client, cost: c.ratios[i] }))
+        .flatMap(c => {
+          const cost = c.ratios[i];
+          return cost ? [{ client: c.client, cost }] : [];
+        })
         .sort((a, b) => b.cost.lo - a.cost.lo)[0];
       return worst && isMispriced(worst.cost) && worst.cost.ratio > 1 ? { opcode, ...worst } : null;
     })

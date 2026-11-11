@@ -60,19 +60,21 @@ export function timedRows<T extends RollupRow>(rows: T[] | undefined, bucketSeco
   }
   const sorted = [...byTime.keys()].sort((a, b) => a - b);
   const times: number[] = [];
-  sorted.forEach((t, i) => {
-    if (i > 0 && t - sorted[i - 1] > bucketSeconds) times.push(sorted[i - 1] + bucketSeconds);
+  let previous: number | undefined;
+  for (const t of sorted) {
+    if (previous !== undefined && t - previous > bucketSeconds) times.push(previous + bucketSeconds);
     times.push(t);
-  });
+    previous = t;
+  }
   return { times, byTime };
 }
 
 /** Pairs each value with its bucket start, the point shape a time axis takes */
 function withTimes(series: SeriesData[], times: number[]): SeriesData[] {
-  return series.map(s => ({
-    ...s,
-    data: (s.data as (number | null)[]).map((v, i): [number, number | null] => [times[i], v]),
-  }));
+  return series.map(s => {
+    const values = s.data as (number | null)[];
+    return { ...s, data: times.map((t, i): [number, number | null] => [t, values[i] ?? null]) };
+  });
 }
 
 /** The bucket start a tooltip is for: the x of its first point */
@@ -177,12 +179,8 @@ export function formatTooltipDate(value: number | string, isDaily: boolean): str
 
 /** Gets the chunk index for a gas limit band. Bands are half-open: each covers [previous max, max). */
 export function getChunkIndex(gasLimitBand: number): number {
-  for (let i = 0; i < GAS_BANDS.length; i++) {
-    if (gasLimitBand < GAS_BANDS[i].max) {
-      return i;
-    }
-  }
-  return GAS_BANDS.length - 1;
+  const index = GAS_BANDS.findIndex(band => gasLimitBand < band.max);
+  return index === -1 ? GAS_BANDS.length - 1 : index;
 }
 
 /** Gets the display label for a chunk index */

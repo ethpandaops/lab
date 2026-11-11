@@ -4,7 +4,7 @@ import { useNetwork } from './useNetwork';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { NetworkContextValue } from '@/contexts/NetworkContext/NetworkContext.types';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
-import { type ReactNode } from 'react';
+import { type JSX, type ReactNode } from 'react';
 
 describe('useNetwork', () => {
   const mockNetwork: Network = {

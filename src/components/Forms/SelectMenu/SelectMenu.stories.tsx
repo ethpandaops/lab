@@ -28,8 +28,10 @@ interface Country {
   name: string;
 }
 
+const unitedStates: Country = { code: 'us', name: 'United States' };
+
 const countries: SelectMenuOption<Country>[] = [
-  { value: { code: 'us', name: 'United States' }, label: 'United States' },
+  { value: unitedStates, label: 'United States' },
   { value: { code: 'ca', name: 'Canada' }, label: 'Canada' },
   { value: { code: 'mx', name: 'Mexico' }, label: 'Mexico' },
   { value: { code: 'uk', name: 'United Kingdom' }, label: 'United Kingdom' },
@@ -46,7 +48,7 @@ const countriesWithIcons: SelectMenuOption<Country>[] = countries.map(country =>
  */
 export const Default: Story = {
   render: () => {
-    const [selected, setSelected] = useState(countries[0].value);
+    const [selected, setSelected] = useState(unitedStates);
     return <SelectMenu value={selected} onChange={setSelected} options={countries} showLabel label="Country" />;
   },
 };
@@ -56,7 +58,7 @@ export const Default: Story = {
  */
 export const WithoutLabel: Story = {
   render: () => {
-    const [selected, setSelected] = useState(countries[0].value);
+    const [selected, setSelected] = useState(unitedStates);
     return <SelectMenu value={selected} onChange={setSelected} options={countries} />;
   },
 };
@@ -66,7 +68,7 @@ export const WithoutLabel: Story = {
  */
 export const WithIcons: Story = {
   render: () => {
-    const [selected, setSelected] = useState(countriesWithIcons[0].value);
+    const [selected, setSelected] = useState(unitedStates);
     return (
       <SelectMenu value={selected} onChange={setSelected} options={countriesWithIcons} showLabel label="Country" />
     );
@@ -78,7 +80,7 @@ export const WithIcons: Story = {
  */
 export const Disabled: Story = {
   render: () => {
-    const [selected, setSelected] = useState(countries[0].value);
+    const [selected, setSelected] = useState(unitedStates);
     return (
       <SelectMenu value={selected} onChange={setSelected} options={countries} showLabel label="Country" disabled />
     );
@@ -108,7 +110,7 @@ export const DifferentIcons: Story = {
  */
 export const Rounded: Story = {
   render: () => {
-    const [selected, setSelected] = useState(countries[0].value);
+    const [selected, setSelected] = useState(unitedStates);
     return <SelectMenu value={selected} onChange={setSelected} options={countries} showLabel label="Country" rounded />;
   },
 };
@@ -118,8 +120,8 @@ export const Rounded: Story = {
  */
 export const RoundedComparison: Story = {
   render: () => {
-    const [selectedSharp, setSelectedSharp] = useState(countries[0].value);
-    const [selectedRounded, setSelectedRounded] = useState(countries[0].value);
+    const [selectedSharp, setSelectedSharp] = useState(unitedStates);
+    const [selectedRounded, setSelectedRounded] = useState(unitedStates);
     return (
       <div className="flex flex-col gap-6">
         <div>

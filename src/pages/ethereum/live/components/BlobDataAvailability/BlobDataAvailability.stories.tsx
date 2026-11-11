@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { BlobDataAvailability } from './BlobDataAvailability';
+import type { BlobDataAvailabilityProps } from './BlobDataAvailability.types';
 
 const { BLOB_COLORS, CONTINENT_COLORS } = getDataVizColors();
 
@@ -99,6 +100,17 @@ const allContinentsPropagationData = [
     ],
   },
 ];
+
+/** The sample data as the slot view passes it `time` ms into the slot */
+const seenBy = (
+  time: number
+): Pick<BlobDataAvailabilityProps, 'deduplicatedBlobData' | 'visibleContinentalPropagationData'> => ({
+  deduplicatedBlobData: sampleFirstSeenData.filter(point => point.time <= time),
+  visibleContinentalPropagationData: allContinentsPropagationData.map(continent => ({
+    ...continent,
+    data: continent.data.filter(point => point.time <= time),
+  })),
+});
 
 /**
  * Interactive story with auto-progress - simulates live slot progression
@@ -432,12 +444,7 @@ export const NoPropagationData: Story = {
  */
 export const EarlyPhase: Story = {
   name: 'Early Phase (1s)',
-  args: {
-    currentTime: 1000,
-    deduplicatedBlobData: sampleFirstSeenData,
-
-    visibleContinentalPropagationData: allContinentsPropagationData,
-  },
+  args: seenBy(1000),
 };
 
 /**
@@ -445,12 +452,7 @@ export const EarlyPhase: Story = {
  */
 export const PeakPhase: Story = {
   name: 'Peak Phase (1.5s)',
-  args: {
-    currentTime: 1500,
-    deduplicatedBlobData: sampleFirstSeenData,
-
-    visibleContinentalPropagationData: allContinentsPropagationData,
-  },
+  args: seenBy(1500),
 };
 
 /**
@@ -458,12 +460,7 @@ export const PeakPhase: Story = {
  */
 export const CompletePhase: Story = {
   name: 'Complete Phase (12s)',
-  args: {
-    currentTime: 12000,
-    deduplicatedBlobData: sampleFirstSeenData,
-
-    visibleContinentalPropagationData: allContinentsPropagationData,
-  },
+  args: seenBy(12000),
 };
 
 /**
@@ -471,10 +468,5 @@ export const CompletePhase: Story = {
  */
 export const VeryEarly: Story = {
   name: 'Very Early (0.5s)',
-  args: {
-    currentTime: 500,
-    deduplicatedBlobData: sampleFirstSeenData,
-
-    visibleContinentalPropagationData: allContinentsPropagationData,
-  },
+  args: seenBy(500),
 };

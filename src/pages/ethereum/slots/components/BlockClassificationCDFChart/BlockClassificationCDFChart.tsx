@@ -3,7 +3,7 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import type { SeriesData } from '@/components/Charts/MultiLine/MultiLine.types';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { getClassificationLabel, CLASSIFICATION_DESCRIPTIONS } from '@/utils/classification';
+import { CLASSIFICATION_DESCRIPTIONS, getClassificationLabel } from '@/utils/classification';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { BlockClassificationCDFChartProps } from './BlockClassificationCDFChart.types';
 
@@ -131,9 +131,7 @@ export function BlockClassificationCDFChart({ blockPropagationData }: BlockClass
             <div className="space-y-1.5">
               {(['individual', 'corporate', 'internal'] as const).map(cls => (
                 <div key={cls} className="flex items-start gap-2 text-xs">
-                  <span className="mt-0.5 shrink-0 font-semibold text-foreground">
-                    {CLASSIFICATION_DESCRIPTIONS[cls].label}:
-                  </span>
+                  <span className="mt-0.5 shrink-0 font-semibold text-foreground">{getClassificationLabel(cls)}:</span>
                   <span className="text-muted">{CLASSIFICATION_DESCRIPTIONS[cls].description}</span>
                 </div>
               ))}

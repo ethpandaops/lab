@@ -54,8 +54,9 @@ function shareNowStat(
   fromRangeStart = true
 ): { value: string; delta?: { value: string; type: 'neutral' } } {
   const counted = points.filter(point => point.atLeast !== null);
-  if (now == null || counted.length < 2 || !fromRangeStart) return { value: shareText(now) };
-  const change = Math.round((now - counted[0].atLeast!) * 10) / 10;
+  const first = counted[0]?.atLeast;
+  if (now == null || first == null || counted.length < 2 || !fromRangeStart) return { value: shareText(now) };
+  const change = Math.round((now - first) * 10) / 10;
   return {
     value: shareText(now),
     delta: { value: `${change > 0 ? '+' : ''}${change.toFixed(1)} pts over ${window}`, type: 'neutral' },

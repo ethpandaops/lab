@@ -151,5 +151,10 @@ export function useTablesBounds(tableNames: string[]): UseQueryResult<TablesBoun
  */
 export function useNetworksBounds(networkNames: string[]): Record<string, UseQueryResult<Bounds, GetBoundsError>> {
   const results = useQueries({ queries: networkNames.map(boundsOptions) });
-  return Object.fromEntries(networkNames.map((name, index) => [name, results[index]]));
+  return Object.fromEntries(
+    networkNames.flatMap((name, index): [string, UseQueryResult<Bounds, GetBoundsError>][] => {
+      const result = results[index];
+      return result ? [[name, result]] : [];
+    })
+  );
 }

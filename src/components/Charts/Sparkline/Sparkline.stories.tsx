@@ -73,6 +73,9 @@ export const WithGaps: Story = {
  * Sparkline rendered inside a table cell to demonstrate real usage
  */
 export const InTableRow: Story = {
+  args: {
+    data: [98.5, 99.1, 97.8, 99.3, 98.9, 99.5, 99.2],
+  },
   render: () => (
     <table className="w-full text-sm text-foreground">
       <thead>

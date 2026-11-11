@@ -8,15 +8,17 @@ export interface MapPointWithTiming extends PointData {
 
 export function useMapData(nodes: FctBlockFirstSeenByNode[]): MapPointWithTiming[] {
   return useMemo(() => {
-    // Group nodes by city/country for aggregation
-    const cityGroups = new Map<string, FctBlockFirstSeenByNode[]>();
+    // Group nodes by city/country for aggregation; a group always holds at least one node
+    const cityGroups = new Map<string, [FctBlockFirstSeenByNode, ...FctBlockFirstSeenByNode[]]>();
 
     nodes.forEach(node => {
       const cityKey = `${node.meta_client_geo_city}-${node.meta_client_geo_country_code}`;
-      if (!cityGroups.has(cityKey)) {
-        cityGroups.set(cityKey, []);
+      const group = cityGroups.get(cityKey);
+      if (group) {
+        group.push(node);
+      } else {
+        cityGroups.set(cityKey, [node]);
       }
-      cityGroups.get(cityKey)!.push(node);
     });
 
     // Convert to PointData format with timing information

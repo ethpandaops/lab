@@ -158,8 +158,8 @@ export function IndexPage(): JSX.Element {
 
   // Get current state (baseline) from latest data point
   const currentState = useMemo(() => {
-    if (!data || data.length === 0) return { bytes: null, slots: null, date: null };
-    const latest = data[data.length - 1];
+    const latest = data?.at(-1);
+    if (!latest) return { bytes: null, slots: null, date: null };
     return { bytes: latest.effectiveBytes, slots: latest.activeSlots, date: latest.dateLabel };
   }, [data]);
 
@@ -324,15 +324,15 @@ export function IndexPage(): JSX.Element {
     if (seriesName === 'Current State') return;
 
     // Parse series name like "Slot (1y)" or "Contract (2y)"
-    const match = seriesName.match(/^(Slot|Contract)\s+\((\d+y)\)$/i);
-    if (match) {
-      const type = match[1].toLowerCase() as ExpiryType;
+    const [, typeName, policyLabel] = seriesName.match(/^(Slot|Contract)\s+\((\d+y)\)$/i) ?? [];
+    if (typeName && policyLabel) {
+      const type = typeName.toLowerCase() as ExpiryType;
       // Convert label back to policy key
       const labelToPolicy: Record<string, ExpiryPolicy> = { '1y': '12m', '2y': '24m' };
-      const policy = labelToPolicy[match[2]];
+      const policy = labelToPolicy[policyLabel];
 
       // Validate policy exists
-      if (EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
+      if (policy && EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
         setSelectedType(type);
         setSelectedPolicy(policy);
       }

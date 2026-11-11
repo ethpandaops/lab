@@ -92,8 +92,8 @@ describe('useConfig', () => {
       });
 
       expect(result.current.data?.networks).toEqual(mockConfig.networks);
-      expect(result.current.data?.networks[0].name).toBe('mainnet');
-      expect(result.current.data?.networks[1].name).toBe('sepolia');
+      expect(result.current.data?.networks[0]?.name).toBe('mainnet');
+      expect(result.current.data?.networks[1]?.name).toBe('sepolia');
     });
 
     it('should return features array', async () => {
@@ -106,8 +106,8 @@ describe('useConfig', () => {
       });
 
       expect(result.current.data?.features).toEqual(mockConfig.features);
-      expect(result.current.data?.features[0].path).toBe('/ethereum/live');
-      expect(result.current.data?.features[0].disabled_networks).toEqual([]);
+      expect(result.current.data?.features[0]?.path).toBe('/ethereum/live');
+      expect(result.current.data?.features[0]?.disabled_networks).toEqual([]);
     });
 
     it('should fetch from correct endpoint', async () => {

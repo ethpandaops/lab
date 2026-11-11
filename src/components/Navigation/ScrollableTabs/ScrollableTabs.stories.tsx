@@ -6,6 +6,9 @@ import { Tab } from '@/components/Navigation/Tab';
 const meta = {
   title: 'Components/Navigation/ScrollableTabs',
   component: ScrollableTabs,
+  args: {
+    children: <Tab>Overview</Tab>,
+  },
   parameters: {
     layout: 'padded',
   },

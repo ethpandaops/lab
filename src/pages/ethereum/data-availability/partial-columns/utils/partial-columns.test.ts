@@ -162,8 +162,8 @@ describe('buildPathShareSeries', () => {
     expect(series.map(s => s.name)).toEqual(['Full gossip', 'Partial gossip', 'Execution layer']);
     const first = series.reduce((sum, s) => sum + ((s.data[0] as number | null) ?? 0), 0);
     expect(first).toBeCloseTo(100);
-    expect(series[0].data[1]).toBe(100);
-    expect(series[1].data[1]).toBe(0);
+    expect(series[0]?.data[1]).toBe(100);
+    expect(series[1]?.data[1]).toBe(0);
     expect(series.every(s => s.stack === 'share')).toBe(true);
   });
 
@@ -172,7 +172,7 @@ describe('buildPathShareSeries', () => {
       paths.filter(r => r.key === H1),
       [H1, H2]
     );
-    expect(series[0].data[1]).toBeNull();
+    expect(series[0]?.data[1]).toBeNull();
   });
 });
 
@@ -216,9 +216,9 @@ describe('partial message series', () => {
 
   it('should plot the useful cell ratio and received cells on the secondary axis', () => {
     const [received, useful] = buildUsefulCellSeries(partials, [H1, H2]);
-    expect(received.yAxisIndex).toBe(1);
-    expect(received.data).toEqual([210, null]);
-    expect(useful.data).toEqual([25, null]);
+    expect(received?.yAxisIndex).toBe(1);
+    expect(received?.data).toEqual([210, null]);
+    expect(useful?.data).toEqual([25, null]);
   });
 
   it('should stack only the verdicts that occur', () => {
@@ -226,7 +226,7 @@ describe('partial message series', () => {
     const series = buildVerdictSeries(partials, [H1, H2], themeColors);
     expect(series.map(s => s.name)).toEqual(['Cells accepted', 'Cells ignored', 'Header ignored']);
     expect(series.slice(0, 2).map(s => s.color)).toEqual(['#success', '#muted']);
-    expect(series[2].data).toEqual([0, 4]);
+    expect(series[2]?.data).toEqual([0, 4]);
   });
 });
 
@@ -243,9 +243,9 @@ describe('peer adoption', () => {
   it('should plot consensus clients and all peers, leaving crawlers to the total', () => {
     const series = buildAdoptionSeries(peers, [H1, H2]);
     expect(series.map(s => s.name)).toEqual(['Lighthouse', 'Prysm', 'All peers']);
-    expect(series[0].data).toEqual([25, 50]);
-    expect(series[1].data).toEqual([100, null]);
-    expect(series[2].data).toEqual([30, 50]);
+    expect(series[0]?.data).toEqual([25, 50]);
+    expect(series[1]?.data).toEqual([100, null]);
+    expect(series[2]?.data).toEqual([30, 50]);
   });
 
   it('should report the latest bucket with subscribing peers', () => {

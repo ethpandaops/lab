@@ -26,7 +26,7 @@ describe('groupStakes', () => {
       ['*lido', 360, 164],
       ['kiln', 300, 0],
     ]);
-    expect(grouped[0].series).toEqual([196, 360]);
+    expect(grouped[0]?.series).toEqual([196, 360]);
   });
 
   it('lists the members of a group largest first and leaves other entities out', () => {

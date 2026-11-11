@@ -31,7 +31,7 @@ export type ExpiryPolicy = (typeof EXPIRY_POLICIES)[number];
 
 /** Format date as YYYY-MM-DD */
 function formatDateStr(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return date.toISOString().slice(0, 10);
 }
 
 /** Data for a specific expiry policy */
@@ -41,7 +41,7 @@ interface ExpiryPolicyData {
 }
 
 /** A single data point representing contract storage state on a given day */
-interface ContractStorageDataPoint {
+export interface ContractStorageDataPoint {
   date: Date;
   dateLabel: string;
   /** Contract-level active slots without expiry policy */
@@ -238,8 +238,10 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     // Helper to get min/max dates from a map
     const getDateRange = (map: Map<string, unknown>): { min: string; max: string } | null => {
       const dates = Array.from(map.keys()).sort();
-      if (dates.length === 0) return null;
-      return { min: dates[0], max: dates[dates.length - 1] };
+      const min = dates[0];
+      const max = dates.at(-1);
+      if (min === undefined || max === undefined) return null;
+      return { min, max };
     };
 
     // Contract current state
@@ -483,10 +485,7 @@ export function useContractStorageData(address: string): UseContractStorageDataR
     slotExpiryTableEnd,
   ]);
 
-  const latestData = useMemo(() => {
-    if (!processedData || processedData.length === 0) return null;
-    return processedData[processedData.length - 1];
-  }, [processedData]);
+  const latestData = useMemo(() => processedData?.at(-1) ?? null, [processedData]);
 
   const isLoading =
     currentStateQuery.isLoading ||

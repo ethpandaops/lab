@@ -71,7 +71,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    currentTime: 4000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 4000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -81,7 +80,6 @@ export const Default: Story = {
 export const Interactive: Story = {
   name: 'Interactive with Auto-Progress',
   args: {
-    currentTime: 0,
     attestationChartValues: [],
     totalExpected: 0,
     maxCount: 0,
@@ -129,12 +127,7 @@ export const Interactive: Story = {
           </button>
           <span className="text-sm text-muted">Current time: {Math.round(currentTime / 1000)}s</span>
         </div>
-        <AttestationArrivals
-          currentTime={currentTime}
-          attestationChartValues={chartValues}
-          totalExpected={TOTAL_EXPECTED}
-          maxCount={MAX_COUNT}
-        />
+        <AttestationArrivals attestationChartValues={chartValues} totalExpected={TOTAL_EXPECTED} maxCount={MAX_COUNT} />
       </div>
     );
   },
@@ -143,7 +136,6 @@ export const Interactive: Story = {
 export const EarlyPhase: Story = {
   name: 'Early Phase (1s)',
   args: {
-    currentTime: 1000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 1000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -153,7 +145,6 @@ export const EarlyPhase: Story = {
 export const PeakPhase: Story = {
   name: 'Peak Phase (2s)',
   args: {
-    currentTime: 2000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 2000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -163,7 +154,6 @@ export const PeakPhase: Story = {
 export const MidPhase: Story = {
   name: 'Mid Phase (4s)',
   args: {
-    currentTime: 4000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 4000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -173,7 +163,6 @@ export const MidPhase: Story = {
 export const LatePhase: Story = {
   name: 'Late Phase (8s)',
   args: {
-    currentTime: 8000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 8000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -183,7 +172,6 @@ export const LatePhase: Story = {
 export const Complete: Story = {
   name: 'Slot Complete (12s)',
   args: {
-    currentTime: 12000,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 12000),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -193,7 +181,6 @@ export const Complete: Story = {
 export const VeryEarly: Story = {
   name: 'Very Early (0.5s)',
   args: {
-    currentTime: 500,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 500),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,
@@ -203,7 +190,6 @@ export const VeryEarly: Story = {
 export const NoData: Story = {
   name: 'No Attestations Yet',
   args: {
-    currentTime: 0,
     attestationChartValues: convertToChartValues(ATTESTATION_DATA, 0),
     totalExpected: TOTAL_EXPECTED,
     maxCount: MAX_COUNT,

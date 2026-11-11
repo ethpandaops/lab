@@ -712,11 +712,13 @@ function buildStandings(totalsByImpl: Map<string, number>, allClients: string[])
     .sort((a, b) => b.totalWins - a.totalWins);
 
   let currentRank = 1;
-  for (let idx = 0; idx < sorted.length; idx++) {
-    if (idx > 0 && sorted[idx].totalWins < sorted[idx - 1].totalWins) {
+  let previousWins: number | undefined;
+  for (const [idx, standing] of sorted.entries()) {
+    if (previousWins !== undefined && standing.totalWins < previousWins) {
       currentRank = idx + 1;
     }
-    sorted[idx].rank = currentRank;
+    standing.rank = currentRank;
+    previousWins = standing.totalWins;
   }
 
   return sorted;
@@ -795,7 +797,8 @@ function WinrateSection({
         }
 
         // Use the timestamp of the first slot in the bucket for the label
-        const ts = slotToTimestamp.get(bucketSlots[0]) ?? 0;
+        const firstSlot = bucketSlots[0];
+        const ts = firstSlot === undefined ? 0 : (slotToTimestamp.get(firstSlot) ?? 0);
         const date = new Date(ts * 1000);
         const label = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const tooltipLabel = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })} UTC`;
@@ -1030,7 +1033,7 @@ function WinrateSection({
   if (!chartConfig && standings.length === 0) return null;
 
   const totalWins = standings.reduce((s, st) => s + st.totalWins, 0);
-  const maxWinRate = standings.length > 0 ? standings[0].winRate : 0;
+  const maxWinRate = standings[0]?.winRate ?? 0;
 
   return (
     <PopoutCard

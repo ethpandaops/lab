@@ -394,7 +394,7 @@ export function versionColors(versions: VersionSummary[], palette: readonly stri
     .slice(0, limit)
     .map(summary => summary.version)
     .sort((a, b) => compareVersions(b, a));
-  return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
+  return new Map(top.map((version, index) => [version, palette[index % palette.length] ?? OTHER_VERSION_COLOR]));
 }
 
 /** How finely versions are drawn: each release, or each minor line */
@@ -552,11 +552,12 @@ export function shareStat(
   window: string
 ): { value: string; delta?: { value: string; type: 'neutral' } } {
   const counted = points.map(point => point[key]).filter((share): share is number => share !== null);
-  if (counted.length === 0) return { value: '-' };
-  const latest = counted[counted.length - 1];
+  const first = counted[0];
+  const latest = counted.at(-1);
+  if (first === undefined || latest === undefined) return { value: '-' };
   const value = `${latest.toFixed(1)}%`;
   if (counted.length < 2) return { value };
-  const change = Math.round((latest - counted[0]) * 10) / 10;
+  const change = Math.round((latest - first) * 10) / 10;
   return {
     value,
     delta: { value: `${change > 0 ? '+' : ''}${change.toFixed(1)} pts over ${window}`, type: 'neutral' },

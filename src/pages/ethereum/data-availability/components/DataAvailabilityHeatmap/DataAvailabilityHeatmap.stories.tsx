@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
 import { DataAvailabilityHeatmap } from './DataAvailabilityHeatmap';
 import type { DataAvailabilityFilters } from './DataAvailabilityFilterPanel.types';
 import {
@@ -52,23 +51,6 @@ export const WindowLevel: Story = {
 };
 
 /**
- * Window-level view with a selected column. Other columns are dimmed to 10% opacity.
- * Shows the clear selection UI banner at the top.
- */
-export const WindowLevelWithSelectedColumn: Story = {
-  args: {
-    rows: generateWindowLevelData(19),
-    granularity: 'window',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    selectedColumnIndex: 42,
-    showColumnHeader: true,
-    showLegend: true,
-    onClearColumnSelection: () => alert('Clear selection clicked'),
-  },
-};
-
-/**
  * Day-level view (Level 2) showing 24 hours in a single day.
  * Accessed via `/ethereum/data-availability/$window`.
  */
@@ -80,22 +62,6 @@ export const DayLevel: Story = {
     cellSize: 'xs',
     showColumnHeader: true,
     showLegend: true,
-  },
-};
-
-/**
- * Day-level view with a selected column dimmed.
- */
-export const DayLevelWithSelectedColumn: Story = {
-  args: {
-    rows: generateDayLevelData('2024-01-15'),
-    granularity: 'day',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    selectedColumnIndex: 42,
-    showColumnHeader: true,
-    showLegend: true,
-    onClearColumnSelection: () => alert('Clear selection clicked'),
   },
 };
 
@@ -115,22 +81,6 @@ export const HourLevel: Story = {
 };
 
 /**
- * Hour-level view with a selected column dimmed.
- */
-export const HourLevelWithSelectedColumn: Story = {
-  args: {
-    rows: generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8),
-    granularity: 'hour',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    selectedColumnIndex: 42,
-    showColumnHeader: true,
-    showLegend: true,
-    onClearColumnSelection: () => alert('Clear selection clicked'),
-  },
-};
-
-/**
  * Epoch-level view (Level 4) showing 32 slots in a single epoch.
  * Accessed via `/ethereum/data-availability/$window/$hour/$epoch`.
  */
@@ -146,25 +96,8 @@ export const EpochLevel: Story = {
 };
 
 /**
- * Epoch-level view with a selected column dimmed.
- */
-export const EpochLevelWithSelectedColumn: Story = {
-  args: {
-    rows: generateEpochLevelData('epoch-100000', 100000),
-    granularity: 'epoch',
-    filters: defaultFilters,
-    cellSize: 'xs',
-    selectedColumnIndex: 42,
-    showColumnHeader: true,
-    showLegend: true,
-    onClearColumnSelection: () => alert('Clear selection clicked'),
-  },
-};
-
-/**
- * Interactive demo showing the full drill-down hierarchy with column selection.
- * Hover over column headers or row labels to preview selection.
- * Click cells to select a column and see the dimming effect.
+ * Interactive demo showing the full drill-down hierarchy.
+ * Hover over column headers or row labels to highlight them.
  */
 export const InteractiveHierarchyDemo: Story = {
   args: {
@@ -173,7 +106,6 @@ export const InteractiveHierarchyDemo: Story = {
     filters: defaultFilters,
   },
   render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>();
     const windowData = generateWindowLevelData(19);
 
     return (
@@ -181,9 +113,7 @@ export const InteractiveHierarchyDemo: Story = {
         <div className="rounded-sm bg-background p-4">
           <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 1: Window View (19 days)</h3>
           <p className="mb-4 text-sm/6 text-muted">
-            Hover column headers or row labels to preview selection
-            <br />
-            Click a cell to select a column (others will dim to 10% opacity)
+            Hover column headers or row labels to highlight them
             <br />
             Click a day label to view all columns for that day
           </p>
@@ -192,16 +122,13 @@ export const InteractiveHierarchyDemo: Story = {
             rows={windowData}
             granularity="window"
             cellSize="xs"
-            selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               console.log(`Navigate to: /ethereum/data-availability/date/${identifier}?column_index=${columnIndex}`);
-              setSelectedColumn(columnIndex);
             }}
             onRowClick={identifier => {
               console.log(`Navigate to: /ethereum/data-availability/date/${identifier}`);
               alert(`Would navigate to day view for ${identifier} (all columns)`);
             }}
-            onClearColumnSelection={() => setSelectedColumn(undefined)}
           />
         </div>
       </div>
@@ -210,7 +137,7 @@ export const InteractiveHierarchyDemo: Story = {
 };
 
 /**
- * Interactive demo showing day-level (hours) drill-down with column selection.
+ * Interactive demo showing day-level (hours) drill-down.
  */
 export const InteractiveDayDrillDown: Story = {
   args: {
@@ -219,7 +146,6 @@ export const InteractiveDayDrillDown: Story = {
     filters: defaultFilters,
   },
   render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
     const dayData = generateDayLevelData('2024-01-15');
 
     return (
@@ -227,8 +153,6 @@ export const InteractiveDayDrillDown: Story = {
         <div className="rounded-sm bg-background p-4">
           <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 2: Day View - Hours</h3>
           <p className="mb-4 text-sm/6 text-muted">
-            Column {selectedColumn} is selected. Try clearing the selection or selecting a different column.
-            <br />
             Click a cell → drill down to hour view (epochs)
             <br />
             Click an hour label → view all columns for that hour
@@ -238,14 +162,12 @@ export const InteractiveDayDrillDown: Story = {
             rows={dayData}
             granularity="day"
             cellSize="xs"
-            selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               const hourMatch = identifier.match(/hour-(\d+)/);
               const hourNum = hourMatch ? hourMatch[1] : 'unknown';
               console.log(
                 `Navigate to: /ethereum/data-availability/date/2024-01-15/${hourNum}?column_index=${columnIndex}`
               );
-              setSelectedColumn(columnIndex);
               alert(`Would navigate to hour view (epochs) for hour ${hourNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
@@ -254,7 +176,6 @@ export const InteractiveDayDrillDown: Story = {
               console.log(`Navigate to: /ethereum/data-availability/date/2024-01-15/${hourNum}`);
               alert(`Would navigate to hour view (epochs) for hour ${hourNum} (all columns)`);
             }}
-            onClearColumnSelection={() => setSelectedColumn(undefined)}
           />
         </div>
       </div>
@@ -263,7 +184,7 @@ export const InteractiveDayDrillDown: Story = {
 };
 
 /**
- * Interactive demo showing hour-level (epochs) drill-down with column selection.
+ * Interactive demo showing hour-level (epochs) drill-down.
  */
 export const InteractiveHourDrillDown: Story = {
   args: {
@@ -272,7 +193,6 @@ export const InteractiveHourDrillDown: Story = {
     filters: defaultFilters,
   },
   render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
     const hourData = generateHourLevelData('2024-01-15-hour-8', '2024-01-15', 8);
 
     return (
@@ -280,8 +200,6 @@ export const InteractiveHourDrillDown: Story = {
         <div className="rounded-sm bg-background p-4">
           <h3 className="mb-2 text-lg/7 font-semibold text-foreground">Level 3: Hour View - Epochs</h3>
           <p className="mb-4 text-sm/6 text-muted">
-            Column {selectedColumn} is selected. Try clearing the selection or selecting a different column.
-            <br />
             Click a cell → drill down to epoch view (slots)
             <br />
             Click an epoch label → view all columns for that epoch
@@ -291,12 +209,10 @@ export const InteractiveHourDrillDown: Story = {
             rows={hourData}
             granularity="hour"
             cellSize="xs"
-            selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               const epochMatch = identifier.match(/epoch-(\d+)/);
               const epochNum = epochMatch ? epochMatch[1] : 'unknown';
               console.log(`Navigate to: /ethereum/data-availability/epoch/${epochNum}?column_index=${columnIndex}`);
-              setSelectedColumn(columnIndex);
               alert(`Would navigate to epoch view (slots) for epoch ${epochNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
@@ -305,7 +221,6 @@ export const InteractiveHourDrillDown: Story = {
               console.log(`Navigate to: /ethereum/data-availability/epoch/${epochNum}`);
               alert(`Would navigate to epoch view (slots) for epoch ${epochNum} (all columns)`);
             }}
-            onClearColumnSelection={() => setSelectedColumn(undefined)}
           />
         </div>
       </div>
@@ -314,7 +229,7 @@ export const InteractiveHourDrillDown: Story = {
 };
 
 /**
- * Interactive demo showing epoch-level (slots) drill-down with column selection.
+ * Interactive demo showing epoch-level (slots) drill-down.
  */
 export const InteractiveEpochDrillDown: Story = {
   args: {
@@ -323,7 +238,6 @@ export const InteractiveEpochDrillDown: Story = {
     filters: defaultFilters,
   },
   render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(42);
     const epochData = generateEpochLevelData('epoch-100000', 100000);
 
     return (
@@ -340,12 +254,10 @@ export const InteractiveEpochDrillDown: Story = {
             rows={epochData}
             granularity="epoch"
             cellSize="xs"
-            selectedColumnIndex={selectedColumn}
             onCellClick={(identifier, columnIndex) => {
               const slotMatch = identifier.match(/slot-(\d+)/);
               const slotNum = slotMatch ? slotMatch[1] : 'unknown';
               console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}?column_index=${columnIndex}`);
-              setSelectedColumn(columnIndex);
               alert(`Would show slot detail view for slot ${slotNum}, column ${columnIndex}`);
             }}
             onRowClick={identifier => {
@@ -354,7 +266,6 @@ export const InteractiveEpochDrillDown: Story = {
               console.log(`Navigate to: /ethereum/data-availability/slot/${slotNum}`);
               alert(`Would show slot detail view for slot ${slotNum} (all columns)`);
             }}
-            onClearColumnSelection={() => setSelectedColumn(undefined)}
           />
         </div>
       </div>

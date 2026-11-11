@@ -128,7 +128,7 @@ export const TwoClients: Story = {
  */
 export const SingleBlock: Story = {
   args: {
-    preparedBlocks: [mockPreparedBlocks[0]],
+    preparedBlocks: mockPreparedBlocks.slice(0, 1),
   },
 };
 

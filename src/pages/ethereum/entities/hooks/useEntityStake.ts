@@ -111,7 +111,7 @@ export function useEntityStake(window: EntitiesWindow, enabled = true): UseEntit
           changeEth: 0,
         } satisfies EntityStake);
       const eth = (row.active_effective_balance ?? 0) / GWEI;
-      (entity.series as number[])[i] += eth;
+      entity.series[i] = (entity.series[i] ?? 0) + eth;
       if (i === days.length - 1) {
         entity.validators += row.active_validator_count ?? 0;
         entity.stakeEth += eth;

@@ -111,8 +111,8 @@ export function TopEntitiesChart({
 
     // Calculate x-axis range (use provided or calculate from data)
     const allX = [...new Set(data.map(d => d.x))].sort((a, b) => a - b);
-    const minX = xAxis.min ?? allX[0];
-    const maxX = xAxis.max ?? allX[allX.length - 1];
+    const minX = xAxis.min ?? allX[0] ?? 0;
+    const maxX = xAxis.max ?? allX[allX.length - 1] ?? 0;
 
     // Build series data for each entity
     // Create a map of entity -> x -> count

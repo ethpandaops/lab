@@ -58,11 +58,11 @@ const calls: { table: string; query: Record<string, string | number> }[] = [];
 function list(table: string) {
   return async ({ query }: { query: Record<string, string | number> }) => {
     calls.push({ table, query });
-    let rows = [...tables[table]];
+    let rows = [...(tables[table] ?? [])];
     for (const [key, raw] of Object.entries(query)) {
       const match = /^(.*)_(eq|gte|lte|lt|in_values|has|ends_with|contains)$/.exec(key);
-      if (!match) continue;
-      const [, field, op] = match;
+      const [, field, op] = match ?? [];
+      if (field === undefined || op === undefined) continue;
       const set = op === 'in_values' ? new Set(String(raw).split(',').map(Number)) : undefined;
       rows = rows.filter(row => {
         const value = row[field] as number | string | string[];
@@ -81,6 +81,7 @@ function list(table: string) {
       .map(part => part.trim().split(' '));
     rows.sort((a, b) => {
       for (const [field, dir] of order) {
+        if (field === undefined) continue;
         const diff = (a[field] as number) - (b[field] as number);
         if (diff !== 0) return dir === 'desc' ? -diff : diff;
       }
@@ -180,7 +181,7 @@ describe('fetchSlotsPage', () => {
     const first = await fetchSlotsPage({ ...args({}), cursor: undefined }, 0, false);
     expect(first.rows.map(r => r.slot)).toEqual(slotsWhere(() => true).slice(0, 25));
     const second = await fetchSlotsPage({ ...args({}), cursor: first.nextCursor }, 0, false);
-    expect(second.rows[0].slot).toBe(LAST - 25);
+    expect(second.rows[0]?.slot).toBe(LAST - 25);
     const third = await fetchSlotsPage({ ...args({}), cursor: second.nextCursor }, 0, false);
     const back = await fetchSlotsPage({ ...args({}), cursor: third.prevCursor }, 0, false);
     expect(back.rows.map(r => r.slot)).toEqual(second.rows.map(r => r.slot));
@@ -237,10 +238,10 @@ describe('fetchSlotsPage', () => {
   it('reads slots before the proposer head table from the canonical table', async () => {
     const headStart = 2000;
     // The canonical table only holds finalized slots
-    tables.int_block_proposer_canonical = tables.fct_block_proposer_head.filter(row => row.slot < 3900);
+    tables.int_block_proposer_canonical = (tables.fct_block_proposer_head ?? []).filter(row => row.slot < 3900);
     // The status table reaches genesis, but only knows orphaned blocks from the head table's first slot
     for (const table of ['fct_block_proposer_head', 'fct_block_proposer_entity']) {
-      tables[table] = tables[table].filter(row => row.slot >= headStart);
+      tables[table] = (tables[table] ?? []).filter(row => row.slot >= headStart);
     }
 
     expect((await allPages(args({}), headStart)).flat()).toEqual(slotsWhere(() => true));

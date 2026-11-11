@@ -19,7 +19,7 @@ export interface EngineSectionProps {
  */
 export function EngineSection({ newPayload, getBlobs, rangeLabel }: EngineSectionProps): JSX.Element {
   const colors = useThemeColors();
-  const blobsColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0];
+  const blobsColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0] ?? colors.muted;
   const payloadRows = rowsByBucket(newPayload.rows);
   const blobRows = rowsByBucket(getBlobs?.rows ?? []);
   const payload = newPayload.buckets.map(start => payloadRows.get(start) ?? null);

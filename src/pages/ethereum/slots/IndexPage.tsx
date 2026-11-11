@@ -1,10 +1,10 @@
 import { type JSX, type MouseEvent, type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { createColumnHelper, type SortingState, type VisibilityState } from '@tanstack/react-table';
+import type { SortingState, VisibilityState } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { DataTable } from '@/components/DataTable';
+import { DataTable, type DataTableColumn } from '@/components/DataTable';
 import { Alert } from '@/components/Feedback/Alert';
 import { Button } from '@/components/Elements/Button';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -30,8 +30,6 @@ import {
   type SlotSort,
   type SlotsSearch,
 } from './IndexPage.types';
-
-const column = createColumnHelper<SlotRow>();
 
 const STATUS_STYLES = {
   proposed: { label: 'Proposed', className: 'text-muted' },
@@ -196,57 +194,63 @@ export function IndexPage(): JSX.Element {
   );
 
   const columns = useMemo(
-    () => [
-      column.accessor('slot', {
+    (): DataTableColumn<SlotRow>[] => [
+      {
+        accessorKey: 'slot',
         id: 'slot',
         header: 'Slot',
-        cell: info => <Slot slot={info.getValue()} />,
+        cell: ({ row }) => <Slot slot={row.original.slot} />,
         sortDescFirst: true,
         meta: { cellClassName: 'font-medium text-foreground' },
         enableHiding: false,
-      }),
-      column.accessor('epoch', {
+      },
+      {
+        accessorKey: 'epoch',
         id: 'epoch',
         header: 'Epoch',
-        cell: info => <Epoch epoch={info.getValue()} />,
+        cell: ({ row }) => <Epoch epoch={row.original.epoch} />,
         enableSorting: false,
-      }),
-      column.accessor('timestamp', {
+      },
+      {
+        accessorKey: 'timestamp',
         id: 'time',
         header: 'Time',
-        cell: info => <Timestamp timestamp={info.getValue()} format="relative" className="text-muted" />,
+        cell: ({ row }) => <Timestamp timestamp={row.original.timestamp} format="relative" className="text-muted" />,
         enableSorting: false,
-      }),
-      column.accessor('proposerIndex', {
+      },
+      {
+        accessorKey: 'proposerIndex',
         id: 'proposer',
         header: 'Proposer',
-        cell: info => {
-          const index = info.getValue();
+        cell: ({ row }) => {
+          const index = row.original.proposerIndex;
           return index === null ? <Muted /> : <Validator index={index} />;
         },
         enableSorting: false,
-      }),
-      column.accessor('entity', {
+      },
+      {
+        accessorKey: 'entity',
         id: 'entity',
         header: 'Entity',
         // Before the entity table starts, a slot without a graffiti entity has no entity data
-        cell: info =>
-          info.getValue() === null && entityDataStart !== undefined && info.row.original.timestamp < entityDataStart ? (
+        cell: ({ row }) =>
+          row.original.entity === null && entityDataStart !== undefined && row.original.timestamp < entityDataStart ? (
             <Muted />
           ) : (
-            <Entity entity={info.getValue()} />
+            <Entity entity={row.original.entity} />
           ),
         enableSorting: false,
-      }),
-      column.accessor('status', {
+      },
+      {
+        accessorKey: 'status',
         id: 'status',
         header: 'Status',
-        cell: info => {
-          const status = info.getValue();
+        cell: ({ row }) => {
+          const status = row.original.status;
           if (!status) return <Muted />;
           const style = STATUS_STYLES[status];
           const orphanUnknown =
-            status === 'missed' && (orphansKnownFrom === undefined || info.row.original.timestamp < orphansKnownFrom);
+            status === 'missed' && (orphansKnownFrom === undefined || row.original.timestamp < orphansKnownFrom);
           return (
             <FilterButton
               title={`Only ${style.label.toLowerCase()} slots`}
@@ -258,12 +262,13 @@ export function IndexPage(): JSX.Element {
           );
         },
         enableSorting: false,
-      }),
-      column.accessor('source', {
+      },
+      {
+        accessorKey: 'source',
         id: 'source',
         header: 'Source',
-        cell: info => {
-          const source = info.getValue();
+        cell: ({ row }) => {
+          const source = row.original.source;
           if (!source) return <Muted />;
           return (
             <FilterButton
@@ -276,12 +281,13 @@ export function IndexPage(): JSX.Element {
           );
         },
         enableSorting: false,
-      }),
-      column.accessor('relays', {
+      },
+      {
+        accessorKey: 'relays',
         id: 'relays',
         header: 'Relays',
-        cell: info => {
-          const relays = info.getValue();
+        cell: ({ row }) => {
+          const relays = row.original.relays;
           if (relays.length === 0) return <Muted />;
           return (
             <span className="inline-flex gap-1">
@@ -299,12 +305,13 @@ export function IndexPage(): JSX.Element {
           );
         },
         enableSorting: false,
-      }),
-      column.accessor('builder', {
+      },
+      {
+        accessorKey: 'builder',
         id: 'builder',
         header: 'Builder',
-        cell: info => {
-          const builder = info.getValue();
+        cell: ({ row }) => {
+          const builder = row.original.builder;
           if (!builder) return <Muted />;
           return (
             <FilterButton
@@ -317,64 +324,71 @@ export function IndexPage(): JSX.Element {
           );
         },
         enableSorting: false,
-      }),
-      column.accessor('value', {
+      },
+      {
+        accessorKey: 'value',
         id: 'value',
         header: 'MEV value',
-        cell: info => {
-          const value = info.getValue();
+        cell: ({ row }) => {
+          const value = row.original.value;
           return value ? <span className="text-foreground">{weiToEth(value).toFixed(4)} ETH</span> : <Muted />;
         },
         enableSorting: false,
-      }),
-      column.accessor('blockNumber', {
+      },
+      {
+        accessorKey: 'blockNumber',
         id: 'block',
         header: 'Block',
-        cell: info => info.getValue() ?? <Muted />,
+        cell: ({ row }) => row.original.blockNumber ?? <Muted />,
         enableSorting: false,
-      }),
-      column.accessor('blobCount', {
+      },
+      {
+        accessorKey: 'blobCount',
         id: 'blobs',
         header: 'Blobs',
-        cell: info => info.getValue() ?? <Muted />,
+        cell: ({ row }) => row.original.blobCount ?? <Muted />,
         sortDescFirst: true,
-      }),
-      column.accessor('gasUsed', {
+      },
+      {
+        accessorKey: 'gasUsed',
         id: 'gas',
         header: 'Gas used',
-        cell: info => {
-          const gas = info.getValue();
+        cell: ({ row }) => {
+          const gas = row.original.gasUsed;
           return gas === null ? <Muted /> : `${(gas / 1e6).toFixed(1)}M`;
         },
         sortDescFirst: true,
-      }),
-      column.accessor('txCount', {
+      },
+      {
+        accessorKey: 'txCount',
         id: 'txs',
         header: 'Txs',
-        cell: info => info.getValue() ?? <Muted />,
+        cell: ({ row }) => row.original.txCount ?? <Muted />,
         sortDescFirst: true,
-      }),
-      column.accessor('cl', {
+      },
+      {
+        accessorKey: 'cl',
         id: 'cl',
         header: 'CL client',
-        cell: info => {
-          const client = info.getValue();
+        cell: ({ row }) => {
+          const client = row.original.cl;
           return client ? <ClientLabel client={client} /> : <Muted />;
         },
         enableSorting: false,
-      }),
-      column.accessor('el', {
+      },
+      {
+        accessorKey: 'el',
         id: 'el',
         header: 'EL client',
-        cell: info => {
-          const client = info.getValue();
+        cell: ({ row }) => {
+          const client = row.original.el;
           return client ? <ClientLabel client={client} /> : <Muted />;
         },
         enableSorting: false,
-      }),
+      },
       ...(hasGloas
         ? [
-            column.display({
+            {
               id: 'payload',
               header: 'Payload',
               cell: ({ row }) => {
@@ -391,7 +405,7 @@ export function IndexPage(): JSX.Element {
                   </span>
                 );
               },
-            }),
+            } satisfies DataTableColumn<SlotRow>,
           ]
         : []),
     ],

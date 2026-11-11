@@ -3,7 +3,7 @@ import { renderHook } from '@/test-utils';
 import { useTheme } from './useTheme';
 import { ThemeContext } from '@/contexts/ThemeContext';
 import type { ThemeContextValue, Theme } from '@/contexts/ThemeContext/ThemeContext.types';
-import { type ReactNode } from 'react';
+import { type JSX, type ReactNode } from 'react';
 
 describe('useTheme', () => {
   const createWrapper = (

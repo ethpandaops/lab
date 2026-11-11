@@ -199,12 +199,15 @@ export function CardChain({
 
     const currentIds = items.map(i => i.id);
     const prevIds = prevIdsRef.current;
+    const newFirstId = currentIds[0];
+    const prevFirstId = prevIds[0];
 
     // Skip initial render or identical item sets
-    if (prevIds.length > 0 && JSON.stringify(currentIds) !== JSON.stringify(prevIds)) {
-      const newFirstId = currentIds[0];
-      const prevFirstId = prevIds[0];
-
+    if (
+      newFirstId !== undefined &&
+      prevFirstId !== undefined &&
+      JSON.stringify(currentIds) !== JSON.stringify(prevIds)
+    ) {
       // Compare as numbers if both are numeric, otherwise use string comparison
       const newFirst = Number(newFirstId);
       const prevFirst = Number(prevFirstId);

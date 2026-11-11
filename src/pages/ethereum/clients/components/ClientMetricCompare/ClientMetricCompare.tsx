@@ -9,7 +9,7 @@ import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { ratio, type ClientMetric } from '@/pages/ethereum/clients/utils/client-metrics';
+import { ratio, type ClientMetrics } from '@/pages/ethereum/clients/utils/client-metrics';
 
 export interface ClientMetricCompareProps<T extends { day_start_date?: string; client?: string }> {
   /** Client the page is about, drawn on top and highlighted in the table */
@@ -17,7 +17,7 @@ export interface ClientMetricCompareProps<T extends { day_start_date?: string; c
   title: string;
   subtitle?: string;
   rows: T[];
-  metrics: Array<ClientMetric<T>>;
+  metrics: ClientMetrics<T>;
   /** Count shown beside each client in the table, e.g. blocks or validators */
   countLabel: string;
   count: (row: T) => number;
@@ -67,9 +67,12 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
       if (row.day_start_date) days.add(row.day_start_date);
     }
     const allDays = [...days].sort();
+    const first = allDays[0];
+    const last = allDays.at(-1);
     const weekly =
-      allDays.length > 1 &&
-      (Date.parse(allDays[allDays.length - 1]) - Date.parse(allDays[0])) / 86_400_000 > WEEKLY_AFTER_DAYS;
+      first !== undefined &&
+      last !== undefined &&
+      (Date.parse(last) - Date.parse(first)) / 86_400_000 > WEEKLY_AFTER_DAYS;
     const bucket = (day: string): string => (weekly ? weekStart(day) : day);
     const sortedDays = [...new Set(allDays.map(bucket))];
     const clients = [...byClient.entries()]

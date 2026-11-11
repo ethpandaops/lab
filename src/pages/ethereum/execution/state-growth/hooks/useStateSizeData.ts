@@ -74,10 +74,7 @@ export function useStateSizeData(): UseStateSizeDataResult {
     return normalizeDailyData(dailyQuery.data.fct_execution_state_size_daily ?? []);
   }, [dailyQuery.data]);
 
-  const latestData = useMemo(() => {
-    if (!normalizedData || normalizedData.length === 0) return null;
-    return normalizedData[normalizedData.length - 1];
-  }, [normalizedData]);
+  const latestData = useMemo(() => normalizedData?.at(-1) ?? null, [normalizedData]);
 
   return {
     data: normalizedData,

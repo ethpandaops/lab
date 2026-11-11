@@ -230,6 +230,12 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  args: {
+    rows: 6,
+    height: 340,
+    showChrome: true,
+    loading: true,
+  },
   argTypes: {
     rows: { control: { type: 'range', min: 1, max: 12, step: 1 } },
     height: { control: { type: 'range', min: 200, max: 800, step: 20 } },

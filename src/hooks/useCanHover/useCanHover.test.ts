@@ -15,7 +15,7 @@ describe('useCanHover', () => {
       addEventListener: addEventListenerMock,
       removeEventListener: removeEventListenerMock,
     });
-    window.matchMedia = matchMediaMock;
+    vi.stubGlobal('matchMedia', matchMediaMock);
   });
 
   afterEach(() => {

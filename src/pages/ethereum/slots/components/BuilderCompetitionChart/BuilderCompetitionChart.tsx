@@ -59,6 +59,7 @@ export function BuilderCompetitionChart({ builderData, winningBuilder }: Builder
   const tooltipFormatter = useMemo(
     () => (params: unknown) => {
       const param = (params as { name: string; value: number; data: { value: number }; dataIndex: number }[])[0];
+      if (!param) return '';
       const builderInfo = processedData[param.dataIndex];
       const isWinner = builderInfo?.isWinner;
       const winnerText = isWinner ? '<br/><strong>(Winner)</strong>' : '';

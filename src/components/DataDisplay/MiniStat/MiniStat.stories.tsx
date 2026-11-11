@@ -93,6 +93,10 @@ export const InlineVariantLow: Story = {
  * Multiple MiniStats shown together (as they appear in the slot detail page)
  */
 export const MultipleStats: Story = {
+  args: {
+    label: 'Participation',
+    value: '31,075',
+  },
   render: () => (
     <div className="space-y-4">
       <MiniStat label="Participation" value="31,075" secondaryText="/ 31,153 validators" percentage={99.75} />
@@ -106,6 +110,10 @@ export const MultipleStats: Story = {
  * Comparison: Both variants side by side
  */
 export const VariantComparison: Story = {
+  args: {
+    label: 'Participation',
+    value: '31,075',
+  },
   render: () => (
     <div className="space-y-6">
       <div>

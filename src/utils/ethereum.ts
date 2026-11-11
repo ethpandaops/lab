@@ -242,7 +242,11 @@ const FALLBACK_COLORS = [
  */
 export function getExecutionClientColor(clientName: string, fallbackIndex = 0): string {
   const normalized = normalizeClientName(clientName);
-  return EXECUTION_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
+  return (
+    EXECUTION_CLIENT_COLORS[normalized] ??
+    FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length] ??
+    UNKNOWN_CLIENT_COLOR
+  );
 }
 
 /**
@@ -261,7 +265,11 @@ export function getExecutionClientColor(clientName: string, fallbackIndex = 0): 
 export function getConsensusClientColor(clientName: string, fallbackIndex = 0): string {
   const normalized = normalizeClientName(clientName);
   if (normalized === 'unknown') return UNKNOWN_CLIENT_COLOR;
-  return CONSENSUS_CLIENT_COLORS[normalized] ?? FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length];
+  return (
+    CONSENSUS_CLIENT_COLORS[normalized] ??
+    FALLBACK_COLORS[fallbackIndex % FALLBACK_COLORS.length] ??
+    UNKNOWN_CLIENT_COLOR
+  );
 }
 
 /**
@@ -301,11 +309,9 @@ export function parseExecutionClient(metaClientName?: string): string {
   if (!metaClientName) return 'Unknown';
 
   // Handle "ClientName/version" format
-  const parts = metaClientName.split('/');
-  if (parts.length >= 2) {
-    const clientName = parts[0].trim();
-    const version = parts[1].trim();
-    return `${clientName} ${version}`;
+  const [clientName, version] = metaClientName.split('/');
+  if (clientName !== undefined && version !== undefined) {
+    return `${clientName.trim()} ${version.trim()}`;
   }
 
   return metaClientName;

@@ -594,10 +594,12 @@ export function ClientVersionBreakdown({
 
     clientMap.forEach(versions => {
       const sorted = [...versions].sort((a, b) => b.lastSeen - a.lastSeen || b.observations - a.observations);
+      const [newest] = sorted;
+      if (!newest) return;
 
       if (sorted.length === 1) {
         result.push({
-          ...sorted[0],
+          ...newest,
           versions: [],
           versionCount: 1,
         });
@@ -637,10 +639,10 @@ export function ClientVersionBreakdown({
         }
       );
 
-      const allVersions = rangePercentiles?.get(`${sorted[0].client}|`);
+      const allVersions = rangePercentiles?.get(`${newest.client}|`);
       result.push({
-        client: sorted[0].client,
-        version: sorted[0].version,
+        client: newest.client,
+        version: newest.version,
         avgDuration: summary.durationObs > 0 ? summary.totalWeightedAvg / summary.durationObs : 0,
         p50Duration: rangePercentiles
           ? (allVersions?.p50 ?? 0)
@@ -657,7 +659,7 @@ export function ClientVersionBreakdown({
         observations: summary.observations,
         avgBlobCount: summary.observations > 0 ? summary.totalWeightedBlobCount / summary.observations : 0,
         firstSeen: summary.firstSeen,
-        lastSeen: sorted[0].lastSeen,
+        lastSeen: newest.lastSeen,
         versions: sorted,
         versionCount: sorted.length,
       });

@@ -19,7 +19,7 @@ export function ColumnArrivalChart({ history, rangeLabel, behind }: ColumnArriva
   const colors = useThemeColors();
   const byBucket = rowsByBucket(history.rows);
   const aligned = history.buckets.map(start => byBucket.get(start) ?? null);
-  const plotted = aligned.map((row, index) => (behind?.has(history.buckets[index]) ? null : row));
+  const plotted = history.buckets.map(start => (behind?.has(start) ? null : (byBucket.get(start) ?? null)));
 
   return (
     <TimeSeriesChart

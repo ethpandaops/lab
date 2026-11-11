@@ -78,7 +78,9 @@ export function EntityVersionBars({
   const versions = useMemo(() => summariseVersions(blocks), [blocks]);
   const colors = useMemo(() => {
     const map = versionColors(versions, getDataVizColors().CHART_CATEGORICAL_COLORS);
-    if (focusVersion && !map.has(focusVersion)) map.set(focusVersion, getDataVizColors().CHART_CATEGORICAL_COLORS[0]);
+    if (focusVersion && !map.has(focusVersion)) {
+      map.set(focusVersion, getDataVizColors().CHART_CATEGORICAL_COLORS[0] ?? OTHER_VERSION_COLOR);
+    }
     return map;
   }, [versions, focusVersion]);
   const colorOf = (version: string): string =>

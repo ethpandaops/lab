@@ -432,10 +432,12 @@ export function ValidatorHeatmap({
 
     const dataSlots = [...new Set(attestationSlot.map(d => d.slot))].sort((a, b) => a - b);
     const minSlot = dataSlots[0];
-    const maxSlot = dataSlots[dataSlots.length - 1];
+    const maxSlot = dataSlots.at(-1);
     const allSlots: number[] = [];
-    for (let s = minSlot; s <= maxSlot; s++) {
-      allSlots.push(s);
+    if (minSlot !== undefined && maxSlot !== undefined) {
+      for (let s = minSlot; s <= maxSlot; s++) {
+        allSlots.push(s);
+      }
     }
 
     const uniqueValidators = [...new Set(attestationSlot.map(d => d.validatorIndex))].sort((a, b) => a - b);
@@ -491,7 +493,7 @@ export function ValidatorHeatmap({
     const cellMap = new Map<string, number>();
     for (const p of blockProposals) {
       const dayTs = Math.floor(new Date(p.slotTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000);
-      const dayIdx = timestampToIndex.get(stepDays === 7 ? columnTimestamps(dayTs, dayTs, 7)[0] : dayTs);
+      const dayIdx = timestampToIndex.get(stepDays === 7 ? (columnTimestamps(dayTs, dayTs, 7)[0] ?? dayTs) : dayTs);
       const valIdx = validatorToIndex.get(p.validatorIndex);
       if (dayIdx === undefined || valIdx === undefined) continue;
 
@@ -505,7 +507,7 @@ export function ValidatorHeatmap({
     }
 
     const chartData: [number, number, number][] = Array.from(cellMap.entries()).map(([key, value]) => {
-      const [x, y] = key.split(',').map(Number);
+      const [x = 0, y = 0] = key.split(',').map(Number);
       return [x, y, value];
     });
 
@@ -555,7 +557,7 @@ export function ValidatorHeatmap({
     }
 
     const chartData: [number, number, number][] = Array.from(cellMap.entries()).map(([key, value]) => {
-      const [x, y] = key.split(',').map(Number);
+      const [x = 0, y = 0] = key.split(',').map(Number);
       return [x, y, value];
     });
 
@@ -596,10 +598,12 @@ export function ValidatorHeatmap({
     } else if (hourProposals.length > 0) {
       const dataSlots = [...new Set(hourProposals.map(p => p.slot))].sort((a, b) => a - b);
       const minSlot = dataSlots[0];
-      const maxSlot = dataSlots[dataSlots.length - 1];
+      const maxSlot = dataSlots.at(-1);
       allSlots = [];
-      for (let s = minSlot; s <= maxSlot; s++) {
-        allSlots.push(s);
+      if (minSlot !== undefined && maxSlot !== undefined) {
+        for (let s = minSlot; s <= maxSlot; s++) {
+          allSlots.push(s);
+        }
       }
     } else {
       return {
@@ -816,6 +820,7 @@ export function ValidatorHeatmap({
     const [dayIdx, validatorIdx, value] = params.value;
     const timestamp = activeDailyTimestamps[dayIdx];
     const validatorIndex = activeDailyValidators[validatorIdx];
+    if (timestamp === undefined || validatorIndex === undefined) return '';
     const dayText = (ts: number): string =>
       new Date(ts * 1000).toLocaleDateString('en-US', {
         weekday: 'short',
@@ -850,6 +855,7 @@ export function ValidatorHeatmap({
     const [hourIdx, validatorIdx, value] = params.value;
     const validators = isProposalsMetric ? proposalHourlyHeatmap.validatorIndices : hourlyHeatmap.validatorIndices;
     const validatorIndex = validators[validatorIdx];
+    if (validatorIndex === undefined) return '';
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       let statusLine = '';
@@ -870,6 +876,7 @@ export function ValidatorHeatmap({
     const slotSlots = isProposalsMetric ? proposalSlotHeatmap.slots : slotHeatmap.slots;
     const validatorIndex = slotValidators[validatorIdx];
     const slot = slotSlots[slotIdx];
+    if (validatorIndex === undefined || slot === undefined) return '';
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       return `<strong>Validator ${formatSlot(validatorIndex)}</strong><br/>Slot ${formatSlot(slot)}<br/><span style="opacity:0.5">${label}</span>`;

@@ -29,8 +29,8 @@ interface Group {
 
 /** Groups rows by each key in turn, largest group first */
 function groupBy(rows: NodeRow[], levels: Array<(row: NodeRow) => { key: string; label: ReactNode }>): Group[] {
-  if (levels.length === 0) return [];
   const [level, ...rest] = levels;
+  if (!level) return [];
   const groups = new Map<string, { label: ReactNode; rows: NodeRow[] }>();
   rows.forEach(row => {
     const { key, label } = level(row);

@@ -22,7 +22,7 @@ function filenameFromDisposition(header: string | null): string | null {
 
   const match = /filename="?([^";]+)"?/.exec(header);
 
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 }
 
 /**

@@ -1062,7 +1062,7 @@ export function SimulatePage(): JSX.Element {
 
           <div ref={blockStripRef} className="mx-5 flex gap-2 overflow-x-auto pb-5">
             {simState.results.map((result, index) => {
-              const delta = blockDeltas[index];
+              const delta = blockDeltas[index] ?? 0;
               const isSelected = selectedBlockIndex === index;
               const divergedCount = result.transactions.filter(tx => tx.diverged).length;
 
@@ -1172,7 +1172,7 @@ export function SimulatePage(): JSX.Element {
               <div>
                 <h3 className="font-mono text-sm font-semibold text-foreground">{selectedResult.blockNumber}</h3>
                 {(() => {
-                  const delta = blockDeltas[selectedBlockIndex!];
+                  const delta = blockDeltas[selectedBlockIndex!] ?? 0;
                   return (
                     <span className={clsx('font-mono text-xs font-medium', getDeltaColor(delta))}>
                       {formatDelta(delta)} gas delta

@@ -65,7 +65,7 @@ export function useLiveProbeStream({
   const newItemIdsRef = useRef<Set<string>>(new Set());
   const queue = useRef<IntCustodyProbe[]>([]);
   const seenIds = useRef<Set<string>>(new Set());
-  const dripTimer = useRef<NodeJS.Timeout | null>(null);
+  const dripTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastBoundsMax = useRef<number | null>(null);
   const hitPageLimitRef = useRef(false);
 

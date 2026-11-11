@@ -198,7 +198,8 @@ export function IndexPage(): JSX.Element {
   // Handle sorting change
   const handleSortingChange = useCallback(
     (sorting: SortingState): void => {
-      if (sorting.length === 0) {
+      const [sort] = sorting;
+      if (!sort) {
         navigate({
           search: prev => ({
             ...prev,
@@ -209,7 +210,7 @@ export function IndexPage(): JSX.Element {
           resetScroll: false,
         });
       } else {
-        const { id, desc } = sorting[0];
+        const { id, desc } = sort;
         navigate({
           search: prev => ({
             ...prev,
@@ -257,8 +258,8 @@ export function IndexPage(): JSX.Element {
 
   // Build current sorting state from URL
   const currentSorting: SortingState = useMemo(() => {
-    const parts = orderBy.split(' ');
-    return [{ id: parts[0], desc: parts[1] === 'desc' }];
+    const [id = '', direction] = orderBy.split(' ');
+    return [{ id, desc: direction === 'desc' }];
   }, [orderBy]);
 
   // Handle filter panel changes

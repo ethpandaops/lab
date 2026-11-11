@@ -64,7 +64,7 @@ function generatePattern(peerId: number): boolean[][] {
  */
 function getColor(peerId: number): string {
   const index = Math.abs(peerId) % COLORS.length;
-  return COLORS[index];
+  return COLORS[index] ?? DATA_COLORS.orange;
 }
 
 /**

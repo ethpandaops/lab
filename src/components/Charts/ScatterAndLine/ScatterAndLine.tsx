@@ -93,7 +93,7 @@ export function ScatterAndLineChart({
 
   const option = useMemo(() => {
     // Auto-assign colors from categorical palette for multi-series data
-    const getSeriesColor = (index: number): string => {
+    const getSeriesColor = (index: number): string | undefined => {
       return CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
     };
 

@@ -112,7 +112,8 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
   const segmentColors = useMemo(() => {
     const colors: Record<string, string> = {};
     segments.forEach((seg, index) => {
-      colors[seg.name] = seg.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
+      const color = seg.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
+      if (color) colors[seg.name] = color;
     });
     return colors;
   }, [segments]);

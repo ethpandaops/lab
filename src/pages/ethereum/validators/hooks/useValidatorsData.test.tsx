@@ -62,10 +62,10 @@ describe('useValidatorsData', () => {
     await waitFor(() => expect(result.current.summary).not.toBeNull());
     const [one, two] = result.current.validators;
     // (1 × 200 + 2 × 10) / 210, where averaging the daily averages would give 1.5
-    expect(one.attestation.avgInclusionDistance).toBeCloseTo(220 / 210, 6);
-    expect(one.attestation.inclusionRate).toBeCloseTo((210 / 675) * 100, 6);
-    expect(two.attestation.inclusionRate).toBeNull();
-    expect(two.attestation.headCorrectRate).toBeNull();
+    expect(one?.attestation.avgInclusionDistance).toBeCloseTo(220 / 210, 6);
+    expect(one?.attestation.inclusionRate).toBeCloseTo((210 / 675) * 100, 6);
+    expect(two?.attestation.inclusionRate).toBeNull();
+    expect(two?.attestation.headCorrectRate).toBeNull();
 
     const offline = result.current.attestationDaily.find(
       p => p.validatorIndex === 1 && p.avgInclusionDistance === null
@@ -96,11 +96,11 @@ describe('useValidatorsData', () => {
 
     await waitFor(() => expect(result.current.summary).not.toBeNull());
     expect(result.current.summary?.attestation.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
-    expect(result.current.validators[0].attestation.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
+    expect(result.current.validators[0]?.attestation.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
     const [first, second] = result.current.attestationDaily;
-    expect(first.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
+    expect(first?.sourceCorrectRate).toBeCloseTo((190 / 192) * 100, 6);
     // Unknown, not 100%
-    expect(second.sourceCorrectRate).toBeNull();
+    expect(second?.sourceCorrectRate).toBeNull();
     // Head and target still divide by attestations
     expect(result.current.summary?.attestation.headCorrectRate).toBe(100);
     // The rollup carries the wrong votes; nothing reads the per-slot table
@@ -291,6 +291,6 @@ describe('useValidatorsData', () => {
         max_balance: 32.2e9,
       }),
     ]);
-    expect(result.current.validators[0].balance.endBalance).toBeCloseTo(32.2, 6);
+    expect(result.current.validators[0]?.balance.endBalance).toBeCloseTo(32.2, 6);
   });
 });

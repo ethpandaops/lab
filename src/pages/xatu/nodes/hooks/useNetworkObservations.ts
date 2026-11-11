@@ -46,12 +46,13 @@ function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFirstSeenB
   const slots: SlotDistribution[] = [];
   for (let slot = window.startSlot; slot < window.endSlot; slot++) {
     const values = [...(bySlot.get(slot)?.values() ?? [])].sort((a, b) => a - b);
+    const min = values[0];
     slots.push(
-      values.length === 0
+      min === undefined
         ? { slot, min: null, p10: null, p50: null, p90: null, nodeCount: 0 }
         : {
             slot,
-            min: values[0],
+            min,
             p10: quantile(values, 0.1),
             p50: quantile(values, 0.5),
             p90: quantile(values, 0.9),

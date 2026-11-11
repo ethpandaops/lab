@@ -5,6 +5,9 @@ import { Tab } from './Tab';
 const meta = {
   title: 'Components/Navigation/Tab',
   component: Tab,
+  args: {
+    children: 'Overview',
+  },
   parameters: {
     layout: 'centered',
   },

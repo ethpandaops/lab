@@ -97,7 +97,9 @@ export function RadarChart({
 
     // Build series configuration
     const seriesConfig = series.map((s, index) => {
-      const seriesColor = s.color ? resolveCssColorToHex(s.color) : extendedPalette[index % extendedPalette.length];
+      const seriesColor = s.color
+        ? resolveCssColorToHex(s.color)
+        : (extendedPalette[index % extendedPalette.length] ?? themeColors.primary);
 
       return {
         type: 'radar' as const,
@@ -187,6 +189,7 @@ export function RadarChart({
           let result = `<div style="font-weight: 600; margin-bottom: 4px;">${name}</div>`;
           indicators.forEach((ind, i) => {
             const val = value[i];
+            if (val === undefined) return;
             const percentage = ind.max > 0 ? ((val / ind.max) * 100).toFixed(1) : '0.0';
             result += `<div style="display: flex; justify-content: space-between; gap: 16px;">`;
             result += `<span>${ind.name}:</span>`;
@@ -221,6 +224,7 @@ export function RadarChart({
     themeColors.muted,
     themeColors.border,
     themeColors.surface,
+    themeColors.primary,
   ]);
 
   return (

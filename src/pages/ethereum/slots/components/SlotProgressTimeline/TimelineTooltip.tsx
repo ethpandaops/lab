@@ -85,7 +85,7 @@ export function TimelineTooltip({ span, position, containerWidth }: TimelineTool
               </span>
               {span.executionVersion && (
                 <span className="ml-1 text-muted" title={span.executionVersion}>
-                  {formatVersion(span.executionVersion.split('/')[0])}
+                  {formatVersion(span.executionVersion.split('/')[0] ?? '')}
                 </span>
               )}
               {span.methodVersion && (

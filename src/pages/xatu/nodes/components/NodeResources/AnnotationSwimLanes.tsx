@@ -27,7 +27,7 @@ function nodeMatches(nodeName: string, selectedNode: string): boolean {
 
 function percentile(sorted: number[], p: number): number {
   const idx = Math.floor(sorted.length * p);
-  return sorted[Math.min(idx, sorted.length - 1)];
+  return sorted[Math.min(idx, sorted.length - 1)] ?? NaN;
 }
 
 function clampFraction(value: number): number {
@@ -110,7 +110,7 @@ export function AnnotationSwimLanes({
         if (hasRanges) {
           const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
           const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
-          const rawStartFrac = starts[0] / SLOT_DURATION_MS;
+          const rawStartFrac = percentile(starts, 0) / SLOT_DURATION_MS;
           const rawEndFrac = percentile(ends, 0.95) / SLOT_DURATION_MS;
           if (rawEndFrac < 0 || rawStartFrac > 1) continue;
 
@@ -124,7 +124,7 @@ export function AnnotationSwimLanes({
           });
         } else {
           const times = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const rawMinFrac = times[0] / SLOT_DURATION_MS;
+          const rawMinFrac = percentile(times, 0) / SLOT_DURATION_MS;
           const rawP95Frac = percentile(times, 0.95) / SLOT_DURATION_MS;
           if (rawP95Frac < 0 || rawMinFrac > 1) continue;
 

@@ -59,8 +59,10 @@ export function bucketFilter(
   buckets: number[],
   allHistory: boolean
 ): Record<string, string | number> {
-  const last = buckets[buckets.length - 1];
-  if (granularity === 'hourly') return { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: last + HOUR };
+  const first = buckets[0];
+  const last = buckets.at(-1);
+  if (first === undefined || last === undefined) throw new Error('bucketFilter needs at least one bucket');
+  if (granularity === 'hourly') return { hour_start_date_time_gte: first, hour_start_date_time_lt: last + HOUR };
   if (granularity === 'weekly') return { week_start_date_ne: toDateString(last + WEEK) };
   return allHistory
     ? { day_start_date_ne: toDateString(last + DAY) }
@@ -144,5 +146,5 @@ export function weightedMedian(values: Array<{ value: number; weight: number }>)
     running += entry.weight;
     if (running >= total / 2) return entry.value;
   }
-  return sorted[sorted.length - 1].value;
+  return sorted.at(-1)?.value ?? null;
 }

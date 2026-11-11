@@ -306,7 +306,8 @@ export async function fetchSlotsPage(
       const realNext = next === 'more' ? undefined : next;
       let index = skip;
       for (; index < slots.length && matched.length < pageSize; index++) {
-        if (passes(slots[index])) matched.push(facts.get(slots[index])!);
+        const slot = slots[index];
+        if (slot !== undefined && passes(slot)) matched.push(facts.get(slot)!);
       }
       if (matched.length === pageSize) {
         nextCursor =

@@ -86,6 +86,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColor = color ? resolveCssColorToHex(color) : undefined;
+  const lineColor = convertedColor || CHART_CATEGORICAL_COLORS[0] || themeColors.primary;
 
   const option = useMemo(
     () => ({
@@ -150,7 +151,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           symbol: 'none',
           showSymbol: false,
           lineStyle: {
-            color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+            color: lineColor,
             width: 3,
           },
           areaStyle: showArea
@@ -164,11 +165,11 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
                   colorStops: [
                     {
                       offset: 0,
-                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.5),
+                      color: hexToRgba(lineColor, 0.5),
                     },
                     {
                       offset: 1,
-                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.06),
+                      color: hexToRgba(lineColor, 0.06),
                     },
                   ],
                 },
@@ -182,7 +183,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
               width: 4,
             },
             itemStyle: {
-              color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+              color: lineColor,
               borderColor: themeColors.background,
               borderWidth: 2,
             },
@@ -223,7 +224,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       titleTop,
       smooth,
       showArea,
-      convertedColor,
+      lineColor,
       yMax,
       xMax,
       connectNulls,

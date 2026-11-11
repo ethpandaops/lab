@@ -247,7 +247,7 @@ export const GitHubContributions: Story = {
     const weekLabels = Array.from({ length: weeks }, (_, i) => {
       const month = Math.floor((i * 7) / 30);
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return i % 4 === 0 ? months[month % 12] : '';
+      return i % 4 === 0 ? (months[month % 12] ?? '') : '';
     });
     const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -331,7 +331,9 @@ export const AnimatedRealtime: Story = {
           const newData = [...prev];
           for (let i = 0; i < 5; i++) {
             const randomIndex = Math.floor(Math.random() * newData.length);
-            const [x, y] = newData[randomIndex];
+            const cell = newData[randomIndex];
+            if (!cell) continue;
+            const [x, y] = cell;
             newData[randomIndex] = [x, y, Math.floor(Math.random() * 100)];
           }
           return newData;

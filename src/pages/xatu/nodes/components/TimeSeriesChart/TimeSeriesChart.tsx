@@ -73,15 +73,15 @@ export function TimeSeriesChart({
 
   const tooltipFormatter = (params: unknown): string => {
     const index = hoveredIndex(params);
-    if (index === null || index >= buckets.length) return '';
+    if (index === null) return '';
+    const start = buckets[index];
+    if (start === undefined) return '';
     const rows = [
-      ...(behind?.has(buckets[index])
-        ? [{ color: colors.muted, label: 'Behind the network, catching up', value: '' }]
-        : []),
+      ...(behind?.has(start) ? [{ color: colors.muted, label: 'Behind the network, catching up', value: '' }] : []),
       ...tooltipRows(index),
     ];
     return renderTooltip(
-      bucketHeading(buckets[index], granularity, timezone),
+      bucketHeading(start, granularity, timezone),
       rows.length > 0 ? rows : [{ label: 'No data', value: '' }]
     );
   };

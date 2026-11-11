@@ -38,7 +38,7 @@ const generateLineData = (count: number, xRange: [number, number], fn: (x: numbe
 };
 
 // Basic scatter plot data
-const BASIC_SCATTER_DATA: ScatterSeries[] = [
+const BASIC_SCATTER_DATA: [ScatterSeries] = [
   {
     name: 'Data Points',
     data: [
@@ -58,7 +58,7 @@ const BASIC_SCATTER_DATA: ScatterSeries[] = [
 ];
 
 // Basic line chart data
-const BASIC_LINE_DATA: LineSeries[] = [
+const BASIC_LINE_DATA: [LineSeries] = [
   {
     name: 'Trend Line',
     data: [
@@ -139,7 +139,7 @@ const MULTI_SCATTER_DATA: ScatterSeries[] = [
   },
 ];
 
-const MULTI_LINE_DATA: LineSeries[] = [
+const MULTI_LINE_DATA: [LineSeries, LineSeries, LineSeries] = [
   {
     name: 'Trend A',
     data: generateLineData(50, [0, 100], x => 100 + x),
@@ -274,7 +274,7 @@ export const CustomTooltip: Story = {
             (param: { color: string; seriesName: string; data: number[] }) =>
               `<div style="margin-bottom: 4px;">
                 <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${param.color};margin-right:5px;"></span>
-                ${param.seriesName}: (${param.data[0].toFixed(1)}, ${param.data[1].toFixed(1)})
+                ${param.seriesName}: (${param.data[0]?.toFixed(1) ?? ''}, ${param.data[1]?.toFixed(1) ?? ''})
               </div>`
           )
           .join('');
@@ -285,8 +285,8 @@ export const CustomTooltip: Story = {
           <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:5px;"></span>
           ${p.seriesName}
         </div>
-        <div>X: ${p.data[0].toFixed(1)}</div>
-        <div>Y: ${p.data[1].toFixed(1)}</div>
+        <div>X: ${p.data[0]?.toFixed(1) ?? ''}</div>
+        <div>Y: ${p.data[1]?.toFixed(1) ?? ''}</div>
       `;
     },
   },

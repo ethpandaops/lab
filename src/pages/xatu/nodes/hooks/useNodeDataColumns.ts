@@ -51,10 +51,13 @@ function buildNodeDataColumns(window: SlotWindow, rows: FctBlockDataColumnSideca
   const slots = new Map<number, SlotColumns>();
   bySlot.forEach((columns, slot) => {
     const values = [...columns.values()].sort((a, b) => a - b);
+    const first = values[0];
+    const last = values.at(-1);
+    if (first === undefined || last === undefined) return;
     slots.set(slot, {
-      first: values[0],
+      first,
       p50: median(values)!,
-      last: values[values.length - 1],
+      last,
       count: values.length,
     });
     columns.forEach((value, column) => {

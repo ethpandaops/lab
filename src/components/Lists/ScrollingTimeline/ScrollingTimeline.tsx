@@ -109,7 +109,8 @@ export function ScrollingTimeline({
     // Find the active item index
     let activeIndex = -1;
     for (let i = items.length - 1; i >= 0; i--) {
-      if (items[i].timestamp <= currentTime) {
+      const item = items[i];
+      if (item && item.timestamp <= currentTime) {
         activeIndex = i;
         break;
       }

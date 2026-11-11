@@ -102,7 +102,7 @@ function getFunctionName(
   const sig = functionSignatures[functionSelector.toLowerCase()];
   if (sig?.name) {
     // Return just the function name without parameters
-    return sig.name.split('(')[0];
+    return sig.name.split('(')[0] ?? null;
   }
 
   return null;
@@ -323,9 +323,7 @@ export function useTransactionGasData({
         signal,
         throwOnError: true,
       });
-      const items = response.data?.int_transaction_call_frame ?? [];
-      if (items.length === 0) return null;
-      return items[0].block_number ?? null;
+      return response.data?.int_transaction_call_frame?.[0]?.block_number ?? null;
     },
     enabled: !!currentNetwork && !!transactionHash && providedBlockNumber == null,
     staleTime: Infinity, // Block number for a tx never changes

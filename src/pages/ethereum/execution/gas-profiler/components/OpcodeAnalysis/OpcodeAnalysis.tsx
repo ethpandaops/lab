@@ -79,7 +79,8 @@ function OpcodeByGasChart({
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';
-        const stat = opcodeStats.find(s => s.opcode === p[0].name);
+        const { name } = p[0];
+        const stat = opcodeStats.find(s => s.opcode === name);
         if (!stat) return '';
         const pct = totalGas > 0 ? ((stat.totalGas / totalGas) * 100).toFixed(1) : '0';
         return `
@@ -139,7 +140,8 @@ function OpcodeByCountChart({
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';
-        const stat = opcodeStats.find(s => s.opcode === p[0].name);
+        const { name } = p[0];
+        const stat = opcodeStats.find(s => s.opcode === name);
         if (!stat) return '';
         const pct = totalCount > 0 ? ((stat.count / totalCount) * 100).toFixed(1) : '0';
         return `

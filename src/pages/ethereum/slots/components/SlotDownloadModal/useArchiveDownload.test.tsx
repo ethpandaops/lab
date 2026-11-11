@@ -53,7 +53,9 @@ describe('useArchiveDownload', () => {
     act(() => result.current.download('block-json', { slot: 100, block_root: root, format: 'json' }));
 
     await waitFor(() => expect(result.current.pendingKey).toBe('block-json'));
-    const url = new URL(fetchMock.mock.calls[0][0].url);
+    const request = fetchMock.mock.calls[0]?.[0];
+    if (!request) throw new Error('expected the download to fetch the block');
+    const url = new URL(request.url);
     expect(url.pathname).toBe('/api/v1/download/mainnet/block');
     expect(Object.fromEntries(url.searchParams)).toEqual({ slot: '100', block_root: root, format: 'json' });
 
@@ -87,7 +89,9 @@ describe('useArchiveDownload', () => {
     act(() => result.current.download('blob-0', { versioned_hash: hash }));
 
     await waitFor(() => expect(result.current.error).toBe('blob not found in archive'));
-    const url = new URL(fetchMock.mock.calls[0][0].url);
+    const request = fetchMock.mock.calls[0]?.[0];
+    if (!request) throw new Error('expected the download to fetch the blob');
+    const url = new URL(request.url);
     expect(url.pathname).toBe('/api/v1/download/hoodi/blob');
     expect(url.searchParams.get('versioned_hash')).toBe(hash);
 

@@ -51,7 +51,7 @@ export function NetworkArrivalChart({
       ]}
       tooltipRows={index => {
         const bucket = byBucket[index];
-        if (bucket.nodeCount === 0) return [];
+        if (!bucket || bucket.nodeCount === 0) return [];
         return [
           { color: colors.primary, label: 'P90', value: formatMs(bucket.p90) },
           { color: colors.primary, label: 'Median', value: formatMs(bucket.p50) },

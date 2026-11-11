@@ -1,4 +1,4 @@
-import { useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useRef, useCallback, useLayoutEffect } from 'react';
 
 /**
  * Creates a stable callback reference that always calls the latest version of the function.
@@ -231,11 +231,5 @@ export function useStableCallback<Args extends readonly unknown[], Return>(
  * ```
  */
 export function hasUseEffectEvent(): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const React = require('react');
-    return typeof React.useEffectEvent === 'function';
-  } catch {
-    return false;
-  }
+  return typeof React.useEffectEvent === 'function';
 }

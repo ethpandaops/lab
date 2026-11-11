@@ -944,7 +944,7 @@ export function IndexPage(): JSX.Element {
               {/* Back button */}
               <button
                 type="button"
-                onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
+                onClick={breadcrumbs.at(-2)?.onClick}
                 className="group flex items-center gap-1.5 rounded-sm bg-muted-30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent-10 hover:text-accent"
               >
                 <ArrowLeftIcon className="size-3.5" />

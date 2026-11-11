@@ -179,7 +179,7 @@ export function PreparedBlocksComparisonChart({
       let tooltip = `<div style="display: flex; align-items: center; gap: 6px;">${clientLogoHtml(param.name)}<strong>${param.name}</strong></div>`;
       tooltip += `Reward: ${value.toFixed(5)} ETH<br/>`;
 
-      if (!block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
+      if (block && !block.isProposed && 'execution_payload_transactions_count' in block.originalBlock) {
         const txCount = (block.originalBlock as FctPreparedBlock).execution_payload_transactions_count;
         tooltip += `Transactions: ${txCount?.toLocaleString() || 0}<br/>`;
       }

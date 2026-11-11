@@ -44,6 +44,7 @@ export function ArrivalHistogram({
     const index = hoveredIndex(params);
     if (index === null) return '';
     const start = starts[index];
+    if (start === undefined) return '';
     const isOverflow = start + bucketMs >= maxMs && values.some(value => value >= maxMs);
     const range = isOverflow
       ? `${(start / 1000).toFixed(2)}s+`

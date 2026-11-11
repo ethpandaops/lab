@@ -126,7 +126,6 @@ export const WithHeader: Story = {
 
 export const Interactive: Story = {
   render: () => {
-    const [selectedColumn, setSelectedColumn] = useState<number | undefined>(undefined);
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
     const rows = generateSampleData(12, 25);
 
@@ -139,18 +138,15 @@ export const Interactive: Story = {
         )}
         <GridHeatmap
           rows={rows}
-          selectedColumn={selectedColumn}
           renderCell={(data, props) => <SampleCell data={data as MetricData} {...props} />}
-          onCellClick={(rowId, colIndex, cellData) => {
-            setSelectedColumn(colIndex);
+          onCellClick={(rowId, colIndex) => {
             setSelectedRowId(rowId);
-            console.log('Cell clicked:', { rowId, colIndex, cellData });
+            console.log('Cell clicked:', { rowId, colIndex });
           }}
           onRowClick={rowId => {
             setSelectedRowId(rowId);
             console.log('Row clicked:', rowId);
           }}
-          onClearColumnSelection={() => setSelectedColumn(undefined)}
         />
       </div>
     );

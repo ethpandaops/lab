@@ -171,7 +171,8 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
 
   const records = useMemo(() => query.data ?? [], [query.data]);
   // While another window loads, the previous window's records stay, keyed by their own bucket: days have dashes
-  const recordsDaily = query.isPlaceholderData && records.length > 0 ? records[0].key.includes('-') : isDaily;
+  const firstRecord = records[0];
+  const recordsDaily = query.isPlaceholderData && firstRecord ? firstRecord.key.includes('-') : isDaily;
 
   const keys = useMemo(() => {
     const unique = [...new Set(records.map(record => record.key))].sort();

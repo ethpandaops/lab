@@ -18,6 +18,9 @@ export interface ClientMetric<T> {
   lowerIsBetter?: boolean;
 }
 
+/** Metrics to choose from, at least one */
+export type ClientMetrics<T> = [ClientMetric<T>, ...Array<ClientMetric<T>>];
+
 /** Ratio of summed numerator to summed denominator, or null with nothing to divide by */
 export function ratio<T>(rows: T[], metric: ClientMetric<T>): number | null {
   let numerator = 0;
@@ -35,7 +38,7 @@ const percent = (value: number): string => `${value.toFixed(2)}%`;
 const duties = (row: FctBlockProposalByClientDaily): number =>
   (row.block_count ?? 0) + (row.orphaned_block_count ?? 0) + (row.missed_slot_count ?? 0);
 
-export const PROPOSAL_METRICS: Array<ClientMetric<FctBlockProposalByClientDaily>> = [
+export const PROPOSAL_METRICS: ClientMetrics<FctBlockProposalByClientDaily> = [
   {
     id: 'mev-share',
     label: 'MEV blocks',
@@ -91,7 +94,7 @@ export const PROPOSAL_METRICS: Array<ClientMetric<FctBlockProposalByClientDaily>
   },
 ];
 
-export const ATTESTATION_METRICS: Array<ClientMetric<FctAttestationVoteCorrectnessByClientDaily>> = [
+export const ATTESTATION_METRICS: ClientMetrics<FctAttestationVoteCorrectnessByClientDaily> = [
   {
     id: 'attested',
     label: 'Attested',

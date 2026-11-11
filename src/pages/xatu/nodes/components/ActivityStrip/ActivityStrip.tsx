@@ -48,6 +48,8 @@ export function ActivityStrip({ block, blockSlots }: ActivityStripProps): JSX.El
   const settled = bars.filter(bar => bar.counted);
   const settledSeen = settled.reduce((sum, bar) => sum + bar.seen, 0);
   const settledTotal = settled.reduce((sum, bar) => sum + (bar.before ? 0 : bar.total), 0);
+  const firstBar = bars[0];
+  const lastBar = bars.at(-1);
 
   return (
     <Card
@@ -108,10 +110,10 @@ export function ActivityStrip({ block, blockSlots }: ActivityStripProps): JSX.El
           </div>
         ))}
       </div>
-      {bars.length > 0 && (
+      {firstBar && lastBar && (
         <div className="mt-2 flex justify-between text-xs/5 text-muted tabular-nums">
-          <span>{bucketHeading(bars[0].start, block.granularity, timezone)}</span>
-          <span>{bucketHeading(bars[bars.length - 1].start, block.granularity, timezone)}</span>
+          <span>{bucketHeading(firstBar.start, block.granularity, timezone)}</span>
+          <span>{bucketHeading(lastBar.start, block.granularity, timezone)}</span>
         </div>
       )}
     </Card>

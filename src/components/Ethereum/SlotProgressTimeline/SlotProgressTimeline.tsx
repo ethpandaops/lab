@@ -160,8 +160,8 @@ export function SlotProgressTimeline({
           {enrichedPhases.map((phase, index) => {
             const status = phase.isActive ? 'active' : phase.isCompleted ? 'completed' : 'pending';
             const hasConnection = index < enrichedPhases.length - 1;
-            const isConnectionActive =
-              mode === 'live' && connectionProgress[index] > 0 && connectionProgress[index] < 100;
+            const progress = connectionProgress[index] ?? 0;
+            const isConnectionActive = mode === 'live' && progress > 0 && progress < 100;
 
             return (
               <React.Fragment key={phase.id}>
@@ -178,11 +178,7 @@ export function SlotProgressTimeline({
                 {/* Connection to next phase */}
                 {hasConnection && (
                   <div className="mx-4 flex-1">
-                    <PhaseConnection
-                      progress={connectionProgress[index]}
-                      orientation="horizontal"
-                      isActive={isConnectionActive}
-                    />
+                    <PhaseConnection progress={progress} orientation="horizontal" isActive={isConnectionActive} />
                   </div>
                 )}
               </React.Fragment>
@@ -197,8 +193,8 @@ export function SlotProgressTimeline({
           {enrichedPhases.map((phase, index) => {
             const status = phase.isActive ? 'active' : phase.isCompleted ? 'completed' : 'pending';
             const hasConnection = index < enrichedPhases.length - 1;
-            const isConnectionActive =
-              mode === 'live' && connectionProgress[index] > 0 && connectionProgress[index] < 100;
+            const progress = connectionProgress[index] ?? 0;
+            const isConnectionActive = mode === 'live' && progress > 0 && progress < 100;
 
             return (
               <div key={phase.id} className="flex flex-col items-center">
@@ -213,11 +209,7 @@ export function SlotProgressTimeline({
                 {/* Connection to next phase */}
                 {hasConnection && (
                   <div className="my-2 h-12">
-                    <PhaseConnection
-                      progress={connectionProgress[index]}
-                      orientation="vertical"
-                      isActive={isConnectionActive}
-                    />
+                    <PhaseConnection progress={progress} orientation="vertical" isActive={isConnectionActive} />
                   </div>
                 )}
               </div>

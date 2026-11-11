@@ -40,6 +40,7 @@ export function calculateOutlierBounds(values: number[]): { lower: number; upper
   const q3Index = Math.floor(sorted.length * 0.75);
   const q1 = sorted[q1Index];
   const q3 = sorted[q3Index];
+  if (q1 === undefined || q3 === undefined) return null;
   const iqr = q3 - q1;
 
   // Use 1.5 * IQR as the standard fence

@@ -32,10 +32,16 @@ type Story = StoryObj<typeof meta>;
 // Wrapper component for interactive state with toggle button
 function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(props.initialOpen ?? false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="relative min-h-screen bg-background">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+      />
 
       {/* Mock header bar (mobile only) */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface px-4 py-4 lg:hidden">

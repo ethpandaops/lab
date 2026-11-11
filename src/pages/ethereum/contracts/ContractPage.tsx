@@ -13,7 +13,14 @@ import type { PolicyData } from '@/pages/ethereum/execution/state-expiry/compone
 import { formatSmartDecimal, hexToRgba } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import { useContractStorageData, EXPIRY_POLICIES, EXPIRY_TYPES, type ExpiryPolicy, type ExpiryType } from './hooks';
+import {
+  useContractStorageData,
+  EXPIRY_POLICIES,
+  EXPIRY_TYPES,
+  type ContractStorageDataPoint,
+  type ExpiryPolicy,
+  type ExpiryType,
+} from './hooks';
 import { ContractInfoCard, ContractInfoCardSkeleton, ContractStateExpirySkeleton } from './components';
 
 /** Short labels for chart series */
@@ -295,14 +302,16 @@ export function ContractPage(): JSX.Element {
 
     const markLines: MarkLineConfig[] = [];
 
-    for (let i = 1; i < data.length; i++) {
-      const prevData = data[i - 1].expiryData[selectedPolicy];
-      const currData = data[i].expiryData[selectedPolicy];
+    let previous: ContractStorageDataPoint | undefined;
+    for (const item of data) {
+      const prevData = previous?.expiryData[selectedPolicy];
+      const currData = item.expiryData[selectedPolicy];
+      previous = item;
 
       // Check if bytes went from 0 to non-zero (resurrection)
-      if (prevData.effectiveBytes === 0 && currData.effectiveBytes !== null && currData.effectiveBytes > 0) {
+      if (prevData?.effectiveBytes === 0 && currData.effectiveBytes !== null && currData.effectiveBytes > 0) {
         markLines.push({
-          xValue: data[i].dateLabel,
+          xValue: item.dateLabel,
           label: 'Resurrected',
           labelPosition: 'end',
           color: DATA_COLORS.emerald,
@@ -401,15 +410,15 @@ export function ContractPage(): JSX.Element {
     if (seriesName === 'Current State') return;
 
     // Parse series name like "Slot (1y)" or "Contract (2y)"
-    const match = seriesName.match(/^(Slot|Contract)\s+\((\d+y)\)$/i);
-    if (match) {
-      const type = match[1].toLowerCase() as ExpiryType;
+    const [, typeLabel, policyLabel] = seriesName.match(/^(Slot|Contract)\s+\((\d+y)\)$/i) ?? [];
+    if (typeLabel && policyLabel) {
+      const type = typeLabel.toLowerCase() as ExpiryType;
       // Convert label back to policy key
       const labelToPolicy: Record<string, ExpiryPolicy> = { '1y': '12m', '2y': '24m' };
-      const policy = labelToPolicy[match[2]];
+      const policy = labelToPolicy[policyLabel];
 
       // Validate policy exists
-      if (EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
+      if (policy && EXPIRY_POLICIES.includes(policy) && EXPIRY_TYPES.includes(type)) {
         setSelectedType(type);
         setSelectedPolicy(policy);
       }

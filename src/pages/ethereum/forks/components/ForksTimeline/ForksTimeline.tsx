@@ -31,12 +31,13 @@ export function ForksTimeline({
       <div>
         <div className="space-y-8">
           {forks.map((fork, forkIndex) => {
+            const prevFork = forks[forkIndex - 1];
+            const nextFork = forks[forkIndex + 1];
             const isActive = currentEpoch >= fork.epoch;
-            const isCurrentFork =
-              isActive && (forkIndex === forks.length - 1 || currentEpoch < forks[forkIndex + 1].epoch);
+            const isCurrentFork = isActive && (!nextFork || currentEpoch < nextFork.epoch);
 
             // Find blob schedule items that fall within this fork's epoch range
-            const nextForkEpoch = forkIndex < forks.length - 1 ? forks[forkIndex + 1].epoch : Infinity;
+            const nextForkEpoch = nextFork?.epoch ?? Infinity;
             const blobItems = blobSchedule
               .filter(item => item.epoch >= fork.epoch && item.epoch < nextForkEpoch)
               .sort((a, b) => a.epoch - b.epoch);
@@ -134,9 +135,8 @@ export function ForksTimeline({
                                   </p>
                                 );
                               })()
-                            : forkIndex > 0
+                            : prevFork
                               ? (() => {
-                                  const prevFork = forks[forkIndex - 1];
                                   const epochsSincePrev = fork.epoch - prevFork.epoch;
                                   const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
 

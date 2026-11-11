@@ -263,7 +263,9 @@ function PerformanceSections({
     );
   }
 
-  if (rangeClients.length === 0) {
+  const fastest = rangeClients[0];
+  const slowest = rangeClients.at(-1);
+  if (!fastest || !slowest) {
     return (
       <Alert
         variant="info"
@@ -277,8 +279,6 @@ function PerformanceSections({
     );
   }
 
-  const fastest = rangeClients[0];
-  const slowest = rangeClients[rangeClients.length - 1];
   const budgetMs = Number(budget);
   const ceilings = (clients ?? [])
     .map(c => ({ client: c, mgas: gasCeiling(ceilingBasis === 'p50' ? c.fitP50 : c.fitP95, budgetMs) }))
@@ -541,8 +541,9 @@ function throughputTooltip(params: unknown, daily: boolean): string {
     value?: [number, number];
     color?: string;
   }[];
-  if (!points.length) return '';
-  const time = new Date(points[0].value?.[0] ?? 0).toLocaleString(
+  const [first] = points;
+  if (!first) return '';
+  const time = new Date(first.value?.[0] ?? 0).toLocaleString(
     [],
     daily
       ? { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
@@ -568,14 +569,15 @@ function GasCeiling({
   ceilings: { client: ClientPerformance; mgas: number }[];
   gasLimitM: number;
   basis: 'p50' | 'p95';
-}): JSX.Element {
+}): JSX.Element | null {
   const max = Math.max(...ceilings.map(c => c.mgas), gasLimitM);
   const step = max > 4000 ? 1000 : max > 2000 ? 500 : max > 800 ? 200 : 100;
   const axisMax = Math.ceil(max / step) * step;
   const ticks = Array.from({ length: axisMax / step + 1 }, (_, i) => i * step);
   // Phones label at most four ticks so the labels don't run together
   const phoneTickEvery = Math.ceil((ticks.length - 1) / 3);
-  const network = ceilings[ceilings.length - 1];
+  const network = ceilings.at(-1);
+  if (!network) return null;
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">

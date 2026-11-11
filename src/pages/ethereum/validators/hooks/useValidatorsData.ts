@@ -93,11 +93,12 @@ function intoWeeks<T extends { validator_index?: number; day_start_date?: string
     const key = `${row.validator_index}:${weekStartOf(row.day_start_date ?? '')}`;
     groups.set(key, [...(groups.get(key) ?? []), row]);
   }
-  return [...groups.values()].map(group => ({
-    ...group[group.length - 1],
-    ...merge(group),
-    day_start_date: weekStartOf(group[0].day_start_date ?? ''),
-  }));
+  return [...groups.values()].flatMap(group => {
+    const first = group[0];
+    const last = group.at(-1);
+    if (!first || !last) return [];
+    return [{ ...last, ...merge(group), day_start_date: weekStartOf(first.day_start_date ?? '') }];
+  });
 }
 
 function mergeAttestationDays(
@@ -132,8 +133,8 @@ function mergeBalanceDays(days: FctValidatorBalanceDaily[]): Partial<FctValidato
   const mins = days.flatMap(d => (d.min_balance == null ? [] : [d.min_balance]));
   const maxes = days.flatMap(d => (d.max_balance == null ? [] : [d.max_balance]));
   return {
-    start_balance: days[0].start_balance,
-    start_epoch: days[0].start_epoch,
+    start_balance: days[0]?.start_balance,
+    start_epoch: days[0]?.start_epoch,
     min_balance: mins.length > 0 ? Math.min(...mins) : undefined,
     max_balance: maxes.length > 0 ? Math.max(...maxes) : undefined,
   };

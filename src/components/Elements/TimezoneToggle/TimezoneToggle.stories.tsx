@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { JSX } from 'react';
 import { TimezoneToggle } from './TimezoneToggle';
 import { TimezoneProvider } from '@/providers/TimezoneProvider';
 import { useTimezone } from '@/hooks/useTimezone';

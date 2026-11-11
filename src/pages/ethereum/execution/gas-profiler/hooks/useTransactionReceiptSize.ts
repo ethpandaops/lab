@@ -44,11 +44,10 @@ export function useTransactionReceiptSize({
     staleTime: 5 * 60 * 1000,
   });
 
-  const data = useMemo<IntTransactionReceiptSize | null>(() => {
-    const items = response?.int_transaction_receipt_size;
-    if (!items?.length) return null;
-    return items[0];
-  }, [response]);
+  const data = useMemo<IntTransactionReceiptSize | null>(
+    () => response?.int_transaction_receipt_size?.[0] ?? null,
+    [response]
+  );
 
   return {
     data,

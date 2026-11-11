@@ -521,7 +521,7 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
       if (values.length === 0) return 0;
       const sorted = [...values].sort((a, b) => a - b);
       const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-      return sorted[Math.max(0, index)];
+      return sorted[Math.max(0, index)] ?? 0;
     };
 
     const blockArrivalTimeSeries: BlockArrivalDataPoint[] = Array.from({ length: 32 }, (_, i) => {
@@ -542,11 +542,11 @@ export function useEpochDetailData(epoch: number, isLive = false): UseEpochDetai
       const sorted = [...times].sort((a, b) => a - b);
       return {
         slot,
-        min: sorted[0],
+        min: sorted[0] ?? null,
         p05: calculatePercentile(times, 5),
         p50: calculatePercentile(times, 50),
         p90: calculatePercentile(times, 90),
-        max: sorted[sorted.length - 1],
+        max: sorted.at(-1) ?? null,
       };
     });
 

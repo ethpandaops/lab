@@ -44,6 +44,10 @@ export function parseNetworkName(name: string): ParsedNetworkName | null {
   }
 
   const [, family, kind, index] = match;
+  if (family === undefined || kind === undefined || index === undefined) {
+    return null;
+  }
+
   return { family: titleCase(family), label: `${titleCase(kind)} ${index}` };
 }
 
@@ -87,7 +91,12 @@ export function groupNetworks(networks: Network[]): NetworkGroup[] {
 
   const familyGroups: NetworkGroup[] = [...families]
     .map(([family, members]) => ({ id: `family:${family}`, label: family, networks: members.sort(newestFirst) }))
-    .sort((a, b) => newestFirst(a.networks[0], b.networks[0]));
+    .sort((a, b) => {
+      // Each family's networks are sorted newest first, so its first network is its newest
+      const [newestA] = a.networks;
+      const [newestB] = b.networks;
+      return newestA && newestB ? newestFirst(newestA, newestB) : 0;
+    });
 
   return [
     { id: 'public', label: 'Public', networks: publicNetworks },

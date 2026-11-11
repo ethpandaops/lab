@@ -9,7 +9,7 @@ const mockRouter = {
   navigate: mockNavigate,
   subscribe: mockSubscribe,
 };
-const mockSearch = {};
+const mockSearch: { network?: string } = {};
 
 vi.mock('@tanstack/react-router', async importOriginal => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),

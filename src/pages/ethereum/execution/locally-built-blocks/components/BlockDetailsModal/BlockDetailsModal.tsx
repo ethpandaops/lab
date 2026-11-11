@@ -92,15 +92,14 @@ export function BlockDetailsModal({
           nodeMap.get(nodeName)!.push(block);
         });
 
-        const nodes = Array.from(nodeMap.entries()).map(([nodeName, nodeBlocks]) => ({
-          nodeName,
-          blocks: nodeBlocks,
-          representativeBlock: nodeBlocks[0],
-        }));
+        const nodes = Array.from(nodeMap.entries()).flatMap(([nodeName, nodeBlocks]) => {
+          const [representativeBlock] = nodeBlocks;
+          return representativeBlock ? [{ nodeName, blocks: nodeBlocks, representativeBlock }] : [];
+        });
 
         return {
           slot: slotNumber,
-          slotStartDateTime: blocks[0].slot_start_date_time || 0,
+          slotStartDateTime: blocks[0]?.slot_start_date_time || 0,
           nodes,
           totalBlocks: blocks.length,
         };
@@ -150,11 +149,10 @@ export function BlockDetailsModal({
       deduplicatedNodeMap.set(nodeName, uniqueBlocks);
     });
 
-    nodeGroups = Array.from(deduplicatedNodeMap.entries()).map(([nodeName, nodeBlocks]) => ({
-      nodeName,
-      blocks: nodeBlocks,
-      representativeBlock: nodeBlocks[0],
-    }));
+    nodeGroups = Array.from(deduplicatedNodeMap.entries()).flatMap(([nodeName, nodeBlocks]) => {
+      const [representativeBlock] = nodeBlocks;
+      return representativeBlock ? [{ nodeName, blocks: nodeBlocks, representativeBlock }] : [];
+    });
   }
 
   const nodeCount = isPairingContext ? slotGroups.reduce((sum, s) => sum + s.nodes.length, 0) : nodeGroups.length;

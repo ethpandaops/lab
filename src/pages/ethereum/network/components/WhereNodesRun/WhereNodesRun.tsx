@@ -34,7 +34,7 @@ const located = (row: ConcentrationRow): number | undefined => row.located_peer_
  */
 export function WhereNodesRun({ rows, countryCodes, countries, noun }: WhereNodesRunProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS: palette } = getDataVizColors();
-  const color = (index: number): string => palette[index % palette.length];
+  const color = (index: number): string | undefined => palette[index % palette.length];
   const geoDays = seriesDays(rows, geolocated);
   const days = seriesDays(rows, located);
   const share = (part: (row: ConcentrationRow) => number | undefined): Array<number | null> =>

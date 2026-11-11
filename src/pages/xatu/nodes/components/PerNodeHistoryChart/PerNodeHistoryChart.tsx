@@ -44,7 +44,7 @@ export function PerNodeHistoryChart({
       raw,
       behind: history.buckets.map(start => behind.has(start)),
       // Hours a node spent catching up would flatten every other line
-      values: raw.map((value, bucket) => (behind.has(history.buckets[bucket]) ? null : value)),
+      values: history.buckets.map(start => (behind.has(start) ? null : (byBucket.get(start)?.p50 ?? null))),
     };
   });
   // Two nodes on one client would share a colour, so a node's ID is always in its name

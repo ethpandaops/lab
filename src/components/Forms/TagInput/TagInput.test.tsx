@@ -174,7 +174,10 @@ describe('TagInput', () => {
       render(<TagInput tags={['hello', 'world']} onTagsChange={onTagsChange} />);
 
       const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
-      await userEvent.click(removeButtons[0]);
+      expect(removeButtons).toHaveLength(2);
+      const [removeHello] = removeButtons;
+      if (!removeHello) throw new Error('Expected a Remove button for the first tag');
+      await userEvent.click(removeHello);
 
       expect(onTagsChange).toHaveBeenCalledWith(['world']);
     });

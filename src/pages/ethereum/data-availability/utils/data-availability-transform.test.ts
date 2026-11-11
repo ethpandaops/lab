@@ -44,13 +44,13 @@ describe('transformDailyToRows', () => {
     const result = transformDailyToRows(dailyData);
 
     expect(result).toHaveLength(2); // 2 unique dates
-    expect(result[0].identifier).toBe('2024-01-15'); // Sorted descending
-    expect(result[0].label).toBe('Jan 15');
-    expect(result[0].cells).toHaveLength(128); // All 128 columns
-    expect(result[0].cells[0].availability).toBe(0.955);
-    expect(result[0].cells[0].successCount).toBe(100);
-    expect(result[0].cells[0].totalCount).toBe(105);
-    expect(result[0].cells[1].availability).toBe(0.98);
+    expect(result[0]?.identifier).toBe('2024-01-15'); // Sorted descending
+    expect(result[0]?.label).toBe('Jan 15');
+    expect(result[0]?.cells).toHaveLength(128); // All 128 columns
+    expect(result[0]?.cells[0]?.availability).toBe(0.955);
+    expect(result[0]?.cells[0]?.successCount).toBe(100);
+    expect(result[0]?.cells[0]?.totalCount).toBe(105);
+    expect(result[0]?.cells[1]?.availability).toBe(0.98);
   });
 
   it('labels rows with the year when they span years', () => {
@@ -93,11 +93,11 @@ describe('transformDailyToRows', () => {
 
     const result = transformDailyToRows(dailyData);
 
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].availability).toBe(0.95);
-    expect(result[0].cells[1].availability).toBe(0); // Placeholder
-    expect(result[0].cells[1].totalCount).toBe(0);
-    expect(result[0].cells[2].availability).toBe(0.9);
+    expect(result[0]?.cells).toHaveLength(128);
+    expect(result[0]?.cells[0]?.availability).toBe(0.95);
+    expect(result[0]?.cells[1]?.availability).toBe(0); // Placeholder
+    expect(result[0]?.cells[1]?.totalCount).toBe(0);
+    expect(result[0]?.cells[2]?.availability).toBe(0.9);
   });
 
   it('should skip items without date', () => {
@@ -121,7 +121,7 @@ describe('transformDailyToRows', () => {
     const result = transformDailyToRows(dailyData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].identifier).toBe('2024-01-15');
+    expect(result[0]?.identifier).toBe('2024-01-15');
   });
 
   it('should sort dates in descending order (most recent first)', () => {
@@ -133,9 +133,9 @@ describe('transformDailyToRows', () => {
 
     const result = transformDailyToRows(dailyData);
 
-    expect(result[0].identifier).toBe('2024-01-15');
-    expect(result[1].identifier).toBe('2024-01-12');
-    expect(result[2].identifier).toBe('2024-01-10');
+    expect(result[0]?.identifier).toBe('2024-01-15');
+    expect(result[1]?.identifier).toBe('2024-01-12');
+    expect(result[2]?.identifier).toBe('2024-01-10');
   });
 });
 
@@ -162,10 +162,10 @@ describe('transformHourlyToRows', () => {
     const result = transformHourlyToRows(hourlyData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].identifier).toBe('1705334400');
-    expect(result[0].label).toMatch(/\d{2}:\d{2}/); // Hour label in HH:MM format
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].availability).toBe(0.955);
+    expect(result[0]?.identifier).toBe('1705334400');
+    expect(result[0]?.label).toMatch(/\d{2}:\d{2}/); // Hour label in HH:MM format
+    expect(result[0]?.cells).toHaveLength(128);
+    expect(result[0]?.cells[0]?.availability).toBe(0.955);
   });
 
   it('should handle empty data', () => {
@@ -206,9 +206,9 @@ describe('transformHourlyToRows', () => {
 
     const result = transformHourlyToRows(hourlyData);
 
-    expect(result[0].identifier).toBe('1705334400'); // 16:00 first
-    expect(result[1].identifier).toBe('1705338000'); // 17:00
-    expect(result[2].identifier).toBe('1705341600'); // 18:00
+    expect(result[0]?.identifier).toBe('1705334400'); // 16:00 first
+    expect(result[1]?.identifier).toBe('1705338000'); // 17:00
+    expect(result[2]?.identifier).toBe('1705341600'); // 18:00
   });
 });
 
@@ -235,10 +235,10 @@ describe('transformEpochsToRows', () => {
     const result = transformEpochsToRows(epochData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].identifier).toBe('100');
-    expect(result[0].label).toBe('100');
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].availability).toBe(0.955);
+    expect(result[0]?.identifier).toBe('100');
+    expect(result[0]?.label).toBe('100');
+    expect(result[0]?.cells).toHaveLength(128);
+    expect(result[0]?.cells[0]?.availability).toBe(0.955);
   });
 
   it('should handle empty data', () => {
@@ -279,9 +279,9 @@ describe('transformEpochsToRows', () => {
 
     const result = transformEpochsToRows(epochData);
 
-    expect(result[0].identifier).toBe('100');
-    expect(result[1].identifier).toBe('101');
-    expect(result[2].identifier).toBe('102');
+    expect(result[0]?.identifier).toBe('100');
+    expect(result[1]?.identifier).toBe('101');
+    expect(result[2]?.identifier).toBe('102');
   });
 });
 
@@ -308,12 +308,12 @@ describe('transformSlotsToRows', () => {
     const result = transformSlotsToRows(slotData);
 
     expect(result).toHaveLength(1);
-    expect(result[0].identifier).toBe('3200');
-    expect(result[0].label).toBe('3200');
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].availability).toBe(0.955);
-    expect(result[0].cells[0].successCount).toBe(100);
-    expect(result[0].cells[0].totalCount).toBe(105);
+    expect(result[0]?.identifier).toBe('3200');
+    expect(result[0]?.label).toBe('3200');
+    expect(result[0]?.cells).toHaveLength(128);
+    expect(result[0]?.cells[0]?.availability).toBe(0.955);
+    expect(result[0]?.cells[0]?.successCount).toBe(100);
+    expect(result[0]?.cells[0]?.totalCount).toBe(105);
   });
 
   it('should handle empty data', () => {
@@ -354,9 +354,9 @@ describe('transformSlotsToRows', () => {
 
     const result = transformSlotsToRows(slotData);
 
-    expect(result[0].identifier).toBe('3200');
-    expect(result[1].identifier).toBe('3201');
-    expect(result[2].identifier).toBe('3202');
+    expect(result[0]?.identifier).toBe('3200');
+    expect(result[1]?.identifier).toBe('3201');
+    expect(result[2]?.identifier).toBe('3202');
   });
 });
 
@@ -377,9 +377,9 @@ describe('column filling behavior', () => {
 
     const result = transformDailyToRows(dailyData);
 
-    expect(result[0].cells).toHaveLength(128);
-    expect(result[0].cells[0].columnIndex).toBe(0);
-    expect(result[0].cells[127].columnIndex).toBe(127);
+    expect(result[0]?.cells).toHaveLength(128);
+    expect(result[0]?.cells[0]?.columnIndex).toBe(0);
+    expect(result[0]?.cells[127]?.columnIndex).toBe(127);
   });
 
   it('should fill gaps between columns with placeholders', () => {
@@ -404,10 +404,11 @@ describe('column filling behavior', () => {
 
     // Check columns 1-4 are placeholders
     for (let i = 1; i <= 4; i++) {
-      expect(result[0].cells[i].columnIndex).toBe(i);
-      expect(result[0].cells[i].availability).toBe(0);
-      expect(result[0].cells[i].totalCount).toBe(0);
-      expect(result[0].cells[i].successCount).toBe(0);
+      const cell = result[0]?.cells[i];
+      expect(cell?.columnIndex).toBe(i);
+      expect(cell?.availability).toBe(0);
+      expect(cell?.totalCount).toBe(0);
+      expect(cell?.successCount).toBe(0);
     }
   });
 });
@@ -434,9 +435,9 @@ describe('data field mapping', () => {
 
     const result = transformDailyToRows(dailyData);
 
-    expect(result[0].cells[0].availability).toBe(1.0);
-    expect(result[0].cells[1].availability).toBe(0.5);
-    expect(result[0].cells[2].availability).toBe(0.0);
+    expect(result[0]?.cells[0]?.availability).toBe(1.0);
+    expect(result[0]?.cells[1]?.availability).toBe(0.5);
+    expect(result[0]?.cells[2]?.availability).toBe(0.0);
   });
 
   it('should handle missing optional fields gracefully', () => {
@@ -451,9 +452,11 @@ describe('data field mapping', () => {
 
     const result = transformDailyToRows(dailyData);
 
-    expect(result[0].cells[0].availability).toBe(0.95);
-    expect(result[0].cells[0].successCount).toBeUndefined();
-    expect(result[0].cells[0].totalCount).toBeUndefined();
-    expect(result[0].cells[0].avgResponseTimeMs).toBeUndefined();
+    const cell = result[0]?.cells[0];
+    if (!cell) throw new Error('Expected a cell for column 0');
+    expect(cell.availability).toBe(0.95);
+    expect(cell.successCount).toBeUndefined();
+    expect(cell.totalCount).toBeUndefined();
+    expect(cell.avgResponseTimeMs).toBeUndefined();
   });
 });

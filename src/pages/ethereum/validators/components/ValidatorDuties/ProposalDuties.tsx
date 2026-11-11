@@ -139,7 +139,7 @@ export function ProposalDuties({
             onChange={setStatus}
             options={[
               { value: 'all', label: 'All statuses' },
-              ...statuses.map(s => ({ value: s, label: s[0].toUpperCase() + s.slice(1) })),
+              ...statuses.map(s => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) })),
             ]}
             expandToFit
           />

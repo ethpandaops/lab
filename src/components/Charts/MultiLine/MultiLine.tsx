@@ -96,7 +96,7 @@ function blendHex(color: string, base: string, alpha: number): string {
   if (a.some(Number.isNaN) || b.some(Number.isNaN)) return hexToRgba(color, alpha);
   return `#${a
     .map((v, i) =>
-      Math.round(v * alpha + b[i] * (1 - alpha))
+      Math.round(v * alpha + (b[i] ?? 0) * (1 - alpha))
         .toString(16)
         .padStart(2, '0')
     )
@@ -107,12 +107,14 @@ function blendHex(color: string, base: string, alpha: number): string {
 function endLabelsClear(values: (number | null)[], plotHeight: number, axisMin?: number, axisMax?: number): boolean {
   const ends = values.filter((v): v is number => v !== null).sort((a, b) => a - b);
   if (ends.length < 2) return ends.length > 0;
-  const low = axisMin ?? Math.min(0, ends[0]);
-  const high = axisMax ?? ends[ends.length - 1];
+  const low = axisMin ?? Math.min(0, ends[0] ?? 0);
+  const high = axisMax ?? ends[ends.length - 1] ?? 0;
   const range = high - low || 1;
   const minGap = (END_LABEL_GAP_PX / Math.max(plotHeight, 1)) * range;
-  for (let i = 1; i < ends.length; i++) {
-    if (ends[i] - ends[i - 1] < minGap) return false;
+  let previous: number | undefined;
+  for (const end of ends) {
+    if (previous !== undefined && end - previous < minGap) return false;
+    previous = end;
   }
   return true;
 }
@@ -318,6 +320,8 @@ export function MultiLineChart({
       // Convert pixel coordinates to data coordinates
       const pointInGrid = instance.convertFromPixel('grid', [offsetX, offsetY]);
       if (!pointInGrid) return;
+      const [gridX, gridY] = pointInGrid;
+      if (gridX === undefined || gridY === undefined) return;
 
       // Get all series data and find which one is closest to click position
       const opt = instance.getOption() as { series?: Array<{ name?: string; data?: unknown[] }> };
@@ -328,7 +332,7 @@ export function MultiLineChart({
       for (const s of chartSeries) {
         if (!s.name || !s.data) continue;
         // Find the y value at the clicked x position
-        const xIndex = Math.round(pointInGrid[0]);
+        const xIndex = Math.round(gridX);
         if (xIndex < 0 || xIndex >= s.data.length) continue;
         const dataPoint = s.data[xIndex];
         if (dataPoint === null || dataPoint === undefined) continue;
@@ -336,7 +340,7 @@ export function MultiLineChart({
         const yValue = typeof dataPoint === 'number' ? dataPoint : (dataPoint as [number, number])[1];
         if (yValue === null || yValue === undefined) continue;
 
-        const distance = Math.abs(yValue - pointInGrid[1]);
+        const distance = Math.abs(yValue - gridY);
         if (distance < minDistance) {
           minDistance = distance;
           closestSeries = s.name;
@@ -711,7 +715,7 @@ export function MultiLineChart({
     const seriesConfig = displayedSeries.map(s => {
       // Use explicit color or auto-assign from palette
       const originalIndex = series.indexOf(s);
-      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
+      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length] || themeColors.primary;
 
       const chartType = s.seriesType ?? 'line';
 
@@ -882,7 +886,7 @@ export function MultiLineChart({
           lastIndex = mark.index;
         } else {
           const names = mergedMarkLabels.get(lastIndex) ?? [];
-          names.unshift(markLines![mark.index].label ?? '');
+          names.unshift(markLines![mark.index]?.label ?? '');
           mergedMarkLabels.set(lastIndex, names);
         }
       }
@@ -1206,6 +1210,7 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
+    themeColors.primary,
     xAxis,
     yAxis,
     secondaryYAxis,
@@ -1243,8 +1248,10 @@ export function MultiLineChart({
     group.items.push(s);
   }
   // A single series still gets a legend when it is a client, so its logo and name label the chart
+  const firstSeries = series[0];
   const hasLegend =
-    showLegend && (series.length > 1 || (series.length === 1 && isKnownClient(series[0].client ?? series[0].name)));
+    showLegend &&
+    (series.length > 1 || (firstSeries !== undefined && isKnownClient(firstSeries.client ?? firstSeries.name)));
 
   const legendControls = (
     <>
@@ -1267,7 +1274,8 @@ export function MultiLineChart({
             {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
             {group.items.map(s => {
               const isVisible = visibleSeries.has(s.name);
-              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              const seriesColor =
+                s.color || extendedPalette[series.indexOf(s) % extendedPalette.length] || themeColors.primary;
               return (
                 <button
                   key={s.name}

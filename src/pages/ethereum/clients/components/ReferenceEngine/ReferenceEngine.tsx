@@ -179,20 +179,21 @@ export function ReferenceEngine({
       .map(line => ({ line, costs: opcodeCosts(byLine.get(line)!) }));
   }, [opcodes, lines, focus]);
   // Newer build first, so the change reads as what the newer build did
+  const [newerLine, olderLine] = opcodeLines;
   const opcodeChanges =
-    opcodeLines.length < 2
-      ? null
-      : {
-          current: opcodeLines[0].line,
-          previous: opcodeLines[1].line,
-          changes: compareOpcodeCosts(opcodeLines[0].costs, opcodeLines[1].costs),
-        };
+    newerLine && olderLine
+      ? {
+          current: newerLine.line,
+          previous: olderLine.line,
+          changes: compareOpcodeCosts(newerLine.costs, olderLine.costs),
+        }
+      : null;
   const opcodeGroups = useMemo(
     () => [...new Set(opcodeLines.flatMap(({ costs }) => [...costs.keys()]))].sort(),
     [opcodeLines]
   );
   const [pickedGroup, setOpcodeGroup] = useState('SLOAD');
-  const opcodeGroup = opcodeGroups.includes(pickedGroup) ? pickedGroup : opcodeGroups[0];
+  const opcodeGroup = opcodeGroups.includes(pickedGroup) ? pickedGroup : (opcodeGroups[0] ?? '');
   const groupCosts = opcodeLines.slice(0, MAX_OPCODE_BUILDS).flatMap(({ line, costs }) => {
     const cost = costs.get(opcodeGroup);
     return cost ? [{ line, ...cost }] : [];
@@ -312,7 +313,7 @@ export function ReferenceEngine({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <span className="text-muted">
           EIP-7870 reference Xatu nodes, since{' '}
-          {lines.reduce((first, line) => (line.firstDay < first ? line.firstDay : first), lines[0].firstDay)}
+          {lines.reduce((first, line) => (line.firstDay < first ? line.firstDay : first), lines[0]?.firstDay ?? '')}
         </span>
         {implementation && (
           <Link

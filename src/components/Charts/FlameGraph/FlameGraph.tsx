@@ -53,8 +53,9 @@ function getNodeColors(
   }
 
   // Look up category in color map
-  if (node.category && colorMap?.[node.category]) {
-    return colorMap[node.category];
+  const categoryColors = node.category ? colorMap?.[node.category] : undefined;
+  if (categoryColors) {
+    return categoryColors;
   }
 
   // Fallback to default
@@ -449,6 +450,7 @@ export function FlameGraph({
                   <ChevronRightIcon className="size-3 shrink-0 text-border" />
                   {(() => {
                     const parent = zoomPath[zoomPath.length - 2];
+                    if (!parent) return null;
                     const parentColors = colorMap?.[parent.category ?? ''];
                     return (
                       <button
@@ -477,6 +479,7 @@ export function FlameGraph({
               <ChevronRightIcon className="size-3 shrink-0 text-border" />
               {(() => {
                 const current = zoomPath[zoomPath.length - 1];
+                if (!current) return null;
                 const currentColors = colorMap?.[current.category ?? ''];
                 return (
                   <span

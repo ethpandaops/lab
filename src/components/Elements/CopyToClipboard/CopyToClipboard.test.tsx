@@ -11,7 +11,10 @@ const renderWithProvider = (ui: React.ReactElement): ReturnType<typeof render> =
 
 // Mock ClipboardItem
 global.ClipboardItem = class ClipboardItem {
-  constructor(public data: Record<string, Blob>) {}
+  data: Record<string, Blob>;
+  constructor(data: Record<string, Blob>) {
+    this.data = data;
+  }
   get types(): string[] {
     return Object.keys(this.data);
   }

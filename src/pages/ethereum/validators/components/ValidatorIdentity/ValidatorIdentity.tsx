@@ -216,7 +216,7 @@ export function ValidatorSetCard({
   }
   const credentials = (['0x02', '0x01', '0x00'] as const)
     .map(ct => {
-      const members = states.filter((_, n) => identities[n].credentialType === ct);
+      const members = states.filter((_, n) => identities[n]?.credentialType === ct);
       return { ct, count: members.length, stake: members.reduce((a, s) => a + s.effectiveBalanceEth, 0) };
     })
     .filter(c => c.count > 0);

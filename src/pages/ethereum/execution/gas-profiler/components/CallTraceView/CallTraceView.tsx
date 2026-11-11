@@ -71,7 +71,7 @@ function buildCallTree(
     const contractName = contractOwners[frame.target_address?.toLowerCase() ?? '']?.contract_name ?? null;
     const funcSelector = frame.function_selector?.toLowerCase();
     const funcSig = funcSelector ? functionSignatures[funcSelector] : undefined;
-    const functionName = funcSig?.name ? funcSig.name.split('(')[0] : null;
+    const functionName = funcSig?.name ? (funcSig.name.split('(')[0] ?? null) : null;
 
     frameMap.set(frameId, {
       frame,

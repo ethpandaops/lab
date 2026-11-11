@@ -661,8 +661,8 @@ export function BlockPage(): JSX.Element {
         source: sourceIdx,
         target: targetIdx,
         value: flow.gas,
-        sourceName: nodes[sourceIdx].name,
-        targetName: nodes[targetIdx].name,
+        sourceName: nodes[sourceIdx]?.name,
+        targetName: nodes[targetIdx]?.name,
         callCount: flow.callCount,
         txHash: flow.txHash,
       };

@@ -277,8 +277,8 @@ export const AxisFormatters: Story = {
         xAxis={{
           type: 'value',
           name: 'Month',
-          min: dataPoints[0][0],
-          max: dataPoints[dataPoints.length - 1][0],
+          min: dataPoints[0]?.[0],
+          max: dataPoints[dataPoints.length - 1]?.[0],
           formatter: (value: number | string) => {
             const date = new Date(value as number);
             return date.toLocaleDateString('en-US', { month: 'short' });
@@ -902,7 +902,7 @@ export const TimeAxis: Story = {
           { name: 'Average', data: avg, color: colors.emerald[500], lineWidth: 2 },
           {
             name: '_band_base',
-            data: avg.map(([t, v]) => [t, v - 4]),
+            data: avg.map(([t, v]): [number, number] => [t, v - 4]),
             stack: 'band',
             showArea: true,
             areaOpacity: 0,
@@ -911,7 +911,7 @@ export const TimeAxis: Story = {
           },
           {
             name: 'Band',
-            data: avg.map(([t]) => [t, 8]),
+            data: avg.map(([t]): [number, number] => [t, 8]),
             stack: 'band',
             showArea: true,
             areaOpacity: 0.15,

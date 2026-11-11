@@ -1,11 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type JSX } from 'react';
+import { fn } from 'storybook/test';
 import { Notification } from './Notification';
 import { Button } from '@/components/Elements/Button';
 
 const meta = {
   title: 'Components/Overlays/Notification',
   component: Notification,
+  args: {
+    open: false,
+    onClose: fn(),
+  },
   parameters: {
     layout: 'fullscreen',
   },
@@ -50,6 +55,9 @@ type Story = StoryObj<typeof meta>;
  * Interactive demo showing how notifications are triggered by user actions
  */
 export const Interactive: Story = {
+  args: {
+    children: 'Action completed successfully!',
+  },
   render: function InteractiveDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -78,6 +86,9 @@ export const Interactive: Story = {
  * Success notification - typically used for successful operations
  */
 export const Success: Story = {
+  args: {
+    children: 'Copied to clipboard!',
+  },
   render: function SuccessDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -102,6 +113,9 @@ export const Success: Story = {
  * Info notification - for informational messages
  */
 export const Info: Story = {
+  args: {
+    children: 'New data available',
+  },
   render: function InfoDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -120,6 +134,9 @@ export const Info: Story = {
  * Warning notification - for warning messages
  */
 export const Warning: Story = {
+  args: {
+    children: 'Connection unstable',
+  },
   render: function WarningDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -144,6 +161,9 @@ export const Warning: Story = {
  * Danger notification - for error messages
  */
 export const Danger: Story = {
+  args: {
+    children: 'Failed to save changes',
+  },
   render: function DangerDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -162,6 +182,9 @@ export const Danger: Story = {
  * Different positions on screen
  */
 export const Positions: Story = {
+  args: {
+    children: 'Notification at Top Left',
+  },
   render: function PositionsDemo(): JSX.Element {
     const [activePosition, setActivePosition] = useState<string | null>(null);
 
@@ -204,6 +227,9 @@ export const Positions: Story = {
  * With close button for manual dismissal
  */
 export const WithCloseButton: Story = {
+  args: {
+    children: 'This notification stays until you close it',
+  },
   render: function WithCloseButtonDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -229,6 +255,9 @@ export const WithCloseButton: Story = {
  * Custom duration - quick notification
  */
 export const QuickDismiss: Story = {
+  args: {
+    children: 'Quick message!',
+  },
   render: function QuickDismissDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -253,6 +282,9 @@ export const QuickDismiss: Story = {
  * Long duration notification
  */
 export const LongDuration: Story = {
+  args: {
+    children: 'This notification lasts 10 seconds (or close it manually)',
+  },
   render: function LongDurationDemo(): JSX.Element {
     const [show, setShow] = useState(false);
 
@@ -278,6 +310,9 @@ export const LongDuration: Story = {
  * Multiple notifications can be triggered sequentially
  */
 export const MultipleActions: Story = {
+  args: {
+    children: 'Saved successfully!',
+  },
   render: function MultipleActionsDemo(): JSX.Element {
     const [show1, setShow1] = useState(false);
     const [show2, setShow2] = useState(false);

@@ -446,12 +446,13 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
           propagationNodeCount: 0,
         };
       }
-      const at = (q: number): number => diffs[Math.min(diffs.length - 1, Math.floor(q * (diffs.length - 1)))];
+      const at = (q: number): number | null =>
+        diffs[Math.min(diffs.length - 1, Math.floor(q * (diffs.length - 1)))] ?? null;
       return {
-        propagationMinMs: diffs[0],
+        propagationMinMs: diffs[0] ?? null,
         propagationP50Ms: at(0.5),
         propagationP90Ms: at(0.9),
-        propagationMaxMs: diffs[diffs.length - 1],
+        propagationMaxMs: diffs.at(-1) ?? null,
         propagationNodeCount: diffs.length,
       };
     }, [blockFirstSeenQuery.data]);
@@ -563,7 +564,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
     return {
       payloadFirstSeenMs: seenDiffs[0] ?? null,
-      payloadP50Ms: seenDiffs.length > 0 ? seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] : null,
+      payloadP50Ms: seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] ?? null,
       payloadNodeCount: seenDiffs.length,
       builderIndex: seenRows[0]?.builder_index ?? null,
       ptcPresentVotes: presentVotes,

@@ -339,9 +339,9 @@ describe('fetchAllPages', () => {
       ]);
 
       // Type assertion to verify type is maintained
-      const firstUser: User = result[0];
-      expect(firstUser.id).toBe(1);
-      expect(firstUser.name).toBe('Alice');
+      const firstUser: User | undefined = result[0];
+      expect(firstUser?.id).toBe(1);
+      expect(firstUser?.name).toBe('Alice');
     });
   });
 });

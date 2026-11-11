@@ -47,7 +47,7 @@ export function getClassificationLabel(classification: string): string {
 /**
  * Classification descriptions map with all known classifications
  */
-export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {
+export const CLASSIFICATION_DESCRIPTIONS = {
   individual: {
     label: 'Individual',
     description: 'Public contributors (likely home stakers)',
@@ -64,4 +64,4 @@ export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; descri
     label: 'Unclassified',
     description: 'Xatu nodes with unknown classification',
   },
-};
+} satisfies Record<string, { label: string; description: string }>;

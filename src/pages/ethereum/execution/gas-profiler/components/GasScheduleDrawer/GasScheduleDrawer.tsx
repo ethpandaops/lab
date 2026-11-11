@@ -6,6 +6,9 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import type { GasSchedule, GasScheduleDefaults } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Category ordering for display */
 const CATEGORY_ORDER = [
@@ -175,7 +178,7 @@ export function GasScheduleDrawer({
     return Array.from(categoryMap.entries())
       .map(([name, keys]) => ({
         name,
-        color: CATEGORY_COLORS[name] || CATEGORY_COLORS.Other,
+        color: CATEGORY_COLORS[name] ?? CATEGORY_COLORS.Other ?? DATA_COLORS.slate,
         keys,
       }))
       .sort((a, b) => {

@@ -160,6 +160,9 @@ export const FutureTimestamp: Story = {
  * Multiple timestamps in a list
  */
 export const MultipleTimestamps: Story = {
+  args: {
+    timestamp: now - 5,
+  },
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
@@ -190,6 +193,9 @@ export const MultipleTimestamps: Story = {
  * Different formats side by side
  */
 export const AllFormats: Story = {
+  args: {
+    timestamp: twoMinutesAgo,
+  },
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
