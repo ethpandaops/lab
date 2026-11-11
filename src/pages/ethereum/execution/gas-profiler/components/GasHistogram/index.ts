@@ -1,1 +1,2 @@
-export { GasHistogram, TRANSACTION_BUCKETS } from './GasHistogram';
+export { GasHistogram } from './GasHistogram';
+export { TRANSACTION_BUCKETS } from './constants';

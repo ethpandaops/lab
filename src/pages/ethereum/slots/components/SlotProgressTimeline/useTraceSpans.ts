@@ -200,6 +200,8 @@ export function useTraceSpans({
     dataColumnPropagation,
     attestations,
     mevBidding,
+    payloadPropagation,
+    ptcArrivals,
     rawExecutionNodes,
     selectedUsername,
     excludeOutliers,

@@ -14,7 +14,7 @@
     "test:storybook:watch": "VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB=1000000 vitest --project storybook",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --project unit --coverage",
-    "lint": "eslint . --cache --cache-location .eslintcache",
+    "lint": "eslint . --max-warnings 0 --cache --cache-location node_modules/.cache/eslint",
     "typecheck": "tsc -b",
     "knip": "KNIP_DISABLE_RAW_TRANSFER=1 knip",
     "format": "prettier --write .",

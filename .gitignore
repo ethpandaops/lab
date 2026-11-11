@@ -42,8 +42,6 @@ storybook-static
 # Tanstack
 .tanstack
 
-# ESLint
-.eslintcache
 # design-sync (claude.ai/design)
 .design-sync/sb-reference/
 .design-sync/learnings/

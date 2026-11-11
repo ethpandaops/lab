@@ -16,7 +16,7 @@ import { getBoundsQueryKey, getConfigQueryKey } from '@/lab-api/@tanstack/react-
  * previews get the same context the storybook reference does. Theme is pinned
  * to dark to match the storybook default theme deterministically.
  */
-export function DesignSyncProvider({ children }: { children: React.ReactNode }) {
+export function DesignSyncProvider({ children }: { children: React.ReactNode }): React.JSX.Element {
   const [{ queryClient, router }] = React.useState(() => {
     const qc = new QueryClient({
       defaultOptions: { queries: { retry: 0, staleTime: Infinity } },

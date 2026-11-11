@@ -37,6 +37,12 @@ export default defineConfig(
       'src/routeTree.gen.ts',
     ],
   },
+  {
+    // A suppression only stays honest if a dead one fails the build.
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+    },
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,
@@ -197,7 +203,6 @@ export default defineConfig(
     // Switched on, with their fixes, by the commits that follow.
     files: ['**/*.{ts,tsx}'],
     rules: {
-      'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/preserve-manual-memoization': 'off',
       'react-hooks/immutability': 'off',
       'react-hooks/refs': 'off',

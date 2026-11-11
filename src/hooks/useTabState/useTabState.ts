@@ -76,9 +76,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
       const directIndex = tabs.findIndex(tab => tab.id === hash);
       if (directIndex >= 0) {
         // Migrate to new format
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (navigate as any)({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           search: (prev: any) => ({ ...prev, tab: hash }),
           replace: true,
           hash: undefined,
@@ -91,9 +91,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
       const anchorTab = tabs[anchorIndex];
       if (anchorTab) {
         // Migrate to new format, preserving the anchor
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (navigate as any)({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           search: (prev: any) => ({ ...prev, tab: anchorTab.id }),
           replace: true,
           hash,
@@ -182,9 +182,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
 
     if (hashBelongsToNewTab) {
       // Keep the anchor and scroll to it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigate as any)({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         search: (prev: any) => ({ ...prev, tab: newTab.id }),
         replace: true,
         hash: currentHash,
@@ -192,9 +192,9 @@ export function useTabState(tabs: TabConfig[]): UseTabStateReturn {
       setShouldScrollToAnchor(true);
     } else {
       // Clear the hash when switching tabs
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigate as any)({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-restricted-syntax
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         search: (prev: any) => ({ ...prev, tab: newTab.id }),
         replace: true,
         hash: undefined,
