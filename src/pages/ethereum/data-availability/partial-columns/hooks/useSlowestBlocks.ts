@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctBlockDataColumnCompletionServiceList } from '@/api/sdk.gen';
 import type { FctBlockDataColumnCompletion } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { QUERY_RETRIES, SLOWEST_BLOCKS, SLOWEST_BLOCKS_MAX_DAYS } from '../constants';
+import { QUERY_RETRIES, SLOWEST_BLOCKS, SLOWEST_BLOCKS_MAX_DAYS, WRAPPED_COMPLETION_MS } from '../constants';
 
 export interface UseSlowestBlocksResult {
   blocks: FctBlockDataColumnCompletion[];
@@ -30,6 +30,7 @@ export function useSlowestBlocks(windowStart: number, windowEnd: number): UseSlo
         query: {
           slot_start_date_time_gte: since,
           slot_start_date_time_lt: windowEnd,
+          p90_completion_slot_start_diff_lt: WRAPPED_COMPLETION_MS,
           order_by: 'p90_completion_slot_start_diff desc, slot_start_date_time desc',
           page_size: SLOWEST_BLOCKS,
         },
