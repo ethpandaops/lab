@@ -45,25 +45,6 @@ export function getClassificationLabel(classification: string): string {
 }
 
 /**
- * Get the description for a contributor classification
- *
- * @param classification - The classification type
- * @returns Description of the classification
- */
-export function getClassificationDescription(classification: string): string {
-  switch (classification) {
-    case 'individual':
-      return 'Public contributors (likely home stakers)';
-    case 'corporate':
-      return 'Public contributors (likely running in datacenters)';
-    case 'internal':
-      return 'Xatu nodes run by the ethPandaOps team in datacenters';
-    default:
-      return 'Xatu nodes with unknown classification';
-  }
-}
-
-/**
  * Classification descriptions map with all known classifications
  */
 export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {

@@ -14,7 +14,7 @@ export type BadgeColor =
 
 export type BadgeVariant = 'border' | 'flat';
 
-export type BadgeSize = 'default' | 'small';
+type BadgeSize = 'default' | 'small';
 
 export interface BadgeProps {
   /**

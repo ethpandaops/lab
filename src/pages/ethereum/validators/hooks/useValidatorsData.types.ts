@@ -93,7 +93,7 @@ export interface ValidatorMetrics {
 /**
  * Daily data point for time series charts
  */
-export interface DailyDataPoint {
+interface DailyDataPoint {
   timestamp: number;
   validatorIndex: number;
 }

@@ -139,12 +139,6 @@ function phasesFromSpec(specs: SlotPhaseSpec[], slotDurationMs: number): SlotPha
 export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(PRE_GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
 
 /**
- * Gloas (ePBS) slot phases (12000 milliseconds total): block, attestations,
- * payload reveal, PTC vote.
- */
-export const GLOAS_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
-
-/**
  * Get the slot phases for a fork. Gloas and later forks use the ePBS slot
  * structure; everything earlier keeps the classic three-phase layout.
  */
@@ -154,7 +148,7 @@ export function getSlotPhases(fork?: ForkVersion | null, slotDurationMs = SECOND
   return phasesFromSpec(specs, slotDurationMs);
 }
 
-export { CANONICAL_FORK_ORDER, isForkAtOrAfter } from './forkOrder';
+export { isForkAtOrAfter } from './forkOrder';
 
 /**
  * Convert slot number to Unix timestamp
@@ -220,22 +214,6 @@ export function epochToTimestamp(epoch: number, genesisTime: number): number {
 }
 
 /**
- * Convert timestamp to epoch number
- *
- * @param timestamp - Unix timestamp in seconds
- * @param genesisTime - Genesis time in Unix seconds
- * @returns Epoch number
- *
- * @example
- * ```tsx
- * timestampToEpoch(1606827863, 1606824023) // Returns 10
- * ```
- */
-export function timestampToEpoch(timestamp: number, genesisTime: number): number {
-  return Math.floor((timestamp - genesisTime) / (SLOTS_PER_EPOCH * SECONDS_PER_SLOT));
-}
-
-/**
  * Get the slot range for a given epoch
  *
  * @param epoch - Epoch number
@@ -250,27 +228,6 @@ export function getEpochSlotRange(epoch: number): { firstSlot: number; lastSlot:
   const firstSlot = epoch * SLOTS_PER_EPOCH;
   const lastSlot = firstSlot + SLOTS_PER_EPOCH - 1;
   return { firstSlot, lastSlot };
-}
-
-/**
- * Check if the current epoch is at or after a target fork epoch
- *
- * @param currentEpoch - Current epoch number
- * @param forkEpoch - Target fork epoch (undefined if not configured for network)
- * @returns true if current epoch >= fork epoch, false otherwise
- *
- * @example
- * ```tsx
- * isEpochAtOrAfter(1000, 500) // Returns true (1000 >= 500)
- * isEpochAtOrAfter(100, 500) // Returns false (100 < 500)
- * isEpochAtOrAfter(1000, undefined) // Returns false (fork not configured)
- * ```
- */
-export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): boolean {
-  if (forkEpoch === undefined) {
-    return false;
-  }
-  return currentEpoch >= forkEpoch;
 }
 
 /**

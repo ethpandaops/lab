@@ -3,12 +3,12 @@ import type { JSX, ReactNode } from 'react';
 /**
  * Color variants for gas formula segments
  */
-export type GasFormulaColor = 'blue' | 'purple' | 'green' | 'amber' | 'cyan';
+type GasFormulaColor = 'blue' | 'purple' | 'green' | 'amber' | 'cyan';
 
 /**
  * A segment in the gas formula (before the equals sign)
  */
-export interface GasFormulaSegment {
+interface GasFormulaSegment {
   /** Display label for this segment */
   label: string;
   /** Numeric value */
@@ -24,7 +24,7 @@ export interface GasFormulaSegment {
 /**
  * The result segment (after the equals sign)
  */
-export interface GasFormulaResult {
+interface GasFormulaResult {
   /** Display label for the result */
   label: string;
   /** Numeric value */

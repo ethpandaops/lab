@@ -133,8 +133,3 @@ export function getGasExplanations(context: GasContext = 'transaction'): Record<
       return TRANSACTION_EXPLANATIONS;
   }
 }
-
-/**
- * @deprecated Use getGasExplanations(context) instead
- */
-export const GAS_EXPLANATIONS = TRANSACTION_EXPLANATIONS;

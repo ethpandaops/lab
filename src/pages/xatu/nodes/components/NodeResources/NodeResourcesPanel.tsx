@@ -33,8 +33,6 @@ import {
   type HighlightRange,
 } from './types';
 
-export type { CpuMetric } from './types';
-
 function nodeMatches(cpuNodeName: string, eventNodeName: string): boolean {
   const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
   return (

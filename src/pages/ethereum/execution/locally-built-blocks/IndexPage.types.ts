@@ -15,14 +15,14 @@ export const TIME_WINDOW_SECONDS: Record<Exclude<TimeWindow, 'all'>, number> = {
 export const DEFAULT_TIME_WINDOW: TimeWindow = 'all';
 
 /** Blocks table columns the API can sort by */
-export const BLOCK_SORT_KEYS = ['slot', 'node', 'gas', 'txs', 'size'] as const;
+const BLOCK_SORT_KEYS = ['slot', 'node', 'gas', 'txs', 'size'] as const;
 export type BlockSortKey = (typeof BLOCK_SORT_KEYS)[number];
 
 const count = z.coerce.number().int().nonnegative().optional().catch(undefined);
 const amount = z.coerce.number().nonnegative().optional().catch(undefined);
 
 /** Filters applied by the API to the timeline, the pairings and the blocks table */
-export const blockFiltersSchema = z.object({
+const blockFiltersSchema = z.object({
   slotFrom: count,
   slotTo: count,
   /** Node id, the last segment of the node name */

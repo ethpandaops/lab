@@ -1,4 +1,4 @@
-export type HeaderSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type HeaderSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface HeaderProps {
   /**

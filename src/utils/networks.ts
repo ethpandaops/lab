@@ -1,7 +1,7 @@
 import type { Network } from '@/hooks/useConfig';
 
 /** Canonical ordering of well-known persistent networks (mainnet + testnets). */
-export const NETWORK_ORDER: readonly string[] = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
+const NETWORK_ORDER: readonly string[] = ['mainnet', 'holesky', 'sepolia', 'hoodi'];
 
 /** Short-lived network name split into its family and its label within that family. */
 export interface ParsedNetworkName {

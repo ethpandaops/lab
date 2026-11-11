@@ -15,6 +15,5 @@ export type {
   SlotPlayerMetaContextValue,
   SlotPlayerActions,
   SlotPlayerProviderProps,
-  SlotPlayerCallbacks,
   SlotPlayerContextValue,
 } from './SlotPlayerContext.types';

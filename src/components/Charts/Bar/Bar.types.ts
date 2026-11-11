@@ -1,6 +1,6 @@
 import type { TooltipFormatter } from '@/types/echarts';
 
-export interface BarDataItem {
+interface BarDataItem {
   /**
    * The value of this bar
    */

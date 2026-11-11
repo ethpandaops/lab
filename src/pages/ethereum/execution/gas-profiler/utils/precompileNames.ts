@@ -42,11 +42,3 @@ export function isPrecompileAddress(address: string | null | undefined): boolean
   if (!address) return false;
   return address.toLowerCase() in PRECOMPILE_NAMES;
 }
-
-/**
- * Get the human-readable name for a precompile address, or null if not a precompile.
- */
-export function getPrecompileName(address: string | null | undefined): string | null {
-  if (!address) return null;
-  return PRECOMPILE_NAMES[address.toLowerCase()] ?? null;
-}

@@ -1,7 +1,7 @@
 /**
  * Configuration for a single gauge item
  */
-export interface GaugeItem {
+interface GaugeItem {
   /**
    * Display name for the gauge
    */

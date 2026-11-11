@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { DialogSize } from '@/components/Overlays/Dialog';
 
-export interface PopoutCardRenderProps {
+interface PopoutCardRenderProps {
   /**
    * Whether the content is being rendered in the modal (true) or card (false)
    */

@@ -69,16 +69,6 @@ export interface FctValidatorStakeByEntityGroupDaily {
   active_effective_balance?: number;
 }
 
-export interface FctAttestationVoteCorrectnessByEntityGroupDaily extends AttestationColumns {
-  day_start_date?: string;
-  entity_group?: string;
-}
-
-export interface FctBlockProposalByEntityGroupDaily extends ProposalColumns {
-  day_start_date?: string;
-  entity_group?: string;
-}
-
 export const fctValidatorStakeByEntityGroupDailyList = listByPath(ENTITY_TABLES.groupStake);
 export const fctAttestationVoteCorrectnessByEntityGroupDailyList = listByPath(ENTITY_TABLES.groupAttestations);
 export const fctBlockProposalByEntityGroupDailyList = listByPath(ENTITY_TABLES.groupProposals);

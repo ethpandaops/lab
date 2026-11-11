@@ -10,5 +10,5 @@ export { NewValidatorsCard, ValidatorIdentityCard, ValidatorSetCard } from './Va
 export type { ValidatorState } from './ValidatorIdentity/ValidatorIdentity';
 export { ValidatorBalance } from './ValidatorBalance';
 export { ValidatorDuties } from './ValidatorDuties';
-export { TableCard, TableSearch, ValidatorFilter } from './TableCard';
+export { TableCard, TableSearch } from './TableCard';
 export { InspectSection } from './InspectSection';

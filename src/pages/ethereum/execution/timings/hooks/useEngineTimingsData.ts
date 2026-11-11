@@ -81,7 +81,7 @@ export interface EngineTimingsData {
   winratePerSlot: IntEngineNewPayloadFastestExecutionByNodeClass[];
 }
 
-export type ActiveTab = 'newPayload' | 'getBlobs';
+type ActiveTab = 'newPayload' | 'getBlobs';
 
 export interface UseEngineTimingsDataOptions {
   timeRange: TimeRange;

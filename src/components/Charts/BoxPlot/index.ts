@@ -1,3 +1,3 @@
 export { BoxPlot } from './BoxPlot';
 export { calculateBoxPlotStats } from './BoxPlot.utils';
-export type { BoxPlotProps, BoxPlotData, BoxPlotStats, BoxPlotDataItem } from './BoxPlot.types';
+export type { BoxPlotData, BoxPlotDataItem } from './BoxPlot.types';

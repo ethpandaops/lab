@@ -11,8 +11,6 @@ import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { ratio, type ClientMetric } from '../../utils/client-metrics';
 
-export type { ClientMetric };
-
 export interface ClientMetricCompareProps<T extends { day_start_date?: string; client?: string }> {
   /** Client the page is about, drawn on top and highlighted in the table */
   client?: string;

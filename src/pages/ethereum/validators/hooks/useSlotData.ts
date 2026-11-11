@@ -26,7 +26,7 @@ export interface AttestationSlotDataPoint {
 }
 
 /** Per-slot sync committee data point */
-export interface SyncCommitteeSlotDataPoint {
+interface SyncCommitteeSlotDataPoint {
   slot: number;
   slotTimestamp: number;
   validatorIndex: number;
@@ -34,7 +34,7 @@ export interface SyncCommitteeSlotDataPoint {
 }
 
 /** Per-epoch balance data point (epoch granularity within the hour) */
-export interface BalanceSlotDataPoint {
+interface BalanceSlotDataPoint {
   epoch: number;
   epochTimestamp: number;
   validatorIndex: number;

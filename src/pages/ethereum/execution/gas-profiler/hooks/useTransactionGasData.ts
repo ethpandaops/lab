@@ -33,7 +33,7 @@ export interface CallFrameOpcodeStats {
   hasError: boolean;
 }
 
-export interface TransactionGasData {
+interface TransactionGasData {
   /** Raw call frames from API */
   callFrames: IntTransactionCallFrame[];
   /** Raw opcode gas data from API */
@@ -67,7 +67,7 @@ export interface UseTransactionGasDataResult {
  * Get a display label for a contract address.
  * Prioritizes: contract_name > truncated address > fallback
  */
-export function getContractLabel(
+function getContractLabel(
   targetAddress: string | null | undefined,
   contractOwners: ContractOwnerMap,
   fallback = 'Root'
@@ -86,7 +86,7 @@ export function getContractLabel(
  * Get a function name from a selector.
  * Returns just the function name without parameters, or null if not found.
  */
-export function getFunctionName(
+function getFunctionName(
   functionSelector: string | null | undefined,
   functionSignatures: FunctionSignatureMap
 ): string | null {

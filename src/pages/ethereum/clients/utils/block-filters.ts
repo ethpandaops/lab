@@ -4,16 +4,16 @@ import { entityQuery } from './client-share';
 import { offsetPageToken } from '@/utils/page-token';
 
 /** Rows per page the block tables offer */
-export const BLOCK_PAGE_SIZES = [10, 25, 50, 100] as const;
+const BLOCK_PAGE_SIZES = [10, 25, 50, 100] as const;
 
 /** Rows per page when the URL does not say */
 export const DEFAULT_BLOCK_PAGE_SIZE = 25;
 
 /** Order when the URL does not say: newest first */
-export const DEFAULT_BLOCK_SORT = 'slot_start_date_time desc';
+const DEFAULT_BLOCK_SORT = 'slot_start_date_time desc';
 
 /** Columns of fct_block_graffiti the blocks table sorts by */
-export const GRAFFITI_SORT_FIELDS = [
+const GRAFFITI_SORT_FIELDS = [
   'slot_start_date_time',
   'slot',
   'proposer_index',
@@ -118,7 +118,7 @@ export function parseProposers(value: string | undefined): number[] {
 }
 
 /** Version filter as stored by the graffiti model, which prefixes a "v": 8.0.0 → v8.0.0 */
-export function normaliseVersionFilter(value: string): string {
+function normaliseVersionFilter(value: string): string {
   return /^\d/.test(value) ? `v${value}` : value;
 }
 

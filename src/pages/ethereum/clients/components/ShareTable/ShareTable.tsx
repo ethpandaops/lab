@@ -3,7 +3,7 @@ import type { JSX, ReactNode } from 'react';
 import { ShareBar } from '../ShareBar';
 
 /** One row of a share table */
-export interface ShareTableRow {
+interface ShareTableRow {
   key: string;
   label: ReactNode;
   /** Share, 0-100 */

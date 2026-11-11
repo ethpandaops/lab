@@ -1,2 +1,2 @@
 export { Stats } from './Stats';
-export type { StatsProps, Stat, DeltaType } from './Stats.types';
+export type { Stat } from './Stats.types';

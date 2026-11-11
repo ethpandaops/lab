@@ -22,7 +22,7 @@ function bytesToMB(bytes: number): number {
   return bytes / (1024 * 1024);
 }
 
-export type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
+type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
 
 const METRIC_OPTIONS = [
   { value: 'vm_rss' as MemoryMetric, label: 'RSS Total' },

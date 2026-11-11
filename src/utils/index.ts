@@ -1,5 +1,5 @@
 export { resolveCssColorToHex, hexToRgba } from './color';
-export { getDataVizColors, buildEChartsTheme } from './dataVizColors';
+export { getDataVizColors } from './dataVizColors';
 export * from './beacon';
 export * from './time';
 export * from './gas';

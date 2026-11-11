@@ -1,24 +1,9 @@
 export { MultiLineChart } from './MultiLine';
-export type {
-  EnrichedDataPoint,
-  MarkAreaConfig,
-  MarkLineConfig,
-  MultiLineChartProps,
-  SeriesData,
-  XAxisConfig,
-  YAxisConfig,
-} from './MultiLine.types';
+export type { MarkLineConfig, MultiLineChartProps, SeriesData } from './MultiLine.types';
 export {
   createBandSeries,
   createBlobScheduleMarkLines,
   createExecutionForkMarkLines,
   createForkMarkLines,
   createStatisticSeries,
-} from './MultiLine.utils';
-export type {
-  BandConfig,
-  BlobScheduleMarkLinesOptions,
-  ExecutionForkMarkLinesOptions,
-  ForkMarkLinesOptions,
-  StatisticConfig,
 } from './MultiLine.utils';

@@ -8,7 +8,6 @@ export type TimePeriod = '24h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | '
 export const consensusOverviewSearchSchema = z.object({
   t: z.enum(['24h', '7d', '30d', '90d', '180d', '1y', '2y', 'all']).optional(),
 });
-export type ConsensusOverviewSearch = z.infer<typeof consensusOverviewSearchSchema>;
 
 /** Page size for all overview queries — generous flat value to avoid truncation on dimensional data */
 export const PAGE_SIZE = 10_000;

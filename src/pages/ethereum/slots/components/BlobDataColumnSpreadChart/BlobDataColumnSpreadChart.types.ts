@@ -2,7 +2,7 @@
  * Blob or data column propagation data point from the first seen by node API endpoint
  * Pre-Fulu uses blob_index, Fulu+ uses column_index
  */
-export interface BlobDataColumnPropagationDataPoint {
+interface BlobDataColumnPropagationDataPoint {
   /**
    * Blob index (pre-Fulu forks: Deneb, Electra)
    */
@@ -38,32 +38,6 @@ export interface BlobDataColumnSpreadChartProps {
    * Slot number to determine active fork
    */
   slot: number;
-}
-
-/**
- * Spread statistics for a single blob or data column
- */
-export interface SpreadStats {
-  /**
-   * Blob or data column index
-   */
-  index: number;
-  /**
-   * Minimum time observed (first node to see first blob/column)
-   */
-  minTime: number;
-  /**
-   * Maximum time observed (last node to see last blob/column)
-   */
-  maxTime: number;
-  /**
-   * Spread in milliseconds (max - min)
-   */
-  spread: number;
-  /**
-   * Number of observations for this blob/column
-   */
-  observationCount: number;
 }
 
 /**

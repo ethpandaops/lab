@@ -1,2 +1,2 @@
 export { TagInput } from './TagInput';
-export type { TagInputProps, TagValidationResult } from './TagInput.types';
+export type { TagValidationResult } from './TagInput.types';

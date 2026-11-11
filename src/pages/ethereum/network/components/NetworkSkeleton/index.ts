@@ -1,1 +1,1 @@
-export { NetworkSkeleton, PlaceSkeleton, StatsSkeleton, TableCardSkeleton, ChartCardSkeleton } from './NetworkSkeleton';
+export { NetworkSkeleton, PlaceSkeleton, TableCardSkeleton } from './NetworkSkeleton';

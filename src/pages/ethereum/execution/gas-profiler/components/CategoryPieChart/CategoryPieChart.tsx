@@ -10,7 +10,7 @@ const { DATA_COLORS } = getDataVizColors();
 /**
  * Data item for the pie chart
  */
-export interface CategoryPieChartItem {
+interface CategoryPieChartItem {
   name: string;
   value: number;
 }

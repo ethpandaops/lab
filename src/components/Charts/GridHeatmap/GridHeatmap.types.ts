@@ -8,7 +8,7 @@ export type GridCellSize = '3xs' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 /**
  * Generic cell data structure - columnIndex + arbitrary data payload
  */
-export interface GridCell<T = unknown> {
+interface GridCell<T = unknown> {
   /** Column index for this cell */
   columnIndex: number;
   /** Arbitrary data payload for the cell */
@@ -30,7 +30,7 @@ export interface GridRow<T = unknown> {
 /**
  * Props passed to cell render function
  */
-export interface CellRenderProps {
+interface CellRenderProps {
   /** Whether this cell is in the selected column */
   isSelected: boolean;
   /** Whether this cell is highlighted (hover preview) */

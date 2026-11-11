@@ -1,7 +1,7 @@
 /**
  * Configuration for a single donut segment
  */
-export interface DonutDataItem {
+interface DonutDataItem {
   /**
    * Display name for this segment
    */

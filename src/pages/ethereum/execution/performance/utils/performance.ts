@@ -12,7 +12,7 @@ import { getExecutionClientColor } from '@/utils';
 import { completeBucketEnd } from '@/utils/time';
 
 /** Seconds per slot on mainnet-like networks */
-export const SLOT_SECONDS = 12;
+const SLOT_SECONDS = 12;
 
 /** Blocks below this gas are dominated by fixed overhead and skew per-gas throughput */
 const MIN_GAS_FOR_THROUGHPUT = 5_000_000;
@@ -90,7 +90,7 @@ export interface ClientPerformance {
  * Counts and sums per client of the fct_engine_new_payload_*_window tables, which hold them over a range; short
  * ranges build the same rows from their blocks (rollupBlocks).
  */
-export type GasBucketRow = Pick<
+type GasBucketRow = Pick<
   FctEngineNewPayloadGasBucketWindow,
   | 'client'
   | 'gas_bucket_mgas'

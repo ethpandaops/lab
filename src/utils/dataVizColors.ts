@@ -1,4 +1,3 @@
-import type { ThemeColors } from '@/hooks/useThemeColors';
 import { resolveCssColorToHex } from './color';
 
 /** Named data hues (`--color-data-*` in src/index.css) for series that need a specific hue */
@@ -22,7 +21,7 @@ const DATA_HUES = [
   'rose',
   'slate',
 ] as const;
-export type DataHue = (typeof DATA_HUES)[number];
+type DataHue = (typeof DATA_HUES)[number];
 
 // Cache object to avoid re-reading DOM on every call
 const cache: { colors: ReturnType<typeof computeDataVizColors> | null } = { colors: null };
@@ -191,100 +190,3 @@ export function getDataVizColors(): ReturnType<typeof computeDataVizColors> {
 
 /** Font stack for ECharts canvas text; matches the UI's --font-sans. */
 export const CHART_FONT_FAMILY = "'Geist Variable', Geist, system-ui, sans-serif";
-
-/**
- * Build ECharts-compatible theme object from ThemeColors
- *
- * Provides a consistent base theme configuration for all ECharts instances,
- * eliminating duplicate color assignments across chart components.
- *
- * **Architecture:**
- * - CSS (src/index.css) is the single source of truth
- * - ThemeColors are computed from CSS variables via useThemeColors hook
- * - This builder transforms ThemeColors into ECharts option format
- *
- * **Usage in components:**
- * ```tsx
- * const themeColors = useThemeColors();
- * const echartsTheme = buildEChartsTheme(themeColors);
- *
- * const option = useMemo(() => ({
- *   ...echartsTheme,  // Apply base theme styles
- *   xAxis: {
- *     type: 'category',
- *     data: labels,
- *     // Axis styles automatically inherited from echartsTheme
- *   },
- *   series: [{ type: 'line', data }],
- * }), [themeColors, data]);
- * ```
- *
- * @param colors - Theme colors from useThemeColors hook
- * @returns Base ECharts theme configuration object
- */
-export function buildEChartsTheme(colors: ThemeColors): Record<string, unknown> {
-  return {
-    // Global background and text styles
-    backgroundColor: 'transparent', // Let CSS handle background
-    textStyle: {
-      color: colors.foreground,
-      fontFamily: CHART_FONT_FAMILY,
-    },
-
-    // Title defaults
-    title: {
-      textStyle: {
-        color: colors.foreground,
-        fontSize: 16,
-        fontWeight: 600,
-      },
-      left: 'center',
-      top: 8,
-    },
-
-    // Axis line defaults
-    axisLine: {
-      lineStyle: {
-        color: colors.border,
-      },
-    },
-
-    // Axis label defaults
-    axisLabel: {
-      color: colors.muted,
-      fontSize: 12,
-    },
-
-    // Split line defaults (grid lines)
-    splitLine: {
-      lineStyle: {
-        color: colors.border,
-        type: 'dashed' as const,
-      },
-    },
-
-    // Tooltip defaults
-    tooltip: {
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderWidth: 1,
-      textStyle: {
-        color: colors.foreground,
-        fontSize: 12,
-      },
-    },
-
-    // Axis pointer defaults (shown on hover)
-    axisPointer: {
-      lineStyle: {
-        color: colors.muted,
-        type: 'dashed' as const,
-      },
-    },
-
-    // Animation defaults
-    animation: true,
-    animationDuration: 300,
-    animationEasing: 'cubicOut' as const,
-  };
-}

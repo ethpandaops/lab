@@ -13,9 +13,6 @@ export function groupName(entity: string): string | undefined {
 /** The group's id as the group tables key it ("lido" for "*lido") */
 export const groupId = (group: string): string => group.slice(1);
 
-/** Every group value, such as "*lido" */
-export const GROUP_VALUES = ENTITY_GROUPS.map(({ id }) => `*${id}`);
-
 /**
  * Entities with each group's members merged into one row named by the group value. Stake, validators and change
  * add up exactly, since every row covers the same two days. Largest stake first.

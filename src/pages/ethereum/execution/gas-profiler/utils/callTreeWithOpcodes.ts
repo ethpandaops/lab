@@ -113,10 +113,3 @@ function createCodeDepositNode(parentFrameId: number, gas: number): CallTreeNode
     } as CallTreeNode['metadata'] & { isOpcode: boolean; isCodeDeposit: boolean; executionCount: number },
   };
 }
-
-/**
- * Check if a node represents an opcode (vs a call frame)
- */
-export function isOpcodeNode(node: CallTreeNode): boolean {
-  return (node.metadata as { isOpcode?: boolean })?.isOpcode === true;
-}

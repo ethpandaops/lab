@@ -6,7 +6,7 @@ import { weightedMedian } from './time-buckets';
 /**
  * Whether a node's bucket trails the network median by more than a slot, i.e. the node was catching up.
  */
-export function isBehind(row: HistoryRow, networkMedians: Map<number, number>): boolean {
+function isBehind(row: HistoryRow, networkMedians: Map<number, number>): boolean {
   const network = networkMedians.get(row.start);
   return network !== undefined && row.p50 - network > BEHIND_MS;
 }

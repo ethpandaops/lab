@@ -23,7 +23,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { slotToTimestamp } from '@/utils/beacon';
 import { fetchAllPages } from '@/utils/api-pagination';
 
-export interface SlotPayloadData {
+interface SlotPayloadData {
   /** Winning bid committed in the canonical block (available after finalization pipeline) */
   bid?: FctBlockPayloadBid;
   /** Payload envelope sightings per sentry node */

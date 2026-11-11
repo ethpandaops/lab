@@ -23,11 +23,11 @@ export interface SimTxFilters {
   impactMin?: number;
 }
 
-export function hasStatusChange(tx: TxSummary): boolean {
+function hasStatusChange(tx: TxSummary): boolean {
   return tx.originalStatus !== tx.simulatedStatus;
 }
 
-export function hasCallErrors(tx: TxSummary): boolean {
+function hasCallErrors(tx: TxSummary): boolean {
   return (tx.originalErrors?.length ?? 0) > 0 || (tx.simulatedErrors?.length ?? 0) > 0 || !!tx.error;
 }
 

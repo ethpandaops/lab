@@ -8,7 +8,7 @@ import { ECHARTS_THEME } from '@/utils/echarts-theme';
 /**
  * Data point for the scatter chart
  */
-export interface CallsVsGasDataPoint {
+interface CallsVsGasDataPoint {
   /** Number of calls (call frames) */
   calls: number;
   /** Gas used */

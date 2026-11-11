@@ -1,7 +1,7 @@
 /**
  * Data point for transaction count timeseries
  */
-export interface TransactionCountDataPoint {
+interface TransactionCountDataPoint {
   /** X-axis value (slot, epoch, block, timestamp, etc.) */
   x: number;
   /** Number of transactions */
@@ -16,7 +16,7 @@ export interface TransactionCountDataPoint {
 /**
  * X-axis configuration for TransactionCountChart
  */
-export interface TransactionCountXAxisConfig {
+interface TransactionCountXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

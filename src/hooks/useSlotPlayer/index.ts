@@ -1,24 +1,5 @@
-export {
-  useSlotPlayer,
-  useSlotPlayerProgress,
-  useSlotPlayerState,
-  useSlotPlayerConfig,
-  useSlotPlayerActions,
-  useSlotPlayerMeta,
-} from './useSlotPlayer';
-
-// Re-export types from context for convenience
-export type {
-  SlotMode,
-  PauseReason,
-  SlotPlayerProgressContextValue,
-  SlotPlayerStateContextValue,
-  SlotPlayerConfigContextValue,
-  SlotPlayerMetaContextValue,
-  SlotPlayerActions,
-  SlotPlayerCallbacks,
-  SlotPlayerContextValue,
-} from '@/contexts/SlotPlayerContext';
-
-// Re-export stable callback utility for convenience with SlotPlayer
-export { useStableCallback, hasUseEffectEvent } from '@/hooks/useStableCallback';
+export { useSlotPlayerProgress, useSlotPlayerState, useSlotPlayerActions } from './useSlotPlayer';
+/** @public The rest of the player API that the SlotPlayerProvider docs describe */
+export { useSlotPlayer, useSlotPlayerConfig, useSlotPlayerMeta } from './useSlotPlayer';
+/** @public */
+export { useStableCallback } from '@/hooks/useStableCallback/useStableCallback';

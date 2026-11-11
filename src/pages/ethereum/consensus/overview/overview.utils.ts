@@ -29,11 +29,8 @@ const { DATA_COLORS } = getDataVizColors();
 // Re-export shared utilities from execution overview
 export {
   fillTimeKeys,
-  formatHourlyDate,
-  formatDailyDate,
   formatTooltipDate,
   buildTooltipHtml,
-  type TooltipItem,
   type TooltipSection,
 } from '@/pages/ethereum/execution/overview/overview.utils';
 
@@ -66,9 +63,6 @@ export function trimDailyRecords<T extends { day_start_date?: string }>(
   if (!startDate) return records;
   return records.filter(r => (r.day_start_date ?? '') >= startDate);
 }
-
-/** @deprecated Use formatBand instead */
-export const formatBlobBand = formatBand;
 
 /** Builds chart series config from blob count records aligned to unified time keys */
 export function buildBlobCountChartConfig(
@@ -500,7 +494,7 @@ export function buildProposalStatusChartConfig(
 }
 
 /** Theme color per block proposal / payload status */
-export const STATUS_COLORS: Record<string, 'success' | 'warning' | 'danger'> = {
+const STATUS_COLORS: Record<string, 'success' | 'warning' | 'danger'> = {
   delivered: 'success',
   absent: 'danger',
   canonical: 'success',

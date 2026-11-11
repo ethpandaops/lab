@@ -11,7 +11,7 @@ const GAS_PROFILER_TABLES = [
   'int_transaction_call_frame_opcode_gas',
 ] as const;
 
-export interface GasProfilerBounds {
+interface GasProfilerBounds {
   /** Minimum block number where ALL gas profiler tables have data */
   min: number;
   /** Maximum block number where ALL gas profiler tables have data */

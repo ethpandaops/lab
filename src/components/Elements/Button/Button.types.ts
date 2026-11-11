@@ -1,11 +1,11 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import type { Button as HeadlessButton } from '@headlessui/react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'outline' | 'danger' | 'blank';
+type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'outline' | 'danger' | 'blank';
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-export type ButtonRounded = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+type ButtonRounded = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessButton> {
   /**

@@ -10,7 +10,7 @@ import { summarize, type Summary } from '../utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Attestation arrival a node saw in one slot */
-export interface SlotAttestations {
+interface SlotAttestations {
   p50: number;
   count: number;
 }
@@ -48,7 +48,7 @@ function earliestBySlot(rows: Array<FctBlockFirstSeenByNode | FctHeadFirstSeenBy
 /**
  * Aggregate one node's block, head and attestation rows by slot.
  */
-export function buildNodePerformance(
+function buildNodePerformance(
   window: SlotWindow,
   blocks: FctBlockFirstSeenByNode[],
   heads: FctHeadFirstSeenByNode[],

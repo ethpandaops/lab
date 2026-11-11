@@ -69,8 +69,6 @@ export interface FilterValues {
  */
 export const ENGINE_STATUS_VALUES = ['VALID', 'INVALID', 'SYNCING', 'ERROR'] as const;
 
-export type EngineStatus = (typeof ENGINE_STATUS_VALUES)[number];
-
 /**
  * Default filter values
  */

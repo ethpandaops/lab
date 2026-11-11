@@ -33,12 +33,12 @@ type PeerHourlyRow = FctPeerPartialMessageSupportByClientHourly;
 type PeerDailyRow = FctPeerPartialMessageSupportByClientDaily;
 
 /** Time bucket key of an hourly or daily row: unix seconds or YYYY-MM-DD */
-export function bucketKey(row: { hour_start_date_time?: number; day_start_date?: string }, isDaily: boolean): string {
+function bucketKey(row: { hour_start_date_time?: number; day_start_date?: string }, isDaily: boolean): string {
   return isDaily ? (row.day_start_date ?? '') : String(row.hour_start_date_time ?? '');
 }
 
 /** Lower-cases a client name from the API, mapping missing values to unknown */
-export function normaliseClient(name: string | undefined | null): string {
+function normaliseClient(name: string | undefined | null): string {
   const value = (name ?? '').trim().toLowerCase();
   return value === '' ? UNKNOWN_CLIENT : value;
 }
@@ -385,12 +385,12 @@ export function buildHeaderSeries(records: PartialRecord[], keys: string[]): Ser
 }
 
 /** Whether a peer implementation is a consensus client, as opposed to crawlers, sentries and unidentified peers */
-export function isConsensusClient(client: string): boolean {
+function isConsensusClient(client: string): boolean {
   return CONSENSUS_CLIENTS_SET.has(client);
 }
 
 /** Consensus clients with subscribing peers in the window, most subscribed first */
-export function adoptionClients(records: PeerRecord[]): string[] {
+function adoptionClients(records: PeerRecord[]): string[] {
   const totals = new Map<string, number>();
   for (const record of records) {
     if (isConsensusClient(record.client))

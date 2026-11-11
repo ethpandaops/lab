@@ -1,7 +1,7 @@
 /**
  * Block propagation data point from the first seen by node API endpoint
  */
-export interface BlockClassificationCDFDataPoint {
+interface BlockClassificationCDFDataPoint {
   /**
    * Milliseconds from slot start when node first saw the block
    */

@@ -9,7 +9,7 @@ const WEEK = 7 * DAY;
 const GRAIN: Record<Granularity, RollupGrain> = { hourly: 'hour', daily: 'day', weekly: 'week' };
 
 /** Length of one bucket in seconds */
-export function bucketSeconds(granularity: Granularity): number {
+function bucketSeconds(granularity: Granularity): number {
   return granularity === 'hourly' ? HOUR : granularity === 'daily' ? DAY : WEEK;
 }
 
@@ -46,7 +46,7 @@ export function weekStart(seconds: number): number {
 }
 
 /** UTC date of a daily bucket, e.g. "2026-10-30" */
-export function toDateString(seconds: number): string {
+function toDateString(seconds: number): string {
   return new Date(seconds * 1000).toISOString().slice(0, 10);
 }
 

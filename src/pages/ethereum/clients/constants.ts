@@ -14,7 +14,6 @@ export const clientsSearchSchema = z.object({
   /** Layer the performance comparison shows */
   layer: z.enum(['consensus', 'execution']).optional().catch(undefined),
 });
-export type ClientsSearch = z.infer<typeof clientsSearchSchema>;
 
 /** Configuration for each time period: hourly data for short windows, daily for long ones */
 export const TIME_RANGE_CONFIG = {
@@ -126,7 +125,6 @@ export const clientSearchSchema = z.object({
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
 });
-export type ClientSearch = z.infer<typeof clientSearchSchema>;
 
 /** Zod schema for the version page search params */
 export const versionSearchSchema = z.object({
@@ -135,7 +133,6 @@ export const versionSearchSchema = z.object({
   /** Fork whose minimum client version to check readiness against */
   fork: z.string().optional(),
 });
-export type VersionSearch = z.infer<typeof versionSearchSchema>;
 
 /** node_class of the EIP-7870 reference nodes in the engine and opcode tables */
 export const REFERENCE_NODE_CLASS = 'eip7870-block-builder';

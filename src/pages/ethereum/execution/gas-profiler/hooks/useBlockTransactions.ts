@@ -28,7 +28,7 @@ export interface TransactionSummary {
 /**
  * Call type distribution data for charts
  */
-export interface CallTypeCount {
+interface CallTypeCount {
   callType: string;
   count: number;
   gasUsed: number;
@@ -37,7 +37,7 @@ export interface CallTypeCount {
 /**
  * Contract gas consumption data
  */
-export interface ContractGasData {
+interface ContractGasData {
   address: string;
   name: string | null;
   gas: number;
@@ -63,7 +63,7 @@ export interface TxContractFlow {
 /**
  * Block data with transaction summaries
  */
-export interface BlockData {
+interface BlockData {
   blockNumber: number;
   transactions: TransactionSummary[];
   totalGasUsed: number;

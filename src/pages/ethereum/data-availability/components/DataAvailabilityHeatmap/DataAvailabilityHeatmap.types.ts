@@ -46,21 +46,21 @@ export type DataAvailabilityGranularity = 'window' | 'day' | 'hour' | 'epoch';
 /**
  * Callback when a cell is clicked
  */
-export interface CellClickHandler {
+interface CellClickHandler {
   (identifier: string, columnIndex: number): void;
 }
 
 /**
  * Callback when a column header is clicked (to view all rows for that column)
  */
-export interface ColumnClickHandler {
+interface ColumnClickHandler {
   (columnIndex: number): void;
 }
 
 /**
  * Callback when a row label is clicked (to view all columns for that time period)
  */
-export interface RowClickHandler {
+interface RowClickHandler {
   (identifier: string): void;
 }
 

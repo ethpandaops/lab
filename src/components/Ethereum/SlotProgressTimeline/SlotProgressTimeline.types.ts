@@ -29,7 +29,7 @@ export interface PhaseData {
 /**
  * Timeline mode configuration
  */
-export type TimelineMode = 'live' | 'static';
+type TimelineMode = 'live' | 'static';
 
 /**
  * Props for the SlotProgressTimeline component
@@ -75,20 +75,6 @@ export interface PhaseConnectionProps {
   orientation: 'horizontal' | 'vertical';
   /** Whether this connection is active (for styling) */
   isActive?: boolean;
-  /** Optional CSS class name */
-  className?: string;
-}
-
-/**
- * Props for the TimelineAxis sub-component
- */
-export interface TimelineAxisProps {
-  /** Layout orientation */
-  orientation: 'horizontal' | 'vertical';
-  /** Total duration in milliseconds (default: 12000) */
-  totalDuration?: number;
-  /** Number of tick marks to show (default: 7 for 0s, 2s, 4s, 6s, 8s, 10s, 12s) */
-  tickCount?: number;
   /** Optional CSS class name */
   className?: string;
 }

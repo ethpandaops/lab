@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export interface CopyToClipboardRenderProps {
+interface CopyToClipboardRenderProps {
   /**
    * Click handler to trigger the copy action
    */

@@ -168,5 +168,3 @@ export const BLOB_POSTERS = [
   'zksync-gateway',
   'zora',
 ] as const;
-
-export type BlobPoster = (typeof BLOB_POSTERS)[number];

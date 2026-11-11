@@ -3,6 +3,3 @@ export { HomePage } from './HomePage';
 export { BlockPage } from './BlockPage';
 export { TransactionPage } from './TransactionPage';
 export { CallPage } from './CallPage';
-
-// Simulate
-export { SimulatePage } from './SimulatePage';

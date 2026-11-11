@@ -119,13 +119,3 @@ export const generateEpochLevelData = (epochIdentifier: string, epochNum: number
     };
   });
 };
-
-/**
- * Filters rows to only include a specific column
- */
-export const filterByColumn = (rows: DataAvailabilityRow[], columnIndex: number): DataAvailabilityRow[] => {
-  return rows.map(row => ({
-    ...row,
-    cells: row.cells.filter(cell => cell.columnIndex === columnIndex),
-  }));
-};

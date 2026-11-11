@@ -1,9 +1,9 @@
 import type { ColumnDef, ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
-export type FilterType = 'text' | 'select' | 'multi-select' | 'number-range' | 'date-range';
+type FilterType = 'text' | 'select' | 'multi-select' | 'number-range' | 'date-range';
 
-export interface FilterOption {
+interface FilterOption {
   value: string;
   label: string;
   icon?: ReactNode;

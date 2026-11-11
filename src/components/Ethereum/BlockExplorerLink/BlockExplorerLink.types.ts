@@ -1,4 +1,4 @@
-export type BlockExplorerType = 'beaconchain' | 'etherscan' | 'dora' | 'tracoor';
+type BlockExplorerType = 'beaconchain' | 'etherscan' | 'dora' | 'tracoor';
 
 export interface BlockExplorerLinkProps {
   type: BlockExplorerType;

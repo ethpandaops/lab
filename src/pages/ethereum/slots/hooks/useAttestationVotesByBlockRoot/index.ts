@@ -1,4 +1,1 @@
-export {
-  useAttestationVotesByBlockRoot,
-  type UseAttestationVotesByBlockRootResult,
-} from './useAttestationVotesByBlockRoot';
+export { useAttestationVotesByBlockRoot } from './useAttestationVotesByBlockRoot';

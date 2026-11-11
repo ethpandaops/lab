@@ -10,7 +10,7 @@ const { DATA_COLORS } = getDataVizColors();
 /**
  * Opcode stats type
  */
-export interface OpcodeStats {
+interface OpcodeStats {
   opcode: string;
   count: number;
   totalGas: number;

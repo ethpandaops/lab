@@ -1,7 +1,7 @@
 /**
  * Data point for gas usage timeseries
  */
-export interface GasUsedDataPoint {
+interface GasUsedDataPoint {
   /** X-axis value (slot, epoch, block, timestamp, etc.) */
   x: number;
   /** Gas used */
@@ -18,7 +18,7 @@ export interface GasUsedDataPoint {
 /**
  * X-axis configuration for GasUsedChart
  */
-export interface GasUsedXAxisConfig {
+interface GasUsedXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

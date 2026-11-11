@@ -1,2 +1,2 @@
 export { TopItemsByGasTable } from './TopItemsByGasTable';
-export type { TopItemsByGasTableProps, TopGasItem } from './TopItemsByGasTable';
+export type { TopGasItem } from './TopItemsByGasTable';

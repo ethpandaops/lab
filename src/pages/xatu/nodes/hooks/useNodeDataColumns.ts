@@ -7,7 +7,7 @@ import { median, summarize, type Summary } from '../utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Arrival of the columns a node saw in one slot */
-export interface SlotColumns {
+interface SlotColumns {
   first: number;
   p50: number;
   /** When the node held every column it saw */
@@ -33,10 +33,7 @@ export interface UseNodeDataColumnsResult {
 /**
  * Group one node's data column sidecar rows by column index and by slot.
  */
-export function buildNodeDataColumns(
-  window: SlotWindow,
-  rows: FctBlockDataColumnSidecarFirstSeenByNode[]
-): NodeDataColumns {
+function buildNodeDataColumns(window: SlotWindow, rows: FctBlockDataColumnSidecarFirstSeenByNode[]): NodeDataColumns {
   const byColumn = new Map<number, number[]>();
   const bySlot = new Map<number, Map<number, number>>();
 

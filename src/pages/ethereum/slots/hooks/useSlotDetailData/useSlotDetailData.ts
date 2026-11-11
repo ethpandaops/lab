@@ -45,7 +45,7 @@ import type {
   FctBlockProposerEntity,
 } from '@/api/types.gen';
 
-export interface MissedAttestationEntity {
+interface MissedAttestationEntity {
   entity: string;
   count: number;
 }
@@ -86,7 +86,7 @@ export interface SlotDetailData {
  * Raw API data for SlotProgressTimeline integration.
  * Extracted from arrays for easier consumption.
  */
-export interface SlotDetailRawApiData {
+interface SlotDetailRawApiData {
   blockHead?: FctBlockHead;
   blockProposer?: FctBlockProposer;
   blockMev?: FctBlockMev;

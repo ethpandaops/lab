@@ -226,7 +226,7 @@ export function getForksAtEpoch(network: Network, epoch: number): ForkInfo[] {
  * Includes both consensus fork names (phase0, altair, etc.)
  * and combined upgrade names (merge, shapella, dencun, pectra, fusaka, glamsterdam).
  */
-export const VALID_FORK_SLUGS = [
+const VALID_FORK_SLUGS = [
   // Consensus fork names
   'phase0',
   'altair',
@@ -245,7 +245,7 @@ export const VALID_FORK_SLUGS = [
   'glamsterdam',
 ] as const;
 
-export type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
+type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
 
 /**
  * Check if a string is a valid fork slug.
@@ -253,7 +253,7 @@ export type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
  * @param slug - String to validate
  * @returns True if the slug is a valid fork identifier
  */
-export function isValidForkSlug(slug: string): slug is ForkSlug {
+function isValidForkSlug(slug: string): slug is ForkSlug {
   return VALID_FORK_SLUGS.includes(slug as ForkSlug);
 }
 

@@ -18,19 +18,6 @@ import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
 
-/** Canonical resource category names */
-export const RESOURCE_CATEGORIES = [
-  'Compute',
-  'Memory',
-  'Address Access',
-  'State Growth',
-  'History',
-  'Bloom Topics',
-  'Block Size',
-] as const;
-
-export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number];
-
 /** Color scheme deliberately distinct from opcode CATEGORY_COLORS */
 export const RESOURCE_COLORS: Record<string, string> = {
   Compute: DATA_COLORS.blue,

@@ -1,4 +1,4 @@
-export interface MinClientVersions {
+interface MinClientVersions {
   grandine?: string;
   lighthouse?: string;
   lodestar?: string;
@@ -14,7 +14,7 @@ export interface ConsensusFork {
   min_client_versions: MinClientVersions;
 }
 
-export interface ConsensusForks {
+interface ConsensusForks {
   phase0?: ConsensusFork;
   altair?: ConsensusFork;
   bellatrix?: ConsensusFork;
@@ -26,7 +26,7 @@ export interface ConsensusForks {
   fusaka?: ConsensusFork;
 }
 
-export interface ExecutionFork {
+interface ExecutionFork {
   block: number;
   timestamp: number;
 }
@@ -49,12 +49,12 @@ export interface ExecutionForks {
   paris?: ExecutionFork;
 }
 
-export interface Forks {
+interface Forks {
   consensus: ConsensusForks;
   execution?: ExecutionForks;
 }
 
-export interface ServiceUrls {
+interface ServiceUrls {
   beaconExplorer?: string; // Beaconcha.in URL
   explorer?: string; // Execution layer explorer (Etherscan, etc.)
   dora?: string; // Dora block explorer URL
@@ -81,7 +81,7 @@ export interface Network {
   blob_schedule?: BlobScheduleItem[];
 }
 
-export interface Feature {
+interface Feature {
   path: string;
   disabled_networks?: string[]; // Optional: list of networks where page is disabled
 }

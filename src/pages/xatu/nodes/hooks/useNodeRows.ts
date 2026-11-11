@@ -8,7 +8,7 @@ import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHist
 import { useStableNodes } from './useStableNodes';
 
 /** One node's typical timings over the selected range */
-export interface NodeObservation {
+interface NodeObservation {
   blockP50: number | null;
   attestationP50: number | null;
   /** Slots the node saw a block in */

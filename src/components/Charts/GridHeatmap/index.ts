@@ -1,9 +1,2 @@
 export { GridHeatmap } from './GridHeatmap';
-export type {
-  GridHeatmapProps,
-  GridRow,
-  GridCell,
-  GridCellSize,
-  CellRenderProps,
-  RowLabelRenderProps,
-} from './GridHeatmap.types';
+export type { GridRow, RowLabelRenderProps } from './GridHeatmap.types';

@@ -41,7 +41,7 @@ interface ExpiryPolicyData {
 }
 
 /** A single data point representing contract storage state on a given day */
-export interface ContractStorageDataPoint {
+interface ContractStorageDataPoint {
   date: Date;
   dateLabel: string;
   /** Contract-level active slots without expiry policy */

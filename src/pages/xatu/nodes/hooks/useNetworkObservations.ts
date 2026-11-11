@@ -7,7 +7,7 @@ import { quantile } from '../utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Block arrival across every node in one slot */
-export interface SlotDistribution {
+interface SlotDistribution {
   slot: number;
   min: number | null;
   p10: number | null;
@@ -16,7 +16,7 @@ export interface SlotDistribution {
   nodeCount: number;
 }
 
-export interface NetworkObservations {
+interface NetworkObservations {
   window: SlotWindow;
   /** Every slot in the window, oldest first */
   slots: SlotDistribution[];
@@ -32,7 +32,7 @@ export interface UseNetworkObservationsResult {
  * Block arrival per slot across every node, from per-node rows. A node that reports a slot twice counts once, with
  * its earliest arrival.
  */
-export function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFirstSeenByNode[]): NetworkObservations {
+function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFirstSeenByNode[]): NetworkObservations {
   // slot → node → earliest block arrival
   const bySlot = new Map<number, Map<string, number>>();
   blocks.forEach(row => {

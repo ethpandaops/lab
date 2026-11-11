@@ -3,7 +3,7 @@ import type { PopoutCardProps } from '@/components/Layout/PopoutCard';
 /**
  * Data point for block arrival times chart
  */
-export interface BlockArrivalDataPoint {
+interface BlockArrivalDataPoint {
   /** X-axis value (typically slot number) */
   x: number;
   /** Minimum arrival time (ms from slot start) */
@@ -26,7 +26,7 @@ export interface BlockArrivalDataPoint {
 /**
  * X-axis configuration
  */
-export interface XAxisConfig {
+interface XAxisConfig {
   /** X-axis name */
   name: string;
   /** Minimum x value */

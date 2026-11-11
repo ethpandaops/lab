@@ -222,13 +222,10 @@ export const AllVariants: Story = {
 
 ### 6. Create Barrel Export
 
+Export what other modules import, usually just the component. Add a type only once a consumer imports it: `pnpm knip` fails on exports that nothing imports.
+
 ```tsx
 export { ComponentName } from './ComponentName';
-export type {
-  ComponentNameProps,
-  ComponentVariant,
-  ComponentSize
-} from './ComponentName.types';
 ```
 
 ## Composition Patterns
@@ -342,6 +339,7 @@ Before completing:
 - [ ] Dark mode handled via semantic tokens
 - [ ] Icon handling uses cloneElement pattern
 - [ ] `pnpm lint` passes
+- [ ] `pnpm knip` passes
 - [ ] `pnpm build` passes
 
 ## Testing in Storybook
@@ -403,6 +401,7 @@ Use Playwright MCP tools to:
 5. **Validate**:
    - Test in Storybook
    - Run `pnpm lint`
+   - Run `pnpm knip`
    - Run `pnpm build`
    - Verify all checklist items
 

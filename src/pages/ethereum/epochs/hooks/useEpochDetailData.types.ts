@@ -67,7 +67,7 @@ export interface EpochStats {
 /**
  * MEV data point for time series
  */
-export interface MevDataPoint {
+interface MevDataPoint {
   /** Slot number */
   slot: number;
   /** Whether this slot used MEV */
@@ -83,7 +83,7 @@ export interface MevDataPoint {
 /**
  * Block production quality data point for time series
  */
-export interface BlockProductionDataPoint {
+interface BlockProductionDataPoint {
   /** Slot number */
   slot: number;
   /** Number of blobs */
@@ -105,7 +105,7 @@ export interface BlockProductionDataPoint {
 /**
  * Block size data point for time series
  */
-export interface BlockSizeDataPoint {
+interface BlockSizeDataPoint {
   /** Slot number */
   slot: number;
   /** Total beacon block size in bytes (uncompressed) */

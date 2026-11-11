@@ -1,4 +1,4 @@
-export type ProgressStepStatus = 'complete' | 'current' | 'upcoming';
+type ProgressStepStatus = 'complete' | 'current' | 'upcoming';
 
 export interface ProgressStep {
   /** Unique identifier for the step */
@@ -13,7 +13,7 @@ export interface ProgressStep {
   description?: string;
 }
 
-export type ProgressStepsVariant = 'simple' | 'panels' | 'bullets' | 'circles' | 'bullets-text' | 'circles-text';
+type ProgressStepsVariant = 'simple' | 'panels' | 'bullets' | 'circles' | 'bullets-text' | 'circles-text';
 
 export interface ProgressStepsProps {
   /** The variant style to render */

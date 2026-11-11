@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export interface SegmentedControlOption<T extends string> {
+interface SegmentedControlOption<T extends string> {
   value: T;
   label: ReactNode;
   /** Shown but not selectable, e.g. a filter with no matching rows */

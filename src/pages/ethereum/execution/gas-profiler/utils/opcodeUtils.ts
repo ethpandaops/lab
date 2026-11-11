@@ -5,7 +5,7 @@ const { DATA_COLORS } = getDataVizColors();
 /**
  * Opcode category mapping based on EVM opcode semantics
  */
-export const OPCODE_CATEGORIES: Record<string, string> = {
+const OPCODE_CATEGORIES: Record<string, string> = {
   // Math (0x01-0x0B)
   ADD: 'Math',
   MUL: 'Math',
@@ -162,60 +162,6 @@ export const CALL_TYPE_COLORS: Record<string, string> = {
 };
 
 /**
- * Determine if a gas schedule item is a parameter (modifier/component)
- * vs an actual EVM opcode.
- *
- * Parameters are cost components like SLOAD_COLD, CREATE_DATA, CALL_VALUE_XFER
- * Opcodes are actual EVM instructions like SLOAD, CREATE, CALL
- */
-export function isGasParameter(name: string): boolean {
-  // Known parameter suffixes (cold/warm access, data costs, special modifiers)
-  const parameterSuffixes = [
-    '_COLD',
-    '_WARM',
-    '_SET',
-    '_RESET',
-    '_CLEAR',
-    '_DATA',
-    '_WORD',
-    '_BYTE',
-    '_TOPIC',
-    '_XFER',
-    '_NEW_ACCOUNT',
-    '_BY_SELFDESTRUCT',
-  ];
-
-  // Check for parameter suffixes
-  if (parameterSuffixes.some(suffix => name.endsWith(suffix))) {
-    return true;
-  }
-
-  // Precompile gas parameters (PC_SHA256_BASE, PC_ECREC, etc.)
-  if (name.startsWith('PC_')) {
-    return true;
-  }
-
-  // Intrinsic gas parameters (TX_BASE, TX_DATA_ZERO, etc.)
-  if (name.startsWith('TX_')) {
-    return true;
-  }
-
-  // Known standalone parameters (not opcodes)
-  const standaloneParameters = [
-    'MEMORY', // Memory expansion cost
-    'COPY', // Per-word copy cost
-    'INIT_CODE_WORD', // Per-word init code cost
-    'REFUND_SSTORE_CLEARS', // Refund amount
-  ];
-
-  if (standaloneParameters.includes(name)) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
  * Get category for an opcode or gas parameter
  *
  * Handles both opcodes (SLOAD, CALL) and gas parameters (SLOAD_COLD, CALL_VALUE_XFER)
@@ -303,7 +249,7 @@ export const FLAME_GRAPH_CALL_TYPE_COLORS: Record<string, { bg: string; hover: s
 /**
  * FlameGraph color map for opcode categories (derived from CATEGORY_COLORS)
  */
-export const FLAME_GRAPH_CATEGORY_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
+const FLAME_GRAPH_CATEGORY_COLORS: Record<string, { bg: string; hover: string }> = Object.fromEntries(
   Object.entries(CATEGORY_COLORS).map(([key, hex]) => [
     key,
     HEX_TO_TAILWIND[hex] ?? { bg: 'bg-data-slate', hover: 'hover:bg-data-slate/80' },

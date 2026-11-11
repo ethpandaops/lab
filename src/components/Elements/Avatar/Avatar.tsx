@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 
-export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface AvatarProps {
   /**

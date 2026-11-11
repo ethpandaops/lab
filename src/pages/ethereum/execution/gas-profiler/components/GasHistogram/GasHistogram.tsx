@@ -7,7 +7,7 @@ import { ECHARTS_THEME } from '@/utils/echarts-theme';
 /**
  * Bucket definition for histogram
  */
-export interface HistogramBucket {
+interface HistogramBucket {
   label: string;
   min: number;
   max: number;
@@ -171,4 +171,4 @@ export function GasHistogram({
 }
 
 // Export bucket presets for convenience
-export { TRANSACTION_BUCKETS, CALL_BUCKETS };
+export { TRANSACTION_BUCKETS };

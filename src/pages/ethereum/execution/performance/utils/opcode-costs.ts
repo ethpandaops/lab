@@ -79,7 +79,7 @@ export interface OpcodeCost {
 }
 
 /** One UTC day's or week's fit */
-export interface OpcodeCostDay {
+interface OpcodeCostDay {
   /** Unix seconds at 00:00 UTC on the day, or the Monday starting the week */
   day: number;
   blocks: number;
@@ -90,7 +90,7 @@ export interface OpcodeCostDay {
   versions: string[];
 }
 
-export interface OpcodeCostClient {
+interface OpcodeCostClient {
   client: string;
   /** Median of the daily fits, with a day-resampled 5–95% interval */
   ratios: OpcodeCost[];

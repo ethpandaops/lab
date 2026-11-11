@@ -42,6 +42,7 @@ const useInputContext = (): InputContextValue => {
  *   <select>...</select>
  * </Input.Leading>
  * ```
+ * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputLeading = ({ children, className, type }: InputSlotProps): React.ReactNode => {
   const { size, inline } = useInputContext();
@@ -139,6 +140,7 @@ InputLeading.displayName = 'Input.Leading';
  *   <Button>Sort</Button>
  * </Input.Trailing>
  * ```
+ * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputTrailing = ({ children, className, type }: InputSlotProps): React.ReactNode => {
   const { size, inline } = useInputContext();
@@ -238,6 +240,7 @@ InputTrailing.displayName = 'Input.Trailing';
  *   inputMode="email"
  * />
  * ```
+ * @public Kept exported so Fast Refresh sees this module as components
  */
 export const InputField = ({ className, ref, inputMode, ...props }: InputFieldProps): JSX.Element => {
   const { size, error, inputId, labelVariant } = useInputContext();

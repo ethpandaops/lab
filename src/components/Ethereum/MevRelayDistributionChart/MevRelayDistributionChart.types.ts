@@ -1,7 +1,7 @@
 /**
  * Data point containing MEV relay information
  */
-export interface MevRelayDataPoint {
+interface MevRelayDataPoint {
   /** Relay name/identifier */
   relay: string | null;
   /** Optional additional context (e.g., slot, epoch, block number) */

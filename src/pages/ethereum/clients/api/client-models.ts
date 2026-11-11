@@ -28,7 +28,7 @@ import type { FctPeerCountByClClientAsnDaily, FctPeerCountByClClientCountryDaily
 import type { fetchAllPages } from '@/utils/api-pagination';
 
 /** How a graffiti resolved to a release */
-export type ReleaseStatus =
+type ReleaseStatus =
   /** A tagged commit */
   | 'commit_match'
   /** A branch commit, counted under the release it builds on */
@@ -47,7 +47,7 @@ export type ReleaseStatus =
   | 'none';
 
 /** Statuses whose version names a release */
-export const RESOLVED_STATUSES: ReadonlySet<string> = new Set([
+export const RESOLVED_STATUSES: ReadonlySet<string> = new Set<ReleaseStatus>([
   'commit_match',
   'commit_untagged',
   'commit_mismatch',
@@ -64,15 +64,11 @@ export const UNRESOLVED_STATUSES: readonly string[] = [
   'commit_ambiguous',
   'version_unmatched',
   'none',
-];
+] satisfies ReleaseStatus[];
 
 export type {
   DimClientCommit,
   FctAttestationVoteCorrectnessByClientDaily,
-  FctBlockGraffitiClientVersionByEntityDaily,
-  FctBlockGraffitiClientVersionByEntityHourly,
-  FctBlockGraffitiClientVersionDaily,
-  FctBlockGraffitiClientVersionHourly,
   FctBlockProposalByClientDaily,
   FctCustodyProbeByClientDaily,
   FctPeerCountByClClientDaily,
