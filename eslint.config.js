@@ -1,13 +1,13 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from 'eslint-plugin-storybook';
-
+import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import eslintReact from '@eslint-react/eslint-plugin';
+import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier/recommended';
+import vitest from '@vitest/eslint-plugin';
+import storybook from 'eslint-plugin-storybook';
 import betterTailwind from 'eslint-plugin-better-tailwindcss';
 import { getDefaultSelectors } from 'eslint-plugin-better-tailwindcss/defaults';
 import customRules from './eslint-rules/index.cjs';
@@ -20,19 +20,21 @@ const colorProperty =
 // An opacity modifier (`bg-primary/10`). `w-1/2` is a fraction, and `text-sm/6` gives a type
 // size a line height from the spacing step.
 const modifier = '(?:^|:)!?(?!text-(?:2xs|xs|sm|base|lg|\\d?xl)/)[a-z-]*[a-z]/\\d+!?$';
+const noParentImports = { group: ['../*'], message: 'Import through the @/ alias instead of parent-relative paths.' };
 
-export default tseslint.config(
+export default defineConfig(
   {
+    // src/api and src/lab-api are generated from the CBT and lab-backend OpenAPI specs (pnpm generate:api).
     ignores: [
       'dist',
       'node_modules',
       'coverage',
-      'eslint_report.json',
-      'src/api',
-      'src/lab-api',
       'storybook-static',
       'lab',
       'eslint-rules',
+      'src/api',
+      'src/lab-api',
+      'src/routeTree.gen.ts',
     ],
   },
   js.configs.recommended,
@@ -40,41 +42,52 @@ export default tseslint.config(
   prettier,
   {
     files: ['**/*.{ts,tsx}'],
+    ...eslintReact.configs['recommended-typescript'],
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       globals: globals.browser,
     },
     plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin,
+      'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...reactPlugin.configs.recommended.rules,
-      ...reactPlugin.configs['jsx-runtime'].rules,
+      // eslint-plugin-react-hooks owns hooks correctness; @eslint-react's
+      // overlapping rules are off so nothing reports twice.
+      '@eslint-react/rules-of-hooks': 'off',
+      '@eslint-react/exhaustive-deps': 'off',
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error',
+      // React Compiler static analysis. The compiler is not enabled in the
+      // build; these rules are a lint-time guard only.
+      'react-hooks/preserve-manual-memoization': 'error',
+      'react-hooks/immutability': 'error',
+      'react-hooks/refs': 'error',
+      'react-hooks/set-state-in-effect': 'error',
+      'react-hooks/set-state-in-render': 'error',
+      'react-hooks/purity': 'error',
+      'react-hooks/static-components': 'error',
+      'react-hooks/use-memo': 'error',
+      'react-hooks/globals': 'error',
+      'react-hooks/error-boundaries': 'error',
+      'react-hooks/no-deriving-state-in-effects': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
-      'no-restricted-imports': [
-        'error',
+      '@typescript-eslint/explicit-function-return-type': [
+        'warn',
         {
-          patterns: [{ group: ['../*'], message: 'Import through the @/ alias instead of parent-relative paths.' }],
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+          allowHigherOrderFunctions: true,
+          allowDirectConstAssertionInArrowFunctions: true,
         },
       ],
+      'no-restricted-imports': ['error', { patterns: [noParentImports] }],
       'no-restricted-syntax': [
         'error',
-        {
-          selector: 'TSAnyKeyword',
-          message:
-            'The `any` type defeats the purpose of TypeScript. Use proper types instead or `unknown` if the type is truly unknown.',
-        },
         // Colour literals in inline styles and SVG colour attributes bypass the tokens.
         { selector: `JSXAttribute[name.name='style'] Property > Literal[value=/${colorLiteral}/]`, message: noColor },
         {
@@ -86,20 +99,6 @@ export default tseslint.config(
           message: noColor,
         },
       ],
-      '@typescript-eslint/explicit-function-return-type': [
-        'warn',
-        {
-          allowExpressions: true,
-          allowTypedFunctionExpressions: true,
-          allowHigherOrderFunctions: true,
-          allowDirectConstAssertionInArrowFunctions: true,
-        },
-      ],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
     },
   },
   {
@@ -165,15 +164,69 @@ export default tseslint.config(
       ],
     },
   },
-  // Custom rules
   {
-    files: ['**/*.{ts,tsx}'], // Only TSX/TS files have JSX and className
+    files: ['**/*.{ts,tsx}'],
     plugins: {
       lab: customRules,
     },
     rules: {
-      // Validate route images exist
       'lab/validate-route-images': 'error',
+    },
+  },
+  {
+    // The Foundations blocks draw swatches in the colours they document.
+    files: ['src/design-docs/**/*.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    plugins: { vitest },
+    rules: {
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-disabled-tests': 'warn',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{ name: '@testing-library/react', message: 'Import Testing Library helpers from @/test-utils.' }],
+          patterns: [noParentImports],
+        },
+      ],
+    },
+  },
+  {
+    // Switched on, with their fixes, by the commits that follow.
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/set-state-in-render': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/no-deriving-state-in-effects': 'off',
+      '@eslint-react/no-array-index-key': 'off',
+      '@eslint-react/no-context-provider': 'off',
+      '@eslint-react/no-use-context': 'off',
+      '@eslint-react/no-forward-ref': 'off',
+      '@eslint-react/no-clone-element': 'off',
+      '@eslint-react/no-children-to-array': 'off',
+      '@eslint-react/no-nested-component-definitions': 'off',
+      '@eslint-react/naming-convention-ref-name': 'off',
+      '@eslint-react/use-state': 'off',
+      '@eslint-react/use-memo': 'off',
+      '@eslint-react/purity': 'off',
+      '@eslint-react/set-state-in-effect': 'off',
+      '@eslint-react/static-components': 'off',
+      '@eslint-react/web-api-no-leaked-timeout': 'off',
+    },
+  },
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    rules: {
+      'vitest/no-disabled-tests': 'off',
+      'no-restricted-imports': ['error', { patterns: [noParentImports] }],
     },
   },
   {
@@ -181,16 +234,22 @@ export default tseslint.config(
     files: ['.design-sync/**'],
     rules: { 'no-restricted-imports': 'off' },
   },
-  // TanStack Router route files export both components and Route objects
   {
-    files: ['src/routes/**/*.{ts,tsx}'],
+    // Route files export the Route object; Storybook config is not hot-reloaded.
+    files: ['src/routes/**/*.{ts,tsx}', '.storybook/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    files: ['*.config.{js,ts}', 'knip.ts', 'vite-plugins/**/*.ts', '.storybook/*.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   storybook.configs['flat/recommended'],
   {
-    files: ['**/.storybook/**/*.{js,ts}'],
+    files: ['.storybook/**/*.{js,ts}'],
     rules: {
       'storybook/no-uninstalled-addons': [
         'error',

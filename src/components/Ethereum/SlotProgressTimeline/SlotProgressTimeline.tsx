@@ -88,7 +88,7 @@ export function SlotProgressTimeline({
       const nextPhaseTime = nextPhase?.timestamp;
 
       // Determine if this phase is completed
-      let isCompleted = false;
+      let isCompleted: boolean;
       if (phase.duration !== undefined) {
         // Has explicit duration
         isCompleted = currentTime >= phaseTime + phase.duration;

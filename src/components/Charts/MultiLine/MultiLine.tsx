@@ -1270,7 +1270,7 @@ export function MultiLineChart({
       {/* One wrapping row: each group is a muted name followed by its series */}
       <div className="flex max-h-50 flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
         {legendGroups.map(group => (
-          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
+          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-0.5">
             {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
             {group.items.map(s => {
               const isVisible = visibleSeries.has(s.name);
@@ -1389,7 +1389,7 @@ export function MultiLineChart({
                         onChange={() => toggleSeries(s.name)}
                         className="h-4 w-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
                       />
-                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
+                      <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
                       <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
                     </label>
                   );
