@@ -17,6 +17,9 @@ dist-ssr
 /build/stats.html
 storybook-static
 
+# Unit test coverage
+/coverage
+
 # Environment variables
 .env
 .env.local

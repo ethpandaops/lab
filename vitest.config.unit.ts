@@ -22,6 +22,19 @@ export default defineConfig({
     fakeTimers: {
       toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate', 'clearImmediate', 'Date'],
     },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/api/**',
+        'src/routeTree.gen.ts',
+        'src/test-utils/**',
+        'src/design-docs/**',
+        'src/styles/**',
+        'src/**/*.{test,stories}.{ts,tsx}',
+        'src/**/*.d.ts',
+      ],
+    },
   },
   resolve: {
     alias: {
