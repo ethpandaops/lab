@@ -1281,6 +1281,7 @@ export function MultiLineChart({
                   {isKnownClient(s.client ?? s.name) && (
                     <ClientLogo
                       noLink
+                      decorative
                       client={s.client ?? s.name}
                       size={14}
                       className={isVisible ? undefined : 'opacity-50'}

@@ -1,4 +1,4 @@
-import { type JSX, cloneElement, isValidElement } from 'react';
+import { type JSX, Fragment, cloneElement, isValidElement } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import clsx from 'clsx';
 import type { DropdownProps, DropdownItemProps, DropdownHeaderProps, DropdownSectionProps } from './Dropdown.types';
@@ -26,8 +26,8 @@ export function Dropdown({
 }: DropdownProps): JSX.Element {
   return (
     <Menu as="div" className={clsx('relative inline-block', className)} {...menuProps}>
-      {/* Render trigger as MenuButton if it's a valid element */}
-      {isValidElement(trigger) ? <MenuButton as="div">{trigger}</MenuButton> : <MenuButton>{trigger}</MenuButton>}
+      {/* An element trigger becomes the menu button itself, so no wrapper carries its ARIA attributes */}
+      {isValidElement(trigger) ? <MenuButton as={Fragment}>{trigger}</MenuButton> : <MenuButton>{trigger}</MenuButton>}
 
       <MenuItems
         anchor={align === 'left' ? 'bottom start' : 'bottom end'}

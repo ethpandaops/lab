@@ -91,7 +91,7 @@ export function Alert({
 
         <div className={`${displayIcon ? 'ml-3' : ''} ${link ? 'flex-1 md:flex md:justify-between' : ''}`}>
           {/* Title and description section */}
-          {title && !link && <h3 className={`text-sm/5 font-medium ${config.title}`}>{title}</h3>}
+          {title && !link && <h2 className={`text-sm/5 font-medium ${config.title}`}>{title}</h2>}
 
           {description && (
             <div className={`${title && !link ? 'mt-2' : ''} text-sm/5 ${descriptionClasses}`}>

@@ -162,6 +162,7 @@ export function TableToolbar<TData>({
           <button
             onClick={() => table.previousPage()}
             disabled={!canPreviousPage}
+            aria-label="Previous page"
             className={clsx(
               'flex items-center justify-center rounded-sm p-1 transition-colors',
               canPreviousPage ? 'text-muted hover:bg-primary-10 hover:text-primary' : 'cursor-not-allowed text-muted-30'
@@ -172,6 +173,7 @@ export function TableToolbar<TData>({
           <button
             onClick={() => table.nextPage()}
             disabled={!canNextPage}
+            aria-label="Next page"
             className={clsx(
               'flex items-center justify-center rounded-sm p-1 transition-colors',
               canNextPage ? 'text-muted hover:bg-primary-10 hover:text-primary' : 'cursor-not-allowed text-muted-30'

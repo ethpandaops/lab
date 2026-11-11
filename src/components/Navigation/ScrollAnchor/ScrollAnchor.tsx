@@ -98,7 +98,6 @@ export function ScrollAnchor({
             handleClick();
           }
         }}
-        aria-label={`Link to ${id} section`}
       >
         {children}
       </div>

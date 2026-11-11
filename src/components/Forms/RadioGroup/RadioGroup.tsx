@@ -142,7 +142,7 @@ export function RadioOption({
         className="relative cursor-pointer disabled:cursor-not-allowed"
       >
         {({ checked, disabled: optionDisabled }) => (
-          <ListItem className="flex items-start justify-between">
+          <ListItem as="div" className="flex items-start justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
               <Label className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
                 {children ?? name}
@@ -167,7 +167,7 @@ export function RadioOption({
         className="relative cursor-pointer disabled:cursor-not-allowed"
       >
         {({ checked, disabled: optionDisabled }) => (
-          <ListItem className="flex items-center justify-between">
+          <ListItem as="div" className="flex items-center justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
               <Label
                 className={clsx(
@@ -197,6 +197,7 @@ export function RadioOption({
       >
         {({ checked, disabled: optionDisabled }) => (
           <ListItem
+            as="div"
             className={clsx('grid w-full grid-cols-1 gap-2 py-0.5 focus:outline-none md:grid-cols-3 md:gap-4', {
               'relative z-10 border-primary bg-primary-10': checked,
             })}
@@ -248,6 +249,7 @@ export function RadioOption({
       >
         {({ checked, disabled: optionDisabled }) => (
           <ListItem
+            as="div"
             className={clsx('flex items-start py-0.5 focus:outline-none', {
               'relative z-10 border-primary bg-primary-10': checked,
             })}
@@ -507,7 +509,7 @@ export function RadioGroup({
     // List with radio on right variant
     if (variant === 'right-radio-list') {
       return (
-        <ListContainer variant="simple" withDividers compact className="mt-2.5">
+        <ListContainer as="div" variant="simple" withDividers compact className="mt-2.5">
           {children}
         </ListContainer>
       );
@@ -516,7 +518,7 @@ export function RadioGroup({
     // Simple list with radio on right variant
     if (variant === 'simple-right-radio-list') {
       return (
-        <ListContainer variant="flat" withDividers compact className="mt-4">
+        <ListContainer as="div" variant="flat" withDividers compact className="mt-4">
           {children}
         </ListContainer>
       );
@@ -525,7 +527,7 @@ export function RadioGroup({
     // Table variant
     if (variant === 'table' || variant === 'panel') {
       return (
-        <ListContainer variant="card" withDividers compact>
+        <ListContainer as="div" variant="card" withDividers compact>
           {children}
         </ListContainer>
       );

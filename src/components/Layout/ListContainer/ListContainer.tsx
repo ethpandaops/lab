@@ -56,7 +56,7 @@ const variantStyles: Record<
   },
 };
 
-export function ListItem({ children, className, onClick }: ListItemProps): JSX.Element {
+export function ListItem({ children, className, onClick, as: Component = 'li' }: ListItemProps): JSX.Element {
   const { variant, fullWidthOnMobile, compact } = useContext(ListContainerContext);
   const styles = variantStyles[variant];
   const itemClass = fullWidthOnMobile && styles.itemMobileFull ? styles.itemMobileFull : styles.item;
@@ -65,9 +65,9 @@ export function ListItem({ children, className, onClick }: ListItemProps): JSX.E
   const paddingClass = compact ? 'py-0.5' : 'py-4';
 
   return (
-    <li className={clsx(itemClass, paddingClass, className)} onClick={onClick}>
+    <Component className={clsx(itemClass, paddingClass, className)} onClick={onClick}>
       {children}
-    </li>
+    </Component>
   );
 }
 
@@ -83,6 +83,9 @@ export function ListContainer({
   const styles = variantStyles[variant];
   const contextValue: ListContainerContextValue = { variant, fullWidthOnMobile, compact, withDividers };
 
+  // A div is not a list (its items carry another role, such as radio options)
+  const role = Component === 'div' ? undefined : 'list';
+
   // Apply dividers based on withDividers prop and variant
   // Note: 'separate' variant doesn't use dividers
   const listClassName = clsx(styles.list, withDividers && variant !== 'separate' && styles.listWithDividers);
@@ -90,7 +93,7 @@ export function ListContainer({
   // Variants with wrapper need an extra container
   if (styles.wrapper) {
     const list = (
-      <Component role="list" className={listClassName}>
+      <Component role={role} className={listClassName}>
         {children}
       </Component>
     );
@@ -106,7 +109,7 @@ export function ListContainer({
 
   // Simple variants render list directly
   const list = (
-    <Component role="list" className={clsx(listClassName, className)}>
+    <Component role={role} className={clsx(listClassName, className)}>
       {children}
     </Component>
   );

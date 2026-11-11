@@ -220,7 +220,7 @@ export function ProbesView({
       // Actions column (first for easy access)
       columnHelper.display({
         id: 'actions',
-        header: '',
+        header: () => <span className="sr-only">Details</span>,
         size: 40,
         cell: info => (
           <Button
@@ -231,6 +231,7 @@ export function ProbesView({
               handleOpenDetails(info.row.original);
             }}
             className="p-1!"
+            aria-label="View probe details"
           >
             <EyeIcon className="size-3" />
           </Button>
@@ -320,7 +321,7 @@ export function ProbesView({
           return (
             <FilterableCell field="meta_client_implementation" value={client} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1.5">
-                <ClientLogo client={client} size={16} />
+                <ClientLogo client={client} size={16} noLink decorative />
                 <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
@@ -358,7 +359,7 @@ export function ProbesView({
           return (
             <FilterableCell field="meta_peer_implementation" value={client} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1.5">
-                <ClientLogo client={client} size={16} />
+                <ClientLogo client={client} size={16} noLink decorative />
                 <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
@@ -654,7 +655,7 @@ export function ProbesView({
                 href="https://github.com/ethp2p/dasmon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 hover:text-primary-80"
               >
                 Dasmon
               </a>
@@ -682,7 +683,7 @@ export function ProbesView({
                 href="https://github.com/ethp2p/dasmon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 hover:text-primary-80"
               >
                 Dasmon
               </a>

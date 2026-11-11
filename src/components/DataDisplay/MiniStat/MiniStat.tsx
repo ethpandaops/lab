@@ -118,17 +118,17 @@ export function MiniStat({
         {renderIcon()}
 
         {/* Stats content - 2 rows */}
-        <div className="flex-1">
+        <dl className="flex-1">
           <dt className="text-xs/tight font-medium text-muted">{label}</dt>
           <dd className="text-base/tight font-semibold text-foreground">{value}</dd>
-        </div>
+        </dl>
       </div>
     );
   }
 
   // Default layout with secondary text
   return (
-    <div>
+    <dl>
       {/* Label */}
       <dt className="text-xs font-medium text-muted">{label}</dt>
 
@@ -145,6 +145,6 @@ export function MiniStat({
           <div className="text-xs/tight text-muted">{secondaryText}</div>
         </div>
       </dd>
-    </div>
+    </dl>
   );
 }

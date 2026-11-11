@@ -39,10 +39,12 @@ export function ScrollArea({
       onWheel={handleWheel}
       {...props}
     >
+      {/* Focusable so keyboard users can scroll it */}
       <ScrollAreaPrimitive.Viewport
         ref={viewportRef}
         data-slot="scroll-area-viewport"
-        className="size-full rounded-inherit"
+        tabIndex={0}
+        className="size-full rounded-inherit focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>

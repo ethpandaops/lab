@@ -456,7 +456,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
   return (
     <>
       {/* Mobile sidebar */}
-      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-30 lg:hidden">
+      <Dialog open={sidebarOpen} onClose={setSidebarOpen} aria-label="Sidebar" className="relative z-30 lg:hidden">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-background transition-opacity duration-300 ease-linear data-closed:opacity-0"

@@ -121,8 +121,6 @@ function SlotTimelineComponent({
 
   return (
     <div className="w-full">
-      <h4 className="sr-only">{ariaLabel}</h4>
-
       {/* Timeline container */}
       <div className="relative w-full">
         {/* Phase segments */}

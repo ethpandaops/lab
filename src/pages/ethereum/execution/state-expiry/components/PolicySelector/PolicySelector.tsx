@@ -49,6 +49,7 @@ export function PolicySelector<TType extends string, TPolicy extends string>({
                 <InformationCircleIcon className="size-3 text-muted-50 transition-colors hover:text-muted" />
               }
               className="p-0!"
+              aria-label="How slot size is counted"
             />
             <PopoverPanel anchor="bottom start" className="w-56 p-2.5">
               <p className="text-xs/5 text-muted">
