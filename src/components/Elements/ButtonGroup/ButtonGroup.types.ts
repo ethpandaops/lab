@@ -1,6 +1,10 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 
 export interface ButtonGroupProps extends ComponentPropsWithoutRef<'span'> {
+  /**
+   * Ref to the group's span element
+   */
+  ref?: Ref<HTMLSpanElement>;
   /**
    * Button elements to group together (use Button components from @/components/Button)
    */

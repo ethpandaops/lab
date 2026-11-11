@@ -40,11 +40,11 @@ const ATTESTATIONS = {
 
 function wrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <NetworkContext.Provider
+    <NetworkContext
       value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
     >
       {children}
-    </NetworkContext.Provider>
+    </NetworkContext>
   );
 }
 

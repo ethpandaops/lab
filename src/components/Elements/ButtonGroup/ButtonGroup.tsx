@@ -1,46 +1,46 @@
-import { forwardRef, Children, isValidElement, cloneElement } from 'react';
+import { type JSX, Children, isValidElement, cloneElement } from 'react';
 import { clsx } from 'clsx';
 import type { ButtonGroupProps } from './ButtonGroup.types';
 
-const ButtonGroupRoot = forwardRef<HTMLSpanElement, ButtonGroupProps>(
-  ({ children, className = '', rounded = true, ...props }, ref) => {
-    const childArray = Children.toArray(children);
-    const count = childArray.length;
+export function ButtonGroup({
+  children,
+  className = '',
+  rounded = true,
+  ref,
+  ...props
+}: ButtonGroupProps): JSX.Element {
+  const childArray = Children.toArray(children);
+  const count = childArray.length;
 
-    const childrenWithPosition = childArray.map((child, index) => {
-      if (!isValidElement(child)) return child;
+  const childrenWithPosition = childArray.map((child, index) => {
+    if (!isValidElement(child)) return child;
 
-      const isFirst = index === 0;
-      const isLast = index === count - 1;
+    const isFirst = index === 0;
+    const isLast = index === count - 1;
 
-      const positionClasses = clsx(
-        // Rounded corners (only when rounded prop is true)
-        rounded && isFirst && 'rounded-l-sm rounded-r-none!',
-        rounded && isLast && 'rounded-r-sm rounded-l-none!',
-        rounded && !isFirst && !isLast && 'rounded-none!',
-        // Square corners (when rounded prop is false)
-        !rounded && 'rounded-none!',
-        // Negative margin for overlapping borders
-        !isFirst && '-ml-px',
-        // Focus z-index
-        'focus:z-10'
-      );
-
-      // Type-safe way to add className to existing element
-      const childProps = child.props as { className?: string };
-      return cloneElement(child, {
-        className: clsx(childProps.className, positionClasses),
-      } as Partial<{ className: string }>);
-    });
-
-    return (
-      <span ref={ref} className={clsx('isolate inline-flex', rounded && 'rounded-sm', className)} {...props}>
-        {childrenWithPosition}
-      </span>
+    const positionClasses = clsx(
+      // Rounded corners (only when rounded prop is true)
+      rounded && isFirst && 'rounded-l-sm rounded-r-none!',
+      rounded && isLast && 'rounded-r-sm rounded-l-none!',
+      rounded && !isFirst && !isLast && 'rounded-none!',
+      // Square corners (when rounded prop is false)
+      !rounded && 'rounded-none!',
+      // Negative margin for overlapping borders
+      !isFirst && '-ml-px',
+      // Focus z-index
+      'focus:z-10'
     );
-  }
-);
 
-ButtonGroupRoot.displayName = 'ButtonGroup';
+    // Type-safe way to add className to existing element
+    const childProps = child.props as { className?: string };
+    return cloneElement(child, {
+      className: clsx(childProps.className, positionClasses),
+    } as Partial<{ className: string }>);
+  });
 
-export const ButtonGroup = ButtonGroupRoot;
+  return (
+    <span ref={ref} className={clsx('isolate inline-flex', rounded && 'rounded-sm', className)} {...props}>
+      {childrenWithPosition}
+    </span>
+  );
+}

@@ -195,9 +195,9 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   }
 
   return (
-    <NetworkContext.Provider value={value}>
+    <NetworkContext value={value}>
       <BoundsLoader />
       {children}
-    </NetworkContext.Provider>
+    </NetworkContext>
   );
 }

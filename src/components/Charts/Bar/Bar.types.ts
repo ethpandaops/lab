@@ -1,3 +1,6 @@
+import type { Ref } from 'react';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+
 import type { TooltipFormatter } from '@/types/echarts';
 
 interface BarDataItem {
@@ -16,6 +19,10 @@ interface BarDataItem {
 }
 
 export interface BarChartProps {
+  /**
+   * Ref to the underlying echarts-for-react instance
+   */
+  ref?: Ref<ReactEChartsCore>;
   /**
    * Chart data - either array of numbers or array of BarDataItem objects
    */

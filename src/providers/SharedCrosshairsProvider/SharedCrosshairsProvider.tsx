@@ -73,9 +73,5 @@ export function SharedCrosshairsProvider({ children }: SharedCrosshairsProviderP
     }
   }, []);
 
-  return (
-    <SharedCrosshairsContext.Provider value={{ registerChart, unregisterChart }}>
-      {children}
-    </SharedCrosshairsContext.Provider>
-  );
+  return <SharedCrosshairsContext value={{ registerChart, unregisterChart }}>{children}</SharedCrosshairsContext>;
 }

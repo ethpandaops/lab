@@ -1,4 +1,4 @@
-import React, { useId, createContext, useContext, type JSX } from 'react';
+import React, { useId, createContext, use, type JSX } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/Elements/Button';
 import type { InputProps, InputFieldProps, InputSlotProps, InputSize, SelectAddonProps } from './Input.types';
@@ -15,7 +15,7 @@ interface InputContextValue {
 const InputContext = createContext<InputContextValue | null>(null);
 
 const useInputContext = (): InputContextValue => {
-  const context = useContext(InputContext);
+  const context = use(InputContext);
   if (!context) {
     throw new Error('Input subcomponents must be used within an Input component');
   }
@@ -526,7 +526,7 @@ const InputBase = ({
   // Overlapping label layout
   if (labelVariant === 'overlapping') {
     return (
-      <InputContext.Provider value={contextValue}>
+      <InputContext value={contextValue}>
         <div className={clsx('relative', wrapperClassName)}>
           {renderLabel()}
           {needsGrid ? (
@@ -540,7 +540,7 @@ const InputBase = ({
           )}
           {renderHelperText()}
         </div>
-      </InputContext.Provider>
+      </InputContext>
     );
   }
 
@@ -552,7 +552,7 @@ const InputBase = ({
       lg: 'px-3 pt-2.5 pb-1.5',
     };
     return (
-      <InputContext.Provider value={contextValue}>
+      <InputContext value={contextValue}>
         <div className={clsx(wrapperClassName)}>
           <div
             className={clsx(
@@ -567,14 +567,14 @@ const InputBase = ({
           </div>
           {renderHelperText()}
         </div>
-      </InputContext.Provider>
+      </InputContext>
     );
   }
 
   // Flex layout (for inline addons)
   if (needsFlex) {
     return (
-      <InputContext.Provider value={contextValue}>
+      <InputContext value={contextValue}>
         <div className={clsx(wrapperClassName)}>
           {renderLabel()}
           <div
@@ -589,14 +589,14 @@ const InputBase = ({
           </div>
           {renderHelperText()}
         </div>
-      </InputContext.Provider>
+      </InputContext>
     );
   }
 
   // Grid layout (for icons/buttons)
   if (needsGrid) {
     return (
-      <InputContext.Provider value={contextValue}>
+      <InputContext value={contextValue}>
         <div className={clsx(wrapperClassName)}>
           {renderLabel()}
           <div className="grid grid-cols-1">
@@ -606,14 +606,14 @@ const InputBase = ({
           </div>
           {renderHelperText()}
         </div>
-      </InputContext.Provider>
+      </InputContext>
     );
   }
 
   // External addons layout (text addons outside border)
   if (needsExternalFlex) {
     return (
-      <InputContext.Provider value={contextValue}>
+      <InputContext value={contextValue}>
         <div className={clsx(wrapperClassName)}>
           {renderLabel()}
           <div className="flex">
@@ -623,19 +623,19 @@ const InputBase = ({
           </div>
           {renderHelperText()}
         </div>
-      </InputContext.Provider>
+      </InputContext>
     );
   }
 
   // Standard layout (field only)
   return (
-    <InputContext.Provider value={contextValue}>
+    <InputContext value={contextValue}>
       <div className={clsx(wrapperClassName)}>
         {renderLabel()}
         {fieldSlot}
         {renderHelperText()}
       </div>
-    </InputContext.Provider>
+    </InputContext>
   );
 };
 

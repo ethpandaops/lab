@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { BarChart as EChartsBar } from 'echarts/charts';
@@ -53,33 +53,31 @@ echarts.use([EChartsBar, GridComponent, TooltipComponent, TitleComponent, Canvas
  * />
  * ```
  */
-export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function BarChart(
-  {
-    data = [],
-    labels = [],
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    orientation = 'vertical',
-    height: _height = 400,
-    color,
-    max,
-    splitNumber = 5,
-    barWidth = '60%',
-    showLabel = true,
-    labelPosition,
-    labelFormatter = '{c}',
-    axisName,
-    animationDuration = 300,
-    tooltipFormatter,
-    categoryLabelInterval = 'auto',
-    valueAxisLabelFormatter,
-  },
-  ref
-): JSX.Element {
+export function BarChart({
+  data = [],
+  labels = [],
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  orientation = 'vertical',
+  height: _height = 400,
+  color,
+  max,
+  splitNumber = 5,
+  barWidth = '60%',
+  showLabel = true,
+  labelPosition,
+  labelFormatter = '{c}',
+  axisName,
+  animationDuration = 300,
+  tooltipFormatter,
+  categoryLabelInterval = 'auto',
+  valueAxisLabelFormatter,
+  ref,
+}: BarChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
@@ -236,4 +234,4 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
       />
     </div>
   );
-});
+}

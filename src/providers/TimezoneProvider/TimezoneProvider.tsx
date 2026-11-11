@@ -37,5 +37,5 @@ export function TimezoneProvider({ children }: TimezoneProviderProps): JSX.Eleme
 
   const value = useMemo(() => ({ timezone, toggleTimezone, setTimezone }), [timezone, toggleTimezone, setTimezone]);
 
-  return <TimezoneContext.Provider value={value}>{children}</TimezoneContext.Provider>;
+  return <TimezoneContext value={value}>{children}</TimezoneContext>;
 }

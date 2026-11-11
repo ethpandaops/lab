@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef, useCallback, useState } from 'react';
+import { type JSX, useMemo, useCallback, useState } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { BarChart as EChartsBar } from 'echarts/charts';
@@ -62,34 +62,32 @@ function defaultValueFormatter(value: number): string {
  * />
  * ```
  */
-export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function StackedBar(
-  {
-    segments,
-    total: providedTotal,
-    title,
-    subtitle,
-    footerLeft,
-    footerRight,
-    footerLeftClassName,
-    footerRightClassName,
-    showLabels = true,
-    showPercentages = true,
-    animated = true,
-    height = 120,
-    labelFontSize = 11,
-    animationDuration = 300,
-    valueFormatter = defaultValueFormatter,
-    showLegend = false,
-    onSegmentClick,
-    onSegmentHover,
-    selectedSegmentName,
-    minWidthPercent = 0.5,
-    minLabelWidthPercent = 8,
-    renderTooltip,
-    emptyMessage = 'No data available',
-  },
-  ref
-): JSX.Element {
+export function StackedBar({
+  segments,
+  total: providedTotal,
+  title,
+  subtitle,
+  footerLeft,
+  footerRight,
+  footerLeftClassName,
+  footerRightClassName,
+  showLabels = true,
+  showPercentages = true,
+  animated = true,
+  height = 120,
+  labelFontSize = 11,
+  animationDuration = 300,
+  valueFormatter = defaultValueFormatter,
+  showLegend = false,
+  onSegmentClick,
+  onSegmentHover,
+  selectedSegmentName,
+  minWidthPercent = 0.5,
+  minLabelWidthPercent = 8,
+  renderTooltip,
+  emptyMessage = 'No data available',
+  ref,
+}: StackedBarProps): JSX.Element {
   const themeColors = useThemeColors();
   const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
 
@@ -367,4 +365,4 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
       )}
     </div>
   );
-});
+}

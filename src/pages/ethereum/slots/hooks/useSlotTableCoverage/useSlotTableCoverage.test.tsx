@@ -38,11 +38,11 @@ function setup(slotTimestamp: number): {
   const queryClient = createQueryClient({ retry: false });
   queryClient.setQueryData(mainnetBounds(), bounds);
   const wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-    <NetworkContext.Provider
+    <NetworkContext
       value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
     >
       {children}
-    </NetworkContext.Provider>
+    </NetworkContext>
   );
   const { result, rerender } = renderHook(props => useSlotTableCoverage(props.slotTimestamp), {
     client: queryClient,

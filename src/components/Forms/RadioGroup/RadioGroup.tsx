@@ -1,7 +1,7 @@
 import { RadioGroup as HeadlessRadioGroup, Description, Label } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
-import { type JSX, createContext, useContext } from 'react';
+import { type JSX, createContext, use } from 'react';
 import { Avatar } from '@/components/Elements/Avatar';
 import { Card } from '@/components/Layout/Card';
 import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
@@ -46,7 +46,7 @@ export function RadioOption({
   caption,
   children,
 }: RadioOptionProps): JSX.Element {
-  const { variant, disabled: groupDisabled, getRadioStyles } = useContext(RadioGroupContext);
+  const { variant, disabled: groupDisabled, getRadioStyles } = use(RadioGroupContext);
   const optionValue = value ?? id;
   const optionLabel = children ?? title ?? name;
   const isDisabled = disabled || groupDisabled;
@@ -557,7 +557,7 @@ export function RadioGroup({
   };
 
   return (
-    <RadioGroupContext.Provider value={contextValue}>
+    <RadioGroupContext value={contextValue}>
       <HeadlessRadioGroup
         value={currentValue}
         onChange={handleChange}
@@ -586,6 +586,6 @@ export function RadioGroup({
         )}
         {renderContent()}
       </HeadlessRadioGroup>
-    </RadioGroupContext.Provider>
+    </RadioGroupContext>
   );
 }

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 import type { Button as HeadlessButton } from '@headlessui/react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'soft' | 'outline' | 'danger' | 'blank';
@@ -8,6 +8,11 @@ type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type ButtonRounded = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<typeof HeadlessButton> {
+  /**
+   * Ref to the rendered button element
+   */
+  ref?: Ref<HTMLButtonElement>;
+
   /**
    * The visual style variant of the button
    * @default 'primary'

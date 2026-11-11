@@ -10,7 +10,7 @@ describe('useTheme', () => {
     contextValue: ThemeContextValue | undefined
   ): (({ children }: { children: ReactNode }) => JSX.Element) => {
     const Wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-      <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
+      <ThemeContext value={contextValue}>{children}</ThemeContext>
     );
     return Wrapper;
   };
@@ -155,7 +155,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {
@@ -187,7 +187,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {
@@ -219,7 +219,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {

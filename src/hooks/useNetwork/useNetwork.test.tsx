@@ -22,7 +22,7 @@ describe('useNetwork', () => {
     contextValue: NetworkContextValue | undefined
   ): (({ children }: { children: ReactNode }) => JSX.Element) => {
     const Wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-      <NetworkContext.Provider value={contextValue}>{children}</NetworkContext.Provider>
+      <NetworkContext value={contextValue}>{children}</NetworkContext>
     );
     return Wrapper;
   };
@@ -188,7 +188,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {
@@ -222,7 +222,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {
@@ -253,7 +253,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {

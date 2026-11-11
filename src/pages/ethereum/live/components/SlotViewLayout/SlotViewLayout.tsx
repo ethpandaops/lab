@@ -5,7 +5,7 @@ import {
   useRef,
   useCallback,
   useEffect,
-  useContext,
+  use,
   useState,
   memo,
   createContext,
@@ -59,7 +59,7 @@ interface SlotLiveDataContextValue {
 const SlotLiveDataContext = createContext<SlotLiveDataContextValue | null>(null);
 
 function useSlotLiveData(): SlotLiveDataContextValue {
-  const context = useContext(SlotLiveDataContext);
+  const context = use(SlotLiveDataContext);
   if (!context) {
     throw new Error('useSlotLiveData must be used within SlotLiveDataProvider');
   }
@@ -260,7 +260,7 @@ function SlotLiveDataProvider({
     return { timeFilteredData: timeFilteredDataRef.current };
   }, [dataVersion]);
 
-  return <SlotLiveDataContext.Provider value={value}>{children}</SlotLiveDataContext.Provider>;
+  return <SlotLiveDataContext value={value}>{children}</SlotLiveDataContext>;
 }
 
 const LiveSlotHud = memo(function LiveSlotHud({

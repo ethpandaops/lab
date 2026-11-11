@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo, useCallback, useContext } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, use } from 'react';
 import type { EChartsInstance } from 'echarts-for-react/lib';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import ReactEChartsComponent from 'echarts-for-react/lib/core';
@@ -252,7 +252,7 @@ export function MultiLineChart({
   const [zoomRange, setZoomRange] = useState({ start: 0, end: 100 });
 
   // Get shared crosshairs context for sync registration
-  const crosshairsContext = useContext(SharedCrosshairsContext);
+  const crosshairsContext = use(SharedCrosshairsContext);
 
   // Handle chart ready - register for sync when chart is fully initialized
   const handleChartReady = useCallback(

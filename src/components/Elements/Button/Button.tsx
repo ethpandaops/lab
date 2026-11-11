@@ -1,4 +1,4 @@
-import { forwardRef, cloneElement, isValidElement } from 'react';
+import { type JSX, cloneElement, isValidElement } from 'react';
 import { Button as HeadlessButton } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ButtonProps } from './Button.types';
@@ -17,64 +17,58 @@ const iconMarginStyles = {
   trailing: '-mr-0.5',
 };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      variant = 'primary',
-      size = 'md',
-      rounded,
-      leadingIcon,
-      trailingIcon,
-      iconOnly = false,
-      nowrap = false,
-      hyper = false,
-      className,
-      children,
-      type = 'button',
-      ...props
-    },
-    ref
-  ) => {
-    const classes = buttonClassName({
-      variant,
-      size,
-      rounded,
-      iconOnly,
-      className: clsx(
-        nowrap && 'whitespace-nowrap',
-        hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
-        className
-      ),
-    });
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  rounded,
+  leadingIcon,
+  trailingIcon,
+  iconOnly = false,
+  nowrap = false,
+  hyper = false,
+  className,
+  children,
+  type = 'button',
+  ref,
+  ...props
+}: ButtonProps): JSX.Element {
+  const classes = buttonClassName({
+    variant,
+    size,
+    rounded,
+    iconOnly,
+    className: clsx(
+      nowrap && 'whitespace-nowrap',
+      hyper && (variant === 'blank' ? 'button-hyper-blank' : 'button-hyper'),
+      className
+    ),
+  });
 
-    // Render icon with appropriate styles
-    const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
-      if (!icon || !isValidElement(icon)) return null;
+  // Render icon with appropriate styles
+  const renderIcon = (icon: React.ReactNode, position: 'leading' | 'trailing'): React.ReactNode | null => {
+    if (!icon || !isValidElement(icon)) return null;
 
-      return cloneElement(icon, {
-        'aria-hidden': 'true',
-        className: clsx(iconSizeStyles[size], !iconOnly && iconMarginStyles[position]),
-      } as Record<string, unknown>);
-    };
+    return cloneElement(icon, {
+      'aria-hidden': 'true',
+      className: clsx(iconSizeStyles[size], !iconOnly && iconMarginStyles[position]),
+    } as Record<string, unknown>);
+  };
 
-    // For icon-only buttons
-    if (iconOnly) {
-      const icon = leadingIcon || trailingIcon;
-      return (
-        <HeadlessButton ref={ref} type={type} className={classes} {...props}>
-          {renderIcon(icon, 'leading')}
-        </HeadlessButton>
-      );
-    }
-
+  // For icon-only buttons
+  if (iconOnly) {
+    const icon = leadingIcon || trailingIcon;
     return (
       <HeadlessButton ref={ref} type={type} className={classes} {...props}>
-        {renderIcon(leadingIcon, 'leading')}
-        {children}
-        {renderIcon(trailingIcon, 'trailing')}
+        {renderIcon(icon, 'leading')}
       </HeadlessButton>
     );
   }
-);
 
-Button.displayName = 'Button';
+  return (
+    <HeadlessButton ref={ref} type={type} className={classes} {...props}>
+      {renderIcon(leadingIcon, 'leading')}
+      {children}
+      {renderIcon(trailingIcon, 'trailing')}
+    </HeadlessButton>
+  );
+}

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { use } from 'react';
 import { TimezoneContext } from '@/contexts/TimezoneContext';
 import type { TimezoneContextValue } from '@/contexts/TimezoneContext';
 
@@ -7,7 +7,7 @@ import type { TimezoneContextValue } from '@/contexts/TimezoneContext';
  * @throws {Error} If used outside of TimezoneProvider
  */
 export function useTimezone(): TimezoneContextValue {
-  const context = useContext(TimezoneContext);
+  const context = use(TimezoneContext);
 
   if (context === undefined) {
     throw new Error('useTimezone must be used within a TimezoneProvider');

@@ -804,14 +804,14 @@ export function SlotPlayerProvider({
    * - Progress - High-frequency updates (60fps animation)
    */
   return (
-    <SlotPlayerMetaContext.Provider value={metaValue}>
-      <SlotPlayerActionsContext.Provider value={actions}>
-        <SlotPlayerConfigContext.Provider value={configValue}>
-          <SlotPlayerStateContext.Provider value={stateValue}>
-            <SlotPlayerProgressContext.Provider value={progressValue}>{children}</SlotPlayerProgressContext.Provider>
-          </SlotPlayerStateContext.Provider>
-        </SlotPlayerConfigContext.Provider>
-      </SlotPlayerActionsContext.Provider>
-    </SlotPlayerMetaContext.Provider>
+    <SlotPlayerMetaContext value={metaValue}>
+      <SlotPlayerActionsContext value={actions}>
+        <SlotPlayerConfigContext value={configValue}>
+          <SlotPlayerStateContext value={stateValue}>
+            <SlotPlayerProgressContext value={progressValue}>{children}</SlotPlayerProgressContext>
+          </SlotPlayerStateContext>
+        </SlotPlayerConfigContext>
+      </SlotPlayerActionsContext>
+    </SlotPlayerMetaContext>
   );
 }

@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useContext, useMemo, memo } from 'react';
+import { use, useMemo, memo } from 'react';
 import clsx from 'clsx';
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from '@heroicons/react/16/solid';
 import { SlotPlayerProgressContext } from '@/contexts/SlotPlayerContext';
@@ -21,7 +21,7 @@ function AvailabilityStatus({
   onTimeColumnCount: number;
   deadlineMs: number;
 }): JSX.Element {
-  const progress = useContext(SlotPlayerProgressContext);
+  const progress = use(SlotPlayerProgressContext);
   const pastDeadline = progress === undefined || progress.slotProgress >= deadlineMs;
 
   const status =

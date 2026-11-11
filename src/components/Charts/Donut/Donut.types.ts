@@ -1,3 +1,6 @@
+import type { Ref } from 'react';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+
 /**
  * Configuration for a single donut segment
  */
@@ -21,6 +24,10 @@ interface DonutDataItem {
  * Props for the Donut component
  */
 export interface DonutProps {
+  /**
+   * Ref to the underlying echarts-for-react instance
+   */
+  ref?: Ref<ReactEChartsCore>;
   /**
    * Array of data items to display in the donut chart
    */

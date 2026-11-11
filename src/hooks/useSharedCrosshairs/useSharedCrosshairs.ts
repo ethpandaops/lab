@@ -1,4 +1,4 @@
-import { useContext, useCallback } from 'react';
+import { use, useCallback } from 'react';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import type { EChartsInstance } from 'echarts-for-react/lib';
 import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
@@ -21,7 +21,7 @@ import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
  * ```
  */
 export function useSharedCrosshairs({ syncGroup }: { syncGroup?: string }): (node: ReactEChartsCore | null) => void {
-  const context = useContext(SharedCrosshairsContext);
+  const context = use(SharedCrosshairsContext);
 
   const chartRef = useCallback(
     (node: ReactEChartsCore | null) => {

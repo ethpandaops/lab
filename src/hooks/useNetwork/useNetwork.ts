@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { use } from 'react';
 import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext/index';
 
 /**
@@ -36,7 +36,7 @@ import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkCont
  * @throws {Error} If used outside of NetworkProvider
  */
 export function useNetwork(): NetworkContextValue {
-  const context = useContext(NetworkContext);
+  const context = use(NetworkContext);
 
   if (!context) {
     throw new Error('useNetwork must be used within a NetworkProvider');

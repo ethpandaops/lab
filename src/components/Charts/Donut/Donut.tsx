@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
@@ -51,29 +51,27 @@ echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, Canvas
  * />
  * ```
  */
-export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
-  {
-    data = [],
-    height = 400,
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    innerRadius = 40,
-    outerRadius = 70,
-    showLegend = true,
-    legendPosition = 'top',
-    legendOrientation = 'horizontal',
-    showLabel = false,
-    labelPosition = 'center',
-    showCenterValue = true,
-    centerValueFontSize = 40,
-    animationDuration = 300,
-  },
-  ref
-): JSX.Element {
+export function Donut({
+  data = [],
+  height = 400,
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  innerRadius = 40,
+  outerRadius = 70,
+  showLegend = true,
+  legendPosition = 'top',
+  legendOrientation = 'horizontal',
+  showLabel = false,
+  labelPosition = 'center',
+  showCenterValue = true,
+  centerValueFontSize = 40,
+  animationDuration = 300,
+  ref,
+}: DonutProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
@@ -236,4 +234,4 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
       />
     </div>
   );
-});
+}

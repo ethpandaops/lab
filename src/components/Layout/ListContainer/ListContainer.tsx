@@ -1,4 +1,4 @@
-import { type JSX, createContext, useContext } from 'react';
+import { type JSX, createContext, use } from 'react';
 import clsx from 'clsx';
 import type { ListContainerProps, ListItemProps, ListContainerVariant } from './ListContainer.types';
 
@@ -57,7 +57,7 @@ const variantStyles: Record<
 };
 
 export function ListItem({ children, className, onClick, as: Component = 'li' }: ListItemProps): JSX.Element {
-  const { variant, fullWidthOnMobile, compact } = useContext(ListContainerContext);
+  const { variant, fullWidthOnMobile, compact } = use(ListContainerContext);
   const styles = variantStyles[variant];
   const itemClass = fullWidthOnMobile && styles.itemMobileFull ? styles.itemMobileFull : styles.item;
 
@@ -101,9 +101,9 @@ export function ListContainer({
     const wrapperClass = fullWidthOnMobile && styles.wrapperMobileFull ? styles.wrapperMobileFull : styles.wrapper;
 
     return (
-      <ListContainerContext.Provider value={contextValue}>
+      <ListContainerContext value={contextValue}>
         <div className={clsx(wrapperClass, className)}>{list}</div>
-      </ListContainerContext.Provider>
+      </ListContainerContext>
     );
   }
 
@@ -114,5 +114,5 @@ export function ListContainer({
     </Component>
   );
 
-  return <ListContainerContext.Provider value={contextValue}>{list}</ListContainerContext.Provider>;
+  return <ListContainerContext value={contextValue}>{list}</ListContainerContext>;
 }

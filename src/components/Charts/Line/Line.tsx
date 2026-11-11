@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef, useCallback } from 'react';
+import { type JSX, useMemo, useCallback } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -37,32 +37,30 @@ echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, Canva
  * />
  * ```
  */
-export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function LineChart(
-  {
-    data = [820, 932, 901, 934, 1290, 1330, 1320],
-    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    height = 400,
-    smooth = true,
-    showArea = false,
-    color,
-    yMax,
-    xMax,
-    connectNulls = false,
-    animationDuration = 300,
-    xAxisLabelInterval = 'auto',
-    xAxisTitle,
-    yAxisTitle,
-    syncGroup,
-    tooltipFormatter,
-  },
-  ref
-): JSX.Element {
+export function LineChart({
+  data = [820, 932, 901, 934, 1290, 1330, 1320],
+  labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  height = 400,
+  smooth = true,
+  showArea = false,
+  color,
+  yMax,
+  xMax,
+  connectNulls = false,
+  animationDuration = 300,
+  xAxisLabelInterval = 'auto',
+  xAxisTitle,
+  yAxisTitle,
+  syncGroup,
+  tooltipFormatter,
+  ref,
+}: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   // Get callback ref for crosshair sync
@@ -250,4 +248,4 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       />
     </div>
   );
-});
+}

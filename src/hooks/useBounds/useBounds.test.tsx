@@ -41,7 +41,7 @@ describe('useBounds', () => {
   const networkWrapper = (network: Network | null = mockNetwork) =>
     function Wrapper({ children }: { children: ReactNode }): JSX.Element {
       return (
-        <NetworkContext.Provider
+        <NetworkContext
           value={{
             currentNetwork: network,
             setCurrentNetwork: vi.fn(),
@@ -50,7 +50,7 @@ describe('useBounds', () => {
           }}
         >
           {children}
-        </NetworkContext.Provider>
+        </NetworkContext>
       );
     };
 
@@ -95,7 +95,7 @@ describe('useBounds', () => {
       let currentNetwork: Network | null = null;
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider
+        <NetworkContext
           value={{
             currentNetwork,
             setCurrentNetwork: vi.fn(),
@@ -104,7 +104,7 @@ describe('useBounds', () => {
           }}
         >
           {children}
-        </NetworkContext.Provider>
+        </NetworkContext>
       );
 
       const { rerender } = renderHook(() => useBounds(), { wrapper: DynamicWrapper });
@@ -216,7 +216,7 @@ describe('useBounds', () => {
       let currentNetwork: Network = mockNetwork;
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider
+        <NetworkContext
           value={{
             currentNetwork,
             setCurrentNetwork: vi.fn(),
@@ -225,7 +225,7 @@ describe('useBounds', () => {
           }}
         >
           {children}
-        </NetworkContext.Provider>
+        </NetworkContext>
       );
 
       const { rerender } = renderHook(() => useBounds(), { wrapper: DynamicWrapper });
