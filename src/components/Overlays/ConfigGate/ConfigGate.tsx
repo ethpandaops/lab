@@ -34,7 +34,6 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
 
   // Show error state if initial config fetch failed
   if (!config) {
-    console.error('Config error:', error);
     const errorMessage = apiErrorMessage(error);
 
     return (

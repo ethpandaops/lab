@@ -1,27 +1,14 @@
-import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { client } from '@/lab-api/client.gen';
+import { describe, it, expect } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { renderHook, server, waitFor } from '@/test-utils';
+import { configHandlers } from '@/test-utils/handlers';
 import { getConfigQueryKey } from '@/lab-api/@tanstack/react-query.gen';
-import { createQueryClient } from '@/utils/query-client';
 import { useConfig } from './useConfig';
 import type { Config } from './useConfig.types';
-import { type ReactNode } from 'react';
 
-// Mock fetch globally
-global.fetch = vi.fn();
-
-/** A JSON response, as the API sends it. */
-const json = (body: unknown, status = 200): Response =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
-
-/** A plain-text error, as the API sends it. */
-const text = (body: string, status: number): Response =>
-  new Response(body, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+const CONFIG_URL = '/api/v1/config';
 
 describe('useConfig', () => {
-  let queryClient: QueryClient;
-
   const mockConfig: Config = {
     networks: [
       {
@@ -64,33 +51,23 @@ describe('useConfig', () => {
     ],
   };
 
-  // jsdom's fetch needs absolute URLs
-  beforeAll(() => client.setConfig({ baseUrl: 'http://localhost' }));
-
-  beforeEach(() => {
-    queryClient = createQueryClient({ retry: false });
-
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    queryClient.clear();
-  });
-
-  const createWrapper = (): (({ children }: { children: ReactNode }) => JSX.Element) => {
-    const Wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  /** Serves `config` and returns the number of requests the server has answered so far. */
+  const serveConfig = (config: Config = mockConfig): (() => number) => {
+    let requests = 0;
+    server.use(
+      http.get(CONFIG_URL, () => {
+        requests += 1;
+        return HttpResponse.json(config);
+      })
     );
-    return Wrapper;
+    return () => requests;
   };
 
   describe('successful data fetching', () => {
     it('should fetch and return config data', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       expect(result.current.isLoading).toBe(true);
       expect(result.current.data).toBeUndefined();
@@ -106,11 +83,9 @@ describe('useConfig', () => {
     });
 
     it('should return networks array', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -122,11 +97,9 @@ describe('useConfig', () => {
     });
 
     it('should return features array', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -138,42 +111,52 @@ describe('useConfig', () => {
     });
 
     it('should fetch from correct endpoint', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      const paths: string[] = [];
+      server.use(
+        http.get('*', ({ request }) => {
+          paths.push(new URL(request.url).pathname);
+          return HttpResponse.json(mockConfig);
+        })
+      );
 
-      renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalled();
+        expect(result.current.isSuccess).toBe(true);
       });
 
-      expect((vi.mocked(fetch).mock.calls[0][0] as Request).url).toBe('http://localhost/api/v1/config');
+      expect(paths).toEqual(['/api/v1/config']);
     });
   });
 
   describe('error handling', () => {
     it('should handle fetch errors', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(text('failed to encode response\n', 500));
+      server.use(
+        http.get(
+          CONFIG_URL,
+          () =>
+            new HttpResponse('failed to encode response\n', {
+              status: 500,
+              headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            })
+        )
+      );
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
 
+      // The generated client throws lab-backend's response body
       expect(result.current.error).toBe('failed to encode response\n');
       expect(result.current.data).toBeUndefined();
     });
 
     it('should reject a configuration that does not match the spec', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json({ ...mockConfig, networks: [{ name: 'mainnet' }] }));
+      server.use(http.get(CONFIG_URL, () => HttpResponse.json({ ...mockConfig, networks: [{ name: 'mainnet' }] })));
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
@@ -183,27 +166,24 @@ describe('useConfig', () => {
     });
 
     it('should handle network errors', async () => {
-      vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'));
+      server.use(http.get(CONFIG_URL, () => HttpResponse.error()));
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
       });
 
-      expect(result.current.error).toHaveProperty('message', 'Network error');
+      expect(result.current.error).toBeInstanceOf(TypeError);
+      expect(result.current.data).toBeUndefined();
     });
 
     it('should handle invalid JSON', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(
-        new Response('{not json', { status: 200, headers: { 'Content-Type': 'application/json' } })
+      server.use(
+        http.get(CONFIG_URL, () => new HttpResponse('{', { headers: { 'Content-Type': 'application/json' } }))
       );
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true);
@@ -215,16 +195,9 @@ describe('useConfig', () => {
 
   describe('loading states', () => {
     it('should start with loading state', () => {
-      vi.mocked(fetch).mockImplementation(
-        () =>
-          new Promise(() => {
-            // Never resolve - stay loading
-          })
-      );
+      server.use(configHandlers.pending);
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       expect(result.current.isLoading).toBe(true);
       expect(result.current.isPending).toBe(true);
@@ -233,11 +206,9 @@ describe('useConfig', () => {
     });
 
     it('should transition from loading to success', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       expect(result.current.isLoading).toBe(true);
 
@@ -250,11 +221,9 @@ describe('useConfig', () => {
     });
 
     it('should transition from loading to error', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(text('Server Error', 500));
+      server.use(configHandlers.failure);
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       expect(result.current.isLoading).toBe(true);
 
@@ -269,37 +238,32 @@ describe('useConfig', () => {
 
   describe('caching behavior', () => {
     it('should cache data and not refetch on remount', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      const requests = serveConfig();
 
-      const { result, unmount } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result, unmount, client } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(requests()).toBe(1);
 
       unmount();
 
-      // Remount - should use cached data
-      const { result: result2 } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      // Remount with the same client - should use cached data
+      const { result: result2 } = renderHook(() => useConfig(), { client });
 
       // Should immediately have data from cache
       expect(result2.current.data).toEqual(mockConfig);
       // Should not fetch again
-      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(requests()).toBe(1);
     });
 
     it('should share data between multiple instances', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      const requests = serveConfig();
 
-      const wrapper = createWrapper();
-      const { result: result1 } = renderHook(() => useConfig(), { wrapper });
-      const { result: result2 } = renderHook(() => useConfig(), { wrapper });
+      const { result: result1, client } = renderHook(() => useConfig());
+      const { result: result2 } = renderHook(() => useConfig(), { client });
 
       await waitFor(() => {
         expect(result1.current.isSuccess).toBe(true);
@@ -307,7 +271,7 @@ describe('useConfig', () => {
       });
 
       // Should only fetch once
-      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(requests()).toBe(1);
 
       // Both should have same data
       expect(result1.current.data).toEqual(mockConfig);
@@ -317,50 +281,38 @@ describe('useConfig', () => {
 
   describe('query configuration', () => {
     it('should use correct query key', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result, client } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
       // Check if data is cached under the correct key
-      const cachedData = queryClient.getQueryData(getConfigQueryKey());
-      expect(cachedData).toEqual(mockConfig);
+      expect(client.getQueryData(getConfigQueryKey())).toEqual(mockConfig);
     });
 
     it('should have infinite staleTime', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result, client } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
       // Data should never be stale
-      const queryState = queryClient.getQueryState(getConfigQueryKey());
+      const queryState = client.getQueryState(getConfigQueryKey());
       expect(queryState?.isInvalidated).toBe(false);
     });
   });
 
   describe('data structure', () => {
     it('should handle empty networks array', async () => {
-      const emptyConfig: Config = {
-        networks: [],
-        features: [],
-      };
+      serveConfig({ networks: [], features: [] });
 
-      vi.mocked(fetch).mockResolvedValueOnce(json(emptyConfig));
-
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -371,7 +323,7 @@ describe('useConfig', () => {
     });
 
     it('should handle network with complete fork data', async () => {
-      const configWithForks: Config = {
+      serveConfig({
         networks: [
           {
             name: 'mainnet',
@@ -400,13 +352,9 @@ describe('useConfig', () => {
           },
         ],
         features: [],
-      };
-
-      vi.mocked(fetch).mockResolvedValueOnce(json(configWithForks));
-
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
       });
+
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -420,11 +368,9 @@ describe('useConfig', () => {
     });
 
     it('should handle features with different disabled network configurations', async () => {
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -440,31 +386,27 @@ describe('useConfig', () => {
 
   describe('refetch behavior', () => {
     it('should allow manual refetch', async () => {
-      vi.mocked(fetch).mockImplementation(async () => json(mockConfig));
+      const requests = serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(requests()).toBe(1);
 
       // Manually refetch
       await result.current.refetch();
 
-      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(requests()).toBe(2);
     });
 
     it('should handle failed refetch with cached data', async () => {
       // First fetch succeeds
-      vi.mocked(fetch).mockResolvedValueOnce(json(mockConfig));
+      serveConfig();
 
-      const { result } = renderHook(() => useConfig(), {
-        wrapper: createWrapper(),
-      });
+      const { result } = renderHook(() => useConfig());
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -473,11 +415,14 @@ describe('useConfig', () => {
       const cachedData = result.current.data;
 
       // Second fetch fails
-      vi.mocked(fetch).mockResolvedValueOnce(text('Server Error', 500));
+      server.use(configHandlers.failure);
 
       await result.current.refetch();
 
       // Should still have cached data
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
       expect(result.current.data).toEqual(cachedData);
     });
   });

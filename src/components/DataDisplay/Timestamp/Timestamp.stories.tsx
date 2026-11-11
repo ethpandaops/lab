@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Timestamp } from './Timestamp';
+import { freezeNow, NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/DataDisplay/Timestamp',
@@ -7,6 +8,7 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
+  beforeEach: freezeNow,
   tags: ['autodocs'],
   decorators: [
     Story => (
@@ -21,7 +23,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Get various timestamps for stories
-const now = Math.floor(Date.now() / 1000);
+const now = Math.floor(NOW_MS / 1000);
 const twoMinutesAgo = now - 120;
 const oneHourAgo = now - 3600;
 const yesterday = now - 86400;
@@ -108,7 +110,7 @@ export const LongFormat: Story = {
  */
 export const DateFormat: Story = {
   args: {
-    timestamp: Math.floor(Date.now() / 1000) - 86400 * 10,
+    timestamp: now - 86400 * 10,
     format: 'date',
   },
 };

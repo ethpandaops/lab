@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { GasUsedChart } from './GasUsedChart';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/Ethereum/GasUsedChart',
@@ -149,7 +150,7 @@ export const LowUtilization: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
-      x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
+      x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
       gasUsed: Math.floor(Math.random() * 100000000 + 950000000), // 950M-1.05B daily gas
     })),
     xAxis: {

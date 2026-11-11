@@ -1,10 +1,7 @@
-import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
 import type { JSX, ReactNode } from 'react';
-import { client } from '@/api/client.gen';
-import { client as labClient } from '@/lab-api/client.gen';
-import { createQueryClient } from '@/utils/query-client';
+import { renderHook, server, waitFor } from '@/test-utils';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import { useValidatorsData } from './useValidatorsData';
@@ -42,32 +39,21 @@ const ATTESTATIONS = {
 };
 
 function wrapper({ children }: { children: ReactNode }): JSX.Element {
-  const queryClient = createQueryClient({ retry: false });
   return (
-    <QueryClientProvider client={queryClient}>
-      <NetworkContext.Provider
-        value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
-      >
-        {children}
-      </NetworkContext.Provider>
-    </QueryClientProvider>
+    <NetworkContext.Provider
+      value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
+    >
+      {children}
+    </NetworkContext.Provider>
   );
 }
 
 describe('useValidatorsData', () => {
-  // Node's fetch needs an absolute URL
-  beforeAll(() => {
-    client.setConfig({ baseUrl: 'http://localhost' });
-    labClient.setConfig({ baseUrl: 'http://localhost' });
-  });
-  afterEach(() => vi.unstubAllGlobals());
-
   it('weights the inclusion delay by attestations and leaves rates with nothing to divide by empty', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const body = request.url.includes('fct_attestation_vote_correctness_by_validator_daily') ? ATTESTATIONS : {};
-        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return HttpResponse.json(body);
       })
     );
 
@@ -95,15 +81,14 @@ describe('useValidatorsData', () => {
     // Before gossip data starts no source vote is known, so both counts are 0
     const beforeGossip = { ...day('2026-09-02', 1, 225, 225, 1), source_correct_count: 0, source_incorrect_count: 0 };
     const urls: URL[] = [];
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const url = new URL(request.url);
         urls.push(url);
         const body = url.pathname.endsWith('fct_attestation_vote_correctness_by_validator_daily')
           ? { fct_attestation_vote_correctness_by_validator_daily: [known, beforeGossip] }
           : {};
-        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return HttpResponse.json(body);
       })
     );
 
@@ -124,9 +109,8 @@ describe('useValidatorsData', () => {
 
   it('asks for 250 validators per request and follows page tokens', async () => {
     const urls: URL[] = [];
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const url = new URL(request.url);
         urls.push(url);
         const body = url.pathname.endsWith('fct_validator_balance_daily')
@@ -137,7 +121,7 @@ describe('useValidatorsData', () => {
                 next_page_token: 'next',
               }
           : {};
-        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return HttpResponse.json(body);
       })
     );
 
@@ -161,9 +145,8 @@ describe('useValidatorsData', () => {
     const rangeEnd = sunday + 3 * 86400;
     const urls: URL[] = [];
     const proposal = (ts: number): object => ({ validator_index: 1, slot_start_date_time: ts, status: 'canonical' });
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const url = new URL(request.url);
         urls.push(url);
         const body = url.pathname.endsWith('fct_block_proposer_by_validator')
@@ -171,7 +154,7 @@ describe('useValidatorsData', () => {
               fct_block_proposer_by_validator: [proposal(monday - 12), proposal(monday + 12), proposal(rangeEnd + 12)],
             }
           : {};
-        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return HttpResponse.json(body);
       })
     );
 
@@ -197,9 +180,8 @@ describe('useValidatorsData', () => {
     const day = 1788134400; // 2026-08-31
     const headStart = day + 3600;
     const proposal = (ts: number, status: string): object => ({ validator_index: 1, slot_start_date_time: ts, status });
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const url = new URL(request.url);
         const body = url.pathname.endsWith('/bounds')
           ? { fct_block_proposer_head: { min: headStart, max: day + 86400 } }
@@ -213,7 +195,7 @@ describe('useValidatorsData', () => {
                 ],
               }
             : {};
-        return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return HttpResponse.json(body);
       })
     );
 
@@ -247,9 +229,8 @@ describe('useValidatorsData', () => {
       min_balance: min,
       max_balance: end,
     });
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (request: Request) => {
+    server.use(
+      http.get('*', ({ request }) => {
         const url = new URL(request.url);
         urls.push(url);
         const table = url.pathname.split('/').pop() ?? '';
@@ -266,10 +247,7 @@ describe('useValidatorsData', () => {
             balance('2026-11-03', 32.1e9, 32.2e9, 32.05e9),
           ],
         };
-        return new Response(JSON.stringify({ [table]: body[table] ?? [] }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return HttpResponse.json({ [table]: body[table] ?? [] });
       })
     );
 

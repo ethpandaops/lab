@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@/test-utils';
 import { ReactNode } from 'react';
 import {
   useSlotPlayer,

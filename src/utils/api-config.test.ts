@@ -1,20 +1,20 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test-utils';
 import { intCustodyProbeServiceList } from '@/api/sdk.gen';
 
 describe('API client Int64 handling', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it('keeps peer_id_unique_key lossless from the response back into a filter', async () => {
-    const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL) =>
-        new Response(
+    const requests: Request[] = [];
+    server.use(
+      http.get('http://lab.test/api/v1/int_custody_probe', ({ request }) => {
+        requests.push(request);
+        return new HttpResponse(
           '{"int_custody_probe":[{"peer_id_unique_key":6292022559433348801,"slot":15558666},{"peer_id_unique_key":-42,"slot":1}]}',
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        )
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+      })
     );
-    vi.stubGlobal('fetch', fetchMock);
 
     const { data } = await intCustodyProbeServiceList({
       baseUrl: 'http://lab.test',
@@ -27,7 +27,7 @@ describe('API client Int64 handling', () => {
     ]);
     expect(data?.int_custody_probe?.[0].slot).toBe(15558666);
 
-    const request = fetchMock.mock.calls[0][0] as Request;
-    expect(new URL(request.url).searchParams.get('peer_id_unique_key_in_values')).toBe('6292022559433348801');
+    expect(requests).toHaveLength(1);
+    expect(new URL(requests[0].url).searchParams.get('peer_id_unique_key_in_values')).toBe('6292022559433348801');
   });
 });

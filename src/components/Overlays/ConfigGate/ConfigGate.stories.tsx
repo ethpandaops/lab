@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { http, HttpResponse, delay } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { ConfigGate } from './ConfigGate';
+import { configHandlers } from '@/test-utils/handlers';
 import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 const meta: Meta = {
@@ -45,9 +46,7 @@ export const Loading: Story = {
     hydration: false, // Disable hydration to show loading state
     msw: {
       handlers: {
-        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, async () => {
-          await delay('infinite');
-        }),
+        config: configHandlers.pending,
       },
     },
   },
@@ -71,12 +70,7 @@ export const Error: Story = {
     hydration: false, // Disable hydration to show error state
     msw: {
       handlers: {
-        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
-          return HttpResponse.json(
-            { error: 'Internal Server Error' },
-            { status: 500, statusText: 'Internal Server Error' }
-          );
-        }),
+        config: configHandlers.failure,
       },
     },
     tanstackQuery: {
@@ -136,12 +130,7 @@ export const ErrorWithRetries: Story = {
     hydration: false, // Disable hydration to show error state
     msw: {
       handlers: {
-        config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
-          return HttpResponse.json(
-            { error: 'Internal Server Error' },
-            { status: 500, statusText: 'Internal Server Error' }
-          );
-        }),
+        config: configHandlers.failure,
       },
     },
     // Override global retry settings for this story

@@ -5,7 +5,9 @@ import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } fr
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ConfigGate } from '@/components/Overlays/ConfigGate';
-import { mockConfig, mockBounds } from '../.storybook/mocks';
+import { boundsFixture } from '@/test-utils/handlers/bounds';
+import { configFixture } from '@/test-utils/handlers/config';
+import { getBoundsQueryKey, getConfigQueryKey } from '@/lab-api/@tanstack/react-query.gen';
 
 /**
  * Provider chain for design-sync previews. Mirrors the decorator chain in
@@ -19,9 +21,9 @@ export function DesignSyncProvider({ children }: { children: React.ReactNode }) 
     const qc = new QueryClient({
       defaultOptions: { queries: { retry: 0, staleTime: Infinity } },
     });
-    qc.setQueryData(['config'], mockConfig);
-    mockConfig.networks.forEach(network => {
-      qc.setQueryData(['bounds', network.name], mockBounds);
+    qc.setQueryData(getConfigQueryKey(), configFixture);
+    configFixture.networks.forEach(network => {
+      qc.setQueryData(getBoundsQueryKey({ path: { network: network.name } }), boundsFixture);
     });
 
     const rootRoute = createRootRoute({

@@ -12,7 +12,7 @@ import { FeatureGate } from './FeatureGate';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 import { createQueryClient } from '@/utils/query-client';
-import { mockBounds } from '../../../../.storybook/mocks';
+import { boundsHandlers } from '@/test-utils/handlers';
 
 /**
  * FeatureGate is a component that checks if the current page is enabled for the active network.
@@ -90,9 +90,7 @@ export const Default: Story = {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.json(mockConfigDisabled);
         }),
-        bounds: http.get(`${BASE_URL}${PATH_PREFIX}/*/bounds`, () => {
-          return HttpResponse.json(mockBounds);
-        }),
+        bounds: boundsHandlers.success,
       },
     },
   },

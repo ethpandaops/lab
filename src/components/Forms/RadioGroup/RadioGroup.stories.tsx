@@ -216,16 +216,12 @@ export const Picker: Story = {
           name="Block Production Flow"
           src="/images/experiments/block-production-flow.png"
         />
-        <RadioOption id="fork-readiness" name="Fork Readiness" src="/images/experiments/fork-readiness.png" />
-        <RadioOption
-          id="geographical-checklist"
-          name="Geographical Checklist"
-          src="/images/experiments/geographical-checklist.png"
-        />
+        <RadioOption id="fork-readiness" name="Fork Readiness" src="/images/ethereum/clients.png" />
+        <RadioOption id="geographical-checklist" name="Geographical Checklist" src="/images/ethereum/network.png" />
         <RadioOption
           id="locally-built-blocks"
           name="Locally Built Blocks"
-          src="/images/experiments/locally-built-blocks.png"
+          src="/images/ethereum/execution/locally-built-blocks.png"
         />
         <RadioOption id="networks" name="Networks" src="/images/experiments/networks.png" />
         <RadioOption id="live" name="Live" src="/images/ethereum/live.png" />

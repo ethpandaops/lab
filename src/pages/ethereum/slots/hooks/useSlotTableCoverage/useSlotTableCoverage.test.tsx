@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
-import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ReactNode } from 'react';
+import { type JSX, type ReactNode } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { act, renderHook } from '@/test-utils';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
 import type { Bounds } from '@/hooks/useBounds';
@@ -26,26 +26,26 @@ const bounds: Bounds = {
   fct_block_mev: { min: 2000, max: 6000 },
 };
 
-const mainnetBounds = getBoundsQueryKey({ path: { network: 'mainnet' } });
+// Built when used: the key holds the client's base URL, which the test setup sets after this module loads.
+const mainnetBounds = (): ReturnType<typeof getBoundsQueryKey> => getBoundsQueryKey({ path: { network: 'mainnet' } });
 
 function setup(slotTimestamp: number): {
   queryClient: QueryClient;
   result: { current: ReturnType<typeof useSlotTableCoverage> };
   rerender: (props: { slotTimestamp: number }) => void;
 } {
-  global.fetch = vi.fn(() => new Promise<Response>(() => {}));
+  // Bounds are already cached, so the hook makes no request.
   const queryClient = createQueryClient({ retry: false });
-  queryClient.setQueryData(mainnetBounds, bounds);
+  queryClient.setQueryData(mainnetBounds(), bounds);
   const wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-    <QueryClientProvider client={queryClient}>
-      <NetworkContext.Provider
-        value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
-      >
-        {children}
-      </NetworkContext.Provider>
-    </QueryClientProvider>
+    <NetworkContext.Provider
+      value={{ currentNetwork: network, setCurrentNetwork: vi.fn(), networks: [network], isLoading: false }}
+    >
+      {children}
+    </NetworkContext.Provider>
   );
   const { result, rerender } = renderHook(props => useSlotTableCoverage(props.slotTimestamp), {
+    client: queryClient,
     wrapper,
     initialProps: { slotTimestamp },
   });
@@ -77,7 +77,7 @@ describe('useSlotTableCoverage', () => {
     expect(result.current.settled.fct_attestation_correctness).toBe(false);
 
     act(() => {
-      queryClient.setQueryData(mainnetBounds, {
+      queryClient.setQueryData(mainnetBounds(), {
         ...bounds,
         fct_attestation_correctness: { min: 1000, max: 7000 },
       });

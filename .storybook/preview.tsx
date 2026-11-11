@@ -2,28 +2,49 @@ import type { Preview, ReactRenderer } from '@storybook/react-vite';
 import { INITIAL_VIEWPORTS } from 'storybook/viewport';
 import { RouterProvider, createMemoryHistory, createRootRoute, createRouter } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { NetworkProvider } from '../src/providers/NetworkProvider';
-import { ThemeProvider } from '../src/providers/ThemeProvider';
-import { ConfigGate } from '../src/components/Overlays/ConfigGate';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { http, HttpResponse } from 'msw';
+import { setupWorker, type SetupWorker } from 'msw/browser';
+import { mswLoader } from 'msw-storybook-addon/csf3';
 import { withThemeByClassName } from '@storybook/addon-themes';
-import { handlers, mockConfig, mockBounds } from './mocks';
-import { createQueryClient } from '../src/utils/query-client';
-import { getBoundsQueryKey, getConfigQueryKey } from '../src/lab-api/@tanstack/react-query.gen';
+import { NetworkProvider } from '@/providers/NetworkProvider';
+import { NotificationProvider } from '@/providers/NotificationProvider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ConfigGate } from '@/components/Overlays/ConfigGate';
+import type { Theme } from '@/contexts/ThemeContext';
+import { boundsFixture, boundsHandlers, configFixture, configHandlers } from '@/test-utils/handlers';
+import { BASE_URL } from '@/utils/api-config';
+import { createQueryClient } from '@/utils/query-client';
+import { getBoundsQueryKey, getConfigQueryKey } from '@/lab-api/@tanstack/react-query.gen';
+import { createCatchAllAssetHandler } from './assetHandlers';
 import '../src/index.css';
 
 // Get the base path from environment
-const basePath = import.meta.env.STORYBOOK_BASE_PATH || '';
+const basePath = (import.meta.env.STORYBOOK_BASE_PATH || '').replace(/\/$/, '');
 
-// Initialize MSW with correct service worker URL for GitHub Pages
-initialize({
-  onUnhandledRequest: 'bypass',
-  quiet: true, // Suppress MSW startup messages
-  serviceWorker: {
-    // Use base path for service worker URL
-    url: basePath ? `${basePath}/mockServiceWorker.js` : '/mockServiceWorker.js',
-  },
+// An API request a story did not mock is a defect: answer 404 and log it,
+// which fails the story's test (see vitest-setup.ts). Stories add handlers
+// with `parameters.msw.handlers`; those take precedence over this one.
+const unmockedApi = http.all(`${BASE_URL}/api/*`, ({ request }) => {
+  console.error(`Unmocked API request in story: ${request.method} ${new URL(request.url).pathname}`);
+  return new HttpResponse(null, { status: 404 });
 });
+
+async function startWorker(): Promise<SetupWorker> {
+  // The MSW Vite plugin serves the worker script and emits it into the build.
+  const worker = setupWorker(unmockedApi, ...createCatchAllAssetHandler());
+  await worker.start({
+    onUnhandledFrame: 'bypass',
+    quiet: true,
+    serviceWorker: { url: `${basePath}/mockServiceWorker.js` },
+  });
+  return worker;
+}
+
+const themes: Record<Theme, string> = { light: '', dark: 'dark', star: 'star' };
+
+// The toolbar's starting theme. Vitest runs every story under each theme instead
+// (vitest.config.ts sets the theme global per project).
+const defaultTheme: Theme = 'dark';
 
 /**
  * Storybook Preview Configuration
@@ -47,16 +68,9 @@ initialize({
  * This allows testing components that depend on URL search params (e.g., network selection).
  */
 const preview: Preview = {
-  loaders: [mswLoader],
+  loaders: [mswLoader(startWorker)],
   decorators: [
-    withThemeByClassName<ReactRenderer>({
-      themes: {
-        light: '',
-        dark: 'dark',
-        star: 'star',
-      },
-      defaultTheme: 'dark',
-    }),
+    withThemeByClassName<ReactRenderer>({ themes, defaultTheme }),
     (Story, context) => {
       // Allow stories to override query options via parameters.tanstackQuery
       const queryOptions = context.parameters.tanstackQuery?.queries || {};
@@ -72,11 +86,11 @@ const preview: Preview = {
       // This mirrors the configuration and bounds lab-backend injects into the page
       if (context.parameters.hydration !== false) {
         // Hydrate config
-        queryClient.setQueryData(getConfigQueryKey(), mockConfig);
+        queryClient.setQueryData(getConfigQueryKey(), configFixture);
 
         // Hydrate bounds for each network
-        mockConfig.networks.forEach(network => {
-          queryClient.setQueryData(getBoundsQueryKey({ path: { network: network.name } }), mockBounds);
+        configFixture.networks.forEach(network => {
+          queryClient.setQueryData(getBoundsQueryKey({ path: { network: network.name } }), boundsFixture);
         });
       }
 
@@ -111,20 +125,43 @@ const preview: Preview = {
         defaultPendingMinMs: 0,
       });
 
+      // The app's provider follows the theme the toolbar (or the test project) chose,
+      // so components that read the theme agree with the class on <html>.
+      const theme: Theme = context.parameters.themes?.themeOverride || context.globals.theme || defaultTheme;
+
       return (
         <QueryClientProvider client={queryClient} key={context.id}>
-          <ThemeProvider>
-            <ConfigGate>
-              <RouterProvider router={router} />
-            </ConfigGate>
+          <ThemeProvider themeOverride={theme}>
+            <NotificationProvider>
+              <ConfigGate>
+                <RouterProvider router={router} />
+              </ConfigGate>
+            </NotificationProvider>
           </ThemeProvider>
         </QueryClientProvider>
       );
     },
-  ] as ReactRenderer['decorators'],
+  ],
   parameters: {
+    // Accessibility violations fail the story's test.
+    a11y: {
+      test: 'error',
+      config: {
+        rules: [
+          // Contrast comes from the theme tokens, which are being reworked separately. Turn this
+          // back on once they meet it.
+          { id: 'color-contrast', enabled: false },
+          // react-datepicker names a day "Choose Wednesday, September 30th, 2026", which does not
+          // contain its visible "30" as a word. Every other element is still checked.
+          { id: 'label-content-name-mismatch', selector: '*:not(.react-datepicker__day)' },
+        ],
+      },
+    },
     msw: {
-      handlers: handlers,
+      handlers: {
+        config: configHandlers.success,
+        bounds: boundsHandlers.success,
+      },
     },
     viewport: {
       viewports: INITIAL_VIEWPORTS,

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useStateDelta } from './useStateDelta';
 import type { NormalizedDataPoint } from './useStateSizeData';
 

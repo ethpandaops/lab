@@ -1,10 +1,11 @@
-import { http, HttpResponse } from 'msw';
-import type { Config } from '../src/hooks/useConfig';
-import type { Bounds } from '../src/hooks/useBounds';
-import { createCatchAllAssetHandler } from './assetHandlers';
+import { delay, http, HttpResponse } from 'msw';
+import type { Config } from '@/hooks/useConfig';
+import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
-// Mock config data for Storybook
-export const mockConfig: Config = {
+// Fixtures are typed with the app's types, so a change that breaks them fails
+// typecheck. One file per API domain.
+
+export const configFixture: Config = {
   networks: [
     {
       name: 'holesky',
@@ -158,31 +159,14 @@ export const mockConfig: Config = {
   features: [],
 };
 
-// Mock bounds data for Storybook
-export const mockBounds: Bounds = {
-  fct_block: {
-    min: 1000000,
-    max: 2000000,
-  },
-  fct_attestation: {
-    min: 5000000,
-    max: 10000000,
-  },
-  fct_transaction: {
-    min: 1000000,
-    max: 2000000,
-  },
-};
+const url = `${BASE_URL}${PATH_PREFIX}/config`;
 
-// MSW handlers for Storybook
-export const handlers = [
-  // API handlers
-  http.get('*/config', () => {
-    return HttpResponse.json(mockConfig);
+/** MSW handlers for GET /api/v1/config, one per state a test or story needs. */
+export const configHandlers = {
+  success: http.get(url, () => HttpResponse.json(configFixture)),
+  failure: http.get(url, () => new HttpResponse(null, { status: 502, statusText: 'Bad Gateway' })),
+  pending: http.get(url, async () => {
+    await delay('infinite');
+    return HttpResponse.json(configFixture);
   }),
-  http.get('*/bounds', () => {
-    return HttpResponse.json(mockBounds);
-  }),
-  // Asset handlers for GitHub Pages (only active when STORYBOOK_BASE_PATH is set)
-  ...createCatchAllAssetHandler(),
-];
+};

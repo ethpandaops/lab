@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BlobCountChart } from './BlobCountChart';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/Ethereum/BlobCountChart',
@@ -59,7 +60,7 @@ export const EpochGranularity: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
-      x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
+      x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
       value: Math.floor(Math.random() * 50 + 100), // 100-150 avg blobs
     })),
     xAxis: {

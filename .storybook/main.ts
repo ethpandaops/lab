@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import { resolve } from 'node:path';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -6,12 +7,16 @@ const config: StorybookConfig = {
     '@chromatic-com/storybook',
     '@storybook/addon-docs',
     '@storybook/addon-vitest',
+    '@storybook/addon-a11y',
     '@storybook/addon-themes',
     'storybook/viewport',
   ],
   framework: {
     name: '@storybook/react-vite',
-    options: {},
+    options: {
+      // Not the app's vite.config.ts: the router generator, head plugin and proxy belong to the app.
+      builder: { viteConfigPath: resolve(import.meta.dirname, 'vite.config.ts') },
+    },
   },
   core: {
     builder: '@storybook/builder-vite',

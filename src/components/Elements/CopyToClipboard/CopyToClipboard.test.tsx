@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@/test-utils';
 import userEvent from '@testing-library/user-event';
 import { NotificationProvider } from '@/providers/NotificationProvider';
 import { CopyToClipboard } from './CopyToClipboard';
@@ -33,10 +33,6 @@ describe('CopyToClipboard', () => {
         write: mockWrite,
       },
     });
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
   });
 
   it('renders default clipboard icon button', () => {

@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { NOW_MS } from '@/test-utils/time';
 import {
   getRelativeTime,
   formatTimestamp,
@@ -11,16 +12,10 @@ import {
 } from './time';
 
 describe('getRelativeTime', () => {
-  let mockNow: number;
+  const mockNow = NOW_MS;
 
   beforeEach(() => {
-    // Mock Date.now() to return a consistent value
-    mockNow = 1700000000000; // Nov 14, 2023 22:13:20 GMT
     vi.spyOn(Date, 'now').mockReturnValue(mockNow);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   describe('past timestamps', () => {

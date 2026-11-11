@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, screen } from 'storybook/test';
 import { PopoutCard } from './PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { LineChart } from '@/components/Charts/Line';
@@ -35,6 +36,10 @@ export const Default: Story = {
         height={300}
       />
     ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Export options' }));
+    await expect(await screen.findByRole('menuitem', { name: 'Copy to clipboard' })).toBeInTheDocument();
   },
 };
 

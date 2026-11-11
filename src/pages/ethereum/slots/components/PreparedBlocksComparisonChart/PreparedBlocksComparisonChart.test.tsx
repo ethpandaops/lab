@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@/test-utils';
 import { PreparedBlocksComparisonChart } from './PreparedBlocksComparisonChart';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import type { ProposedBlockData } from './PreparedBlocksComparisonChart.types';

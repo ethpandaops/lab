@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BlockValueChart } from './BlockValueChart';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/Ethereum/BlockValueChart',
@@ -80,7 +81,7 @@ export const BlockGranularity: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
-      x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
+      x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
       // Daily MEV total: 50-200 ETH
       value: Math.random() * 150 + 50,
     })),

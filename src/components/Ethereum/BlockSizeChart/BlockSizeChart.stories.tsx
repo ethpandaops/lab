@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BlockSizeChart } from './BlockSizeChart';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/Ethereum/BlockSizeChart',
@@ -86,7 +87,7 @@ export const TimestampGranularity: Story = {
       const elUncompressed = Math.floor(Math.random() * 60000 + 20000);
 
       return {
-        x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
+        x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
         consensusSize: clUncompressed,
         consensusSizeCompressed: Math.floor(clUncompressed * 0.65),
         executionSize: elUncompressed,

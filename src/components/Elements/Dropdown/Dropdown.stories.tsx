@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, screen } from 'storybook/test';
 import {
   ArchiveBoxIcon,
   ArrowRightCircleIcon,
@@ -50,6 +51,12 @@ export const Simple: Story = {
         <DropdownItem>Sign out</DropdownItem>
       </DropdownSection>
     ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole('button', { name: 'Options' });
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(await screen.findByRole('menuitem', { name: 'Sign out' })).toBeInTheDocument();
   },
 };
 

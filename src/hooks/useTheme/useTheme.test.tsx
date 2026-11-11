@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useTheme } from './useTheme';
 import { ThemeContext } from '@/contexts/ThemeContext';
 import type { ThemeContextValue, Theme } from '@/contexts/ThemeContext/ThemeContext.types';

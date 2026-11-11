@@ -8,11 +8,14 @@ BACKEND=production pnpm dev # Dev server proxying to production (lab.ethpandaops
 pnpm lint
 pnpm format:check           # Prettier over the whole repo; pnpm format rewrites
 pnpm knip                   # Unused files, exports and dependencies
-pnpm test
+pnpm test                   # Unit tests (jsdom), then every story in Chromium under each theme
+pnpm test:unit              # jsdom only; pnpm test:storybook for stories only
 pnpm test:coverage          # Unit tests with a v8 coverage report in coverage/
 pnpm build
 pnpm storybook
 ```
+
+Story tests need Chromium once: `pnpm exec playwright install chromium`.
 
 The `BACKEND` env var controls the API proxy target. Values: `local` (default), `production`, or any custom URL.
 
@@ -23,7 +26,7 @@ The `BACKEND` env var controls the API proxy target. Values: `local` (default), 
 - @tanstack/react-query v5, @tanstack/router-plugin v1
 - zod v4, react-hook-form v7, clsx
 - echarts v6, echarts-for-react v3, echarts-gl v2
-- storybook v10, vitest v4
+- storybook v10, vitest v5, msw v3
 
 ## Project Structure
 
@@ -159,6 +162,11 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - **Required for**: All hooks, utilities, and core components
 - **Vitest** for hooks and utilities, **Storybook interactions** for components
 - **Location**: Co-located with source files (`.test.ts(x)` for Vitest, `.stories.tsx` for Storybook)
+- `vitest.config.ts` holds both projects: `unit` (jsdom) and `storybook` (Chromium, once per theme: `storybook:light`, `storybook:dark`, `storybook:star`, each in UTC, `en-US` and reduced motion). Mocks and stubbed globals are restored before every test.
+- Unit tests render through `@/test-utils` (`render`, `renderHook`: a fresh query client and a router; pass `client`, `wrapper` or `initialProps` when a test needs them) and add MSW handlers with `server.use(...)`. A request no handler answers fails the test.
+- `src/test-utils/handlers/<domain>.ts` holds a fixture typed with the app's types and a `<domain>Handlers` object with one handler per state (`success`, `failure`, and `pending`, which never resolves), re-exported from `handlers/index.ts`. Unit tests and stories share them.
+- Fixtures, tests and stories take the current time from `@/test-utils/time` (`NOW_MS`), never `Date.now()` or `new Date()`. Stories of components that show times relative to now set `beforeEach: freezeNow`.
+- Vitest caps jsdom at four workers, then runs Storybook with two Chromium pages per theme. The test scripts raise `VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB` so Vitest's Linux workaround collects Chromium garbage after each file.
 
 ### Loading States
 
@@ -206,7 +214,7 @@ Detailed standards for specific topics are in `.claude/rules/`:
 - [Forms](.claude/rules/forms.md) — Zod search param validation, react-hook-form patterns
 - [SEO](.claude/rules/seo.md) — Head meta hierarchy, feature images, route implementation
 - [Styling](.claude/rules/styling.md) — Tokens, themes, Tailwind classes, adding a token
-- [Storybook](.claude/rules/storybook.md) — Decorator pattern, story title convention
+- [Storybook](.claude/rules/storybook.md) — Stories as tests, API mocks, decorator pattern, story title convention
 
 ## Layout
 

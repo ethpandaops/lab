@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { TimezoneToggle } from './TimezoneToggle';
 import { TimezoneProvider } from '@/providers/TimezoneProvider';
 import { useTimezone } from '@/hooks/useTimezone';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta = {
   title: 'Components/Elements/TimezoneToggle',
@@ -32,7 +33,7 @@ type Story = StoryObj<typeof meta>;
 
 function LiveDateExample(): JSX.Element {
   const { timezone } = useTimezone();
-  const now = new Date();
+  const now = new Date(NOW_MS);
   const exampleDate = new Date('2025-10-31T14:30:00Z'); // Fixed example date
 
   return (

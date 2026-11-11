@@ -3,11 +3,9 @@ saveExact: true
 # Refuse a version published with weaker provenance than an earlier one.
 trustPolicy: no-downgrade
 
-# The only install scripts that run: esbuild fetches its binary and msw copies
-# its service worker into public/.
+# The only install script that runs: esbuild fetches its binary.
 allowBuilds:
   esbuild: true
-  msw: true
 
 peerDependencyRules:
   allowedVersions:

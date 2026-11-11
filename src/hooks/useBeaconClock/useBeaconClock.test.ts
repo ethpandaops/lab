@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@/test-utils';
+import { NOW_MS } from '@/test-utils/time';
 import { useBeaconClock } from './useBeaconClock';
 import * as useNetworkModule from '@/hooks/useNetwork';
 import * as useIntervalModule from '@/hooks/useInterval';
@@ -360,8 +361,7 @@ describe('useBeaconClock', () => {
 
     it('should default to Date.now when no getCurrentTime is provided', () => {
       const genesis_time = 1606824000;
-      const now = Date.now();
-      const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(now);
+      const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(NOW_MS);
 
       vi.mocked(useNetworkModule.useNetwork).mockReturnValue({
         currentNetwork: createMockNetwork(genesis_time) as Network,
@@ -375,8 +375,6 @@ describe('useBeaconClock', () => {
       renderHook(() => useBeaconClock());
 
       expect(dateNowSpy).toHaveBeenCalled();
-
-      dateNowSpy.mockRestore();
     });
   });
 

@@ -1,32 +1,18 @@
-import '@testing-library/jest-dom';
-import { beforeAll, vi } from 'vitest';
-import { setProjectAnnotations } from '@storybook/react-vite';
-import * as projectAnnotations from './preview';
+import { configure } from 'storybook/test';
+import { afterEach, beforeEach, vi } from 'vitest';
 
-setProjectAnnotations([projectAnnotations]);
+// findBy/waitFor default to 1s; MSW-backed queries can take longer under load.
+configure({ asyncUtilTimeout: 5000 });
 
-// Setup mocks for ECharts v6 test environment
-beforeAll(() => {
-  // Mock DOM dimensions for ECharts (jsdom doesn't compute actual dimensions)
-  // This fixes "Can't get DOM width or height" warnings in tests
-  Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
-    configurable: true,
-    value: 800,
-  });
+// A story that logs a React or console error fails, even if it rendered.
+let consoleError: ReturnType<typeof vi.spyOn>;
 
-  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
-    configurable: true,
-    value: 600,
-  });
+beforeEach(() => {
+  consoleError = vi.spyOn(console, 'error');
+});
 
-  // Mock ResizeObserver for ECharts and echarts-for-react
-  // This fixes "Cannot read properties of undefined (reading 'disconnect')" errors
-  // Using regular function constructor (not arrow function) for proper instantiation
-  const ResizeObserverMock = vi.fn(function (this: ResizeObserver) {
-    this.observe = vi.fn();
-    this.unobserve = vi.fn();
-    this.disconnect = vi.fn();
-  });
-
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+afterEach(() => {
+  const errors = (consoleError.mock.calls as unknown[][]).map(args => args.map(String).join(' '));
+  consoleError.mockRestore();
+  if (errors.length > 0) throw new Error(errors.join('\n'));
 });

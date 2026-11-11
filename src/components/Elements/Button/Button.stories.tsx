@@ -373,9 +373,9 @@ export const Rounded: Story = {
 export const CircularIconOnly: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <Button variant="primary" size="xs" iconOnly leadingIcon={<PlusIcon />} />
-      <Button variant="primary" size="sm" iconOnly leadingIcon={<PlusIcon />} />
-      <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} />
+      <Button variant="primary" size="xs" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
+      <Button variant="primary" size="sm" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
+      <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
     </div>
   ),
 };
@@ -393,7 +393,7 @@ export const AllVariants: Story = {
           <Button variant="primary" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -405,7 +405,7 @@ export const AllVariants: Story = {
           <Button variant="secondary" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="secondary" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="secondary" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -417,7 +417,7 @@ export const AllVariants: Story = {
           <Button variant="soft" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="soft" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="soft" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -429,7 +429,7 @@ export const AllVariants: Story = {
           <Button variant="outline" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="outline" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="outline" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -441,7 +441,7 @@ export const AllVariants: Story = {
           <Button variant="danger" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="danger" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="danger" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -453,7 +453,7 @@ export const AllVariants: Story = {
           <Button variant="blank" size="md" leadingIcon={<CheckCircleIcon />}>
             With icon
           </Button>
-          <Button variant="blank" size="md" iconOnly leadingIcon={<PlusIcon />} />
+          <Button variant="blank" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
         </div>
       </div>
     </div>
@@ -672,22 +672,22 @@ export const Hyper: Story = {
       <div className="flex flex-col gap-2">
         <p className="text-sm/6 text-muted">Icon Only (Circular) - All Sizes - Hyper Mode</p>
         <div className="flex flex-wrap items-center gap-4">
-          <Button variant="primary" size="xs" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="primary" size="sm" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="primary" size="lg" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="primary" size="xl" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" size="xs" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="primary" size="sm" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="primary" size="md" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="primary" size="lg" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="primary" size="xl" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
         </div>
       </div>
       <div className="flex flex-col gap-2">
         <p className="text-sm/6 text-muted">Icon Only - All Variants - Hyper Mode</p>
         <div className="flex flex-wrap items-center gap-4">
-          <Button variant="primary" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="secondary" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="outline" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="danger" iconOnly leadingIcon={<PlusIcon />} hyper />
-          <Button variant="blank" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="primary" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="secondary" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="outline" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="danger" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
+          <Button variant="blank" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -703,8 +703,8 @@ export const Hyper: Story = {
           <Button variant="secondary" rounded="full" hyper>
             Hyper Rounded
           </Button>
-          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} />
-          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} hyper />
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" />
+          <Button variant="soft" iconOnly leadingIcon={<PlusIcon />} aria-label="Add" hyper />
         </div>
       </div>
     </div>

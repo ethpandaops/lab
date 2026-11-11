@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CalendarIcon } from '@heroicons/react/24/outline';
 import { DatePicker } from './DatePicker';
 import { Popover, PopoverButton, PopoverPanel } from '@/components/Overlays/Popover';
+import { NOW_MS } from '@/test-utils/time';
 
 const meta: Meta<typeof DatePicker> = {
   title: 'Components/DateTimePickers/DatePicker',
@@ -28,7 +29,7 @@ type Story = StoryObj<typeof DatePicker>;
  */
 export const Default: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
 
     return <DatePicker selected={selectedDate} onChange={(date: Date | null) => setSelectedDate(date)} />;
   },
@@ -61,7 +62,7 @@ export const WithSpecificDate: Story = {
  */
 export const WithDisabledDates: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
 
     // Disable weekends
     const isWeekday = (date: Date): boolean => {
@@ -84,9 +85,9 @@ export const WithDisabledDates: Story = {
  */
 export const WithDateRange: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-    const today = new Date();
-    const maxDate = new Date();
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
+    const today = new Date(NOW_MS);
+    const maxDate = new Date(NOW_MS);
     maxDate.setMonth(maxDate.getMonth() + 3);
 
     return (
@@ -105,8 +106,8 @@ export const WithDateRange: Story = {
  */
 export const RangeSelection: Story = {
   render: () => {
-    const today = new Date();
-    const weekFromNow = new Date();
+    const today = new Date(NOW_MS);
+    const weekFromNow = new Date(NOW_MS);
     weekFromNow.setDate(weekFromNow.getDate() + 7);
 
     const [startDate, setStartDate] = useState<Date | null>(today);
@@ -139,7 +140,7 @@ export const RangeSelection: Story = {
  */
 export const WithPopover: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(NOW_MS));
 
     return (
       <div className="flex flex-col gap-4">

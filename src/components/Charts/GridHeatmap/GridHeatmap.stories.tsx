@@ -245,6 +245,7 @@ function AvailabilityCell({
     <div className="relative">
       <button
         type="button"
+        aria-label={data.hasData ? `${availabilityPercent}% successful probes` : 'No data'}
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}

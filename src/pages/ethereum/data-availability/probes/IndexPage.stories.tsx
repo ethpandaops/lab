@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { ProbesView } from './components/ProbesView';
 import type { IntCustodyProbe } from '@/api/types.gen';
+import { freezeNow, NOW_MS } from '@/test-utils/time';
 
 // Use generated type directly
 type CustodyProbe = IntCustodyProbe;
@@ -41,7 +43,7 @@ function generateMockProbes(count: number): CustodyProbe[] {
     'network unreachable',
   ];
 
-  const baseTime = Date.now();
+  const baseTime = NOW_MS;
 
   return Array.from({ length: count }, (_, i) => {
     const result = results[Math.floor(Math.random() * 100) < 75 ? 0 : Math.floor(Math.random() * 3)];
@@ -90,6 +92,14 @@ const meta: Meta<typeof ProbesView> = {
   parameters: {
     layout: 'padded',
   },
+  args: {
+    filters: {},
+    onFiltersChange: fn(),
+    onClearFilters: fn(),
+    selectedProbe: null,
+    onProbeSelect: fn(),
+  },
+  beforeEach: freezeNow,
   decorators: [
     Story => (
       <div className="min-w-200 rounded-xs bg-surface p-6">

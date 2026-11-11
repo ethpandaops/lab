@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useNetwork } from './useNetwork';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { NetworkContextValue } from '@/contexts/NetworkContext/NetworkContext.types';

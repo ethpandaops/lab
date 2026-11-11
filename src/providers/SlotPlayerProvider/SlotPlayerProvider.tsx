@@ -261,7 +261,7 @@ const PROGRESS_EMIT_STEP_MS = 50;
  * Wrap components in test provider:
  *
  * ```tsx
- * import { render } from '@testing-library/react';
+ * import { render } from '@/test-utils';
  * import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
  *
  * const wrapper = ({ children }) => (

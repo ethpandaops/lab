@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useNetworkChangeRedirect } from './useNetworkChangeRedirect';
 
 // Mock the router
@@ -11,7 +11,8 @@ const mockRouter = {
 };
 const mockSearch = {};
 
-vi.mock('@tanstack/react-router', () => ({
+vi.mock('@tanstack/react-router', async importOriginal => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   useRouter: () => mockRouter,
   useNavigate: () => mockNavigate,
   useSearch: () => mockSearch,

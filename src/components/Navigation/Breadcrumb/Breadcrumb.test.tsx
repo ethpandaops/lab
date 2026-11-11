@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test-utils';
 import { Breadcrumb } from './Breadcrumb';
 
 // Mock TanStack Router hooks
-vi.mock('@tanstack/react-router', () => ({
+vi.mock('@tanstack/react-router', async importOriginal => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   Link: ({ to, children, ...props }: { to: string; children: React.ReactNode }) => (
     <a href={to} {...props}>
       {children}

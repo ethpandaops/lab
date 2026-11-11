@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useStableCallback, hasUseEffectEvent } from './useStableCallback';
 
 describe('useStableCallback', () => {

@@ -494,7 +494,7 @@ export const TallCard: Story = {
         <button className="text-sm/6 font-semibold text-primary hover:text-accent">View details →</button>
       </div>
     ),
-    featureImage: <img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />,
+    featureImage: <img src="/images/ethereum/clients.png" alt="Fork Readiness" />,
   },
   decorators: [
     Story => (
@@ -574,7 +574,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Live Slots</h3>}
-        featureImage={<img src="/images/experiments/live-slots.png" alt="Live Slots" />}
+        featureImage={<img src="/images/ethereum/live.png" alt="Live Slots" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">8,234</p>
         <p className="mt-1 text-sm/6 text-muted">Current slot</p>
@@ -582,7 +582,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Locally Built Blocks</h3>}
-        featureImage={<img src="/images/experiments/locally-built-blocks.png" alt="Locally Built Blocks" />}
+        featureImage={<img src="/images/ethereum/execution/locally-built-blocks.png" alt="Locally Built Blocks" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">67%</p>
         <p className="mt-1 text-sm/6 text-muted">Local block rate</p>
@@ -598,7 +598,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Fork Readiness</h3>}
-        featureImage={<img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />}
+        featureImage={<img src="/images/ethereum/clients.png" alt="Fork Readiness" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">98.5%</p>
         <p className="mt-1 text-sm/6 text-muted">Clients ready</p>

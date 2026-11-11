@@ -1,8 +1,6 @@
 import type { JSX } from 'react';
 
 export function FatalError({ error }: { error: Error }): JSX.Element {
-  console.error('Route error:', error);
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
       {/* Content */}

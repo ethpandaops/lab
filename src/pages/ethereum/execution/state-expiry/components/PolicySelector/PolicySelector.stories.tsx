@@ -63,15 +63,33 @@ const EXAMPLE_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
   },
 };
 
+/** The current state the savings compare against, with formatters like the page's */
+const BASELINE = {
+  currentBytes: 250 * 1024 ** 3,
+  currentSlots: 1_400_000_000,
+  formatBytes: (bytes: number): string => `${(bytes / 1024 ** 3).toFixed(1)} GiB`,
+  formatSlots: (slots: number): string => `${(slots / 1_000_000_000).toFixed(2)}B`,
+};
+
+/** A cell's savings and the state left after them */
+function cell(bytesPercent: number, slotsPercent: number): PolicyData {
+  return {
+    bytesPercent,
+    slotsPercent,
+    afterBytes: BASELINE.currentBytes * (1 + bytesPercent / 100),
+    afterSlots: Math.round(BASELINE.currentSlots * (1 + slotsPercent / 100)),
+  };
+}
+
 /** Example savings data */
 const EXAMPLE_SAVINGS_DATA: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
   slot: {
-    '12m': { bytesPercent: -45, slotsPercent: -42 },
-    '24m': { bytesPercent: -32, slotsPercent: -30 },
+    '12m': cell(-45, -42),
+    '24m': cell(-32, -30),
   },
   contract: {
-    '12m': { bytesPercent: -38, slotsPercent: -35 },
-    '24m': { bytesPercent: -25, slotsPercent: -22 },
+    '12m': cell(-38, -35),
+    '24m': cell(-25, -22),
   },
 };
 
@@ -88,6 +106,7 @@ const meta: Meta<typeof PolicySelector<ExpiryType, ExpiryPolicy>> = {
   parameters: {
     layout: 'centered',
   },
+  args: BASELINE,
 };
 
 export default meta;
@@ -109,6 +128,7 @@ function InteractivePolicySelector(): JSX.Element {
         }}
         savingsData={EXAMPLE_SAVINGS_DATA}
         config={EXAMPLE_CONFIG}
+        {...BASELINE}
       />
       <p className="text-sm text-muted">
         Selected: <strong>{selectedType}</strong> + <strong>{selectedPolicy}</strong>
@@ -142,14 +162,15 @@ export const ContractSelected: Story = {
 };
 
 /** Example with some missing data */
+const MISSING: PolicyData = { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null };
 const PARTIAL_DATA: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
   slot: {
-    '12m': { bytesPercent: -45, slotsPercent: -42 },
-    '24m': { bytesPercent: null, slotsPercent: null },
+    '12m': cell(-45, -42),
+    '24m': MISSING,
   },
   contract: {
-    '12m': { bytesPercent: -38, slotsPercent: -35 },
-    '24m': { bytesPercent: null, slotsPercent: null },
+    '12m': cell(-38, -35),
+    '24m': MISSING,
   },
 };
 
