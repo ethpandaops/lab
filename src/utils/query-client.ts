@@ -15,9 +15,7 @@ declare global {
 /**
  * The app's query client; tests and stories pass their own defaults, such as `{ retry: false }`.
  *
- * Data stays fresh for 30 s, so a remount or a window focus within that reads the cache instead of refetching; a
- * query that follows the chain head sets its own staleTime or refetchInterval. A failed query keeps retrying, backing
- * off to every 30 s, so the app recovers when the API does.
+ * A failed query keeps retrying, backing off to every 30 s, so the app recovers when the API does.
  *
  * The configuration and bounds lab-backend injected into the page seed the cache, so the first render does not wait
  * for them. The Vite dev server serves the page unmodified, so there they are fetched.
@@ -26,7 +24,6 @@ export function createQueryClient(queries: DefaultOptions['queries'] = {}): Quer
   const client = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 30_000,
         retry: Infinity,
         retryDelay: attempt => Math.min(1000 * 2 ** attempt, 30_000),
         ...queries,

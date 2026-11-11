@@ -173,7 +173,7 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Actions, such as a download or a simulation, run the generated SDK function or `<operation>Mutation()` through `useMutation`.
 - A lab-backend route the UI needs goes into `openapi/lab-backend.yaml`, matching the backend's handler in `internal/api`; `pnpm generate:api` regenerates both clients. Responses are validated against the specs, so a spec that drifts from the backend fails loudly.
 - The generated clients throw the response body, not an `Error`. Read lab-backend's message with `apiErrorMessage` from `@/utils/api-error`.
-- `createQueryClient` (`@/utils/query-client`) makes the app's query client; tests and stories use it too, with `{ retry: false }`. Its `staleTime` is 30 s, so a query that follows the chain head sets its own `staleTime` or `refetchInterval`.
+- `createQueryClient` (`@/utils/query-client`) makes the app's query client; tests and stories use it too, with `{ retry: false }`.
 - Read configuration with `useConfig()` and bounds with `useBounds()`, never `window.__CONFIG__` or `window.__BOUNDS__`. lab-backend injects both into the page, and `createQueryClient` seeds the cache with them before the first render.
 
 ## Slot & Epoch Display
