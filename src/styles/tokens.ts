@@ -97,9 +97,10 @@ export interface ContrastRule {
 
 /**
  * Every pair tokens.test.ts checks in all three themes, and the Colours page shows.
- * Body text meets AA (4.5). Muted and status text, and tag text, sit just under it
- * on the light page colour, and primary and accent are for marks and large text, so
- * their minimums hold today's values: they can rise, never fall.
+ * Body text meets AA (4.5). The other minimums sit just under the light theme's weakest
+ * pair, below AA: 4 for muted, status and tag text, and 2.5 for primary and accent, which
+ * are for marks and large text. Dark and star clear them by a wide margin (dark primary on
+ * surface is 7.47), so these minimums do not hold those themes at today's values.
  */
 export const CONTRAST_RULES: readonly ContrastRule[] = [
   {
