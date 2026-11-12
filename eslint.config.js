@@ -173,7 +173,7 @@ export default defineConfig(
             { pattern: '(?:^|:)!?leading-', message: 'Line height comes with each text size; text-sm/6 sets another.' },
             {
               pattern: modifier,
-              message: 'Opacity tints skip the contrast checks; use a tint token (bg-primary-10) or add one.',
+              message: 'Opacity modifiers bypass the tokens; use a tint token (bg-primary-10) or add one.',
             },
           ],
         },
