@@ -9,7 +9,7 @@ This skill creates React components following Lab's established architecture pat
 
 ## Technology Stack
 
-- **React**: v19 (using forwardRef, JSX.Element)
+- **React**: v19 (`ref` as a prop, JSX.Element)
 - **TypeScript**: v5 (strict typing)
 - **Tailwind CSS**: v4 (semantic color tokens)
 - **Storybook**: v9 (autodocs with decorators)
@@ -107,7 +107,8 @@ src/pages/[section]/components/[ComponentName]/
 **Key Patterns:**
 
 ```tsx
-import { forwardRef } from 'react';
+import type { JSX } from 'react';
+import clsx from 'clsx';
 import type { ComponentNameProps } from './ComponentName.types';
 
 // Inline Tailwind class definitions (not objects)
@@ -119,29 +120,29 @@ const variantClasses = {
   secondary: 'bg-surface text-foreground hover:bg-surface-hover',
 };
 
-export const ComponentName = forwardRef<HTMLElement, ComponentNameProps>(
-  ({ variant = 'primary', className = '', children, ...props }, ref) => {
-    const classes = [baseClasses, variantClasses[variant], className]
-      .filter(Boolean)
-      .join(' ');
-
-    return (
-      <element ref={ref} className={classes} {...props}>
-        {children}
-      </element>
-    );
-  }
-);
-
-ComponentName.displayName = 'ComponentName';
+// React 19 passes ref as a prop, so there is no forwardRef or displayName
+export function ComponentName({
+  variant = 'primary',
+  className,
+  children,
+  ref,
+  ...props
+}: ComponentNameProps): JSX.Element {
+  return (
+    <div ref={ref} className={clsx(baseClasses, variantClasses[variant], className)} {...props}>
+      {children}
+    </div>
+  );
+}
 ```
 
 **Semantic Colors:**
 
 - Use tokens: `bg-surface`, `text-foreground`, `text-muted`, `border-border`
 - Brand: `bg-primary`, `text-primary`, `bg-secondary`, `bg-accent`
-- States: `text-success`, `text-warning`, `text-error`
-- Avoid hard-coded colors (no `text-gray-500`)
+- States: `text-success`, `text-warning`, `text-danger`
+- Only token classes: no hard-coded colors (`text-gray-500`) or arbitrary values (`min-w-[600px]`); see
+  [Styling](../../rules/styling.md)
 
 **Conditional Classes:**
 
@@ -159,12 +160,17 @@ className={clsx(
 ### 4. Create Types File (when needed)
 
 ```tsx
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 
-export type ComponentVariant = 'primary' | 'secondary';
-export type ComponentSize = 'sm' | 'md' | 'lg';
+// Export a type only once another module imports it; pnpm knip fails on unused exports
+type ComponentVariant = 'primary' | 'secondary';
 
-export interface ComponentNameProps extends ComponentPropsWithoutRef<'element'> {
+export interface ComponentNameProps extends ComponentPropsWithoutRef<'div'> {
+  /**
+   * Ref to the rendered element
+   */
+  ref?: Ref<HTMLDivElement>;
+
   /**
    * The visual style variant
    * @default 'primary'
@@ -194,7 +200,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -288,15 +294,12 @@ export function UserCard({ username, clients }: Props) {
 ### Icon Handling (Heroicons)
 
 ```tsx
-import { cloneElement, isValidElement } from 'react';
-
-// Clone icon element to apply size classes
-{leadingIcon && isValidElement(leadingIcon) &&
-  cloneElement(leadingIcon, {
-    'aria-hidden': 'true',
-    className: 'size-5',
-  } as Record<string, unknown>)
-}
+// Size the icon from a box-less wrapper, as Button does: the icon keeps its own classes and stays a flex item
+{leadingIcon && (
+  <span aria-hidden="true" className="contents *:size-5">
+    {leadingIcon}
+  </span>
+)}
 ```
 
 ### Size Variants
@@ -332,9 +335,9 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headless
   </ListboxButton>
 
   <ListboxOptions className="absolute z-9999 mt-1 rounded-sm border">
-    {options.map((option, index) => (
+    {options.map(option => (
       <ListboxOption
-        key={index}
+        key={option.value}
         value={option.value}
         className="data-focus:bg-primary-10 data-selected:text-primary"
       >
@@ -360,7 +363,7 @@ Before completing:
 - [ ] No page-specific logic in core components
 - [ ] Accessibility attributes included (aria-\*, role)
 - [ ] Dark mode handled via semantic tokens
-- [ ] Icon handling uses cloneElement pattern
+- [ ] Icons are sized from a wrapper, never with cloneElement
 - [ ] `pnpm lint` passes
 - [ ] `pnpm knip` passes
 - [ ] `pnpm build` passes
