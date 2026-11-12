@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
-import { contrastRatio } from '@/styles/contrast';
-import { colorValue, srgbValue } from '@/styles/tokenSource';
+import { wcagContrast } from 'culori';
+import { colorValue } from '@/styles/tokenSource';
 import { THEMES, type ContrastRule } from '@/styles/tokens';
 import { Table } from './Table';
 
@@ -26,7 +26,7 @@ export function ContrastTable({ rule }: ContrastTableProps): JSX.Element {
         cells: [
           foreground,
           ...columns.map(({ theme, background }) => {
-            const ratio = contrastRatio(srgbValue(theme, foreground), srgbValue(theme, background));
+            const ratio = wcagContrast(colorValue(theme, foreground), colorValue(theme, background));
             return (
               <span key={`${theme}-${background}`} className="flex items-center gap-2 font-mono text-xs">
                 <span

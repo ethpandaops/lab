@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { formatHex8, wcagContrast } from 'culori';
 import { describe, expect, it } from 'vitest';
-import { contrastRatio, sameColor } from './contrast';
-import { colorValue, namespaceNames, srgbValue, tokenSource } from './tokenSource';
+import { colorValue, namespaceNames, tokenSource } from './tokenSource';
 import {
   CATEGORY_COLOR_PREFIXES,
   COLOR_TOKENS,
@@ -114,7 +114,7 @@ describe.each(THEMES)('contrast in the %s theme', name => {
   it.each(CONTRAST_RULES.map(rule => [rule.name, rule] as const))('%s', (_, rule) => {
     for (const foreground of rule.foregrounds) {
       for (const background of rule.backgrounds) {
-        const ratio = contrastRatio(srgbValue(name, foreground), srgbValue(name, background));
+        const ratio = wcagContrast(colorValue(name, foreground), colorValue(name, background));
         expect(ratio, `${foreground} on ${background}`).toBeGreaterThanOrEqual(rule.minimum);
       }
     }
@@ -148,7 +148,7 @@ describe('outside tokens.css', () => {
       const colors = /\{ light: '([^']+)', dark: '([^']+)', star: '([^']+)' \}/.exec(text)?.slice(1);
       expect(colors, `${file} theme colours`).toHaveLength(3);
       THEMES.forEach((name, index) => {
-        expect(sameColor(colors?.[index] ?? '', colorValue(name, 'background')), `${file}: ${name}`).toBe(true);
+        expect(formatHex8(colors?.[index]), `${file}: ${name}`).toBe(formatHex8(colorValue(name, 'background')));
       });
     }
   });

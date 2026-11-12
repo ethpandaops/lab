@@ -1,4 +1,3 @@
-import { formatHex } from 'culori';
 import css from './tokens.css?raw';
 import type { Theme } from './tokens';
 
@@ -78,15 +77,6 @@ export function colorValue(themeName: Theme, name: string): string {
   if (value === undefined) throw new Error(`--color-${name} is not in tokens.css's @theme block`);
   const reference = /^var\(--color-([a-z0-9-]+)\)$/.exec(value)?.[1];
   return reference === undefined ? value : colorValue(themeName, reference);
-}
-
-/**
- * A colour token's value in one theme as sRGB hex or rgb(), which contrast.ts reads. The
- * category colours are Tailwind's oklch palette; sRGB is what an sRGB display shows of them.
- */
-export function srgbValue(themeName: Theme, name: string): string {
-  const value = colorValue(themeName, name);
-  return value.startsWith('oklch(') ? (formatHex(value) ?? value) : value;
 }
 
 /** The token names under `--<namespace>-*`, without sub-properties such as `--line-height`. */
