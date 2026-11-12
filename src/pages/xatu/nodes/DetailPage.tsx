@@ -7,6 +7,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { useNow } from '@/hooks/useNow';
 import { Route } from '@/routes/xatu/nodes/$nodeId';
 import {
   ActivityStrip,
@@ -28,7 +29,6 @@ import { useNodeDataColumns } from './hooks/useNodeDataColumns';
 import { useNodeHistory } from './hooks/useNodeHistory';
 import { useNodePerformance } from './hooks/useNodePerformance';
 import { buildNodeRows } from './hooks/useNodeRows';
-import { useNow } from './hooks/useNow';
 import { behindStarts, rangeValue } from './utils/history';
 import { formatMs, getIngestedEndSlot, getSyncState } from './utils/node-stats';
 
@@ -66,7 +66,8 @@ export function DetailPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
 
-  const now = useNow();
+  // Unix seconds, once a minute: a range moves on to its next bucket, and a node shows offline, at most a minute late
+  const now = useNow(60_000) / 1000;
   const { nodes, isLoading, error } = useLastSeenNodes(range, now, nodeId);
   const filter = { nodeId };
   const block = useNodeHistory('block', range, filter, now);

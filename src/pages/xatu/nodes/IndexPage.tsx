@@ -12,6 +12,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
+import { useNow } from '@/hooks/useNow';
 import {
   ArrivalHistogram,
   BreakdownList,
@@ -27,7 +28,6 @@ import type { BreakdownItem } from './components/BreakdownList/BreakdownList';
 import { DEFAULT_NODE_RANGE, NODE_RANGE_CONFIG, NODE_RANGE_OPTIONS } from './constants';
 import { useNetworkHistory } from './hooks/useNetworkHistory';
 import { useNodeRows, type NodeRow } from './hooks/useNodeRows';
-import { useNow } from './hooks/useNow';
 import { formatMs, median } from './utils/node-stats';
 
 /** Count Xatu nodes by key */
@@ -51,7 +51,8 @@ export function IndexPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const contributor = search.contributor;
-  const now = useNow();
+  // Unix seconds, once a minute: a range moves on to its next bucket, and a node shows offline, at most a minute late
+  const now = useNow(60_000) / 1000;
   const { rows: allRows, block, isLoading, error } = useNodeRows(range, now);
   const networkHistory = useNetworkHistory(range, now);
 

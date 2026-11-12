@@ -1,4 +1,5 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useNow } from '@/hooks/useNow';
 import { secondsToCountdown } from './countdown';
 
 function Separator(): React.JSX.Element {
@@ -25,13 +26,7 @@ interface ForkCountdownProps {
  * "Goes Live In" countdown, ticking every second. The days cell is hidden once less than a day remains.
  */
 export function ForkCountdown({ timestamp, footer }: ForkCountdownProps): React.JSX.Element {
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+  const now = Math.floor(useNow() / 1000);
   const countdown = secondsToCountdown(timestamp === undefined ? 0 : Math.max(0, timestamp - now));
 
   return (

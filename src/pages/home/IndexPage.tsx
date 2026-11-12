@@ -1,24 +1,15 @@
-import { type JSX, useEffect, useMemo, useState } from 'react';
+import { type JSX, useMemo } from 'react';
 import { Container } from '@/components/Layout/Container';
 import { useNetwork } from '@/hooks/useNetwork';
+import { useNow } from '@/hooks/useNow';
 import { groupNetworks } from '@/utils/networks';
 import { NetworksTable } from './components/NetworksTable';
-
-/** Current unix time, updating every second */
-function useNow(): number {
-  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
-  useEffect(() => {
-    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
-    return () => clearInterval(id);
-  }, []);
-  return now;
-}
 
 /** Start page: every network's head and indexing state. */
 export function IndexPage(): JSX.Element {
   const { networks } = useNetwork();
   const groups = useMemo(() => groupNetworks(networks), [networks]);
-  const now = useNow();
+  const now = Math.floor(useNow() / 1000);
 
   return (
     <Container>
