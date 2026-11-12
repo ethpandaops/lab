@@ -74,7 +74,6 @@ function advance(ms: number): void {
 
 describe('SlotPlayerProvider playback', () => {
   beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.useFakeTimers({
       toFake: [
         'requestAnimationFrame',

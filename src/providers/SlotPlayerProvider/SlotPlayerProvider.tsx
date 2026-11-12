@@ -373,14 +373,7 @@ export function SlotPlayerProvider({
     if (!boundsData?.aggregate?.minOfMaxes || !boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
     const maxLagSeconds = 3 * SECONDS_PER_SLOT;
     const effectiveMax = Math.max(boundsData.aggregate.minOfMaxes, boundsData.aggregate.maxOfMaxes - maxLagSeconds);
-    const calculated = Math.floor((effectiveMax - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
-    console.log('[SlotPlayerProvider] maxSlot calculation:', {
-      minOfMaxes: boundsData.aggregate.minOfMaxes,
-      maxOfMaxes: boundsData.aggregate.maxOfMaxes,
-      genesisTime: currentNetwork.genesis_time,
-      calculatedMaxSlot: calculated,
-    });
-    return calculated;
+    return Math.floor((effectiveMax - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
   }, [boundsData, currentNetwork]);
 
   // Calculate initial slot (returns actual slot number)
