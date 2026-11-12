@@ -19,7 +19,7 @@ export function TimelineGrid({ labelWidth }: TimelineGridProps): JSX.Element {
         />
       ))}
       {/* Attestation deadline highlight */}
-      <div className="absolute top-0 left-0 h-full bg-success-5" style={{ width: `${(4 / 12) * 100}%` }} />
+      <div className="absolute top-0 left-0 h-full w-1/3 bg-success-5" />
     </div>
   );
 }
