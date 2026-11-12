@@ -5,30 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#efeee5" />
     <style>
-      /* Critical CSS - Inline for instant rendering */
-      body:not(.react-loaded) * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body:not(.react-loaded) {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        background: rgb(10, 18, 40);
-        min-height: 100vh;
-        overflow: hidden;
-      }
-
+      /* Covers the page until React has mounted. Style only the overlay: the app's first render lays out under it,
+         so a rule on the body or the app would change that layout. */
       body:not(.react-loaded) #loading-screen {
         position: fixed;
         inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         background: rgb(10, 18, 40);
         z-index: 50;
       }
