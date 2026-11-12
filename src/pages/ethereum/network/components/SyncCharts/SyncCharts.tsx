@@ -63,9 +63,9 @@ export function SyncCharts({ rows }: SyncChartsProps): JSX.Element {
         ]}
       />
       <SeriesCard
-        title="Within a slot of the head, by client"
+        title="Share of each client's peers within a slot of the head"
         days={days}
-        yName="Share of peers"
+        yName="Share of the client's peers"
         percent="line"
         empty={empty}
         series={clientShareLines(rows, days, row => row.head_lag_0_1_peer_count, status, MIN_CLIENT_PEERS)}

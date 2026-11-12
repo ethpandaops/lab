@@ -55,9 +55,9 @@ export function ReachabilityCharts({ network, clients }: ReachabilityChartsProps
           ]}
         />
         <SeriesCard
-          title="Dialled, by client"
+          title="Share of each client's peers that were dialled"
           days={clientDays}
-          yName="Share of peers"
+          yName="Share of the client's peers"
           percent="line"
           empty="No consensus peer was counted in this range."
           series={clientShareLines(clients, clientDays, row => row.dialled_peer_count, peers, MIN_CLIENT_PEERS)}

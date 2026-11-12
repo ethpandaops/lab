@@ -52,9 +52,9 @@ export function SubnetCharts({ clients, coverage, latest, latestDay }: SubnetCha
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
       <SeriesCard
-        title="On all 64 subnets, by client"
+        title="Share of each client's peers on all 64 subnets"
         days={days}
-        yName="Share of peers"
+        yName="Share of the client's peers"
         percent="line"
         empty={empty}
         series={clientShareLines(clients, days, row => row.attnets_64_peer_count, peers, MIN_CLIENT_PEERS)}
