@@ -15,12 +15,12 @@ server.events.on('request:unhandled', ({ request }) => {
 // Taken before any test fakes timers.
 const realSetTimeout = globalThis.setTimeout;
 
-beforeAll(() => {
-  server.listen({ onUnhandledFrame: 'error' });
-  // The generated clients build relative URLs, which Node's fetch rejects.
-  client.setConfig({ baseUrl: window.location.origin });
-  labClient.setConfig({ baseUrl: window.location.origin });
-});
+// The generated clients build relative URLs, which Node's fetch rejects. Set before test modules load, so a query key
+// built at module level holds the same base URL as the requests.
+client.setConfig({ baseUrl: window.location.origin });
+labClient.setConfig({ baseUrl: window.location.origin });
+
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterAll(() => server.close());
 
 afterEach(async () => {
