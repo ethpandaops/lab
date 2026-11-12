@@ -15,7 +15,6 @@ import { TimelineGrid } from './TimelineGrid';
 import { TimelineTooltip } from './TimelineTooltip';
 import { TimelineLegend } from './TimelineLegend';
 
-const ROW_HEIGHT = 28;
 const LABEL_WIDTH = 280;
 
 /**
@@ -252,10 +251,9 @@ export function SlotProgressTimeline({
                   <div
                     key={span.id}
                     className={clsx(
-                      'relative flex items-center border-b border-border-30 transition-colors',
+                      'relative flex h-7 items-center border-b border-border-30 transition-colors',
                       isHovered && 'bg-surface-80'
                     )}
-                    style={{ height: ROW_HEIGHT }}
                     onMouseEnter={() => handleMouseEnter(span)}
                     onMouseLeave={handleMouseLeave}
                     onMouseMove={handleMouseMove}
@@ -308,7 +306,7 @@ export function SlotProgressTimeline({
                     <div className="relative h-full flex-1">
                       <div
                         className={clsx(
-                          'absolute top-1 min-w-1 rounded-xs transition-all',
+                          'absolute top-1 h-5 min-w-1 rounded-xs transition-all',
                           colors.bg,
                           isHovered && 'ring-1 ring-on-fill-20 brightness-110',
                           span.collapsible && 'cursor-pointer'
@@ -316,7 +314,6 @@ export function SlotProgressTimeline({
                         style={{
                           left: `${startPercent}%`,
                           width: `${widthPercent}%`,
-                          height: ROW_HEIGHT - 8,
                         }}
                         title={span.details}
                         onClick={span.collapsible ? () => toggleCollapse(span.id) : undefined}

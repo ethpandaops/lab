@@ -12,12 +12,13 @@ paths:
   `bg-red-500`, `text-white`, `text-7xl` and `shadow-2xl` do not exist. Spacing and sizing use the 4px step (`p-4`,
   `gap-6`, `h-75`); each text size carries its line height, and `text-sm/6` sets another.
 - Lint rejects classes and colours that bypass the tokens: arbitrary values (`h-[300px]`), `dark:` variants,
-  `leading-*`, opacity modifiers (`bg-primary/10`), fixed values in `style`, and colour literals in SVG colour
-  attributes. `style` only carries values computed at runtime, such as a height passed as a prop. It reads
-  class strings in `className` and `…ClassName` props, `clsx`, the router's `activeProps` and `inactiveProps`, class
-  constants and variant maps named `…ClassName`, `…Classes` or `…Styles`, and arrow-function helpers named
-  `get…Class` or `get…Styles`. Write each class whole (not `` `text-${tone}` ``) so lint checks it and Tailwind finds
-  it.
+  `leading-*`, opacity modifiers (`bg-primary/10`), literal values in `style`, and colour literals in SVG colour
+  attributes. `style` only carries values computed at runtime, such as a height passed as a prop. Lint can't see a fixed
+  value behind a constant (`height: ROW_HEIGHT`), so make that a class too, unless the constant keeps several elements
+  aligned. It reads class strings in `className` and `…ClassName` props, `clsx`, the router's `activeProps` and
+  `inactiveProps`, class constants and variant maps named `…ClassName`, `…Classes` or `…Styles`, and arrow-function
+  helpers named `get…Class` or `get…Styles`. Write each class whole (not `` `text-${tone}` ``) so lint checks it and
+  Tailwind finds it.
 - Name tokens for their role (`danger`, `muted`, `panel`), never their look. Tags and chips name their category.
 - Every base colour is a `light-dark(light, dark)` pair with its own value in `html.star`. Lab has three themes: light
   and dark are the two sides of each pair, and star is a dark scheme with its own palette. Colours derived from the
