@@ -3,38 +3,6 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { TableColGroup } from './TableColGroup';
 
 /**
- * A placeholder row of the desktop table
- */
-function RowSkeleton(): JSX.Element {
-  return (
-    <tr>
-      <td className="px-2 py-1.5 text-center">
-        <LoadingContainer className="mx-auto size-5 rounded-xs" />
-      </td>
-      <td className="px-2 py-1.5">
-        <div className="flex items-center gap-1.5">
-          <LoadingContainer className="h-3.5 w-24 rounded-xs" />
-          <LoadingContainer className="h-4 w-16 rounded-full" />
-        </div>
-        <LoadingContainer className="mt-1 h-3 w-32 rounded-xs" />
-      </td>
-      <td className="px-2 py-1.5">
-        <LoadingContainer className="h-3 w-20 rounded-xs" />
-      </td>
-      <td className="px-2 py-1.5 text-right">
-        <LoadingContainer className="ml-auto h-3 w-14 rounded-xs" />
-      </td>
-      <td className="px-2 py-1.5 text-right">
-        <LoadingContainer className="ml-auto h-3 w-10 rounded-xs" />
-      </td>
-      <td className="px-2 py-1.5 text-right">
-        <LoadingContainer className="ml-auto h-3 w-10 rounded-xs" />
-      </td>
-    </tr>
-  );
-}
-
-/**
  * Skeleton loading state for the ContractTop100List table (desktop).
  * Displays header and 8 placeholder rows matching the table layout.
  */
@@ -53,52 +21,34 @@ export function ContractTop100ListSkeleton(): JSX.Element {
         </tr>
       </thead>
       <tbody className="divide-y divide-border-50">
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
-        <RowSkeleton />
+        {Array.from({ length: 8 }).map((_, i) => (
+          <tr key={i}>
+            <td className="px-2 py-1.5 text-center">
+              <LoadingContainer className="mx-auto size-5 rounded-xs" />
+            </td>
+            <td className="px-2 py-1.5">
+              <div className="flex items-center gap-1.5">
+                <LoadingContainer className="h-3.5 w-24 rounded-xs" />
+                <LoadingContainer className="h-4 w-16 rounded-full" />
+              </div>
+              <LoadingContainer className="mt-1 h-3 w-32 rounded-xs" />
+            </td>
+            <td className="px-2 py-1.5">
+              <LoadingContainer className="h-3 w-20 rounded-xs" />
+            </td>
+            <td className="px-2 py-1.5 text-right">
+              <LoadingContainer className="ml-auto h-3 w-14 rounded-xs" />
+            </td>
+            <td className="px-2 py-1.5 text-right">
+              <LoadingContainer className="ml-auto h-3 w-10 rounded-xs" />
+            </td>
+            <td className="px-2 py-1.5 text-right">
+              <LoadingContainer className="ml-auto h-3 w-10 rounded-xs" />
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
-  );
-}
-
-/**
- * A placeholder card of the mobile layout
- */
-function CardSkeleton(): JSX.Element {
-  return (
-    <div className="border-b border-border-50 px-3 py-3">
-      <div className="flex items-start gap-3">
-        {/* Rank badge skeleton */}
-        <LoadingContainer className="size-7 shrink-0 rounded-xs" />
-
-        {/* Content skeleton */}
-        <div className="min-w-0 flex-1">
-          {/* Name and badges */}
-          <div className="flex items-center gap-1.5">
-            <LoadingContainer className="h-4 w-32 rounded-xs" />
-            <LoadingContainer className="h-4 w-16 rounded-full" />
-          </div>
-
-          {/* Address */}
-          <LoadingContainer className="mt-1 h-3 w-48 rounded-xs" />
-
-          {/* Stats row */}
-          <div className="mt-2 flex items-center gap-4">
-            <LoadingContainer className="h-3 w-20 rounded-xs" />
-            <LoadingContainer className="h-3 w-12 rounded-xs" />
-            <LoadingContainer className="h-3 w-12 rounded-xs" />
-          </div>
-
-          {/* Owner */}
-          <LoadingContainer className="mt-1 h-3 w-24 rounded-xs" />
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -109,12 +59,36 @@ function CardSkeleton(): JSX.Element {
 export function ContractTop100ListSkeletonMobile(): JSX.Element {
   return (
     <div>
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="border-b border-border-50 px-3 py-3">
+          <div className="flex items-start gap-3">
+            {/* Rank badge skeleton */}
+            <LoadingContainer className="size-7 shrink-0 rounded-xs" />
+
+            {/* Content skeleton */}
+            <div className="min-w-0 flex-1">
+              {/* Name and badges */}
+              <div className="flex items-center gap-1.5">
+                <LoadingContainer className="h-4 w-32 rounded-xs" />
+                <LoadingContainer className="h-4 w-16 rounded-full" />
+              </div>
+
+              {/* Address */}
+              <LoadingContainer className="mt-1 h-3 w-48 rounded-xs" />
+
+              {/* Stats row */}
+              <div className="mt-2 flex items-center gap-4">
+                <LoadingContainer className="h-3 w-20 rounded-xs" />
+                <LoadingContainer className="h-3 w-12 rounded-xs" />
+                <LoadingContainer className="h-3 w-12 rounded-xs" />
+              </div>
+
+              {/* Owner */}
+              <LoadingContainer className="mt-1 h-3 w-24 rounded-xs" />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

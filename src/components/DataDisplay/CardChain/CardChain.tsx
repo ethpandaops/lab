@@ -11,7 +11,7 @@ function CardSkeleton(): JSX.Element {
     <div className="relative flex-1">
       <div className="relative">
         {/* 3D top face */}
-        <div className="absolute -top-2 right-1 left-1 h-3 rounded-t-xs bg-border-30" />
+        <div className="absolute inset-x-1 -top-2 h-3 rounded-t-xs bg-border-30" />
         {/* Main card */}
         <div className="animate-pulse rounded-xs border border-border-50 bg-surface p-4">
           <div className="mb-3 pt-1">
@@ -250,7 +250,7 @@ export function CardChain({
     >
       {/* Flowing line connecting all cards */}
       <div className="absolute top-1/2 right-15 left-15 h-0.5 -translate-y-1/2">
-        <div className="h-full w-full bg-border" />
+        <div className="size-full bg-border" />
       </div>
 
       <div className="relative flex items-center gap-3">
@@ -271,9 +271,10 @@ export function CardChain({
         {/* Cards */}
         <div className="flex flex-1 items-stretch justify-between gap-4">
           {isLoading
-            ? // Loading skeleton: placeholders carry no data, only their place in the chain
-              Array.from({ length: skeletonCount }, (_, place) => `place-${place + 1}`).map(place => (
-                <CardSkeleton key={place} />
+            ? // Loading skeleton
+              Array.from({ length: skeletonCount }).map((_, index) => (
+                // eslint-disable-next-line @eslint-react/no-array-index-key -- placeholders carry no data and never reorder
+                <CardSkeleton key={index} />
               ))
             : // Actual items
               items.map((item, index) => {

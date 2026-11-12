@@ -12,28 +12,13 @@ function ChartCardSkeleton(): JSX.Element {
           <LoadingContainer className="h-3 w-64 rounded-xs" />
         </div>
         <div className="flex flex-wrap gap-2">
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <LoadingContainer key={`legend-${i}`} className="h-6 w-24 rounded-xs" />
+          ))}
         </div>
         <LoadingContainer className="h-72 w-full rounded-sm" />
       </div>
     </Card>
-  );
-}
-
-/** A client's row in the layer table: logo, name, two share bars and a count */
-function ClientRowSkeleton(): JSX.Element {
-  return (
-    <div className="flex items-center gap-4">
-      <LoadingContainer className="size-5 rounded-xs" />
-      <LoadingContainer className="h-4 w-24 rounded-xs" />
-      <LoadingContainer className="h-2 flex-1 rounded-xs" />
-      <LoadingContainer className="h-2 flex-1 rounded-xs" />
-      <LoadingContainer className="h-4 w-20 rounded-xs" />
-    </div>
   );
 }
 
@@ -43,13 +28,15 @@ function LayerSkeleton(): JSX.Element {
     <Card rounded>
       <div className="flex flex-col gap-3 p-4">
         <LoadingContainer className="h-5 w-40 rounded-xs" />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
-        <ClientRowSkeleton />
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={`row-${i}`} className="flex items-center gap-4">
+            <LoadingContainer className="size-5 rounded-xs" />
+            <LoadingContainer className="h-4 w-24 rounded-xs" />
+            <LoadingContainer className="h-2 flex-1 rounded-xs" />
+            <LoadingContainer className="h-2 flex-1 rounded-xs" />
+            <LoadingContainer className="h-4 w-20 rounded-xs" />
+          </div>
+        ))}
       </div>
     </Card>
   );

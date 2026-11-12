@@ -7,34 +7,6 @@ interface ValidatorsSkeletonProps {
   className?: string;
 }
 
-/** One cell of the performance summary: label, value and note */
-function SummaryStatSkeleton(): JSX.Element {
-  return (
-    <div className="flex flex-col gap-2 px-4 py-3.5 shadow-divider sm:px-5">
-      <LoadingContainer className="h-4 w-24 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-8 w-20 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-3 w-32 rounded-sm" shimmer={false} />
-    </div>
-  );
-}
-
-/** One row of the validator table */
-function TableRowSkeleton(): JSX.Element {
-  return (
-    <div className="flex items-center gap-4 border-b border-border px-4 py-3 last:border-0">
-      <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-14 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-10 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />
-      <LoadingContainer className="h-5 w-20 rounded-sm" shimmer={false} />
-    </div>
-  );
-}
-
 /**
  * Skeleton loading state for the validators page
  */
@@ -70,12 +42,13 @@ export function ValidatorsSkeleton({ className }: ValidatorsSkeletonProps): JSX.
 
       {/* Performance summary skeleton */}
       <div className="grid grid-cols-2 overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border lg:grid-cols-3">
-        <SummaryStatSkeleton />
-        <SummaryStatSkeleton />
-        <SummaryStatSkeleton />
-        <SummaryStatSkeleton />
-        <SummaryStatSkeleton />
-        <SummaryStatSkeleton />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-2 px-4 py-3.5 shadow-divider sm:px-5">
+            <LoadingContainer className="h-4 w-24 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-8 w-20 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-3 w-32 rounded-sm" shimmer={false} />
+          </div>
+        ))}
       </div>
 
       {/* Table skeleton */}
@@ -94,11 +67,19 @@ export function ValidatorsSkeleton({ className }: ValidatorsSkeletonProps): JSX.
         </div>
 
         {/* Table rows */}
-        <TableRowSkeleton />
-        <TableRowSkeleton />
-        <TableRowSkeleton />
-        <TableRowSkeleton />
-        <TableRowSkeleton />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 border-b border-border px-4 py-3 last:border-0">
+            <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-14 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-10 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-12 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-16 rounded-sm" shimmer={false} />
+            <LoadingContainer className="h-5 w-20 rounded-sm" shimmer={false} />
+          </div>
+        ))}
       </div>
     </div>
   );

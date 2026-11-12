@@ -195,6 +195,11 @@ export default defineConfig(
     rules: { 'no-restricted-syntax': 'off' },
   },
   {
+    // Loading placeholders are identical and never reorder, so their index is their identity.
+    files: ['src/**/*Skeleton.tsx'],
+    rules: { '@eslint-react/no-array-index-key': 'off' },
+  },
+  {
     // Tests and stories see the same data on every run (src/test-utils/time.ts and random.ts).
     files: ['src/**/*.test.{ts,tsx}', 'src/**/*.stories.tsx'],
     rules: {

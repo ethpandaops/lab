@@ -12,10 +12,9 @@ function ChartCardSkeleton(): JSX.Element {
           <LoadingContainer className="h-3 w-64 rounded-xs" />
         </div>
         <div className="flex flex-wrap gap-2">
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
-          <LoadingContainer className="h-6 w-24 rounded-xs" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <LoadingContainer key={`legend-${i}`} className="h-6 w-24 rounded-xs" />
+          ))}
         </div>
         <LoadingContainer className="h-64 w-full rounded-sm" />
       </div>
@@ -30,16 +29,14 @@ export function PartialColumnsSkeleton(): JSX.Element {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <LoadingContainer className="h-24 rounded-sm" />
-        <LoadingContainer className="h-24 rounded-sm" />
-        <LoadingContainer className="h-24 rounded-sm" />
-        <LoadingContainer className="h-24 rounded-sm" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <LoadingContainer key={`stat-${i}`} className="h-24 rounded-sm" />
+        ))}
       </div>
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <ChartCardSkeleton />
-        <ChartCardSkeleton />
-        <ChartCardSkeleton />
-        <ChartCardSkeleton />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <ChartCardSkeleton key={`chart-${i}`} />
+        ))}
       </div>
     </div>
   );

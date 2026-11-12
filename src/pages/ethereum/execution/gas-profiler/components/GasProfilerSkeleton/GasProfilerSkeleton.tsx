@@ -6,33 +6,6 @@ import { Card } from '@/components/Layout/Card';
  */
 const shimmer = 'animate-pulse bg-muted-20';
 
-/** Widths of the opcode distribution bars (% of the row), longest first */
-const OPCODE_BAR_WIDTHS = [100, 92, 84, 76, 68, 60, 52, 44, 36, 28];
-
-/**
- * A label and value under the gas breakdown
- */
-function StatSkeleton(): JSX.Element {
-  return (
-    <div>
-      <div className={`mb-1 h-3 w-12 rounded-xs ${shimmer}`} />
-      <div className={`h-4 w-16 rounded-xs ${shimmer}`} />
-    </div>
-  );
-}
-
-/**
- * A swatch and name in the call tree legend
- */
-function LegendItemSkeleton(): JSX.Element {
-  return (
-    <div className="flex items-center gap-1">
-      <div className={`size-3 rounded-xs ${shimmer}`} />
-      <div className={`h-3 w-16 rounded-xs ${shimmer}`} />
-    </div>
-  );
-}
-
 /**
  * Skeleton loading state for the Gas Profiler page
  */
@@ -50,10 +23,12 @@ export function GasProfilerSkeleton(): JSX.Element {
         </div>
         <div className={`h-20 w-full rounded-xs ${shimmer}`} />
         <div className="mt-3 grid grid-cols-4 gap-4 border-t border-border pt-3">
-          <StatSkeleton />
-          <StatSkeleton />
-          <StatSkeleton />
-          <StatSkeleton />
+          {[...Array(4)].map((_, i) => (
+            <div key={i}>
+              <div className={`mb-1 h-3 w-12 rounded-xs ${shimmer}`} />
+              <div className={`h-4 w-16 rounded-xs ${shimmer}`} />
+            </div>
+          ))}
         </div>
       </Card>
 
@@ -72,11 +47,12 @@ export function GasProfilerSkeleton(): JSX.Element {
           <div className={`ml-8 h-7 w-8/12 rounded-xs ${shimmer}`} />
         </div>
         <div className="mt-3 flex gap-3">
-          <LegendItemSkeleton />
-          <LegendItemSkeleton />
-          <LegendItemSkeleton />
-          <LegendItemSkeleton />
-          <LegendItemSkeleton />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center gap-1">
+              <div className={`size-3 rounded-xs ${shimmer}`} />
+              <div className={`h-3 w-16 rounded-xs ${shimmer}`} />
+            </div>
+          ))}
         </div>
       </Card>
 
@@ -90,10 +66,10 @@ export function GasProfilerSkeleton(): JSX.Element {
           </div>
         </div>
         <div className="space-y-2">
-          {OPCODE_BAR_WIDTHS.map(width => (
-            <div key={width} className="flex items-center gap-2">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="flex items-center gap-2">
               <div className={`h-5 w-16 rounded-xs ${shimmer}`} />
-              <div className={`h-5 rounded-xs ${shimmer}`} style={{ width: `${width}%` }} />
+              <div className={`h-5 rounded-xs ${shimmer}`} style={{ width: `${100 - i * 8}%` }} />
             </div>
           ))}
         </div>

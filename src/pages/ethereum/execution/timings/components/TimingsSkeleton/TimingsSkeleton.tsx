@@ -3,21 +3,6 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /**
- * A stat card: label, value and note
- */
-function StatCardSkeleton(): JSX.Element {
-  return (
-    <Card>
-      <div className="space-y-2 p-4">
-        <LoadingContainer className="h-3 w-20 rounded-xs" />
-        <LoadingContainer className="h-8 w-24 rounded-sm" />
-        <LoadingContainer className="h-3 w-16 rounded-xs" />
-      </div>
-    </Card>
-  );
-}
-
-/**
  * Loading skeleton for engine timings page
  * Mirrors the structure of the Overview tab with stats and charts
  */
@@ -28,26 +13,30 @@ export function TimingsSkeleton(): JSX.Element {
       <div className="flex items-center gap-4">
         <LoadingContainer className="h-4 w-20 rounded-xs" />
         <div className="flex gap-2">
-          <LoadingContainer className="h-8 w-20 rounded-xs" />
-          <LoadingContainer className="h-8 w-20 rounded-xs" />
-          <LoadingContainer className="h-8 w-20 rounded-xs" />
+          {Array.from({ length: 3 }).map((_, index) => (
+            <LoadingContainer key={index} className="h-8 w-20 rounded-xs" />
+          ))}
         </div>
       </div>
 
       {/* Tabs skeleton */}
       <div className="flex gap-4 border-b border-border pb-2">
-        <LoadingContainer className="h-6 w-24 rounded-xs" />
-        <LoadingContainer className="h-6 w-24 rounded-xs" />
-        <LoadingContainer className="h-6 w-24 rounded-xs" />
-        <LoadingContainer className="h-6 w-24 rounded-xs" />
+        {Array.from({ length: 4 }).map((_, index) => (
+          <LoadingContainer key={index} className="h-6 w-24 rounded-xs" />
+        ))}
       </div>
 
       {/* Stats grid skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-        <StatCardSkeleton />
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Card key={index}>
+            <div className="space-y-2 p-4">
+              <LoadingContainer className="h-3 w-20 rounded-xs" />
+              <LoadingContainer className="h-8 w-24 rounded-sm" />
+              <LoadingContainer className="h-3 w-16 rounded-xs" />
+            </div>
+          </Card>
+        ))}
       </div>
 
       {/* Chart skeletons */}
