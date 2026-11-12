@@ -22,20 +22,6 @@ import type {
   SimulateBlockErrors,
   SimulateBlockResponses,
 } from './types.gen';
-import {
-  zDownloadBlobData,
-  zDownloadBlobResponse,
-  zDownloadBlockData,
-  zDownloadBlockResponse,
-  zGetBoundsData,
-  zGetBoundsResponse,
-  zGetConfigData,
-  zGetConfigResponse,
-  zGetGasScheduleData,
-  zGetGasScheduleResponse,
-  zSimulateBlockData,
-  zSimulateBlockResponse,
-} from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
   TData,
@@ -61,8 +47,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const getConfig = <ThrowOnError extends boolean = false>(options?: Options<GetConfigData, ThrowOnError>) =>
   (options?.client ?? client).get<GetConfigResponses, GetConfigErrors, ThrowOnError>({
-    requestValidator: async data => await zGetConfigData.parseAsync(data),
-    responseValidator: async data => await zGetConfigResponse.parseAsync(data),
     url: '/api/v1/config',
     ...options,
   });
@@ -74,8 +58,6 @@ export const getConfig = <ThrowOnError extends boolean = false>(options?: Option
  */
 export const getBounds = <ThrowOnError extends boolean = false>(options: Options<GetBoundsData, ThrowOnError>) =>
   (options.client ?? client).get<GetBoundsResponses, GetBoundsErrors, ThrowOnError>({
-    requestValidator: async data => await zGetBoundsData.parseAsync(data),
-    responseValidator: async data => await zGetBoundsResponse.parseAsync(data),
     url: '/api/v1/{network}/bounds',
     ...options,
   });
@@ -87,8 +69,6 @@ export const downloadBlock = <ThrowOnError extends boolean = false>(
   options: Options<DownloadBlockData, ThrowOnError>
 ) =>
   (options.client ?? client).get<DownloadBlockResponses, DownloadBlockErrors, ThrowOnError>({
-    requestValidator: async data => await zDownloadBlockData.parseAsync(data),
-    responseValidator: async data => await zDownloadBlockResponse.parseAsync(data),
     url: '/api/v1/download/{network}/block',
     ...options,
   });
@@ -100,8 +80,6 @@ export const downloadBlock = <ThrowOnError extends boolean = false>(
  */
 export const downloadBlob = <ThrowOnError extends boolean = false>(options: Options<DownloadBlobData, ThrowOnError>) =>
   (options.client ?? client).get<DownloadBlobResponses, DownloadBlobErrors, ThrowOnError>({
-    requestValidator: async data => await zDownloadBlobData.parseAsync(data),
-    responseValidator: async data => await zDownloadBlobResponse.parseAsync(data),
     url: '/api/v1/download/{network}/blob',
     ...options,
   });
@@ -113,8 +91,6 @@ export const getGasSchedule = <ThrowOnError extends boolean = false>(
   options: Options<GetGasScheduleData, ThrowOnError>
 ) =>
   (options.client ?? client).get<GetGasScheduleResponses, GetGasScheduleErrors, ThrowOnError>({
-    requestValidator: async data => await zGetGasScheduleData.parseAsync(data),
-    responseValidator: async data => await zGetGasScheduleResponse.parseAsync(data),
     url: '/api/v1/gas-profiler/{network}/gas-schedule',
     ...options,
   });
@@ -126,8 +102,6 @@ export const simulateBlock = <ThrowOnError extends boolean = false>(
   options: Options<SimulateBlockData, ThrowOnError>
 ) =>
   (options.client ?? client).post<SimulateBlockResponses, SimulateBlockErrors, ThrowOnError>({
-    requestValidator: async data => await zSimulateBlockData.parseAsync(data),
-    responseValidator: async data => await zSimulateBlockResponse.parseAsync(data),
     url: '/api/v1/gas-profiler/{network}/simulate-block',
     ...options,
     headers: {

@@ -1,14 +1,13 @@
 import { QueryClient, type DefaultOptions } from '@tanstack/react-query';
-import type { ZodType } from 'zod';
+import type { Bounds, Config } from '@/lab-api';
 import { getBoundsQueryKey, getConfigQueryKey } from '@/lab-api/@tanstack/react-query.gen';
-import { zBounds, zConfig } from '@/lab-api/zod.gen';
 
 declare global {
   interface Window {
     /** The configuration, set by lab-backend in index.html. */
-    __CONFIG__?: unknown;
+    __CONFIG__?: Config;
     /** Each network's bounds, by network name, set by lab-backend in index.html. */
-    __BOUNDS__?: Record<string, unknown>;
+    __BOUNDS__?: Record<string, Bounds>;
   }
 }
 
@@ -31,29 +30,11 @@ export function createQueryClient(queries: DefaultOptions['queries'] = {}): Quer
     },
   });
 
-  const config = injected('configuration', zConfig, window.__CONFIG__);
-  if (config) client.setQueryData(getConfigQueryKey(), config);
+  if (window.__CONFIG__) client.setQueryData(getConfigQueryKey(), window.__CONFIG__);
 
-  for (const [network, value] of Object.entries(window.__BOUNDS__ ?? {})) {
-    const bounds = injected(`${network} bounds`, zBounds, value);
-    if (bounds) client.setQueryData(getBoundsQueryKey({ path: { network } }), bounds);
+  for (const [network, bounds] of Object.entries(window.__BOUNDS__ ?? {})) {
+    client.setQueryData(getBoundsQueryKey({ path: { network } }), bounds);
   }
 
   return client;
-}
-
-/**
- * An injected value, or undefined when it is missing or does not match the spec. It is returned whole rather than
- * parsed: the generated client also only validates responses, so seeded and fetched data keep the same fields.
- */
-function injected<T>(name: string, schema: ZodType<T>, value: unknown): T | undefined {
-  if (value === undefined) return undefined;
-
-  const parsed = schema.safeParse(value);
-  if (!parsed.success) {
-    console.error(`the injected ${name} does not match the spec`, parsed.error);
-    return undefined;
-  }
-
-  return value as T;
 }

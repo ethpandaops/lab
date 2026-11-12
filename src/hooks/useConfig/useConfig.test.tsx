@@ -153,18 +153,6 @@ describe('useConfig', () => {
       expect(result.current.data).toBeUndefined();
     });
 
-    it('should reject a configuration that does not match the spec', async () => {
-      server.use(http.get(CONFIG_URL, () => HttpResponse.json({ ...mockConfig, networks: [{ name: 'mainnet' }] })));
-
-      const { result } = renderHook(() => useConfig());
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(result.current.data).toBeUndefined();
-    });
-
     it('should handle network errors', async () => {
       server.use(http.get(CONFIG_URL, () => HttpResponse.error()));
 

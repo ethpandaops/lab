@@ -171,7 +171,7 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 
 - Read server data with `useQuery(<operation>Options(...))` from the generated clients: `@/api/@tanstack/react-query.gen` for the CBT tables, `@/lab-api/@tanstack/react-query.gen` for lab-backend's own routes (config, bounds, downloads, gas profiler). Types come from `@/api` and `@/lab-api`, schemas from their `zod.gen`. Never `fetch` in a component or an effect.
 - Actions, such as a download or a simulation, run the generated SDK function or `<operation>Mutation()` through `useMutation`.
-- A lab-backend route the UI needs goes into `openapi/lab-backend.yaml`, matching the backend's handler in `internal/api`; `pnpm generate:api` regenerates both clients. Responses are validated against the specs, so a spec that drifts from the backend fails loudly.
+- A lab-backend route the UI needs goes into `openapi/lab-backend.yaml`, matching the backend's handler in `internal/api`; `pnpm generate:api` regenerates both clients. The CBT client validates requests and responses against its spec. The lab-backend client doesn't: its spec is written by hand, and a field it gets wrong must not stop the app from loading.
 - The generated clients throw the response body, not an `Error`. Read lab-backend's message with `apiErrorMessage` from `@/utils/api-error`.
 - `createQueryClient` (`@/utils/query-client`) makes the app's query client; tests and stories use it too, with `{ retry: false }`.
 - Read configuration with `useConfig()` and bounds with `useBounds()`, never `window.__CONFIG__` or `window.__BOUNDS__`. lab-backend injects both into the page, and `createQueryClient` seeds the cache with them before the first render.

@@ -3,7 +3,7 @@ import { defineConfig, type UserConfig } from '@hey-api/openapi-ts';
 const OPENAPI_INPUT =
   process.env.OPENAPI_INPUT || 'https://cbt-api-mainnet.analytics.production.platform.ethpandaops.io/openapi.yaml';
 
-const plugins = (zod: { compatibilityVersion?: 'mini' }): UserConfig['plugins'] => [
+const plugins = (zod: { compatibilityVersion?: 'mini' }, validator: 'zod' | false): UserConfig['plugins'] => [
   {
     name: '@hey-api/client-fetch',
     runtimeConfigPath: '../utils/api-config.ts',
@@ -16,7 +16,7 @@ const plugins = (zod: { compatibilityVersion?: 'mini' }): UserConfig['plugins'] 
   '@tanstack/react-query',
   {
     name: '@hey-api/sdk',
-    validator: 'zod',
+    validator,
   },
 ];
 
@@ -34,13 +34,13 @@ export default defineConfig([
     input: OPENAPI_INPUT,
     output: { path: 'src/api', postProcess: [prettier] },
     // The CBT schemas are megabytes, loaded with the pages that query them; zod/mini keeps them small
-    plugins: plugins({ compatibilityVersion: 'mini' }),
+    plugins: plugins({ compatibilityVersion: 'mini' }, 'zod'),
   },
   {
     input: './openapi/lab-backend.yaml',
     output: { path: 'src/lab-api', postProcess: [prettier] },
-    // The configuration is validated before the first render. Classic zod is in the entry chunk already; zod/mini there
-    // would cost the CBT schema chunk 25 kB gzipped, as its minifier could no longer drop unused schemas.
-    plugins: plugins({}),
+    // Not validated: this spec is written by hand, and a field it gets wrong must not stop the app from loading. Its
+    // few schemas use classic zod, which the entry chunk loads for the routes' search params anyway.
+    plugins: plugins({}, false),
   },
 ]);
