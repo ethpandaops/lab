@@ -136,7 +136,7 @@ export const InCard: Story = {
       <ScrollArea className="h-64">
         <div className="p-2">
           {events.map(event => (
-            <div key={event} className="flex items-center gap-3 rounded-sm px-2 py-2 hover:bg-muted-10">
+            <div key={event} className="flex items-center gap-3 rounded-sm p-2 hover:bg-muted-10">
               <div className="size-8 rounded-full bg-primary-20" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Event {event}</p>

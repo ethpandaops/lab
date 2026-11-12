@@ -44,12 +44,12 @@ function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }):
       />
 
       {/* Mock header bar (mobile only) */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface px-4 py-4 lg:hidden">
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface p-4 lg:hidden">
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5"
+            className="group -m-2.5 flex size-10 flex-col items-center justify-center gap-1.5 p-2.5"
             aria-label="Toggle sidebar"
             aria-pressed={sidebarOpen}
           >

@@ -310,7 +310,7 @@ export function GasScheduleDrawer({
                 <DialogPanel className="pointer-events-auto w-screen max-w-lg">
                   <div className="flex h-full flex-col overflow-y-auto bg-background">
                     {/* Header */}
-                    <div className="border-b border-border px-4 py-4">
+                    <div className="border-b border-border p-4">
                       <div className="flex items-center justify-between">
                         <DialogTitle className="text-base font-semibold text-foreground">Gas Schedule</DialogTitle>
                         <button

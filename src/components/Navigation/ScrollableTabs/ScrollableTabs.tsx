@@ -105,7 +105,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
           className="absolute top-0 left-0 z-10 flex h-full items-center border-r border-border bg-surface px-2 transition-colors hover:text-primary"
           aria-label="Scroll tabs left"
         >
-          <ChevronLeftIcon className="h-5 w-5 text-foreground" />
+          <ChevronLeftIcon className="size-5 text-foreground" />
         </button>
       )}
 
@@ -122,7 +122,7 @@ export function ScrollableTabs({ children, className }: ScrollableTabsProps): JS
           className="absolute top-0 right-0 z-10 flex h-full items-center border-l border-border bg-surface px-2 transition-colors hover:text-primary"
           aria-label="Scroll tabs right"
         >
-          <ChevronRightIcon className="h-5 w-5 text-foreground" />
+          <ChevronRightIcon className="size-5 text-foreground" />
         </button>
       )}
     </div>

@@ -375,7 +375,7 @@ function TransactionsViewHeatmap({
       <Legend opcodeCount={allOpcodesOrdered.length} />
 
       {/* Heatmap grid with sticky row headers and max height */}
-      <div className={`overflow-x-auto overflow-y-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
+      <div className={`overflow-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
         <div className="inline-flex min-w-full">
           {/* Row headers (transaction labels) - sticky */}
           <div className="sticky left-0 z-10 shrink-0 pr-2">
@@ -553,7 +553,7 @@ export function BlockOpcodeHeatmap({
       headerActions={viewModeToggle}
     >
       {({ inModal }) => (
-        <div className={inModal ? 'flex h-full w-full flex-col' : 'w-full'}>
+        <div className={inModal ? 'flex size-full flex-col' : 'w-full'}>
           {viewMode === 'block' ? (
             <BlockViewHeatmap opcodeStats={opcodeStats} />
           ) : (

@@ -58,10 +58,10 @@ export function ForksTimeline({
                   )}
 
                   {/* Fork icon */}
-                  <div className="relative flex h-14 w-14 flex-none items-center justify-center">
+                  <div className="relative flex size-14 flex-none items-center justify-center">
                     <div
                       className={clsx(
-                        'flex h-14 w-14 items-center justify-center rounded-sm border text-3xl transition-colors',
+                        'flex size-14 items-center justify-center rounded-sm border text-3xl transition-colors',
                         isCurrentFork
                           ? 'border-primary-30 bg-primary-20'
                           : isActive
@@ -193,10 +193,10 @@ export function ForksTimeline({
                       return (
                         <div key={`blob-${blobItem.epoch}`} className="relative flex items-start gap-x-4">
                           {/* Blob schedule icon */}
-                          <div className="relative flex h-9 w-9 flex-none items-center justify-center">
+                          <div className="relative flex size-9 flex-none items-center justify-center">
                             <div
                               className={clsx(
-                                'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
+                                'flex size-9 items-center justify-center rounded-sm border transition-colors',
                                 isCurrentBlob
                                   ? 'border-accent-30 bg-accent-20'
                                   : isBlobActive
@@ -205,7 +205,7 @@ export function ForksTimeline({
                               )}
                             >
                               <ArrowTrendingUpIcon
-                                className={clsx('h-5 w-5', isBlobActive ? 'text-accent' : 'text-muted')}
+                                className={clsx('size-5', isBlobActive ? 'text-accent' : 'text-muted')}
                               />
                             </div>
                           </div>

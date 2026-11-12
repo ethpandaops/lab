@@ -142,7 +142,7 @@ export function Alert({
         {/* Dismiss button */}
         {onDismiss && (
           <div className="ml-auto pl-3">
-            <div className="-mx-1.5 -my-1.5">
+            <div className="-m-1.5">
               <button
                 type="button"
                 onClick={onDismiss}

@@ -396,7 +396,7 @@ function ValidatorRow({
         </td>
 
         {/* Validator index + pubkey */}
-        <td className="px-2 py-2 font-mono">
+        <td className="p-2 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="font-medium text-foreground">{row.validatorIndex}</span>
             {pubkey && (
@@ -412,10 +412,10 @@ function ValidatorRow({
         </td>
 
         {/* Inclusion rate */}
-        <td className="px-2 py-2 text-right">{formatPercent(row.attestation.inclusionRate)}</td>
+        <td className="p-2 text-right">{formatPercent(row.attestation.inclusionRate)}</td>
 
         {/* Inclusion sparkline */}
-        <td className="px-2 py-2 text-center">
+        <td className="p-2 text-center">
           {inclusionSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={inclusionSparkline} width={80} />
@@ -426,10 +426,10 @@ function ValidatorRow({
         </td>
 
         {/* Head */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">{formatPercent(row.attestation.headCorrectRate)}</td>
+        <td className="hidden p-2 text-right lg:table-cell">{formatPercent(row.attestation.headCorrectRate)}</td>
 
         {/* Head sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {headSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={headSparkline} width={80} />
@@ -440,12 +440,10 @@ function ValidatorRow({
         </td>
 
         {/* Target */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">
-          {formatPercent(row.attestation.targetCorrectRate)}
-        </td>
+        <td className="hidden p-2 text-right lg:table-cell">{formatPercent(row.attestation.targetCorrectRate)}</td>
 
         {/* Target sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {targetSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={targetSparkline} width={80} />
@@ -456,12 +454,10 @@ function ValidatorRow({
         </td>
 
         {/* Source */}
-        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
-          {formatPercent(row.attestation.sourceCorrectRate)}
-        </td>
+        <td className="hidden p-2 text-right 2xl:table-cell">{formatPercent(row.attestation.sourceCorrectRate)}</td>
 
         {/* Source sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {sourceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={sourceSparkline} width={80} />
@@ -472,7 +468,7 @@ function ValidatorRow({
         </td>
 
         {/* Avg Delay */}
-        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
+        <td className="hidden p-2 text-right 2xl:table-cell">
           {row.attestation.avgInclusionDistance !== null ? (
             <span className="tabular-nums">{row.attestation.avgInclusionDistance.toFixed(2)}</span>
           ) : (
@@ -481,7 +477,7 @@ function ValidatorRow({
         </td>
 
         {/* Delay sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {delaySparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={delaySparkline} width={80} />
@@ -492,10 +488,10 @@ function ValidatorRow({
         </td>
 
         {/* Sync % */}
-        <td className="px-2 py-2 text-right">{formatPercent(row.syncCommittee?.participationRate ?? null)}</td>
+        <td className="p-2 text-right">{formatPercent(row.syncCommittee?.participationRate ?? null)}</td>
 
         {/* Proposals */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">
+        <td className="hidden p-2 text-right lg:table-cell">
           {row.blockProposal ? (
             <span
               className={clsx(
@@ -515,12 +511,12 @@ function ValidatorRow({
         </td>
 
         {/* Min Balance */}
-        <td className="px-2 py-2 text-right">
+        <td className="p-2 text-right">
           <span className="tabular-nums">{formatEth(row.balance.minBalance)}</span>
         </td>
 
         {/* Balance sparkline */}
-        <td className="px-2 py-2 text-center">
+        <td className="p-2 text-center">
           {balanceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={balanceSparkline} width={80} showArea />

@@ -499,14 +499,14 @@ function BPOParentForkCard({ bpo }: BPOParentForkCardProps): React.JSX.Element {
         params={{ fork: getForkSlug(bpo.parentFork) }}
         className="group flex items-center gap-4 rounded-sm border border-border p-4 transition-colors hover:bg-background"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface text-2xl transition-colors group-hover:border-accent-30">
+        <div className="flex size-12 items-center justify-center rounded-sm border border-border bg-surface text-2xl transition-colors group-hover:border-accent-30">
           {bpo.parentFork.emoji}
         </div>
         <div className="flex-1">
           <div className="text-lg font-semibold text-foreground">{bpo.parentFork.displayName}</div>
           <div className="text-sm text-muted">{bpo.parentFork.description}</div>
         </div>
-        <ChevronRightIcon className="h-5 w-5 text-muted transition-colors group-hover:text-foreground" />
+        <ChevronRightIcon className="size-5 text-muted transition-colors group-hover:text-foreground" />
       </Link>
     </Card>
   );
@@ -538,10 +538,10 @@ function BlobScheduleCard({
 
           const content = (
             <>
-              <div className="relative flex h-9 w-9 flex-none items-center justify-center">
+              <div className="relative flex size-9 flex-none items-center justify-center">
                 <div
                   className={clsx(
-                    'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
+                    'flex size-9 items-center justify-center rounded-sm border transition-colors',
                     isCurrent
                       ? 'border-accent-30 bg-accent-20'
                       : isActive
@@ -549,7 +549,7 @@ function BlobScheduleCard({
                         : 'border-border bg-surface'
                   )}
                 >
-                  <ArrowTrendingUpIcon className={clsx('h-5 w-5', isActive ? 'text-accent' : 'text-muted')} />
+                  <ArrowTrendingUpIcon className={clsx('size-5', isActive ? 'text-accent' : 'text-muted')} />
                 </div>
               </div>
 

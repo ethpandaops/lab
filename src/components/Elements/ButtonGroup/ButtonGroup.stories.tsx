@@ -86,7 +86,7 @@ export const WithDropdown: Story = {
         Save changes
       </Button>
       <Menu as="div" className="relative -ml-px block">
-        <MenuButton className="relative inline-flex items-center rounded-r-md bg-surface px-2 py-2 text-muted inset-ring inset-ring-border hover:bg-surface-hover focus:z-10">
+        <MenuButton className="relative inline-flex items-center rounded-r-md bg-surface p-2 text-muted inset-ring inset-ring-border hover:bg-surface-hover focus:z-10">
           <span className="sr-only">Open options</span>
           <ChevronDownIcon aria-hidden="true" className="size-5" />
         </MenuButton>

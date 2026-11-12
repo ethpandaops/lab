@@ -60,7 +60,7 @@ export function ContractTop100ListSkeletonMobile(): JSX.Element {
   return (
     <div>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="border-b border-border-50 px-3 py-3">
+        <div key={i} className="border-b border-border-50 p-3">
           <div className="flex items-start gap-3">
             {/* Rank badge skeleton */}
             <LoadingContainer className="size-7 shrink-0 rounded-xs" />

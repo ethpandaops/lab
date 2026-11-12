@@ -95,7 +95,7 @@ export function DataAvailabilityRowLabel({
       onMouseLeave={onMouseLeave}
       disabled={!effectiveCanDrillDown}
       className={clsx(
-        'group flex h-full w-full items-center gap-1.5 pr-2 text-left transition-all',
+        'group flex size-full items-center gap-1.5 pr-2 text-left transition-all',
         effectiveCanDrillDown ? 'cursor-pointer' : 'cursor-default',
         isDisabled ? 'opacity-40' : '',
         isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'

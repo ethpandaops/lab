@@ -65,12 +65,12 @@ function MobileHeader({
   const { currentNetwork } = useNetwork();
 
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-background px-4 py-4 sm:px-6 lg:hidden">
+    <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-border bg-background p-4 sm:px-6 lg:hidden">
       <div className="flex items-center gap-x-6">
         <button
           type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
+          className="group -m-2.5 flex size-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
           aria-label="Toggle sidebar"
           aria-pressed={sidebarOpen}
         >

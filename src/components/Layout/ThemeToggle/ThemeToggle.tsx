@@ -22,11 +22,11 @@ export function ThemeToggle(): JSX.Element {
   const getThemeIcon = (): JSX.Element => {
     switch (theme) {
       case 'light':
-        return <SunIcon className="h-5 w-5 text-warning" />;
+        return <SunIcon className="size-5 text-warning" />;
       case 'dark':
-        return <MoonIcon className="h-5 w-5 text-primary" />;
+        return <MoonIcon className="size-5 text-primary" />;
       case 'star':
-        return <SparklesIcon className="h-5 w-5 text-primary" />;
+        return <SparklesIcon className="size-5 text-primary" />;
     }
   };
 
@@ -45,7 +45,7 @@ export function ThemeToggle(): JSX.Element {
     <button
       type="button"
       onClick={cycleTheme}
-      className="flex h-8 w-8 items-center justify-center rounded-sm transition-colors hover:bg-primary-10 hover:text-primary"
+      className="flex size-8 items-center justify-center rounded-sm transition-colors hover:bg-primary-10 hover:text-primary"
       aria-label={`Current theme: ${getThemeLabel()}. Click to cycle themes.`}
       title={getThemeLabel()}
     >

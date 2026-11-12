@@ -178,13 +178,11 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
             <tbody className="divide-y divide-border bg-surface">
               {displayed.map(row => (
                 <tr key={row.opcode} className="transition-colors hover:bg-background">
-                  <td className="px-3 py-3 font-mono text-sm text-foreground">{row.opcode}</td>
-                  <td className="px-3 py-3 text-right font-mono text-sm text-muted">{row.count.toLocaleString()}</td>
-                  <td className="px-3 py-3 text-right font-mono text-sm text-foreground">
-                    {row.totalGas.toLocaleString()}
-                  </td>
+                  <td className="p-3 font-mono text-sm text-foreground">{row.opcode}</td>
+                  <td className="p-3 text-right font-mono text-sm text-muted">{row.count.toLocaleString()}</td>
+                  <td className="p-3 text-right font-mono text-sm text-foreground">{row.totalGas.toLocaleString()}</td>
                   {visibleColumns.map(col => (
-                    <td key={col.field} className="px-3 py-3 text-right font-mono text-sm text-muted">
+                    <td key={col.field} className="p-3 text-right font-mono text-sm text-muted">
                       {formatGas(row[col.field as keyof OpcodeResourceRow] as number)}
                     </td>
                   ))}

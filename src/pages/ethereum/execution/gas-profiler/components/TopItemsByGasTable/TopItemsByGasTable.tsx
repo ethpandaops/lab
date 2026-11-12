@@ -123,7 +123,7 @@ export function TopItemsByGasTable({
         </td>
 
         {/* Second column: name/identifier with link; takes the remaining width and truncates */}
-        <td className="w-full max-w-0 px-2 py-2">
+        <td className="w-full max-w-0 p-2">
           {getLinkProps ? (
             <Link {...getLinkProps(item)} className="group flex items-center gap-1.5">
               {identifierContent}
@@ -138,7 +138,7 @@ export function TopItemsByGasTable({
         </td>
 
         {/* Gas column */}
-        <td className="px-2 py-2 text-right font-mono text-foreground">{formatCompact(item.gas)}</td>
+        <td className="p-2 text-right font-mono text-foreground">{formatCompact(item.gas)}</td>
 
         {/* Percentage column */}
         <td className="py-2 pl-2 text-right">
@@ -164,8 +164,8 @@ export function TopItemsByGasTable({
               <thead className="sticky top-0 bg-surface">
                 <tr className="border-b border-border text-xs text-muted">
                   <th className="py-2 pr-2 text-left font-medium">{columns.first}</th>
-                  <th className="px-2 py-2 text-left font-medium">{columns.second}</th>
-                  <th className="px-2 py-2 text-right font-medium">Gas</th>
+                  <th className="p-2 text-left font-medium">{columns.second}</th>
+                  <th className="p-2 text-right font-medium">Gas</th>
                   <th className="py-2 pl-2 text-right font-medium">%</th>
                 </tr>
               </thead>

@@ -597,7 +597,7 @@ function GasCeiling({
 
       {/* Bars, today's marker and ticks share the middle column; the bar track keeps room on its
           right for the value label after the longest bar */}
-      <div className="grid min-w-0 flex-1 grid-cols-auto-fill items-center gap-x-3 gap-y-3 pt-5 sm:grid-cols-auto-fill-auto">
+      <div className="grid min-w-0 flex-1 grid-cols-auto-fill items-center gap-3 pt-5 sm:grid-cols-auto-fill-auto">
         {ceilings.map(({ client, mgas }, i) => {
           const fit = basis === 'p50' ? client.fitP50 : client.fitP95;
           return (
@@ -876,7 +876,7 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
                       <span
                         key={p.client}
                         title={`${p.client} · ${Math.round(p.ms)} ms`}
-                        className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
+                        className="absolute top-1/2 size-3 -translate-1/2 rounded-full ring-2 ring-surface"
                         style={{ left: `${(p.ms / maxMs) * 100}%`, backgroundColor: getExecutionClientColor(p.client) }}
                       />
                     ))}

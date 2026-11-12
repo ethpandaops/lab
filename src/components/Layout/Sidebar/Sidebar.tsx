@@ -594,7 +594,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
         </div>
 
         {/* Scrollable content */}
-        <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'px-3 py-3')}>
+        <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'p-3')}>
           {/* Network Selector */}
           {collapsed ? (
             currentNetwork && (

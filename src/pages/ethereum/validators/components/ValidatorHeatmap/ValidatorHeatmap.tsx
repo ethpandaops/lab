@@ -302,7 +302,7 @@ function HeatmapSkeleton({ rows, height }: { rows: number; height: number }): JS
       </div>
       {/* Visual map placeholder */}
       <div className="absolute inset-y-1/4 right-6 w-4">
-        <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
+        <LoadingContainer className="size-full rounded-xs" shimmer={false} />
       </div>
     </div>
   );

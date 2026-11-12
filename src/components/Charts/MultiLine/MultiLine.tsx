@@ -1387,7 +1387,7 @@ export function MultiLineChart({
                         type="checkbox"
                         checked={isVisible}
                         onChange={() => toggleSeries(s.name)}
-                        className="h-4 w-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                        className="size-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
                       />
                       <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
                       <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
@@ -1447,7 +1447,7 @@ export function MultiLineChart({
   // At height 100% the legend and the chart share the container: a flex column lets the chart take
   // what the legend leaves, instead of the full height plus the legend (which clipped the x axis)
   return (
-    <div ref={measureRef} className={_height === '100%' ? 'flex h-full w-full flex-col' : 'w-full'}>
+    <div ref={measureRef} className={_height === '100%' ? 'flex size-full flex-col' : 'w-full'}>
       {chartContent}
     </div>
   );

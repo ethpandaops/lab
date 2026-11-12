@@ -112,7 +112,7 @@ export function IndexPage(): JSX.Element {
       <div className="flex items-center gap-2">
         <Header title="Locally Built Blocks" />
         {timeline.isFetching && !timeline.isLoading && (
-          <div className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" />
+          <div className="inline-block size-2 animate-pulse rounded-full bg-primary" />
         )}
       </div>
 

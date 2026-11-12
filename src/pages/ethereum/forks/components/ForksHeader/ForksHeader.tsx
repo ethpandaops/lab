@@ -23,7 +23,7 @@ function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.E
     <div className="flex items-center gap-2">
       <a href="https://ethereum.org/en/roadmap/" target="_blank" rel="noopener noreferrer" className={linkClass}>
         Roadmap
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+        <ArrowTopRightOnSquareIcon className="size-3" />
       </a>
       <span className="text-border">•</span>
       <a
@@ -33,7 +33,7 @@ function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.E
         className={linkClass}
       >
         Forkcast
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+        <ArrowTopRightOnSquareIcon className="size-3" />
       </a>
     </div>
   );

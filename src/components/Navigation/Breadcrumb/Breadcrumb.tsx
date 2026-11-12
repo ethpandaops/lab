@@ -90,7 +90,7 @@ export function Breadcrumb({ className, separator = '/', showHome = true }: Brea
           <>
             <li>
               <Link to="/" className="text-muted transition-colors hover:text-foreground" aria-label="Home">
-                <HomeIcon className="h-4 w-4" />
+                <HomeIcon className="size-4" />
               </Link>
             </li>
             <li aria-hidden="true" className="text-muted-50">

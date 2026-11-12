@@ -137,7 +137,7 @@ function ContractRow({
           })}
         </div>
       </td>
-      <td className="px-2 py-2">
+      <td className="p-2">
         {contract.address && contract.address !== 'unknown' && (
           <ContractStorageButton address={contract.address} size="sm" />
         )}
@@ -210,7 +210,7 @@ function ImplementationRow({
           })}
         </div>
       </td>
-      <td className="px-2 py-2">
+      <td className="p-2">
         {contract.address && contract.address !== 'unknown' && (
           <ContractStorageButton address={contract.address} size="sm" />
         )}

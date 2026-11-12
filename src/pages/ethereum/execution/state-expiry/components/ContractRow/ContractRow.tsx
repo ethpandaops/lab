@@ -130,7 +130,7 @@ export function ContractCard({ item, index, hideSavings = false }: ContractRowPr
     <Link
       to="/ethereum/contracts/$address"
       params={{ address: contract_address ?? '' }}
-      className="block border-b border-border-50 px-3 py-3 transition-colors hover:bg-muted-30"
+      className="block border-b border-border-50 p-3 transition-colors hover:bg-muted-30"
     >
       <div className="flex items-start gap-3">
         {/* Index badge */}

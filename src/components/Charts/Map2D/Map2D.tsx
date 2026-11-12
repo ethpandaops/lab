@@ -415,7 +415,7 @@ function Map2DChartComponent({
 
   // Always render the map container
   return (
-    <div className="relative h-full w-full">
+    <div className="relative size-full">
       {/* Fixed hover panel at top */}
       {hoveredPoint && (
         <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">

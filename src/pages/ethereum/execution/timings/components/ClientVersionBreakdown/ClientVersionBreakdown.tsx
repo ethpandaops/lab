@@ -742,7 +742,7 @@ export function ClientVersionBreakdown({
   };
 
   const headerClass =
-    'cursor-pointer select-none py-3 px-3 text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
+    'cursor-pointer select-none p-3  text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
 
   if (aggregatedData.length === 0) {
     const emptyContent = (
@@ -859,7 +859,7 @@ export function ClientVersionBreakdown({
               const renderMetricCells = (metricRow: AggregatedRow): JSX.Element => (
                 <>
                   {hasActivity && (
-                    <td className="px-3 py-3">
+                    <td className="p-3">
                       {metricRow.lastSeen > 0 ? (
                         <span
                           className="text-sm whitespace-nowrap text-muted"
@@ -872,7 +872,7 @@ export function ClientVersionBreakdown({
                       )}
                     </td>
                   )}
-                  <td className="px-3 py-3 text-right">
+                  <td className="p-3 text-right">
                     {metricRow.avgDuration > 0 ? (
                       <span
                         className={clsx(
@@ -887,7 +887,7 @@ export function ClientVersionBreakdown({
                     )}
                   </td>
                   {hasHourlyData && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.p50Duration > 0 ? (
                         <span
                           className={clsx(
@@ -903,7 +903,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {hasHourlyData && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.p95Duration > 0 ? (
                         <span
                           className={clsx(
@@ -919,7 +919,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {!hideRange && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.maxDuration > 0 ? (
                         <span className="text-sm text-muted">
                           {metricRow.minDuration.toFixed(0)} – {metricRow.maxDuration.toFixed(0)} ms
@@ -930,7 +930,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {showBlobCount && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       <span className="text-sm text-muted">{(metricRow.avgBlobCount ?? 0).toFixed(1)}</span>
                     </td>
                   )}
@@ -964,7 +964,7 @@ export function ClientVersionBreakdown({
                         {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
                       </div>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="p-3">
                       {hasMultipleVersions ? (
                         <span title={`Aggregate across ${row.versionCount} versions for the selected period`}>
                           <Badge variant="flat" size="small">
@@ -1030,7 +1030,7 @@ export function ClientVersionBreakdown({
                                 )}
                               </div>
                             </td>
-                            <td className="px-3 py-3">
+                            <td className="p-3">
                               <span className="font-mono text-sm text-muted">{subRow.version}</span>
                             </td>
                             {renderMetricCells(subRow)}

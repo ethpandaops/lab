@@ -249,7 +249,7 @@ export function CardChain({
       )}
     >
       {/* Flowing line connecting all cards */}
-      <div className="absolute top-1/2 right-15 left-15 h-0.5 -translate-y-1/2">
+      <div className="absolute inset-x-15 top-1/2 h-0.5 -translate-y-1/2">
         <div className="size-full bg-border" />
       </div>
 

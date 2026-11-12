@@ -1084,7 +1084,7 @@ function WinrateSection({
                     key={standing.implementation}
                     className={clsx(
                       'relative overflow-hidden',
-                      isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
+                      isLeader ? 'rounded-sm border p-4' : 'rounded-xs px-3 py-2',
                       isLeader ? 'border-border' : '',
                       !isLeader && isTopThree && medal ? medal.bg : '',
                       !isTopThree ? 'bg-surface-20' : ''

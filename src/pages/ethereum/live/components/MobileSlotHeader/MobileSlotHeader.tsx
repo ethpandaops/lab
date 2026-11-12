@@ -62,21 +62,21 @@ function MobileSlotHeaderComponent({
           className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label="Previous slot"
         >
-          <ChevronLeftIcon className="h-5 w-5" />
+          <ChevronLeftIcon className="size-5" />
         </button>
         <button
           onClick={onPlayPause}
           className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
-          {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
+          {isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
         </button>
         <button
           onClick={onForward}
           className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label="Next slot"
         >
-          <ChevronRightIcon className="h-5 w-5" />
+          <ChevronRightIcon className="size-5" />
         </button>
       </div>
     </div>

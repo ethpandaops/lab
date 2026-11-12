@@ -115,7 +115,7 @@ export function Dialog({
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
+                <div className="flex items-start justify-between gap-4 p-4 sm:px-6 sm:py-5">
                   <div className="min-w-0 flex-1 space-y-1.5">
                     {title && <DialogTitle className="text-sm/6 font-semibold text-foreground">{title}</DialogTitle>}
                     {description && <Description className="text-sm/5 text-muted">{description}</Description>}
@@ -136,7 +136,7 @@ export function Dialog({
               {/* Content */}
               <div
                 className={clsx(
-                  noPadding ? 'p-0' : 'px-4 py-4 sm:px-6 sm:py-5',
+                  noPadding ? 'p-0' : 'p-4 sm:px-6 sm:py-5',
                   size === 'fullscreen' && 'flex-1 overflow-auto',
                   size !== 'fullscreen' && 'max-h-dvh-less-40 overflow-y-auto'
                 )}
