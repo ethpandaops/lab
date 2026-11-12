@@ -504,8 +504,9 @@ export function SlotPlayerProvider({
     }
   }, [maxSlot]);
 
-  // Paused at the live edge boundary in continuous mode: the playback loop keeps running to resume once newer slots arrive
-  const isWaitingAtBoundary = !isPlaying && pauseReason === 'boundary' && mode === 'continuous';
+  // Paused at the live edge boundary in continuous mode, with newer slots in: the playback loop restarts to resume
+  const canResumeAtBoundary =
+    !isPlaying && pauseReason === 'boundary' && mode === 'continuous' && currentSlot < maxSlot;
 
   // Calculate derived state
   // Both wallClockSlot and currentSlot are now actual slot numbers - direct comparison
@@ -522,7 +523,7 @@ export function SlotPlayerProvider({
   // Using useLayoutEffect to ensure cleanup happens synchronously before re-paint,
   // preventing the animation frame from escaping cleanup logic
   useLayoutEffect(() => {
-    if (!isPlaying && !isWaitingAtBoundary) {
+    if (!isPlaying && !canResumeAtBoundary) {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -539,7 +540,7 @@ export function SlotPlayerProvider({
           return;
         }
 
-        // Auto-resume when newer slots arrive past the live edge boundary in continuous mode
+        // Resume past the live edge boundary once the refs catch up with the render that restarted the loop
         if (currentSlotRef.current >= maxSlotRef.current) {
           lastProcessedTime = currentTime;
           animationFrameRef.current = requestAnimationFrame(animate);
@@ -605,7 +606,7 @@ export function SlotPlayerProvider({
         animationFrameRef.current = null;
       }
     };
-  }, [isPlaying, isWaitingAtBoundary, slotDuration, callbacks, setSlotProgressSafe]);
+  }, [isPlaying, canResumeAtBoundary, slotDuration, callbacks, setSlotProgressSafe]);
 
   // Define actions using useCallback for optimal performance
   const play = useCallback(() => {

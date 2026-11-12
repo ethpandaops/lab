@@ -106,6 +106,8 @@ describe('SlotPlayerProvider playback', () => {
 
     advance(500);
     expect(result.current.state.isPlaying).toBe(false);
+    // No animation frame runs while it waits
+    expect(vi.getTimerCount()).toBe(0);
 
     setBounds(1000, 10002);
     rerender();
