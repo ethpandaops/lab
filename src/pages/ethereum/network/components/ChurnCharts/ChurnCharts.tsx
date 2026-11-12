@@ -95,17 +95,17 @@ export function ChurnCharts({ networkTypes, clients }: ChurnChartsProps): JSX.El
           )}
         />
         <SeriesCard
-          title="New peers, by client"
+          title="Share of each client's peers that were new"
           days={clientDays}
-          yName="Share of peers"
+          yName="Share of the client's peers"
           percent="line"
           empty={empty}
           series={clientShareLines(byClient, clientDays, row => row.new_peer_count, peers, MIN_CLIENT_PEERS)}
         />
         <SeriesCard
-          title="Seen all 30 days, by network type"
+          title="Share of each network type's peers seen all 30 days"
           days={days}
-          yName="Share of peers"
+          yName="Share of the type's peers"
           percent="line"
           empty={empty}
           series={[line('Hosting', stayed('hosting'), palette[0]), line('Other', stayed('other'), palette[1])]}
